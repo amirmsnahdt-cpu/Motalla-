@@ -673,6 +673,8 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 /* پیش‌نمایش PDF: دکمه‌ها پایین صفحه، گزارش هم‌عرض گوشی */
 #pv .pvh{order:2;border-bottom:0!important;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))!important;box-shadow:0 -8px 24px -16px #16213a40}
 #pv iframe{order:1}
+/* گام انجام‌شده‌ای که صفحه فعلی است: تیک سبز با حلقه */
+.flow .fs.on.done i{background:var(--ok);border-color:var(--ok);color:#fff;box-shadow:0 0 0 3px var(--ok2)}
 </style>
 </head>
 <body>
@@ -1099,7 +1101,7 @@ function flowState(d){d=d||dateVal;const has=entries.some(e=>e.entryDate===d),un
   const step=!has?1:un&&!bs.length?(cur==='split1'||cur==='split3'?2:1):op?3:un?2:cl?4:1;return{has,un,bs:bs.length,op,cl,step}}
 function flowBar(at){const f=flowState(),S=[['entry','ثبت لیست'],['split','تقسیم'],['track','پیگیری'],['day','بایگانی']];
   const done=[f.has,f.bs>0&&!f.un,f.bs>0&&!f.op,f.cl>0&&!f.op&&!f.un];
-  return `<div class="flow">${S.map(([k,t],i)=>`<button class="fs${at===i+1?' on':''}${done[i]?' done':''}" data-act="flowGo" data-s="${k}"><i>${done[i]&&at!==i+1?ic('check'):toFa(i+1)}</i><span>${t}</span></button>`).join('<b></b>')}</div>`}
+  return `<div class="flow">${S.map(([k,t],i)=>`<button class="fs${at===i+1?' on':''}${done[i]?' done':''}" data-act="flowGo" data-s="${k}"><i>${done[i]?ic('check'):toFa(i+1)}</i><span>${t}</span></button>`).join('<b></b>')}</div>`}
 function ring(c,size){const p=c.all?c.ok/c.all*100:0,f=c.all?c.fail/c.all*100:0;return `<div class="ring" style="--s:${size||64}px;background:conic-gradient(var(--ok) 0 ${p}%,var(--red) ${p}% ${p+f}%,var(--ringbg) ${p+f}% 100%)"><span><b>${toFa(Math.round(p))}٪</b></span></div>`}
 /* ---------- صفحه پیگیری ---------- */
 let gQ='',gF='all';
