@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.4,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.5,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -734,7 +734,7 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.4,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.5,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2358,7 +2358,7 @@ ACT.checkUpd=()=>{if(UPD){applyUpd();return}if(location.protocol==='https:'){toa
   ACT.checkUpd0()};
 ACT.checkUpd0=()=>{if(location.hostname!=='raw.githack.com'){if(location.protocol!=='https:'){toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));return}toast('در حال دریافت آخرین نسخه…');const r=()=>location.reload();try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,500))}catch(e){setTimeout(r,500)}return}
   toast('در حال بررسی…');const v0=APP_V;try{sessionStorage.removeItem('m_updchk')}catch(e){}checkUpdate(true);setTimeout(()=>{let nv=0;try{nv=+localStorage.getItem('m_app_next_v')||0}catch(e){}if(!(nv>v0))toast('برنامه به‌روز است ✓ نسخه '+toFa(v0))},6000)};
-ACT.getApk=()=>{location.href=/MotallaAndroid/.test(navigator.userAgent)?'https://github.com/amirmsnahdt-cpu/Motalla-/releases/download/apk/motalla.apk':APK_URL};
+ACT.getApk=()=>{const old=/MotallaAndroid/.test(navigator.userAgent)&&!(window.AndroidBridge&&AndroidBridge.setTheme);location.href=old?'https://github.com/amirmsnahdt-cpu/Motalla-/releases/download/apk/motalla.apk':APK_URL};
 ACT.shareInstall=()=>{const t='نصب برنامه واریزی مطلا\n\nآیفون: این لینک را در Safari باز کنید، دکمه اشتراک‌گذاری ← Add to Home Screen\n'+WEB_URL+'\n\nاندروید: فایل نصب را دانلود و نصب کنید\n'+APK_URL+'\n\nنام کاربری و رمز را از مدیر بگیرید.';
   if(navigator.share)navigator.share({text:t}).catch(()=>{});else copyText(t)};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const f=ACT[t.dataset.act];if(f){e.preventDefault();f(t.dataset,e)}});

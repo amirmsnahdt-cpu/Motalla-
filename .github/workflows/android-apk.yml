@@ -28,3 +28,14 @@ jobs:
           body: فایل نصبی اندروید مطلا. اطلاعات روی سرور است؛ با نصب نسخه جدید چیزی پاک نمی‌شود.
           files: motalla.apk
           make_latest: true
+      - name: ذخیره APK در مخزن تا از سرور لیارا (داخل ایران) دانلود شود
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p dist && cp motalla.apk dist/motalla.apk
+          git config user.name "motalla-bot"
+          git config user.email "motalla-bot@users.noreply.github.com"
+          git add dist/motalla.apk
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "فایل نصب اندروید جدید برای دانلود از سرور"
+          git push origin HEAD:main
+          git push origin HEAD:v2-server || echo "v2-server جداست؛ دستی به‌روز شود"

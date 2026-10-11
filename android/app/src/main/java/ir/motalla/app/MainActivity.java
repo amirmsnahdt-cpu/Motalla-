@@ -68,6 +68,10 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+        // دانلود فایل (مثل نسخه جدید اپ) به مرورگر گوشی سپرده می‌شود
+        web.setDownloadListener((url, ua, cd, mime, len) -> {
+            try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); } catch (Exception e) { toast("مرورگری برای دانلود پیدا نشد"); }
+        });
         web.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams params) {

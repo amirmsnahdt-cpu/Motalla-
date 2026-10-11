@@ -244,7 +244,15 @@ async function handle(req, res) {
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
   const url = new URL(req.url, 'http://x'), p = url.pathname;
   if (p === '/robots.txt') { res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' }); res.end('User-agent: *\nAllow: /api/status\nDisallow: /\n'); return; }
-  if (p === '/app.apk' || p === '/android') { res.writeHead(302, { Location: 'https://github.com/amirmsnahdt-cpu/Motalla-/releases/download/apk/motalla.apk' }); res.end(); return; }
+  if (p === '/app.apk' || p === '/android') {
+    // فایل نصب اندروید از همین سرور (داخل ایران) دانلود می‌شود؛ فقط اگر نبود به GitHub می‌رود
+    const f = path.join(ROOT, 'dist', 'motalla.apk');
+    let st = null; try { st = fs.statSync(f); } catch (e) { }
+    if (!st) { res.writeHead(302, { Location: 'https://github.com/amirmsnahdt-cpu/Motalla-/releases/download/apk/motalla.apk' }); res.end(); return; }
+    res.writeHead(200, { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Length': st.size, 'Content-Disposition': 'attachment; filename="motalla.apk"', 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff' });
+    if (req.method === 'HEAD') { res.end(); return; }
+    fs.createReadStream(f).pipe(res); return;
+  }
   if (!p.startsWith('/api/')) { if (req.method === 'GET' && serveStatic(req, res, p)) return; res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); return; }
 
   if (p === '/api/status' && req.method === 'GET') return send(res, 200, { ok: true, setup: q.userCount.get().n === 0, app: APP_VER, v: APP_V });
