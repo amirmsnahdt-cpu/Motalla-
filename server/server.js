@@ -4,6 +4,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const zlib = require('node:zlib');
 const { DatabaseSync } = require('node:sqlite');
 
 const PORT = +process.env.PORT || 3000;
@@ -338,8 +339,24 @@ async function handle(req, res) {
   }
 
   /* ---- مدیریت کاربران (فقط مدیر) ---- */
-  if (p.startsWith('/api/users') || p === '/api/backup') {
+  if (p.startsWith('/api/users') || p.startsWith('/api/backup')) {
     if (me.role !== 'admin') return bad(res, 403, 'فقط مدیر دسترسی دارد');
+    if (p === '/api/backups' && req.method === 'GET') return send(res, 200, { ...diskInfo(), last: (q.getMeta.get('last_backup') || {}).v || null });
+    if (p === '/api/backups' && req.method === 'POST') { const f = makeBackup(true); return send(res, 200, { name: f, ...diskInfo() }); }
+    const bm = p.match(/^\/api\/backups\/(motalla-\d{4}-\d{2}-\d{2}(?:-\d{4})?\.json\.gz)$/);
+    if (bm && req.method === 'GET') {
+      const f = path.join(BK_DIR, bm[1]); if (!fs.existsSync(f)) return bad(res, 404, 'پیدا نشد');
+      res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Disposition': 'attachment; filename="' + bm[1] + '"', 'Cache-Control': 'no-store' });
+      fs.createReadStream(f).pipe(res); return;
+    }
+    if (bm && req.method === 'POST' && url.searchParams.get('restore') === '1') { const n = restoreBackup(bm[1], me.name); return send(res, 200, { ok: true, changed: n }); }
+    if (p === '/api/backup/full' && req.method === 'GET') {
+      // نسخه کامل با عکس‌ها (فشرده) برای نگهداری بیرون از سرور
+      const out = { ...backupData(), kind: 'full', imgs: db.prepare('SELECT k,data,updated_at FROM imgs').all() };
+      const gz = zlib.gzipSync(Buffer.from(JSON.stringify(out)));
+      res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Length': gz.length, 'Content-Disposition': 'attachment; filename="motalla-full-' + tehranDay() + '.json.gz"', 'Cache-Control': 'no-store' });
+      res.end(gz); return;
+    }
     if (p === '/api/backup' && req.method === 'GET') {
       const rows = q.allDocs.all().map(r => ({ coll: r.coll, id: r.id, data: JSON.parse(r.data), updated_at: r.updated_at, updated_by: r.updated_by }));
       return send(res, 200, { app: 'motalla', exported_at: now(), users: q.users.all().map(pubUser), docs: rows });
@@ -376,6 +393,59 @@ async function handle(req, res) {
     }
   }
   return bad(res, 404, 'not found');
+}
+
+/* ---------- پشتیبان‌گیری خودکار ----------
+   هر شب ساعت ۳ بامداد تهران یک نسخه فشرده از همه اطلاعات (بدون عکس‌ها) در data/backups ساخته می‌شود؛
+   ۳۰ نسخه آخر نگه داشته می‌شود. نسخه کامل با عکس‌ها فقط هنگام دانلود ساخته می‌شود. */
+const BK_DIR = path.join(DATA_DIR, 'backups'), BK_KEEP = 30;
+try { fs.mkdirSync(BK_DIR, { recursive: true }); } catch (e) { }
+const tehranDay = (d = new Date()) => new Date(d.getTime() + 3.5 * 3600e3).toISOString().slice(0, 10);
+function backupData() {
+  return { app: 'motalla', kind: 'data', created_at: now(), ver: VER,
+    users: db.prepare('SELECT id,username,name,pass,role,perms,active,created_at,last_login FROM users').all(),
+    docs: db.prepare('SELECT coll,id,data,updated_at,updated_by FROM docs WHERE deleted=0').all().map(r => ({ ...r, data: JSON.parse(r.data) })) };
+}
+function listBackups() {
+  try { return fs.readdirSync(BK_DIR).filter(f => /^motalla-\d{4}-\d{2}-\d{2}(?:-\d{4})?\.json\.gz$/.test(f)).sort().reverse().map(f => { const st = fs.statSync(path.join(BK_DIR, f)); return { name: f, day: f.slice(8, 18), size: st.size, at: st.mtime.toISOString() }; }); } catch (e) { return []; }
+}
+function makeBackup(force) {
+  // نسخه شبانه: motalla-روز ؛ نسخه دستی یا قبل از بازگردانی: motalla-روز-ساعت (روی نسخه شبانه نمی‌نویسد)
+  const t = new Date(Date.now() + 3.5 * 3600e3).toISOString(), day = t.slice(0, 10), f = path.join(BK_DIR, 'motalla-' + day + (force ? '-' + t.slice(11, 13) + t.slice(14, 16) : '') + '.json.gz');
+  if (!force && fs.existsSync(f)) return null;
+  const gz = zlib.gzipSync(Buffer.from(JSON.stringify(backupData())), { level: 9 });
+  fs.writeFileSync(f + '.tmp', gz); fs.renameSync(f + '.tmp', f);
+  listBackups().slice(BK_KEEP).forEach(b => { try { fs.unlinkSync(path.join(BK_DIR, b.name)); } catch (e) { } });
+  q.setMeta.run('last_backup', now());
+  console.log('backup saved', path.basename(f), gz.length, 'bytes');
+  return path.basename(f);
+}
+function diskInfo() {
+  let total = 0, free = 0; try { const st = fs.statfsSync(DATA_DIR); total = st.blocks * st.bsize; free = st.bavail * st.bsize; } catch (e) { }
+  const sz = f => { try { return fs.statSync(f).size; } catch (e) { return 0; } };
+  const dbSize = sz(path.join(DATA_DIR, 'motalla.db')) + sz(path.join(DATA_DIR, 'motalla.db-wal'));
+  const imgs = db.prepare('SELECT COUNT(*) n, COALESCE(SUM(LENGTH(data)),0) b FROM imgs').get();
+  const bks = listBackups(); return { total, free, dbSize, imgCount: imgs.n, imgBytes: imgs.b, backups: bks, backupsSize: bks.reduce((a, b) => a + b.size, 0) };
+}
+// هر ۳۰ دقیقه: اگر ساعت تهران از ۳ گذشته و نسخه امروز ساخته نشده، بساز (بعد از هر راه‌اندازی هم بررسی می‌شود)
+function backupTick() { try { const h = new Date(Date.now() + 3.5 * 3600e3).getUTCHours(); if (h >= 3 || !listBackups().length) makeBackup(false); } catch (e) { console.error('backup failed', e); } }
+setTimeout(backupTick, 60e3).unref(); setInterval(backupTick, 30 * 60e3).unref();
+/* بازگردانی: اسناد به وضعیت نسخه پشتیبان برمی‌گردند (کاربران و عکس‌ها دست نمی‌خورند)؛ همه گوشی‌ها با همگام‌سازی بعدی به‌روز می‌شوند */
+function restoreBackup(name, byName) {
+  const f = path.join(BK_DIR, path.basename(name)); if (!/^motalla-\d{4}-\d{2}-\d{2}(?:-\d{4})?\.json\.gz$/.test(path.basename(name)) || !fs.existsSync(f)) throw Object.assign(new Error('نسخه پشتیبان پیدا نشد'), { code: 404 });
+  const bk = JSON.parse(zlib.gunzipSync(fs.readFileSync(f)).toString('utf8'));
+  makeBackup(true);   // قبل از بازگردانی، از وضعیت فعلی هم نسخه بگیر
+  const want = new Map(bk.docs.map(d => [d.coll + '\u0000' + d.id, d])); let n = 0;
+  tx(() => {
+    for (const r of db.prepare('SELECT coll,id,data FROM docs WHERE deleted=0').all()) {
+      const k = r.coll + '\u0000' + r.id, b = want.get(k);
+      if (!b) { q.putDoc.run(r.coll, r.id, null, 1, nextVer(), now(), byName); n++; }
+      else if (JSON.stringify(b.data) !== r.data) { q.putDoc.run(r.coll, r.id, JSON.stringify(b.data), 0, nextVer(), now(), byName); n++; }
+      want.delete(k);
+    }
+    for (const b of want.values()) { if (!COLLS.has(b.coll)) continue; q.putDoc.run(b.coll, String(b.id), JSON.stringify(b.data), 0, nextVer(), now(), byName); n++; }
+  });
+  return n;
 }
 
 const server = http.createServer((req, res) => {

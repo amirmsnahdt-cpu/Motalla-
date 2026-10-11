@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (بدون نیاز به گوگل) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=30.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=30.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -785,6 +785,7 @@ body.loading #bar::after{opacity:1;animation:ldb 1.1s linear infinite}
 .pmi .tg::after{content:'';position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:.2s}
 .pmi input:checked+.tg{background:var(--ok)}.pmi input:checked+.tg::after{right:21px}
 .mpl{display:flex;flex-wrap:wrap;gap:6px;padding:12px}.mpl .pill{margin:0}.mpl .pill.off{opacity:.55}
+.dbar{height:8px;border-radius:6px;background:var(--hair);margin:4px 18px 12px;overflow:hidden}.dbar i{display:block;height:100%;background:var(--ok);border-radius:6px}.dbar i.w{background:var(--red)}
 </style>
 </head>
 <body>
@@ -795,7 +796,7 @@ body.loading #bar::after{opacity:1;animation:ldb 1.1s linear infinite}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=30.1,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=30.2,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -936,9 +937,9 @@ const fullName=r=>(r.title==='خانم'?'خانم ':r.title==='آقا'?'آقای
 const setLine=x=>(x.title==='خانم'?'خانم ':x.title==='آقا'?'آقای ':'')+x.name+(x.phone?' ('+x.phone+')':'')+(x.inv?' — فاکتور فروش '+x.inv:'')+' — '+Number(x.amount||0).toLocaleString('en-US')+' تومان';
 /* ============ مسیریابی (نوار پایین) ============ */
 let cur='home',editBack=null;
-const TAB={home:'home',entry:'entry',bulk:'entry',list:'list',split1:'split',split3:'split',srcview:'split',part:'split',track:'track',batch:'track',day:'track',debt:'debt',cred:'debt',cwiz:'debt',pwiz:'debt',audit:'audit',users:'settings',settings:'settings'};
-const PARENT={settings:'home',users:'settings',bulk:'entry',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
-const TITLES={settings:'تنظیمات',users:'کاربران',home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
+const TAB={home:'home',entry:'entry',bulk:'entry',list:'list',split1:'split',split3:'split',srcview:'split',part:'split',track:'track',batch:'track',day:'track',debt:'debt',cred:'debt',cwiz:'debt',pwiz:'debt',audit:'audit',users:'settings',settings:'settings',backups:'settings'};
+const PARENT={settings:'home',users:'settings',backups:'settings',bulk:'entry',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
+const TITLES={backups:'پشتیبان‌ها',settings:'تنظیمات',users:'کاربران',home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
 function go(n,noPush){if(n!==cur&&TOKEN&&['home','list','split1','track','debt','audit','day','batch'].includes(n))setTimeout(quietRefresh,30);if(!$('ov').classList.contains('hide')){aSt=null;closeSheet()}if(cur==='entry'&&n!=='entry'&&n!=='bulk')editId=null;cur=n;if(!noPush){try{history.pushState({n},'')}catch(e){}}render(true);window.scrollTo(0,0)}
 function back(){if((cur==='cwiz'||cur==='pwiz')&&wz){ACT.wzPrev();return}navBack=true;go(PARENT[cur]||'home')}
 window.addEventListener('popstate',e=>{navBack=true;cur=(e.state&&e.state.n)||'home';if(cur!=='entry')editId=null;render(true)});
@@ -948,10 +949,10 @@ function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length
 function render(anim){const V=$('view'),B=$('bar'),A=$('act');
   const hasBack=!!PARENT[cur]||(cur==='entry'&&editId);
   B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:`<button class="mark mset" data-act="settings" aria-label="تنظیمات">${ic('gear')}</button>`}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button></div></div>${dchip()}`;
-  const R={home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null],users:[vUsers,aUsers],settings:[vSettings,null]}[cur];
+  const R={home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null],users:[vUsers,aUsers],settings:[vSettings,null],backups:[vBackups,null]}[cur];
   V.innerHTML=R[0]();A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();
   if(anim){V.classList.remove('in','bk');void V.offsetWidth;V.classList.add('in');if(navBack)V.classList.add('bk')}navBack=false;
-  ({entry:bindEntry,bulk:bindBulk,list:bindList,split1:bindSplit1,batch:bindBatch,track:bindTrack,debt:bindDebt,cwiz:bindWiz,pwiz:bindWiz,users:bindUsers})[cur]?.()}
+  ({backups:()=>{if(!BK&&!bkErr)loadBk()},entry:bindEntry,bulk:bindBulk,list:bindList,split1:bindSplit1,batch:bindBatch,track:bindTrack,debt:bindDebt,cwiz:bindWiz,pwiz:bindWiz,users:bindUsers})[cur]?.()}
 /* ============ نوار تاریخ‌ها (هوشمند) ============ */
 function dstrip(){const L=datesWith(),t=todayISO();if(!L.some(x=>x.iso===t))L.unshift({iso:t,n:0,s:0,bad:0});if(!L.some(x=>x.iso===dateVal))L.push({iso:dateVal,n:0,s:0,bad:0});
   L.sort((a,b)=>a.iso<b.iso?1:-1);return `<div class="dstrip">${L.slice(0,20).map(x=>{const D=dates(x.iso),r=relDay(x.iso);return `<button class="dpill${x.iso===dateVal?' on':''}${x.bad?' err':''}" data-act="pickDate" data-iso="${x.iso}"><b>${['امروز','دیروز','فردا'].includes(r)?r:toFa(D.jd)+' '+JM[D.jm-1]}</b><small>${x.n?fmt(x.n)+' واریزی':'خالی'}</small></button>`}).join('')}</div>`}
@@ -1173,7 +1174,7 @@ function closePrint(){$('pv').classList.add('hide');$('pvf').srcdoc='';document.
 async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){}
   try{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
 /* ذخیره فایل: اشتراک‌گذاری روی موبایل، دانلود روی کامپیوتر */
-const MIME={html:'text/html',txt:'text/plain',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+const MIME={gz:'application/gzip',html:'text/html',txt:'text/plain',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
 const isTouch=()=>matchMedia('(pointer:coarse)').matches;
 async function save(name,data,ok){const ext=name.split('.').pop(),type=MIME[ext]||'application/octet-stream';
   try{if(typeof claude!=='undefined'){const d=await claude.use('downloads');if(d){await d.save({filename:name,data});toast(ok);return}}}catch(e){if(e&&e.code==='declined'){toast('ذخیره لغو شد');return}}
@@ -1208,7 +1209,7 @@ async function imgPut(k,v){try{const db=await idb();await new Promise((res,rej)=
 async function imgGet(k){let v=null;try{const db=await idb();v=await new Promise(res=>{const r=db.transaction('img').objectStore('img').get(k);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)})}catch(e){}if(!v){try{v=localStorage.getItem('m_img_'+k)}catch(e){}}return v}
 async function imgDel(k){try{const db=await idb();db.transaction('img','readwrite').objectStore('img').delete(k)}catch(e){}try{localStorage.removeItem('m_img_'+k)}catch(e){}}
 const ikey=(b,x)=>b.id+':'+x.id;
-function shrink(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{const m=1400,sc=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.72))};im.src=fr.result};fr.readAsDataURL(file)})}
+function shrink(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{const m=1280,sc=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.66))};im.src=fr.result};fr.readAsDataURL(file)})}
 /* ---------- ارسال: واریزی‌ها از تقسیم خارج و وارد پیگیری می‌شوند ---------- */
 function commitAlloc(A,quiet){if(!A||!A.res)return null;let b=A.bid&&batches.find(x=>x.id===A.bid);if(b)return b;
   const items=[],used={};A.res.forEach(R=>{if(R.src.id!=null)used[R.src.id]=sum(R.items);R.items.forEach(r=>items.push({id:r.id,name:r.name,code:r.code||'',amount:r.amount,iban:r.iban,bank:r.bankShow||'',src:R.src.name,st:'pending'}))});
@@ -2019,7 +2020,7 @@ const PERM_OF={saveEntry:()=>editId?'edit':'add',bulkAdd:'add',newList:'add',tab
   credNew:'debt',credSave:'debt',credEdit:'debt',payNew:'debt',paySave:'debt',payEdit:'debt',payOk:'debt',wzSave:'debt',toDebt:'debt',
   srcMgr:'src',srcSet:'src',saveSrc:'src',addSrc:'src',delSrc:'src',delSrcGo:'src',undoEv:'undo',restoreOne:'undo',restoreAll:'undo',
   expAll:'export',expOpen:'export',expPdf:'export',expText:'export',expXls:'export',dayExp:'export',dayPdf:'export',dayText:'export',dayXls:'export',partsExp:'export',partExp:'export',lexp:'export',tkReport:'export',credPdf:'export',credStmt:'export',
-  userNew:'admin',userEdit:'admin',userCreate:'admin',userSave:'admin',userDel:'admin',backup:'admin'};
+  bkNow:'admin',bkDl:'admin',bkFull:'admin',bkRestore:'admin',userNew:'admin',userEdit:'admin',userCreate:'admin',userSave:'admin',userDel:'admin',backup:'admin'};
 const permFor=(k,d)=>{const v=PERM_OF[k];return typeof v==='function'?v(d):v||null};
 const canAct=(k,d)=>{const p=permFor(k,d);return !p||(p==='admin'?isAdmin():can(p))};
 /* دکمه‌هایی که بدون دسترسی پنهان می‌شوند (ردیف‌ها پنهان نمی‌شوند؛ فقط کار مسدود می‌شود) */
@@ -2257,7 +2258,7 @@ function vSettings(){const sgi=(act,icn,cls,t,sub,extra,attrs)=>`<button class="
   h+=`<div class="sgh">ظاهر</div><div class="sgr"><div class="thm">${THEMES.map(([k,t,sub,c])=>`<button class="${themePref===k?'on':''}" data-act="setTheme" data-t="${k}" aria-pressed="${themePref===k}">${pv(c)}<span>${t}</span><small>${sub}</small></button>`).join('')}</div>${IOS_SA?`<div class="thn">آیفون رنگ نوار ساعت و باتری را فقط موقع باز شدن برنامه می‌خواند؛ بعد از عوض کردن حالت، برنامه را یک بار کامل ببندید و دوباره باز کنید.</div>`:''}</div>`;
   if(ME){h+=`<div class="sgh">حساب</div><div class="sgr">${sgi('pwSheet','key','','تغییر رمز عبور','رمز ورود خودتان را عوض کنید')}</div>`;
     if(!isAdmin())h+=`<div class="sgh">دسترسی‌های من</div><div class="sgr"><div class="mpl">${PERMS.map(([k,t])=>`<span class="pill ${can(k)?'okp':'g off'}">${can(k)?'✓':'—'} ${t}</span>`).join('')}</div></div>`+(can('src')?`<div class="sgh">مدیریت</div><div class="sgr">${sgi('srcMgr','bank','g','منابع پرداخت','نام و بانک منبع‌ها')}</div>`:'');
-    if(isAdmin())h+=`<div class="sgh">مدیریت</div><div class="sgr">${sgi('go','users','g','کاربران','افزودن همکار، رمز عبور و دسترسی',null,' data-n="users"')}${sgi('srcMgr','bank','g','منابع پرداخت','نام و بانک منبع‌ها')}${sgi('backup','down','g','پشتیبان کامل','دریافت فایل همه اطلاعات سرور')}${sgi('shareInstall','share','g','لینک نصب برای همکاران','آیفون و اندروید')}</div>`}
+    if(isAdmin())h+=`<div class="sgh">مدیریت</div><div class="sgr">${sgi('go','users','g','کاربران','افزودن همکار، رمز عبور و دسترسی',null,' data-n="users"')}${sgi('srcMgr','bank','g','منابع پرداخت','نام و بانک منبع‌ها')}${sgi('go','down','g','پشتیبان‌ها','خودکار هر شب · دانلود و بازگردانی'+(bkDlAgo()===null||bkDlAgo()>=7?' · ⚠️ نسخه گوشی قدیمی است':''),null,' data-n="backups"')}${sgi('shareInstall','share','g','لینک نصب برای همکاران','آیفون و اندروید')}</div>`}
   const isAnd=/MotallaAndroid/.test(navigator.userAgent),oldApk=isAnd&&!(window.AndroidBridge&&AndroidBridge.version);
   if(oldApk)h+=`<div class="sgr" style="margin-top:12px;border-color:var(--gold)">${sgi('getApk','down','g','نسخه جدید اپ اندروید آماده است','برای چاپ PDF و امکانات جدید نصب کنید؛ روی همین برنامه نصب می‌شود و اطلاعات پاک نمی‌شود')}</div>`;
   h+=`<div class="sgh">برنامه</div><div class="sgr">${sgi('checkUpd','refresh','k','بررسی به‌روزرسانی','نسخه '+toFa(APP_V),'')}${!isAnd&&/Android/i.test(navigator.userAgent)?sgi('getApk','down','k','نصب اپ اندروید','دانلود فایل نصب'):''}</div>`;
@@ -2296,6 +2297,29 @@ let quietT=0;function quietRefresh(){if(!TOKEN||Date.now()-quietT<2500)return;qu
     loading(false);busy=false;show(0,false);
     const vv=V(),y=vv.scrollTop;render();vv.scrollTop=y;flashNew();vv.classList.remove('in','bk');void vv.offsetWidth;vv.classList.add('in');refreshMsg(r)};
   document.addEventListener('touchend',end,{passive:true});document.addEventListener('touchcancel',end,{passive:true});})();
+/* ---------- پشتیبان‌ها (فقط مدیر) ---------- */
+let BK=null,bkErr='',bkOpen=new Set();
+const fsz=b=>b>=1073741824?toFa((b/1073741824).toFixed(2))+' گیگ':b>=1048576?toFa((b/1048576).toFixed(1))+' مگ':toFa(Math.max(1,Math.round(b/1024)))+' کیلو';
+async function loadBk(){bkErr='';try{BK=await api('/api/backups')}catch(e){if(e.status!==401)bkErr=e.message}if(cur==='backups')render()}
+const bkDlAgo=()=>{const t=+ls.get('m_bk_dl',0);return t?Math.floor((Date.now()-t)/864e5):null};
+function vBackups(){if(!isAdmin())return '<div class="card empty"><b>فقط مدیر دسترسی دارد</b></div>';
+  if(bkErr)return `<div class="msg bad">${esc(bkErr)}</div><div class="row"><button class="btn sec" data-act="bkLoad">تلاش دوباره</button></div>`;
+  if(!BK)return '<div class="card empty"><b>در حال دریافت…</b></div>';
+  const used=BK.total?BK.total-BK.free:BK.dbSize+BK.backupsSize,pct=BK.total?Math.round(used/BK.total*100):0,warn=pct>=80,ago=bkDlAgo();
+  let h=`<div class="ingot"><div class="lb">فضای دیسک سرور</div><div class="v">${BK.total?toFa(pct)+'٪':'—'}<small>${BK.total?'پر از '+fsz(BK.total):''}</small></div>
+    <div class="dbar"><i style="width:${Math.min(100,pct)}%" class="${warn?'w':''}"></i></div>
+    <div class="row3 r4"><div><small>اطلاعات</small><b>${fsz(Math.max(0,BK.dbSize-BK.imgBytes))}</b></div><div><small>عکس‌ها (${fmt(BK.imgCount)})</small><b>${fsz(BK.imgBytes)}</b></div><div><small>پشتیبان‌ها</small><b>${fsz(BK.backupsSize)}</b></div><div><small>خالی</small><b class="${warn?'r':''}">${BK.total?fsz(BK.free):'—'}</b></div></div></div>`;
+  if(warn)h+=`<div class="msg warn">دیسک سرور نزدیک به پر شدن است. از پنل لیارا حجم دیسک «data» را بیشتر کنید.</div>`;
+  h+=`<div class="msg ${ago===null||ago>=7?'warn':'ok'}">${ago===null?'هنوز پشتیبانی روی این گوشی ذخیره نکرده‌اید. هفته‌ای یک بار «دانلود کامل» (همه اطلاعات و عکس‌ها) را بزنید و فایل را جای امن نگه دارید، مثلاً تلگرام.':ago>=7?'آخرین پشتیبان روی گوشی '+toFa(ago)+' روز پیش بوده؛ یک نسخه تازه بگیرید.':'آخرین پشتیبان روی گوشی: '+(ago?toFa(ago)+' روز پیش':'امروز')+' ✓'}</div>`;
+  h+=`<div class="row" style="margin:0 0 6px"><button class="btn gold" data-act="bkFull">${ic('down')} دانلود کامل</button><button class="btn sec" data-act="bkNow">${ic('refresh')} پشتیبان الان</button></div>`;
+  h+=`<div class="sgh" style="margin:14px 6px 6px;font-size:12.5px;font-weight:800;color:var(--mut)">پشتیبان‌های روی سرور (خودکار هر شب ساعت ۳ بامداد، تا ۳۰ نسخه)</div>`;
+  if(!BK.backups.length)return h+'<div class="card empty"><b>هنوز پشتیبانی ساخته نشده</b>اولین نسخه چند دقیقه بعد از راه‌اندازی سرور ساخته می‌شود.</div>';
+  h+='<div class="hgrp">'+BK.backups.map(b=>{const op=bkOpen.has(b.name),man=b.name.length>26,D=b.day;return `<div class="hrow${op?' open':''}"><button class="hh" data-act="bkTog" data-n="${esc(b.name)}"><span class="hi" style="--c:var(--ok)">${ic('restore')}</span><span class="tx"><b>${relDay(D)}، ${dates(D).fa}</b><small>${man?'دستی':'خودکار'}، ساعت <bdi>${hm(b.at)}</bdi>، حجم <bdi>${fsz(b.size)}</bdi></small></span>${chevI()}</button>
+    <div class="hb"><div class="hact"><button class="sm sec" data-act="bkDl" data-n="${esc(b.name)}">${ic('down')} دانلود</button><button class="sm red" data-act="bkRestore" data-n="${esc(b.name)}">${ic('undo')} بازگردانی به این نسخه</button></div>
+    <div class="muted" style="font-size:11.5px;margin-top:8px;line-height:1.8">بازگردانی، واریزی‌ها و لیست‌ها را به وضعیت همین زمان برمی‌گرداند. کاربران و عکس‌ها دست نمی‌خورند و قبلش از وضعیت فعلی هم یک نسخه گرفته می‌شود.</div></div></div>`}).join('')+'</div>';
+  return h}
+async function bkFetch(path,name){toast('در حال دانلود…');try{const r=await fetch(API_BASE+path,{headers:{Authorization:'Bearer '+TOKEN},cache:'no-store'});if(!r.ok)throw new Error('خطای '+r.status);
+  const buf=new Uint8Array(await r.arrayBuffer());await save(name,buf,'پشتیبان ذخیره شد ✓');ls.set('m_bk_dl',Date.now());if(cur==='backups')render()}catch(e){toast('دانلود انجام نشد: '+e.message,true)}}
 const ACT={
   back,close:()=>{aSt=null;dpMode='';closeSheet()},go:d=>go(d.n),date:openDate,user:openUser,resetForm,resetBulk,saveEntry,bulkAdd,
   toastAct:()=>{const f=toastAct;toastAct=null;$('toast').style.display='none';f&&f()},
@@ -2502,6 +2526,13 @@ ACT.settings=()=>go('settings');
 ACT.setTheme=d=>{const ch=themePref!==d.t;themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;
   if(ch&&IOS_SA)toast('برای هم‌رنگ شدن نوار بالا، برنامه را یک بار کامل ببندید و باز کنید');};
 ACT.applyUpd=()=>applyUpd();
+ACT.bkLoad=()=>{BK=null;loadBk();render()};
+ACT.bkTog=(d,e)=>{const r=e.target.closest('.hrow');if(!r)return;r.classList.toggle('open')?bkOpen.add(d.n):bkOpen.delete(d.n)};
+ACT.bkNow=async()=>{toast('در حال ساخت پشتیبان…');try{await api('/api/backups',{});BK=await api('/api/backups');render();toast('پشتیبان روی سرور ساخته شد ✓')}catch(e){toast(e.message,true)}};
+ACT.bkDl=d=>bkFetch('/api/backups/'+d.n,d.n);
+ACT.bkFull=()=>bkFetch('/api/backup/full','motalla-full-'+todayISO()+'.json.gz');
+ACT.bkRestore=d=>askConfirm('همه واریزی‌ها، لیست‌ها و حساب‌ها به وضعیت این نسخه برمی‌گردند و تغییرات بعد از آن کنار می‌روند (قبلش از وضعیت فعلی نسخه گرفته می‌شود). ادامه می‌دهید؟','بله، بازگردانی',async()=>{
+  toast('در حال بازگردانی…');try{const j=await api('/api/backups/'+d.n+'?restore=1',{});await syncNow();BK=await api('/api/backups');render();toast('بازگردانی انجام شد ✓ · '+toFa(j.changed)+' مورد تغییر کرد')}catch(e){toast(e.message,true)}});
 /* دکمه برگشت اندروید: اول پنجره باز، بعد صفحه قبلی، در خانه خروج */
 window.__androidBack=()=>{try{const au=$('auth');if(au&&!au.classList.contains('hide'))return false;
   if(!$('ov').classList.contains('hide')){ACT.close();return true}
