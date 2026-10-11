@@ -483,6 +483,8 @@ html{padding:0!important}
 #view{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
 #bottom{position:relative!important;flex:none;background:var(--bg)!important;padding-top:6px!important}
 #act{margin-bottom:40px!important}
+#bottom{padding-bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 10px))!important}
+html,body{background:var(--bg)}
 @media print{html,body{height:auto;overflow:visible}#app{height:auto}}
 .hav{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--navy);color:var(--gold2);display:grid;place-items:center;font-weight:900;font-size:15px;cursor:pointer;flex:none;padding:0}
 .hav svg{width:18px;height:18px}
@@ -1948,6 +1950,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov'){aSt=null;srcRet='';closeSheet()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('ov').classList.contains('hide')){aSt=null;srcRet='';closeSheet()}});
 try{history.replaceState({n:'home'},'')}catch(e){}
+/* آیفون (برنامه روی صفحه اصلی): iOS ارتفاع صفحه را به اندازه نوار ساعت کم گزارش می‌کند؛ قاب را به اندازه کامل صفحه می‌کنیم */
+function fitApp(){const a=$('app');if(!a)return;const sa=navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
+  if(!sa||!/iPhone|iPad|iPod/.test(navigator.userAgent)){a.style.removeProperty('height');a.style.removeProperty('bottom');return}
+  const full=matchMedia('(orientation: portrait)').matches?Math.max(screen.width,screen.height):Math.min(screen.width,screen.height),h=Math.max(window.innerHeight,full);
+  a.style.setProperty('height',h+'px','important');a.style.setProperty('bottom','auto','important')}
+fitApp();window.addEventListener('resize',fitApp);window.addEventListener('orientationchange',()=>setTimeout(fitApp,300));
 render(true);
 if(!user)setTimeout(openUser,300);
 </script>
