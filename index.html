@@ -471,7 +471,14 @@ button.sm{border-radius:10px;background:var(--btn)}button.sm.sec{background:var(
 .swr{position:relative;margin-bottom:10px;border-radius:16px;isolation:isolate;overflow:hidden;overflow:clip}
 /* اسکلت ثابت: فقط وسط صفحه اسکرول می‌شود */
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
-#app{height:100vh;height:100dvh;min-height:0!important;overflow:hidden}
+html{padding:0!important}
+#app{position:fixed!important;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:560px;height:auto!important;min-height:0!important;overflow:hidden}
+#bar{padding-top:calc(10px + env(safe-area-inset-top,0px))!important;min-height:calc(64px + env(safe-area-inset-top,0px))!important}
+.tt2{min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.tt2 b{font-size:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uline{border:0;background:none;padding:3px 0 0;margin:0;color:var(--mut);font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;cursor:pointer;max-width:100%;text-align:right}
+.uline span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uline svg{width:13px;height:13px;color:var(--gold);flex:none}
 #bar{position:relative!important;flex:none;z-index:20}
 #view{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
 #bottom{position:relative!important;flex:none;background:var(--bg)!important;padding-top:6px!important}
@@ -736,7 +743,7 @@ function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length
   return tb('home','home','خانه')+tb('list','list','لیست‌ها',bad)+tb('split','split','تقسیم')+`<button class="fab${t==='entry'?' on':''}" data-act="tab" data-n="entry" aria-label="ثبت واریزی">${ic('plus')}</button>`+tb('track','track','پیگیری',pendingAll())+tb('debt','debt','بدهی')+tb('audit','clock','تاریخچه')}
 function render(anim){const V=$('view'),B=$('bar'),A=$('act');
   const hasBack=!!PARENT[cur]||(cur==='entry'&&editId);
-  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:'<div class="mark">م</div>'}<b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b></div>${cur==='home'?`<button class="hav" data-act="user" aria-label="نام کاربر: ${esc(user||'ثبت نشده')}">${user?esc(userInit(user)):ic('user')}</button>`:''}${dchip()}`;
+  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:'<div class="mark">م</div>'}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${user?esc(user):'ثبت نام کاربر'}</span></button></div></div>${dchip()}`;
   const R={home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null]}[cur];
   V.innerHTML=R[0]();A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();
   if(anim){V.classList.remove('in','bk');void V.offsetWidth;V.classList.add('in');if(navBack)V.classList.add('bk')}navBack=false;
