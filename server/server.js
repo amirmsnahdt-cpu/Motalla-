@@ -10,12 +10,25 @@ const PORT = +process.env.PORT || 3000;
 process.on('uncaughtException', e => { console.error('uncaught:', e); });
 process.on('unhandledRejection', e => { console.error('unhandled:', e); });
 const ROOT = path.join(__dirname, '..');
-const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, 'data');
+// پوشه داده: اول DATA_DIR، بعد پوشه data کنار برنامه (دیسک لیارا روی همین سوار می‌شود)
+function pickDataDir() {
+  const C = process.env.DATA_DIR ? [process.env.DATA_DIR] : [path.join(ROOT, 'data'), '/app/data', '/usr/src/app/data'];
+  for (const c of C) {
+    let p = c;
+    try { const l = fs.readlinkSync(c); p = path.resolve(path.dirname(c), l); } catch (e) { /* not a symlink */ }
+    try {
+      fs.mkdirSync(p, { recursive: true });
+      const t = path.join(p, '.w'); fs.writeFileSync(t, '1'); fs.unlinkSync(t);
+      return p;
+    } catch (e) { console.error('data dir not usable:', c, '->', p, e.code || e.message); }
+  }
+  throw new Error('no writable data directory (tried ' + C.join(', ') + ')');
+}
+const DATA_DIR = pickDataDir();
 const SESSION_DAYS = 180;
 const ALLOWED_ORIGINS = new Set(['https://raw.githack.com', ...(process.env.EXTRA_ORIGINS || '').split(',').filter(Boolean)]);
 const COLLS = new Set(['entries', 'sources', 'batches', 'creds', 'trash', 'audit', 'drafts']);
 
-fs.mkdirSync(DATA_DIR, { recursive: true });
 const db = new DatabaseSync(path.join(DATA_DIR, 'motalla.db'));
 db.exec(`
 PRAGMA journal_mode=WAL;
