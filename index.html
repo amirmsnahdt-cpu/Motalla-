@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=34,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=35,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -990,6 +990,17 @@ body{font-feature-settings:normal}
 #app.ent #act .btn{border-radius:16px;min-height:50px}
 #app.ent #act .btn.gold{background:var(--blu);color:#fff;box-shadow:0 8px 20px -10px var(--blu)}
 #app.ent #act .btn.sec{background:var(--blu2);color:var(--blu);border-color:transparent}
+
+/* ---------- v35: جزئیات از پایین بالا می‌آید و نوار پایین کنار می‌رود (مثل بلو) ---------- */
+#app.ent #dock{display:none!important}
+#app.ent #bottom{padding-bottom:max(8px,env(safe-area-inset-bottom,0px))!important}
+#app.ent #view.in,#app.ent #view.in.bk{animation:entUp .34s cubic-bezier(.2,.85,.25,1)}
+#app.ent:has(#view.in) #bar,#app.ent:has(#view.in) #act{animation:entUp .34s cubic-bezier(.2,.85,.25,1)}
+@keyframes entUp{from{transform:translateY(60vh);opacity:0}60%{opacity:1}to{transform:none;opacity:1}}
+#app.entout #view,#app.entout #bar,#app.entout #act{transition:transform .23s cubic-bezier(.4,0,.8,.4),opacity .23s;transform:translateY(70vh);opacity:0}
+/* شماره‌های روی دکمه‌ها بی‌رنگ */
+.ba em,.ba em.r{background:#fff!important;color:var(--hero)!important;box-shadow:0 2px 6px -2px #0004}
+#dock .tb .bd{background:var(--ink)!important;color:var(--card)!important}
 </style>
 </head>
 <body>
@@ -1000,7 +1011,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=34,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=35,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1146,7 +1157,7 @@ const TAB={ent:'home',find:'home',home:'home',entry:'home',bulk:'home',list:'hom
 const PARENT={ent:'home',find:'home',entry:'home',list:'home',split1:'home',users:'settings',backups:'settings',bulk:'entry',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
 const TITLES={ent:'جزئیات واریزی',find:'جستجو',backups:'پشتیبان‌ها',settings:'تنظیمات',users:'کاربران',home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
 function go(n,noPush){if((n==='home'||(n==='entry'||n==='bulk')&&!editId)&&dateVal!==todayISO()){dateVal=todayISO();ls.set('m_date',dateVal);alloc=null}if(n!==cur&&TOKEN&&['home','list','split1','track','debt','audit','day','batch'].includes(n))setTimeout(quietRefresh,30);if(!$('ov').classList.contains('hide')){aSt=null;closeSheet()}if(cur==='entry'&&n!=='entry'&&n!=='bulk')editId=null;cur=n;if(!noPush){try{history.pushState({n},'')}catch(e){}}render(true);window.scrollTo(0,0)}
-function back(){if((cur==='cwiz'||cur==='pwiz')&&wz){ACT.wzPrev();return}navBack=true;go(PARENT[cur]||'home')}
+function back(){if((cur==='cwiz'||cur==='pwiz')&&wz){ACT.wzPrev();return}if(cur==='ent'&&!back._c){const a=$('app');back._c=1;a.classList.add('entout');setTimeout(()=>{a.classList.remove('entout');navBack=true;go(PARENT.ent||'home');back._c=0},230);return}navBack=true;go(PARENT[cur]||'home')}
 window.addEventListener('popstate',e=>{navBack=true;cur=(e.state&&e.state.n)||'home';if(cur!=='entry')editId=null;render(true)});
 const dchip=()=>{const D=dates(dateVal);return `<button class="dchip" data-act="date" aria-label="تاریخ گزارش: ${D.fa}">${ic('cal')}<span class="t"><b>${D.fa}</b><small>${relDay(dateVal)==='امروز'?'Today — ':''}${D.en}</small></span></button>`};
 function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length,tb=(k,i,l,b)=>`<button class="tb${t===k?' on':''}" data-act="tab" data-n="${k}" aria-label="${l}" title="${l}">${ic(i)}<span class="lb">${l}</span>${b?`<span class="bd">${toFa(b)}</span>`:''}</button>`;
@@ -2197,7 +2208,7 @@ window.addEventListener('resize',()=>requestAnimationFrame(segFx));
     if(!g.lk){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;g.lk=dx>0&&dx>Math.abs(dy)?'h':'v';if(g.lk!=='h'){g=null;return}V().classList.add('edge')}
     e.preventDefault();g.dx=Math.max(0,dx);V().style.transform=`translateX(${-g.dx}px)`;V().style.opacity=String(1-Math.min(.5,g.dx/innerWidth))},{passive:false});
   const fin=()=>{if(!g)return;const z=g;g=null;const v=V();v.classList.remove('edge');if(z.lk!=='h')return;v.classList.add('edgeback');
-    if(z.dx>innerWidth*.28){v.style.transform=`translateX(${-innerWidth}px)`;v.style.opacity='0';setTimeout(()=>{v.classList.remove('edgeback');v.style.transform='';v.style.opacity='';cur==='entry'&&editId?ACT.cancelEdit():back()},200)}
+    if(z.dx>innerWidth*.28){v.style.transform=`translateX(${-innerWidth}px)`;v.style.opacity='0';setTimeout(()=>{v.classList.remove('edgeback');v.style.transform='';v.style.opacity='';cur==='entry'&&editId?ACT.cancelEdit():cur==='ent'?(navBack=true,go(PARENT.ent||'home')):back()},200)}
     else{v.style.transform='';v.style.opacity='';setTimeout(()=>v.classList.remove('edgeback'),260)}};
   document.addEventListener('touchend',fin);document.addEventListener('touchcancel',fin);
 })();
