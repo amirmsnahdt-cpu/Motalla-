@@ -10,11 +10,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(s&&v<V){localStorage.removeItem('m_app_next');localStorage.removeItem('m_app_next_v')}}catch(e){}})();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>(function(){try{var t=JSON.parse(localStorage.getItem('m_theme')||'"auto"');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);var c=t==='dark'?'#0a1222':'#f5f6f8',m=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<m.length;i++){m[i].setAttribute('content',c);m[i].removeAttribute('media')}}}catch(e){}})()</script>
 <style>
 :root{--bg:#eef1f6;--card:#fff;--ink:#13203a;--mut:#667089;--line:#dde3ee;--navy:#13284f;--navy2:#1d3b72;--pri:#1d3b72;--pri2:#e6ecf7;--gold:#c99a3a;--gold2:#f2dfa6;--goldbg:#fbf4e1;--red:#d3334f;--red2:#fdeef1;--warn:#a66a00;--warn2:#fff6e3;--ok:#178049;--ok2:#eaf8f0;--dock:rgba(19,40,79,.94);--btn:linear-gradient(135deg,#1d3b72,#13284f);--cta:linear-gradient(135deg,#ecc874,#c99a3a);--ctaink:#1b1404;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1222;--card:#121c32;--ink:#edf1fa;--mut:#99a5bf;--line:#24324f;--navy:#0c1730;--navy2:#1a2c52;--pri:#8fb2ff;--pri2:#1a2846;--gold:#e2b558;--gold2:#6b5320;--goldbg:#2a2210;--red:#ff7a90;--red2:#3a1520;--warn:#f3c053;--warn2:#352a0e;--ok:#5bd68f;--ok2:#0f2e1e;--dock:rgba(16,27,52,.95);--btn:linear-gradient(135deg,#3666c9,#244c9e)}}
@@ -23,7 +24,7 @@ else if(s&&v<V){localStorage.removeItem('m_app_next');localStorage.removeItem('m
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Vazirmatn',Tahoma,'Segoe UI',sans-serif;font-size:15px;line-height:1.65;font-weight:500;font-feature-settings:"tnum"}
 #app{max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
 @media(min-width:600px){body{background:#e2e7f0}#app{background:var(--bg);box-shadow:0 0 50px #13284f1a}}
-@media(min-width:600px) and (prefers-color-scheme:dark){body{background:#060c18}}
+@media(min-width:600px) and (prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:#060c18}}@media(min-width:600px){:root[data-theme="dark"] body{background:#060c18}}
 button,input,select,textarea{font:inherit}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -62,7 +63,7 @@ button.sm svg{width:16px;height:16px}
 #bottom>*{pointer-events:auto}
 #act{display:flex;gap:8px;align-items:center;padding:10px;margin:0 2px 42px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px #13284f1f}#act:empty{display:none}
 #dock{position:relative;display:grid;grid-template-columns:1fr 1fr 66px 1fr 1fr 1fr;align-items:center;height:64px;border-radius:22px;background:var(--dock);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 14px 34px #0a162e55;padding:0 6px}
-@media (prefers-color-scheme:dark){#dock{box-shadow:0 14px 34px #0009,inset 0 0 0 1px #ffffff17}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #dock{box-shadow:0 14px 34px #0009,inset 0 0 0 1px #ffffff17}}:root[data-theme="dark"] #dock{box-shadow:0 14px 34px #0009,inset 0 0 0 1px #ffffff17}
 #dock .tb{height:52px;border:0;background:transparent;color:#a9b6d3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:15px;cursor:pointer;font-size:11px;font-weight:700;position:relative}
 #dock .tb svg{width:22px;height:22px}
 #dock .tb.on{color:#f2d68d}#dock .tb.on::before{content:'';position:absolute;top:3px;width:18px;height:3px;border-radius:3px;background:var(--gold)}
@@ -188,7 +189,7 @@ svg.flip{transform:scaleX(-1);color:var(--mut)}
 #printArea{display:none}
 @media print{body>*:not(#printArea){display:none!important}#printArea{display:block!important}body{background:#fff}}
 /* ---------- پیگیری ---------- */
-:root{--ringbg:#e3e8f1}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ringbg:#24324f}}
+:root{--ringbg:#e3e8f1}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ringbg:#24324f}}:root[data-theme="dark"]{--ringbg:#24324f}
 .ring{width:var(--s);height:var(--s);border-radius:50%;display:grid;place-items:center;flex:none}
 .ring span{width:calc(var(--s) - 12px);height:calc(var(--s) - 12px);border-radius:50%;background:var(--card);display:grid;place-items:center}.ring b{font-size:calc(var(--s) / 4.6);font-weight:900}
 .tags{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}
@@ -458,7 +459,7 @@ button.sm{border-radius:10px;background:var(--btn)}button.sm.sec{background:var(
 #bottom{padding:14px 12px calc(12px + env(safe-area-inset-bottom,0px))}
 #act{border-radius:20px;box-shadow:var(--sh);border-color:var(--line);margin-bottom:44px}
 #dock{height:66px;border-radius:24px;background:color-mix(in srgb,var(--card) 88%,transparent);border:1px solid var(--line);box-shadow:0 14px 34px -12px #16213a40;padding:0 6px}
-@media (prefers-color-scheme:dark){#dock{box-shadow:0 14px 34px -12px #000}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #dock{box-shadow:0 14px 34px -12px #000}}:root[data-theme="dark"] #dock{box-shadow:0 14px 34px -12px #000}
 #dock::before{content:'';position:absolute;top:8px;height:50px;left:var(--ix,0);width:var(--iw,0);border-radius:16px;background:color-mix(in srgb,var(--gold) 13%,transparent);opacity:var(--io,0);transition:left .38s cubic-bezier(.3,1.25,.5,1),width .38s,opacity .2s}
 #dock .tb{color:var(--mut);z-index:1;font-weight:700}
 #dock .tb.on{color:var(--ink)}#dock .tb.on svg{color:var(--gold)}#dock .tb.on::before{display:none}
@@ -675,6 +676,40 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 #pv iframe{order:1}
 /* گام انجام‌شده‌ای که صفحه فعلی است: تیک سبز با حلقه */
 .flow .fs.on.done i{background:var(--ok);border-color:var(--ok);color:#fff;box-shadow:0 0 0 3px var(--ok2)}
+/* ---------- تنظیمات و حالت روز/شب ---------- */
+:root{color-scheme:light dark}:root[data-theme="light"]{color-scheme:light}:root[data-theme="dark"]{color-scheme:dark}
+.mark.mset{border:0;cursor:pointer;padding:0;color:var(--gold2)}.mark.mset svg{width:19px;height:19px}
+.stg{display:flex;flex-direction:column;gap:6px}
+.stg .sgh{font-size:12.5px;font-weight:800;color:var(--mut);margin:14px 6px 2px}
+.stg .sgr{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.stg .sgi{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border:0;background:none;color:var(--ink);font:inherit;text-align:right;cursor:pointer}
+.stg .sgi+.sgi{border-top:1px solid var(--hair)}
+.stg .sgi:active{background:var(--bg)}
+.stg .sgi .si{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--pri2);color:var(--pri)}
+.stg .sgi .si svg{width:17px;height:17px}
+.stg .sgi .si.g{background:var(--goldbg);color:var(--gold)}.stg .sgi .si.r{background:var(--red2);color:var(--red)}.stg .sgi .si.k{background:var(--ok2);color:var(--ok)}
+.stg .sgi .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}
+.stg .sgi .tx b{font-weight:800;font-size:14.5px}.stg .sgi .tx small{font-size:12px;color:var(--mut)}
+.stg .sgi .vl{color:var(--mut);font-size:13px;font-weight:700}
+.stg .sgi .cv{color:#a0a6b2;flex:none}.stg .sgi .cv svg{width:15px;height:15px;transform:scaleX(-1)}
+.stg .sgi.rd .tx b{color:var(--red)}
+.stg .prof{display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh)}
+.stg .prof .av{width:56px;height:56px;font-size:24px;flex:none}
+.stg .prof .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.stg .prof .tx b{font-size:18px;font-weight:900}
+.stg .prof .tx .ln{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.stg .prof .pill{margin:0}
+.thm{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px}
+.thm button{border:1.5px solid var(--line);background:var(--bg);border-radius:16px;padding:8px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;color:var(--ink);font:inherit;font-weight:800;font-size:13px}
+.thm button.on{border-color:var(--gold);box-shadow:0 0 0 3px var(--goldbg)}
+.thm .pv{width:100%;aspect-ratio:1.25;border-radius:11px;overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:7px;box-shadow:inset 0 0 0 1px #0000001a}
+.thm .pv i{display:block;border-radius:4px;height:7px}.thm .pv i.b{height:15px;border-radius:5px}
+.thm .pv.l{background:#f5f6f8}.thm .pv.l i{background:#fff;box-shadow:0 0 0 1px #e7e9ef}.thm .pv.l i.g{background:#e2b558;box-shadow:none;width:55%}
+.thm .pv.d{background:#0a1222}.thm .pv.d i{background:#121c32;box-shadow:0 0 0 1px #24324f}.thm .pv.d i.g{background:#e2b558;box-shadow:none;width:55%}
+.thm .pv.a{background:linear-gradient(110deg,#f5f6f8 50%,#0a1222 50%);flex-direction:row;align-items:center;justify-content:center}
+.thm .pv.a span{width:26px;height:26px;border-radius:50%;background:linear-gradient(110deg,#e2b558 50%,#121c32 50%);box-shadow:0 0 0 2px #fff8}
+.thm small{font-size:11px;color:var(--mut);font-weight:600;margin-top:-4px}
+.stg .ver{text-align:center;color:var(--mut);font-size:12px;margin:14px 0 4px}
 </style>
 </head>
 <body>
@@ -685,7 +720,7 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.1,REPO='amirmsnahdt-cpu/Motalla-';
 function checkUpdate(force){try{if(location.hostname!=='raw.githack.com')return;let t=0;try{t=+sessionStorage.getItem('m_updchk')||0}catch(e){}
   if(!force&&Date.now()-t<3*60e3)return;try{sessionStorage.setItem('m_updchk',String(Date.now()))}catch(e){}
   fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;if(!sha||!/^[0-9a-f]{40}$/.test(sha))return null;
@@ -807,9 +842,9 @@ const fullName=r=>(r.title==='خانم'?'خانم ':r.title==='آقا'?'آقای
 const setLine=x=>(x.title==='خانم'?'خانم ':x.title==='آقا'?'آقای ':'')+x.name+(x.phone?' ('+x.phone+')':'')+(x.inv?' — فاکتور فروش '+x.inv:'')+' — '+Number(x.amount||0).toLocaleString('en-US')+' تومان';
 /* ============ مسیریابی (نوار پایین) ============ */
 let cur='home',editBack=null;
-const TAB={home:'home',entry:'entry',bulk:'entry',list:'list',split1:'split',split3:'split',srcview:'split',part:'split',track:'track',batch:'track',day:'track',debt:'debt',cred:'debt',cwiz:'debt',pwiz:'debt',audit:'audit',users:'home'};
-const PARENT={users:'home',bulk:'entry',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
-const TITLES={home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
+const TAB={home:'home',entry:'entry',bulk:'entry',list:'list',split1:'split',split3:'split',srcview:'split',part:'split',track:'track',batch:'track',day:'track',debt:'debt',cred:'debt',cwiz:'debt',pwiz:'debt',audit:'audit',users:'settings',settings:'settings'};
+const PARENT={settings:'home',users:'settings',bulk:'entry',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
+const TITLES={settings:'تنظیمات',users:'کاربران',home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
 function go(n,noPush){if(!$('ov').classList.contains('hide')){aSt=null;closeSheet()}if(cur==='entry'&&n!=='entry'&&n!=='bulk')editId=null;cur=n;if(!noPush){try{history.pushState({n},'')}catch(e){}}render(true);window.scrollTo(0,0)}
 function back(){if((cur==='cwiz'||cur==='pwiz')&&wz){ACT.wzPrev();return}navBack=true;go(PARENT[cur]||'home')}
 window.addEventListener('popstate',e=>{navBack=true;cur=(e.state&&e.state.n)||'home';if(cur!=='entry')editId=null;render(true)});
@@ -818,8 +853,8 @@ function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length
   return tb('home','home','خانه')+tb('list','list','لیست‌ها',bad)+tb('split','split','تقسیم')+`<button class="fab${t==='entry'?' on':''}" data-act="tab" data-n="entry" aria-label="ثبت واریزی">${ic('plus')}</button>`+tb('track','track','پیگیری',pendingAll())+tb('debt','debt','بدهی')+tb('audit','clock','تاریخچه')}
 function render(anim){const V=$('view'),B=$('bar'),A=$('act');
   const hasBack=!!PARENT[cur]||(cur==='entry'&&editId);
-  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:'<div class="mark">م</div>'}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button></div></div>${dchip()}`;
-  const R={home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null],users:[vUsers,aUsers]}[cur];
+  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:`<button class="mark mset" data-act="settings" aria-label="تنظیمات">${ic('gear')}</button>`}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button></div></div>${dchip()}`;
+  const R={home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null],users:[vUsers,aUsers],settings:[vSettings,null]}[cur];
   V.innerHTML=R[0]();A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();
   if(anim){V.classList.remove('in','bk');void V.offsetWidth;V.classList.add('in');if(navBack)V.classList.add('bk')}navBack=false;
   ({entry:bindEntry,bulk:bindBulk,list:bindList,split1:bindSplit1,batch:bindBatch,track:bindTrack,debt:bindDebt,cwiz:bindWiz,pwiz:bindWiz,users:bindUsers})[cur]?.()}
@@ -2055,6 +2090,27 @@ let dayOpen=new Set();
 function pvFit(){const f=$('pvf');if(!f)return;try{const d=f.contentDocument;if(!d||!d.body)return;d.documentElement.style.zoom='';const w=Math.max(d.documentElement.scrollWidth,d.body.scrollWidth),W=f.clientWidth;if(w>W+2)d.documentElement.style.zoom=String(Math.max(.3,(W-4)/w))}catch(e){}}
 {const f=$('pvf');if(f)f.addEventListener('load',()=>setTimeout(pvFit,60))}
 window.addEventListener('resize',()=>{if(!$('pv').classList.contains('hide'))pvFit()});
+/* ---------- تنظیمات و حالت روز/شب ---------- */
+Object.assign(IC,{sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',moon:'<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>',key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M21.5 20a6.5 6.5 0 00-4-6"/>',bank:'<path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>',down:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',share:'<path d="M12 15V4M8 8l4-4 4 4M5 13v6a1 1 0 001 1h12a1 1 0 001-1v-6"/>',out:'<path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 17l-5-5 5-5M5 12h11"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'});
+let themePref=ls.get('m_theme','auto');if(!['auto','light','dark'].includes(themePref))themePref='auto';
+const sysDark=matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(){const r=document.documentElement;if(themePref==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',themePref);
+  const dark=themePref==='dark'||(themePref==='auto'&&sysDark.matches);document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{m.setAttribute('content',dark?'#0a1222':'#f5f6f8');m.removeAttribute('media')})}
+applyTheme();try{sysDark.addEventListener('change',()=>{if(themePref==='auto')applyTheme()})}catch(e){try{sysDark.addListener(()=>{if(themePref==='auto')applyTheme()})}catch(_){}}
+const THEMES=[['light','روز','همیشه روشن','l'],['dark','شب','همیشه تیره','d'],['auto','خودکار','مثل گوشی','a']];
+const APK_URL='https://motalla.liara.run/app.apk',WEB_URL='https://motalla.liara.run';
+function vSettings(){const sgi=(act,icn,cls,t,sub,extra,attrs)=>`<button class="sgi${cls.indexOf('rd')>=0?' rd':''}" data-act="${act}"${attrs||''}><span class="si ${cls.replace('rd','')}">${ic(icn)}</span><span class="tx"><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span>${extra==null?`<span class="cv">${ic('back')}</span>`:extra}</button>`;
+  const pv=k=>k==='a'?'<div class="pv a"><span></span></div>':`<div class="pv ${k}"><i class="b"></i><i></i><i class="g"></i></div>`;
+  let h='<div class="stg">';
+  if(ME)h+=`<div class="prof"><div class="av">${esc(userInit(ME.name))}</div><div class="tx"><b>${esc(ME.name)}</b><div class="ln"><span class="pill ${isAdmin()?'gd':'g'}">${ROLE[ME.role]||ME.role}</span><bdi dir="ltr">@${esc(ME.username)}</bdi></div><div class="ln"><span class="sdot ${SY.state}"></span>${esc(syncLabel())}</div></div></div>`;
+  h+=`<div class="sgh">ظاهر</div><div class="sgr"><div class="thm">${THEMES.map(([k,t,sub,c])=>`<button class="${themePref===k?'on':''}" data-act="setTheme" data-t="${k}" aria-pressed="${themePref===k}">${pv(c)}<span>${t}</span><small>${sub}</small></button>`).join('')}</div></div>`;
+  if(ME){h+=`<div class="sgh">حساب</div><div class="sgr">${sgi('pwSheet','key','','تغییر رمز عبور','رمز ورود خودتان را عوض کنید')}</div>`;
+    if(isAdmin())h+=`<div class="sgh">مدیریت</div><div class="sgr">${sgi('go','users','g','کاربران','افزودن همکار، رمز عبور و دسترسی',null,' data-n="users"')}${sgi('srcMgr','bank','g','منابع پرداخت','نام و بانک منبع‌ها')}${sgi('backup','down','g','پشتیبان کامل','دریافت فایل همه اطلاعات سرور')}${sgi('shareInstall','share','g','لینک نصب برای همکاران','آیفون و اندروید')}</div>`}
+  const isAnd=/MotallaAndroid/.test(navigator.userAgent);
+  h+=`<div class="sgh">برنامه</div><div class="sgr">${sgi('checkUpd','refresh','k','بررسی به‌روزرسانی','نسخه '+toFa(APP_V),'')}${!isAnd&&/Android/i.test(navigator.userAgent)?sgi('getApk','down','k','نصب اپ اندروید','دانلود فایل نصب'):''}</div>`;
+  if(ME)h+=`<div class="sgr" style="margin-top:14px">${sgi('logout','out','r rd','خروج از حساب','اطلاعات این گوشی پاک می‌شود و روی سرور می‌ماند','')}</div>`;
+  return h+`<div class="ver">مطلا · سامانه واریزی · نسخه ${toFa(APP_V)}</div></div>`}
+function openAccount(){if(!ME){showAuth();return}go('settings')}
 const ACT={
   back,close:()=>{aSt=null;dpMode='';closeSheet()},go:d=>go(d.n),date:openDate,user:openUser,resetForm,resetBulk,saveEntry,bulkAdd,
   toastAct:()=>{const f=toastAct;toastAct=null;$('toast').style.display='none';f&&f()},
@@ -2255,6 +2311,13 @@ for(const k of ADMIN_ACTS){const f=ACT[k];if(f)ACT[k]=(...a)=>isAdmin()?f(...a):
 ACT.homeSt=d=>{homeSt=d.t;ls.set('m_homest',homeSt);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.dayGrp=(d,e)=>{const g=e.target.closest('.tg2');if(!g)return;const o=g.classList.toggle('open');const h=g.querySelector('.tgh2');if(h)h.setAttribute('aria-expanded',o);o?dayOpen.add(d.s):dayOpen.delete(d.s)};
 {const _od=ACT.openDay;ACT.openDay=d=>{dayOpen=new Set();_od(d)}}
+ACT.settings=()=>go('settings');
+ACT.setTheme=d=>{themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
+ACT.checkUpd=()=>{if(location.hostname!=='raw.githack.com'){if(location.protocol!=='https:'){toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));return}toast('در حال دریافت آخرین نسخه…');const r=()=>location.reload();try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,500))}catch(e){setTimeout(r,500)}return}
+  toast('در حال بررسی…');const v0=APP_V;try{sessionStorage.removeItem('m_updchk')}catch(e){}checkUpdate(true);setTimeout(()=>{let nv=0;try{nv=+localStorage.getItem('m_app_next_v')||0}catch(e){}if(!(nv>v0))toast('برنامه به‌روز است ✓ نسخه '+toFa(v0))},6000)};
+ACT.getApk=()=>{location.href=APK_URL};
+ACT.shareInstall=()=>{const t='نصب برنامه واریزی مطلا\n\nآیفون: این لینک را در Safari باز کنید، دکمه اشتراک‌گذاری ← Add to Home Screen\n'+WEB_URL+'\n\nاندروید: فایل نصب را دانلود و نصب کنید\n'+APK_URL+'\n\nنام کاربری و رمز را از مدیر بگیرید.';
+  if(navigator.share)navigator.share({text:t}).catch(()=>{});else copyText(t)};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const f=ACT[t.dataset.act];if(f){e.preventDefault();f(t.dataset,e)}});
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov'){aSt=null;srcRet='';closeSheet()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('ov').classList.contains('hide')){aSt=null;srcRet='';closeSheet()}});
