@@ -1,0 +1,12 @@
+App: motalla
+Path: /home/runner/work/Motalla-/Motalla-
+Platform: node
+Port: 3000
+Disks: 
+  data -> /app/data
+node version: 22
+- Creating an archive...
+Compressed size: 639.5KB (use .gitignore to reduce the size)
+✔ Upload finished.
+
+ ›   Error: CODE 428: Max deployment count in day.
