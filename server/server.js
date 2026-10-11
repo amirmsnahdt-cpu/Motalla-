@@ -218,7 +218,7 @@ function doSync(user, body) {
   const out = rows.map(rowOut), have = new Set(out.map(r => r.coll + '\u0000' + r.id));
   for (const k of touched) { if (have.has(k)) continue; const [c, i] = k.split('\u0000'); const r = q.getDoc.get(c, i); if (r) out.push(rowOut(r)); }
   const ver = more ? rows[rows.length - 1].ver : VER;
-  return { ver, full: since === 0, more, changes: out, rejected, app: APP_VER };
+  return { ver, full: since === 0, more, changes: out, rejected, app: APP_VER, v: APP_V };
 }
 
 /* ---------- فایل‌های ثابت ---------- */

@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.92,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.93,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -736,7 +736,7 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.92,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.93,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -760,7 +760,10 @@ function applyUpd(){try{toast('در حال به‌روزرسانی…')}catch(e)
   try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,300))}catch(e){setTimeout(r,300)}}
 setTimeout(()=>checkUpdate(true),1500);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate(false)});
-setInterval(()=>{if(document.visibilityState==='visible')checkUpdate(false)},5*60e3);
+setInterval(()=>{if(document.visibilityState==='visible')checkUpdate(false)},60e3);
+window.addEventListener('pageshow',()=>checkUpdate(false));window.addEventListener('focus',()=>checkUpdate(false));window.addEventListener('online',()=>checkUpdate(true));
+/* بعد از به‌روز شدن، یک پیام کوتاه نشان بده تا کاربر بداند نسخه جدید آمده */
+setTimeout(()=>{try{const last=+localStorage.getItem('m_seen_v')||0;if(last&&APP_V>last)toast('برنامه به نسخه '+toFa(APP_V)+' به‌روز شد ✓');localStorage.setItem('m_seen_v',String(APP_V))}catch(e){}},1200);
 (()=>{const V=()=>document.getElementById('view');const ws=window.scrollTo.bind(window);
   Object.defineProperty(window,'scrollY',{configurable:true,get:()=>{const v=V();return v?v.scrollTop:0}});
   window.scrollTo=function(a,b){const v=V();if(!v)return ws(a,b);if(typeof a==='object')v.scrollTo(a);else v.scrollTop=b||0}})();
@@ -1982,7 +1985,7 @@ async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.bu
       if(!r&&SYNC[c].noDel){delete SY.pend[pk];continue}
       const j=r?sj(r):null;sent[pk]=j;changes.push({coll:c,id,base:SY.pend[pk]===null?null:JSON.parse(SY.pend[pk]),data:r?JSON.parse(j):null})}
     if(changes.length)setSync('busy');
-    let res=await api('/api/sync',{since:SY.since,changes});
+    let res=await api('/api/sync',{since:SY.since,changes});try{if(res&&+res.v>APP_V){if(location.hostname==='raw.githack.com')checkUpdate(false);else updFound(+res.v)}}catch(e){}
     applyRemote(res,sent);
     while(res.more){res=await api('/api/sync',{since:SY.since,changes:[]});applyRemote(res,{})}
     if(res.rejected&&res.rejected.length)toast(res.rejected[0].why||'این تغییر مجاز نبود',true);
