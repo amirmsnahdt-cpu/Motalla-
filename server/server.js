@@ -66,13 +66,25 @@ CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT);
 CREATE TABLE IF NOT EXISTS imgs(k TEXT PRIMARY KEY, data TEXT NOT NULL, updated_at TEXT NOT NULL);
 `);
 
+// ستون دسترسی‌ها (برای پایگاه‌داده‌های قدیمی اضافه می‌شود)
+try { db.exec('ALTER TABLE users ADD COLUMN perms TEXT'); } catch (e) { /* از قبل هست */ }
+/* ---------- دسترسی‌ها: مدیر همه را دارد؛ کارمند فقط آنچه مدیر روشن کرده ---------- */
+const PERMS = ['add', 'edit', 'del', 'split', 'track', 'close', 'unsend', 'debt', 'src', 'undo', 'export'];
+const DEF_STAFF = ['add', 'edit', 'split', 'track', 'close', 'debt', 'export'];
+function userPerms(u) {
+  if (!u) return [];
+  if (u.role === 'admin') return PERMS.slice();
+  let p = null; try { p = JSON.parse(u.perms || 'null'); } catch (e) { }
+  return Array.isArray(p) ? p.filter(x => PERMS.includes(x)) : DEF_STAFF.slice();
+}
+const cleanPerms = v => Array.isArray(v) ? [...new Set(v.map(String).filter(x => PERMS.includes(x)))] : null;
 const now = () => new Date().toISOString();
 const q = {
   userCount: db.prepare('SELECT COUNT(*) n FROM users'),
   userByName: db.prepare('SELECT * FROM users WHERE username=?'),
   userById: db.prepare('SELECT * FROM users WHERE id=?'),
-  users: db.prepare('SELECT id,username,name,role,active,created_at,last_login FROM users ORDER BY id'),
-  addUser: db.prepare('INSERT INTO users(username,name,pass,role,active,created_at) VALUES(?,?,?,?,1,?)'),
+  users: db.prepare('SELECT id,username,name,role,perms,active,created_at,last_login FROM users ORDER BY id'),
+  addUser: db.prepare('INSERT INTO users(username,name,pass,role,active,created_at,perms) VALUES(?,?,?,?,1,?,?)'),
   addSession: db.prepare('INSERT INTO sessions(token,user_id,created_at,expires_at,device) VALUES(?,?,?,?,?)'),
   session: db.prepare('SELECT s.expires_at, u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?'),
   delSession: db.prepare('DELETE FROM sessions WHERE token=?'),
@@ -102,7 +114,7 @@ function checkPass(p, stored) {
   try { const [alg, s, h] = String(stored).split('$'); if (alg !== 'scrypt') return false; const want = Buffer.from(h, 'hex'); const got = crypto.scryptSync(String(p), Buffer.from(s, 'hex'), want.length, { N: 16384, r: 8, p: 1 }); return crypto.timingSafeEqual(want, got); } catch (e) { return false; }
 }
 const sha = s => crypto.createHash('sha256').update(s).digest('hex');
-const pubUser = u => ({ id: u.id, username: u.username, name: u.name, role: u.role, active: !!u.active, created_at: u.created_at, last_login: u.last_login || null });
+const pubUser = u => ({ id: u.id, username: u.username, name: u.name, role: u.role, perms: userPerms(u), active: !!u.active, created_at: u.created_at, last_login: u.last_login || null });
 
 /* ---------- ادغام سه‌طرفه (برای ویرایش هم‌زمان چند کاربر) ---------- */
 function stable(v) { if (v === undefined) return 'u'; if (v === null || typeof v !== 'object') return JSON.stringify(v); if (Array.isArray(v)) return '[' + v.map(stable).join(',') + ']'; return '{' + Object.keys(v).sort().filter(k => v[k] !== undefined).map(k => JSON.stringify(k) + ':' + stable(v[k])).join(',') + '}'; }
@@ -141,9 +153,12 @@ function merge3(base, mine, theirs) {
 /* ---------- مجوزها ---------- */
 function deny(user, coll, deleting, theirs) {
   if (user.role === 'admin') return null;
-  if (coll === 'sources') return 'تغییر منابع فقط برای مدیر مجاز است';
-  if (deleting && (coll === 'entries' || coll === 'creds')) return 'حذف فقط برای مدیر مجاز است';
-  if (deleting && coll === 'batches' && theirs && theirs.closed) return 'حذف لیست بایگانی‌شده فقط برای مدیر مجاز است';
+  const P = new Set(userPerms(user));
+  if (coll === 'sources') return P.has('src') ? null : 'تغییر منابع پرداخت برای حساب شما مجاز نیست';
+  if (deleting && (coll === 'entries' || coll === 'creds')) return P.has('del') ? null : 'حذف برای حساب شما مجاز نیست';
+  if (deleting && coll === 'batches' && theirs && theirs.closed) return P.has('del') ? null : 'حذف لیست بایگانی‌شده برای حساب شما مجاز نیست';
+  if (!deleting && !theirs && coll === 'entries' && !P.has('add') && !P.has('undo')) return 'ثبت واریزی برای حساب شما مجاز نیست';
+  if (!deleting && coll === 'creds' && !P.has('debt')) return 'تسویه بدهی برای حساب شما مجاز نیست';
   return null;
 }
 
@@ -218,7 +233,7 @@ function doSync(user, body) {
   const out = rows.map(rowOut), have = new Set(out.map(r => r.coll + '\u0000' + r.id));
   for (const k of touched) { if (have.has(k)) continue; const [c, i] = k.split('\u0000'); const r = q.getDoc.get(c, i); if (r) out.push(rowOut(r)); }
   const ver = more ? rows[rows.length - 1].ver : VER;
-  return { ver, full: since === 0, more, changes: out, rejected, app: APP_VER, v: APP_V };
+  return { ver, full: since === 0, more, changes: out, rejected, app: APP_VER, v: APP_V, me: pubUser(user) };
 }
 
 /* ---------- فایل‌های ثابت ---------- */
@@ -273,7 +288,7 @@ async function handle(req, res) {
     if (!validUsername(username)) return bad(res, 400, 'نام کاربری باید ۳ تا ۳۲ حرف انگلیسی یا عدد باشد');
     if (!name) return bad(res, 400, 'نام را بنویسید');
     if (!validPass(b.password)) return bad(res, 400, 'رمز عبور باید حداقل ۶ کاراکتر باشد');
-    const r = q.addUser.run(username, name.slice(0, 60), hashPass(b.password), 'admin', now());
+    const r = q.addUser.run(username, name.slice(0, 60), hashPass(b.password), 'admin', now(), null);
     const u = q.userById.get(r.lastInsertRowid);
     tx(() => { [[1, 'بانک سینا', 'سینا'], [2, 'بانک ملی', 'ملی'], [3, 'سینا فلاح', ''], [4, 'بلو بانک', 'بلو']].forEach(([id, n, bk]) => { if (!q.getDoc.get('sources', String(id))) q.putDoc.run('sources', String(id), JSON.stringify({ id, name: n, bank: bk, limit: 0, count: 0 }), 0, nextVer(), now(), name); }); });
     return send(res, 200, { token: newSession(u, req), user: pubUser(u) });
@@ -328,7 +343,7 @@ async function handle(req, res) {
       if (!name) return bad(res, 400, 'نام کامل را بنویسید');
       if (!validPass(b.password)) return bad(res, 400, 'رمز عبور باید حداقل ۶ کاراکتر باشد');
       if (q.userByName.get(username)) return bad(res, 409, 'این نام کاربری قبلاً ساخته شده است');
-      const r = q.addUser.run(username, name.slice(0, 60), hashPass(b.password), role, now());
+      const r = q.addUser.run(username, name.slice(0, 60), hashPass(b.password), role, now(), JSON.stringify(cleanPerms(b.perms) || DEF_STAFF));
       return send(res, 200, { user: pubUser(q.userById.get(r.lastInsertRowid)) });
     }
     const um = p.match(/^\/api\/users\/(\d+)$/);
@@ -339,6 +354,7 @@ async function handle(req, res) {
         const b = await readBody(req, 1e5);
         if (b.name !== undefined) { const n = String(b.name).trim(); if (!n) return bad(res, 400, 'نام خالی است'); db.prepare('UPDATE users SET name=? WHERE id=?').run(n.slice(0, 60), u.id); }
         if (b.role !== undefined) { const role = b.role === 'admin' ? 'admin' : 'staff'; if (u.role === 'admin' && role !== 'admin' && admins <= 1) return bad(res, 400, 'حداقل یک مدیر لازم است'); db.prepare('UPDATE users SET role=? WHERE id=?').run(role, u.id); }
+        if (b.perms !== undefined) { const pp = cleanPerms(b.perms); if (pp) db.prepare('UPDATE users SET perms=? WHERE id=?').run(JSON.stringify(pp), u.id); }
         if (b.active !== undefined) { const act = b.active ? 1 : 0; if (!act && u.id === me.id) return bad(res, 400, 'نمی‌توانید حساب خودتان را غیرفعال کنید'); if (!act && u.role === 'admin' && admins <= 1) return bad(res, 400, 'حداقل یک مدیر فعال لازم است'); db.prepare('UPDATE users SET active=? WHERE id=?').run(act, u.id); if (!act) q.delUserSessions.run(u.id); }
         if (b.password !== undefined) { if (!validPass(b.password)) return bad(res, 400, 'رمز عبور باید حداقل ۶ کاراکتر باشد'); db.prepare('UPDATE users SET pass=? WHERE id=?').run(hashPass(b.password), u.id); if (u.id !== me.id) q.delUserSessions.run(u.id); }
         return send(res, 200, { user: pubUser(q.userById.get(u.id)) });
