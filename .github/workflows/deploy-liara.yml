@@ -9,6 +9,7 @@ on:
     - cron: '45 0 * * *'    # ۰۴:۱۵ تهران (اگر سقف روزانه لیارا با ساعت جهانی صفر شود)
     - cron: '0 4 * * *'     # ۰۷:۳۰ تهران
   workflow_dispatch:
+permissions: { contents: write }
 jobs:
   wait:
     runs-on: ubuntu-latest
@@ -48,6 +49,12 @@ jobs:
           code=$?
           cat out.txt
           if [ $code -ne 0 ]; then
+            # لاگ کامل در شاخه deploy-logs ذخیره می‌شود تا بشود علت را دید
+            sed 's/\x1b\[[0-9;]*m//g' out.txt > /tmp/deploy-log.txt
+            git config user.name motalla-bot; git config user.email motalla-bot@users.noreply.github.com
+            git fetch origin deploy-logs 2>/dev/null && git checkout -q -B deploy-logs origin/deploy-logs || git checkout -q --orphan deploy-logs
+            git rm -rq --cached . 2>/dev/null || true
+            cp /tmp/deploy-log.txt last-deploy.txt; git add last-deploy.txt; git commit -qm "deploy log $(date -u +%FT%TZ)" && git push -q origin deploy-logs || true
             tail -n 6 out.txt | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r l; do echo "::error::$l"; done
             exit $code
           fi
