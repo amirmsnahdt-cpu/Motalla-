@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.7,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.8,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -734,7 +734,7 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.7,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.8,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2129,7 +2129,11 @@ function applyTheme(){const r=document.documentElement;if(themePref==='auto')r.r
   const old=[...document.querySelectorAll('meta[name="theme-color"]')];if(!(old.length===1&&old[0].content===bg&&!old[0].media)){old.forEach(m=>m.remove());const n=document.createElement('meta');n.name='theme-color';n.content=bg;document.head.appendChild(n)}
   try{if(location.protocol==='https:')document.cookie='m_theme='+themePref+';path=/;max-age=31536000;samesite=lax;secure'}catch(e){}
   try{if(window.AndroidBridge&&AndroidBridge.setTheme)AndroidBridge.setTheme(bg,dark)}catch(e){}}
-applyTheme();try{sysDark.addEventListener('change',()=>{if(themePref==='auto')applyTheme()})}catch(e){try{sysDark.addListener(()=>{if(themePref==='auto')applyTheme()})}catch(_){}}
+/* حالت خودکار در آیفون: وقتی حالت گوشی عوض شد، صفحه در اولین فرصت امن تازه می‌شود تا نوار بالا هم عوض شود */
+let themeReload=false;const safeIdle=()=>$('ov').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&cur!=='entry'&&cur!=='cwiz'&&cur!=='pwiz';
+function onSysTheme(){if(themePref!=='auto')return;applyTheme();if(navigator.standalone===true){themeReload=true;if(document.visibilityState==='visible'&&safeIdle())location.reload()}}
+document.addEventListener('visibilitychange',()=>{if(themeReload&&document.visibilityState==='visible'&&safeIdle())location.reload()});
+applyTheme();try{sysDark.addEventListener('change',onSysTheme)}catch(e){try{sysDark.addListener(onSysTheme)}catch(_){}}
 const THEMES=[['light','روز','همیشه روشن','l'],['dark','شب','همیشه تیره','d'],['auto','خودکار','مثل گوشی','a']];
 const APK_URL='https://motalla.liara.run/app.apk',WEB_URL='https://motalla.liara.run';
 function vSettings(){const sgi=(act,icn,cls,t,sub,extra,attrs)=>`<button class="sgi${cls.indexOf('rd')>=0?' rd':''}" data-act="${act}"${attrs||''}><span class="si ${cls.replace('rd','')}">${ic(icn)}</span><span class="tx"><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span>${extra==null?`<span class="cv">${ic('back')}</span>`:extra}</button>`;
