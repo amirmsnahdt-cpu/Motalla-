@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths-ignore: ['android/**', '**.md', '.github/workflows/android-apk.yml', '.github/workflows/fetch-fonts.yml']
   schedule:
-    - cron: '35 20 * * *'   # هر شب ۰۰:۰۵ به وقت تهران: اگر نسخه سرور عقب است، مستقر کن
+    - cron: '35 20 * * *'   # ۰۰:۰۵ تهران
+    - cron: '45 0 * * *'    # ۰۴:۱۵ تهران (اگر سقف روزانه لیارا با ساعت جهانی صفر شود)
+    - cron: '0 4 * * *'     # ۰۷:۳۰ تهران
   workflow_dispatch:
 jobs:
   wait:
@@ -27,8 +29,8 @@ jobs:
           if [ -z "$LIARA_API_TOKEN" ]; then echo "::warning::توکن لیارا (LIARA_API_TOKEN) تنظیم نشده"; echo "SKIP=1" >> $GITHUB_ENV; exit 0; fi
           WANT=$(grep -o 'const APP_V=[0-9.]*' index.html | head -1 | cut -d= -f2)
           HAVE=$(curl -s -m 20 https://motalla.liara.run/api/status | grep -o '"v":[0-9.]*' | cut -d: -f2 || true)
-          echo "repo=$WANT server=$HAVE"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ -n "$HAVE" ] && [ "$WANT" = "$HAVE" ]; then echo "سرور به‌روز است"; echo "SKIP=1" >> $GITHUB_ENV; fi
+          echo "::notice::repo=$WANT server=$HAVE"
+          if [ "${{ github.event_name }}" = "schedule" ] && { [ -z "$HAVE" ] || [ "$WANT" = "$HAVE" ]; }; then echo "::notice::سرور به‌روز است یا در دسترس نیست؛ استقرار زمان‌بندی‌شده لازم نیست"; echo "SKIP=1" >> $GITHUB_ENV; fi
       - uses: actions/setup-node@v4
         if: env.SKIP != '1'
         with: { node-version: '22' }
