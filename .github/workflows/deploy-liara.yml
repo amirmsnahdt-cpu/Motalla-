@@ -19,7 +19,7 @@ jobs:
         with: { node-version: '22' }
       - name: تست سرور
         if: env.SKIP != '1'
-        run: node --disable-warning=ExperimentalWarning -e "require('./server/server.js');console.log('server loads ok');process.exit(0)"
+        run: node --experimental-sqlite --disable-warning=ExperimentalWarning -e "require('./server/server.js');console.log('server loads ok');process.exit(0)"
         env: { DATA_DIR: /tmp/motalla-test }
       - name: استقرار
         if: env.SKIP != '1'
