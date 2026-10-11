@@ -243,6 +243,14 @@ const STATIC = {
   '/apple-touch-icon.png': ['apple-touch-icon.png', 'image/png'], '/icon-192.png': ['icon-192.png', 'image/png'], '/icon-512.png': ['icon-512.png', 'image/png'],
 };
 function serveStatic(req, res, p) {
+  const fm = /^\/fonts\/(Vazirmatn(?:-[A-Za-z]+)?\.woff2)$/.exec(p);
+  if (fm) {
+    fs.readFile(path.join(ROOT, 'fonts', fm[1]), (err, buf) => {
+      if (err) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200, { 'Content-Type': 'font/woff2', 'Cache-Control': 'public, max-age=31536000, immutable', 'Access-Control-Allow-Origin': '*' }); res.end(buf);
+    });
+    return true;
+  }
   const s = STATIC[p]; if (!s) return false;
   fs.readFile(path.join(ROOT, s[0]), (err, buf) => {
     if (err) { res.writeHead(404); res.end('not found'); return; }

@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
 import android.provider.MediaStore;
@@ -35,6 +37,7 @@ public class MainActivity extends Activity {
     private WebView printView;
     private ValueCallback<Uri[]> fileCb;
     private String serverUrl;
+    private final Handler ui = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle state) {
@@ -182,20 +185,34 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void printHtml(final String html, final String title) {
             runOnUiThread(() -> {
-                printView = new WebView(MainActivity.this);
-                printView.getSettings().setJavaScriptEnabled(false);
-                printView.setWebViewClient(new WebViewClient() {
+                final WebView pv = new WebView(MainActivity.this);
+                printView = pv;
+                pv.getSettings().setJavaScriptEnabled(false);
+                final boolean[] done = {false};
+                final Runnable go = () -> {
+                    if (done[0]) return;
+                    done[0] = true;
+                    try {
+                        PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
+                        String jobName = (title == null || title.isEmpty()) ? "Motalla" : title;
+                        pm.print(jobName, pv.createPrintDocumentAdapter(jobName), new PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A4).build());
+                    } catch (Exception e) { toast("چاپ ممکن نشد"); }
+                };
+                pv.setWebViewClient(new WebViewClient() {
                     @Override
-                    public void onPageFinished(WebView view, String url) {
-                        view.postDelayed(() -> {
-                            PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
-                            String jobName = (title == null || title.isEmpty()) ? "Motalla" : title;
-                            pm.print(jobName, view.createPrintDocumentAdapter(jobName), new PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A4).build());
-                        }, 600);
-                    }
+                    public void onPageFinished(WebView view, String url) { ui.postDelayed(go, 500); }
                 });
-                printView.loadDataWithBaseURL(serverUrl, html, "text/html", "utf-8", null);
+                // نکته: این WebView به صفحه وصل نیست و view.postDelayed روی آن هرگز اجرا نمی‌شود؛ پس از Handler اصلی استفاده می‌کنیم.
+                // اگر بارگذاری منابع طول کشید، بعد از ۴ ثانیه به‌هرحال چاپ باز شود
+                ui.postDelayed(go, 4000);
+                pv.loadDataWithBaseURL(serverUrl, html, "text/html", "utf-8", null);
             });
+        }
+
+        /** شماره نسخه اپ اندروید (برای اینکه صفحه وب بداند این پوسته چه امکاناتی دارد) */
+        @JavascriptInterface
+        public int version() {
+            try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode; } catch (Exception e) { return 0; }
         }
 
         /** صفحه وب پس از انتخاب حالت روز/شب این را صدا می‌زند */
