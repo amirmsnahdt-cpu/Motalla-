@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.95,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.96,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -740,6 +740,38 @@ body.loading #bar::after{opacity:1;animation:ldb 1.1s linear infinite}
 @keyframes flashIn{0%{box-shadow:0 0 0 2px var(--gold),0 0 18px -2px var(--gold);transform:scale(1.01)}20%{transform:scale(1)}100%{box-shadow:0 0 0 0 transparent}}
 .flash>*,.flash .swc>*{animation:flashBg 1.7s ease-out}
 @keyframes flashBg{0%{background-color:var(--goldbg)}100%{}}
+/* تاریخچه ساده */
+.hsum{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;font-size:12.5px;color:var(--mut);margin:2px 4px 10px}
+.hsum b{color:var(--ink);font-weight:800}.hsum b.r{color:var(--red)}.hsum>span:first-child{font-weight:800;color:var(--ink)}
+.swtip.hhint{display:block;background:none;border:0;padding:0;margin:0 6px 4px;font-size:11.5px;color:var(--mut);text-align:center}
+.hseg2 button{font-size:13px;padding:7px 4px}
+.hday{font-size:12.5px;font-weight:800;color:var(--mut);margin:14px 6px 6px}
+.hgrp{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.hgrp>.swr,.hgrp>.hrow{margin:0;border-radius:0}
+.hgrp>*+*{border-top:1px solid var(--hair)}
+.hgrp .swr>.swc>.hrow{border-radius:0}
+.hrow{background:var(--card)}
+.hrow .hh{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:0;background:none;color:var(--ink);font:inherit;text-align:right;cursor:pointer}
+.hrow .hh:active{background:var(--bg)}
+.hrow .hi{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent)}
+.hrow .hi svg{width:16px;height:16px}
+.hrow .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}
+.hrow .tx b{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hrow .tx small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hrow .hm{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
+.hrow .hm small{font-size:11.5px;color:var(--mut);font-weight:700}
+.hrow .hm .pill{margin:0;font-size:10px;padding:0 7px}
+.hrow .chv{width:15px;height:15px;color:#a0a6b2;flex:none;transition:transform .25s}
+.hrow.open .chv{transform:rotate(180deg)}
+.hrow .hb{display:none;padding:0 12px 12px 12px;animation:hbIn .22s ease-out}
+.hrow.open .hb{display:block}
+@keyframes hbIn{from{opacity:0;transform:translateY(-4px)}}
+.hrow .hd{font-size:13px;line-height:1.8;background:var(--bg);border-radius:12px;padding:8px 11px;margin-bottom:8px;overflow-wrap:anywhere}
+.hrow .ch{font-size:12.5px;margin:0 0 8px;background:var(--bg);border-radius:12px;padding:7px 11px}.hrow .ch del{color:var(--red);text-decoration:line-through}.hrow .ch ins{color:var(--ok);text-decoration:none}
+.hmeta{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:8px}
+.hmeta>div{display:flex;flex-direction:column;line-height:1.5;min-width:0}.hmeta small{font-size:11px;color:var(--mut)}.hmeta b{font-size:12.5px;font-weight:700;overflow-wrap:anywhere}
+.hact{display:flex;gap:8px;flex-wrap:wrap}
+.hrow.undone .tx b{color:var(--mut);text-decoration:line-through;text-decoration-thickness:1px}
 </style>
 </head>
 <body>
@@ -750,7 +782,7 @@ body.loading #bar::after{opacity:1;animation:ldb 1.1s linear infinite}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.95,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.96,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1617,31 +1649,47 @@ const hm=ts=>{const d=new Date(ts);return toFa(p2(d.getHours())+':'+p2(d.getMinu
 const FN={name:'نام',code:'فاکتور',amount:'مبلغ',iban:'شبا',card:'کارت',entryDate:'تاریخ'};
 function diffHTML(b,a){if(!b||!a)return '';const ch=Object.keys(FN).filter(k=>String(b[k]||'')!==String(a[k]||''));if(!ch.length)return '';
   const v=(k,x)=>k==='amount'?fmt(x):k==='entryDate'?dates(x).fa:esc(x||'—');return `<div class="ch">${ch.map(k=>`${FN[k]}: <del>${v(k,b[k])}</del> ← <ins>${v(k,a[k])}</ins>`).join('<br>')}</div>`}
-function evHTML(x){if(!x.ts)return `<div class="ev" style="--c:var(--mut)"><div class="t1"><b>${esc(x.action||'')}</b><small>${esc(x.time||'')}</small></div><div class="d">${esc(x.user||'')} — ${esc(x.detail||'')}</div></div>`;
-  const[t,c]=EVT[x.type]||['فعالیت','var(--pri)'],inTrash=(x.ids||[]).filter(id=>trash.some(z=>z.id===id)).length,live=(x.ids||[]).filter(id=>entries.some(z=>z.id===id)).length;let btn='';
+/* ---------- تاریخچه: ردیف ساده، با زدن جزئیات باز می‌شود، کشیدن برای برگرداندن/نمایش ---------- */
+const EVI={add:'plus',bulk:'paste',edit:'edit',del:'trash',clear:'trash',purge:'trash',split:'split',restore:'restore',undo:'undo',batch:'track',requeue:'refresh',uncommit:'undo',close:'check',alloc:'split',debt:'debt'};
+let histOpen=new Set();
+function evActs(x){const inTrash=(x.ids||[]).filter(id=>trash.some(z=>z.id===id)).length,live=(x.ids||[]).filter(id=>entries.some(z=>z.id===id)).length,R=[],L=[];
   if(!x.undone){
-    if(x.type==='add'&&live)btn+=`<button class="sm sec" data-act="showEnt" data-ev="${x.id}">${ic('eye')} نمایش در لیست</button><button class="sm gold" data-act="undoEv" data-ev="${x.id}">${ic('undo')} لغو ثبت</button>`;
-    if(x.type==='bulk'&&live)btn+=`<button class="sm gold" data-act="undoEv" data-ev="${x.id}">${ic('undo')} لغو ورود گروهی (${fmt(live)})</button>`;
-    if(x.type==='edit'&&live)btn+=`<button class="sm gold" data-act="undoEv" data-ev="${x.id}">${ic('undo')} برگرداندن به قبل</button>`;
-    if((x.type==='del'||x.type==='clear')&&inTrash)btn+=`<button class="sm gold" data-act="undoEv" data-ev="${x.id}">${ic('restore')} بازگردانی${inTrash>1?' ('+fmt(inTrash)+')':''}</button>`}
-  if(x.type==='split'&&x.snap)btn+=`<button class="sm sec" data-act="reopen" data-ev="${x.id}">${ic('eye')} مشاهده نتیجه و خروجی</button>`;
-  return `<div class="ev${x.undone?' undone':''}" style="--c:${c}"><div class="t1"><b>${esc(x.summary||t)}</b><small>${hm(x.ts)}</small></div><div class="d">${esc(x.user)} — ${esc(x.detail)}${x.undone?'، لغو شد':''}</div>${x.type==='edit'?diffHTML(x.before,x.after):''}${btn?`<div class="eact">${btn}</div>`:''}</div>`}
+    if(x.type==='add'&&live){R.push(['undoEv','لغو ثبت','undo','#b8862b']);L.push(['showEnt','نمایش','eye','#3b6fd6'])}
+    if(x.type==='bulk'&&live)R.push(['undoEv','لغو گروهی'+(live>1?' ('+fmt(live)+')':''),'undo','#b8862b']);
+    if(x.type==='edit'&&live)R.push(['undoEv','برگرداندن','undo','#b8862b']);
+    if((x.type==='del'||x.type==='clear')&&inTrash)R.push(['undoEv','بازگردانی'+(inTrash>1?' ('+fmt(inTrash)+')':''),'restore','#178049'])}
+  if(x.type==='split'&&x.snap)L.push(['reopen','مشاهده','eye','#3b6fd6']);
+  return {R,L}}
+function evHTML(x){
+  if(!x.ts)return `<div class="hrow"><div class="hh"><span class="hi" style="--c:var(--mut)">${ic('clock')}</span><span class="tx"><b>${esc(x.action||'')}</b><small>${esc(x.user||'')}${x.detail?' · '+esc(x.detail):''}</small></span><span class="hm"><small>${esc(x.time||'')}</small></span></div></div>`;
+  const[t,c]=EVT[x.type]||['فعالیت','var(--pri)'],op=histOpen.has(String(x.id)),A=evActs(x),acts=[...A.R,...A.L].filter(a=>isAdmin()||!ADMIN_ACTS.has(a[0]));
+  const D=isoOfTs(x.ts),meta=[['زمان',relDay(D)+'، '+dates(D).fa+' · ساعت '+hm(x.ts)],['انجام‌دهنده',x.user||'—'],['نوع',t+(x.undone?' — لغو شد':'')]];
+  const inner=`<div class="hrow${op?' open':''}${x.undone?' undone':''}"><button class="hh" data-act="evTog" data-ev="${x.id}" aria-expanded="${op}"><span class="hi" style="--c:${c}">${ic(EVI[x.type]||'clock')}</span><span class="tx"><b>${esc(x.summary||t)}</b><small>${esc(x.user||'')}${x.detail?' · '+esc(x.detail):''}</small></span><span class="hm"><small>${hm(x.ts)}</small>${x.undone?'<span class="pill g">لغو شد</span>':''}</span>${chevI()}</button>
+    <div class="hb">${x.detail?`<div class="hd">${esc(x.detail)}</div>`:''}${x.type==='edit'?diffHTML(x.before,x.after):''}<div class="hmeta">${meta.map(([k,v])=>`<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>${acts.length?`<div class="hact">${acts.map(a=>`<button class="sm ${a[0]==='undoEv'?'gold':'sec'}" data-act="${a[0]}" data-ev="${x.id}">${ic(a[2])} ${a[1]}</button>`).join('')}</div>`:''}</div></div>`;
+  return (A.R.length||A.L.length)?swW(inner,{r:A.R,l:A.L,data:{ev:x.id}}):inner}
+const histTip=()=>ls.get('m_hswiped',false)?'':`<div class="hhint swtip">برای جزئیات روی هر مورد بزنید · برای برگرداندن به چپ بکشید</div>`;
 function vAudit(){const t=todayISO(),td=audit.filter(a=>a.ts&&isoOfTs(a.ts)===t),k=ty=>td.filter(a=>ty.includes(a.type)).length;
-  let h=`<div class="seg"><button data-act="htab" data-t="ev" class="${histTab==='ev'?'on':''}">فعالیت‌ها</button><button data-act="htab" data-t="tr" class="${histTab==='tr'?'on':''}">سطل بازیابی ${trash.length?'('+fmt(trash.length)+')':''}</button></div>`;
+  let h=`<div class="seg"><button data-act="htab" data-t="ev" class="${histTab==='ev'?'on':''}">فعالیت‌ها</button><button data-act="htab" data-t="tr" class="${histTab==='tr'?'on':''}">سطل بازیابی ${trash.length?fmt(trash.length):''}</button></div>`;
   if(histTab==='tr')return h+trashHTML();
-  h+=`<div class="kpi"><div><small>ثبت امروز</small><b>${fmt(k(['add','bulk']))}</b></div><div><small>ویرایش</small><b>${fmt(k(['edit']))}</b></div><div><small>حذف</small><b style="color:var(--red)">${fmt(k(['del','clear']))}</b></div><div><small>تقسیم</small><b>${fmt(k(['split']))}</b></div></div>`;
+  const nA=k(['add','bulk']),nE=k(['edit']),nD=k(['del','clear']),nS=k(['split']);
+  h+=`<div class="hsum"><span>امروز</span><span><b>${fmt(nA)}</b> ثبت</span><span><b>${fmt(nE)}</b> ویرایش</span><span><b class="${nD?'r':''}">${fmt(nD)}</b> حذف</span><span><b>${fmt(nS)}</b> تقسیم</span></div>`;
   const F={all:'همه',add:'ثبت',edit:'ویرایش',del:'حذف',split:'تقسیم'},grp={add:['add','bulk'],edit:['edit'],del:['del','clear','purge'],split:['split']};
-  h+=`<div class="chips">${Object.entries(F).map(([a,b])=>`<button class="chip${histFilter===a?' on':''}" data-act="hfilter" data-f="${a}">${b}</button>`).join('')}</div>`;
+  h+=`<div class="seg hseg2">${Object.entries(F).map(([a,b])=>`<button class="${histFilter===a?'on':''}" data-act="hfilter" data-f="${a}">${b}</button>`).join('')}</div>`;
   const L=audit.filter(a=>histFilter==='all'||(a.ts&&grp[histFilter].includes(a.type)));
   if(!L.length)return h+`<div class="card empty">${ic('clock')}<b>فعالیتی برای نمایش نیست</b>هر ثبت، ویرایش، حذف و تقسیم اینجا ثبت می‌شود و قابل برگشت است.</div>`;
-  let last='';h+='<div class="tl">';L.slice(0,150).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){last=d;h+=`<div class="tday">${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</div>`}h+=evHTML(x)});
-  return h+'</div>'}
+  h+=histTip();let last='',open=false;
+  L.slice(0,150).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){if(open)h+='</div>';last=d;open=true;h+=`<div class="hday">${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</div><div class="hgrp">`}h+=evHTML(x)});
+  return h+(open?'</div>':'')}
 function trashHTML(){if(!trash.length)return `<div class="card empty">${ic('trash')}<b>سطل بازیابی خالی است</b>واریزی‌هایی که حذف می‌کنید تا ۶۰ روز اینجا می‌مانند و قابل بازگردانی‌اند.</div>`;
-  let h=`<div class="banner"><span>${fmt(trash.length)} واریزی حذف‌شده، ${fmt(sum(trash))} تومان</span><span style="display:flex;gap:6px"><button class="sm gold" data-act="restoreAll">${ic('restore')} بازگردانی همه</button><button class="sm red" data-act="emptyTrash">خالی کردن</button></span></div>`;
-  trash.forEach(x=>{const ago=x.deletedAt?relDay(isoOfTs(x.deletedAt))+' '+hm(x.deletedAt):'';
-    h+=`<div class="slip"><div class="a"><div style="min-width:0"><div class="nmb"><b>${esc(x.name||'—')}</b></div><div class="meta"><span class="pill gd">${dates(x.entryDate).fa}</span><span class="pill g">${esc(ibanBank(x.iban)||x.bank||'بانک نامشخص')}</span>${x.code?`<span class="pill g">فاکتور ${esc(toEn(x.code))}</span>`:''}</div></div><div class="amt">${fmt(x.amount)}<small>تومان</small></div></div>
-    <div class="b"><div class="ac">حذف: ${esc(ago)}، ${esc(x.deletedBy||'')}، ${esc(x.reason||'')}</div><div class="eact"><button class="sm gold" data-act="restoreOne" data-id="${x.id}">${ic('restore')} بازگردانی</button><button class="sm red" data-act="purgeOne" data-id="${x.id}">حذف دائمی</button></div></div></div>`});
-  return h+'<div class="muted" style="font-size:12px;text-align:center">موارد سطل بعد از ۶۰ روز خودکار پاک می‌شوند.</div>'}
+  let h=`<div class="hsum"><span>${fmt(trash.length)} واریزی حذف‌شده</span><span><b>${fmt(sum(trash))}</b> تومان</span></div><div class="row" style="margin:0 0 10px"><button class="sm gold" data-act="restoreAll">${ic('restore')} بازگردانی همه</button>${isAdmin()?`<button class="sm red" data-act="emptyTrash">خالی کردن سطل</button>`:''}</div>`;
+  h+=ls.get('m_hswiped',false)?'':`<div class="hhint swtip">برای جزئیات بزنید · به چپ بکشید: بازگردانی · به راست: حذف دائمی</div>`;
+  h+='<div class="hgrp">';
+  trash.forEach(x=>{const op=histOpen.has('t'+x.id),ago=x.deletedAt?relDay(isoOfTs(x.deletedAt))+' · '+hm(x.deletedAt):'';
+    const meta=[['حذف',ago||'—'],['حذف‌کننده',x.deletedBy||'—'],['دلیل',x.reason||'—'],['لیست',dates(x.entryDate).fa],['بانک',ibanBank(x.iban)||x.bank||'نامشخص'],['فاکتور',x.code?toEn(x.code):'—']];
+    const inner=`<div class="hrow${op?' open':''}"><button class="hh" data-act="evTog" data-ev="t${x.id}" aria-expanded="${op}"><span class="hi" style="--c:var(--red)">${ic('trash')}</span><span class="tx"><b>${esc(x.name||'—')}</b><small>${fmt(x.amount)} تومان · ${esc(dates(x.entryDate).fa)}</small></span><span class="hm"><small>${esc(x.deletedAt?hm(x.deletedAt):'')}</small></span>${chevI()}</button>
+      <div class="hb"><div class="hmeta">${meta.map(([k,v])=>`<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>${x.iban?`<div class="hd ltrv">${esc(x.iban)}</div>`:''}<div class="hact"><button class="sm gold" data-act="restoreOne" data-id="${x.id}">${ic('restore')} بازگردانی</button>${isAdmin()?`<button class="sm red" data-act="purgeOne" data-id="${x.id}">حذف دائمی</button>`:''}</div></div></div>`;
+    h+=swW(inner,{r:[['restoreOne','بازگردانی','restore','#178049']],l:[['purgeOne','حذف دائمی','trash','#d23c48']],data:{id:x.id}})});
+  return h+'</div><div class="muted" style="font-size:12px;text-align:center;margin-top:10px">موارد سطل بعد از ۶۰ روز خودکار پاک می‌شوند.</div>'}
 function undoEv(id){const x=audit.find(a=>a.id==id);if(!x||x.undone)return;
   if(x.type==='add'||x.type==='bulk'){const m=trashIds(x.ids||[],x.type==='add'?'لغو ثبت':'لغو ورود گروهی');if(!m.length){toast('این واریزی‌ها دیگر در لیست نیستند',true);return}x.undone=true;logA('undo','لغو '+(x.type==='add'?'ثبت':'ورود گروهی'),x.detail);toast(fmt(m.length)+' واریزی به سطل بازیابی رفت')}
   else if(x.type==='edit'){const e=entries.find(z=>z.id===(x.ids||[])[0]);if(!e){toast('این واریزی دیگر در لیست نیست',true);return}Object.keys(FN).forEach(k=>{if(x.before&&k in x.before)e[k]=x.before[k]});e.updatedBy=who();e.updatedAt=new Date().toISOString();saveE();alloc=null;x.undone=true;logA('undo','برگرداندن ویرایش',x.before?x.before.name:'');toast('به مقدار قبل برگشت')}
@@ -1822,7 +1870,7 @@ const edgeOK=()=>(!!PARENT[cur]||(cur==='entry'&&editId))&&$('ov').classList.con
     if(side&&full!==side.classList.contains('full')){side.classList.toggle('full',full);if(full&&navigator.vibrate)try{navigator.vibrate(10)}catch(_){}}});
   const end=e=>{if(!s||e.pointerId!==s.id)return;const z=s;s=null;if(z.lk!=='h'){if(open===z.w&&Math.abs(e.clientX-z.x)<9){close(z.w);swT=Date.now()}return}swT=Date.now();
     const W=z.w.offsetWidth,d=z.d,n=d<0?z.nr:z.nl,side=z.w.querySelector(d<0?':scope>.swa.r':':scope>.swa.l');
-    if(!ls.get('m_swiped2',false)){ls.set('m_swiped2',true);document.querySelectorAll('.swtip').forEach(t=>t.remove())}
+    if(!ls.get('m_swiped2',false)||(cur==='audit'&&!ls.get('m_hswiped',false))){ls.set('m_swiped2',true);if(cur==='audit')ls.set('m_hswiped',true);document.querySelectorAll('.swtip').forEach(t=>t.remove())}
     if(n&&Math.abs(d)>W*.58&&side){const b=side.querySelector('.swb'),act=ACT[b.dataset.act],ds={...b.dataset};
       if(/^(del|cancel|partDelId|delSrc)$/.test(b.dataset.act)){setX(z.w,d<0?-W:W,true);setTimeout(()=>{act&&act(ds);setTimeout(()=>{if(z.w.isConnected)close(z.w)},350)},220)}
       else{close(z.w);setTimeout(()=>act&&act(ds),120)}return}
@@ -2226,7 +2274,8 @@ const ACT={
   yes:()=>{const f=confirmCb;confirmCb=null;closeSheet();f&&f()},
   copyDate:d=>{const x=entries.find(y=>y.id==d.id);if(!x)return;const ne={...x,id:nid++,entryDate:dateVal,originalEntryDate:x.originalEntryDate||x.entryDate,createdBy:who(),updatedBy:who(),updatedAt:new Date().toISOString()};entries.push(ne);saveE();alloc=null;logA('add','افزودن به تاریخ دیگر',x.name+' → '+dates(dateVal).fa,{ids:[ne.id],after:pick(ne)});toast('به '+dates(dateVal).fa+' اضافه شد');render()},
   clearDay:()=>askConfirm('کل لیست '+dates(dateVal).fa+' به سطل بازیابی برود؟','انتقال به سطل',()=>{const ids=dayEntries().map(e=>e.id),s=sum(dayEntries());trashIds(ids,'پاک‌کردن لیست روز');logA('clear','پاک‌کردن لیست روز',fmt(ids.length)+' واریزی | '+fmt(s)+' تومان | '+dates(dateVal).fa,{ids});const evId=audit[0].id;render();toast(fmt(ids.length)+' واریزی به سطل رفت','','بازگردانی',()=>undoEv(evId))}),
-  htab:d=>{histTab=d.t;render()},hfilter:d=>{histFilter=d.f;render()},
+  htab:d=>{histTab=d.t;histOpen=new Set();render()},hfilter:d=>{histFilter=d.f;histOpen=new Set();render()},
+  evTog:(d,e)=>{const r=e.target.closest('.hrow');if(!r)return;const o=r.classList.toggle('open'),h=r.querySelector('.hh');if(h)h.setAttribute('aria-expanded',o);const k=String(d.ev);o?histOpen.add(k):histOpen.delete(k)},
   undoEv:d=>undoEv(d.ev),reopen:d=>reopen(d.ev),
   showEnt:d=>{const x=audit.find(a=>a.id==d.ev),e=x&&entries.find(z=>z.id===(x.ids||[])[0]);if(!e){toast('این واریزی دیگر در لیست نیست',true);return}listMode='day';listFilter='all';listQ=e.name;dateVal=e.entryDate;ls.set('m_date',dateVal);go('list')},
   restoreOne:d=>{const b=restoreIds([+d.id]);if(b.length){logA('restore','بازگردانی',b[0].name+' | '+dates(b[0].entryDate).fa,{ids:[b[0].id]});toast('«'+b[0].name+'» به لیست '+dates(b[0].entryDate).fa+' برگشت')}render()},
