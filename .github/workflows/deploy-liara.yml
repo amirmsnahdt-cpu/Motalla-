@@ -5,9 +5,7 @@ on:
     branches: [main]
     paths-ignore: ['android/**', '**.md', '.github/workflows/android-apk.yml', '.github/workflows/fetch-fonts.yml']
   schedule:
-    - cron: '35 20 * * *'   # ۰۰:۰۵ تهران
-    - cron: '45 0 * * *'    # ۰۴:۱۵ تهران (اگر سقف روزانه لیارا با ساعت جهانی صفر شود)
-    - cron: '0 4 * * *'     # ۰۷:۳۰ تهران
+    - cron: '20 */2 * * *'  # هر ۲ ساعت: اگر نسخه سرور عقب‌تر از برنامه است (مثلاً به‌خاطر سقف روزانه لیارا)، دوباره مستقر کن
   workflow_dispatch:
 permissions: { contents: write }
 jobs:
