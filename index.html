@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (بدون نیاز به گوگل) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.99,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=30,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -795,7 +795,7 @@ body.loading #bar::after{opacity:1;animation:ldb 1.1s linear infinite}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.99,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=30,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2510,7 +2510,12 @@ window.__androidBack=()=>{try{const au=$('auth');if(au&&!au.classList.contains('
   if(cur!=='home'){back();return true}return false}catch(e){return false}};
 /* پیام نسخه جدید روی صفحه ورود هم دیده شود */
 {const W=f=>function(){const r=f.apply(this,arguments);try{updBar()}catch(e){}return r};showAuth=W(showAuth);authForm=W(authForm);loggedIn=W(loggedIn);forceLogout=W(forceLogout)}
-ACT.checkUpd=()=>{if(UPD){applyUpd();return}if(location.protocol==='https:'){toast('در حال بررسی…');checkUpdate(true);setTimeout(()=>{if(!UPD)toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));else toast('نسخه جدید پیدا شد؛ دکمه طلایی پایین صفحه را بزنید')},6000);return}
+ACT.checkUpd=async()=>{if(UPD){applyUpd();return}
+  if(location.protocol==='https:'&&location.hostname!=='raw.githack.com'){toast('در حال بررسی…');
+    try{const j=await (await fetch('/api/status?t='+Date.now(),{cache:'no-store'})).json(),sv=+j.v||0;
+      if(sv>APP_V){updFound(sv);toast('نسخه '+toFa(sv)+' آماده است؛ دکمه پایین صفحه را بزنید')}else toast('برنامه به‌روز است ✓ نسخه شما '+toFa(APP_V)+' · نسخه سرور '+toFa(sv))}
+    catch(e){toast('اتصال به سرور برقرار نیست',true)}return}
+  if(location.protocol==='https:'){toast('در حال بررسی…');checkUpdate(true);setTimeout(()=>{if(!UPD)toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));else toast('نسخه جدید پیدا شد؛ دکمه طلایی پایین صفحه را بزنید')},6000);return}
   ACT.checkUpd0()};
 ACT.checkUpd0=()=>{if(location.hostname!=='raw.githack.com'){if(location.protocol!=='https:'){toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));return}toast('در حال دریافت آخرین نسخه…');const r=()=>location.reload();try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,500))}catch(e){setTimeout(r,500)}return}
   toast('در حال بررسی…');const v0=APP_V;try{sessionStorage.removeItem('m_updchk')}catch(e){}checkUpdate(true);setTimeout(()=>{let nv=0;try{nv=+localStorage.getItem('m_app_next_v')||0}catch(e){}if(!(nv>v0))toast('برنامه به‌روز است ✓ نسخه '+toFa(v0))},6000)};
