@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.6,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.7,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -734,7 +734,7 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.6,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.7,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2346,7 +2346,9 @@ ACT.homeSt=d=>{homeSt=d.t;ls.set('m_homest',homeSt);const v=$('view'),y=v.scroll
 ACT.dayGrp=(d,e)=>{const g=e.target.closest('.tg2');if(!g)return;const o=g.classList.toggle('open');const h=g.querySelector('.tgh2');if(h)h.setAttribute('aria-expanded',o);o?dayOpen.add(d.s):dayOpen.delete(d.s)};
 {const _od=ACT.openDay;ACT.openDay=d=>{dayOpen=new Set();_od(d)}}
 ACT.settings=()=>go('settings');
-ACT.setTheme=d=>{themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
+ACT.setTheme=d=>{const ch=themePref!==d.t;themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;
+  /* آیفون (برنامه نصب‌شده) رنگ نوار بالا را فقط موقع باز شدن صفحه می‌خواند؛ پس یک بار صفحه را تازه می‌کنیم تا نوار هم عوض شود */
+  if(ch&&navigator.standalone===true){try{sessionStorage.setItem('m_back_settings','1')}catch(e){}setTimeout(()=>location.reload(),250)}};
 ACT.applyUpd=()=>applyUpd();
 /* دکمه برگشت اندروید: اول پنجره باز، بعد صفحه قبلی، در خانه خروج */
 window.__androidBack=()=>{try{const au=$('auth');if(au&&!au.classList.contains('hide'))return false;
@@ -2374,6 +2376,7 @@ function fitApp(){const a=$('app');if(!a)return;const sa=navigator.standalone===
   a.style.setProperty('height',h+'px','important');a.style.setProperty('bottom','auto','important')}
 
 if(ME)user=ME.name;document.body.classList.toggle('staff',!!ME&&!isAdmin());syncInit();
+try{if(sessionStorage.getItem('m_back_settings')){sessionStorage.removeItem('m_back_settings');if(ME&&TOKEN)cur='settings'}}catch(e){}
 render(true);
 if(!TOKEN)showAuth();else{setSync(navigator.onLine===false?'off':'busy');syncNow()}
 if('serviceWorker' in navigator&&(location.protocol==='https:'||/^(127\.0\.0\.1|localhost)$/.test(location.hostname))){navigator.serviceWorker.register('sw.js').catch(()=>{})}
