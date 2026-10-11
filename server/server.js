@@ -7,6 +7,8 @@ const crypto = require('node:crypto');
 const { DatabaseSync } = require('node:sqlite');
 
 const PORT = +process.env.PORT || 3000;
+process.on('uncaughtException', e => { console.error('uncaught:', e); });
+process.on('unhandledRejection', e => { console.error('unhandled:', e); });
 const ROOT = path.join(__dirname, '..');
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, 'data');
 const SESSION_DAYS = 180;
@@ -326,5 +328,5 @@ const server = http.createServer((req, res) => {
 });
 setInterval(() => { try { q.purgeSessions.run(now()); } catch (e) { } }, 6 * 3600e3).unref();
 try { fs.watch(path.join(ROOT, 'index.html'), () => setTimeout(appVersion, 200)); } catch (e) { }
-if (require.main === module) server.listen(PORT, () => console.log('motalla server on :' + PORT + ' data=' + DATA_DIR + ' app=' + APP_VER));
+if (require.main === module) server.listen(PORT, process.env.HOST || '0.0.0.0', () => console.log('motalla server on :' + PORT + ' data=' + DATA_DIR + ' app=' + APP_VER));
 module.exports = { server, merge3, db };
