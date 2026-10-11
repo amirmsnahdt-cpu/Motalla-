@@ -485,6 +485,7 @@ html{padding:0!important}
 #act{margin-bottom:40px!important}
 #bottom{padding-bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 10px))!important}
 html,body{background:var(--bg)}
+.ver{text-align:center;font-size:11.5px;color:var(--mut);margin:18px 0 4px;opacity:.8}
 @media print{html,body{height:auto;overflow:visible}#app{height:auto}}
 .hav{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--navy);color:var(--gold2);display:grid;place-items:center;font-weight:900;font-size:15px;cursor:pointer;flex:none;padding:0}
 .hav svg{width:18px;height:18px}
@@ -621,6 +622,14 @@ html,body{background:var(--bg)}
 <div id="pv" class="hide"><div class="pvh"><button class="btn sec" data-act="pvClose" style="flex:0 0 auto;padding:0 18px">بستن</button><button class="btn gold" data-act="pvPrint">چاپ / ذخیره PDF</button></div><iframe id="pvf" title="پیش‌نمایش گزارش"></iframe></div>
 <div id="printArea"></div>
 <script>
+/* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
+const APP_V=27,REPO='amirmsnahdt-cpu/Motalla-';
+function checkUpdate(force){try{if(location.hostname!=='raw.githack.com')return;let t=0;try{t=+sessionStorage.getItem('m_updchk')||0}catch(e){}
+  if(!force&&Date.now()-t<3*60e3)return;try{sessionStorage.setItem('m_updchk',String(Date.now()))}catch(e){}
+  fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;
+    if(sha&&/^[0-9a-f]{40}$/.test(sha)&&!location.pathname.includes(sha))location.replace('https://raw.githack.com/'+REPO+'/'+sha+'/index.html')}).catch(()=>{})}catch(e){}}
+checkUpdate(true);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&typeof cur!=='undefined'&&cur==='home'&&document.getElementById('ov').classList.contains('hide'))checkUpdate(false)});
 (()=>{const V=()=>document.getElementById('view');const ws=window.scrollTo.bind(window);
   Object.defineProperty(window,'scrollY',{configurable:true,get:()=>{const v=V();return v?v.scrollTop:0}});
   window.scrollTo=function(a,b){const v=V();if(!v)return ws(a,b);if(typeof a==='object')v.scrollTo(a);else v.scrollTop=b||0}})();
@@ -766,7 +775,7 @@ function vHome(){const L=dayList(),bad=L.filter(r=>r.level===2).length,last=L.sl
   ${storeOK?'':'<div class="msg warn">ذخیره خودکار در این مرورگر ممکن نیست.</div>'}
   ${openCreds().length?`<button class="lrow" data-act="tab" data-n="debt"><span class="ic gd">${ic('debt')}</span><span class="tx"><b>تسویه بدهی: ${fmt(openCreds().length)} حساب باز</b><small>مانده کل ${fmt(openCreds().reduce((s,c)=>s+cRem(c),0))} تومان</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:''}
   <div class="sec-h"><b>ثبت‌های ${['امروز','دیروز','فردا'].includes(r)?r:'این روز'}: ${fmt(L.length)} مورد</b>${L.length?'<button class="link" data-act="tab" data-n="list">همه</button>':''}</div>
-  ${L.length?`<div class="hscroll">${[...L].reverse().map(x=>`<button class="hc${x.level===2?' bad':''}${x.sentBid?' sent':''}" data-act="edit" data-id="${x.id}"><span class="t"><span class="idx">${fmt(x.seq)}</span>${x.level===2?'<span class="pill rd">خطا</span>':stPill(x)}</span><b>${esc(x.name||'—')}</b><span class="a">${fmt(x.amount)}<small> تومان</small></span><small>${esc(x.bankShow||'—')}</small></button>`).join('')}</div>`:`<div class="card empty">${ic('list')}<b>برای ${dates(dateVal).fa} واریزی‌ای ثبت نشده</b>با دکمه طلایی پایین صفحه شروع کنید.</div>`}`}
+  ${L.length?`<div class="hscroll">${[...L].reverse().map(x=>`<button class="hc${x.level===2?' bad':''}${x.sentBid?' sent':''}" data-act="edit" data-id="${x.id}"><span class="t"><span class="idx">${fmt(x.seq)}</span>${x.level===2?'<span class="pill rd">خطا</span>':stPill(x)}</span><b>${esc(x.name||'—')}</b><span class="a">${fmt(x.amount)}<small> تومان</small></span><small>${esc(x.bankShow||'—')}</small></button>`).join('')}</div>`:`<div class="card empty">${ic('list')}<b>برای ${dates(dateVal).fa} واریزی‌ای ثبت نشده</b>با دکمه طلایی پایین صفحه شروع کنید.</div>`}<div class="ver">مطلا · نسخه ${toFa(APP_V)}</div>`}
 function flowCard(){const f=flowState(),r=relDay(dateVal),lab=['امروز','دیروز','فردا'].includes(r)?r:dates(dateVal).fa,pa=pendingAll();
   let msg,btn;if(!f.has){msg='برای '+lab+' هنوز لیستی شروع نشده';btn=`<button class="btn gold" data-act="newList">${ic('plus')} شروع لیست جدید</button>`}
   else if(f.op){const p=openB().filter(b=>b.date===dateVal).reduce((s,b)=>s+b.items.filter(x=>x.st==='pending').length,0);msg=p?fmt(p)+' واریز منتظر تأیید':'همه تیک خورده؛ ثبت نهایی مانده';btn=`<button class="btn gold" data-act="flowGo" data-s="track">ادامه: پیگیری</button>`}
