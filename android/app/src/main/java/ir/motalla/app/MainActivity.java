@@ -221,6 +221,21 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> applyBars(bg, dark));
         }
 
+        /** فقط نوار وضعیت بالا (مثلاً آبی در صفحه خانه)؛ نوار پایین دست نمی‌خورد */
+        @JavascriptInterface
+        public void setStatusBar(final String hex, final boolean lightIcons) {
+            runOnUiThread(() -> {
+                int c;
+                try { c = Color.parseColor(hex); } catch (Exception e) { return; }
+                Window w = getWindow();
+                w.setStatusBarColor(c);
+                View d = w.getDecorView();
+                int f = d.getSystemUiVisibility();
+                if (lightIcons) f &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR; else f |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                d.setSystemUiVisibility(f);
+            });
+        }
+
         @JavascriptInterface
         public void share(String text) {
             Intent i = new Intent(Intent.ACTION_SEND);
