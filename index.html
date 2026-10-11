@@ -469,8 +469,14 @@ button.sm{border-radius:10px;background:var(--btn)}button.sm.sec{background:var(
 .tgh span{color:var(--ink)}
 /* ================= کشیدن برای حذف / ویرایش ================= */
 .swr{position:relative;margin-bottom:10px;border-radius:16px;isolation:isolate;overflow:hidden;overflow:clip}
-html{overflow-x:clip}body{overflow-x:clip}
-#bar{position:sticky;top:0;transform:translateZ(0)}#bottom{position:sticky;bottom:0;transform:translateZ(0)}
+/* اسکلت ثابت: فقط وسط صفحه اسکرول می‌شود */
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+#app{height:100vh;height:100dvh;min-height:0!important;overflow:hidden}
+#bar{position:relative!important;flex:none;z-index:20}
+#view{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+#bottom{position:relative!important;flex:none;background:var(--bg)!important;padding-top:6px!important}
+#act{margin-bottom:40px!important}
+@media print{html,body{height:auto;overflow:visible}#app{height:auto}}
 .hav{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--navy);color:var(--gold2);display:grid;place-items:center;font-weight:900;font-size:15px;cursor:pointer;flex:none;padding:0}
 .hav svg{width:18px;height:18px}
 #act .btn{font-size:15px;white-space:nowrap;padding:0 12px}
@@ -606,6 +612,9 @@ html{overflow-x:clip}body{overflow-x:clip}
 <div id="pv" class="hide"><div class="pvh"><button class="btn sec" data-act="pvClose" style="flex:0 0 auto;padding:0 18px">بستن</button><button class="btn gold" data-act="pvPrint">چاپ / ذخیره PDF</button></div><iframe id="pvf" title="پیش‌نمایش گزارش"></iframe></div>
 <div id="printArea"></div>
 <script>
+(()=>{const V=()=>document.getElementById('view');const ws=window.scrollTo.bind(window);
+  Object.defineProperty(window,'scrollY',{configurable:true,get:()=>{const v=V();return v?v.scrollTop:0}});
+  window.scrollTo=function(a,b){const v=V();if(!v)return ws(a,b);if(typeof a==='object')v.scrollTo(a);else v.scrollTop=b||0}})();
 const FA='۰۱۲۳۴۵۶۷۸۹';
 const toEn=s=>String(s).replace(/[۰-۹]/g,d=>FA.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
 const toFa=s=>String(s).replace(/\d/g,d=>FA[d]);
@@ -1677,7 +1686,7 @@ window.addEventListener('resize',()=>requestAnimationFrame(segFx));
 /* ================= v21: نوار ناوبری با نشانگر متحرک ================= */
 function dockInd(){const d=$('dock');if(!d)return;const o=d.querySelector('.tb.on');if(o){d.style.setProperty('--ix',o.offsetLeft+'px');d.style.setProperty('--iw',o.offsetWidth+'px');d.style.setProperty('--io','1')}else d.style.setProperty('--io','0')}
 window.addEventListener('resize',dockInd);
-window.addEventListener('scroll',()=>{const b=$('bar');if(b)b.classList.toggle('sc',window.scrollY>4)},{passive:true});
+$('view').addEventListener('scroll',()=>{const b=$('bar');if(b)b.classList.toggle('sc',$('view').scrollTop>4)},{passive:true});
 let navBack=false;
 /* ================= v21: پیگیری — هر منبع یک لیست جدا و بازشونده ================= */
 let tkOpen=new Set();
