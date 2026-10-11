@@ -3,6 +3,7 @@ package ir.motalla.app;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -39,12 +40,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         serverUrl = getString(R.string.server_url);
-        Window w = getWindow();
-        w.setStatusBarColor(Color.parseColor("#0A1222"));
-        w.setNavigationBarColor(Color.parseColor("#0A1222"));
-
+        boolean night = isSystemNight();
         web = new WebView(this);
-        web.setBackgroundColor(Color.parseColor("#0A1222"));
+        applyBars(night ? "#0A1222" : "#F5F6F8", night);
         setContentView(web);
 
         WebSettings s = web.getSettings();
@@ -101,14 +99,43 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (web != null && web.canGoBack()) web.goBack();
-        else super.onBackPressed();
+        if (web == null) { super.onBackPressed(); return; }
+        // برنامه وب تصمیم می‌گیرد: بستن پنجره، رفتن به صفحه قبل، یا خروج از خانه
+        web.evaluateJavascript("(window.__androidBack&&window.__androidBack())?'1':'0'", v -> {
+            if (!"\"1\"".equals(v)) super.onBackPressed();
+        });
     }
 
     @Override
     protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
         if (web != null) web.saveState(out);
+    }
+
+    private boolean isSystemNight() {
+        return (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    /** رنگ نوار وضعیت (بالا) و نوار ناوبری (دکمه‌های برگشت/خانه) را هم‌رنگ برنامه می‌کند */
+    private void applyBars(String hex, boolean dark) {
+        int c;
+        try { c = Color.parseColor(hex); } catch (Exception e) { c = Color.parseColor(dark ? "#0A1222" : "#F5F6F8"); }
+        Window w = getWindow();
+        w.setStatusBarColor(c);
+        View d = w.getDecorView();
+        int f = d.getSystemUiVisibility();
+        if (dark) f &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR; else f |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        if (Build.VERSION.SDK_INT >= 26) {
+            w.setNavigationBarColor(c);
+            if (dark) f &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR; else f |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            if (Build.VERSION.SDK_INT >= 28) w.setNavigationBarDividerColor(dark ? Color.parseColor("#1B2641") : Color.parseColor("#E7E9EF"));
+        } else {
+            // اندروید ۷: آیکون تیره در نوار ناوبری پشتیبانی نمی‌شود، پس نوار تیره می‌ماند تا دکمه‌ها دیده شوند
+            w.setNavigationBarColor(Color.parseColor("#0A1222"));
+        }
+        d.setSystemUiVisibility(f);
+        w.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(c));
+        if (web != null) web.setBackgroundColor(c);
     }
 
     private void toast(final String msg) {
@@ -165,6 +192,12 @@ public class MainActivity extends Activity {
                 });
                 printView.loadDataWithBaseURL(serverUrl, html, "text/html", "utf-8", null);
             });
+        }
+
+        /** صفحه وب پس از انتخاب حالت روز/شب این را صدا می‌زند */
+        @JavascriptInterface
+        public void setTheme(final String bg, final boolean dark) {
+            runOnUiThread(() -> applyBars(bg, dark));
         }
 
         @JavascriptInterface

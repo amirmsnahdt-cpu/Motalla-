@@ -6,11 +6,21 @@ android {
     applicationId 'ir.motalla.app'
     minSdk 24
     targetSdk 34
-    versionCode 1
-    versionName '1.0'
+    // هر ساخت شماره بالاتری می‌گیرد تا نصب روی نسخه قبلی ممکن باشد
+    versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger() + 100)
+    versionName '1.' + (System.getenv('GITHUB_RUN_NUMBER') ?: '0')
+  }
+  signingConfigs {
+    // کلید ثابت: همه نسخه‌ها با یک امضا ساخته می‌شوند و روی هم نصب می‌شوند
+    release {
+      storeFile file('motalla-release.keystore')
+      storePassword 'motalla2026'
+      keyAlias 'motalla'
+      keyPassword 'motalla2026'
+    }
   }
   buildTypes {
-    release { minifyEnabled false; signingConfig signingConfigs.debug }
+    release { minifyEnabled false; signingConfig signingConfigs.release }
   }
   compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }

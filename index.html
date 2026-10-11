@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.3,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -734,7 +734,7 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.2,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.3,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2125,7 +2125,8 @@ Object.assign(IC,{sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4
 let themePref=ls.get('m_theme','auto');if(!['auto','light','dark'].includes(themePref))themePref='auto';
 const sysDark=matchMedia('(prefers-color-scheme: dark)');
 function applyTheme(){const r=document.documentElement;if(themePref==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',themePref);
-  const dark=themePref==='dark'||(themePref==='auto'&&sysDark.matches);document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{m.setAttribute('content',dark?'#0a1222':'#f5f6f8');m.removeAttribute('media')})}
+  const dark=themePref==='dark'||(themePref==='auto'&&sysDark.matches),bg=dark?'#0a1222':'#f5f6f8';document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{m.setAttribute('content',bg);m.removeAttribute('media')});
+  try{if(window.AndroidBridge&&AndroidBridge.setTheme)AndroidBridge.setTheme(bg,dark)}catch(e){}}
 applyTheme();try{sysDark.addEventListener('change',()=>{if(themePref==='auto')applyTheme()})}catch(e){try{sysDark.addListener(()=>{if(themePref==='auto')applyTheme()})}catch(_){}}
 const THEMES=[['light','روز','همیشه روشن','l'],['dark','شب','همیشه تیره','d'],['auto','خودکار','مثل گوشی','a']];
 const APK_URL='https://motalla.liara.run/app.apk',WEB_URL='https://motalla.liara.run';
@@ -2344,6 +2345,12 @@ ACT.dayGrp=(d,e)=>{const g=e.target.closest('.tg2');if(!g)return;const o=g.class
 ACT.settings=()=>go('settings');
 ACT.setTheme=d=>{themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.applyUpd=()=>applyUpd();
+/* دکمه برگشت اندروید: اول پنجره باز، بعد صفحه قبلی، در خانه خروج */
+window.__androidBack=()=>{try{const au=$('auth');if(au&&!au.classList.contains('hide'))return false;
+  if(!$('ov').classList.contains('hide')){ACT.close();return true}
+  const pv=$('pv');if(pv&&!pv.classList.contains('hide')){closePrint();return true}
+  if(cur==='entry'&&editId){ACT.cancelEdit();return true}
+  if(cur!=='home'){back();return true}return false}catch(e){return false}};
 /* پیام نسخه جدید روی صفحه ورود هم دیده شود */
 {const W=f=>function(){const r=f.apply(this,arguments);try{updBar()}catch(e){}return r};showAuth=W(showAuth);authForm=W(authForm);loggedIn=W(loggedIn);forceLogout=W(forceLogout)}
 ACT.checkUpd=()=>{if(UPD){applyUpd();return}if(location.protocol==='https:'){toast('در حال بررسی…');checkUpdate(true);setTimeout(()=>{if(!UPD)toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));else toast('نسخه جدید پیدا شد؛ دکمه طلایی پایین صفحه را بزنید')},6000);return}

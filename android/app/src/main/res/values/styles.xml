@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- حالت روز: پس‌زمینه روشن، آیکون‌های نوار وضعیت و ناوبری تیره -->
+  <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+    <item name="android:windowBackground">@color/app_bg</item>
+    <item name="android:statusBarColor">@color/app_bg</item>
+    <item name="android:navigationBarColor">@color/app_bg</item>
+    <item name="android:windowLightStatusBar">true</item>
+  </style>
+  <color name="app_bg">#F5F6F8</color>
+</resources>
