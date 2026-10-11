@@ -1,0 +1,30 @@
+name: ساخت اپ اندروید (APK)
+on:
+  push:
+    branches: [main, v2-server]
+    paths: ['android/**', '.github/workflows/android-apk.yml']
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.7' }
+      - name: ساخت APK
+        run: gradle -p android assembleRelease --no-daemon --stacktrace
+      - run: cp android/app/build/outputs/apk/release/app-release.apk motalla.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: motalla-apk, path: motalla.apk }
+      - name: انتشار در Releases
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk
+          name: اپ اندروید مطلا
+          body: فایل نصبی اندروید مطلا. اطلاعات روی سرور است؛ با نصب نسخه جدید چیزی پاک نمی‌شود.
+          files: motalla.apk
+          make_latest: true

@@ -1,0 +1,29 @@
+name: استقرار روی لیارا
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['android/**', '**.md']
+  workflow_dispatch:
+concurrency: { group: liara-deploy, cancel-in-progress: false }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: بررسی وجود توکن لیارا
+        env: { LIARA_API_TOKEN: '${{ secrets.LIARA_API_TOKEN }}' }
+        run: |
+          if [ -z "$LIARA_API_TOKEN" ]; then echo "::warning::توکن لیارا (LIARA_API_TOKEN) هنوز تنظیم نشده؛ استقرار انجام نشد."; echo "SKIP=1" >> $GITHUB_ENV; fi
+      - uses: actions/setup-node@v4
+        if: env.SKIP != '1'
+        with: { node-version: '22' }
+      - name: تست سرور
+        if: env.SKIP != '1'
+        run: node --disable-warning=ExperimentalWarning -e "require('./server/server.js');console.log('server loads ok');process.exit(0)"
+        env: { DATA_DIR: /tmp/motalla-test }
+      - name: استقرار
+        if: env.SKIP != '1'
+        env: { LIARA_API_TOKEN: '${{ secrets.LIARA_API_TOKEN }}' }
+        run: |
+          npm i -g @liara/cli@5
+          liara deploy --app="$(node -p "require('./liara.json').app")" --api-token="$LIARA_API_TOKEN" --no-app-logs

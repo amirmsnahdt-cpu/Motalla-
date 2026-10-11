@@ -1,0 +1,7 @@
+{
+  "platform": "node",
+  "app": "motalla",
+  "port": 3000,
+  "node": { "version": "22" },
+  "disks": [{ "name": "data", "mountTo": "/usr/src/app/data" }]
+}

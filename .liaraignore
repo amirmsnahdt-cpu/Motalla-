@@ -1,0 +1,5 @@
+android/
+.github/
+data/
+node_modules/
+*.png.bak
