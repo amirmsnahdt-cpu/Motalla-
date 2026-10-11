@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.91,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.92,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -736,7 +736,7 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.91,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.92,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1031,7 +1031,7 @@ function listBody(){const V=validated(),q=listQ.trim(),base=listMode==='day'?V.f
   if(!q)h+=`<div class="ingot"><div class="lb">جمع همه لیست‌ها</div><div class="v">${fmt(sum(L))}<small>تومان</small></div><div class="rule"></div><div class="row3"><div><small>لیست‌ها</small><b>${fmt(ks.length)}</b></div><div><small>تسویه کامل</small><b>${fmt(ks.filter(k=>dayDone(k,V)).length)}</b></div><div><small>کل واریزی‌ها</small><b>${fmt(L.length)}</b></div></div></div>`;
   ks.forEach(k=>{const g=by[k],D=dates(k),gb=g.filter(r=>r.level===2).length,op=q||openGroups.has(k),dn=dayDone(k,V),dc=doneCnt(V.filter(r=>r.entryDate===k));
     h+=`<div class="dgrp${op?' open':''}${dn?' done':''}" data-g="${k}"><button class="h" data-act="tgl" data-g="${k}" aria-expanded="${op}"><span class="cal"><b>${toFa(D.jd)}</b><small>${JM[D.jm-1]}</small></span><span class="mid"><b>${relDay(k)}، ${D.fa}</b><small>${fmt(g.length)} واریزی${gb?`، <span style="color:var(--red)">${fmt(gb)} خطادار</span>`:''}</small><span class="tags">${dn?'<span class="pill okp">✓ تسویه کامل</span>':dc?`<span class="pill gd">${fmt(dc)} از ${fmt(V.filter(r=>r.entryDate===k).length)} تسویه</span>`:'<span class="pill g">در جریان</span>'}</span></span><span class="sum">${fmt(sum(g))}</span>${ic('chev').replace('class="i"','class="i chev"')}</button>
-    <div class="in"><div class="row" style="margin:0 0 10px"><button class="sm" data-act="lsel" data-iso="${k}">${ic('open')} انتخاب این لیست (جمع و خروجی)</button></div>${g.map(r=>slipHTML(r,q,H.get(r.id),false)).join('')}</div></div>`});
+    <div class="in">${g.map(r=>slipHTML(r,q,H.get(r.id),false)).join('')}</div></div>`});
   return h}
 function exportCard(L){const ok=L.filter(r=>r.level<2).length,bad=L.length-ok;
   return `<div class="card"><b>خروجی از همین لیست</b><div class="muted" style="font-size:12.5px">${fmt(ok)} ردیف سالم${bad?`، ${fmt(bad)} ردیف خطادار وارد خروجی نمی‌شود`:''}${listMode==='all'?'، همه لیست‌ها، هر تاریخ جدا':'، فقط لیست '+esc(dates(dateVal).fa)}</div><div class="xp"><button class="sm" data-act="lexp" data-a="menu">خروجی: متن، PDF، Excel</button><button class="sm sec" data-act="lexp" data-a="cp">${ic('copy')} کپی متن</button></div></div>`}
