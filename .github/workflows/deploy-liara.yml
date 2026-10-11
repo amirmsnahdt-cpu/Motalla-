@@ -25,5 +25,14 @@ jobs:
         if: env.SKIP != '1'
         env: { LIARA_API_TOKEN: '${{ secrets.LIARA_API_TOKEN }}', LIARA_APP: '${{ vars.LIARA_APP }}' }
         run: |
-          npm i -g @liara/cli@5
-          liara deploy --app="${LIARA_APP:-motalla}" --api-token="$LIARA_API_TOKEN" --no-app-logs
+          npm i -g @liara/cli@5 >/dev/null 2>&1
+          liara --version || true
+          set +e
+          liara deploy --app="${LIARA_APP:-motalla}" --api-token="$LIARA_API_TOKEN" --region=iran --no-app-logs > out.txt 2>&1
+          code=$?
+          cat out.txt
+          if [ $code -ne 0 ]; then
+            # خطا را به شکل annotation بنویس تا بدون دسترسی به لاگ هم دیده شود
+            tail -n 25 out.txt | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r l; do echo "::error::$l"; done
+            exit $code
+          fi
