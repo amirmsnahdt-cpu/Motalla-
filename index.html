@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=38,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=38.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1128,6 +1128,12 @@ body{font-feature-settings:normal}
 
 .er.col{flex-wrap:wrap;gap:0;padding-top:10px}.er.col .erl{flex-basis:100%}.er.col .erv{flex-basis:100%}.er.col input{padding:8px 0 12px;font-size:16px;letter-spacing:.2px}
 .er.col+.erh{padding-inline-start:0;margin-top:-6px}
+
+/* گوشه‌های گرد برای کارت‌های لیست */
+.fcard{background:var(--card);border-radius:20px;overflow:hidden;overflow:clip;padding:0 12px;box-shadow:0 1px 2px #16213a0a;margin-bottom:6px}
+.fcard>.swr{border-radius:0!important;margin:0!important}
+.fcard .brw,.fcard .brh{background:var(--card)}
+#app{overflow-x:hidden;overflow-x:clip}
 </style>
 </head>
 <body>
@@ -1138,7 +1144,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=38,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=38.1,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1408,8 +1414,8 @@ function findRows(){const q=toEn(fQ.trim()).toLowerCase(),qd=q.replace(/\D/g,'')
     return hay.includes(q)||(qd.length>=3&&[x.iban,x.card,x.acct,String(x.amount),al&&al.tn].some(v=>v&&String(v).includes(qd)))})
    .sort((a,b)=>a.entryDate<b.entryDate?1:a.entryDate>b.entryDate?-1:(b.id-a.id))}
 function findHTML(){const all=findRows(),L=all.slice(0,fN);if(!all.length)return `<div class="bempty">${ic('search')}<b>${fQ.trim()?'چیزی پیدا نشد':'واریزی‌ای نیست'}</b><span>${fQ.trim()?'نام، فاکتور، مبلغ یا بخشی از شبا را امتحان کنید':''}</span></div>`;
-  let h='',last=null;L.forEach(x=>{if(x.entryDate!==last){last=x.entryDate;const r=relDay(last);h+=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(last).fa)}</div>`}h+=homeRow(x)});
-  return `<div class="fcount">${fmt(all.length)} واریزی، جمع ${fmt(sum(all))} تومان</div><div class="blist">${h}</div>${all.length>fN?`<button class="btn sec" style="width:100%;margin-top:10px" data-act="findMore">نمایش بیشتر (${fmt(all.length-fN)} مورد دیگر)</button>`:''}`}
+  let h='',last=null;L.forEach(x=>{if(x.entryDate!==last){if(last!==null)h+='</div>';last=x.entryDate;const r=relDay(last);h+=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(last).fa)}</div><div class="blist fcard">`}h+=homeRow(x)});if(last!==null)h+='</div>';
+  return `<div class="fcount">${fmt(all.length)} واریزی، جمع ${fmt(sum(all))} تومان</div>${h}${all.length>fN?`<button class="btn sec" style="width:100%;margin-top:10px" data-act="findMore">نمایش بیشتر (${fmt(all.length-fN)} مورد دیگر)</button>`:''}`}
 function vFind(){AM=allocMap();const V=validated(),cnt=k=>V.filter(x=>rowSt(x)===k).length,SC={};V.forEach(x=>{const a=AM.get(x.id);if(a&&a.src)SC[a.src]=(SC[a.src]||0)+1});const SL=Object.keys(SC).sort((a,b)=>SC[b]-SC[a]);if(fS&&!SC[fS])fS='';
   const chips=[['all','همه',V.length],['bad','خطادار',cnt('bad')],['new','ثبت شده',cnt('new')],['pend','ارسال شده',cnt('pend')],['ok','تسویه شده',cnt('ok')],['fail','ناموفق',cnt('fail')]].filter(c=>c[0]==='all'||c[2]||fF===c[0]);
   return `<div class="fsearch">${ic('search')}<input id="fq" type="search" placeholder="نام، فاکتور، مبلغ، شبا، منبع…" value="${esc(fQ)}" autocomplete="off" enterkeyhint="search"><button class="x${fQ?'':' hide'}" data-act="fClr" aria-label="پاک کردن">×</button></div>
