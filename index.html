@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=28.6,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=28.7,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(s&&v<V){localStorage.removeItem('m_app_next');localStorage.removeItem('m_app_next_v')}}catch(e){}})();</script>
@@ -651,6 +651,8 @@ html,body{background:var(--bg)}
 /* پیش‌نمایش PDF: دکمه‌ها پایین صفحه، گزارش هم‌عرض گوشی */
 #pv .pvh{order:2;border-bottom:0!important;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))!important;box-shadow:0 -8px 24px -16px #16213a40}
 #pv iframe{order:1}
+/* گام انجام‌شده‌ای که صفحه فعلی است: تیک سبز با حلقه */
+.flow .fs.on.done i{background:var(--ok);border-color:var(--ok);color:#fff;box-shadow:0 0 0 3px var(--ok2)}
 </style>
 </head>
 <body>
@@ -661,7 +663,7 @@ html,body{background:var(--bg)}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=28.6,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=28.7,REPO='amirmsnahdt-cpu/Motalla-';
 function checkUpdate(force){try{if(location.hostname!=='raw.githack.com')return;let t=0;try{t=+sessionStorage.getItem('m_updchk')||0}catch(e){}
   if(!force&&Date.now()-t<3*60e3)return;try{sessionStorage.setItem('m_updchk',String(Date.now()))}catch(e){}
   fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;if(!sha||!/^[0-9a-f]{40}$/.test(sha))return null;
@@ -1077,7 +1079,7 @@ function flowState(d){d=d||dateVal;const has=entries.some(e=>e.entryDate===d),un
   const step=!has?1:un&&!bs.length?(cur==='split1'||cur==='split3'?2:1):op?3:un?2:cl?4:1;return{has,un,bs:bs.length,op,cl,step}}
 function flowBar(at){const f=flowState(),S=[['entry','ثبت لیست'],['split','تقسیم'],['track','پیگیری'],['day','بایگانی']];
   const done=[f.has,f.bs>0&&!f.un,f.bs>0&&!f.op,f.cl>0&&!f.op&&!f.un];
-  return `<div class="flow">${S.map(([k,t],i)=>`<button class="fs${at===i+1?' on':''}${done[i]?' done':''}" data-act="flowGo" data-s="${k}"><i>${done[i]&&at!==i+1?ic('check'):toFa(i+1)}</i><span>${t}</span></button>`).join('<b></b>')}</div>`}
+  return `<div class="flow">${S.map(([k,t],i)=>`<button class="fs${at===i+1?' on':''}${done[i]?' done':''}" data-act="flowGo" data-s="${k}"><i>${done[i]?ic('check'):toFa(i+1)}</i><span>${t}</span></button>`).join('<b></b>')}</div>`}
 function ring(c,size){const p=c.all?c.ok/c.all*100:0,f=c.all?c.fail/c.all*100:0;return `<div class="ring" style="--s:${size||64}px;background:conic-gradient(var(--ok) 0 ${p}%,var(--red) ${p}% ${p+f}%,var(--ringbg) ${p+f}% 100%)"><span><b>${toFa(Math.round(p))}٪</b></span></div>`}
 /* ---------- صفحه پیگیری ---------- */
 let gQ='',gF='all';
