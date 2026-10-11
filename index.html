@@ -469,7 +469,10 @@ button.sm{border-radius:10px;background:var(--btn)}button.sm.sec{background:var(
 .tgh span{color:var(--ink)}
 /* ================= کشیدن برای حذف / ویرایش ================= */
 .swr{position:relative;margin-bottom:10px;border-radius:16px;isolation:isolate;overflow:hidden;overflow:clip}
-html,body{overflow-x:hidden}
+html{overflow-x:clip}body{overflow-x:clip}
+#bar{position:sticky;top:0;transform:translateZ(0)}#bottom{position:sticky;bottom:0;transform:translateZ(0)}
+.hav{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--navy);color:var(--gold2);display:grid;place-items:center;font-weight:900;font-size:15px;cursor:pointer;flex:none;padding:0}
+.hav svg{width:18px;height:18px}
 #act .btn{font-size:15px;white-space:nowrap;padding:0 12px}
 #toast{min-width:min(330px,calc(100vw - 32px));justify-content:space-between;border-radius:16px}
 .swr>.swc>.srow,.swr>.swc>.lrow,.swr>.swc>.slip{border-radius:16px}
@@ -724,7 +727,7 @@ function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length
   return tb('home','home','خانه')+tb('list','list','لیست‌ها',bad)+tb('split','split','تقسیم')+`<button class="fab${t==='entry'?' on':''}" data-act="tab" data-n="entry" aria-label="ثبت واریزی">${ic('plus')}</button>`+tb('track','track','پیگیری',pendingAll())+tb('debt','debt','بدهی')+tb('audit','clock','تاریخچه')}
 function render(anim){const V=$('view'),B=$('bar'),A=$('act');
   const hasBack=!!PARENT[cur]||(cur==='entry'&&editId);
-  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:'<div class="mark">م</div>'}<b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b></div>${dchip()}`;
+  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:'<div class="mark">م</div>'}<b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b></div>${cur==='home'?`<button class="hav" data-act="user" aria-label="نام کاربر: ${esc(user||'ثبت نشده')}">${user?esc(userInit(user)):ic('user')}</button>`:''}${dchip()}`;
   const R={home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null]}[cur];
   V.innerHTML=R[0]();A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();
   if(anim){V.classList.remove('in','bk');void V.offsetWidth;V.classList.add('in');if(navBack)V.classList.add('bk')}navBack=false;
@@ -736,7 +739,7 @@ function dstrip(){const L=datesWith(),t=todayISO();if(!L.some(x=>x.iso===t))L.un
 function greet(){const h=new Date().getHours();return h<5?'شب بخیر':h<12?'صبح بخیر':h<16?'ظهر بخیر':h<20?'عصر بخیر':'شب بخیر'}
 function userInit(u){return u?[...u.trim()][0]:'؟'}
 function vHome(){const L=dayList(),bad=L.filter(r=>r.level===2).length,last=L.slice(-4).reverse(),r=relDay(dateVal);
-  return `<div class="hello"><div><div class="hi">${greet()}</div><div class="nm">${user?esc(user):'همکار عزیز'}</div></div><button class="uchip" data-act="user"><span class="av">${user?esc(userInit(user)):ic('user')}</span><span>${user?'تغییر نام':'ثبت نام کاربر'}</span></button></div>
+  return `<div class="hello"><div><div class="hi">${greet()}</div><div class="nm">${user?esc(user):'همکار عزیز'}</div></div></div>
   ${dstrip()}
   ${flowCard()}
   ${L.length?`<div class="ingot"><div class="lb">جمع واریزی ${['امروز','دیروز','فردا'].includes(r)?r:'این تاریخ'} — ${dates(dateVal).fa}</div><div class="v">${fmt(sum(L))}<small>تومان</small></div><div class="rule"></div>
