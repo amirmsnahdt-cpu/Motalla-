@@ -33,6 +33,6 @@ jobs:
           cat out.txt
           if [ $code -ne 0 ]; then
             # خطا را به شکل annotation بنویس تا بدون دسترسی به لاگ هم دیده شود
-            tail -n 25 out.txt | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r l; do echo "::error::$l"; done
+            tail -n 6 out.txt | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r l; do echo "::error::$l"; done
             exit $code
           fi
