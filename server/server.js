@@ -227,6 +227,7 @@ async function handle(req, res) {
   cors(req, res);
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
   const url = new URL(req.url, 'http://x'), p = url.pathname;
+  if (p === '/robots.txt') { res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' }); res.end('User-agent: *\nAllow: /api/status\nDisallow: /\n'); return; }
   if (p === '/app.apk' || p === '/android') { res.writeHead(302, { Location: 'https://github.com/amirmsnahdt-cpu/Motalla-/releases/download/apk/motalla.apk' }); res.end(); return; }
   if (!p.startsWith('/api/')) { if (req.method === 'GET' && serveStatic(req, res, p)) return; res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); return; }
 
