@@ -154,7 +154,8 @@ function failed(key) { const f = fails.get(key) || { n: 0, until: 0 }; f.n += 1;
 
 /* ---------- ابزار HTTP ---------- */
 let APP_VER = '';
-function appVersion() { try { APP_VER = sha(fs.readFileSync(path.join(ROOT, 'index.html'))).slice(0, 12); } catch (e) { APP_VER = 'dev'; } return APP_VER; }
+let APP_V = 0;
+function appVersion() { try { const t = fs.readFileSync(path.join(ROOT, 'index.html')); APP_VER = sha(t).slice(0, 12); const m = String(t).match(/const APP_V=(\d+(?:\.\d+)?)/); APP_V = m ? +m[1] : 0; } catch (e) { APP_VER = 'dev'; } return APP_VER; }
 appVersion();
 function cors(req, res) {
   const o = req.headers.origin;
@@ -246,7 +247,7 @@ async function handle(req, res) {
   if (p === '/app.apk' || p === '/android') { res.writeHead(302, { Location: 'https://github.com/amirmsnahdt-cpu/Motalla-/releases/download/apk/motalla.apk' }); res.end(); return; }
   if (!p.startsWith('/api/')) { if (req.method === 'GET' && serveStatic(req, res, p)) return; res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); return; }
 
-  if (p === '/api/status' && req.method === 'GET') return send(res, 200, { ok: true, setup: q.userCount.get().n === 0, app: APP_VER });
+  if (p === '/api/status' && req.method === 'GET') return send(res, 200, { ok: true, setup: q.userCount.get().n === 0, app: APP_VER, v: APP_V });
 
   if (p === '/api/setup' && req.method === 'POST') {
     const b = await readBody(req, 1e5);

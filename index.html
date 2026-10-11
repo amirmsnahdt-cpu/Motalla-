@@ -10,10 +10,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
-else if(s&&v<V){localStorage.removeItem('m_app_next');localStorage.removeItem('m_app_next_v')}}catch(e){}})();</script>
+else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
+document.addEventListener('DOMContentLoaded',function(){caches.open('motalla-upd').then(function(k){return k.match('next.html')}).then(function(r){return r?r.text():''}).then(function(h){if(h.indexOf('</html>')<0)throw 0;document.open();document.write(h);document.close()}).catch(function(){try{localStorage.removeItem('m_app_next_c');localStorage.removeItem('m_app_next_v')}catch(e){}location.reload()})})}
+else if(v&&v<V){localStorage.removeItem('m_app_next');localStorage.removeItem('m_app_next_v');localStorage.removeItem('m_app_next_c');if(window.caches)caches.delete('motalla-upd')}}catch(e){}})();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>(function(){try{var t=JSON.parse(localStorage.getItem('m_theme')||'"auto"');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);var c=t==='dark'?'#0a1222':'#f5f6f8',m=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<m.length;i++){m[i].setAttribute('content',c);m[i].removeAttribute('media')}}}catch(e){}})()</script>
 <style>
@@ -710,6 +712,18 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 .thm .pv.a span{width:26px;height:26px;border-radius:50%;background:linear-gradient(110deg,#e2b558 50%,#121c32 50%);box-shadow:0 0 0 2px #fff8}
 .thm small{font-size:11px;color:var(--mut);font-weight:600;margin-top:-4px}
 .stg .ver{text-align:center;color:var(--mut);font-size:12px;margin:14px 0 4px}
+/* پیام نسخه جدید */
+#upd{pointer-events:auto;display:flex;align-items:center;gap:10px;width:calc(100% - 4px);margin:0 2px 8px;padding:10px 12px;border:0;border-radius:18px;background:var(--navy);color:#fff;box-shadow:0 12px 30px -10px #0008;cursor:pointer;font:inherit;text-align:right;animation:updIn .35s cubic-bezier(.2,.9,.3,1.2)}
+#upd:has(+#act:empty){margin-bottom:44px}
+#auth #upd{position:absolute;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:auto;margin:0}
+#upd .ui{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#ffffff1a;color:var(--gold2);flex:none}
+#upd .ui svg{width:18px;height:18px}
+#upd .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}
+#upd .tx b{font-size:14px;font-weight:800}#upd .tx small{font-size:11.5px;opacity:.75}
+#upd .go{flex:none;background:linear-gradient(135deg,#ecc874,#c99a3a);color:#1b1404;font-weight:800;font-size:13px;border-radius:12px;padding:8px 12px}
+#upd:active{transform:scale(.98)}
+#upd{box-shadow:0 12px 30px -10px #0008,inset 0 0 0 1px #ffffff1c}
+@keyframes updIn{from{transform:translateY(20px);opacity:0}}
 </style>
 </head>
 <body>
@@ -720,15 +734,31 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.1,REPO='amirmsnahdt-cpu/Motalla-';
-function checkUpdate(force){try{if(location.hostname!=='raw.githack.com')return;let t=0;try{t=+sessionStorage.getItem('m_updchk')||0}catch(e){}
-  if(!force&&Date.now()-t<3*60e3)return;try{sessionStorage.setItem('m_updchk',String(Date.now()))}catch(e){}
-  fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;if(!sha||!/^[0-9a-f]{40}$/.test(sha))return null;
-    return fetch('https://raw.githack.com/'+REPO+'/'+sha+'/index.html',{cache:'no-store'}).then(r=>r.ok?r.text():null)}).then(h=>{if(!h||h.indexOf('</html>')<0)return;const m=h.match(/const APP_V=(\d+(?:\.\d+)?)/),nv=m?+m[1]:0;
-    if(nv>APP_V){try{localStorage.setItem('m_app_next',h);localStorage.setItem('m_app_next_v',String(nv))}catch(e){return}
-      const go=()=>location.reload();if(typeof cur!=='undefined'&&cur==='home'&&document.getElementById('ov').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)))setTimeout(go,300);else if(typeof toast==='function')toast('نسخه جدید آماده است','','به‌روزرسانی',go)}}).catch(()=>{})}catch(e){}}
-checkUpdate(true);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&typeof cur!=='undefined'&&cur==='home'&&document.getElementById('ov').classList.contains('hide'))checkUpdate(false)});
+const APP_V=29.2,REPO='amirmsnahdt-cpu/Motalla-';
+/* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
+let UPD=null,updT=0;
+function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
+  if(!el){el=document.createElement('button');el.id='upd';el.type='button';el.setAttribute('data-act','applyUpd')}
+  if(el.parentNode!==B)B.insertBefore(el,B.firstChild);
+  el.innerHTML=`<span class="ui">${ic('refresh')}</span><span class="tx"><b>نسخه جدید آماده است</b><small>برای به‌روزرسانی بزنید · نسخه ${toFa(UPD.v)}</small></span><span class="go">به‌روزرسانی</span>`}
+function updFound(v){if(!(v>APP_V)||(UPD&&UPD.v>=v))return;UPD={v};try{updBar()}catch(e){setTimeout(updBar,500)}}
+function stashUpdate(h,nv){
+  try{localStorage.removeItem('m_app_next');localStorage.setItem('m_app_next',h);localStorage.setItem('m_app_next_v',String(nv));localStorage.removeItem('m_app_next_c');return Promise.resolve(true)}
+  catch(e){try{localStorage.removeItem('m_app_next')}catch(_){}}
+  if(!window.caches)return Promise.resolve(false);
+  return caches.open('motalla-upd').then(c=>c.put('next.html',new Response(h,{headers:{'Content-Type':'text/html; charset=utf-8'}}))).then(()=>{localStorage.setItem('m_app_next_v',String(nv));localStorage.setItem('m_app_next_c','1');return true}).catch(()=>false)}
+function checkUpdate(force){if(!force&&Date.now()-updT<60e3)return;updT=Date.now();
+  if(location.hostname==='raw.githack.com'){
+    fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;if(!sha||!/^[0-9a-f]{40}$/.test(sha))return null;
+      return fetch('https://raw.githack.com/'+REPO+'/'+sha+'/index.html',{cache:'no-store'}).then(r=>r.ok?r.text():null)}).then(h=>{if(!h||h.indexOf('</html>')<0)return;const m=h.match(/const APP_V=(\d+(?:\.\d+)?)/),nv=m?+m[1]:0;
+      if(nv>APP_V)return stashUpdate(h,nv).then(()=>updFound(nv))}).catch(()=>{})}
+  else if(location.protocol==='https:'){fetch('/api/status',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&+j.v>APP_V)updFound(+j.v)}).catch(()=>{})}}
+function applyUpd(){try{toast('در حال به‌روزرسانی…')}catch(e){}const r=()=>location.reload();
+  if(location.hostname==='raw.githack.com'){setTimeout(r,150);return}
+  try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,300))}catch(e){setTimeout(r,300)}}
+setTimeout(()=>checkUpdate(true),1500);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate(false)});
+setInterval(()=>{if(document.visibilityState==='visible')checkUpdate(false)},5*60e3);
 (()=>{const V=()=>document.getElementById('view');const ws=window.scrollTo.bind(window);
   Object.defineProperty(window,'scrollY',{configurable:true,get:()=>{const v=V();return v?v.scrollTop:0}});
   window.scrollTo=function(a,b){const v=V();if(!v)return ws(a,b);if(typeof a==='object')v.scrollTo(a);else v.scrollTop=b||0}})();
@@ -2313,7 +2343,12 @@ ACT.dayGrp=(d,e)=>{const g=e.target.closest('.tg2');if(!g)return;const o=g.class
 {const _od=ACT.openDay;ACT.openDay=d=>{dayOpen=new Set();_od(d)}}
 ACT.settings=()=>go('settings');
 ACT.setTheme=d=>{themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
-ACT.checkUpd=()=>{if(location.hostname!=='raw.githack.com'){if(location.protocol!=='https:'){toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));return}toast('در حال دریافت آخرین نسخه…');const r=()=>location.reload();try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,500))}catch(e){setTimeout(r,500)}return}
+ACT.applyUpd=()=>applyUpd();
+/* پیام نسخه جدید روی صفحه ورود هم دیده شود */
+{const W=f=>function(){const r=f.apply(this,arguments);try{updBar()}catch(e){}return r};showAuth=W(showAuth);authForm=W(authForm);loggedIn=W(loggedIn);forceLogout=W(forceLogout)}
+ACT.checkUpd=()=>{if(UPD){applyUpd();return}if(location.protocol==='https:'){toast('در حال بررسی…');checkUpdate(true);setTimeout(()=>{if(!UPD)toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));else toast('نسخه جدید پیدا شد؛ دکمه طلایی پایین صفحه را بزنید')},6000);return}
+  ACT.checkUpd0()};
+ACT.checkUpd0=()=>{if(location.hostname!=='raw.githack.com'){if(location.protocol!=='https:'){toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));return}toast('در حال دریافت آخرین نسخه…');const r=()=>location.reload();try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,500))}catch(e){setTimeout(r,500)}return}
   toast('در حال بررسی…');const v0=APP_V;try{sessionStorage.removeItem('m_updchk')}catch(e){}checkUpdate(true);setTimeout(()=>{let nv=0;try{nv=+localStorage.getItem('m_app_next_v')||0}catch(e){}if(!(nv>v0))toast('برنامه به‌روز است ✓ نسخه '+toFa(v0))},6000)};
 ACT.getApk=()=>{location.href=APK_URL};
 ACT.shareInstall=()=>{const t='نصب برنامه واریزی مطلا\n\nآیفون: این لینک را در Safari باز کنید، دکمه اشتراک‌گذاری ← Add to Home Screen\n'+WEB_URL+'\n\nاندروید: فایل نصب را دانلود و نصب کنید\n'+APK_URL+'\n\nنام کاربری و رمز را از مدیر بگیرید.';
