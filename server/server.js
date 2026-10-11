@@ -232,7 +232,16 @@ function serveStatic(req, res, p) {
   fs.readFile(path.join(ROOT, s[0]), (err, buf) => {
     if (err) { res.writeHead(404); res.end('not found'); return; }
     const isApp = s[0] === 'index.html' || s[0] === 'sw.js';
-    res.writeHead(200, { 'Content-Type': s[1], 'Cache-Control': isApp ? 'no-cache' : 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff', ...(s[0] === 'index.html' ? { 'X-App-Version': APP_VER } : {}) });
+    if (s[0] === 'index.html') {
+      // حالت روز/شب انتخابی کاربر از همان ابتدا در صفحه نوشته می‌شود تا نوار وضعیت آیفون هم‌رنگ برنامه باز شود
+      const m = /(?:^|;\s*)m_theme=(light|dark)(?:;|$)/.exec(req.headers.cookie || '');
+      if (m) {
+        const c = m[1] === 'dark' ? '#0a1222' : '#f5f6f8';
+        let h = buf.toString('utf8').replace(/<meta name="theme-color"[^>]*>(<meta name="theme-color"[^>]*>)?/, '<meta name="theme-color" content="' + c + '">').replace('<html ', '<html data-theme="' + m[1] + '" ');
+        buf = Buffer.from(h, 'utf8');
+      }
+    }
+    res.writeHead(200, { 'Content-Type': s[1], 'Cache-Control': isApp ? 'no-cache' : 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff', ...(s[0] === 'index.html' ? { 'X-App-Version': APP_VER, 'Vary': 'Cookie' } : {}) });
     res.end(buf);
   });
   return true;

@@ -10,14 +10,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.5,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29.6,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){caches.open('motalla-upd').then(function(k){return k.match('next.html')}).then(function(r){return r?r.text():''}).then(function(h){if(h.indexOf('</html>')<0)throw 0;document.open();document.write(h);document.close()}).catch(function(){try{localStorage.removeItem('m_app_next_c');localStorage.removeItem('m_app_next_v')}catch(e){}location.reload()})})}
 else if(v&&v<V){localStorage.removeItem('m_app_next');localStorage.removeItem('m_app_next_v');localStorage.removeItem('m_app_next_c');if(window.caches)caches.delete('motalla-upd')}}catch(e){}})();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>(function(){try{var t=JSON.parse(localStorage.getItem('m_theme')||'"auto"');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);var c=t==='dark'?'#0a1222':'#f5f6f8',m=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<m.length;i++){m[i].setAttribute('content',c);m[i].removeAttribute('media')}}}catch(e){}})()</script>
+<script>(function(){try{var t=JSON.parse(localStorage.getItem('m_theme')||'"auto"');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);var c=t==='dark'?'#0a1222':'#f5f6f8',m=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<m.length;i++)m[i].parentNode.removeChild(m[i]);var n=document.createElement('meta');n.name='theme-color';n.content=c;document.head.appendChild(n)}}catch(e){}})()</script>
 <style>
 :root{--bg:#eef1f6;--card:#fff;--ink:#13203a;--mut:#667089;--line:#dde3ee;--navy:#13284f;--navy2:#1d3b72;--pri:#1d3b72;--pri2:#e6ecf7;--gold:#c99a3a;--gold2:#f2dfa6;--goldbg:#fbf4e1;--red:#d3334f;--red2:#fdeef1;--warn:#a66a00;--warn2:#fff6e3;--ok:#178049;--ok2:#eaf8f0;--dock:rgba(19,40,79,.94);--btn:linear-gradient(135deg,#1d3b72,#13284f);--cta:linear-gradient(135deg,#ecc874,#c99a3a);--ctaink:#1b1404;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1222;--card:#121c32;--ink:#edf1fa;--mut:#99a5bf;--line:#24324f;--navy:#0c1730;--navy2:#1a2c52;--pri:#8fb2ff;--pri2:#1a2846;--gold:#e2b558;--gold2:#6b5320;--goldbg:#2a2210;--red:#ff7a90;--red2:#3a1520;--warn:#f3c053;--warn2:#352a0e;--ok:#5bd68f;--ok2:#0f2e1e;--dock:rgba(16,27,52,.95);--btn:linear-gradient(135deg,#3666c9,#244c9e)}}
@@ -734,7 +734,7 @@ body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=29.5,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29.6,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2125,7 +2125,9 @@ Object.assign(IC,{sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4
 let themePref=ls.get('m_theme','auto');if(!['auto','light','dark'].includes(themePref))themePref='auto';
 const sysDark=matchMedia('(prefers-color-scheme: dark)');
 function applyTheme(){const r=document.documentElement;if(themePref==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',themePref);
-  const dark=themePref==='dark'||(themePref==='auto'&&sysDark.matches),bg=dark?'#0a1222':'#f5f6f8';document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{m.setAttribute('content',bg);m.removeAttribute('media')});
+  const dark=themePref==='dark'||(themePref==='auto'&&sysDark.matches),bg=dark?'#0a1222':'#f5f6f8';
+  const old=[...document.querySelectorAll('meta[name="theme-color"]')];if(!(old.length===1&&old[0].content===bg&&!old[0].media)){old.forEach(m=>m.remove());const n=document.createElement('meta');n.name='theme-color';n.content=bg;document.head.appendChild(n)}
+  try{if(location.protocol==='https:')document.cookie='m_theme='+themePref+';path=/;max-age=31536000;samesite=lax;secure'}catch(e){}
   try{if(window.AndroidBridge&&AndroidBridge.setTheme)AndroidBridge.setTheme(bg,dark)}catch(e){}}
 applyTheme();try{sysDark.addEventListener('change',()=>{if(themePref==='auto')applyTheme()})}catch(e){try{sysDark.addListener(()=>{if(themePref==='auto')applyTheme()})}catch(_){}}
 const THEMES=[['light','روز','همیشه روشن','l'],['dark','شب','همیشه تیره','d'],['auto','خودکار','مثل گوشی','a']];
