@@ -23,7 +23,7 @@ jobs:
         env: { DATA_DIR: /tmp/motalla-test }
       - name: استقرار
         if: env.SKIP != '1'
-        env: { LIARA_API_TOKEN: '${{ secrets.LIARA_API_TOKEN }}' }
+        env: { LIARA_API_TOKEN: '${{ secrets.LIARA_API_TOKEN }}', LIARA_APP: '${{ vars.LIARA_APP }}' }
         run: |
           npm i -g @liara/cli@5
-          liara deploy --app="$(node -p "require('./liara.json').app")" --api-token="$LIARA_API_TOKEN" --no-app-logs
+          liara deploy --app="${LIARA_APP:-motalla}" --api-token="$LIARA_API_TOKEN" --no-app-logs
