@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=28.7,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=29,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(s&&v<V){localStorage.removeItem('m_app_next');localStorage.removeItem('m_app_next_v')}}catch(e){}})();</script>
@@ -618,6 +618,28 @@ html,body{background:var(--bg)}
 #dock .tb svg{width:21px;height:21px}
 #dock .fab{width:54px;height:54px;border-radius:17px}
 .rowno .bts{display:flex;gap:6px}
+/* ================= v28: ورود، حساب، همگام‌سازی ================= */
+#auth{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+#auth.hide{display:none}
+.authc{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px 20px 20px;box-shadow:var(--sh);display:flex;flex-direction:column;align-items:stretch}
+.authc .amk{align-self:center;width:58px;height:58px;border-radius:17px 17px 17px 5px;background:var(--navy);color:var(--gold2);display:grid;place-items:center;font-size:28px;font-weight:900;margin-bottom:10px}
+.authc .atl{align-self:center;font-size:24px;font-weight:900}
+.authc .ast{align-self:center;color:var(--mut);font-size:13px;margin:2px 0 18px;text-align:center}
+.authc .aspin{text-align:center;color:var(--mut);font-size:13px;padding:10px}
+.authc .ahint{text-align:center;color:var(--mut);font-size:12px;margin-top:12px}
+.btn.wait{opacity:.6;pointer-events:none}
+.pw{display:flex;gap:6px}.pw input{flex:1}
+.pwt{flex:none;width:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--mut);display:grid;place-items:center;cursor:pointer}
+.sdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mut);flex:none;transition:background .3s}
+.sdot.ok{background:var(--ok)}.sdot.busy{background:var(--gold);animation:sdp 1s ease-in-out infinite}.sdot.off,.sdot.err{background:var(--red)}
+@keyframes sdp{50%{opacity:.35}}
+.uline .sdot{margin-inline-start:2px}
+.sstat{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg);border-radius:12px;padding:9px 12px;margin:0 0 12px;font-size:13px;font-weight:700}
+.sstat small{flex-basis:100%;color:var(--mut);font-weight:600}
+.lrow.off{opacity:.6}
+.uhero b{display:block}
+.uhero .pill{margin:2px}
+body.staff [data-act="srcMgr"],body.staff [data-act="srcSet"],body.staff .srcc .ed,body.staff [data-act="clearDay"],body.staff [data-act="tkDel"],body.staff [data-act="delEdit"],body.staff [data-act="emptyTrash"],body.staff [data-act="purgeOne"],body.staff [data-act="credDel"],body.staff [data-act="undoEv"],body.staff [data-act="undoCommit"],body.staff .opt[data-act="del"],body.staff .eact [data-act="del"]{display:none!important}
 /* خانه: کارت جمع با ۴ عدد و فهرست وضعیت */
 .ingot .row3.r4>div{padding:10px 10px 11px}
 .ingot .row3 b.g{color:var(--ok)}.ingot .row3 b.w{color:var(--warn)}
@@ -656,14 +678,14 @@ html,body{background:var(--bg)}
 </style>
 </head>
 <body>
-<div id="app"><header id="bar"></header><main id="view"></main><div id="bottom"><div id="act"></div><nav id="dock"></nav></div></div>
+<div id="auth" class="hide"></div><div id="app"><header id="bar"></header><main id="view"></main><div id="bottom"><div id="act"></div><nav id="dock"></nav></div></div>
 <div id="ov" class="ov hide"><div class="sheet" id="sheet" role="dialog"></div></div>
 <div id="toast" role="status"></div>
 <div id="pv" class="hide"><div class="pvh"><button class="btn sec" data-act="pvClose" style="flex:0 0 auto;padding:0 18px">بستن</button><button class="btn gold" data-act="pvPrint">چاپ / ذخیره PDF</button></div><iframe id="pvf" title="پیش‌نمایش گزارش"></iframe></div>
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=28.7,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=29,REPO='amirmsnahdt-cpu/Motalla-';
 function checkUpdate(force){try{if(location.hostname!=='raw.githack.com')return;let t=0;try{t=+sessionStorage.getItem('m_updchk')||0}catch(e){}
   if(!force&&Date.now()-t<3*60e3)return;try{sessionStorage.setItem('m_updchk',String(Date.now()))}catch(e){}
   fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;if(!sha||!/^[0-9a-f]{40}$/.test(sha))return null;
@@ -731,7 +753,7 @@ const stripName=s=>{let c=clean(String(s||''));const tg=c.match(/^[A-Za-z][A-Za-
 let entries=ls.get('m_entries',[]).map(e=>({...e,entryDate:e.entryDate||dateVal,name:stripName(e.name)}));
 let sources=ls.get('m_sources',[{id:1,name:'بانک سینا',bank:'سینا',limit:0,count:0},{id:2,name:'بانک ملی',bank:'ملی',limit:0,count:0},{id:3,name:'سینا فلاح',bank:'',limit:0,count:0},{id:4,name:'بلو بانک',bank:'بلو',limit:0,count:0}]);
 let trash=ls.get('m_trash',[]);
-let audit=ls.get('m_audit',[]),user=ls.get('m_user',''),nid=Date.now(),editId=null,alloc=null;
+let audit=ls.get('m_audit',[]),user=ls.get('m_user',''),nid=Date.now()*1000+Math.floor(Math.random()*1000),editId=null,alloc=null;
 let listMode='all',listQ='',listSort=ls.get('m_sort','seq'),listFilter='all',openGroups=new Set(),lastList=[],histTab='ev',histFilter='all';
 const saveE=()=>ls.set('m_entries',entries),saveS=()=>ls.set('m_sources',sources),saveAud=()=>ls.set('m_audit',audit),saveT=()=>ls.set('m_trash',trash);
 /* پاکسازی خودکار سطل بازیابی بعد از ۶۰ روز */
@@ -785,10 +807,10 @@ const fullName=r=>(r.title==='خانم'?'خانم ':r.title==='آقا'?'آقای
 const setLine=x=>(x.title==='خانم'?'خانم ':x.title==='آقا'?'آقای ':'')+x.name+(x.phone?' ('+x.phone+')':'')+(x.inv?' — فاکتور فروش '+x.inv:'')+' — '+Number(x.amount||0).toLocaleString('en-US')+' تومان';
 /* ============ مسیریابی (نوار پایین) ============ */
 let cur='home',editBack=null;
-const TAB={home:'home',entry:'entry',bulk:'entry',list:'list',split1:'split',split3:'split',srcview:'split',part:'split',track:'track',batch:'track',day:'track',debt:'debt',cred:'debt',cwiz:'debt',pwiz:'debt',audit:'audit'};
-const PARENT={bulk:'entry',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
-const TITLES={home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه'};
-function go(n,noPush){if(cur==='entry'&&n!=='entry'&&n!=='bulk')editId=null;cur=n;if(!noPush){try{history.pushState({n},'')}catch(e){}}render(true);window.scrollTo(0,0)}
+const TAB={home:'home',entry:'entry',bulk:'entry',list:'list',split1:'split',split3:'split',srcview:'split',part:'split',track:'track',batch:'track',day:'track',debt:'debt',cred:'debt',cwiz:'debt',pwiz:'debt',audit:'audit',users:'home'};
+const PARENT={users:'home',bulk:'entry',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
+const TITLES={home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
+function go(n,noPush){if(!$('ov').classList.contains('hide')){aSt=null;closeSheet()}if(cur==='entry'&&n!=='entry'&&n!=='bulk')editId=null;cur=n;if(!noPush){try{history.pushState({n},'')}catch(e){}}render(true);window.scrollTo(0,0)}
 function back(){if((cur==='cwiz'||cur==='pwiz')&&wz){ACT.wzPrev();return}navBack=true;go(PARENT[cur]||'home')}
 window.addEventListener('popstate',e=>{navBack=true;cur=(e.state&&e.state.n)||'home';if(cur!=='entry')editId=null;render(true)});
 const dchip=()=>{const D=dates(dateVal);return `<button class="dchip" data-act="date" aria-label="تاریخ گزارش: ${D.fa}">${ic('cal')}<span class="t"><b>${D.fa}</b><small>${relDay(dateVal)==='امروز'?'Today — ':''}${D.en}</small></span></button>`};
@@ -796,11 +818,11 @@ function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length
   return tb('home','home','خانه')+tb('list','list','لیست‌ها',bad)+tb('split','split','تقسیم')+`<button class="fab${t==='entry'?' on':''}" data-act="tab" data-n="entry" aria-label="ثبت واریزی">${ic('plus')}</button>`+tb('track','track','پیگیری',pendingAll())+tb('debt','debt','بدهی')+tb('audit','clock','تاریخچه')}
 function render(anim){const V=$('view'),B=$('bar'),A=$('act');
   const hasBack=!!PARENT[cur]||(cur==='entry'&&editId);
-  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:'<div class="mark">م</div>'}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${user?esc(user):'ثبت نام کاربر'}</span></button></div></div>${dchip()}`;
-  const R={home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null]}[cur];
+  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:'<div class="mark">م</div>'}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button></div></div>${dchip()}`;
+  const R={home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null],users:[vUsers,aUsers]}[cur];
   V.innerHTML=R[0]();A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();
   if(anim){V.classList.remove('in','bk');void V.offsetWidth;V.classList.add('in');if(navBack)V.classList.add('bk')}navBack=false;
-  ({entry:bindEntry,bulk:bindBulk,list:bindList,split1:bindSplit1,batch:bindBatch,track:bindTrack,debt:bindDebt,cwiz:bindWiz,pwiz:bindWiz})[cur]?.()}
+  ({entry:bindEntry,bulk:bindBulk,list:bindList,split1:bindSplit1,batch:bindBatch,track:bindTrack,debt:bindDebt,cwiz:bindWiz,pwiz:bindWiz,users:bindUsers})[cur]?.()}
 /* ============ نوار تاریخ‌ها (هوشمند) ============ */
 function dstrip(){const L=datesWith(),t=todayISO();if(!L.some(x=>x.iso===t))L.unshift({iso:t,n:0,s:0,bad:0});if(!L.some(x=>x.iso===dateVal))L.push({iso:dateVal,n:0,s:0,bad:0});
   L.sort((a,b)=>a.iso<b.iso?1:-1);return `<div class="dstrip">${L.slice(0,20).map(x=>{const D=dates(x.iso),r=relDay(x.iso);return `<button class="dpill${x.iso===dateVal?' on':''}${x.bad?' err':''}" data-act="pickDate" data-iso="${x.iso}"><b>${['امروز','دیروز','فردا'].includes(r)?r:toFa(D.jd)+' '+JM[D.jm-1]}</b><small>${x.n?fmt(x.n)+' واریزی':'خالی'}</small></button>`}).join('')}</div>`}
@@ -1015,7 +1037,7 @@ function openText(){const t=txtGen?txtGen():withCtx(txt);
   <div class="seg" style="margin-bottom:8px">${Object.entries(TS).map(([k,v])=>`<button data-act="tstyle" data-s="${k}" class="${txtStyle===k?'on':''}">${v}</button>`).join('')}</div>
   <div class="muted" style="font-size:12px;margin:-2px 2px 8px">${txtStyle==='plain'?'بدون علامت؛ مناسب برنامه بانک و پیامک':'بخش‌های پررنگ و شبا در '+TS[txtStyle]+' مرتب نمایش داده می‌شوند'}</div>
   <textarea id="tout" readonly dir="rtl" style="min-height:42vh;font-size:13.5px;line-height:1.8">${esc(t)}</textarea>
-  <div class="row"><button class="btn gold" data-act="copyOut">${ic('copy')} کپی متن</button>${navigator.share?`<button class="btn sec" data-act="shareOut">اشتراک‌گذاری</button>`:''}</div><div class="row"><button class="link" data-act="saveTxt">ذخیره به‌صورت فایل متنی</button></div>`)}
+  <div class="row"><button class="btn gold" data-act="copyOut">${ic('copy')} کپی متن</button>${(navigator.share||window.AndroidBridge)?`<button class="btn sec" data-act="shareOut">اشتراک‌گذاری</button>`:''}</div><div class="row"><button class="link" data-act="saveTxt">ذخیره به‌صورت فایل متنی</button></div>`)}
 function openPrint(h0){const html=(h0||withCtx(reportHTML)).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.__pv=html;$('pv').classList.remove('hide');$('pvf').srcdoc=html;document.body.style.overflow='hidden'}
 function closePrint(){$('pv').classList.add('hide');$('pvf').srcdoc='';document.body.style.overflow=''}
 /* کپی با پشتیبان برای وب‌ویوهایی که clipboard ندارند */
@@ -1693,6 +1715,7 @@ function startList(iso){dateVal=iso;ls.set('m_date',iso);alloc=null;editId=null;
 const SWB={edit:['ویرایش','edit','#3b6fd6'],copy:['کپی','copy','#b8862b'],del:['حذف','trash','#d23c48'],det:['جزئیات','eye','#3b6fd6'],back:['به تقسیم','undo','#6b7385'],cancel:['لغو','trash','#d23c48'],open:['باز کردن','open','#3b6fd6']};
 function swW(inner,o){let R=o.r,L=o.l;
   if(!R&&!L){R=[];L=[];if(o.edit)R.push([o.edit,o.el||'ویرایش','edit','#3b6fd6']);if(o.copy)R.push([o.copy,'کپی','copy','#b8862b']);if(o.del)L.push([o.del,o.dl||'حذف','trash','#d23c48'])}
+  if(!isAdmin()){R=R.filter(a=>!ADMIN_ACTS.has(a[0]));L=L.filter(a=>!ADMIN_ACTS.has(a[0]))}
   const da=Object.entries(o.data||{}).map(([k,v])=>` data-${k}="${esc(v)}"`).join('');
   const btn=a=>`<button class="swb" data-act="${a[0]}"${da} style="--c:${a[3]}">${ic(a[2])}<span>${a[1]}</span></button>`;
   return `<div class="swr" data-nr="${R.length}" data-nl="${L.length}">${R.length?`<div class="swa r">${R.map(btn).join('')}</div>`:''}${L.length?`<div class="swa l">${L.map(btn).join('')}</div>`:''}<div class="swc">${inner}</div></div>`}
@@ -1833,6 +1856,186 @@ function ltoolsHTML(){const all=listMode==='all',D=dates(dateVal);
   return `<div class="ltools${lsOpen||listQ?' sopen':''}"><div class="lt"><b>${all?'همه لیست‌ها':'لیست '+esc(relDay(dateVal)==='امروز'?'امروز':D.fa)}</b><small>${all?'بر اساس تاریخ':esc(D.fa)}</small></div>
   <button class="ib0" data-act="lsOpen" aria-label="جست‌وجو">${ic('search')}</button><button class="ib0${listSort!=='seq'?' on':''}" data-act="sortSheet" aria-label="مرتب‌سازی: ${SORTS[listSort]}">${ic('sort')}</button><button class="ib0" data-act="lexp" data-a="menu" aria-label="خروجی متن، PDF و Excel">${ic('open')}</button>
   <div class="lsrch"><div class="sbox" style="flex:1">${ic('search')}<input id="lq" type="search" enterkeyhint="search" placeholder="نام، فاکتور، شبا، مبلغ، منبع…" value="${esc(listQ)}" autocomplete="off"><button class="clr${listQ?'':' hide'}" data-act="clearQ" aria-label="پاک کردن">×</button></div><button class="link" data-act="lsClose">انصراف</button></div></div>`}
+/* ================= v28: سرور، ورود، کاربران و همگام‌سازی زنده ================= */
+const SERVER_URL='https://motalla.liara.run';
+const API_BASE=location.protocol==='file:'?(window.__API||SERVER_URL):(location.hostname==='raw.githack.com'?SERVER_URL:'');
+let TOKEN=(()=>{try{return localStorage.getItem('m_token')||''}catch(e){return ''}})(),ME=ls.get('m_me',null);
+const isAdmin=()=>!!ME&&ME.role==='admin';
+const ADMIN_ACTS=new Set(['del','delEdit','clearDay','tkDel','delSrc','delSrcGo','srcSet','saveSrc','srcMgr','addSrc','purgeOne','emptyTrash','credDel','undoEv','undoCommit']);
+const rawSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){storeOK=false}};
+/* JSON پایدار (ترتیب کلیدها مهم نیست) برای مقایسه */
+function sj(v){if(v===undefined||v===null||typeof v!=='object')return v===undefined?'null':JSON.stringify(v);if(Array.isArray(v))return '['+v.map(x=>x===undefined?'null':sj(x)).join(',')+']';return '{'+Object.keys(v).sort().filter(k=>v[k]!==undefined&&typeof v[k]!=='function').map(k=>JSON.stringify(k)+':'+sj(v[k])).join(',')+'}'}
+const isPO=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+/* به‌روزرسانی شیء موجود بدون عوض کردن مرجع (تا کارهای در حال انجام از دست نروند) */
+function patchIn(t,s){if(!isPO(t)||!isPO(s))return s;for(const k of Object.keys(t))if(!(k in s))delete t[k];
+  for(const k of Object.keys(s)){const a=t[k],b=s[k];
+    if(isPO(a)&&isPO(b))patchIn(a,b);
+    else if(Array.isArray(a)&&Array.isArray(b)&&b.every(x=>isPO(x)&&x.id!=null)){const m=new Map(a.filter(isPO).map(x=>[String(x.id),x]));t[k]=b.map(x=>{const o=m.get(String(x.id));return o?patchIn(o,x):x})}
+    else t[k]=b}
+  return t}
+const SYNC={
+  entries:{get:()=>entries,set:v=>{entries=v},key:'m_entries',cmp:(a,b)=>a.id-b.id},
+  sources:{get:()=>sources,set:v=>{sources=v},key:'m_sources',cmp:(a,b)=>a.id-b.id},
+  batches:{get:()=>batches,set:v=>{batches=v},key:'m_batches',cmp:(a,b)=>b.id-a.id},
+  creds:{get:()=>creds,set:v=>{creds=v},key:'m_creds',cmp:(a,b)=>a.id-b.id},
+  trash:{get:()=>trash,set:v=>{trash=v},key:'m_trash',cmp:(a,b)=>String(b.deletedAt||'').localeCompare(String(a.deletedAt||''))},
+  audit:{get:()=>audit,set:v=>{audit=v.slice(0,400)},key:'m_audit',cmp:(a,b)=>b.id-a.id,noDel:true},
+  drafts:{get:()=>Object.keys(drafts).filter(k=>Array.isArray(drafts[k])&&drafts[k].length).map(k=>({id:k,parts:drafts[k]})),
+    set:v=>{const o={};v.forEach(r=>{if(r&&r.id)o[r.id]=r.parts||[]});drafts=o},key:'m_drafts',cache:()=>drafts}
+};
+const SYNCKEY=new Map(Object.entries(SYNC).map(([c,S])=>[S.key,c]));
+const SY={base:{},pend:ls.get('m_pend',{}),since:+ls.get('m_since',0)||0,busy:false,again:false,t:null,state:'off',last:0,app:null,updNote:false,needRender:false,err:''};
+function syncInit(){SY.base={};for(const c in SYNC){const B=SY.base[c]=new Map();for(const r of SYNC[c].get()){if(!r||r.id==null)continue;const id=String(r.id),pk=c+'|'+id;
+    if(pk in SY.pend){if(SY.pend[pk]!==null)B.set(id,SY.pend[pk])}else B.set(id,sj(r))}
+  for(const pk in SY.pend){const [pc,id]=[pk.slice(0,pk.indexOf('|')),pk.slice(pk.indexOf('|')+1)];if(pc===c&&!B.has(id)&&SY.pend[pk]!==null&&!SYNC[c].get().some(r=>r&&String(r.id)===id))B.set(id,SY.pend[pk])}}}
+function markDirty(c){const S=SYNC[c],B=SY.base[c]||(SY.base[c]=new Map()),seen=new Set();
+  for(const r of S.get()){if(!r||r.id==null)continue;const id=String(r.id),pk=c+'|'+id;seen.add(id);
+    if(B.get(id)!==sj(r)){if(!(pk in SY.pend))SY.pend[pk]=B.has(id)?B.get(id):null}else delete SY.pend[pk]}
+  if(!S.noDel)for(const [id,bj] of B){if(!seen.has(id)){const pk=c+'|'+id;if(!(pk in SY.pend))SY.pend[pk]=bj}}
+  rawSet('m_pend',SY.pend)}
+{const _set=ls.set;ls.set=(k,v)=>{_set(k,v);const c=SYNCKEY.get(k);if(c&&TOKEN){markDirty(c);syncSoon()}}}
+function syncSoon(ms){clearTimeout(SY.t);SY.t=setTimeout(syncNow,ms==null?300:ms)}
+const pendN=()=>Object.keys(SY.pend).length;
+function setSync(s,err){SY.state=s;if(err!==undefined)SY.err=err;const d=document.querySelector('.sdot');if(d){d.className='sdot '+s;d.title=syncLabel()}}
+function syncLabel(){const n=pendN();return SY.state==='off'?(n?'بدون اینترنت — '+toFa(n)+' تغییر در صف ارسال':'اتصال به سرور برقرار نیست'):n?'در حال ارسال '+toFa(n)+' تغییر…':'همگام با سرور'+(SY.last?' — '+hm(new Date(SY.last).toISOString()):'')}
+async function api(path,body,method){let r;
+  try{r=await fetch(API_BASE+path,{method:method||(body!==undefined?'POST':'GET'),headers:{'Content-Type':'application/json',...(TOKEN?{Authorization:'Bearer '+TOKEN}:{})},body:body!==undefined?JSON.stringify(body):undefined,cache:'no-store'})}
+  catch(e){throw Object.assign(new Error('اتصال به سرور برقرار نشد؛ اینترنت را بررسی کنید'),{net:true})}
+  const av=r.headers.get('X-App-Version');if(av)noteApp(av);
+  let j=null;try{j=await r.json()}catch(e){}
+  if(r.status===401&&TOKEN&&!/\/api\/(login|setup)$/.test(path)){forceLogout('نشست شما تمام شده یا رمز تغییر کرده؛ دوباره وارد شوید');throw Object.assign(new Error('auth'),{status:401})}
+  if(!r.ok)throw Object.assign(new Error((j&&j.error)||('خطای سرور ('+r.status+')')),{status:r.status});return j}
+function noteApp(v){if(!SY.app){SY.app=v;return}if(v!==SY.app&&!SY.updNote){SY.updNote=true;toast('نسخه جدید برنامه آماده است','','به‌روزرسانی',()=>location.reload())}}
+function findIdx(arr){const m=new Map();arr.forEach((r,i)=>{if(r&&r.id!=null)m.set(String(r.id),i)});return m}
+async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.busy=true;clearTimeout(SY.t);
+  try{
+    if(!SY.scanned){for(const c in SYNC)markDirty(c);SY.scanned=true}
+    const sent={},changes=[];
+    for(const pk in SY.pend){const i=pk.indexOf('|'),c=pk.slice(0,i),id=pk.slice(i+1);if(!SYNC[c])continue;const r=SYNC[c].get().find(x=>x&&String(x.id)===id);
+      if(!r&&SYNC[c].noDel){delete SY.pend[pk];continue}
+      const j=r?sj(r):null;sent[pk]=j;changes.push({coll:c,id,base:SY.pend[pk]===null?null:JSON.parse(SY.pend[pk]),data:r?JSON.parse(j):null})}
+    if(changes.length)setSync('busy');
+    let res=await api('/api/sync',{since:SY.since,changes});
+    applyRemote(res,sent);
+    while(res.more){res=await api('/api/sync',{since:SY.since,changes:[]});applyRemote(res,{})}
+    if(res.rejected&&res.rejected.length)toast(res.rejected[0].why||'این تغییر مجاز نبود',true);
+    SY.last=Date.now();rawSet('m_srv',1);setSync(pendN()?'busy':'ok','');flushImgs();
+  }catch(e){if(e.status!==401)setSync(e.net?'off':'err',e.message)}
+  finally{SY.busy=false;if(SY.again){SY.again=false;syncSoon(50)}}}
+function applyRemote(res,sent){const touched=new Set(),byColl={};
+  for(const ch of res.changes||[]){if(!SYNC[ch.coll])continue;(byColl[ch.coll]=byColl[ch.coll]||[]).push(ch)}
+  for(const c in SYNC){const S=SYNC[c],B=SY.base[c]||(SY.base[c]=new Map()),list=byColl[c]||[];
+    if(!res.full&&!list.length)continue;
+    let arr=S.get().slice(),idx=findIdx(arr);
+    const keepLocal=(pk,id)=>{const r=idx.has(id)?arr[idx.get(id)]:null,cj=r?sj(r):null;return (pk in sent)?cj!==sent[pk]:(pk in SY.pend)};
+    if(res.full){const srv=new Map(list.map(ch=>[String(ch.id),ch])),out=[];B.clear();
+      for(const [id,ch] of srv){const pk=c+'|'+id;if(keepLocal(pk,id)){const r=idx.has(id)?arr[idx.get(id)]:null;if(r)out.push(r);if(pk in sent){if(sent[pk]!==null)B.set(id,sent[pk]);SY.pend[pk]=sent[pk]}else if(SY.pend[pk]!==null)B.set(id,SY.pend[pk]);continue}
+        const loc=idx.has(id)?arr[idx.get(id)]:null;out.push(loc?patchIn(loc,ch.data):ch.data);B.set(id,sj(ch.data));delete SY.pend[pk]}
+      for(const r of arr){if(!r||r.id==null)continue;const id=String(r.id),pk=c+'|'+id;if(srv.has(id))continue;if(keepLocal(pk,id)&&r)out.push(r);else delete SY.pend[pk]}
+      arr=out;touched.add(c)}
+    else for(const ch of list){const id=String(ch.id),pk=c+'|'+id;
+      if(keepLocal(pk,id)){if(pk in sent){if(sent[pk]===null)B.delete(id);else B.set(id,sent[pk]);SY.pend[pk]=sent[pk]}continue}
+      if(ch.deleted){if(idx.has(id)){arr.splice(idx.get(id),1);idx=findIdx(arr)}B.delete(id)}
+      else{if(idx.has(id))patchIn(arr[idx.get(id)],ch.data);else{arr.push(ch.data);idx.set(id,arr.length-1)}B.set(id,sj(ch.data))}
+      delete SY.pend[pk];touched.add(c)}
+    if(touched.has(c)){if(S.cmp)arr.sort(S.cmp);S.set(arr);rawSet(S.key,S.cache?S.cache():S.get())}}
+  for(const pk in sent){if(!(pk in SY.pend))continue;const i=pk.indexOf('|'),c=pk.slice(0,i),id=pk.slice(i+1),r=SYNC[c].get().find(x=>x&&String(x.id)===id),cj=r?sj(r):null;
+    if(cj===sent[pk]){delete SY.pend[pk];const B=SY.base[c];if(cj===null)B.delete(id);else B.set(id,cj)}}
+  SY.since=res.ver;rawSet('m_since',SY.since);rawSet('m_pend',SY.pend);
+  if(touched.size){alloc=null;remoteRefresh()}}
+const canRender=()=>!['entry','bulk','cwiz','pwiz'].includes(cur)&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&!document.querySelector('.swr.on');
+function remoteRefresh(){if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}
+document.addEventListener('focusout',()=>setTimeout(()=>{if(SY.needRender&&canRender())remoteRefresh()},250));
+setInterval(()=>{if(TOKEN&&document.visibilityState==='visible')syncNow()},4000);
+setInterval(()=>{if(TOKEN&&document.visibilityState!=='visible')syncNow()},60000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&TOKEN){syncNow();if(SY.updNote&&cur==='home'&&$('ov').classList.contains('hide'))location.reload()}});
+window.addEventListener('online',()=>syncSoon(100));
+/* ---------- عکس رسیدها روی سرور ---------- */
+{const _put=imgPut,_get=imgGet,_del=imgDel;
+  imgPut=async(k,v)=>{const ok=await _put(k,v);if(TOKEN)api('/api/img/'+encodeURIComponent(k),{data:v},'PUT').catch(()=>{const q=ls.get('m_imgq',[]);if(!q.includes(k)){q.push(k);rawSet('m_imgq',q)}});return ok};
+  imgGet=async k=>{let v=await _get(k);if(!v&&TOKEN){try{const j=await api('/api/img/'+encodeURIComponent(k));if(j&&j.data){v=j.data;_put(k,v)}}catch(e){}}return v};
+  imgDel=async k=>{await _del(k);if(TOKEN)api('/api/img/'+encodeURIComponent(k),undefined,'DELETE').catch(()=>{})}}
+async function flushImgs(){const q=ls.get('m_imgq',[]);if(!q.length)return;const left=[];for(const k of q){try{const v=await imgGet(k);if(v)await api('/api/img/'+encodeURIComponent(k),{data:v},'PUT')}catch(e){left.push(k)}}rawSet('m_imgq',left)}
+/* ---------- صفحه ورود و راه‌اندازی ---------- */
+function showAuth(msg){const a=$('auth');a.classList.remove('hide');a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">مطلا</b><small class="ast">سامانه واریزی</small><div class="aspin">در حال اتصال…</div></div>`;
+  api('/api/status').then(s=>authForm(s.setup?'setup':'login',msg)).catch(e=>{a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">مطلا</b><div class="msg bad" style="margin-top:14px">${esc(e.message)}</div><button class="btn gold" data-act="authRetry" style="width:100%">تلاش دوباره</button></div>`})}
+function authForm(mode,msg){const a=$('auth'),su=mode==='setup';
+  a.innerHTML=`<form class="authc" id="authf" autocomplete="on" onsubmit="return false"><div class="amk">م</div><b class="atl">مطلا</b><small class="ast">${su?'راه‌اندازی اولیه — ساخت حساب مدیر':'ورود به سامانه واریزی'}</small>
+  ${msg?`<div class="msg warn">${esc(msg)}</div>`:''}
+  ${su?`<div class="f"><label>نام شما</label><input id="an" autocomplete="name" placeholder="مثلاً علی رضایی"></div>`:''}
+  <div class="f"><label>نام کاربری</label><input id="au" class="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="latin" placeholder="username"></div>
+  <div class="f"><label>رمز عبور</label><div class="pw"><input id="ap" class="ltr" type="password" autocomplete="${su?'new-password':'current-password'}" placeholder="••••••"><button type="button" class="pwt" data-act="pwToggle" data-t="ap" aria-label="نمایش رمز">${ic('eye')}</button></div></div>
+  ${su?`<div class="f"><label>تکرار رمز عبور</label><input id="ap2" class="ltr" type="password" autocomplete="new-password"></div>`:''}
+  <div id="aerr"></div><button class="btn gold" id="abtn" data-act="${su?'authSetup':'authLogin'}" style="width:100%">${su?'ساخت حساب مدیر و ورود':'ورود'}</button>
+  ${su?'':'<div class="ahint">نام کاربری و رمز را از مدیر مغازه بگیرید.</div>'}</form>`;
+  const f=a.querySelector('#authf');f.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ACT[su?'authSetup':'authLogin']()}});setTimeout(()=>{const i=$(su?'an':'au');if(i)i.focus()},80)}
+function authErr(m){const e=$('aerr');if(e)e.innerHTML=`<div class="msg bad">${esc(m)}</div>`;const b=$('abtn');if(b){b.disabled=false;b.classList.remove('wait')}}
+function authBusy(){const b=$('abtn');if(b){b.disabled=true;b.classList.add('wait')}const e=$('aerr');if(e)e.innerHTML=''}
+function loggedIn(r){TOKEN=r.token;try{localStorage.setItem('m_token',TOKEN)}catch(e){}ME=r.user;rawSet('m_me',ME);user=ME.name;document.body.classList.toggle('staff',!isAdmin());$('auth').classList.add('hide');$('auth').innerHTML='';
+  const hasLocal=entries.length||batches.length||creds.length||Object.values(drafts).some(v=>v&&v.length);
+  if(hasLocal&&!ls.get('m_srv',0)&&isAdmin()){render(true);sheet(`<div class="sh-h"><b>انتقال اطلاعات این گوشی به سرور</b></div><div class="muted" style="font-size:13.5px;line-height:1.9;margin:-4px 2px 12px">این گوشی ${fmt(entries.length)} واریزی، ${fmt(batches.length)} لیست پیگیری و ${fmt(creds.length)} حساب بدهی دارد که قبل از اتصال به سرور ثبت شده‌اند. منتقل شوند تا همه همکاران ببینند؟</div><div class="row"><button class="btn sec" data-act="migNo">نه، فقط اطلاعات سرور</button><button class="btn gold" data-act="migYes">انتقال به سرور</button></div>`);return}
+  startFresh(false)}
+function startFresh(upload){SY.pend={};SY.since=0;if(upload){for(const c in SYNC)for(const r of SYNC[c].get())if(r&&r.id!=null)SY.pend[c+'|'+r.id]=null}rawSet('m_pend',SY.pend);syncInit();if(upload)for(const k in SY.pend){const c=k.slice(0,k.indexOf('|'));SY.base[c].delete(k.slice(k.indexOf('|')+1))}
+  render(true);toast(upload?'در حال انتقال اطلاعات به سرور…':'خوش آمدید '+ME.name);syncNow().then(()=>{if(upload&&!pendN())toast('اطلاعات این گوشی به سرور منتقل شد ✓')})}
+function clearLocal(){entries=[];sources=[];batches=[];creds=[];trash=[];audit=[];drafts={};for(const c in SYNC){const S=SYNC[c];rawSet(S.key,S.cache?S.cache():S.get())}SY.pend={};SY.since=0;SY.base={};['m_pend','m_since','m_srv','m_imgq'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}})}
+function forceLogout(msg){TOKEN='';ME=null;try{localStorage.removeItem('m_token');localStorage.removeItem('m_me')}catch(e){}clearLocal();closeSheet();cur='home';render();showAuth(msg)}
+/* ---------- حساب کاربری ---------- */
+const ROLE={admin:'مدیر',staff:'کارمند'};
+function openAccount(){if(!ME){showAuth();return}
+  sheet(`<div class="sh-h"><b>حساب کاربری</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="uhero"><div class="av">${esc(userInit(ME.name))}</div><b style="font-size:18px">${esc(ME.name)}</b><div><span class="pill ${isAdmin()?'gd':'g'}">${ROLE[ME.role]||ME.role}</span><span class="pill g ltrv">@${esc(ME.username)}</span></div></div>
+  <div class="sstat"><span class="sdot ${SY.state}"></span><span>${esc(syncLabel())}</span>${SY.err&&SY.state!=='ok'?`<small>${esc(SY.err)}</small>`:''}</div>
+  <button class="opt big" data-act="pwSheet">${ic('gear')}<span><b>تغییر رمز عبور</b><small>رمز ورود خودتان را عوض کنید</small></span></button>
+  ${isAdmin()?`<button class="opt big" data-act="go" data-n="users">${ic('user')}<span><b>مدیریت کاربران</b><small>افزودن همکار، رمز عبور و دسترسی</small></span></button>
+  <button class="opt big" data-act="backup">${ic('copy')}<span><b>پشتیبان کامل</b><small>دریافت فایل همه اطلاعات سرور</small></span></button>`:''}
+  <button class="opt big" data-act="logout" style="color:var(--red)">${ic('back')}<span><b>خروج از حساب</b><small>اطلاعات از روی این گوشی پاک می‌شود و روی سرور می‌ماند</small></span></button>
+  <div class="ver">مطلا · نسخه ${toFa(APP_V)}</div>`)}
+function pwSheet(){sheet(`<div class="sh-h"><b>تغییر رمز عبور</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="f"><label>رمز فعلی</label><input id="po" class="ltr" type="password" autocomplete="current-password"></div>
+  <div class="f"><label>رمز جدید <i>(حداقل ۶ کاراکتر)</i></label><input id="pn1" class="ltr" type="password" autocomplete="new-password"></div>
+  <div class="f"><label>تکرار رمز جدید</label><input id="pn2" class="ltr" type="password" autocomplete="new-password"></div>
+  <div class="row"><button class="btn gold" data-act="pwSave">ذخیره رمز جدید</button></div>`);setTimeout(()=>$('po')&&$('po').focus(),60)}
+/* ---------- مدیریت کاربران ---------- */
+let USERS=null,usersErr='';
+function vUsers(){if(!isAdmin())return '<div class="card empty"><b>فقط مدیر دسترسی دارد</b></div>';
+  if(usersErr)return `<div class="msg bad">${esc(usersErr)}</div><div class="row"><button class="btn sec" data-act="usersLoad">تلاش دوباره</button></div>`;
+  if(!USERS)return '<div class="card empty"><b>در حال دریافت فهرست کاربران…</b></div>';
+  const act=USERS.filter(u=>u.active).length;
+  return `<div class="ingot"><div class="lb">کاربران سامانه</div><div class="v">${fmt(USERS.length)}<small>نفر</small></div><div class="row3"><div><small>فعال</small><b>${fmt(act)}</b></div><div><small>مدیر</small><b>${fmt(USERS.filter(u=>u.role==='admin').length)}</b></div><div><small>غیرفعال</small><b>${fmt(USERS.length-act)}</b></div></div></div>
+  <div class="sec-h"><b>همکاران</b><small class="muted">برای ویرایش بزنید</small></div>
+  ${USERS.map(u=>`<button class="lrow${u.active?'':' off'}" data-act="userEdit" data-id="${u.id}"><span class="ic gd">${esc(userInit(u.name))}</span><span class="tx"><b>${esc(u.name)}${u.id===ME.id?' <small class="muted">(شما)</small>':''}</b><small><bdi dir="ltr">@${esc(u.username)}</bdi> · ${u.last_login?'آخرین ورود '+relDay(isoOfTs(u.last_login)):'هنوز وارد نشده'}</small><span class="tags"><span class="pill ${u.role==='admin'?'gd':'g'}">${ROLE[u.role]}</span>${u.active?'':'<span class="pill rd">غیرفعال</span>'}</span></span>${fwd()}</button>`).join('')}`}
+const aUsers=()=>isAdmin()?`<button class="btn gold" data-act="userNew">${ic('plus')} افزودن همکار</button>`:'';
+function bindUsers(){if(!USERS&&!usersErr)loadUsers()}
+async function loadUsers(){usersErr='';try{const j=await api('/api/users');USERS=j.users}catch(e){if(e.status!==401)usersErr=e.message}if(cur==='users')render()}
+const genPass=()=>{const a='abcdefghjkmnpqrstuvwxyz23456789';let s='';const r=crypto.getRandomValues(new Uint32Array(8));for(const x of r)s+=a[x%a.length];return s};
+const roleSeg=r=>`<div class="seg" id="urole">${[['staff','کارمند'],['admin','مدیر']].map(([k,t])=>`<button type="button" class="${r===k?'on':''}" data-act="uRole" data-r="${k}">${t}</button>`).join('')}</div><div class="muted" style="font-size:12px;margin:-4px 2px 12px" id="uroleh">${r==='admin'?'همه کارها، شامل حذف، تنظیم منابع و مدیریت کاربران':'ثبت، تقسیم و پیگیری؛ بدون حذف و تنظیم منابع'}</div>`;
+let uTmp={};
+function userNew(){uTmp={role:'staff'};const p=genPass();
+  sheet(`<div class="sh-h"><b>افزودن همکار</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="f"><label>نام کامل</label><input id="unm" placeholder="مثلاً مریم احمدی" autocomplete="off"></div>
+  <div class="f"><label>نام کاربری <i>(انگلیسی، برای ورود)</i></label><input id="uun" class="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="maryam" autocomplete="off"></div>
+  <div class="f"><label>رمز عبور</label><div class="pw"><input id="upw" class="ltr" value="${p}" autocomplete="off"><button type="button" class="pwt" data-act="uGen" aria-label="رمز تصادفی">${ic('refresh')}</button></div></div>
+  <label class="albl" style="margin-top:4px">دسترسی</label>${roleSeg('staff')}
+  <div class="row"><button class="btn gold" data-act="userCreate">ساخت حساب</button></div>`);setTimeout(()=>$('unm')&&$('unm').focus(),60)}
+function userEdit(id){const u=(USERS||[]).find(x=>x.id==id);if(!u)return;uTmp={id:u.id,role:u.role,active:u.active};
+  sheet(`<div class="sh-h"><div><b>${esc(u.name)}</b><small class="shsub ltrv">@${esc(u.username)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="f"><label>نام کامل</label><input id="unm" value="${esc(u.name)}" autocomplete="off"></div>
+  <label class="albl" style="margin-top:4px">دسترسی</label>${roleSeg(u.role)}
+  <div class="f"><label>رمز عبور جدید <i>(خالی بماند یعنی تغییر نکند)</i></label><div class="pw"><input id="upw" class="ltr" placeholder="بدون تغییر" autocomplete="off"><button type="button" class="pwt" data-act="uGen" aria-label="رمز تصادفی">${ic('refresh')}</button></div></div>
+  ${u.id===ME.id?'':`<label class="sw"><input type="checkbox" id="uact"${u.active?' checked':''}><span class="tr"></span><span>حساب فعال باشد <small class="muted">(غیرفعال = بلافاصله از برنامه خارج می‌شود)</small></span></label>`}
+  <div class="row" style="margin-top:14px">${u.id===ME.id?'':`<button class="btn sec" data-act="userDel" style="color:var(--red);flex:0 0 auto;padding:0 16px">${ic('trash')}</button>`}<button class="btn gold" data-act="userSave">ذخیره</button></div>`)}
+function credCard(u,p){sheet(`<div class="sh-h"><b>حساب «${esc(u.name)}» ساخته شد</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="muted" style="font-size:13px;margin:-4px 2px 10px">این اطلاعات را برای همکارتان بفرستید. بعد از ورود می‌تواند رمزش را عوض کند.</div>
+  <div class="card cinfo"><div class="ci"><small>آدرس برنامه</small><b class="ltrv">${esc(appURL())}</b></div><div class="ci"><small>نام کاربری</small><b class="ltrv">${esc(u.username)}</b></div><div class="ci"><small>رمز عبور</small><b class="ltrv">${esc(p)}</b></div></div>
+  <div class="row"><button class="btn gold" data-act="credCopyU" data-u="${esc(u.username)}" data-p="${esc(p)}" data-n="${esc(u.name)}">${ic('copy')} کپی برای ارسال</button></div>`)}
+const appURL=()=>API_BASE||location.origin;
+/* ---------- اپ اندروید: ذخیره فایل، چاپ و اشتراک از طریق پل بومی ---------- */
+if(window.AndroidBridge){
+  const b64=u8=>{let s='';for(let i=0;i<u8.length;i+=32768)s+=String.fromCharCode.apply(null,u8.subarray(i,i+32768));return btoa(s)};
+  save=async(name,data,ok)=>{const ext=name.split('.').pop(),type=MIME[ext]||'application/octet-stream';const u8=typeof data==='string'?new TextEncoder().encode(data):data instanceof Uint8Array?data:new Uint8Array(data);
+    if(window.AndroidBridge.saveFile(name,b64(u8),type))toast(ok||'ذخیره شد');};
+  printReport=function(){const html=(window.__pv||withCtx(reportHTML)).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.AndroidBridge.printHtml(html,'Motalla')};
+}
 /* ---------- خانه: فهرست عمودی وضعیت واریزی‌ها ---------- */
 let homeSt=ls.get('m_homest','pend');
 function homeStatusList(L){
@@ -1892,7 +2095,7 @@ const ACT={
   expText:()=>openText(),expPdf:()=>{closeSheet();autoTrack();openPrint()},
   expXls:()=>{if(typeof XLSX==='undefined')return;closeSheet();autoTrack();save('motalla-'+ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد')},
   copyOut:async()=>{const ta=$('tout'),ok=await copyText(ta.value);if(ok){toast('متن کپی شد');setTimeout(autoTrack,900)}else{ta.focus();ta.select();toast('متن انتخاب شد؛ «Copy» را بزنید')}},
-  shareOut:async()=>{try{await navigator.share({text:$('tout').value})}catch(e){}},
+  shareOut:async()=>{if(window.AndroidBridge){window.AndroidBridge.share($('tout').value);return}try{await navigator.share({text:$('tout').value})}catch(e){}},
   saveTxt:()=>{autoTrack();save('motalla-'+(txtGen?txtName:ctxName())+'.txt','﻿'+(txtGen?txtGen():withCtx(txt)),'فایل متنی آماده شد')},
   pvClose:closePrint,pvPrint:printReport,
   copySrc:async()=>{txtGen=null;expCtx={A:alloc,sc:String(srcIdx),track:true};const ok=await copyText(withCtx(txt));if(ok){toast('متن «'+srcRows().name+'» کپی شد');setTimeout(autoTrack,900)}else openText()},
@@ -2019,7 +2222,36 @@ const ACT={
       Object.values(drafts).forEach(P=>(P||[]).forEach(p=>{if(p.src&&p.src.id==s.id){p.src.name=name;p.src.bank=bank;const b=p.bid&&batches.find(x=>x.id===p.bid);if(b&&!b.closed)b.items.forEach(x=>{if(x.pid===p.id)x.src=name})}}));saveD();saveB()}
     saveS();if(aSt&&(d.id==='new'||aSt.srcId==s.id)){aSt.srcId=s.id;if(aSt.method==='bank')aSt.bank=bank||aSt.bank}
     if(!aSt&&!srcRet){closeSheet();render()}else{srcBack();if(!aSt&&cur!=='home')render()}toast('منبع «'+name+'» ذخیره شد')},
+  /* ---------- v28: ورود، حساب و کاربران ---------- */
+  user:()=>openAccount(),
+  authRetry:()=>showAuth(),
+  pwToggle:d=>{const i=$(d.t);if(i)i.type=i.type==='password'?'text':'password'},
+  authLogin:async()=>{const u=($('au').value||'').trim(),p=$('ap').value||'';if(!u||!p){authErr('نام کاربری و رمز را بنویسید');return}authBusy();
+    try{loggedIn(await api('/api/login',{username:u,password:p}))}catch(e){authErr(e.message)}},
+  authSetup:async()=>{const n=($('an').value||'').trim(),u=($('au').value||'').trim(),p=$('ap').value||'',p2=$('ap2').value||'';
+    if(!n||!u||!p){authErr('همه کادرها را پر کنید');return}if(p!==p2){authErr('تکرار رمز یکسان نیست');return}authBusy();
+    try{loggedIn(await api('/api/setup',{name:n,username:u,password:p}))}catch(e){authErr(e.message)}},
+  migYes:()=>{closeSheet();startFresh(true)},
+  migNo:()=>askConfirm('اطلاعات قبلی این گوشی کنار گذاشته شود و فقط اطلاعات سرور نمایش داده شود؟','بله',()=>startFresh(false)),
+  logout:()=>askConfirm('از حساب خارج می‌شوید؟'+(pendN()?' '+toFa(pendN())+' تغییر هنوز به سرور نرسیده و از بین می‌رود.':''),'خروج',async()=>{try{await api('/api/logout',{})}catch(e){}forceLogout()}),
+  pwSheet:()=>pwSheet(),
+  pwSave:async()=>{const o=$('po').value,a=$('pn1').value,b=$('pn2').value;if(a!==b){toast('تکرار رمز یکسان نیست',true);return}
+    try{await api('/api/password',{old:o,password:a});closeSheet();toast('رمز عبور عوض شد؛ بقیه دستگاه‌های شما خارج شدند')}catch(e){toast(e.message,true)}},
+  backup:async()=>{closeSheet();try{toast('در حال آماده‌سازی پشتیبان…');const j=await api('/api/backup');save('motalla-backup-'+todayISO()+'.txt',JSON.stringify(j,null,1),'فایل پشتیبان آماده شد')}catch(e){toast(e.message,true)}},
+  usersLoad:()=>{usersErr='';USERS=null;render();loadUsers()},
+  userNew:()=>userNew(),
+  userEdit:d=>userEdit(d.id),
+  uRole:d=>{uTmp.role=d.r;document.querySelectorAll('#urole button').forEach(b=>b.classList.toggle('on',b.dataset.r===d.r));const h=$('uroleh');if(h)h.textContent=d.r==='admin'?'همه کارها، شامل حذف، تنظیم منابع و مدیریت کاربران':'ثبت، تقسیم و پیگیری؛ بدون حذف و تنظیم منابع'},
+  uGen:()=>{const i=$('upw');if(i){i.value=genPass();i.type='text'}},
+  userCreate:async()=>{const n=($('unm').value||'').trim(),u=($('uun').value||'').trim(),p=($('upw').value||'').trim();
+    try{const j=await api('/api/users',{name:n,username:u,password:p,role:uTmp.role});USERS=null;loadUsers();credCard(j.user,p)}catch(e){toast(e.message,true)}},
+  userSave:async()=>{const b={name:($('unm').value||'').trim(),role:uTmp.role},p=($('upw').value||'').trim(),ac=$('uact');if(p)b.password=p;if(ac)b.active=ac.checked;
+    try{const j=await api('/api/users/'+uTmp.id,b,'PATCH');if(j.user.id===ME.id){ME={...ME,name:j.user.name,role:j.user.role};rawSet('m_me',ME);user=ME.name;document.body.classList.toggle('staff',!isAdmin())}
+      USERS=(USERS||[]).map(x=>x.id===j.user.id?j.user:x);closeSheet();render();toast(p?'ذخیره شد — رمز جدید: '+p:'ذخیره شد')}catch(e){toast(e.message,true)}},
+  userDel:()=>{const u=(USERS||[]).find(x=>x.id===uTmp.id);if(!u)return;askConfirm('حساب «'+u.name+'» حذف شود؟ ثبت‌های قبلی او باقی می‌ماند.','حذف حساب',async()=>{try{await api('/api/users/'+u.id,undefined,'DELETE');USERS=USERS.filter(x=>x.id!==u.id);render();toast('حساب حذف شد')}catch(e){toast(e.message,true)}})},
+  credCopyU:async d=>{const t='مطلا | ورود به سامانه واریزی\n'+d.n+'\nآدرس: '+appURL()+'\nنام کاربری: '+d.u+'\nرمز عبور: '+d.p;(await copyText(t))?toast('کپی شد؛ برای همکارتان بفرستید'):(txtGen=()=>t,txtName='login',openText())},
 };
+for(const k of ADMIN_ACTS){const f=ACT[k];if(f)ACT[k]=(...a)=>isAdmin()?f(...a):toast('این کار فقط برای مدیر مجاز است',true)}
 ACT.homeSt=d=>{homeSt=d.t;ls.set('m_homest',homeSt);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.dayGrp=(d,e)=>{const g=e.target.closest('.tg2');if(!g)return;const o=g.classList.toggle('open');const h=g.querySelector('.tgh2');if(h)h.setAttribute('aria-expanded',o);o?dayOpen.add(d.s):dayOpen.delete(d.s)};
 {const _od=ACT.openDay;ACT.openDay=d=>{dayOpen=new Set();_od(d)}}
@@ -2033,9 +2265,10 @@ function fitApp(){const a=$('app');if(!a)return;const sa=navigator.standalone===
   const full=matchMedia('(orientation: portrait)').matches?Math.max(screen.width,screen.height):Math.min(screen.width,screen.height),h=Math.max(window.innerHeight,full);
   a.style.setProperty('height',h+'px','important');a.style.setProperty('bottom','auto','important')}
 
+if(ME)user=ME.name;document.body.classList.toggle('staff',!!ME&&!isAdmin());syncInit();
 render(true);
-if(!user&&(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches))setTimeout(openUser,300);
-if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+if(!TOKEN)showAuth();else{setSync(navigator.onLine===false?'off':'busy');syncNow()}
+if('serviceWorker' in navigator&&(location.protocol==='https:'||/^(127\.0\.0\.1|localhost)$/.test(location.hostname))){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
 </body>
 </html>

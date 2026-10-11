@@ -1,0 +1,12 @@
+{
+  "name": "motalla",
+  "version": "2.0.0",
+  "private": true,
+  "description": "سامانه واریزی مطلا — سرور چندکاربره",
+  "scripts": {
+    "start": "node --experimental-sqlite --disable-warning=ExperimentalWarning server/server.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  }
+}
