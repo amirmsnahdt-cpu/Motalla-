@@ -1,0 +1,33 @@
+name: دریافت فونت وزیرمتن (یک بار)
+on:
+  push:
+    branches: [v2-server]
+    paths: ['.github/workflows/fetch-fonts.yml']
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  fonts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: v2-server, fetch-depth: 0 }
+      - name: دریافت از npm
+        run: |
+          mkdir -p /tmp/vz && cd /tmp/vz && npm pack vazirmatn@33.0.3 && tar xzf vazirmatn-*.tgz
+          ls -R package/fonts | head -50
+      - name: کپی فونت‌ها
+        run: |
+          mkdir -p fonts
+          V=$(ls /tmp/vz/package/fonts/webfonts/ | grep -i 'wght' | grep woff2 | head -1 || true)
+          if [ -n "$V" ]; then cp "/tmp/vz/package/fonts/webfonts/$V" fonts/Vazirmatn.woff2; fi
+          for w in Regular Medium SemiBold Bold ExtraBold Black; do f=/tmp/vz/package/fonts/webfonts/Vazirmatn-$w.woff2; [ -f "$f" ] && cp "$f" fonts/ || true; done
+          cp /tmp/vz/package/OFL.txt fonts/ 2>/dev/null || cp /tmp/vz/package/LICENSE fonts/ 2>/dev/null || true
+          ls -la fonts
+      - name: ذخیره در مخزن (اول شاخه لیارا)
+        run: |
+          git config user.name "motalla-bot"; git config user.email "motalla-bot@users.noreply.github.com"
+          git add fonts
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "فونت وزیرمتن روی سرور خودمان (بدون نیاز به گوگل)"
+          git push origin HEAD:v2-server
+          git fetch origin main && git push origin HEAD:main || echo "main جداست"
