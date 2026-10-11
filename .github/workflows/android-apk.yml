@@ -1,7 +1,7 @@
 name: ساخت اپ اندروید (APK)
 on:
   push:
-    branches: [main, v2-server]
+    branches: [main]
     paths: ['android/**', '.github/workflows/android-apk.yml']
   workflow_dispatch:
 permissions: { contents: write }
@@ -37,6 +37,5 @@ jobs:
           git add dist/motalla.apk
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "فایل نصب اندروید جدید برای دانلود از سرور"
-          # اول شاخه لیارا (v2-server) تا لیارا کامیت را «جدید» ببیند و مستقر کند، بعد main
-          git push origin HEAD:v2-server || echo "v2-server جداست؛ دستی به‌روز شود"
+          # فقط main؛ استقرار لیارا با کار «استقرار روی لیارا» انجام می‌شود
           git push origin HEAD:main

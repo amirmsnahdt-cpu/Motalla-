@@ -1,19 +1,34 @@
 name: استقرار روی لیارا
+# تنها راه استقرار: هر push به main (لیارا روزانه تعداد استقرار محدود دارد، پس چند push پشت‌سرهم یکی می‌شوند)
 on:
   push:
     branches: [main]
-    paths-ignore: ['android/**', '**.md']
+    paths-ignore: ['android/**', '**.md', '.github/workflows/android-apk.yml', '.github/workflows/fetch-fonts.yml']
+  schedule:
+    - cron: '35 20 * * *'   # هر شب ۰۰:۰۵ به وقت تهران: اگر نسخه سرور عقب است، مستقر کن
   workflow_dispatch:
-concurrency: { group: liara-deploy, cancel-in-progress: false }
 jobs:
-  deploy:
+  wait:
     runs-on: ubuntu-latest
+    concurrency: { group: liara-wait, cancel-in-progress: true }
+    steps:
+      - name: صبر برای جمع شدن تغییرات پشت‌سرهم
+        if: github.event_name == 'push'
+        run: sleep 150
+  deploy:
+    needs: wait
+    runs-on: ubuntu-latest
+    concurrency: { group: liara-deploy, cancel-in-progress: false }
     steps:
       - uses: actions/checkout@v4
-      - name: بررسی وجود توکن لیارا
+      - name: بررسی وجود توکن و لزوم استقرار
         env: { LIARA_API_TOKEN: '${{ secrets.LIARA_API_TOKEN }}' }
         run: |
-          if [ -z "$LIARA_API_TOKEN" ]; then echo "::warning::توکن لیارا (LIARA_API_TOKEN) هنوز تنظیم نشده؛ استقرار انجام نشد."; echo "SKIP=1" >> $GITHUB_ENV; fi
+          if [ -z "$LIARA_API_TOKEN" ]; then echo "::warning::توکن لیارا (LIARA_API_TOKEN) تنظیم نشده"; echo "SKIP=1" >> $GITHUB_ENV; exit 0; fi
+          WANT=$(grep -o 'const APP_V=[0-9.]*' index.html | head -1 | cut -d= -f2)
+          HAVE=$(curl -s -m 20 https://motalla.liara.run/api/status | grep -o '"v":[0-9.]*' | cut -d: -f2 || true)
+          echo "repo=$WANT server=$HAVE"
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -n "$HAVE" ] && [ "$WANT" = "$HAVE" ]; then echo "سرور به‌روز است"; echo "SKIP=1" >> $GITHUB_ENV; fi
       - uses: actions/setup-node@v4
         if: env.SKIP != '1'
         with: { node-version: '22' }
@@ -26,13 +41,11 @@ jobs:
         env: { LIARA_API_TOKEN: '${{ secrets.LIARA_API_TOKEN }}', LIARA_APP: '${{ vars.LIARA_APP }}' }
         run: |
           npm i -g @liara/cli@5 >/dev/null 2>&1
-          liara --version || true
           set +e
           liara deploy --app="${LIARA_APP:-motalla}" --api-token="$LIARA_API_TOKEN" --region=iran --no-app-logs > out.txt 2>&1
           code=$?
           cat out.txt
           if [ $code -ne 0 ]; then
-            # خطا را به شکل annotation بنویس تا بدون دسترسی به لاگ هم دیده شود
             tail -n 6 out.txt | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r l; do echo "::error::$l"; done
             exit $code
           fi
