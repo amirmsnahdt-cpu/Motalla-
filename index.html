@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=28.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=28.3,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(s&&v<V){localStorage.removeItem('m_app_next');localStorage.removeItem('m_app_next_v')}}catch(e){}})();</script>
@@ -618,6 +618,23 @@ html,body{background:var(--bg)}
 #dock .tb svg{width:21px;height:21px}
 #dock .fab{width:54px;height:54px;border-radius:17px}
 .rowno .bts{display:flex;gap:6px}
+/* خانه: کارت جمع با ۴ عدد و فهرست وضعیت */
+.ingot .row3.r4>div{padding:10px 10px 11px}
+.ingot .row3 b.g{color:var(--ok)}.ingot .row3 b.w{color:var(--warn)}
+.hseg{margin-bottom:10px}
+.hsl{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.hsr{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border:0;background:none;color:var(--ink);text-align:right;cursor:pointer;font:inherit}
+.hsr+.hsr{border-top:1px solid var(--hair)}
+.hsr:active{background:var(--bg)}
+.hsr .hn{min-width:22px;color:#a0a6b2;font-weight:700;font-size:12px;text-align:center}
+.hsr .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}
+.hsr .tx b{font-weight:800;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsr .tx small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsr .hv{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
+.hsr .hv b{font-weight:800;font-size:14px;letter-spacing:-.2px}
+.hsr .hv .pill{margin:0;font-size:10.5px;padding:1px 8px}
+.hsr.bad{background:var(--red2)}
+.hsmore{display:block;width:100%;text-align:center;margin-top:4px}
 </style>
 </head>
 <body>
@@ -628,7 +645,7 @@ html,body{background:var(--bg)}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=28.2,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=28.3,REPO='amirmsnahdt-cpu/Motalla-';
 function checkUpdate(force){try{if(location.hostname!=='raw.githack.com')return;let t=0;try{t=+sessionStorage.getItem('m_updchk')||0}catch(e){}
   if(!force&&Date.now()-t<3*60e3)return;try{sessionStorage.setItem('m_updchk',String(Date.now()))}catch(e){}
   fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;if(!sha||!/^[0-9a-f]{40}$/.test(sha))return null;
@@ -777,12 +794,11 @@ function vHome(){const L=dayList(),bad=L.filter(r=>r.level===2).length,last=L.sl
   ${dstrip()}
   ${flowCard()}
   ${L.length?`<div class="ingot"><div class="lb">جمع واریزی ${['امروز','دیروز','فردا'].includes(r)?r:'این تاریخ'} — ${dates(dateVal).fa}</div><div class="v">${fmt(sum(L))}<small>تومان</small></div><div class="rule"></div>
-  <div class="row3"><div><small>تعداد</small><b>${fmt(L.length)}</b></div><div><small>خطادار</small><b class="${bad?'r':''}">${fmt(bad)}</b></div><div><small>ردیف بعدی</small><b>${fmt(L.length+1)}</b></div></div></div>`:''}
+  ${(()=>{const okN=L.filter(x=>{const t=entSt(x);return t&&t[1]==='ok'}).length,pend=Math.max(0,L.length-okN-bad);return `<div class="row3 r4"><div><small>تعداد</small><b>${fmt(L.length)}</b></div><div><small>خطادار</small><b class="${bad?'r':''}">${fmt(bad)}</b></div><div><small>تسویه شده</small><b class="${okN?'g':''}">${fmt(okN)}</b></div><div><small>در انتظار</small><b class="${pend?'w':''}">${fmt(pend)}</b></div></div></div>`})()}`:''}
   ${bad?`<div class="msg bad">${fmt(bad)} ردیف خطا دارد و در تقسیم شرکت نمی‌کند. <button class="link" style="padding:0" data-act="showBad">نمایش</button></div>`:''}
   ${storeOK?'':'<div class="msg warn">ذخیره خودکار در این مرورگر ممکن نیست.</div>'}
   ${openCreds().length?`<button class="lrow" data-act="tab" data-n="debt"><span class="ic gd">${ic('debt')}</span><span class="tx"><b>تسویه بدهی: ${fmt(openCreds().length)} حساب باز</b><small>مانده کل ${fmt(openCreds().reduce((s,c)=>s+cRem(c),0))} تومان</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:''}
-  <div class="sec-h"><b>ثبت‌های ${['امروز','دیروز','فردا'].includes(r)?r:'این روز'}: ${fmt(L.length)} مورد</b>${L.length?'<button class="link" data-act="tab" data-n="list">همه</button>':''}</div>
-  ${L.length?`<div class="hscroll">${[...L].reverse().map(x=>`<button class="hc${x.level===2?' bad':''}${x.sentBid?' sent':''}" data-act="edit" data-id="${x.id}"><span class="t"><span class="idx">${fmt(x.seq)}</span>${x.level===2?'<span class="pill rd">خطا</span>':stPill(x)}</span><b>${esc(x.name||'—')}</b><span class="a">${fmt(x.amount)}<small> تومان</small></span><small>${esc(x.bankShow||'—')}</small></button>`).join('')}</div>`:`<div class="card empty">${ic('list')}<b>برای ${dates(dateVal).fa} واریزی‌ای ثبت نشده</b>با دکمه طلایی پایین صفحه شروع کنید.</div>`}<div class="ver">مطلا · نسخه ${toFa(APP_V)}</div>`}
+  ${homeStatusList(L)}<div class="ver">مطلا · نسخه ${toFa(APP_V)}</div>`}
 function flowCard(){const f=flowState(),r=relDay(dateVal),lab=['امروز','دیروز','فردا'].includes(r)?r:dates(dateVal).fa,pa=pendingAll();
   let msg,btn;if(!f.has){msg='برای '+lab+' هنوز لیستی شروع نشده';btn=`<button class="btn gold" data-act="newList">${ic('plus')} شروع لیست جدید</button>`}
   else if(f.op){const p=openB().filter(b=>b.date===dateVal).reduce((s,b)=>s+b.items.filter(x=>x.st==='pending').length,0);msg=p?fmt(p)+' واریز منتظر تأیید':'همه تیک خورده؛ ثبت نهایی مانده';btn=`<button class="btn gold" data-act="flowGo" data-s="track">ادامه: پیگیری</button>`}
@@ -1794,6 +1810,18 @@ function ltoolsHTML(){const all=listMode==='all',D=dates(dateVal);
   return `<div class="ltools${lsOpen||listQ?' sopen':''}"><div class="lt"><b>${all?'همه لیست‌ها':'لیست '+esc(relDay(dateVal)==='امروز'?'امروز':D.fa)}</b><small>${all?'بر اساس تاریخ':esc(D.fa)}</small></div>
   <button class="ib0" data-act="lsOpen" aria-label="جست‌وجو">${ic('search')}</button><button class="ib0${listSort!=='seq'?' on':''}" data-act="sortSheet" aria-label="مرتب‌سازی: ${SORTS[listSort]}">${ic('sort')}</button><button class="ib0" data-act="lexp" data-a="menu" aria-label="خروجی متن، PDF و Excel">${ic('open')}</button>
   <div class="lsrch"><div class="sbox" style="flex:1">${ic('search')}<input id="lq" type="search" enterkeyhint="search" placeholder="نام، فاکتور، شبا، مبلغ، منبع…" value="${esc(listQ)}" autocomplete="off"><button class="clr${listQ?'':' hide'}" data-act="clearQ" aria-label="پاک کردن">×</button></div><button class="link" data-act="lsClose">انصراف</button></div></div>`}
+/* ---------- خانه: فهرست عمودی وضعیت واریزی‌ها ---------- */
+let homeSt=ls.get('m_homest','pend');
+function homeStatusList(L){
+  if(!L.length)return `<div class="card empty">${ic('list')}<b>برای ${dates(dateVal).fa} واریزی‌ای ثبت نشده</b>با دکمه طلایی پایین صفحه شروع کنید.</div>`;
+  const isOk=x=>{const t=entSt(x);return !!t&&t[1]==='ok'},ok=L.filter(isOk),pend=L.filter(x=>!isOk(x)&&x.level<2),bad=L.filter(x=>x.level===2);
+  const st=homeSt==='ok'?'ok':homeSt==='bad'&&bad.length?'bad':'pend',rows=(st==='ok'?ok:st==='bad'?bad:pend).slice().reverse(),MAX=8;
+  const row=x=>{const t=entSt(x),si=x.sentBid?srcInfo(x.id):null,tag=x.level===2?'<span class="pill rd">خطا</span>':t?`<span class="pill ${t[1]==='ok'?'okp':t[1]}">${t[0]}</span>`:'<span class="pill g">ثبت شده</span>';
+    return `<button class="hsr${x.level===2?' bad':''}" data-act="edit" data-id="${x.id}"><span class="hn">${fmt(x.seq)}</span><span class="tx"><b>${esc(fullName(x)||'—')}</b><small>${esc(x.bankShow||'بانک نامشخص')}${si?' · '+esc(si.src):''}</small></span><span class="hv"><b>${fmt(x.amount)}</b>${tag}</span></button>`};
+  return `<div class="sec-h"><b>وضعیت واریزی‌ها</b><button class="link" data-act="tab" data-n="list">همه</button></div>
+  <div class="seg hseg"><button class="${st==='pend'?'on':''}" data-act="homeSt" data-t="pend">در انتظار ${fmt(pend.length)}</button><button class="${st==='ok'?'on':''}" data-act="homeSt" data-t="ok">تسویه شده ${fmt(ok.length)}</button>${bad.length?`<button class="${st==='bad'?'on':''}" data-act="homeSt" data-t="bad">خطادار ${fmt(bad.length)}</button>`:''}</div>
+  ${rows.length?`<div class="hsl">${rows.slice(0,MAX).map(row).join('')}</div>${rows.length>MAX?`<button class="link hsmore" data-act="tab" data-n="list">${fmt(rows.length-MAX)} مورد دیگر — دیدن همه</button>`:''}`
+  :`<div class="aempty">${st==='ok'?'هنوز واریزی‌ای تسویه نشده':'همه واریزی‌های این روز تسویه شده‌اند ✓'}</div>`}`}
 const ACT={
   back,close:()=>{aSt=null;dpMode='';closeSheet()},go:d=>go(d.n),date:openDate,user:openUser,resetForm,resetBulk,saveEntry,bulkAdd,
   toastAct:()=>{const f=toastAct;toastAct=null;$('toast').style.display='none';f&&f()},
@@ -1962,6 +1990,7 @@ const ACT={
     saveS();if(aSt&&(d.id==='new'||aSt.srcId==s.id)){aSt.srcId=s.id;if(aSt.method==='bank')aSt.bank=bank||aSt.bank}
     if(!aSt&&!srcRet){closeSheet();render()}else{srcBack();if(!aSt&&cur!=='home')render()}toast('منبع «'+name+'» ذخیره شد')},
 };
+ACT.homeSt=d=>{homeSt=d.t;ls.set('m_homest',homeSt);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const f=ACT[t.dataset.act];if(f){e.preventDefault();f(t.dataset,e)}});
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov'){aSt=null;srcRet='';closeSheet()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('ov').classList.contains('hide')){aSt=null;srcRet='';closeSheet()}});
