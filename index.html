@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=46.5,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=46.6,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1374,6 +1374,26 @@ body{font-feature-settings:normal}
 .brw.rn1{box-shadow:inset -4px 0 0 #6b5bd6}.brw.rn0{box-shadow:inset -4px 0 0 var(--blu)}
 .brw{position:relative}.rntag{position:absolute;top:8px;left:12px;font-size:10px;font-weight:800;border-radius:7px;padding:0 6px;background:var(--blu2);color:var(--blu);z-index:1}.brw.rn1 .rntag{background:#6b5bd61f;color:#6b5bd6}
 .rnlab{align-self:center;font-size:12px;font-weight:800;color:var(--mut);white-space:nowrap;padding:0 4px}
+/* پنجره تخصیص با تم آبی */
+.ash .astep .n{background:var(--blu)!important;color:#fff!important;border-radius:50%!important}
+.ash .astep .link{color:var(--blu)!important}
+.ash .srcc{border:1.5px solid var(--line)!important;background:var(--card)!important;border-radius:20px!important;box-shadow:none!important}
+.ash .srcc.on{border-color:var(--blu)!important;background:var(--blu2)!important}
+.ash .srcc .av{background:var(--blu2)!important;color:var(--blu)!important;border-radius:50%!important}
+.ash .srcc.on .av:not(.bki){background:var(--blu)!important;color:#fff!important}
+.ash .srcc .bki.av{width:48px!important;min-width:48px!important;height:48px!important;margin:0 auto 6px;display:block}
+.ash .srcc.on::after,.ash .srcc .ok{background:var(--blu)!important}
+.ash .srcc .ed{background:var(--card)!important;color:var(--blu)!important;border-color:var(--blu2)!important}
+.ash .srcc.add{border-style:dashed!important}.ash .srcc.add .av{background:var(--hair)!important;color:var(--blu)!important}
+.ash .mseg{background:var(--hair)!important;border:0!important;border-radius:18px!important}
+.ash .mseg button.on{background:var(--card)!important;color:var(--blu)!important;box-shadow:0 1px 3px #16213a1a!important}.ash .mseg button.on svg{color:var(--blu)!important}
+.ash .pcard{border:0!important;background:var(--hair)!important;border-radius:20px!important;box-shadow:none!important}
+.ash .pcard input,.ash .pcard select{background:var(--card)!important;border-color:transparent!important;border-radius:14px!important}
+.ash .asq{border-radius:16px!important}
+.ash .asave{background:color-mix(in srgb,var(--card) 94%,transparent)!important;border-top:1px solid var(--line)!important;box-shadow:none!important}
+.ash .asave .xgo{flex:1;width:auto;min-height:52px}.ash .atot b{color:var(--ink)}
+.ash .arow input{accent-color:var(--blu)!important}
+#sheet .ash .asave .btn,#sheet .ash .asave .btn.gold{background:var(--blu)!important;color:#fff!important;border:0!important;box-shadow:0 10px 22px -12px var(--blu)!important;border-radius:16px!important}
 </style>
 </head>
 <body>
@@ -1384,7 +1404,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=46.5,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=46.6,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2174,14 +2194,14 @@ function paramHTML(){const m=aSt.method;
 function allocSheet(){const S=sources,P=aPool();
   sheet(`<div class="ash"><div class="sh-h"><div><b>${aSt.editPid?'ویرایش تخصیص':'تخصیص جدید'}</b><small class="shsub">لیست ${esc(dates(dateVal).fa)}، مانده ${fmt(sum(P))} تومان (${fmt(P.length)} واریزی)</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="astep"><span class="n">۱</span><b>منبع پرداخت</b><button class="link" data-act="srcMgr">ویرایش منابع</button></div>
-  <div class="srcs">${S.map(s=>`<button class="srcc${aSt.srcId==s.id?' on':''}" data-act="aSrc" data-id="${s.id}">${aSt.srcId==s.id?`<span class="ed" data-act="srcSet" data-id="${s.id}" role="button" aria-label="ویرایش نام منبع">${ic('edit')}</span>`:''}<span class="av">${esc(userInit(s.name))}</span><b>${esc(s.name)}</b><small>${esc(s.bank||'بانک نامشخص')}</small></button>`).join('')}<button class="srcc add" data-act="srcSet" data-id="new"><span class="av">${ic('plus')}</span><b>منبع جدید</b><small>افزودن</small></button></div>
+  <div class="srcs">${S.map(s=>`<button class="srcc${aSt.srcId==s.id?' on':''}" data-act="aSrc" data-id="${s.id}">${aSt.srcId==s.id?`<span class="ed" data-act="srcSet" data-id="${s.id}" role="button" aria-label="ویرایش نام منبع">${ic('edit')}</span>`:''}${acBank(s)?bankBadge(acBank(s),'lg av'):`<span class="av">${esc(userInit(s.name))}</span>`}<b>${esc(s.name)}</b><small>${esc(acBank(s)?'بانک '+acBank(s):'بانک نامشخص')}</small></button>`).join('')}<button class="srcc add" data-act="aNewSrc"><span class="av">${ic('plus')}</span><b>منبع جدید</b><small>افزودن</small></button></div>
   <div class="astep"><span class="n">۲</span><b>روش انتخاب</b></div>
   <div class="mseg">${Object.keys(MNAME).map(k=>`<button class="${aSt.method===k?'on':''}" data-act="aMeth" data-m="${k}">${MIC[k]}<span>${MNAME[k]}</span></button>`).join('')}</div>
   <div class="pcard"><div class="mdesc">${MDESC[aSt.method]}</div><div id="aparam">${paramHTML()}</div><div id="ameter"></div></div>
   <div class="astep"><span class="n">۳</span><b>واریزی‌ها</b><span id="asum" class="muted"></span></div>
   <div class="sbox asq">${ic('search')}<input id="aq" type="search" placeholder="جست‌وجو در مانده لیست…" value="${esc(aSt.q)}" autocomplete="off"></div>
   <div id="aprev"></div>
-  <div class="asave"><div class="atot"><small>جمع انتخاب</small><b id="atot">۰</b><small id="arem"></small></div><button class="btn gold" data-act="aSave" id="asv">${aSt.editPid?'ذخیره تغییرات':'ثبت تخصیص'}</button></div></div>`);
+  <div class="asave"><div class="atot"><small>جمع انتخاب</small><b id="atot">۰</b><small id="arem"></small></div><button class="btn gold xgo" data-act="aSave" id="asv">${aSt.editPid?'ذخیره تغییرات':'ثبت تخصیص'}</button></div></div>`);
   const sh=$('sheet');sh.oninput=e=>{const t=e.target;if(t.classList.contains('num')){const n=num(t.value);t.value=n?n.toLocaleString('en-US'):''}
     if(t.id==='aq'){aSt.q=t.value;renderPrev();return}
     if(t.id==='pa'){const w=$('pwords');if(w)w.textContent=num(t.value)?shortAmt(num(t.value)):'مثلاً ۱ میلیارد'}
@@ -3309,6 +3329,7 @@ function moveSheet(ids,title){const p=curPart();if(!p)return;const L=sources.fil
 let mvIds=[];
 ACT.entMove=d=>{{const own=parts().find(z=>z.ids.some(i=>String(i)===String(d.id)));if(own)partId=own.id}const id=+d.id||d.id,x=validated().find(r=>String(r.id)===String(d.id));moveSheet([x?x.id:id],x?fullName(x)+'، '+fmt(x.amount)+' تومان':'')};
 ACT.partMoveAll=()=>{const p=curPart();if(!p)return;moveSheet(p.ids.slice(),'همه '+fmt(p.ids.length)+' واریزی «'+p.src.name+'»')};
+ACT.aNewSrc=()=>{const st=aSt;ACT.acNew();acTmp.after=src=>{aSt=st;aSt.srcId=src.id;allocSheet();recalc()}};
 ACT.mvNew=()=>{const ids=mvIds.slice();ACT.acNew();acTmp.after=src=>{mvIds=ids;ACT.mvGo({s:src.id})}};
 ACT.mvGo=d=>{const p=curPart(),src=sources.find(x=>String(x.id)===String(d.s));if(!p||!src)return;const ids=mvIds.slice();closeSheet();const to=moveTo(ids,p,src);
   if(!p.ids.length){partId=to.id}const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(fmt(ids.length)+' واریزی به «'+src.name+'» منتقل شد','', 'برگرداندن',()=>{const P=parts();if(!P.includes(p))P.push(p);moveTo(ids,to,p.src);partId=p.id;render()})};
