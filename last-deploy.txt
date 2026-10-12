@@ -6,7 +6,7 @@ Disks:
   data -> /app/data
 node version: 22
 - Creating an archive...
-Compressed size: 990.71KB (use .gitignore to reduce the size)
+Compressed size: 990.72KB (use .gitignore to reduce the size)
 ✔ Upload finished.
 
  ›   Error: CODE 428: Max deployment count in day.
