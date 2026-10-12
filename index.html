@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=40,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=40.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1189,6 +1189,24 @@ body{font-feature-settings:normal}
 .acnow .t{border-top:1px solid var(--line);padding-top:8px}.acnow .t b{color:var(--blu);font-size:17px}
 .acbig{font-size:20px!important;font-weight:800!important;min-height:58px!important}
 #dock .tb{min-width:0}
+#app.banks #act,#app.split #act{position:absolute;left:0;right:0;bottom:100%;margin:0!important;pointer-events:none;transition:transform .25s cubic-bezier(.3,.8,.3,1),opacity .2s}
+#app.banks #act>*,#app.split #act>*{pointer-events:auto}
+#app.banks #act.hid,#app.split #act.hid{transform:translateY(calc(100% + 90px));opacity:0}
+#app.banks #view,#app.split #view{padding-bottom:96px!important}
+.fcard>.swr{border-radius:0!important;margin:0!important}.fcard>.swr+.swr{border-top:1px solid var(--hair)}
+.fcard>.swr .acrow{background:var(--card)}
+.achero b.nb{font-size:18px;opacity:.9;margin:6px 0}
+/* هر واریزی یک کاشی با گوشه‌های گرد */
+.bpanel .blist>*+*{border-top:0!important}
+.bpanel .blist>.swr{border-radius:16px!important;margin:0 0 8px!important;background:var(--bg)}
+.bpanel .blist .brw{background:var(--bg);border-radius:16px}
+.bpanel .blist .brh{padding:12px 12px}
+.bpanel .blist .bri{background:var(--card)}
+.fcard{background:transparent!important;box-shadow:none!important;padding:0!important;border-radius:0!important;overflow:visible!important}
+.fcard>.swr{border-radius:16px!important;margin:0 0 8px!important;box-shadow:0 1px 2px #16213a0d}.fcard>.swr+.swr{border-top:0!important}
+.fcard .brw{border-radius:16px}.fcard .brh{padding:12px 12px}
+.fcard>.acrow,.fcard>.bkr{background:var(--card);border-radius:16px;padding:12px!important;margin-bottom:8px;border-top:0!important}
+.fcard>.swr .acrow{padding:13px 12px}
 </style>
 </head>
 <body>
@@ -1199,7 +1217,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=40,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=40.1,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1362,7 +1380,7 @@ function render(anim){const V=$('view'),B=$('bar'),A=$('act');
   const hasBack=!!PARENT[cur]||(cur==='entry'&&editId);
   B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'&&editId?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:`<button class="mark mav" data-act="acct" aria-label="حساب کاربری">${ME?esc(userInit(ME.name)):ic('user')}</button>`}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='buy'?'خرید طلا':cur==='ent'?(entEdit?'ویرایش واریزی':'جزئیات واریزی'):cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button>${cur==='home'?`<span class="bcmp"><b>${fmt(sum(dayList()))}</b><small>تومان — ${esc(dates(dateVal).fa)}</small></span>`:''}</div></div>${cur==='home'?`<button class="ib0 hsr0" data-act="hsearch" aria-label="جستجو">${ic('search')}</button>`:(cur==='entry'&&!editId)?`<span class="regd">${ic('cal')}<span>لیست امروز<small>${esc(dates(todayISO()).fa)}</small></span></span>`:cur==='split1'?`<span class="hbtns"><button class="ib0" data-act="xOpen" aria-label="خروجی">${ic('open')}</button><button class="ib0" data-act="srcMgr" aria-label="مدیریت منابع">${ic('gear')}</button></span>`:cur==='ent'||cur==='find'||cur==='buy'||cur==='bulk'||cur==='banks'?'':dchip()}`;
   const R={banks:[vBanks,aBanks],buy:[vBuy,aBuy],ent:[vEnt,aEnt],find:[vFind,null],home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null],users:[vUsers,aUsers],settings:[vSettings,null],backups:[vBackups,null]}[cur];
-  $('app').classList.toggle('home',cur==='home');$('app').classList.toggle('ent',cur==='ent');$('app').classList.toggle('banks',cur==='banks');$('app').classList.toggle('editing',cur==='ent'&&entEdit);{const ap=$('app'),was=ap.classList.contains('full'),fu=FULLP.has(cur);ap.classList.toggle('full',fu);ap.classList.toggle('split',cur==='split1');if(fu&&!was&&anim){ap.classList.add('fullin');clearTimeout(render._fi);render._fi=setTimeout(()=>ap.classList.remove('fullin'),420)}if(!fu)ap.classList.remove('fullin')}B.classList.remove('cmp');
+  $('app').classList.toggle('home',cur==='home');$('act').classList.remove('hid');$('app').classList.toggle('ent',cur==='ent');$('app').classList.toggle('banks',cur==='banks');$('app').classList.toggle('editing',cur==='ent'&&entEdit);{const ap=$('app'),was=ap.classList.contains('full'),fu=FULLP.has(cur);ap.classList.toggle('full',fu);ap.classList.toggle('split',cur==='split1');if(fu&&!was&&anim){ap.classList.add('fullin');clearTimeout(render._fi);render._fi=setTimeout(()=>ap.classList.remove('fullin'),420)}if(!fu)ap.classList.remove('fullin')}B.classList.remove('cmp');
   V.innerHTML=R[0]();A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();if(cur==='home')homeLayout();paintBars();
   if(anim&&!noAnim){V.classList.remove('in','bk');void V.offsetWidth;V.classList.add('in');if(navBack)V.classList.add('bk')}else V.classList.remove('in','bk');navBack=false;noAnim=false;
   ({buy:bindBuy,ent:bindEnt,find:bindFind,backups:()=>{if(!BK&&!bkErr)loadBk()},entry:bindEntry,bulk:bindBulk,list:bindList,split1:bindSplit1,batch:bindBatch,track:bindTrack,debt:bindDebt,cwiz:bindWiz,pwiz:bindWiz,users:bindUsers})[cur]?.()}
@@ -2429,7 +2447,7 @@ const edgeOK=()=>!SLIDEP.has(cur)&&(!!PARENT[cur]||(cur==='entry'&&editId))&&$('
   window.swClose=()=>close(open);
   document.addEventListener('pointerdown',e=>{if(e.button>0)return;const w0=e.target.closest&&e.target.closest('.swr');
     if(open&&open!==w0){close(open);if(w0)swT=Date.now()}
-    if(!w0||e.target.closest('.swb,input,textarea,select'))return;if(edgeOK()&&e.clientX>innerWidth-24)return;
+    if(!w0||e.target.closest('.swb,input,textarea,select'))return;
     s={w:w0,x:e.clientX,y:e.clientY,b:w0._x||0,d:w0._x||0,lk:null,id:e.pointerId,nr:+w0.dataset.nr,nl:+w0.dataset.nl}});
   document.addEventListener('pointermove',e=>{if(!s||e.pointerId!==s.id)return;const dx=e.clientX-s.x,dy=e.clientY-s.y;
     if(!s.lk){if(Math.abs(dx)<9&&Math.abs(dy)<9)return;s.lk=Math.abs(dx)>Math.abs(dy)*1.2?'h':'v';if(s.lk==='h'){try{s.w.querySelector('.swc').setPointerCapture(e.pointerId)}catch(_){}}}
@@ -2461,7 +2479,7 @@ new MutationObserver(()=>{if(!segQ)segQ=requestAnimationFrame(segFx)}).observe(d
 window.addEventListener('resize',()=>requestAnimationFrame(segFx));
 /* ================= v22: بازگشت با کشیدن از لبه راست (مثل آیفون) ================= */
 (()=>{let g=null;const V=()=>$('view');
-  document.addEventListener('touchstart',e=>{if(e.touches.length!==1||!edgeOK())return;const t=e.touches[0];if(t.clientX<innerWidth-24)return;g={x:t.clientX,y:t.clientY,lk:null,dx:0}},{passive:true});
+  document.addEventListener('touchstart',e=>{if(e.touches.length!==1||!edgeOK()||(e.target.closest&&e.target.closest('.swr')))return;const t=e.touches[0];if(t.clientX<innerWidth-24)return;g={x:t.clientX,y:t.clientY,lk:null,dx:0}},{passive:true});
   document.addEventListener('touchmove',e=>{if(!g)return;const t=e.touches[0],dx=g.x-t.clientX,dy=t.clientY-g.y;
     if(!g.lk){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;g.lk=dx>0&&dx>Math.abs(dy)?'h':'v';if(g.lk!=='h'){g=null;return}V().classList.add('edge')}
     e.preventDefault();g.dx=Math.max(0,dx);V().style.transform=`translateX(${-g.dx}px)`;V().style.opacity=String(1-Math.min(.5,g.dx/innerWidth))},{passive:false});
@@ -3099,11 +3117,11 @@ function acSent(s){if(!s.balAt)return 0;let t=0;for(const b of batches){if((b.cr
 const acEst=s=>s.bal==null?null:(+s.bal||0)-acSent(s);
 function agoFa(iso){if(!iso)return '';const m=Math.round((Date.now()-new Date(iso))/6e4);if(m<1)return 'همین الان';if(m<60)return toFa(m)+' دقیقه پیش';const h=Math.round(m/60);if(h<24)return toFa(h)+' ساعت پیش';const d=Math.round(h/24);return d===1?'دیروز':toFa(d)+' روز پیش'}
 function vBanks(){const L=sources,withBal=L.filter(s=>s.bal!=null),tot=withBal.reduce((a,s)=>a+acEst(s),0),last=withBal.map(s=>s.balAt).sort().pop();
-  let h=`<div class="achero"><small>موجودی کل حساب‌ها</small><b>${fmt(tot)}<i>تومان</i></b><span>${fmt(L.length)} حساب${last?' · آخرین به‌روزرسانی '+esc(agoFa(last)):''}</span></div>`;
+  let h=`<div class="achero"><small>موجودی کل حساب‌ها</small>${withBal.length?`<b>${fmt(tot)}<i>تومان</i></b>`:'<b class="nb">هنوز ثبت نشده</b>'}<span>${fmt(L.length)} حساب${last?' · آخرین به‌روزرسانی '+esc(agoFa(last)):''}</span></div>`;
   if(!L.length)return h+`<div class="spempty"><div class="spill">${ic('bank')}</div><b>هنوز حسابی اضافه نکرده‌اید</b><span>حساب‌های بانکی خودتان را با «حساب جدید» اضافه کنید؛ همین حساب‌ها در تقسیم هم به‌عنوان منبع استفاده می‌شوند.</span></div>`;
-  h+=`<div class="spsec"><b>حساب‌های من</b><small>برای به‌روزرسانی موجودی روی هر حساب بزنید</small></div><div class="fcard">`;
+  h+=`<div class="spsec"><b>حساب‌های من</b><small>برای ثبت موجودی بزنید · کشیدن به چپ: ویرایش · به راست: حذف</small></div><div class="fcard">`;
   L.forEach(s=>{const bk=acBank(s),e=acEst(s),sent=acSent(s),mask=s.card?'•••• '+String(s.card).slice(-4):s.iban?'شبا …'+String(s.iban).slice(-4):'';
-    h+=`<button class="acrow" data-act="acOpen" data-id="${s.id}">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(s.name))}</span>`}<span class="tx"><b>${esc(s.name)}</b><small>${esc(bk?'بانک '+bk:'بانک نامشخص')}${mask?' · <bdi dir="ltr">'+esc(mask)+'</bdi>':''}</small></span><span class="v">${e==null?'<em>موجودی ثبت نشده</em>':`<b class="${e<0?'neg':''}">${fmt(e)}<i>تومان</i></b><small>${sent?'پس از '+fmt(sent)+' واریز':esc(agoFa(s.balAt))}</small>`}</span></button>`});
+    h+=swW(`<button class="acrow" data-act="acOpen" data-id="${s.id}">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(s.name))}</span>`}<span class="tx"><b>${esc(s.name)}</b><small>${esc(bk?'بانک '+bk:'بانک نامشخص')}${mask?' · <bdi dir="ltr">'+esc(mask)+'</bdi>':''}</small></span><span class="v">${e==null?'<em>موجودی ثبت نشده</em>':`<b class="${e<0?'neg':''}">${fmt(e)}<i>تومان</i></b><small>${sent?'پس از '+fmt(sent)+' واریز':esc(agoFa(s.balAt))}</small>`}</span></button>`,{r:[['acEdit','ویرایش','edit','#3b6fd6'],['acOpen','موجودی','bank','#178049']],l:[['acDel','حذف','trash','#d23c48']],data:{id:s.id}})});
   return h+'</div>'}
 const aBanks=()=>can('src')?`<button class="fab2" data-act="acNew">${ic('plus')} حساب جدید</button>`:'';
 let acTmp={};
@@ -3260,7 +3278,8 @@ ACT.bkDl=d=>bkFetch('/api/backups/'+d.n,d.n);
 ACT.bkFull=()=>bkFetch('/api/backup/full','motalla-full-'+todayISO()+'.json.gz');
 ACT.bkRestore=d=>askConfirm('همه واریزی‌ها، لیست‌ها و حساب‌ها به وضعیت این نسخه برمی‌گردند و تغییرات بعد از آن کنار می‌روند (قبلش از وضعیت فعلی نسخه گرفته می‌شود). ادامه می‌دهید؟','بله، بازگردانی',async()=>{
   toast('در حال بازگردانی…');try{const j=await api('/api/backups/'+d.n+'?restore=1',{});await syncNow();BK=await api('/api/backups');render();toast('بازگردانی انجام شد ✓ · '+toFa(j.changed)+' مورد تغییر کرد')}catch(e){toast(e.message,true)}});
-$('view').addEventListener('scroll',homeCmp,{passive:true});addEventListener('resize',()=>{if(cur==='home')homeLayout()});
+$('view').addEventListener('scroll',homeCmp,{passive:true});
+{let ly=0;$('view').addEventListener('scroll',()=>{const v=$('view'),y=v.scrollTop,a=$('act');if(!a||!(cur==='banks'||cur==='split1')){ly=y;return}if(y>ly+6&&y>40)a.classList.add('hid');else if(y<ly-6||y<=10)a.classList.remove('hid');ly=y},{passive:true})}addEventListener('resize',()=>{if(cur==='home')homeLayout()});
 try{sysDark.addEventListener('change',()=>paintBars())}catch(e){}
 /* صفحه‌های کشویی (جزئیات، تقسیم): از بالای صفحه به پایین بکشید تا بسته شود */
 (()=>{let g=null;const els=()=>[$('view'),$('bar'),$('act')];
