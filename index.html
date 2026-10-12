@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=41,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=42,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1221,6 +1221,34 @@ body{font-feature-settings:normal}
 .ptlinks{display:flex;flex-direction:column;align-items:center;margin-top:8px}.emore.red{color:var(--red)}
 #app.full .bknote{color:var(--mut)}
 #app.full .fcard>.swr,#app.full .fcard .brw{background:var(--hair)!important;box-shadow:none}#app.full .fcard .brh{background:transparent!important}#app.full .fcard .bri{background:var(--card)}#app.full .fcard .rdate{background:var(--card)}
+/* پیام‌ها: کارت کوچک بالای صفحه، مثل اعلان آیفون؛ با لمس یا کشیدن به بالا بسته می‌شود */
+#toast{position:fixed!important;top:calc(env(safe-area-inset-top,0px) + 10px)!important;bottom:auto!important;left:50%!important;right:auto!important;transform:translate(-50%,-150%)!important;display:flex!important;align-items:center;gap:10px;width:min(440px,calc(100vw - 24px))!important;min-width:0!important;margin:0!important;padding:9px 9px 9px 14px!important;border-radius:18px!important;border:0!important;background:color-mix(in srgb,var(--card) 90%,transparent)!important;-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);color:var(--ink)!important;box-shadow:0 14px 34px -12px #0b1a4a55,0 0 0 1px color-mix(in srgb,var(--line) 70%,transparent)!important;font-size:13.5px!important;font-weight:700;line-height:1.5;z-index:95!important;opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.2,.9,.3,1.15),opacity .22s;cursor:pointer}
+#toast.show{transform:translate(-50%,0)!important;opacity:1;pointer-events:auto}
+#toast .ti{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}
+#toast .ti svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#toast.ok .ti{background:var(--ok2);color:var(--ok)}#toast.bad .ti{background:var(--red2);color:var(--red)}
+#toast .tm{flex:1;min-width:0;padding:2px 0!important}
+#toast button{flex:none;border:0!important;background:var(--blu2)!important;color:var(--blu)!important;font:inherit;font-size:13px;font-weight:800;padding:7px 12px!important;border-radius:12px!important;box-shadow:none!important;cursor:pointer}
+@media (prefers-reduced-motion:reduce){#toast{transition:opacity .2s}}
+/* تنظیمات با تم جدید */
+.stg .prof{background:var(--hero)!important;color:#fff!important;border:0!important;border-radius:24px!important;box-shadow:0 14px 30px -18px var(--hero)!important;padding:18px!important}
+.stg .prof .av{background:#ffffff2b!important;color:#fff!important;border:0!important;box-shadow:none!important}
+.stg .prof b{color:#fff!important}.stg .prof .ln,.stg .prof bdi,.stg .prof .slbl{color:#ffffffd0!important}
+.stg .prof .pill{background:#ffffff26!important;color:#fff!important;border:0!important}
+.stg .sgh{color:var(--mut)!important;font-size:12.5px!important;font-weight:800!important;margin:18px 6px 6px!important}
+.stg .sgr{background:var(--card)!important;border:0!important;border-radius:20px!important;box-shadow:0 1px 2px #16213a0a!important;overflow:hidden}
+.stg .sgi{background:none!important;border:0!important}
+.stg .sgi+.sgi{border-top:1px solid var(--hair)!important}
+.stg .si{background:var(--blu2)!important;color:var(--blu)!important;border-radius:50%!important}
+.stg .sgi.rd .si{background:var(--red2)!important;color:var(--red)!important}
+.stg .sgi .cv{color:var(--mut)!important;opacity:.6}
+.stg .thm button{border-color:var(--line)!important;background:var(--card)!important}
+.stg .thm button.on{border-color:var(--blu)!important;background:var(--blu2)!important;box-shadow:none!important}
+.stg .thm button.on span{color:var(--blu)!important}
+.stg .pv .g,.stg .pv i.g{background:var(--blu)!important}
+#app.settings_ #view{background:var(--bg)}
+#app:not(.home) #bar .mark.mav{background:var(--blu2)!important;color:var(--blu)!important;border:0!important;box-shadow:none!important}
+#bar .uline svg{color:var(--blu)!important}
 </style>
 </head>
 <body>
@@ -1231,7 +1259,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=41,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=42,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1301,7 +1329,12 @@ const norm=s=>toEn(String(s==null?'':s)).toLowerCase().replace(/ي/g,'ی').repla
 function hl(text,q){const t=String(text==null?'':text);if(!q)return esc(t);const tn=norm(t),qn=norm(q);if(!qn)return esc(t);let out='',i=0,k;
   while((k=tn.indexOf(qn,i))>-1){out+=esc(t.slice(i,k))+'<mark>'+esc(t.slice(k,k+qn.length))+'</mark>';i=k+qn.length}return out+esc(t.slice(i))}
 let toastAct=null;
-function toast(m,bad,actLabel,actFn){const t=$('toast');toastAct=actFn||null;t.innerHTML=`<span>${esc(m)}</span>${actLabel?`<button data-act="toastAct">${esc(actLabel)}</button>`:''}`;t.className=bad?'bad':'';t.style.display='flex';clearTimeout(toast.t);toast.t=setTimeout(()=>{t.style.display='none';toastAct=null},actLabel?5000:2200)}
+function toast(m,bad,actLabel,actFn){const t=$('toast');toastAct=actFn||null;m=String(m||'').replace(/\s*✓\s*/g,' ').replace(/\s+—\s*$/,'').trim();
+  const kind=bad?'bad':/(شد|ذخیره|ثبت|کپی|به‌روز|اضافه|آماده|تأیید)/.test(m)?'ok':'info',I={ok:'<path d="M5 13l4 4L19 7"/>',bad:'<path d="M12 7v6M12 17h.01"/>',info:'<path d="M12 11v6M12 7h.01"/>'}[kind];
+  t.innerHTML=`<span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true">${I}</svg></span><span class="tm">${esc(m)}</span>${actLabel?`<button data-act="toastAct">${esc(actLabel)}</button>`:''}`;
+  t.style.display='';t.className='';void t.offsetWidth;t.className='show '+kind;clearTimeout(toast.t);toast.t=setTimeout(toastHide,actLabel?5200:bad?3400:2100)}
+function toastHide(){const t=$('toast');if(!t)return;t.classList.remove('show');toastAct=null}
+(()=>{const t=$('toast');if(!t)return;let y0=null;t.addEventListener('click',e=>{if(!e.target.closest('button'))toastHide()});t.addEventListener('touchstart',e=>{y0=e.touches[0].clientY},{passive:true});t.addEventListener('touchmove',e=>{if(y0!=null&&e.touches[0].clientY-y0<-14){toastHide();y0=null}},{passive:true})})();
 document.addEventListener('click',async e=>{const c=e.target.closest&&e.target.closest('.cp,.kc');if(!c)return;const t=c.dataset.cp;try{await navigator.clipboard.writeText(t);toast('کپی شد: '+t)}catch(x){const r=document.createRange();r.selectNodeContents(c);const sl=window.getSelection();sl.removeAllRanges();sl.addRange(r);toast('انتخاب شد؛ دستی کپی کنید')}});
 /* ============ ذخیره‌سازی ============ */
 let storeOK=true;
@@ -1392,7 +1425,7 @@ function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length
   return tb('home','home','خانه',bad)+tb('banks','bank','بانک')+tb('debt','debt','بدهی')+tb('audit','clock','تاریخچه')+tb('settings','gear','تنظیمات')}
 function render(anim){const V=$('view'),B=$('bar'),A=$('act');
   const hasBack=!!PARENT[cur]||(cur==='entry'&&editId);
-  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'&&editId?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:`<button class="mark mav" data-act="acct" aria-label="حساب کاربری">${ME?esc(userInit(ME.name)):ic('user')}</button>`}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='buy'?'خرید طلا':cur==='ent'?(entEdit?'ویرایش واریزی':'جزئیات واریزی'):cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button>${cur==='home'?`<span class="bcmp"><b>${fmt(sum(dayList()))}</b><small>تومان — ${esc(dates(dateVal).fa)}</small></span>`:''}</div></div>${cur==='home'?`<button class="ib0 hsr0" data-act="hsearch" aria-label="جستجو">${ic('search')}</button>`:(cur==='entry'&&!editId)?`<span class="regd">${ic('cal')}<span>لیست امروز<small>${esc(dates(todayISO()).fa)}</small></span></span>`:cur==='part'&&curPart()?`<span class="hbtns"><button class="ib0" data-act="partExp" aria-label="خروجی">${ic('open')}</button></span>`:cur==='split1'?`<span class="hbtns"><button class="ib0" data-act="xOpen" aria-label="خروجی">${ic('open')}</button><button class="ib0" data-act="srcMgr" aria-label="مدیریت منابع">${ic('gear')}</button></span>`:cur==='ent'||cur==='find'||cur==='buy'||cur==='bulk'||cur==='banks'?'':dchip()}`;
+  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'&&editId?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:`<button class="mark mav" data-act="acct" aria-label="حساب کاربری">${ME?esc(userInit(ME.name)):ic('user')}</button>`}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='buy'?'خرید طلا':cur==='ent'?(entEdit?'ویرایش واریزی':'جزئیات واریزی'):cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button>${cur==='home'?`<span class="bcmp"><b>${fmt(sum(dayList()))}</b><small>تومان — ${esc(dates(dateVal).fa)}</small></span>`:''}</div></div>${cur==='home'?`<button class="ib0 hsr0" data-act="hsearch" aria-label="جستجو">${ic('search')}</button>`:(cur==='entry'&&!editId)?`<span class="regd">${ic('cal')}<span>لیست امروز<small>${esc(dates(todayISO()).fa)}</small></span></span>`:cur==='part'&&curPart()?`<span class="hbtns"><button class="ib0" data-act="partExp" aria-label="خروجی">${ic('open')}</button></span>`:cur==='split1'?`<span class="hbtns"><button class="ib0" data-act="xOpen" aria-label="خروجی">${ic('open')}</button><button class="ib0" data-act="srcMgr" aria-label="مدیریت منابع">${ic('gear')}</button></span>`:cur==='ent'||cur==='find'||cur==='buy'||cur==='bulk'||cur==='banks'||cur==='settings'||cur==='users'||cur==='backups'?'':dchip()}`;
   const R={banks:[vBanks,aBanks],buy:[vBuy,aBuy],ent:[vEnt,aEnt],find:[vFind,null],home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null],users:[vUsers,aUsers],settings:[vSettings,null],backups:[vBackups,null]}[cur];
   $('app').classList.toggle('home',cur==='home');$('act').classList.remove('hid');$('app').classList.toggle('ent',cur==='ent');$('app').classList.toggle('banks',cur==='banks');$('app').classList.toggle('editing',cur==='ent'&&entEdit);{const ap=$('app'),was=ap.classList.contains('full'),fu=FULLP.has(cur);ap.classList.toggle('full',fu);ap.classList.toggle('split',cur==='split1');if(fu&&!was&&anim){ap.classList.add('fullin');clearTimeout(render._fi);render._fi=setTimeout(()=>ap.classList.remove('fullin'),420)}if(!fu)ap.classList.remove('fullin')}B.classList.remove('cmp');
   V.innerHTML=R[0]();A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();if(cur==='home')homeLayout();paintBars();
@@ -2848,8 +2881,8 @@ function vSettings(){const sgi=(act,icn,cls,t,sub,extra,attrs)=>`<button class="
   if(ME)h+=`<div class="prof"><div class="av">${esc(userInit(ME.name))}</div><div class="tx"><b>${esc(ME.name)}</b><div class="ln"><span class="pill ${isAdmin()?'gd':'g'}">${ROLE[ME.role]||ME.role}</span><bdi dir="ltr">@${esc(ME.username)}</bdi></div><div class="ln"><span class="sdot ${SY.state}"></span><span class="slbl">${esc(syncLabel())}</span></div></div></div>`;
   h+=`<div class="sgh">ظاهر</div><div class="sgr"><div class="thm">${THEMES.map(([k,t,sub,c])=>`<button class="${themePref===k?'on':''}" data-act="setTheme" data-t="${k}" aria-pressed="${themePref===k}">${pv(c)}<span>${t}</span><small>${sub}</small></button>`).join('')}</div>${IOS_SA?`<div class="thn">آیفون رنگ نوار ساعت و باتری را فقط موقع باز شدن برنامه می‌خواند؛ بعد از عوض کردن حالت، برنامه را یک بار کامل ببندید و دوباره باز کنید.</div>`:''}</div>`;
   if(ME){h+=`<div class="sgh">حساب</div><div class="sgr">${sgi('pwSheet','key','','تغییر رمز عبور','رمز ورود خودتان را عوض کنید')}</div>`;
-    if(!isAdmin())h+=`<div class="sgh">دسترسی‌های من</div><div class="sgr"><div class="mpl">${PERMS.map(([k,t])=>`<span class="pill ${can(k)?'okp':'g off'}">${can(k)?'✓':'—'} ${t}</span>`).join('')}</div></div>`+(can('src')?`<div class="sgh">مدیریت</div><div class="sgr">${sgi('srcMgr','bank','g','منابع پرداخت','نام و بانک منبع‌ها')}</div>`:'');
-    if(isAdmin())h+=`<div class="sgh">مدیریت</div><div class="sgr">${sgi('go','users','g','کاربران','افزودن همکار، رمز عبور و دسترسی',null,' data-n="users"')}${sgi('srcMgr','bank','g','منابع پرداخت','نام و بانک منبع‌ها')}${sgi('go','down','g','پشتیبان‌ها','خودکار هر شب · دانلود و بازگردانی'+(bkDlAgo()===null||bkDlAgo()>=7?' · ⚠️ نسخه گوشی قدیمی است':''),null,' data-n="backups"')}${sgi('shareInstall','share','g','لینک نصب برای همکاران','آیفون و اندروید')}</div>`}
+    if(!isAdmin())h+=`<div class="sgh">دسترسی‌های من</div><div class="sgr"><div class="mpl">${PERMS.map(([k,t])=>`<span class="pill ${can(k)?'okp':'g off'}">${can(k)?'✓':'—'} ${t}</span>`).join('')}</div></div>`+(can('src')?`<div class="sgh">مدیریت</div><div class="sgr">${sgi('tab','bank','g','حساب‌های بانکی','موجودی، لوگو و منبع‌های تقسیم',null,' data-n="banks"')}</div>`:'');
+    if(isAdmin())h+=`<div class="sgh">مدیریت</div><div class="sgr">${sgi('go','users','g','کاربران','افزودن همکار، رمز عبور و دسترسی',null,' data-n="users"')}${sgi('tab','bank','g','حساب‌های بانکی','موجودی، لوگو و منبع‌های تقسیم',null,' data-n="banks"')}${sgi('go','down','g','پشتیبان‌ها','خودکار هر شب · دانلود و بازگردانی'+(bkDlAgo()===null||bkDlAgo()>=7?' · نسخه روی گوشی قدیمی است':''),null,' data-n="backups"')}${sgi('shareInstall','share','g','لینک نصب برای همکاران','آیفون و اندروید')}</div>`}
   const isAnd=/MotallaAndroid/.test(navigator.userAgent),oldApk=isAnd&&!(window.AndroidBridge&&AndroidBridge.version);
   if(oldApk)h+=`<div class="sgr" style="margin-top:12px;border-color:var(--gold)">${sgi('getApk','down','g','نسخه جدید اپ اندروید آماده است','برای چاپ PDF و امکانات جدید نصب کنید؛ روی همین برنامه نصب می‌شود و اطلاعات پاک نمی‌شود')}</div>`;
   h+=`<div class="sgh">برنامه</div><div class="sgr">${sgi('checkUpd','refresh','k','بررسی به‌روزرسانی','نسخه '+toFa(APP_V),'')}${!isAnd&&/Android/i.test(navigator.userAgent)?sgi('getApk','down','k','نصب اپ اندروید','دانلود فایل نصب'):''}</div>`;
@@ -2916,7 +2949,7 @@ async function bkFetch(path,name){toast('در حال دانلود…');try{const
   const buf=new Uint8Array(await r.arrayBuffer());await save(name,buf,'پشتیبان ذخیره شد ✓');ls.set('m_bk_dl',Date.now());if(cur==='backups')render()}catch(e){toast('دانلود انجام نشد: '+e.message,true)}}
 const ACT={
   back,close:()=>{aSt=null;dpMode='';closeSheet()},go:d=>go(d.n),date:openDate,user:openUser,resetForm,resetBulk,saveEntry,bulkAdd,
-  toastAct:()=>{const f=toastAct;toastAct=null;$('toast').style.display='none';f&&f()},
+  toastAct:()=>{const f=toastAct;toastHide();f&&f()},
   tab:d=>{const n={banks:'banks',home:'home',entry:'entry',list:'list',split:'split1',audit:'audit',track:'track',debt:'debt',settings:'settings'}[d.n];if(n==='entry')editId=null;if(n==='audit'&&cur!=='audit')histTab='ev';if(n==='track'&&cur!=='track'){gQ='';gF='all'}if(n==='list'&&cur!=='list'){listMode='all';openGroups=new Set()}if(n===cur&&n==='list'){window.scrollTo({top:0,behavior:'smooth'});return}go(n);if(d.n==='split'){const C=splitCands().filter(c=>c.ok&&c.ok.length);if(C.length&&!C.some(c=>c.iso===dateVal)){setDate(C[0].iso,true);toast('تقسیم لیست '+dates(C[0].iso).fa)}}},
   cancelEdit:()=>{editId=null;const b=editBack;editBack=null;go(b||'list')},
   pickDate:d=>{closeSheet();setDate(d.iso)},
