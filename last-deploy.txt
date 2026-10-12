@@ -6,7 +6,7 @@ Disks:
   data -> /app/data
 node version: 22
 - Creating an archive...
-Compressed size: 1003.19KB (use .gitignore to reduce the size)
+Compressed size: 1003.41KB (use .gitignore to reduce the size)
 ✔ Upload finished.
 
 @liara/cli/5.8.1 linux-x64 node-v22.23.3
