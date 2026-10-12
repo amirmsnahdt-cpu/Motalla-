@@ -28,7 +28,7 @@ function pickDataDir() {
 const DATA_DIR = pickDataDir();
 const SESSION_DAYS = 180;
 const ALLOWED_ORIGINS = new Set(['https://raw.githack.com', ...(process.env.EXTRA_ORIGINS || '').split(',').filter(Boolean)]);
-const COLLS = new Set(['entries', 'sources', 'batches', 'creds', 'trash', 'audit', 'drafts']);
+const COLLS = new Set(['entries', 'sources', 'batches', 'creds', 'custs', 'trash', 'audit', 'drafts']);
 
 const db = new DatabaseSync(path.join(DATA_DIR, 'motalla.db'));
 db.exec(`
@@ -160,6 +160,7 @@ function deny(user, coll, deleting, theirs) {
   if (deleting && coll === 'batches' && theirs && theirs.closed) return P.has('del') ? null : 'حذف لیست بایگانی‌شده برای حساب شما مجاز نیست';
   if (!deleting && !theirs && coll === 'entries' && !P.has('add') && !P.has('undo')) return 'ثبت واریزی برای حساب شما مجاز نیست';
   if (!deleting && coll === 'creds' && !P.has('debt')) return 'تسویه بدهی برای حساب شما مجاز نیست';
+  if (coll === 'custs') { if (deleting) return P.has('del') ? null : 'حذف برای حساب شما مجاز نیست'; return P.has('debt') ? null : 'حساب مشتریان برای حساب شما مجاز نیست'; }
   return null;
 }
 
