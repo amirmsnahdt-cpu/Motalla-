@@ -6,13 +6,7 @@ Disks:
   data -> /app/data
 node version: 22
 - Creating an archive...
-Compressed size: 1004.75KB (use .gitignore to reduce the size)
+Compressed size: 1004.74KB (use .gitignore to reduce the size)
 ✔ Upload finished.
 
-@liara/cli/5.8.1 linux-x64 node-v22.23.3
-
- ›   Error: Deployment failed.
- ›   To get help, visit our documentation at: https://docs.liara.ir
- ›
- ›   Additionally, you can also retry the build with the debug flag:
- ›       $ liara deploy --debug
+ ›   Error: CODE 428: Max deployment count in day.
