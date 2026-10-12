@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=45,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=46,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1362,6 +1362,10 @@ body{font-feature-settings:normal}
 .bzit-h .x{margin-inline-start:auto;border:0;background:var(--card);width:28px;height:28px;border-radius:50%;color:var(--red);font-size:18px;cursor:pointer}
 .addit{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:1.5px dashed var(--line);background:none;color:var(--blu);font:inherit;font-size:14px;font-weight:800;border-radius:16px;min-height:48px;margin-bottom:12px;cursor:pointer}.addit svg{width:17px;height:17px}.addit small{font-weight:600;color:var(--mut);font-size:11.5px}
 .bztot{display:flex;justify-content:space-between;align-items:baseline;background:var(--card);border:1.5px solid var(--blu);border-radius:16px;padding:12px 16px;margin-top:10px}.bztot span{font-size:13px;color:var(--mut);font-weight:700}.bztot b{font-size:20px;font-weight:800;color:var(--blu)}.bztot b i{font-style:normal;font-size:12px;font-weight:600}
+.ptact{background:var(--hair)!important;box-shadow:none!important;border-radius:20px!important;overflow:hidden}.ptact .si{background:var(--card)!important;color:var(--blu)!important;border-radius:50%!important}.ptact .sgi.rd .si{color:var(--red)!important}.ptact .sgi.rd b{color:var(--red)}
+.ptact .sgi{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;color:var(--ink);font:inherit;text-align:right;padding:13px 14px;cursor:pointer}.ptact .sgi+.sgi{border-top:1px solid var(--line)!important}
+.ptact .si{width:38px;height:38px;display:grid;place-items:center;flex:none}.ptact .si svg{width:19px;height:19px}.ptact .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}.ptact .tx b{font-size:14.5px;font-weight:800}.ptact .tx small{font-size:12px;color:var(--mut)}.ptact .cv svg{width:16px;height:16px;transform:scaleX(-1);color:var(--mut)}
+.mvl{display:flex;flex-direction:column;max-height:60vh;overflow:auto}.mvl .acrow{padding:12px 4px}.mvl .acrow+.acrow{border-top:1px solid var(--hair)}.mvl .acrow>svg{width:16px;height:16px;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -1372,7 +1376,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=45,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=46,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1556,7 +1560,7 @@ const isOkE=x=>{const t=entSt(x);return !!t&&t[1]==='ok'};
 const ST_LAB={bad:'خطادار',ok:'تسویه شده',fail:'ناموفق',pend:'ارسال شده',new:'ثبت شده'};
 function rowSt(x){const t=entSt(x);return x.level===2?'bad':t?(t[1]==='ok'?'ok':(t[1]==='fail'||t[1]==='rd')?'fail':'pend'):'new'}
 function payLab(iso){if(!iso)return '';const r=relDay(iso),t=todayISO();if(['امروز','دیروز','فردا'].includes(r))return r;if(iso===isoAdd(t,2))return 'پس‌فردا';const D=dates(iso);return toFa(D.jd)+' '+JM[D.jm-1]}
-let AM=null,ROWDATE=false,ROWSRC=true,ROWTRK=false;
+let AM=null,ROWDATE=false,ROWSRC=true,ROWTRK=false,ROWMOVE=false;
 function allocMap(){const m=new Map();Object.values(drafts||{}).forEach(L=>(L||[]).forEach(p=>(p.ids||[]).forEach(id=>m.set(id,{src:(p.src&&p.src.name)||'',sent:!!p.sent}))));batches.forEach(b=>b.items.forEach(x=>m.set(x.id,{src:x.src||'',sent:true,tn:x.tn||''})));return m}
 function homeRow(x){const st=rowSt(x),t=entSt(x),al=(AM||(AM=allocMap())).get(x.id);
   const ico=st==='ok'?ic('check'):st==='fail'?'<b>✕</b>':st==='bad'?'<b>!</b>':st==='pend'?ic('clock'):`<b>${esc(userInit(fullName(x)||'؟'))}</b>`;
@@ -1564,6 +1568,7 @@ function homeRow(x){const st=rowSt(x),t=entSt(x),al=(AM||(AM=allocMap())).get(x.
   const inner=`<div class="brw ${st}"><button class="brh" data-act="openEnt" data-id="${x.id}"><span class="bri">${ico}</span><span class="tx"><b>${esc(fullName(x)||'—')}</b><small class="bkl">${bankBadge(x.bankShow)}<span>${esc(x.bankShow||'بانک نامشخص')}${x.payDate?' · واریز '+esc(payLab(x.payDate)):''}${x.code?' · فاکتور '+esc(toEn(x.code)):''}</span></small>${ROWDATE||(ROWSRC&&al&&al.src)?`<span class="rchips">${ROWDATE?`<span class="rdate">${ic('cal')}واریز ${esc(payLab(x.payDate||x.entryDate))}${['امروز','دیروز','فردا','پس‌فردا'].includes(payLab(x.payDate||x.entryDate))?'، '+esc(toFa(dates(x.payDate||x.entryDate).jd)+' '+JM[dates(x.payDate||x.entryDate).jm-1]):''}</span>`:''}${ROWSRC&&al&&al.src?`<span class="rsrc">${ic('split')}${esc(al.src)}</span>`:''}</span>`:''}</span><span class="brv"><b>${fmt(x.amount)} <i>تومان</i></b><small>${lab}</small></span></button>${ROWTRK&&x.sentBid?(()=>{const s0=stOf(x.id);return `<div class="rtk"><button class="ok${s0==='ok'?' on':''}" data-act="entTkQ" data-id="${x.id}" data-st="ok">${ic('check')} واریز شد</button><button class="no${s0==='fail'?' on':''}" data-act="entTkQ" data-id="${x.id}" data-st="fail">✕ ناموفق</button></div>`})():''}</div>`;
   const bi=x.sentBid?stOf(x.id):null,R0=[['entEditGo','ویرایش','edit','#3b6fd6'],['cpEnt','کپی','copy','#b8862b']];
   if(bi==='pending'||bi==='fail')R0.unshift(['entOk','تأیید','check','#178049']);else if(bi==='ok')R0.unshift(['entUnok','لغو تأیید','undo','#6b7385']);
+  if(ROWMOVE)R0.splice(1,0,['entMove','انتقال','split','#6b5bd6']);
   return swW(inner,{r:R0,l:[['del','حذف','trash','#d23c48']],data:{id:x.id}})}
 /* ---------- صفحه جزئیات واریزی (مثل صفحه تراکنش بلو) ---------- */
 let entId=null,entEdit=false;
@@ -2198,8 +2203,9 @@ function vPart(){const p=curPart();if(!p)return '<div class="spempty"><b>این 
     ${p.sent&&rows.length?`<div class="ptbar"><i class="ok" style="width:${ok/rows.length*100}%"></i><i class="no" style="width:${fl/rows.length*100}%"></i></div>`:''}</div>`;
   if(p.sent&&pend>0&&can('track'))h+=`<button class="okall" data-act="partOkAll">${ic('check')} همه ${fmt(pend)} واریز در انتظار، موفق</button>`;
   if(!p.sent)h+=`<div class="bknote" style="margin:0 4px 10px">«کپی و ارسال» متن را کپی می‌کند و همزمان این منبع را به پیگیری می‌برد.</div>`;
-  ROWDATE=true;ROWSRC=false;ROWTRK=!!p.sent&&can('track');AM=allocMap();try{h+=`<div class="spsec"><b>واریزی‌های این منبع</b><small>برای جزئیات و ویرایش روی هر واریزی بزنید</small></div><div class="blist fcard">${rows.map(homeRow).join('')}</div>`}finally{ROWDATE=false;ROWSRC=true;ROWTRK=false}
-  h+=`<div class="ptlinks"><button class="emore" data-act="srcSet" data-id="${p.src.id}">${ic('edit')} ویرایش نام منبع</button>${p.sent?`<button class="emore" data-act="partUnsend">${ic('undo')} برگرداندن از پیگیری به تخصیص</button>`:`<button class="emore red" data-act="partDel">${ic('trash')} لغو این تخصیص</button>`}</div>`;return h}
+  ROWDATE=true;ROWSRC=false;ROWTRK=!!p.sent&&can('track');ROWMOVE=can('split');AM=allocMap();try{h+=`<div class="spsec"><b>واریزی‌های این منبع</b><small>برای جزئیات بزنید · کشیدن به چپ: تأیید، انتقال به منبع دیگر، ویرایش</small></div><div class="blist fcard">${rows.map(homeRow).join('')}</div>`}finally{ROWDATE=false;ROWSRC=true;ROWTRK=false;ROWMOVE=false}
+  const sg=(act,icn,t,sub,cls,attrs)=>`<button class="sgi${cls?' '+cls:''}" data-act="${act}"${attrs||''}><span class="si">${ic(icn)}</span><span class="tx"><b>${t}</b><small>${sub}</small></span><span class="cv">${ic('back')}</span></button>`;
+  h+=`<div class="spsec"><b>تنظیمات این منبع</b></div><div class="sgr ptact">${sources.some(x=>String(x.id)===String(p.src.id))&&can('src')?sg('acEdit','bank','ویرایش حساب منبع','نام، بانک، شبا و کارت؛ همه‌جا به‌روز می‌شود','',` data-id="${p.src.id}"`):''}${can('split')&&rows.length?sg('partMoveAll','split','انتقال همه به منبع دیگر','همه واریزی‌های این منبع یکجا منتقل شوند'):''}${p.sent?sg('partUnsend','undo','برگرداندن از پیگیری به تخصیص','دوباره قابل ویرایش و تقسیم می‌شود'):sg('partDel','trash','لغو این تخصیص','واریزی‌ها به «مانده برای تقسیم» برمی‌گردند','rd')}</div>`;return h}
 const aPart=()=>curPart()?`${curPart().sent?'':`<button class="btn sec" data-act="partEdit" data-id="${curPart().id}" style="flex:0 0 auto;padding:0 16px" aria-label="ویرایش تخصیص">${ic('edit')}</button>`}<button class="btn gold" data-act="partCopy">${ic('copy')} ${curPart().sent?'کپی دوباره':'کپی و ارسال'}</button>`:'';
 const partsAlloc=P=>({res:P.map(p=>({src:{...p.src,limit:0},items:partRows(p)})),left:[],excl:[],D:dates(dateVal)});
 /* ---------- ارسال تخصیص‌ها به پیگیری ---------- */
@@ -2756,7 +2762,7 @@ const DEF_STAFF=['add','edit','split','track','close','debt','export'];
 const myPerms=()=>!ME?[]:ME.role==='admin'?PERMS.map(p=>p[0]):(Array.isArray(ME.perms)?ME.perms:DEF_STAFF);
 const can=p=>isAdmin()||myPerms().includes(p);
 /* هر کار ← دسترسی لازم (کارهای مدیر: 'admin') */
-const PERM_OF={entTkQ:'track',trkArch:'close',partOkAll:'track',trkGo:'track',cuNew:'debt',cuSave:'debt',cuEdit:'debt',cuDel:'del',txNew:'debt',txSave:'debt',txDel:'del',acNew:'src',acOpen:'src',acSave:'src',acBal:'src',acDel:'src',acEdit:'src',buyNew:'add',bzNext:'add',entryMenu:'add',xGo:'export',xOpen:'export',entOk:'track',entUnok:'track',entEditOn:'edit',entSave:'edit',entEditGo:'edit',entDel:'del',entTk:'track',entPay:'edit',saveEntry:()=>editId?'edit':'add',bulkAdd:'add',newList:'add',tab:d=>d&&d.n==='entry'&&!editId?'add':null,edit:'edit',
+const PERM_OF={entMove:'split',partMoveAll:'split',mvGo:'split',entTkQ:'track',trkArch:'close',partOkAll:'track',trkGo:'track',cuNew:'debt',cuSave:'debt',cuEdit:'debt',cuDel:'del',txNew:'debt',txSave:'debt',txDel:'del',acNew:'src',acOpen:'src',acSave:'src',acBal:'src',acDel:'src',acEdit:'src',buyNew:'add',bzNext:'add',entryMenu:'add',xGo:'export',xOpen:'export',entOk:'track',entUnok:'track',entEditOn:'edit',entSave:'edit',entEditGo:'edit',entDel:'del',entTk:'track',entPay:'edit',saveEntry:()=>editId?'edit':'add',bulkAdd:'add',newList:'add',tab:d=>d&&d.n==='entry'&&!editId?'add':null,edit:'edit',
   del:'del',delEdit:'del',clearDay:'del',tkDel:'del',purgeOne:'del',emptyTrash:'del',credDel:'del',payDel:'del',
   allocNew:'split',aSave:'split',partEdit:'split',partDel:'split',partDelId:'split',trackNow:'split',partsSend:'split',
   itSave:'track',tkSet:'track',tkAll:'track',tkRequeue:'track',closeBatch:'close',reopenDay:'close',undoCommit:'unsend',partUnsend:'unsend',
@@ -3279,6 +3285,19 @@ ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render
 ACT.bTog=(d,e)=>{const r=e.target.closest('.brw');if(!r)return;const o=r.classList.toggle('open'),h=r.querySelector('.brh');if(h)h.setAttribute('aria-expanded',o);o?homeOpen.add(String(d.id)):homeOpen.delete(String(d.id))};
 ACT.hsearch=()=>go('find');
 ACT.arcGo=()=>{trTab='arch';go('track')};
+function moveTo(ids,fromP,src){const P=parts(),now=new Date().toISOString();let to;
+  if(fromP.sent)to=P.find(z=>z!==fromP&&z.sent&&z.bid===fromP.bid&&String(z.src.id)===String(src.id));else to=P.find(z=>z!==fromP&&!z.sent&&String(z.src.id)===String(src.id));
+  if(!to){to={id:nid++,src:{id:src.id,name:src.name,bank:src.bank||'',limit:0},method:'manual',param:{},ids:[],sent:!!fromP.sent};if(fromP.sent)to.bid=fromP.bid;P.push(to)}
+  ids.forEach(id=>{fromP.ids=fromP.ids.filter(z=>z!==id);if(!to.ids.includes(id))to.ids.push(id);if(fromP.sent){const b=batches.find(x=>x.id===fromP.bid),it=b&&b.items.find(x=>x.id===id);if(it){it.src=src.name;it.pid=to.id}}});
+  if(!fromP.ids.length)drafts[dateVal]=P.filter(z=>z!==fromP);saveD();saveB();alloc=null;logA('split','انتقال به منبع دیگر',fmt(ids.length)+' واریزی | '+fromP.src.name+' ← '+src.name);return to}
+function moveSheet(ids,title){const p=curPart();if(!p)return;const L=sources.filter(x=>String(x.id)!==String(p.src.id));
+  sheet(`<div class="sh-h"><div><b>انتقال به منبع دیگر</b><small class="shsub">${esc(title)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  ${L.length?`<div class="mvl">${L.map(x=>{const bk=acBank(x),inDay=parts().filter(z=>String(z.src.id)===String(x.id)),n=inDay.reduce((s2,z)=>s2+z.ids.length,0);return `<button class="acrow" data-act="mvGo" data-s="${x.id}">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(x.name))}</span>`}<span class="tx"><b>${esc(x.name)}</b><small>${esc(bk?'بانک '+bk:'بانک نامشخص')}${n?'، '+fmt(n)+' واریزی امروز':''}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`}).join('')}</div>`:'<div class="xnone">منبع دیگری نیست؛ اول از «بانک» حساب اضافه کنید.</div>'}`);mvIds=ids}
+let mvIds=[];
+ACT.entMove=d=>{const id=+d.id||d.id,x=validated().find(r=>String(r.id)===String(d.id));moveSheet([x?x.id:id],x?fullName(x)+'، '+fmt(x.amount)+' تومان':'')};
+ACT.partMoveAll=()=>{const p=curPart();if(!p)return;moveSheet(p.ids.slice(),'همه '+fmt(p.ids.length)+' واریزی «'+p.src.name+'»')};
+ACT.mvGo=d=>{const p=curPart(),src=sources.find(x=>String(x.id)===String(d.s));if(!p||!src)return;const ids=mvIds.slice();closeSheet();const to=moveTo(ids,p,src);
+  if(!p.ids.length){partId=to.id}const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(fmt(ids.length)+' واریزی به «'+src.name+'» منتقل شد','', 'برگرداندن',()=>{const P=parts();if(!P.includes(p))P.push(p);moveTo(ids,to,p.src);partId=p.id;render()})};
 ACT.trkDay=d=>{setDate(d.iso,true);go('split1')};
 ACT.entTkQ=d=>{const e=entries.find(y=>String(y.id)===String(d.id));if(!e)return;const q=entBI(e);if(!q||q.b.closed){toast('لیست این واریزی بسته شده است',true);return}q.it.st=q.it.st===d.st?'pending':d.st;q.it.at=new Date().toISOString();saveB();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;if(!bStat(q.b).pending)toast('همه واریزی‌های این لیست بررسی شد؛ می‌توانید بایگانی کنید')};
 ACT.trkArch=()=>{const b=batches.find(x=>x.date===dateVal&&!x.closed);if(!b)return;const c=bStat(b);
@@ -3327,7 +3346,7 @@ ACT.acSave=d=>{let name=clean($('acN').value);const dI=dg($('acI').value).slice(
   if(sources.some(x=>x.name===name&&String(x.id)!==String(d.id))){toast('حسابی با همین نام هست',true);return}
   const now=new Date().toISOString();let s;
   if(d.id==='new'){s={id:nid++,name,bank,limit:0,count:0,iban:dI?'IR'+dI:'',card};const B=$('acB');if(B&&num(B.value)){s.bal=num(B.value);s.balAt=now}sources.push(s)}
-  else{s=sources.find(x=>x.id==d.id);if(!s)return;const old=s.name;Object.assign(s,{name,bank,iban:dI?'IR'+dI:'',card});if(old!==name)toast('نام عوض شد؛ گزارش‌های قبلی با نام قبلی می‌مانند')}
+  else{s=sources.find(x=>x.id==d.id);if(!s)return;const old=s.name;Object.assign(s,{name,bank,iban:dI?'IR'+dI:'',card});if(old!==name||1){let ch=false;Object.values(drafts).forEach(L=>(L||[]).forEach(pp=>{if(pp.src&&String(pp.src.id)===String(s.id)){pp.src={...pp.src,name,bank};ch=true}}));batches.forEach(b=>{if(b.closed)return;b.items.forEach(x=>{if(x.src===old){x.src=name;ch=true}})});if(ch){saveD();saveB()}}}
   saveS();logA('src',d.id==='new'?'حساب بانکی جدید':'ویرایش حساب بانکی',name);closeSheet();render();if(d.id==='new')toast('حساب «'+name+'» اضافه شد ✓')};
 ACT.acDel=d=>{const s=sources.find(x=>x.id==d.id);if(!s)return;askConfirm('حساب «'+s.name+'» حذف شود؟ (گزارش‌های قبلی دست نمی‌خورند)','حذف',()=>{sources=sources.filter(x=>x.id!=d.id);saveS();logA('src','حذف حساب بانکی',s.name);closeSheet();render();toast('حذف شد')})};
 ACT.acOpen=d=>{const s=sources.find(x=>x.id==d.id);if(!s)return;const bk=acBank(s),e=acEst(s),sent=acSent(s);
