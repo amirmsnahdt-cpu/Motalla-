@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=38.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=39,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1134,6 +1134,39 @@ body{font-feature-settings:normal}
 .fcard>.swr{border-radius:0!important;margin:0!important}
 .fcard .brw,.fcard .brh{background:var(--card)}
 #app{overflow-x:hidden;overflow-x:clip}
+
+/* ---------- v39 ---------- */
+.bkb{display:inline-grid;place-items:center;flex:none;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bc);color:#fff;font-size:9.5px;font-weight:800;line-height:1;vertical-align:-3px;margin-inline-end:4px;box-shadow:0 1px 2px #0002;font-style:normal}
+.bkb.lg{min-width:28px;height:28px;border-radius:14px;font-size:11px;margin:0}
+.brh .tx small .bkb{margin-inline-end:4px}
+.vloading .bkb,.bpanel.loading .bkb{visibility:hidden}
+.ibin{position:relative;display:flex;align-items:center;border:1.5px solid var(--line);background:var(--bg);border-radius:14px;min-height:52px;padding:0 12px;gap:8px;transition:border-color .15s,background .15s}
+.ibin:focus-within{border-color:var(--blu);background:var(--card)}
+.ibin input{flex:1;min-width:0;border:0!important;background:none!important;box-shadow:none!important;outline:none;min-height:48px!important;padding:0!important;direction:ltr;text-align:left;font:inherit;font-size:16px;font-weight:700;color:var(--ink)}
+.ibin .ibir{font-size:14px;font-weight:800;color:var(--blu);order:-1;transition:opacity .15s,width .15s;direction:ltr}
+.ibin:not(:focus-within):has(input:placeholder-shown) .ibir{opacity:0;width:0;margin:0;overflow:hidden}
+.ibin .ibbk{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--mut);white-space:nowrap}
+.ibin .ibbk:empty{display:none}
+/* چسباندن لیست (تم جدید) */
+.bkw .bkta{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:4px;transition:border-color .15s}
+.bkw .bkta:focus-within{border-color:var(--blu)}
+.bkw textarea{width:100%;box-sizing:border-box;min-height:190px;border:0!important;background:none!important;box-shadow:none!important;outline:none;resize:vertical;padding:12px;font:inherit;font-size:16px;line-height:1.8;color:var(--ink)}
+.bkpaste{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;border:0;background:var(--blu2);color:var(--blu);font:inherit;font-size:12.5px;font-weight:800;border-radius:12px;padding:7px 12px;cursor:pointer}.bkpaste svg{width:15px;height:15px}
+.bkprev{margin-top:12px}
+.bkprev .bkh{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 6px;font-size:13px;font-weight:800}.bkprev .bkh small{font-size:12px;color:var(--mut);font-weight:600}
+.bkprev .fcard .bkr{display:flex;align-items:center;gap:10px;padding:10px 0}.bkprev .fcard .bkr+.bkr{border-top:1px solid var(--hair)}
+.bkr .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}.bkr .tx b{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bkr .tx small{font-size:11.5px;color:var(--mut)}.bkr .tx small.bad{color:var(--red)}
+.bkr .v{font-size:13.5px;font-weight:700;white-space:nowrap}.bkr .v i{font-style:normal;font-size:11px;color:var(--mut);margin-inline-start:2px}
+.bkr .n{width:24px;height:24px;border-radius:50%;background:var(--blu2);color:var(--blu);display:grid;place-items:center;font-size:11px;font-weight:800;flex:none}
+.bkr.bad .n{background:var(--red2);color:var(--red)}
+.bkmore{text-align:center;font-size:12px;color:var(--mut);padding:8px 0 4px}
+.bknote{font-size:12px;color:var(--mut);margin:10px 4px 0}
+.brh .tx small.bkl{display:flex;align-items:center;gap:5px;min-width:0}.brh .tx small.bkl>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.brh .tx small.bkl .bkb{margin:0}
+.ibin{direction:ltr}.ibin .ibbk{direction:rtl}
+.vloading .brh .tx small.bkl>span,.bpanel.loading .brh .tx small.bkl>span{visibility:hidden}
+.bzppg{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--blu2);border-radius:16px;padding:14px 16px;margin-top:2px}.bzppg small{display:block;font-size:12px;color:var(--blu);font-weight:700}.bzppg b{font-size:20px;font-weight:800;color:var(--blu)}.bzppg b i{font-style:normal;font-size:12px;font-weight:600;margin-inline-start:4px}.bzppg span.m{font-size:11.5px;color:var(--mut);text-align:left}
+.bki{padding:0;background:#fff;object-fit:contain;width:18px;min-width:18px;height:18px;border-radius:50%;box-shadow:0 0 0 1px #0000000f}
+.bki.lg{width:28px;min-width:28px;height:28px}
 </style>
 </head>
 <body>
@@ -1144,7 +1177,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=38.1,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=39,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1191,6 +1224,10 @@ const BANKOPTS=[...new Set(Object.values(BANKS).concat(['بلو']))];
 const ibanFmt=i=>/^IR\d{24}$/.test(i);
 let ibanOk=i=>{if(!ibanFmt(i))return false;const s=i.slice(4)+'1827'+i.slice(2,4);let r=0;for(const c of s)r=(r*10+ +c)%97;return r===1};
 const ibanBank=i=>ibanFmt(i)?BANKS[i.slice(4,7)]||'':'';
+const BKC={'ملی':'#1d4f91','ملت':'#c8102e','صادرات':'#1f3a8a','تجارت':'#1660b8','سپه':'#e0a400','کشاورزی':'#1f8a3c','مسکن':'#e3731b','رفاه':'#1b7fa6','پاسارگاد':'#c9a000','سامان':'#1a5fb4','پارسیان':'#9b1b30','اقتصاد نوین':'#6b2c91','سینا':'#0e7c86','شهر':'#d0312d','آینده':'#ef7d00','رسالت':'#2e9e4f','مهر ایران':'#0f8f6f','دی':'#1d6fb8','پست بانک':'#2f7d32','کارآفرین':'#00788a','سرمایه':'#b8860b','ایران زمین':'#7a4b9d','گردشگری':'#0f6e8c','صنعت و معدن':'#355c7d','توسعه صادرات':'#2b5d8a','توسعه تعاون':'#3b8f5a','حکمت':'#5a6b7d','انصار':'#2c7a3f','مرکزی':'#33415c','مهر':'#0f8f6f','موسسه توسعه':'#5a6b7d'};
+const BKL={'ملی':'Melli','ملت':'Mellat','صادرات':'Saderat','تجارت':'Tejarat','سپه':'Sepah','کشاورزی':'Keshavarzi','مسکن':'Maskan','رفاه':'Refah','پاسارگاد':'Pasargad','سامان':'Saman','پارسیان':'Parsian','اقتصاد نوین':'Eghtesad_Novin','سینا':'Sina','شهر':'Shahr','آینده':'Ayandeh','رسالت':'Resalat','مهر ایران':'Mehr_Iran','مهر':'Mehr_Iran','دی':'Dey','پست بانک':'Postbank','کارآفرین':'Karafarin','سرمایه':'Sarmayeh','ایران زمین':'Iran_Zamin','گردشگری':'Gardeshgari','صنعت و معدن':'Sanat_Madan','توسعه صادرات':'Tosee_Saderat','توسعه تعاون':'Tosee_Taavon','حکمت':'Hekmat','انصار':'Ansar','مرکزی':'Bank_Markazi','موسسه توسعه':'Tosee','ملل':'Melall','کوثر':'Kosar','نور':'Noor','خاورمیانه':'Khavar_Mianeh','قوامین':'Ghavamin','کاسپین':'Caspian'};
+function bankBadge(b,cls){b=String(b||'').replace(/^بانک\s*/,'').trim();if(!b)return '';const k=Object.keys(BKC).concat(Object.keys(BKL)).find(n=>canon(n)===canon(b))||b,c=BKC[k]||'#64748b',t=k==='مهر ایران'?'مه':k==='ملی'?'ملی':k==='ملت'?'ملت':[...k][0],f=BKL[k];
+  return f?`<img class="bkb bki${cls?' '+cls:''}" src="banks/${f}.svg" alt="${esc(k)}" title="بانک ${esc(k)}" loading="lazy" decoding="async" onerror="this.outerHTML='<span class=&quot;bkb${cls?' '+cls:''}&quot; style=&quot;--bc:${c}&quot;>${esc(t)}</span>'">`:`<span class="bkb${cls?' '+cls:''}" style="--bc:${c}" title="بانک ${esc(k)}">${esc(t)}</span>`}
 {const _ok=ibanOk,M=new Map();ibanOk=i=>{if(M.has(i))return M.get(i);const v=_ok(i);if(M.size>5000)M.clear();M.set(i,v);return v}}
 const acctOf=i=>ibanFmt(i)?i.slice(7).replace(/^0+/,''):'';
 const bankKey=e=>canon(ibanFmt(e.iban)?ibanBank(e.iban):e.bank);
@@ -1290,10 +1327,10 @@ const setLine=x=>(x.title==='خانم'?'خانم ':x.title==='آقا'?'آقای 
 /* ============ مسیریابی (نوار پایین) ============ */
 let cur='home',editBack=null,noAnim=false;
 const TAB={buy:'home',ent:'home',find:'home',home:'home',entry:'home',bulk:'home',list:'home',split1:'home',split3:'home',srcview:'home',part:'home',track:'track',batch:'track',day:'track',debt:'debt',cred:'debt',cwiz:'debt',pwiz:'debt',audit:'audit',users:'settings',settings:'settings',backups:'settings'};
-const PARENT={buy:'home',ent:'home',find:'home',entry:'home',list:'home',split1:'home',users:'settings',backups:'settings',bulk:'entry',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
+const PARENT={bulk:'home',buy:'home',ent:'home',find:'home',entry:'home',list:'home',split1:'home',users:'settings',backups:'settings',split3:'split1',srcview:'split3',part:'split1',batch:'track',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
 const TITLES={buy:'خرید',ent:'جزئیات واریزی',find:'جستجو',backups:'پشتیبان‌ها',settings:'تنظیمات',users:'کاربران',home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
 function go(n,noPush){if(n==='find'&&cur!=='find'&&!(cur==='ent'&&PARENT.ent==='find')){fQ='';fF='all';fS='';fN=120;findY=0}if(cur==='find'&&n==='ent'){try{findY=$('view').scrollTop}catch(e){}}if((n==='home'||n==='buy'||(n==='entry'||n==='bulk')&&!editId)&&dateVal!==todayISO()){dateVal=todayISO();ls.set('m_date',dateVal);alloc=null}if(n!==cur&&TOKEN&&['home','list','split1','track','debt','audit','day','batch'].includes(n))setTimeout(quietRefresh,30);if(!$('ov').classList.contains('hide')){aSt=null;closeSheet()}if(cur==='entry'&&n!=='entry'&&n!=='bulk')editId=null;cur=n;if(!noPush){try{history.pushState({n},'')}catch(e){}}render(true);window.scrollTo(0,0)}
-const FULLP=new Set(['buy','ent','split1','split3','part','srcview']),SLIDEP=new Set(['buy','ent','split1']);
+const FULLP=new Set(['bulk','buy','ent','split1','split3','part','srcview']),SLIDEP=new Set(['bulk','buy','ent','split1']);
 function back(){if((cur==='cwiz'||cur==='pwiz')&&wz){ACT.wzPrev();return}if(cur==='buy'&&bz.step>1){bzRead();bz.step--;bz.msg='';render();return}if(cur==='ent'&&entEdit){entEdit=false;render();return}if(SLIDEP.has(cur)&&!back._c){const a=$('app');back._c=1;a.classList.add('entout');setTimeout(()=>{noAnim=true;navBack=true;go((cur==='ent'?PARENT.ent:PARENT[cur])||'home');a.classList.remove('entout');back._c=0},170);return}navBack=true;go(PARENT[cur]||'home')}
 window.addEventListener('popstate',e=>{navBack=true;cur=(e.state&&e.state.n)||'home';if(cur!=='entry')editId=null;render(true)});
 const dchip=()=>{const D=dates(dateVal);return `<button class="dchip" data-act="date" aria-label="تاریخ گزارش: ${D.fa}">${ic('cal')}<span class="t"><b>${D.fa}</b><small>${relDay(dateVal)==='امروز'?'Today — ':''}${D.en}</small></span></button>`};
@@ -1301,7 +1338,7 @@ function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length
   return tb('home','home','خانه',bad)+tb('track','track','پیگیری',pendingAll())+tb('debt','debt','بدهی')+tb('audit','clock','تاریخچه')+tb('settings','gear','تنظیمات')}
 function render(anim){const V=$('view'),B=$('bar'),A=$('act');
   const hasBack=!!PARENT[cur]||(cur==='entry'&&editId);
-  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'&&editId?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:`<button class="mark mav" data-act="acct" aria-label="حساب کاربری">${ME?esc(userInit(ME.name)):ic('user')}</button>`}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='buy'?'خرید طلا':cur==='ent'?(entEdit?'ویرایش واریزی':'جزئیات واریزی'):cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button>${cur==='home'?`<span class="bcmp"><b>${fmt(sum(dayList()))}</b><small>تومان — ${esc(dates(dateVal).fa)}</small></span>`:''}</div></div>${cur==='home'?`<button class="ib0 hsr0" data-act="hsearch" aria-label="جستجو">${ic('search')}</button>`:(cur==='entry'&&!editId)||cur==='bulk'?`<span class="regd">${ic('cal')}<span>لیست امروز<small>${esc(dates(todayISO()).fa)}</small></span></span>`:cur==='split1'?`<span class="hbtns"><button class="ib0" data-act="xOpen" aria-label="خروجی">${ic('open')}</button><button class="ib0" data-act="srcMgr" aria-label="مدیریت منابع">${ic('gear')}</button></span>`:cur==='ent'||cur==='find'||cur==='buy'?'':dchip()}`;
+  B.innerHTML=`<div class="ttl">${hasBack?`<button class="ib0" data-act="${cur==='entry'&&editId?'cancelEdit':'back'}" aria-label="بازگشت">${ic('back')}</button>`:`<button class="mark mav" data-act="acct" aria-label="حساب کاربری">${ME?esc(userInit(ME.name)):ic('user')}</button>`}<div class="tt2"><b>${cur==='entry'&&editId?'ویرایش واریزی':cur==='buy'?'خرید طلا':cur==='ent'?(entEdit?'ویرایش واریزی':'جزئیات واریزی'):cur==='srcview'&&srcRows()?esc(srcRows().name):cur==='part'&&curPart()?esc(curPart().src.name):cur==='cred'&&curC()?esc(curC().name):cur==='cwiz'&&wz?(wz.id?'ویرایش حساب':'حساب جدید'):cur==='pwiz'&&wz?(wz.id?'ویرایش واریز':'واریز جدید'):TITLES[cur]}</b><button class="uline" data-act="user" aria-label="نام کاربر">${ic('user')}<span>${ME?esc(ME.name):'ورود'}</span><span class="sdot ${SY.state}" title="${esc(syncLabel())}"></span></button>${cur==='home'?`<span class="bcmp"><b>${fmt(sum(dayList()))}</b><small>تومان — ${esc(dates(dateVal).fa)}</small></span>`:''}</div></div>${cur==='home'?`<button class="ib0 hsr0" data-act="hsearch" aria-label="جستجو">${ic('search')}</button>`:(cur==='entry'&&!editId)?`<span class="regd">${ic('cal')}<span>لیست امروز<small>${esc(dates(todayISO()).fa)}</small></span></span>`:cur==='split1'?`<span class="hbtns"><button class="ib0" data-act="xOpen" aria-label="خروجی">${ic('open')}</button><button class="ib0" data-act="srcMgr" aria-label="مدیریت منابع">${ic('gear')}</button></span>`:cur==='ent'||cur==='find'||cur==='buy'||cur==='bulk'?'':dchip()}`;
   const R={buy:[vBuy,aBuy],ent:[vEnt,aEnt],find:[vFind,null],home:[vHome,null],entry:[vEntry,aEntry],bulk:[vBulk,aBulk],list:[vList,null],split1:[vSplit1,aSplit1],split3:[vSplit3,aSplit3],srcview:[vSrc,aSrc],part:[vPart,aPart],track:[vTrack,null],batch:[vBatch,aBatch],day:[vDay,aDay],debt:[vDebt,aDebt],cred:[vCred,aCred],cwiz:[vWiz,aWiz],pwiz:[vWiz,aWiz],audit:[vAudit,null],users:[vUsers,aUsers],settings:[vSettings,null],backups:[vBackups,null]}[cur];
   $('app').classList.toggle('home',cur==='home');$('app').classList.toggle('ent',cur==='ent');$('app').classList.toggle('editing',cur==='ent'&&entEdit);{const ap=$('app'),was=ap.classList.contains('full'),fu=FULLP.has(cur);ap.classList.toggle('full',fu);ap.classList.toggle('split',cur==='split1');if(fu&&!was&&anim){ap.classList.add('fullin');clearTimeout(render._fi);render._fi=setTimeout(()=>ap.classList.remove('fullin'),420)}if(!fu)ap.classList.remove('fullin')}B.classList.remove('cmp');
   V.innerHTML=R[0]();A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();if(cur==='home')homeLayout();paintBars();
@@ -1324,7 +1361,7 @@ function allocMap(){const m=new Map();Object.values(drafts||{}).forEach(L=>(L||[
 function homeRow(x){const st=rowSt(x),t=entSt(x),al=(AM||(AM=allocMap())).get(x.id);
   const ico=st==='ok'?ic('check'):st==='fail'?'<b>✕</b>':st==='bad'?'<b>!</b>':st==='pend'?ic('clock'):`<b>${esc(userInit(fullName(x)||'؟'))}</b>`;
   const lab=st==='bad'?'خطادار':t?t[0]:'ثبت شده';
-  const inner=`<div class="brw ${st}"><button class="brh" data-act="openEnt" data-id="${x.id}"><span class="bri">${ico}</span><span class="tx"><b>${esc(fullName(x)||'—')}</b><small>${esc(x.bankShow||'بانک نامشخص')}${x.payDate?' · واریز '+esc(payLab(x.payDate)):''}${x.code?' · فاکتور '+esc(toEn(x.code)):''}</small>${al&&al.src?`<span class="rsrc">${ic('split')}${esc(al.src)}</span>`:''}</span><span class="brv"><b>${fmt(x.amount)} <i>تومان</i></b><small>${lab}</small></span></button></div>`;
+  const inner=`<div class="brw ${st}"><button class="brh" data-act="openEnt" data-id="${x.id}"><span class="bri">${ico}</span><span class="tx"><b>${esc(fullName(x)||'—')}</b><small class="bkl">${bankBadge(x.bankShow)}<span>${esc(x.bankShow||'بانک نامشخص')}${x.payDate?' · واریز '+esc(payLab(x.payDate)):''}${x.code?' · فاکتور '+esc(toEn(x.code)):''}</span></small>${al&&al.src?`<span class="rsrc">${ic('split')}${esc(al.src)}</span>`:''}</span><span class="brv"><b>${fmt(x.amount)} <i>تومان</i></b><small>${lab}</small></span></button></div>`;
   const bi=x.sentBid?stOf(x.id):null,R0=[['entEditGo','ویرایش','edit','#3b6fd6'],['cpEnt','کپی','copy','#b8862b']];
   if(bi==='pending'||bi==='fail')R0.unshift(['entOk','تأیید','check','#178049']);else if(bi==='ok')R0.unshift(['entUnok','لغو تأیید','undo','#6b7385']);
   return swW(inner,{r:R0,l:[['del','حذف','trash','#d23c48']],data:{id:x.id}})}
@@ -1339,10 +1376,11 @@ function vEnt(){const x=entRow();if(!x){setTimeout(()=>{if(cur==='ent')go('home'
     x.card?kv('شماره کارت',`<span class="ltr">${grp4(x.card)}</span>`,x.card):'',
     x.acct?kv('شماره حساب',`<span class="ltr">${esc(x.acct)}</span>`,x.acct):'',
     x.holder?kv('صاحب حساب',esc(x.holder)):'',
-    kv('بانک',esc(x.bankShow||'نامشخص')),
+    kv('بانک',bankBadge(x.bankShow)+esc(x.bankShow||'نامشخص')),
     kv('مبلغ',fmt(x.amount)+' <i>تومان</i>',x.amount),
     x.code?kv('فاکتور',`<span class="ltr">${esc(toEn(x.code))}</span>`,toEn(x.code)):'',
     x.weight?kv('وزن',esc(toFa(x.weight))+' <i>گرم</i>'):'',
+    x.weight&&ppgOf(x.total||x.amount,x.weight)?kv('هر گرم تمام‌شده',fmt(x.ppg||ppgOf(x.total||x.amount,x.weight))+' <i>تومان</i>'):'',
     x.phone?kv('شماره تماس',`<span class="ltr">${esc(x.phone)}</span>`,x.phone):'',
     x.nid?kv('کد ملی',`<span class="ltr">${esc(x.nid)}</span>`,x.nid):'',
     kv('تاریخ واریز',x.payDate?esc(payLab(x.payDate))+(['امروز','دیروز','فردا','پس‌فردا'].includes(payLab(x.payDate))?'، '+esc(dates(x.payDate).fa):''):'تعیین نشده',null,can('edit')?'entPay':null),
@@ -1367,7 +1405,7 @@ function bindEnt(){const x=entRow();if(!x)return;if(entEdit){bindEntEdit();retur
 const aEnt=()=>{const x=entRow();if(x&&entEdit)return `<button class="btn sec" data-act="entEditOff">انصراف</button><button class="btn gold" data-act="entSave">${ic('check')} ذخیره</button>`;return x?`<button class="btn sec" data-act="cpEnt" data-id="${x.id}">${ic('copy')} کپی همه</button><button class="btn gold" data-act="entEditOn">${ic('edit')} ویرایش</button>`:''};
 let eeTitle='';
 function vEntEdit(x){const e=entries.find(y=>y.id===x.id)||x;eeTitle=e.title||'';
-  const row=(id,l,v,o={})=>`<label class="er${o.big?' big':''}${o.col?' col':''}" for="${id}"><span class="erl">${l}</span><span class="erv">${o.pre?`<em>${o.pre}</em>`:''}<input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(v||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="next">${o.suf?`<em class="suf">${o.suf}</em>`:''}</span></label>${o.hint?`<small class="eh erh" id="${id}v"></small>`:''}`;
+  const row=(id,l,v,o={})=>`<label class="er${o.big?' big':''}${o.col?' col':''}" for="${id}"><span class="erl">${l}</span><span class="erv">${id==='eeI'?'<span id="eeIb"></span>':''}${o.pre?`<em>${o.pre}</em>`:''}<input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(v||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="next">${o.suf?`<em class="suf">${o.suf}</em>`:''}</span></label>${o.hint?`<small class="eh erh" id="${id}v"></small>`:''}`;
   return `<div class="eform2">
   <div class="ehero"><div class="eav">${esc(userInit(fullName(e)||'؟'))}</div><div><b>${esc(fullName(e)||'—')}</b><small>ثبت ${esc(dates(e.entryDate).fa)}${e.createdBy?'، '+esc(e.createdBy):''}</small></div></div>
   <div class="egh">اطلاعات مشتری</div><div class="eg">
@@ -1377,7 +1415,7 @@ function vEntEdit(x){const e=entries.find(y=>y.id===x.id)||x;eeTitle=e.title||''
     ${row('eeM','کد ملی',e.nid,{ltr:1,im:'numeric',ph:'۱۰ رقم',hint:1})}
     ${row('eeC','فاکتور',toEn(e.code||''),{ltr:1,im:'numeric',ph:'شماره فاکتور'})}</div>
   <div class="egh">وزن و مبلغ</div><div class="eg">
-    ${row('eeW','وزن',e.weight,{ltr:1,im:'decimal',ph:'—',suf:'گرم'})}
+    ${row('eeW','وزن',e.weight,{ltr:1,im:'decimal',ph:'—',suf:'گرم',hint:1})}
     ${row('eeA','مبلغ',e.amount?Number(e.amount).toLocaleString('en-US'):'',{ltr:1,im:'numeric',suf:'تومان',big:1})}</div>
   <div class="egh">حساب مقصد</div><div class="eg">
     ${row('eeI','شماره شبا',ibanGroups((e.iban||'').replace(/^IR/,'')),{ltr:1,im:'numeric',pre:'IR',ph:'۲۴ رقم',hint:1,col:1})}
@@ -1386,7 +1424,7 @@ function vEntEdit(x){const e=entries.find(y=>y.id===x.id)||x;eeTitle=e.title||''
     <button class="er ebtn" data-act="eePay"><span class="erl">تاریخ واریز</span><span class="erv"><b id="eePayL">${esc(payLab(fPay))}، ${esc(dates(fPay).fa)}</b>${ic('cal')}</span></button></div>
   <button class="emore" data-act="edit" data-id="${e.id}">${ic('debt')} واریز مستقیم مشتری و تنظیمات بیشتر</button></div>`}
 const eeTitles=()=>['خانم','آقا',''].map(t=>`<button class="tch${eeTitle===t?' on':''}" data-act="eeT" data-t="${t}">${t||'بدون عنوان'}</button>`).join('');
-function eeIbanChk(){const el=$('eeI'),o=$('eeIv');if(!el||!o)return;const v=dg(el.value).slice(0,24);if(!v){o.textContent='';o.className='eh erh';return}
+function eeIbanChk(){const el=$('eeI'),o=$('eeIv');if(!el||!o)return;const v=dg(el.value).slice(0,24);{const bb=$('eeIb'),b5=v.length>=5?BANKS[v.slice(2,5)]||'':'';if(bb)bb.innerHTML=b5?bankBadge(b5,'lg'):''}if(!v){o.textContent='';o.className='eh erh';return}
   if(v.length<24){o.className='eh erh';o.textContent=toFa(v.length)+' از ۲۴ رقم';return}if(!ibanOk('IR'+v)){o.className='eh erh bad';o.textContent='شماره شبا اشتباه است';return}const b=ibanBank('IR'+v);o.className='eh erh ok';o.textContent='شبا معتبر است'+(b?' · بانک '+b:'')}
 function bindEntEdit(){const A=$('eeA'),I=$('eeI'),K=$('eeK'),C=$('eeC');if(!A)return;
   A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''};C.oninput=()=>{C.value=toEn(C.value).replace(/[^0-9A-Za-z\-\/]/g,'')};
@@ -1395,7 +1433,8 @@ function bindEntEdit(){const A=$('eeA'),I=$('eeI'),K=$('eeK'),C=$('eeC');if(!A)r
   const P=$('eeP'),M=$('eeM'),W=$('eeW'),hn=(id,t,c)=>{const o=$(id+'v');if(o){o.textContent=t;o.className='eh erh'+(c?' '+c:'')}};
   P.oninput=()=>{const v=toEn(P.value).replace(/\D/g,'').slice(0,11);P.value=v;hn('eeP',!v||v.length<11?'':phoneOk(v)?'':'شماره تماس باید با ۰۹ شروع شود',v.length===11&&!phoneOk(v)?'bad':'')};
   M.oninput=()=>{const v=toEn(M.value).replace(/\D/g,'').slice(0,10);M.value=v;hn('eeM',v.length===10?(nidOk(v)?'کد ملی معتبر است':'کد ملی معتبر نیست'):'',v.length===10?(nidOk(v)?'ok':'bad'):'')};
-  W.oninput=()=>{W.value=toEn(W.value).replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1')};
+  const pgH=()=>{const pg=ppgOf(num($('eeA').value),W.value);hn('eeW',pg?'هر گرم تمام‌شده: '+fmt(pg)+' تومان':'',pg?'ok':'')};
+  W.oninput=()=>{W.value=toEn(W.value).replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1');pgH()};A.addEventListener('input',pgH);pgH();
   const F=['eeN','eeP','eeM','eeC','eeW','eeA','eeI','eeK','eeH'];F.forEach((id,i)=>{const el=$(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(i<F.length-1)$(F[i+1]).focus();else{el.blur()}}})});
   eeIbanChk();if(K.value)K.oninput();if(M.value)M.oninput()}
 function entSave(){const x=entRow(),i=x?entries.findIndex(y=>y.id===x.id):-1;if(i<0)return;const e0=entries[i];
@@ -1403,7 +1442,7 @@ function entSave(){const x=entRow(),i=x?entries.findIndex(y=>y.id===x.id):-1;if(
   if(phone&&!phoneOk(phone)){toast('شماره تماس درست نیست',true);$('eeP').focus();return}if(nidv&&!nidOk(nidv)){toast('کد ملی معتبر نیست',true);$('eeM').focus();return}
   if(!name){toast('نام را وارد کنید',true);$('eeN').focus();return}if(!amount){toast('مبلغ را وارد کنید',true);$('eeA').focus();return}
   if((e0.settles||[]).reduce((a,z)=>a+(+z.amount||0),0)>amount){toast('مبلغ از جمع واریز مستقیم مشتری کمتر است',true);return}
-  const iban=dI?'IR'+dI:'',before=pick(e0);entries[i]={...e0,name,amount,code,iban,card,phone,nid:nidv,weight,holder:holder&&holder!==name?holder:'',title:eeTitle,payDate:fPay||e0.payDate||e0.entryDate,bank:iban===e0.iban?e0.bank:'',updatedBy:who(),updatedAt:new Date().toISOString()};
+  const iban=dI?'IR'+dI:'',before=pick(e0);entries[i]={...e0,name,amount,code,iban,card,phone,nid:nidv,weight,ppg:ppgOf(amount,weight),holder:holder&&holder!==name?holder:'',title:eeTitle,payDate:fPay||e0.payDate||e0.entryDate,bank:iban===e0.iban?e0.bank:'',updatedBy:who(),updatedAt:new Date().toISOString()};
   logA('edit','ویرایش واریزی',name+' | '+fmt(amount)+' تومان',{ids:[e0.id],before,after:pick(entries[i])});saveE();alloc=null;entEdit=false;render();$('view').scrollTop=0;
   const bad=iban&&!ibanOk(iban);toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد ✓',bad)}
 /* ---------- جستجو (مثل صفحه تراکنش‌های بلو: فیلترها + گروه‌بندی روز) ---------- */
@@ -1517,10 +1556,18 @@ function saveEntry(){const m=$('fm'),dgI=dg($('fi').value).slice(0,24);
   m.innerHTML=bad?'<div class="msg bad"><b>شماره شبا اشتباه است.</b> واریزی ذخیره شد و در لیست قرمز علامت خورد؛ بعداً اصلاحش کنید.</div>':'<div class="msg ok">ذخیره شد ✓ — واریز '+payLab(ne.payDate)+' · '+fmt(dayEntries().length)+' واریزی در لیست امروز</div>';
   if(bad)toast('شماره شبا اشتباه است',true);$('fn').focus()}
 /* ============ چسباندن گروهی ============ */
-const vBulk=()=>{if(!fPay||fPay<todayISO())fPay=payDef();return `<div class="card"><div id="paybox">${payChips()}</div><div class="muted" style="font-size:13px;margin:4px 0 8px">لیست را از تلگرام یا یادداشت کپی و اینجا بچسبانید (نام و شماره فاکتور، مبلغ، بانک، شبا). همه ردیف‌ها در لیست امروز <b style="color:var(--ink)">${dates(dateVal).fa}</b> و با تاریخ واریز بالا ثبت می‌شوند.</div><textarea id="bulk"></textarea></div><div id="bm"></div>`};
+const vBulk=()=>{if(!fPay||fPay<todayISO())fPay=payDef();return `<div class="bkw bzw"><div class="bzh"><small>چند واریزی یکجا · لیست امروز ${esc(dates(todayISO()).fa)}</small><b>چسباندن لیست</b></div>
+  <div class="ef"><label>تاریخ واریز همه ردیف‌ها</label><button class="bzdate" data-act="bkCal">${ic('cal')}<span><b id="bkPayL">${esc(payLab(fPay))}</b><small id="bkPayS">${esc(dates(fPay).wd+' '+dates(fPay).fa)}</small></span>${ic('chev')}</button></div>
+  <div class="ef"><label for="bulk">متن لیست</label><div class="bkta"><textarea id="bulk" placeholder="لیست را از تلگرام یا یادداشت کپی کنید و اینجا بچسبانید؛ نام و فاکتور، مبلغ، بانک و شبا خودکار تشخیص داده می‌شود."></textarea><button class="bkpaste" data-act="bkPaste">${ic('paste')} چسباندن</button></div></div>
+  <div id="bkprev" class="bkprev"></div><div id="bm"></div></div>`};
 const aBulk=()=>'<button class="btn sec" data-act="resetBulk">پاک کردن</button><button class="btn gold" data-act="bulkAdd">افزودن به لیست</button>';
-function bindBulk(){setTimeout(()=>$('bulk')&&$('bulk').focus(),60)}
-function resetBulk(){const b=$('bulk');if(!b||!b.value.trim())return;askConfirm('متن چسبانده‌شده پاک شود؟','پاک شود',()=>{$('bulk').value='';$('bm').innerHTML='';toast('پاک شد')})}
+function bkPrev(){const el=$('bkprev');if(!el)return;const t=($('bulk')||{}).value||'';if(!t.trim()){el.innerHTML='';return}const r=parse(t);
+  if(!r.length){el.innerHTML='<div class="bknote">هنوز واریزی‌ای در متن پیدا نشد.</div>';return}
+  const badN=r.filter(x=>!x.iban||!ibanOk(x.iban)||!x.amount||!x.name).length;
+  el.innerHTML=`<div class="bkh"><span>${fmt(r.length)} واریزی پیدا شد</span><small>جمع ${fmt(sum(r))} تومان${badN?'، '+fmt(badN)+' خطادار':''}</small></div><div class="fcard">${r.slice(0,8).map((x,i)=>{const bk=ibanBank(x.iban)||x.bank||'',bad=!x.iban?'شبا ندارد':!ibanOk(x.iban)?'شبا اشتباه':!x.amount?'مبلغ ندارد':!x.name?'نام ندارد':'';
+    return `<div class="bkr${bad?' bad':''}"><span class="n">${toFa(i+1)}</span><span class="tx"><b>${esc(x.name||'بدون نام')}</b><small class="${bad?'bad':''}">${bad?esc(bad):bankBadge(bk)+esc(bk||'بانک نامشخص')}${x.code?' · فاکتور '+esc(x.code):''}</small></span><span class="v">${fmt(x.amount||0)}<i>تومان</i></span></div>`}).join('')}${r.length>8?`<div class="bkmore">و ${fmt(r.length-8)} واریزی دیگر</div>`:''}</div>`}
+function bindBulk(){const b=$('bulk');if(!b)return;b.oninput=()=>{clearTimeout(b._t);b._t=setTimeout(bkPrev,180)};bkPrev()}
+function resetBulk(){const b=$('bulk');if(!b||!b.value.trim())return;askConfirm('متن چسبانده‌شده پاک شود؟','پاک شود',()=>{$('bulk').value='';$('bm').innerHTML='';bkPrev();toast('پاک شد')})}
 function bulkAdd(){const r=parse($('bulk').value),m=$('bm');if(!r.length){m.innerHTML='<div class="msg bad">واریزی‌ای در متن پیدا نشد.</div>';return}
   const now=new Date().toISOString(),ids=[];r.forEach(x=>{const id=nid++;ids.push(id);entries.push({...x,card:'',id,entryDate:dateVal,payDate:fPay||payDef(),createdBy:who(),updatedBy:who(),updatedAt:now})});
   saveE();alloc=null;logA('bulk','ورود گروهی',fmt(r.length)+' واریزی | '+fmt(sum(r))+' تومان | '+dates(dateVal).fa,{ids});$('bulk').value='';
@@ -3019,12 +3066,15 @@ ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render
 ACT.bTog=(d,e)=>{const r=e.target.closest('.brw');if(!r)return;const o=r.classList.toggle('open'),h=r.querySelector('.brh');if(h)h.setAttribute('aria-expanded',o);o?homeOpen.add(String(d.id)):homeOpen.delete(String(d.id))};
 ACT.hsearch=()=>go('find');
 /* ===== ورود حساب: خرید (مرحله‌به‌مرحله) / فروش ===== */
+ACT.bkCal=()=>openCal(fPay||payDef(),iso=>{fPay=iso;ls.set('m_pay_off',Math.round((new Date(iso+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5));const l=$('bkPayL'),s2=$('bkPayS');if(l)l.textContent=payLab(iso);if(s2)s2.textContent=dates(iso).wd+' '+dates(iso).fa});
+ACT.bkPaste=async()=>{try{const t=await navigator.clipboard.readText();if(!t||!t.trim()){toast('حافظه خالی است',true);return}const b=$('bulk');b.value=(b.value.trim()?b.value.trim()+'\n':'')+t;bkPrev();toast('متن چسبانده شد')}catch(e){toast('اجازه خواندن حافظه داده نشد؛ داخل کادر نگه دارید و «Paste» بزنید',true);$('bulk').focus()}};
 ACT.entryMenu=()=>{if(!can('add')){toast('دسترسی «ثبت واریزی جدید» برای حساب شما فعال نیست',true);return}sheet(`<div class="sh-h"><div><b>ورود حساب</b><small class="shsub">نوع ثبت را انتخاب کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <button class="opt big" data-act="buyNew">${ic('plus')}<span><b>خرید</b><small>خرید طلا از مشتری و واریز مبلغ به حساب او، مرحله‌به‌مرحله</small></span></button>
   <button class="opt big" data-act="sellSoon">${ic('debt')}<span><b>فروش</b><small>فروش طلا به مشتری</small></span></button>
   <button class="opt big" data-act="go" data-n="bulk">${ic('paste')}<span><b>چسباندن لیست</b><small>چند واریزی یکجا از متن تلگرام یا یادداشت</small></span></button>`)};
 ACT.sellSoon=()=>{closeSheet();toast('بخش فروش به‌زودی اضافه می‌شود')};
 let bz={step:1,d:{},msg:''};
+const ppgOf=(amt,w)=>{w=parseFloat(toEn(String(w||'')))||0;return w>0&&amt>0?Math.round(amt/w):0};
 const nidOk=c=>{if(!/^\d{10}$/.test(c)||/^(\d)\1{9}$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);const r=s%11;return r<2?+c[9]===r:+c[9]===11-r};
 const phoneOk=v=>/^09\d{9}$/.test(v);
 ACT.buyNew=()=>{closeSheet();bz={step:1,d:{pay:payDef()},msg:''};go('buy')};
@@ -3038,10 +3088,10 @@ function vBuy(){const d=bz.d,st=bz.step,T=['اطلاعات مشتری','وزن �
   let h=`<div class="bzp">${[1,2,3].map(i=>`<i class="${i<st?'done':i===st?'on':''}"></i>`).join('')}</div><div class="bzh"><small>مرحله ${toFa(st)} از ۳</small><b>${T[st-1]}</b></div>`;
   if(bz.msg)h+=`<div class="bzok">${ic('check')}<span>${bz.msg}</span></div>`;
   if(st===1)h+=bzF('bzN','نام و نام خانوادگی',d.name,{ph:'مثلاً علی رضایی'})+bzF('bzP','شماره تماس',d.phone,{ltr:1,im:'tel',ph:'09xxxxxxxxx',opt:1})+bzF('bzM','کد ملی',d.nid,{ltr:1,im:'numeric',ph:'۱۰ رقم',opt:1})+bzF('bzC','شماره فاکتور',d.code,{ltr:1,im:'numeric',last:1});
-  if(st===2)h+=bzF('bzW','وزن (گرم)',d.weight,{ltr:1,im:'decimal',ph:'مثلاً 12.350',opt:1})+bzF('bzA','مبلغ (تومان)',d.amount,{ltr:1,im:'numeric',last:1})+`<div class="bzsum" id="bzS"></div>`;
-  if(st===3){h+=bzF('bzI','شماره شبا',d.iban,{ltr:1,im:'numeric',pre:'IR',ph:'۲۴ رقم'})+bzF('bzK','شماره کارت',d.card,{ltr:1,im:'numeric',ph:'۱۶ رقم',opt:1})+bzF('bzH','نام صاحب حساب',d.holder!=null?d.holder:clean(d.name||''),{last:1})
+  if(st===2)h+=bzF('bzW','وزن (گرم)',d.weight,{ltr:1,im:'decimal',ph:'مثلاً 12.350',opt:1})+bzF('bzA','مبلغ (تومان)',d.amount,{ltr:1,im:'numeric',last:1})+`<div id="bzS"></div>`;
+  if(st===3){h+=`<div class="ef"><label for="bzI">شماره شبا</label><div class="ibin"><input id="bzI" inputmode="numeric" value="${esc(d.iban||'')}" placeholder="شماره شبا (۲۴ رقم)" autocomplete="off" enterkeyhint="next"><span class="ibir">IR</span><span class="ibbk" id="bzIb"></span></div><small class="eh" id="bzIv"></small></div>`+bzF('bzK','شماره کارت',d.card,{ltr:1,im:'numeric',ph:'۱۶ رقم',opt:1})+bzF('bzH','نام صاحب حساب',d.holder!=null?d.holder:clean(d.name||''),{last:1})
     +`<div class="ef"><label>تاریخ واریز</label><button class="bzdate" data-act="bzCal">${ic('cal')}<span><b>${esc(payLab(d.pay))}</b><small>${esc(dates(d.pay).wd+' '+dates(d.pay).fa)}</small></span>${ic('chev')}</button></div>`
-    +`<div class="bzrev"><div><small>مشتری</small><b>${esc(clean(d.name||'')||'—')}</b></div><div><small>مبلغ</small><b>${fmt(num(d.amount||0))} <i>تومان</i></b></div>${d.weight?`<div><small>وزن</small><b>${esc(toFa(d.weight))} <i>گرم</i></b></div>`:''}${d.code?`<div><small>فاکتور</small><b>${esc(toEn(d.code))}</b></div>`:''}</div>`}
+    +`<div class="bzrev"><div><small>مشتری</small><b>${esc(clean(d.name||'')||'—')}</b></div><div><small>مبلغ</small><b>${fmt(num(d.amount||0))} <i>تومان</i></b></div>${d.weight?`<div><small>وزن</small><b>${esc(toFa(d.weight))} <i>گرم</i></b></div>`:''}${ppgOf(num(d.amount||0),d.weight)?`<div><small>هر گرم تمام‌شده</small><b>${fmt(ppgOf(num(d.amount||0),d.weight))} <i>تومان</i></b></div>`:''}${d.code?`<div><small>فاکتور</small><b>${esc(toEn(d.code))}</b></div>`:''}</div>`}
   return `<div class="bzw">${h}</div>`}
 const aBuy=()=>`<button class="btn gold bzgo" data-act="bzNext">${bz.step<3?'تأیید و ادامه':ic('check')+' ثبت واریزی'}</button>`;
 function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.textContent=t;o.className='eh'+(c?' '+c:'')}};
@@ -3052,23 +3102,23 @@ function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.te
     M.oninput=()=>{const v=toEn(M.value).replace(/\D/g,'').slice(0,10);M.value=v;hint('bzM',!v?'':v.length<10?toFa(v.length)+' از ۱۰ رقم':nidOk(v)?'کد ملی معتبر است':'کد ملی معتبر نیست',v.length===10?(nidOk(v)?'ok':'bad'):'')};
     C.oninput=()=>{C.value=toEn(C.value).replace(/[^0-9A-Za-z\-\/]/g,'');const c=C.value.trim(),dup=c&&entries.some(e=>e.entryDate===todayISO()&&toEn(e.code||'')===c);hint('bzC',dup?'این شماره فاکتور امروز قبلاً ثبت شده':'',dup?'bad':'')};
     [P,M,C].forEach(el=>{if(el.value)el.oninput()})}
-  if(st===2){const A=$('bzA'),W=$('bzW'),S=()=>{const a=num(A.value),w=parseFloat(toEn(W.value))||0;$('bzS').innerHTML=a?`<b>${fmt(a)}</b> تومان${w?` · هر گرم حدود <b>${fmt(Math.round(a/w))}</b> تومان`:''}`:''};
+  if(st===2){const A=$('bzA'),W=$('bzW'),S=()=>{const a=num(A.value),w=parseFloat(toEn(W.value))||0,pg=ppgOf(a,w);$('bzS').innerHTML=pg?`<div class="bzppg"><div><small>هر گرم طلای خام، تمام‌شده</small><b>${fmt(pg)}<i>تومان</i></b></div><span class="m">${fmt(a)} تومان<br>÷ ${esc(toFa(W.value))} گرم</span></div>`:a&&!w?'<div class="bzsum">با وارد کردن وزن، قیمت هر گرم تمام‌شده حساب می‌شود.</div>':''};
     A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):'';S()};W.oninput=()=>{W.value=toEn(W.value).replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1');S()};if(A.value)A.oninput();S()}
   if(st===3){const I=$('bzI'),K=$('bzK');
-    I.oninput=()=>{const v=dg(I.value).slice(0,24);I.value=ibanGroups(v);if(!v){hint('bzI','');return}if(v.length<24){hint('bzI',toFa(v.length)+' از ۲۴ رقم');return}if(!ibanOk('IR'+v)){hint('bzI','شماره شبا اشتباه است','bad');return}const b=ibanBank('IR'+v);hint('bzI','معتبر'+(b?' · بانک '+b:''),'ok')};
+    I.oninput=()=>{const v=dg(I.value).slice(0,24);I.value=ibanGroups(v);const bb=$('bzIb'),b5=v.length>=5?BANKS[v.slice(2,5)]||'':'';if(bb)bb.innerHTML=b5?bankBadge(b5,'lg')+'<span>'+esc(b5)+'</span>':'';if(!v){hint('bzI','اگر شبا را ندارید خالی بگذارید؛ واریزی خطادار علامت می‌خورد');return}if(v.length<24){hint('bzI',toFa(v.length)+' از ۲۴ رقم');return}if(!ibanOk('IR'+v)){hint('bzI','شماره شبا اشتباه است','bad');return}hint('bzI','شماره شبا معتبر است','ok')};
     K.oninput=()=>{const v=dg(K.value).slice(0,16);K.value=grp4(v);hint('bzK',!v?'':v.length<16?toFa(v.length)+' از ۱۶ رقم':luhn(v)?'معتبر':'رقم کنترلی نمی‌خواند',v.length===16?(luhn(v)?'ok':'bad'):'')};
-    if(I.value)I.oninput();if(K.value)K.oninput()}
+    I.oninput();if(K.value)K.oninput()}
   const first=ids.map(id=>$(id)).find(el=>el&&!el.value);if(first)setTimeout(()=>{if(cur==='buy'&&$('ov').classList.contains('hide')&&document.body.contains(first))first.focus()},380)}
 ACT.bzNext=()=>{bzRead();const d=bz.d;
   if(bz.step===1){if(!clean(d.name||'')){toast('نام مشتری را وارد کنید',true);$('bzN').focus();return}const ph=toEn(d.phone||'');if(ph&&!phoneOk(ph)){toast('شماره تماس درست نیست',true);$('bzP').focus();return}const n=toEn(d.nid||'');if(n&&!nidOk(n)){toast('کد ملی معتبر نیست',true);$('bzM').focus();return}bz.step=2;bz.msg='';render();return}
   if(bz.step===2){if(!num(d.amount||0)){toast('مبلغ را وارد کنید',true);$('bzA').focus();return}bz.step=3;bz.msg='';render();return}
-  const dI=dg(d.iban||'').slice(0,24);if(!dI){toast('شماره شبا را وارد کنید',true);$('bzI').focus();return}if(dI.length!==24){toast('شماره شبا باید ۲۴ رقم باشد',true);$('bzI').focus();return}
-  const card=dg(d.card||'').slice(0,16),now=new Date().toISOString(),iban='IR'+dI,name=stripName(d.name),holder=clean(d.holder||'');
+  const dI=dg(d.iban||'').slice(0,24);
+  const card=dg(d.card||'').slice(0,16),now=new Date().toISOString(),iban=dI?'IR'+dI:'',name=stripName(d.name),holder=clean(d.holder||'');
   if(dateVal!==todayISO()){dateVal=todayISO();ls.set('m_date',dateVal)}
-  const ne={id:nid++,name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:[],entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
+  const ne={id:nid++,name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),ppg:ppgOf(num(d.amount),d.weight),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:[],entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
   entries.push(ne);saveE();alloc=null;logA('add','ثبت واریزی (خرید)',name+' | '+fmt(ne.amount)+' تومان | واریز '+dates(ne.payDate).fa,{ids:[ne.id],after:pick(ne)});
-  const bad=!ibanOk(iban);bz={step:1,d:{pay:ne.payDate},msg:`«${esc(name)}» ثبت شد — ${fmt(ne.amount)} تومان، واریز ${esc(payLab(ne.payDate))}${bad?' <em>(شبا اشتباه است؛ در لیست قرمز می‌شود)</em>':''}`};
-  render();$('view').scrollTop=0;toast(bad?'ثبت شد، اما شماره شبا اشتباه است':'ثبت شد ✓ — ثبت بعدی',bad)};
+  const bad=!iban||!ibanOk(iban),why=!iban?'شبا ندارد':'شبا اشتباه است';bz={step:1,d:{pay:ne.payDate},msg:`«${esc(name)}» ثبت شد — ${fmt(ne.amount)} تومان، واریز ${esc(payLab(ne.payDate))}${bad?' <em>('+why+'؛ در لیست خطادار علامت خورد)</em>':''}`};
+  render();$('view').scrollTop=0;toast(bad?'ثبت شد، اما '+why+' (خطادار)':'ثبت شد ✓ — ثبت بعدی',bad)};
 ACT.bzCal=()=>{bzRead();openCal(bz.d.pay||todayISO(),iso=>{bz.d.pay=iso;ls.set('m_pay_off',Math.round((new Date(iso+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5));render()})};
 /* ===== تقویم شمسی (ماهانه) ===== */
 let cal={y:1405,m:1,sel:'',cb:null};

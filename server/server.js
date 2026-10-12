@@ -244,6 +244,14 @@ const STATIC = {
   '/apple-touch-icon.png': ['apple-touch-icon.png', 'image/png'], '/icon-192.png': ['icon-192.png', 'image/png'], '/icon-512.png': ['icon-512.png', 'image/png'],
 };
 function serveStatic(req, res, p) {
+  const bm = /^\/banks\/([A-Za-z_]+\.svg)$/.exec(p);
+  if (bm) {
+    fs.readFile(path.join(ROOT, 'banks', bm[1]), (err, buf) => {
+      if (err) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=2592000' }); res.end(buf);
+    });
+    return true;
+  }
   const fm = /^\/fonts\/((?:Vazirmatn|Estedad)(?:-[A-Za-z]+)?\.woff2)$/.exec(p);
   if (fm) {
     fs.readFile(path.join(ROOT, 'fonts', fm[1]), (err, buf) => {
