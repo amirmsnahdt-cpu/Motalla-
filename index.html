@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.94,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.95,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1559,6 +1559,9 @@ body{font-feature-settings:normal}
 .ldrc{flex:none;width:36px;height:36px;margin-inline-end:10px;border:0;border-radius:11px;background:var(--blu2);color:var(--blu);display:grid;place-items:center;cursor:pointer}.ldrc svg{width:17px;height:17px}
 .blist.fcard.hit{border:1.5px solid var(--blu)!important;box-shadow:0 6px 18px -12px var(--blu)!important;margin-top:6px!important}
 .ldrc.att{background:var(--hair);color:var(--mut);border:1.5px dashed var(--line)}
+
+.fcard .brw.ok,.blist .brw.ok{box-shadow:inset 0 0 0 1.5px var(--ok)!important;border-radius:16px!important;background:color-mix(in srgb,var(--ok2) 45%,var(--card))!important}
+.fcard>.swr:has(.brw.ok),.blist>.swr:has(.brw.ok){padding:3px 4px!important;background:var(--card)!important}
 </style>
 </head>
 <body>
@@ -1569,7 +1572,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.94,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.95,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1730,7 +1733,7 @@ const setLine=x=>x.name+(x.phone?' ('+x.phone+')':'')+(x.inv?' — فاکتور 
 let cur='home',editBack=null,noAnim=false;
 const TAB={custs:'custs',cust:'custs',banks:'banks',buy:'home',ent:'home',find:'home',home:'home',entry:'home',bulk:'home',list:'home',split1:'home',split3:'home',srcview:'home',part:'home',track:'home',batch:'home',day:'home',debt:'settings',cred:'settings',cwiz:'settings',pwiz:'settings',audit:'audit',users:'settings',settings:'settings',backups:'settings'};
 const PARENT={lday:'split1',cust:'custs',debt:'settings',track:'split1',bulk:'home',buy:'home',ent:'home',find:'home',entry:'home',list:'home',split1:'home',users:'settings',backups:'settings',split3:'split1',srcview:'split3',part:'split1',batch:'split1',day:'track',cred:'debt',cwiz:'debt',pwiz:'cred'};
-const TITLES={lday:'جزئیات لیست',split1:'تقسیم و پیگیری',custs:'حساب مشتریان',cust:'حساب مشتری',banks:'موجودی حساب‌ها',buy:'خرید',ent:'جزئیات واریزی',find:'جستجو',backups:'پشتیبان‌ها',settings:'تنظیمات',users:'کاربران',home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'تقسیم و پیگیری',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
+const TITLES={lday:'جزئیات لیست',split1:'واریزها',custs:'حساب مشتریان',cust:'حساب مشتری',banks:'موجودی حساب‌ها',buy:'خرید',ent:'جزئیات واریزی',find:'جستجو',backups:'پشتیبان‌ها',settings:'تنظیمات',users:'کاربران',home:'مطلا',entry:'ثبت واریزی',bulk:'چسباندن لیست',list:'لیست‌ها',split1:'واریزها',split3:'نتیجه تقسیم',srcview:'منبع',part:'تخصیص',track:'پیگیری واریز',batch:'پیگیری واریز',day:'لیست روزانه',debt:'تسویه بدهی',cred:'حساب بدهی',cwiz:'حساب بدهی',pwiz:'واریز خریدار',audit:'تاریخچه',users:'مدیریت کاربران'};
 /* ورود به تقسیم: اگر لیست روز کاری ندارد، لیستی که امروز باید واریز شود (مثلاً ثبت دیروز) خودکار باز شود */
 function spHas(iso){return validated().some(r=>r.entryDate===iso&&!r.sentBid&&!r.full)||(drafts[iso]||[]).some(p=>!p.sent&&p.ids&&p.ids.length)||batches.some(b=>b.date===iso&&!b.closed)}
 function spWork(){const t=todayISO();return [...new Set(validated().map(r=>r.entryDate))].filter(spHas).sort().reverse().map(iso=>{const R=validated().filter(r=>r.entryDate===iso);return{iso,pays:[...new Set(R.map(PD))].sort(),payT:R.some(r=>PD(r)===t)}})}
@@ -1938,7 +1941,7 @@ function vHome(){AM=allocMap();const lo=isoAdd(dateVal,-HOME_DAYS),L0=validated(
     <span class="bhd">${ic('cal')}<span>${esc(D.wd)}، ${D.fa}</span></span>
     ${PKP.length>1?`<div class="bhp${PKP.length>3?' scr':''}">${PKP.map(k=>[k,payLab(k),L0.filter(x=>PD(x)===k)]).map(([k,t,A])=>`<button class="${homeP===k?'on':''}" data-act="homeP" data-iso="${k}"><span>${esc(t)}</span><b>${fmt(sum(A))}</b><small>${fmt(A.length)} واریزی</small></button>`).join('')}</div>`:''}
     <div class="bhc">${chip('bad',bad.length,'خطادار','r')}${chip('ok',ok.length,'تسویه شده','g')}${chip('pend',pend.length,'در انتظار','w')}</div>
-    <div class="bha"><button class="ba pri" data-act="entryMenu"><i>${ic('plus')}</i><span>ورود حساب</span></button><button class="ba" data-act="tab" data-n="split"><i>${ic('split')}</i><span>تقسیم و پیگیری</span>${pa?`<em>${toFa(pa)}</em>`:''}</button><button class="ba" data-act="spLists"><i>${ic('list')}</i><span>لیست‌ها</span>${bad.length?`<em class="r">${toFa(bad.length)}</em>`:''}</button></div></div>`;
+    <div class="bha"><button class="ba pri" data-act="entryMenu"><i>${ic('plus')}</i><span>ورود حساب</span></button><button class="ba" data-act="tab" data-n="split"><i>${ic('split')}</i><span>واریزها</span>${pa?`<em>${toFa(pa)}</em>`:''}</button></div></div>`;
   const fOk=x=>homeF==='bad'?x.level===2:homeF==='ok'?isOkE(x):homeF==='pend'?(x.level<2&&!isOkE(x)):true,rows=L0.filter(fOk).slice().reverse();
   h+=`<div class="bpanel"><div class="grab"><i class="pspin"></i></div><div class="bph"><div><b>لیست‌های واریز</b><small>به تفکیک روز · امروز بالا${L0.length?'، '+fmt(PKH.length)+' روز':''}${homeF!=='all'?'، فیلتر: '+({bad:'خطادار',ok:'تسویه شده',pend:'در انتظار'})[homeF]:''}</small></div>${homeF!=='all'?'<button class="link" data-act="homeF" data-f="all">همه</button>':''}</div>`;
   if(!storeOK)h+='<div class="msg warn">ذخیره خودکار در این مرورگر ممکن نیست.</div>';
@@ -2506,20 +2509,22 @@ function allocSave(){const s=sources.find(x=>x.id==aSt.srcId);if(!s){toast('من
 const curPart=()=>parts().find(p=>p.id===partId);
 const partPay=(p,M)=>{if(p.pay)return p.pay;M=M||new Map(validated().map(r=>[r.id,r]));const S=new Set((p.ids||[]).map(id=>M.get(id)).filter(Boolean).map(PD));return S.size===1?[...S][0]:''};
 const partSibs=p=>{const M=new Map(validated().map(r=>[r.id,r])),pp=partPay(p,M);return parts().filter(z=>String(z.src.id!=null?z.src.id:z.src.name)===String(p.src.id!=null?p.src.id:p.src.name)&&partPay(z,M)===pp)};
-function vPart(){const p=curPart();if(!p)return '<div class="spempty"><b>این تخصیص پیدا نشد</b></div>';const SB=partSibs(p),RN=new Map();SB.forEach((z,k)=>z.ids.forEach(id=>RN.set(id,k+1)));const rows=SB.flatMap(partRows),sm=sum(rows),bk=p.src.bank||'';
+function vPart(){const p=curPart();if(!p)return '<div class="spempty"><b>این تخصیص پیدا نشد</b></div>';const SB=partSibs(p),RN=new Map();SB.forEach((z,k)=>z.ids.forEach(id=>RN.set(id,k+1)));const allRows=SB.flatMap(partRows),rows=partOrder((partAll||SB.length<2?SB:[p]).flatMap(partRows)),sm=sum(rows),bk=p.src.bank||'';
   const S=p.sent?rows.map(r=>stOf(r.id)):[],ok=S.filter(x=>x==='ok').length,fl=S.filter(x=>x==='fail').length,pend=rows.length-ok-fl,bad=rows.filter(r=>r.level===2).length;
   const st=!p.sent?['آماده ارسال','d']:ok===rows.length&&rows.length?['تسویه شده','ok']:['ارسال شده','w'];
   let h=`<div class="pthero"><div class="pti">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:var(--blu)">${esc(userInit(p.src.name))}</span>`}</div><b class="ptn">${esc(p.src.name)}</b><small class="ptm">${esc(methLabel(p))}</small>
     <div class="ptv">${fmt(sm)}<i>تومان</i></div><span class="est ${st[1]==='ok'?'ok':st[1]==='w'?'pend':''}">${st[0]}</span>
     <div class="ptst"><span><b>${fmt(rows.length)}</b> واریزی</span>${p.sent?`<span class="g"><b>${fmt(ok)}</b> تسویه</span><span class="w"><b>${fmt(pend)}</b> در انتظار</span>${fl?`<span class="r"><b>${fmt(fl)}</b> ناموفق</span>`:''}`:''}${bad?`<span class="r"><b>${fmt(bad)}</b> خطادار</span>`:''}</div>
     ${p.sent&&rows.length?`<div class="ptbar"><i class="ok" style="width:${ok/rows.length*100}%"></i><i class="no" style="width:${fl/rows.length*100}%"></i></div>`:''}</div>`;
-  if(SB.length>1)h+=`<div class="seg frnd prnd"><button class="${partAll?'on':''}" data-act="partAllOn">همه مراحل <i>${fmt(rows.length)}</i></button>${SB.map((z,k)=>`<button class="${!partAll&&z===p?'on':''}" data-act="partView" data-id="${z.id}">مرحله ${toFa(k+1)} <i>${fmt(z.ids.length)}</i>${z.sent?'':' <em>●</em>'}</button>`).join('')}</div><div class="bknote" style="margin:0 4px 10px">${partAll?'کپی و خروجی پایین صفحه برای همه مراحل با هم است.':'کپی و خروجی پایین صفحه برای مرحله انتخاب‌شده است؛ برای همه با هم «همه مراحل» را بزنید.'}${SB.some(z=>!z.sent)?' · <em style="font-style:normal;color:var(--warn)">●</em> یعنی هنوز ارسال نشده':''}</div>`;
+  if(SB.length>1)h+=`<div class="seg frnd prnd"><button class="${partAll?'on':''}" data-act="partAllOn">همه مراحل <i>${fmt(allRows.length)}</i></button>${SB.map((z,k)=>`<button class="${!partAll&&z===p?'on':''}" data-act="partView" data-id="${z.id}">مرحله ${toFa(k+1)} <i>${fmt(z.ids.length)}</i>${z.sent?'':' <em>●</em>'}</button>`).join('')}</div><div class="bknote" style="margin:0 4px 10px">${partAll?'کپی و خروجی پایین صفحه برای همه مراحل با هم است.':'کپی و خروجی پایین صفحه برای مرحله انتخاب‌شده است؛ برای همه با هم «همه مراحل» را بزنید.'}${SB.some(z=>!z.sent)?' · <em style="font-style:normal;color:var(--warn)">●</em> یعنی هنوز ارسال نشده':''}</div>`;
   if(p.sent&&pend>0&&can('track'))h+=`<button class="okall" data-act="partOkAll">${ic('check')} همه ${fmt(pend)} واریز در انتظار، موفق</button>`;
   if(!p.sent)h+=`<div class="bknote" style="margin:0 4px 10px">«کپی و ارسال» متن را کپی می‌کند و همزمان این منبع را به پیگیری می‌برد.</div>`;
   ROWDATE=true;ROWSRC=false;ROWTRK=false;ROWMOVE=can('split');ROWRND=SB.length>1?RN:null;ROWTAP=can('edit')?'entEditGo':'openEnt';AM=allocMap();try{h+=`<div class="spsec"><b>واریزی‌های این منبع</b><small>برای جزئیات روی هر واریزی بزنید · کشیدن به چپ: تأیید، انتقال، کپی</small></div><div class="blist fcard">${rows.map(homeRow).join('')}</div>`}finally{ROWDATE=false;ROWSRC=true;ROWTRK=false;ROWMOVE=false;ROWTAP='openEnt';ROWRND=null}
   const sg=(act,icn,t,sub,cls,attrs)=>`<button class="sgi${cls?' '+cls:''}" data-act="${act}"${attrs||''}><span class="si">${ic(icn)}</span><span class="tx"><b>${t}</b><small>${sub}</small></span><span class="cv">${ic('back')}</span></button>`;
   h+=`<div class="spsec"><b>تنظیمات این منبع</b></div><div class="sgr ptact">${sources.some(x=>String(x.id)===String(p.src.id))&&can('src')?sg('acEdit','bank','ویرایش حساب منبع','نام، بانک، شبا و کارت؛ همه‌جا به‌روز می‌شود','',` data-id="${p.src.id}"`):''}${can('split')&&rows.length?sg('partMoveAll','split','انتقال همه به منبع دیگر','همه واریزی‌های این منبع یکجا منتقل شوند'):''}${p.sent?sg('partUnsend','undo','برگرداندن از پیگیری به تخصیص','دوباره قابل ویرایش و تقسیم می‌شود'):sg('partDel','trash','لغو این تخصیص','واریزی‌ها به «مانده برای تقسیم» برمی‌گردند','rd')}</div>`;return h}
-let partAll=false;
+let partAll=false,partOrd={k:'',ids:[]};
+/* ترتیب ردیف‌های منبع: موقع ورود، تسویه‌شده‌ها پایین می‌روند؛ تا بیرون رفتن ترتیب ثابت می‌ماند */
+function partOrder(L){const k=partId+'|'+partAll;if(partOrd.k!==k){const o=r=>stOf(r.id)==='ok'?1:0;partOrd={k,ids:L.slice().sort((a,b)=>o(a)-o(b)).map(r=>r.id)}}const pos=new Map(partOrd.ids.map((id,i)=>[id,i]));return L.slice().sort((a,b)=>(pos.has(a.id)?pos.get(a.id):1e9)-(pos.has(b.id)?pos.get(b.id):1e9))}
 const partSel=()=>{const p=curPart();if(!p)return[];const SB=partSibs(p);return partAll&&SB.length>1?SB:[p]};
 const partSelAlloc=()=>{const P=partSel(),p=curPart();return P.length>1?{res:[{src:{...p.src,limit:0},items:P.flatMap(partRows)}],left:[],excl:[],D:dates(dateVal)}:partsAlloc(P)};
 const aPart=()=>curPart()?`${partSibs(curPart()).length>1?`<span class="rnlab">${partAll?'همه مراحل':'مرحله '+toFa(partSibs(curPart()).indexOf(curPart())+1)}</span>`:''}${curPart().sent?'':`<button class="btn sec" data-act="partEdit" data-id="${curPart().id}" style="flex:0 0 auto;padding:0 16px" aria-label="ویرایش تخصیص">${ic('edit')}</button>`}<button class="btn gold" data-act="partCopy">${ic('copy')} ${partSel().every(z=>z.sent)?'کپی دوباره':'کپی و ارسال'}</button>`:'';
@@ -3508,7 +3513,7 @@ const ACT={
   aAll:()=>{const q=aSt.q.trim();aPool().filter(x=>!aSt.sel.has(x.id)&&(!q||match(x,q))).forEach(x=>aSt.sel.add(x.id));renderPrev()},
   aNone:()=>{aSt.sel=new Set();renderPrev()},
   aMeth:d=>{aSt.method=d.m;allocSheet();recalc()},aSave:()=>allocSave(),
-  partView:d=>{partId=+d.id;partAll=false;go('part')},
+  partView:d=>{partId=+d.id;partAll=false;partOrd.k='';go('part')},
   partAllOn:()=>{partAll=true;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y},
   partCopy:async()=>{const p=curPart();if(!p)return;const P=partSel();txtGen=null;expCtx={A:partSelAlloc(),sc:'0',track:true,parts:P.map(z=>z.id)};const ok=await copyText(withCtx(txt));if(ok){toast('متن «'+p.src.name+'»'+(P.length>1?' (همه مراحل)':'')+' کپی شد');setTimeout(()=>{autoTrack();if(cur==='part')render()},900)}else openText()},
   partExp:()=>{const p=curPart();if(!p)return;const P=partSel();openExport(partSelAlloc(),'0');expCtx.track=true;expCtx.parts=P.map(z=>z.id)},
