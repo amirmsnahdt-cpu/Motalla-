@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.4,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1564,6 +1564,18 @@ body{font-feature-settings:normal}
 .fcard>.swr:has(.brw.ok),.blist>.swr:has(.brw.ok){padding:3px 4px!important;background:var(--card)!important}
 .spsec.oksec{display:flex!important;flex-direction:column;align-items:flex-start;gap:2px}.spsec.oksec b{display:inline-flex;align-items:center;gap:5px;color:var(--ok)}.spsec.oksec b svg{width:16px;height:16px}.blist.fcard.okc{box-shadow:0 0 0 1.5px var(--ok)!important}
 .ef .stimg,.stimg{display:flex!important;flex-direction:row!important;flex-wrap:nowrap;margin:0!important;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;box-sizing:border-box;border:1.5px dashed var(--line);border-radius:16px;background:var(--bg);color:var(--blu);font-size:13px;font-weight:700;cursor:pointer;padding:6px 10px}.stimg i{font-style:normal;display:grid;place-items:center;flex:none}.stimg span{white-space:nowrap}.stimg img{flex:none}.stimg i svg{width:20px;height:20px}.stimg img{width:42px;height:42px;border-radius:10px;object-fit:cover}.stimg.on{border-style:solid;border-color:var(--ok);color:var(--ok);background:var(--ok2)}
+
+.stll2{border-radius:18px;overflow:hidden;display:flex;flex-direction:column;gap:8px}
+.stll2>.swr{border-radius:16px!important;margin:0!important}
+.stlrw{display:flex;align-items:center;gap:6px;border-radius:16px;background:var(--card);position:relative;padding-inline-end:8px}
+.stlrw::after{content:'';position:absolute;inset:0;border-radius:16px;border:1.5px solid var(--line);pointer-events:none}
+.stlrw.w{background:color-mix(in srgb,#f3b52a 10%,var(--card))}.stlrw.w::after{border-color:#d9a21b}
+.stlrw.k{background:color-mix(in srgb,var(--ok2) 45%,var(--card))}.stlrw.k::after{border-color:var(--ok)}
+.stlrw .stlr{flex:1;min-width:0;padding:10px 12px}
+.stlrw .bri{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none}.stlrw.w .bri{background:#fbf1d6;color:#a37406}.stlrw.k .bri{background:var(--ok2);color:var(--ok)}.stlrw .bri svg{width:18px;height:18px}
+.stlrw .brv{display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap}.stlrw .brv b{font-size:14px;font-weight:800}.stlrw .brv i{font-style:normal;font-size:10.5px;color:var(--mut)}.stlrw .brv small{font-size:11px;font-weight:700}.stlrw.w .brv small{color:#a37406}.stlrw.k .brv small{color:var(--ok)}
+.stlc{flex:none;width:36px;height:36px;border:1.5px dashed var(--line);border-radius:11px;background:var(--hair);color:var(--mut);display:grid;place-items:center;cursor:pointer;z-index:1}.stlc svg{width:17px;height:17px}.stlc.on{border:0;background:var(--blu2);color:var(--blu)}
+.stls .w,.stls .w b{color:#a37406}
 </style>
 </head>
 <body>
@@ -1574,7 +1586,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=50.2,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=50.4,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1687,7 +1699,7 @@ function restoreIds(ids){const S=new Set(ids.map(String)),back=[];trash=trash.fi
 const dayEntries=()=>entries.filter(e=>e.entryDate===dateVal);
 function validated(){if(_vc&&_vcE===entries&&_vcN===entries.length)return _vc;const L=validated0();_vc=L;_vcE=entries;_vcN=entries.length;queueMicrotask(memoClear);return L}
 function validated0(){
-  const L=entries.map(e=>{const st=(e.settles||[]).reduce((s,x)=>s+(+x.amount||0),0),t=+e.amount||0;return{...e,issues:[],level:0,total:t,settles:e.settles||[],settled:st,amount:Math.max(0,t-st),full:st>0&&st>=t}}),codes={},keys={},seqs={};
+  const L=entries.map(e=>{const SC=(e.settles||[]).filter(x=>x.st!=='wait'),st=SC.reduce((s,x)=>s+(+x.amount||0),0),t=+e.amount||0;return{...e,issues:[],level:0,total:t,settles:SC,stlW:(e.settles||[]).filter(x=>x.st==='wait'),settled:st,amount:Math.max(0,t-st),full:st>0&&st>=t}}),codes={},keys={},seqs={};
   for(const r of L){const bad=t=>{r.issues.push(t);r.level=2},warn=t=>{r.issues.push(t);r.level=Math.max(r.level,1)};
     r.seq=seqs[r.entryDate]=(seqs[r.entryDate]||0)+1;
     if(!r.name)bad('نام ندارد');if(!(r.total>0))bad('مبلغ نامعتبر');if(r.settled>r.total)bad('مبلغ تسویه با مشتری از مبلغ کل بیشتر است');
@@ -1810,10 +1822,12 @@ function entItems(x){const I=(x.items||[]).filter(z=>z.amt);if(!I.length||(I.len
   return `<div class="esec eit"><b>اقلام خرید</b><small class="emeta">${fmt(I.length)} قلم · جمع ${fmt(tot)} تومان</small><div class="eitl">${I.map(z=>{const K=BZK[z.k]||{},q=parseFloat(z.q)||0;return `<div class="eitr k${['طلا','سکه','دلار','یورو'].indexOf(z.k)}"><span class="ei">${icn[z.k]||'•'}</span><span class="tx"><b>${esc(z.k)}${z.t?` <em>${esc(z.t)}</em>`:''}${z.k==='سایر'&&z.n?' · '+esc(z.n):''}</b><small>${q?esc(toFa(z.q))+' '+(K.u||'')+(z.k==='طلا'?'':''):''}${q&&z.r?' × ':''}${z.r?(z.k==='سکه'?'نرخ لحظه ':'نرخ ')+fmt(z.r):''}${!q&&!z.r?'—':''}</small></span><b class="am">${fmt(z.amt)} <i>تومان</i></b></div>`}).join('')}</div>
   <div class="eits">${gw?`<span>وزن طلا <b>${esc(toFa(Math.round(gw*1000)/1000))} گرم</b></span>`:''}${pg?`<span>هر گرم تمام‌شده <b>${fmt(pg)}</b></span>`:''}<span class="t">جمع کل <b>${fmt(tot)} تومان</b></span></div></div>`}
 /* ---- تسویه از مشتری: واریز مستقیم مشتری دیگر به حساب این شخص ---- */
-function entSettle(x){const S=x.settles||[],ed=can('edit'),open=!x.full&&x.amount>0&&!(x.sentBid&&stOf(x.id)==='ok');if(!S.length&&!(ed&&open))return '';
-  return `<div class="esec stl"><div class="stlh"><div><b>تسویه از مشتری</b><small>${S.length?'از مانده کم شده؛ باقی از طریق بانک':'اگر مشتری دیگری مستقیم به این شخص پرداخت کرده، اینجا ثبت کنید'}</small></div>${ed&&open?`<button class="stladd" data-act="stlNew">${ic('plus')} ثبت تسویه</button>`:''}</div>
-  ${S.length?`<div class="stll">${S.map((z,i)=>`<button class="stlr" data-act="stlOpen" data-i="${i}"><span class="bri">${esc(userInit(z.name||'؟'))}</span><span class="tx"><b>${esc(z.name||'—')}</b><small>${[z.inv?'فاکتور '+esc(z.inv):'',z.tn?'پیگیری '+esc(z.tn):'',z.img?'رسید دارد':'',z.cuId?'در حساب مشتری':''].filter(Boolean).join(' · ')||'واریز مستقیم'}</small></span><b class="am">${fmt(z.amount)}</b></button>`).join('')}</div>
-  <div class="stls"><span>مبلغ کل <b>${fmt(x.total)}</b></span><span class="g">از مشتری <b>${fmt(x.settled)}</b></span><span class="${x.full?'g':''}">${x.full?'تسویه کامل ✓':'مانده بانکی <b>'+fmt(x.amount)+'</b>'}</span></div>`:''}</div>`}
+function entSettle(x){const e=entries.find(z=>z.id===x.id)||x,S=e.settles||[],ed=can('edit'),open=!x.full&&x.amount>0&&!(x.sentBid&&stOf(x.id)==='ok');if(!S.length&&!(ed&&open))return '';
+  const W=S.filter(z=>z.st==='wait');
+  const row=(z,i)=>{const w=z.st==='wait';return swW(`<div class="stlrw ${w?'w':'k'}"><button class="stlr" data-act="stlOpen" data-i="${i}"><span class="bri">${w?ic('clock'):ic('check')}</span><span class="tx"><b>${esc(z.name||'—')}</b><small>${[z.inv?'فاکتور '+esc(z.inv):'',z.tn?'پیگیری '+esc(z.tn):'',z.cuId?'حساب مشتری':''].filter(Boolean).join(' · ')||'واریز مستقیم'}</small></span><span class="brv"><b>${fmt(z.amount)} <i>تومان</i></b><small>${w?'در انتظار تأیید':'تسویه شد'}</small></span></button>${ed?(z.img?`<button class="stlc on" data-act="stlImgI" data-i="${i}" aria-label="رسید">${ic('cam')}</button>`:`<label class="stlc" aria-label="ضمیمه رسید">${ic('plus')}<input type="file" accept="image/*" data-satt="${i}" hidden></label>`):''}</div>`,{r:ed&&w?[['stlOk','تأیید','check','#178049']]:ed?[['stlUnok','لغو تأیید','undo','#6b7385']]:[],l:ed?[['stlDelI','حذف','trash','#d23c48']]:[],data:{i}})};
+  return `<div class="esec stl"><div class="stlh"><div><b>تسویه از مشتری</b><small>${W.length?'تا تأیید نشود از مانده کم نمی‌شود · کشیدن به چپ: تأیید':S.length?'از مانده کم شده؛ باقی از طریق بانک':'اگر مشتری دیگری مستقیم به این شخص پرداخت کرده، اینجا ثبت کنید'}</small></div>${ed&&open?`<button class="stladd" data-act="stlNew">${ic('plus')} ثبت تسویه</button>`:''}</div>
+  ${S.length?`<div class="stll2">${S.map(row).join('')}</div>
+  <div class="stls"><span>مبلغ کل <b>${fmt(x.total)}</b></span><span class="g">تأییدشده <b>${fmt(x.settled)}</b></span>${W.length?`<span class="w">در انتظار <b>${fmt(W.reduce((a,z)=>a+(+z.amount||0),0))}</b></span>`:''}<span class="${x.full?'g':''}">${x.full?'تسویه کامل ✓':'مانده بانکی <b>'+fmt(x.amount)+'</b>'}</span></div>`:''}</div>`}
 let stl=null,cuStlQ='';
 function cuStlHTML(){const c=curCu(),q=toEn(cuStlQ.trim()),L=validated().filter(r=>!r.full&&r.amount>0&&(!q||fullName(r).includes(cuStlQ.trim())||toEn(r.code||'').includes(q)||String(r.amount).includes(q.replace(/\D/g,'')||'#'))).sort((a,b)=>String(b.entryDate+b.id).localeCompare(String(a.entryDate+a.id))).slice(0,40);
   return `<div class="sh-h"><div><b>تسویه کدام واریزی؟</b><small class="shsub">پرداخت «${esc(cuName(c||{}))}» به حساب فروشنده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
@@ -1845,7 +1859,7 @@ function entTrack(x){const q=entBI(x);if(!q)return `<div class="esec"><b>پیگ�
   ${it.img?`<button class="eimg on" data-act="viewImg" data-b="${b.id}" data-id="${it.id}">${ic('eye')}<span>دیدن</span></button><button class="eimg on" data-act="rcEnt" data-b="${b.id}" data-id="${it.id}">${ic('open')}<span>ارسال</span></button>`:''}</div></div>`}
 const eDirty=()=>{if(!eD)return false;const x=entRow();if(!x)return false;const q=entBI(x);return (eD.note!=null&&eD.note.trim()!==(x.note||''))||(q&&((eD.st!=null&&eD.st!==q.it.st)||(eD.tn!=null&&eD.tn!==(q.it.tn||''))||!!eD.imgD))};
 const eUpd=()=>{const a=$('act');if(a)a.innerHTML=aEnt()};
-function bindEnt(){const x=entRow();if(!x)return;if(entEdit){bindEntEdit();return}const n=$('enote');if(n)n.oninput=()=>{eD=eD||{};eD.note=n.value;eUpd()};
+function bindEnt(){{const V=$('view');if(V&&!V._satt){V._satt=1;V.addEventListener('change',async ev=>{const i=ev.target&&ev.target.dataset&&ev.target.dataset.satt;if(i==null||cur!=='ent')return;const f=ev.target.files&&ev.target.files[0],e=stlE(),z=e&&(e.settles||[])[+i];if(!f||!z)return;try{const d=await shrink(f),k='stl:'+z.id;if(await imgPut(k,d)){z.img=k;stlDone(e,'رسید «'+z.name+'» ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(q){toast('این عکس خوانده نشد',true)}})}}const x=entRow();if(!x)return;if(entEdit){bindEntEdit();return}const n=$('enote');if(n)n.oninput=()=>{eD=eD||{};eD.note=n.value;eUpd()};
   const q=entBI(x);if(!q)return;const t=$('etn');if(t)t.oninput=()=>{eD=eD||{};eD.tn=toEn(t.value).replace(/\D/g,'');eUpd()};
   const f=$('eimg');if(f)f.onchange=async()=>{const fl=f.files&&f.files[0];if(!fl)return;try{const d=await shrink(fl);eD=eD||{};eD.imgD=d;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}catch(z){toast('این عکس خوانده نشد',true)}}}
 async function entCommit(){const x=entRow();if(!x||!eD)return;const e=entries.find(y=>y.id===x.id),q=entBI(x),now=new Date().toISOString();
@@ -2142,7 +2156,7 @@ const Mo=t=>txtStyle==='plain'?t:'`'+t+'`';
 const LINE='┈┈┈┈┈┈┈┈┈┈┈┈┈',DLINE='━━━━━━━━━━━━';
 function txtBlock(g,D){const tot=sum(g.rows);
   let t=Bo('مطلا · '+g.name)+'\n'+payLine()+'\n'+toFa(g.rows.length)+' واریزی · جمع '+Bo(N(tot)+' تومان')+'\n'+LINE+'\n';
-  g.rows.forEach((r,i)=>{const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';t+='\n'+Bo(toFa(i+1)+') '+fullName(r))+'\nفاکتور '+(toEn(r.code||'')||'—')+(bk?' · بانک '+bk:'')+'\nمبلغ: '+N(r.amount)+' تومان'+'\n'+Mo(ibanSp(r.iban))+'\n'});
+  g.rows.forEach((r,i)=>{const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';t+='\n'+Bo(toFa(i+1)+') '+fullName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+(bk?'\nبانک: '+bk:'')+'\nمبلغ: '+N(r.amount)+' تومان'+'\nشبا: '+Mo(ibanSp(r.iban))+'\n'});
   return t+LINE+'\n'+Bo('جمع '+g.name+': '+N(tot)+' تومان')+'\n'+toFa(g.rows.length)+' واریزی'}
 function txt(sc){const D=alloc.D,G=groups(sc).filter(g=>g.rows.length);if(G.length===1)return txtBlock(G[0],D);
   const tc=G.reduce((s,g)=>s+g.rows.length,0),ta=G.reduce((s,g)=>s+sum(g.rows),0);
@@ -3058,7 +3072,7 @@ function srcBack(){if(srcRet==='mgr'){srcMgr();return}if(aSt){allocSheet();recal
 function srcInfo(id){for(const b of batches){const x=b.items.find(z=>z.id===id);if(x)return{src:x.src,tn:x.tn||'',st:x.st,time:x.time||''}}return null}
 /* ================= v22: متن کپی یک واریزی ================= */
 function entTxt(r){const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';
-  return Bo(fullName(r))+'\nفاکتور '+(toEn(r.code||'')||'—')+(bk?' · بانک '+bk:'')+'\nمبلغ: '+N(r.amount)+' تومان'+(r.iban?'\n'+Mo(ibanSp(r.iban)):'')+(r.card?'\nکارت: '+Mo(r.card):'')+(r.holder?'\nصاحب حساب: '+r.holder:'')}
+  const pd=r.payDate||r.entryDate;return 'نام: '+Bo(fullName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+(bk?'\nبانک: '+bk:'')+'\nمبلغ: '+Bo(N(r.amount)+' تومان')+(pd?'\nتاریخ واریز: '+dates(pd).fa:'')+(r.iban?'\nشبا: '+Mo(ibanSp(r.iban)):'')+(r.card?'\nکارت: '+Mo(r.card):'')+(r.holder?'\nصاحب حساب: '+r.holder:'')}
 async function cpOut(t,ok){(await copyText(t))?toast(ok):(txtGen=()=>t,txtName='copy',openText())}
 /* ================= v22: منوی هر واریزی (⋯) ================= */
 function entMenu(id){const r=validated().find(x=>x.id==id);if(!r)return;const si=r.sentBid?srcInfo(r.id):null;
@@ -3084,7 +3098,7 @@ const DEF_STAFF=['add','edit','split','track','close','debt','export'];
 const myPerms=()=>!ME?[]:ME.role==='admin'?PERMS.map(p=>p[0]):(Array.isArray(ME.perms)?ME.perms:DEF_STAFF);
 const can=p=>isAdmin()||myPerms().includes(p);
 /* هر کار ← دسترسی لازم (کارهای مدیر: 'admin') */
-const PERM_OF={entCommit:'track',mvNew:'src',entMove:'split',partMoveAll:'split',mvGo:'split',entTkQ:'track',trkArch:'close',partOkAll:'track',trkGo:'track',cuNew:'debt',cuSave:'debt',cuEdit:'debt',cuDel:'del',txNew:'debt',txSave:'debt',txDel:'del',acNew:'src',acOpen:'src',acSave:'src',acBal:'src',acDel:'src',acEdit:'src',buyNew:'add',bzNext:'add',entryMenu:'add',xGo:'export',xOpen:'export',entOk:'track',entUnok:'track',entEditOn:'edit',entSave:'edit',entEditGo:'edit',entDel:'del',entTk:'track',entPay:'edit',stlNew:'edit',stlSave:'edit',stlDel:'edit',cuStl:'edit',saveEntry:()=>editId?'edit':'add',bulkAdd:'add',newList:'add',tab:d=>d&&d.n==='entry'&&!editId?'add':null,edit:'edit',
+const PERM_OF={entCommit:'track',mvNew:'src',entMove:'split',partMoveAll:'split',mvGo:'split',entTkQ:'track',trkArch:'close',partOkAll:'track',trkGo:'track',cuNew:'debt',cuSave:'debt',cuEdit:'debt',cuDel:'del',txNew:'debt',txSave:'debt',txDel:'del',acNew:'src',acOpen:'src',acSave:'src',acBal:'src',acDel:'src',acEdit:'src',buyNew:'add',bzNext:'add',entryMenu:'add',xGo:'export',xOpen:'export',entOk:'track',entUnok:'track',entEditOn:'edit',entSave:'edit',entEditGo:'edit',entDel:'del',entTk:'track',entPay:'edit',stlNew:'edit',stlSave:'edit',stlDel:'edit',stlOk:'edit',stlUnok:'edit',stlDelI:'edit',cuStl:'edit',saveEntry:()=>editId?'edit':'add',bulkAdd:'add',newList:'add',tab:d=>d&&d.n==='entry'&&!editId?'add':null,edit:'edit',
   del:'del',delEdit:'del',clearDay:'del',tkDel:'del',purgeOne:'del',emptyTrash:'del',credDel:'del',payDel:'del',
   allocNew:'split',aSave:'split',partEdit:'split',partDel:'split',partDelId:'split',trackNow:'split',partsSend:'split',
   itSave:'track',tkSet:'track',tkAll:'track',tkRequeue:'track',closeBatch:'close',reopenDay:'close',undoCommit:'unsend',partUnsend:'unsend',
@@ -3969,19 +3983,19 @@ function stlHTML(){const x=entRow(),z=stl,L=custs.filter(c=>!c.del),q=(z.q||'').
 function stlRead(){const g=id=>{const el=$(id);return el?el.value:undefined};if($('stQ')&&!stl.cuId)stl.q=g('stQ');if($('stP'))stl.phone=toEn(g('stP')).replace(/[^\d+]/g,'');if($('stI'))stl.inv=toEn(g('stI')).trim();if($('stA'))stl.amount=num(g('stA'));if($('stT'))stl.tn=toEn(g('stT')).trim();if($('stN'))stl.note=clean(g('stN'))}
 function stlBind(){const Q=$('stQ'),A=$('stA'),F=$('stF');if(Q)Q.oninput=()=>{stl.q=Q.value;stl.cuId='';const p=Q.selectionStart;stlRead();sheet(stlHTML());stlBind();const n=$('stQ');n.focus();try{n.setSelectionRange(p,p)}catch(e){}};if(A)A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''};
   if(F)F.onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{stl.imgD=await shrink(f);stlRead();sheet(stlHTML());stlBind()}catch(z){toast('این عکس خوانده نشد',true)}}}
-function stlSync(e){const st=(e.settles||[]).reduce((s,z)=>s+(+z.amount||0),0),rem=Math.max(0,(+e.amount||0)-st);batches.forEach(b=>b.items.forEach(it=>{if(it.id===e.id){it.amount=rem;it.settled=st;it.settles=e.settles;it.total=+e.amount||0}}));saveB()}
+function stlSync(e){const st=(e.settles||[]).filter(z=>z.st!=='wait').reduce((s,z)=>s+(+z.amount||0),0),rem=Math.max(0,(+e.amount||0)-st);batches.forEach(b=>b.items.forEach(it=>{if(it.id===e.id){it.amount=rem;it.settled=st;it.settles=e.settles;it.total=+e.amount||0}}));saveB()}
 ACT.stlNew=()=>{const x=entRow();if(!x)return;stl={amount:x.amount,q:''};sheet(stlHTML());stlBind();setTimeout(()=>{const q=$('stQ');if(q)q.focus()},300)};
-ACT.stlOpen=d=>{const x=entRow();if(!x)return;const z=(x.settles||[])[+d.i];if(!z)return;stl={...z,i:+d.i,q:z.cuId?'':z.name};sheet(stlHTML());stlBind()};
+ACT.stlOpen=d=>{const x=stlE();if(!x)return;const z=(x.settles||[])[+d.i];if(!z)return;stl={...z,i:+d.i,q:z.cuId?'':z.name};sheet(stlHTML());stlBind()};
 ACT.stlCu=d=>{stlRead();if(d.id==='new'){stl.cuId='';stl.name=clean(stl.q||'');stl.newName=true}else if(!d.id){stl.cuId='';stl.name='';stl.q=''}else{const c=custs.find(z=>String(z.id)===String(d.id));if(c){stl.cuId=c.id;stl.name=cuName(c);if(!stl.phone)stl.phone=c.phone||''}}sheet(stlHTML());stlBind()};
 ACT.stlImg=async()=>{const k=stl&&stl.img;if(!k)return;const v=await imgGet(k);if(!v){toast('عکس پیدا نشد',true);return}sheet(`<div class="sh-h"><b>رسید ${esc(stl.name||'')}</b><button class="x" data-act="stlBack">×</button></div><img src="${v}" class="rcpt" style="max-height:70vh" alt="رسید">`)};
 ACT.stlBack=()=>{sheet(stlHTML());stlBind()};
 ACT.stlSave=async()=>{stlRead();const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e)return;const name=clean(stl.name||stl.q||'');if(!name){toast('پرداخت‌کننده را انتخاب یا نامش را بنویسید',true);return}const a=+stl.amount||0;if(!a){toast('مبلغ را وارد کنید',true);return}
   const S=e.settles=(e.settles||[]).slice(),others=S.filter((z,i)=>i!==stl.i).reduce((s,z)=>s+(+z.amount||0),0);if(others+a>(+e.amount||0)){toast('جمع تسویه‌ها از مبلغ کل این واریزی بیشتر می‌شود',true);return}
-  const now=new Date().toISOString(),old=stl.i!=null?S[stl.i]:null,z={...(old||{}),id:(old&&old.id)||nid++,name,phone:stl.phone||'',inv:stl.inv||'',amount:a,tn:stl.tn||'',note:stl.note||'',cuId:stl.cuId||'',date:(old&&old.date)||todayISO(),at:now,by:who()};
+  const now=new Date().toISOString(),old=stl.i!=null?S[stl.i]:null,z={...(old||{}),st:old?(old.st||'ok'):'wait',id:(old&&old.id)||nid++,name,phone:stl.phone||'',inv:stl.inv||'',amount:a,tn:stl.tn||'',note:stl.note||'',cuId:stl.cuId||'',date:(old&&old.date)||todayISO(),at:now,by:who()};
   if(stl.imgD){const k='stl:'+z.id;if(await imgPut(k,stl.imgD))z.img=k;else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
   if(old&&old.cuId&&old.txId){const oc=custs.find(c=>String(c.id)===String(old.cuId)),ot=oc&&(oc.txs||[]).find(t=>t.id===old.txId);if(ot){ot.del=true;oc.lastAt=now}}
-  delete z.txId;if(z.cuId){const c=custs.find(q=>String(q.id)===String(z.cuId));if(c){const t={id:nid++,type:'pin',kind:'',weight:0,ppg:0,amount:a,note:'تسویه واریزی «'+fullName(e)+'»'+(z.inv?' · فاکتور '+z.inv:'')+(z.tn?' · پیگیری '+z.tn:''),date:todayISO(),at:now,by:who(),entId:e.id,stlId:z.id,img:z.img||''};(c.txs=c.txs||[]).push(t);c.lastAt=now;z.txId=t.id;saveCu()}}
-  if(old)S[stl.i]=z;else S.push(z);e.updatedAt=now;e.updatedBy=who();saveE();stlSync(e);logA('edit','تسویه از مشتری',fullName(e)+' ← '+name+' | '+fmt(a)+' تومان');stl=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const r=entRow();toast(r&&r.full?'تسویه کامل شد ✓':'ثبت شد · مانده بانکی '+fmt(r?r.amount:0)+' تومان')};
+  delete z.txId;if(z.cuId&&z.st!=='wait'){const c=custs.find(q=>String(q.id)===String(z.cuId));if(c){const t={id:nid++,type:'pin',kind:'',weight:0,ppg:0,amount:a,note:'تسویه واریزی «'+fullName(e)+'»'+(z.inv?' · فاکتور '+z.inv:'')+(z.tn?' · پیگیری '+z.tn:''),date:todayISO(),at:now,by:who(),entId:e.id,stlId:z.id,img:z.img||''};(c.txs=c.txs||[]).push(t);c.lastAt=now;z.txId=t.id;saveCu()}}
+  if(old)S[stl.i]=z;else S.push(z);e.updatedAt=now;e.updatedBy=who();saveE();stlSync(e);logA('edit','تسویه از مشتری',fullName(e)+' ← '+name+' | '+fmt(a)+' تومان');stl=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const r=entRow();toast(z.st==='wait'?'ثبت شد · در انتظار تأیید (با کشیدن به چپ تأیید کنید)':r&&r.full?'تسویه کامل شد ✓':'ثبت شد · مانده بانکی '+fmt(r?r.amount:0)+' تومان')};
 ACT.stlDel=()=>{const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e||stl.i==null)return;askConfirm('این تسویه حذف شود؟ مبلغ دوباره به مانده بانکی برمی‌گردد.','حذف',()=>{const S=e.settles=(e.settles||[]).slice(),old=S[stl.i];if(old&&old.cuId&&old.txId){const oc=custs.find(c=>String(c.id)===String(old.cuId)),ot=oc&&(oc.txs||[]).find(t=>t.id===old.txId);if(ot){ot.del=true;oc.lastAt=new Date().toISOString();saveCu()}}S.splice(stl.i,1);e.updatedAt=new Date().toISOString();saveE();stlSync(e);stl=null;closeSheet();render();toast('تسویه حذف شد')})};
 ACT.ldSplit=()=>{const R=validated().filter(r=>PD(r)===ldKey);if(!R.length)return;const c={};R.forEach(r=>{const w=(!r.sentBid&&!r.full?10:0)+1;c[r.entryDate]=(c[r.entryDate]||0)+w});const iso=Object.keys(c).sort((a,b)=>c[b]-c[a])[0];spTab='split';spPay=ldKey;dateVal=iso;ls.set('m_date',dateVal);alloc=null;go('split1')};
 ACT.ldRows=()=>{fV='rows';fP=ldKey;fG='pay';fF='all';fS='';fQ='';fD='';fT='';fN=120;spTab='lists';go('split1')};
@@ -3995,6 +4009,14 @@ ACT.rcShareAll=async()=>rcShare(await rcFiles(RC),RCT);
 ACT.rcEnt=async d=>{const b=batches.find(z=>z.id==d.b),x=b&&b.items.find(z=>String(z.id)===String(d.id));if(!x)return;rcShare(await rcFiles([{key:b.id+':'+x.id,name:x.name,amount:x.amount,tn:x.tn||''}]),x.name)};
 ACT.ldQClr=()=>{ldQ='';const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.rcOne=async d=>{RC=[{key:d.k,name:d.n,amount:+d.a,tn:d.t}];RC.one=1;RCT='رسید '+d.n;ACT.rcView({i:0})};
+function stlTx(e,z){const c=custs.find(q=>String(q.id)===String(z.cuId));if(!c)return;const now=new Date().toISOString(),t={id:nid++,type:'pin',kind:'',weight:0,ppg:0,amount:+z.amount||0,note:'تسویه واریزی «'+fullName(e)+'»'+(z.inv?' · فاکتور '+z.inv:'')+(z.tn?' · پیگیری '+z.tn:''),date:todayISO(),at:now,by:who(),entId:e.id,stlId:z.id,img:z.img||''};(c.txs=c.txs||[]).push(t);c.lastAt=now;z.txId=t.id;saveCu()}
+function stlUntx(z){if(!z.cuId||!z.txId)return;const c=custs.find(q=>String(q.id)===String(z.cuId)),t=c&&(c.txs||[]).find(q=>q.id===z.txId);if(t){t.del=true;c.lastAt=new Date().toISOString();saveCu()}delete z.txId}
+const stlE=()=>{const x=entRow();return x&&entries.find(z=>z.id===x.id)};
+const stlDone=(e,msg)=>{e.updatedAt=new Date().toISOString();e.updatedBy=who();saveE();stlSync(e);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(msg)};
+ACT.stlOk=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;z.st='ok';z.okAt=new Date().toISOString();if(z.cuId&&!z.txId)stlTx(e,z);logA('edit','تأیید تسویه از مشتری',fullName(e)+' ← '+z.name+' | '+fmt(z.amount));const r=()=>entRow();stlDone(e,'تأیید شد · از مانده کم شد'+(r()&&r().full?' · تسویه کامل ✓':''))};
+ACT.stlUnok=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;z.st='wait';stlUntx(z);stlDone(e,'به «در انتظار تأیید» برگشت')};
+ACT.stlDelI=d=>{const e=stlE();if(!e)return;askConfirm('این تسویه حذف شود؟','حذف',()=>{const S=e.settles=(e.settles||[]).slice(),z=S[+d.i];if(!z)return;stlUntx(z);S.splice(+d.i,1);stlDone(e,'تسویه حذف شد')})};
+ACT.stlImgI=async d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z||!z.img)return;RC=[{key:z.img,name:z.name,amount:z.amount,tn:z.tn||''}];RC.one=1;RCT='رسید '+z.name;ACT.rcView({i:0})};
 ACT.fV=d=>{fV=d.v;fN=120;render()};
 ACT.fG=d=>{fG=d.g;fN=120;render()};
 ACT.fCal=()=>{const M=new Set(validated().map(fTK));const tg=k=>`<button class="${fG===k?'on':''}" data-act="fCalG" data-g="${k}">${k==='pay'?'تاریخ واریز':'تاریخ ثبت'}</button>`;
