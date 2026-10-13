@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.97,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.98,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1573,7 +1573,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.97,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.98,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1773,7 +1773,7 @@ function homeRow(x){const st=rowSt(x),t=entSt(x),al=(AM||(AM=allocMap())).get(x.
   const lab=st==='bad'?'خطادار':t?t[0]:'ثبت شده';
   const rn=ROWRND&&ROWRND.get(x.id);
   const inner=`<div class="brw ${st}${rn?' rn'+((rn-1)%2):''}">${rn?`<span class="rntag">مرحله ${toFa(rn)}</span>`:''}<button class="brh" data-act="openEnt" data-id="${x.id}"><span class="bri">${ico}</span><span class="tx"><b>${esc(fullName(x)||'—')}</b><small class="bkl">${bankBadge(x.bankShow)}<span>${esc(x.bankShow||'بانک نامشخص')}${x.payDate?' · واریز '+esc(payLab(x.payDate)):''}${x.code?' · فاکتور '+esc(toEn(x.code)):''}</span></small>${ROWDATE||(ROWSRC&&al&&al.src)?`<span class="rchips">${ROWDATE?`<span class="rdate">${ic('cal')}واریز ${esc(payLab(x.payDate||x.entryDate))}${['امروز','دیروز','فردا','پس‌فردا'].includes(payLab(x.payDate||x.entryDate))?'، '+esc(toFa(dates(x.payDate||x.entryDate).jd)+' '+JM[dates(x.payDate||x.entryDate).jm-1]):''}</span>`:''}${ROWSRC&&al&&al.src?`<span class="rsw"><span class="rsrc">${ic('split')}<em>${esc(al.src)}</em></span>${al.rn>1?`<span class="rrd r${Math.min(al.rnd,3)}">مرحله ${toFa(al.rnd)}</span>`:''}</span>`:''}</span>`:''}</span><span class="brv"><b>${fmt(x.amount)} <i>تومان</i></b><small>${lab}</small></span></button>${ROWTRK&&x.sentBid?(()=>{const s0=stOf(x.id);return `<div class="rtk"><button class="ok${s0==='ok'?' on':''}" data-act="entTkQ" data-id="${x.id}" data-st="ok">${ic('check')} واریز شد</button><button class="no${s0==='fail'?' on':''}" data-act="entTkQ" data-id="${x.id}" data-st="fail">✕ ناموفق</button></div>`})():''}</div>`;
-  const bi=x.sentBid?stOf(x.id):null,R0=[['entEditGo','ویرایش','edit','#3b6fd6'],['cpEnt','کپی','copy','#b8862b']];
+  const bi=x.sentBid?stOf(x.id):null,R0=[['cpEnt','کپی','copy','#b8862b']];
   if(bi==='pending'||bi==='fail')R0.unshift(['entOk','تأیید','check','#178049']);else if(bi==='ok')R0.unshift(['entUnok','لغو تأیید','undo','#6b7385']);
   if(ROWMOVE)R0.splice(1,0,['entMove','انتقال','split','#6b5bd6']);
   return swW(inner,{r:R0,l:[['del','حذف','trash','#d23c48']],data:{id:x.id}})}
@@ -1892,7 +1892,7 @@ function entSave(){const x=entRow(),i=x?entries.findIndex(y=>y.id===x.id):-1;if(
   if(!name){toast('نام را وارد کنید',true);$('eeN').focus();return}if(!amount){toast('مبلغ را وارد کنید',true);$('eeA').focus();return}
   if((e0.settles||[]).reduce((a,z)=>a+(+z.amount||0),0)>amount){toast('مبلغ از جمع واریز مستقیم مشتری کمتر است',true);return}
   const iban=dI?'IR'+dI:'',before=pick(e0);entries[i]={...e0,name,amount,code,iban,card,phone,nid:nidv,weight,ppg:ppgOf(amount,weight),holder:holder&&holder!==name?holder:'',title:'',payDate:fPay||e0.payDate||e0.entryDate,bank:iban===e0.iban?e0.bank:'',updatedBy:who(),updatedAt:new Date().toISOString()};
-  logA('edit','ویرایش واریزی',name+' | '+fmt(amount)+' تومان',{ids:[e0.id],before,after:pick(entries[i])});saveE();alloc=null;entEdit=false;render();$('view').scrollTop=0;
+  logA('edit','ویرایش واریزی',name+' | '+fmt(amount)+' تومان',{ids:[e0.id],before,after:pick(entries[i])});saveE();alloc=null;entEdit=false;eD=null;back();
   const bad=iban&&!ibanOk(iban);toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد ✓',bad)}
 /* ---------- جستجو (مثل صفحه تراکنش‌های بلو: فیلترها + گروه‌بندی روز) ---------- */
 let fV='cards',fQ='',fF='all',fN=120,fS='',fR=0,findY=0,fD='',fP='',fG='entry',fT='';
