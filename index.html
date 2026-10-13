@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.95,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.96,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1572,7 +1572,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.95,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.96,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2516,13 +2516,13 @@ function vPart(){const p=curPart();if(!p)return '<div class="spempty"><b>این 
     <div class="ptv">${fmt(sm)}<i>تومان</i></div><span class="est ${st[1]==='ok'?'ok':st[1]==='w'?'pend':''}">${st[0]}</span>
     <div class="ptst"><span><b>${fmt(rows.length)}</b> واریزی</span>${p.sent?`<span class="g"><b>${fmt(ok)}</b> تسویه</span><span class="w"><b>${fmt(pend)}</b> در انتظار</span>${fl?`<span class="r"><b>${fmt(fl)}</b> ناموفق</span>`:''}`:''}${bad?`<span class="r"><b>${fmt(bad)}</b> خطادار</span>`:''}</div>
     ${p.sent&&rows.length?`<div class="ptbar"><i class="ok" style="width:${ok/rows.length*100}%"></i><i class="no" style="width:${fl/rows.length*100}%"></i></div>`:''}</div>`;
-  if(SB.length>1)h+=`<div class="seg frnd prnd"><button class="${partAll?'on':''}" data-act="partAllOn">همه مراحل <i>${fmt(allRows.length)}</i></button>${SB.map((z,k)=>`<button class="${!partAll&&z===p?'on':''}" data-act="partView" data-id="${z.id}">مرحله ${toFa(k+1)} <i>${fmt(z.ids.length)}</i>${z.sent?'':' <em>●</em>'}</button>`).join('')}</div><div class="bknote" style="margin:0 4px 10px">${partAll?'کپی و خروجی پایین صفحه برای همه مراحل با هم است.':'کپی و خروجی پایین صفحه برای مرحله انتخاب‌شده است؛ برای همه با هم «همه مراحل» را بزنید.'}${SB.some(z=>!z.sent)?' · <em style="font-style:normal;color:var(--warn)">●</em> یعنی هنوز ارسال نشده':''}</div>`;
+  if(SB.length>1)h+=`<div class="seg frnd prnd"><button class="${partAll?'on':''}" data-act="partAllOn">همه مراحل <i>${fmt(allRows.length)}</i></button>${SB.map((z,k)=>`<button class="${!partAll&&z===p?'on':''}" data-act="partView" data-id="${z.id}" data-r="1">مرحله ${toFa(k+1)} <i>${fmt(z.ids.length)}</i>${z.sent?'':' <em>●</em>'}</button>`).join('')}</div><div class="bknote" style="margin:0 4px 10px">${partAll?'کپی و خروجی پایین صفحه برای همه مراحل با هم است.':'کپی و خروجی پایین صفحه برای مرحله انتخاب‌شده است؛ برای همه با هم «همه مراحل» را بزنید.'}${SB.some(z=>!z.sent)?' · <em style="font-style:normal;color:var(--warn)">●</em> یعنی هنوز ارسال نشده':''}</div>`;
   if(p.sent&&pend>0&&can('track'))h+=`<button class="okall" data-act="partOkAll">${ic('check')} همه ${fmt(pend)} واریز در انتظار، موفق</button>`;
   if(!p.sent)h+=`<div class="bknote" style="margin:0 4px 10px">«کپی و ارسال» متن را کپی می‌کند و همزمان این منبع را به پیگیری می‌برد.</div>`;
   ROWDATE=true;ROWSRC=false;ROWTRK=false;ROWMOVE=can('split');ROWRND=SB.length>1?RN:null;ROWTAP=can('edit')?'entEditGo':'openEnt';AM=allocMap();try{h+=`<div class="spsec"><b>واریزی‌های این منبع</b><small>برای جزئیات روی هر واریزی بزنید · کشیدن به چپ: تأیید، انتقال، کپی</small></div><div class="blist fcard">${rows.map(homeRow).join('')}</div>`}finally{ROWDATE=false;ROWSRC=true;ROWTRK=false;ROWMOVE=false;ROWTAP='openEnt';ROWRND=null}
   const sg=(act,icn,t,sub,cls,attrs)=>`<button class="sgi${cls?' '+cls:''}" data-act="${act}"${attrs||''}><span class="si">${ic(icn)}</span><span class="tx"><b>${t}</b><small>${sub}</small></span><span class="cv">${ic('back')}</span></button>`;
   h+=`<div class="spsec"><b>تنظیمات این منبع</b></div><div class="sgr ptact">${sources.some(x=>String(x.id)===String(p.src.id))&&can('src')?sg('acEdit','bank','ویرایش حساب منبع','نام، بانک، شبا و کارت؛ همه‌جا به‌روز می‌شود','',` data-id="${p.src.id}"`):''}${can('split')&&rows.length?sg('partMoveAll','split','انتقال همه به منبع دیگر','همه واریزی‌های این منبع یکجا منتقل شوند'):''}${p.sent?sg('partUnsend','undo','برگرداندن از پیگیری به تخصیص','دوباره قابل ویرایش و تقسیم می‌شود'):sg('partDel','trash','لغو این تخصیص','واریزی‌ها به «مانده برای تقسیم» برمی‌گردند','rd')}</div>`;return h}
-let partAll=false,partOrd={k:'',ids:[]};
+let partAll=true,partOrd={k:'',ids:[]};
 /* ترتیب ردیف‌های منبع: موقع ورود، تسویه‌شده‌ها پایین می‌روند؛ تا بیرون رفتن ترتیب ثابت می‌ماند */
 function partOrder(L){const k=partId+'|'+partAll;if(partOrd.k!==k){const o=r=>stOf(r.id)==='ok'?1:0;partOrd={k,ids:L.slice().sort((a,b)=>o(a)-o(b)).map(r=>r.id)}}const pos=new Map(partOrd.ids.map((id,i)=>[id,i]));return L.slice().sort((a,b)=>(pos.has(a.id)?pos.get(a.id):1e9)-(pos.has(b.id)?pos.get(b.id):1e9))}
 const partSel=()=>{const p=curPart();if(!p)return[];const SB=partSibs(p);return partAll&&SB.length>1?SB:[p]};
@@ -3513,7 +3513,7 @@ const ACT={
   aAll:()=>{const q=aSt.q.trim();aPool().filter(x=>!aSt.sel.has(x.id)&&(!q||match(x,q))).forEach(x=>aSt.sel.add(x.id));renderPrev()},
   aNone:()=>{aSt.sel=new Set();renderPrev()},
   aMeth:d=>{aSt.method=d.m;allocSheet();recalc()},aSave:()=>allocSave(),
-  partView:d=>{partId=+d.id;partAll=false;partOrd.k='';go('part')},
+  partView:d=>{partId=+d.id;partAll=!d.r;partOrd.k='';if(cur==='part'){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}else go('part')},
   partAllOn:()=>{partAll=true;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y},
   partCopy:async()=>{const p=curPart();if(!p)return;const P=partSel();txtGen=null;expCtx={A:partSelAlloc(),sc:'0',track:true,parts:P.map(z=>z.id)};const ok=await copyText(withCtx(txt));if(ok){toast('متن «'+p.src.name+'»'+(P.length>1?' (همه مراحل)':'')+' کپی شد');setTimeout(()=>{autoTrack();if(cur==='part')render()},900)}else openText()},
   partExp:()=>{const p=curPart();if(!p)return;const P=partSel();openExport(partSelAlloc(),'0');expCtx.track=true;expCtx.parts=P.map(z=>z.id)},
