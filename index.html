@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.94,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.96,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1583,6 +1583,20 @@ body{font-feature-settings:normal}
 .seg.sppay button.nd::after{background:var(--red)}.seg.sppay button.dn::after{background:var(--ok)}
 .sprow.sent{position:relative}.sprow.sent::after{content:'';position:absolute;inset:3px;border:1.5px solid var(--red);border-radius:14px;pointer-events:none}
 .sprow.done{position:relative}.sprow.done::after{content:'';position:absolute;inset:3px;border:1.5px solid var(--ok);border-radius:14px;pointer-events:none}
+
+/* حاله وضعیت: سبز = تسویه کامل، زرد = هنوز تسویه نشده (تیک انتخاب جدا نشان داده می‌شود) */
+:root{--pe:#d9a21b}
+.ldg.gok,.ldg.gok.sel{box-shadow:0 0 0 1.5px var(--ok),0 6px 18px -8px color-mix(in srgb,var(--ok) 55%,transparent)!important}
+.ldg.gpe,.ldg.gpe.sel{box-shadow:0 0 0 1.5px var(--pe),0 6px 18px -8px color-mix(in srgb,var(--pe) 55%,transparent)!important}
+.ldg:not(.sel) .ldck{opacity:.7}
+.arcd.ok{border-color:var(--ok)!important;box-shadow:0 6px 18px -10px color-mix(in srgb,var(--ok) 60%,transparent)!important}
+.arcd:not(.ok){border-color:var(--pe)!important;box-shadow:0 6px 18px -10px color-mix(in srgb,var(--pe) 60%,transparent)!important}
+.sprow.done::after{box-shadow:0 4px 14px -6px color-mix(in srgb,var(--ok) 55%,transparent)}
+.sprow.sent::after{box-shadow:0 4px 14px -6px color-mix(in srgb,var(--red) 50%,transparent)}
+
+#sheet textarea.txout{min-height:0!important;height:auto;max-height:46vh}
+.txbar{display:flex;flex-direction:column;gap:10px;margin-top:4px}.txbar .xgo{margin:0!important}.txbar .txacts{margin:0!important}
+.txacts button{min-height:46px}
 </style>
 </head>
 <body>
@@ -1593,7 +1607,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=50.94,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=50.96,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2188,9 +2202,9 @@ function openText(){const t=txtGen?txtGen():withCtx(txt),ln=t.split('\n').length
   sheet(`<div class="sh-h"><div><b>متن خروجی</b><small class="shsub">${fmt(t.length)} نویسه · ${fmt(ln)} خط</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="seg txseg">${Object.entries(TS).map(([k,v])=>`<button data-act="tstyle" data-s="${k}" class="${txtStyle===k?'on':''}">${v}</button>`).join('')}</div>
   <div class="txnote">${ic('copy')}<span>${txtStyle==='plain'?'بدون علامت؛ مناسب برنامه بانک و پیامک':'بخش‌های پررنگ و شبا در '+TS[txtStyle]+' مرتب نمایش داده می‌شوند'}</span></div>
-  <textarea id="tout" class="txout" readonly dir="rtl">${esc(t)}</textarea>
-  <button class="xgo" data-act="copyOut">${ic('copy')} کپی متن</button>
-  <div class="txacts">${(navigator.share||window.AndroidBridge)?`<button data-act="shareOut">${ic('open')} اشتراک‌گذاری</button>`:''}<button data-act="saveTxt">${ic('list')} ذخیره فایل متنی</button></div>`)}
+  <textarea id="tout" class="txout" readonly dir="rtl" rows="${Math.min(18,Math.max(6,ln+1))}">${esc(t)}</textarea>
+  <div class="txbar"><button class="xgo" data-act="copyOut">${ic('copy')} کپی متن</button>
+  <div class="txacts">${(navigator.share||window.AndroidBridge)?`<button data-act="shareOut">${ic('open')} اشتراک‌گذاری</button>`:''}<button data-act="saveTxt">${ic('down')} ذخیره فایل</button></div></div>`)}
 function openPrint(h0){const html=(h0||withCtx(reportHTML)).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.__pv=html;$('pv').classList.remove('hide');const f=$('pvf');
   f.onload=()=>{try{const d=f.contentDocument,b=d.body,land=/A4 landscape/.test(html),W=land?1123:794;
     const st=d.createElement('style');st.textContent=`@media screen{html{background:transparent!important;min-height:100%}body{width:${W}px!important;max-width:none!important;margin:18px auto 28px!important;padding:${land?'30px 34px':'42px 40px'}!important;background:#fff!important;box-shadow:0 10px 34px rgba(16,33,58,.16),0 0 0 1px rgba(16,33,58,.06);border-radius:10px;box-sizing:border-box}}`;d.head.appendChild(st);
@@ -2431,14 +2445,14 @@ function vLday(){const d=ldData(ldKey),D=dates(ldKey);if(!d.rows.length)return '
   <div class="spsec ldsec"><div><b>منابع این لیست</b><small>برای خروجی انتخاب کنید · برای ریز واریزی‌ها بزنید</small></div><button class="link" data-act="ldAll">${ldSel.size===d.G.length+(d.FS.length?1:0)?'هیچ‌کدام':'انتخاب همه'}</button></div>
   <div class="fsearch ldq">${ic('search')}<input id="ldq" type="search" value="${esc(ldQ)}" placeholder="جستجو در این لیست: نام، فاکتور، مبلغ، پیگیری…" autocomplete="off" enterkeyhint="search">${ldQ?'<button class="x" data-act="ldQClr" aria-label="پاک کردن">×</button>':''}</div>`;
   const lq=toEn(ldQ.trim()).toLowerCase(),lqd=lq.replace(/\D/g,''),ldm=x=>!lq||[fullName(x),toEn(x.code||''),x.src||''].join(' ').toLowerCase().includes(lq)||(lqd.length>=3&&[String(x.amount),x.tn,x.iban].some(v=>v&&String(v).includes(lqd)));let ldHits=0;
-  const grp=(key,name,rows,amt,badge,sub,pcs)=>{const on=ldSel.has(key),op=ldOpen.has(key)||!!lq;return `<div class="ldg${on?' sel':''}${op?' open':''}"><div class="ldh"><button class="ldck" data-act="ldPick" data-k="${esc(key)}" aria-label="انتخاب برای خروجی">${on?ic('check'):''}</button><button class="ldm" data-act="ldTog" data-k="${esc(key)}">${badge}<span class="tx"><b>${esc(name)}</b><small>${sub}</small>${pcs}</span><span class="v"><b>${fmt(amt)}</b><small>تومان</small></span>${chevI()}</button></div><div class="ldb">${rows}</div></div>`};
+  const grp=(key,name,rows,amt,badge,sub,pcs,stc)=>{const on=ldSel.has(key),op=ldOpen.has(key)||!!lq;return `<div class="ldg${on?' sel':''}${op?' open':''} ${stc||''}"><div class="ldh"><button class="ldck" data-act="ldPick" data-k="${esc(key)}" aria-label="انتخاب برای خروجی">${on?ic('check'):''}</button><button class="ldm" data-act="ldTog" data-k="${esc(key)}">${badge}<span class="tx"><b>${esc(name)}</b><small>${sub}</small>${pcs}</span><span class="v"><b>${fmt(amt)}</b><small>تومان</small></span>${chevI()}</button></div><div class="ldb">${rows}</div></div>`};
   d.G.forEach(g=>{const gc=bStat({items:g.rows}),so=sources.find(z=>z.name===g.name),bd=so&&so.bank?bankBadge(so.bank,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(g.name))}</span>`,np=g.rows.filter(x=>x.st==='none'||x.st==='pending').length,pc=gc.all?gc.ok/gc.all*100:0,pf=gc.all?gc.fail/gc.all*100:0;
     const sub=`${fmt(g.rows.length)} واریزی · ${gc.ok===gc.all&&gc.all?'<span class="k">تسویه کامل ✓</span>':`<span class="k">${fmt(gc.ok)} تسویه</span>`+(np?` · <span class="w">${fmt(np)} در انتظار</span>`:'')}${gc.fail?` · <span class="f">${fmt(gc.fail)} ناموفق</span>`:''}`;
     const GR=g.rows.filter(ldm);if(!GR.length)return;ldHits+=GR.length;
     const rows=GR.map(x=>{const st=ldSt(x),rk=x.img&&x.bid!=null;return `<div class="ldrw"><button class="ldr" data-act="openEnt" data-id="${x.id}"><span class="tx"><b>${esc(fullName(x))}</b><small>${x.code?'فاکتور '+esc(toEn(x.code))+' · ':''}${esc(setType(x))}${x.tn?' · پیگیری <bdi dir="ltr">'+esc(x.tn)+'</bdi>':''}</small></span><span class="v"><b>${fmt(x.amount)}</b><em class="${st[1]}">${st[0]}</em></span></button>${rk?`<button class="ldrc" data-act="rcOne" data-k="${x.bid}:${x.id}" data-n="${esc(fullName(x))}" data-a="${x.amount}" data-t="${esc(x.tn||'')}" aria-label="رسید">${ic('cam')}</button>`:x.bid!=null&&can('track')?`<label class="ldrc att" aria-label="ضمیمه رسید">${ic('plus')}<input type="file" accept="image/*" data-ratt="${x.bid}:${x.id}" hidden></label>`:''}</div>`}).join('');
-    h+=grp(g.name,g.name,rows,sum(g.rows),bd,sub,`<span class="pb2"><i class="ok" style="width:${pc}%"></i><i class="no" style="width:${pf}%"></i></span>`)});
+    h+=grp(g.name,g.name,rows,sum(g.rows),bd,sub,`<span class="pb2"><i class="ok" style="width:${pc}%"></i><i class="no" style="width:${pf}%"></i></span>`,gc.ok===gc.all&&gc.all?'gok':'gpe')});
   const FSq=d.FS.filter(ldm);ldHits+=FSq.length;if(lq&&!ldHits)h+='<div class="spempty" style="padding:20px 8px"><b>در این لیست پیدا نشد</b></div>';
-  if(FSq.length)h+=grp('__full','تسویه با مشتری',FSq.map(r=>`<button class="ldr" data-act="openEnt" data-id="${r.id}"><span class="tx"><b>${esc(fullName(r))}</b><small>${esc((r.settles||[]).map(setLine).join('؛ '))}</small></span><span class="v"><b>${fmt(r.total)}</b><em class="g">تسویه کامل با مشتری</em></span></button>`).join(''),d.FS.reduce((a,r)=>a+r.total,0),`<span class="bkb lg" style="--bc:#15803d">م</span>`,`${fmt(d.FS.length)} واریزی · <span class="k">تسویه کامل ✓</span>`,'');
+  if(FSq.length)h+=grp('__full','تسویه با مشتری',FSq.map(r=>`<button class="ldr" data-act="openEnt" data-id="${r.id}"><span class="tx"><b>${esc(fullName(r))}</b><small>${esc((r.settles||[]).map(setLine).join('؛ '))}</small></span><span class="v"><b>${fmt(r.total)}</b><em class="g">تسویه کامل با مشتری</em></span></button>`).join(''),d.FS.reduce((a,r)=>a+r.total,0),`<span class="bkb lg" style="--bc:#15803d">م</span>`,`${fmt(d.FS.length)} واریزی · <span class="k">تسویه کامل ✓</span>`,'','gok');
   return h}
 function bindLday(){{const V=$('view');if(V&&!V._ratt){V._ratt=1;V.addEventListener('change',async e=>{const k=e.target&&e.target.dataset&&e.target.dataset.ratt;if(!k||cur!=='lday')return;const f=e.target.files&&e.target.files[0];if(!f)return;const[bid,id]=k.split(':'),b=batches.find(z=>String(z.id)===bid),it=b&&b.items.find(z=>String(z.id)===id);if(!it)return;try{const d=await shrink(f);if(await imgPut(b.id+':'+it.id,d)){it.img=true;it.at=new Date().toISOString();saveB();const y=V.scrollTop;render();V.scrollTop=y;toast('رسید «'+it.name+'» ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(z){toast('این عکس خوانده نشد',true)}})}}const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
 const aLday=()=>{const n=ldSel?ldSel.size:0;return can('export')?`<button class="fab2" data-act="ldExp"${n?'':' disabled'}>${ic('open')} خروجی${n?' '+fmt(n)+' منبع':''}</button>`:''};
