@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1543,7 +1543,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.1,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.2,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2095,7 +2095,7 @@ const Mo=t=>txtStyle==='plain'?t:'`'+t+'`';
 const LINE='┈┈┈┈┈┈┈┈┈┈┈┈┈',DLINE='━━━━━━━━━━━━';
 function txtBlock(g,D){const tot=sum(g.rows);
   let t=Bo('مطلا · '+g.name)+'\n'+D.fa+' — '+D.en+'\n'+toFa(g.rows.length)+' واریزی · جمع '+Bo(N(tot)+' تومان')+'\n'+LINE+'\n';
-  g.rows.forEach((r,i)=>{const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';t+='\n'+Bo(toFa(i+1)+') '+fullName(r))+'\nفاکتور '+(toEn(r.code||'')||'—')+(bk?' · بانک '+bk:'')+'\nمبلغ: '+N(r.amount)+' تومان'+(r.settled?'\n(از مبلغ کل '+N(r.total)+'، '+N(r.settled)+' مستقیم توسط مشتری تسویه شد)':'')+'\n'+Mo(ibanSp(r.iban))+'\n'});
+  g.rows.forEach((r,i)=>{const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';t+='\n'+Bo(toFa(i+1)+') '+fullName(r))+'\nفاکتور '+(toEn(r.code||'')||'—')+(bk?' · بانک '+bk:'')+'\nمبلغ: '+N(r.amount)+' تومان'+'\n'+Mo(ibanSp(r.iban))+'\n'});
   return t+LINE+'\n'+Bo('جمع '+g.name+': '+N(tot)+' تومان')+'\n'+toFa(g.rows.length)+' واریزی'}
 function txt(sc){const D=alloc.D,G=groups(sc).filter(g=>g.rows.length);if(G.length===1)return txtBlock(G[0],D);
   const tc=G.reduce((s,g)=>s+g.rows.length,0),ta=G.reduce((s,g)=>s+sum(g.rows),0);
