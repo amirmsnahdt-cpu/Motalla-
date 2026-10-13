@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.91,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.92,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1568,7 +1568,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.91,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.92,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2378,7 +2378,7 @@ function openSplitPick(){const C=splitCands(),V=validated(),doneN=datesWith().fi
 const lbar=()=>`<button class="lbar" data-act="splitPick">${calB(dateVal)}<span class="tx"><small>لیست در حال تقسیم</small><b>${relDay(dateVal)}، ${dates(dateVal).fa}</b></span><span class="chg">تغییر لیست</span></button>`;
 const fwd=()=>ic('back').replace('class="i"','class="i flip"');
 let spTab='split';
-function spSeg(){const ob=openB(),pend=ob.reduce((a,b)=>a+b.items.filter(x=>x.st==='pending').length,0);return `<div class="seg sptabs">${[['split','تقسیم و پیگیری',pend],['lists','لیست‌ها',0],['arch','تاریخچه لیست‌ها',0]].map(([k,t,n])=>`<button class="${spTab===k?'on':''}" data-act="spTab" data-t="${k}">${t}${n?` <i>${toFa(n)}</i>`:''}</button>`).join('')}</div>`}
+function spSeg(){const ob=openB(),pend=ob.reduce((a,b)=>a+b.items.filter(x=>x.st==='pending').length,0);return `<div class="seg sptabs">${[['split','تقسیم و پیگیری',pend],['lists','لیست‌ها',0]].map(([k,t,n])=>`<button class="${spTab===k?'on':''}" data-act="spTab" data-t="${k}">${t}${n?` <i>${toFa(n)}</i>`:''}</button>`).join('')}</div>`}
 let arcQ='',arcD='';
 /* داده و کارت فشرده هر لیست (بر اساس تاریخ واریز) — مشترک بین «لیست‌ها» و «تاریخچه» */
 function listsData(){const days={},CL=new Set();AM=AM||allocMap();batches.forEach(b=>{if(b.closed)b.items.forEach(i=>CL.add(i.id))});validated().forEach(r=>{const k=PD(r);(days[k]=days[k]||[]).push(r)});
@@ -2416,7 +2416,7 @@ function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='En
 const aLday=()=>{const n=ldSel?ldSel.size:0;return can('export')?`<button class="fab2" data-act="ldExp"${n?'':' disabled'}>${ic('open')} خروجی${n?' '+fmt(n)+' منبع':''}</button>`:''};
 const ST_ORD={ok:0,fail:1,pending:2,none:3};
 function ldPick(){const d=ldData(ldKey);return{reg:d.eds.map(e=>dates(e).fa).join('، '),G:d.G.filter(g=>ldSel.has(g.name)).map(g=>({...g,rows:g.rows.slice().sort((a,b)=>(ST_ORD[a.st]??9)-(ST_ORD[b.st]??9))})),FS:ldSel.has('__full')?d.FS:[],T:'لیست '+pdHead(ldKey)}}
-function vSplit1(){if(spTab==='lists')return spSeg()+vFind();if(spTab==='arch')return spSeg()+vArch();return spSeg()+vSplit1b()}
+function vSplit1(){if(spTab==='arch')spTab='lists';if(spTab==='lists')return spSeg()+vFind();if(spTab==='arch')return spSeg()+vArch();return spSeg()+vSplit1b()}
 function vSplit1b(){const DL0=dayList(),PDS={},US=new Set(parts().flatMap(p=>p.ids));DL0.forEach(r=>{const k=PD(r);PDS[k]=PDS[k]||{n:0,s:0};if(!r.sentBid&&!r.full&&r.level<2&&!US.has(r.id)){PDS[k].n++;PDS[k].s+=r.amount}});if(spPay&&!PDS[spPay])spPay='';const PK=Object.keys(PDS).sort();if(PK.length>1&&!spPay)spPay=PK.find(k=>PDS[k].n)||PK[0];if(PK.length<2)spPay='';
   const R=remainList(),ok=R.filter(r=>r.level<2),badL=R.filter(r=>r.level===2),P=parts().filter(p=>!(p.sent&&batches.some(b=>b.id===p.bid&&b.closed))&&pVis(p)),sentN=DL0.filter(r=>r.sentBid&&(!spPay||PD(r)===spPay)).length,D=dates(dateVal);
   const pseg=PK.length>1?`<div class="seg sppay">${[...PK.map(k=>[k,'واریز '+payLab(k),PDS[k].n])].map(([k,t,n])=>`<button class="${spPay===k?'on':''}" data-act="spPay" data-iso="${k}">${esc(t)}${n?` <i>${toFa(n)}</i>`:''}</button>`).join('')}</div>`:'';
