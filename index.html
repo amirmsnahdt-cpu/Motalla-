@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.6,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.8,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1552,6 +1552,7 @@ body{font-feature-settings:normal}
 .rcr .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}.rcr .tx b{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rcr .tx small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rcb{width:34px;height:34px;border-radius:11px;border:0;background:var(--hair);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}.rcb svg{width:16px;height:16px}.rcb.p{background:var(--blu2);color:var(--blu)}
 .ldacts button span{white-space:nowrap}
+.rcm{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:none;color:var(--ink);font:inherit;text-align:right;padding:0;cursor:pointer}.rcm:active .rct{transform:scale(.95)}.rct{transition:transform .15s}
 </style>
 </head>
 <body>
@@ -1562,7 +1563,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.6,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.8,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1821,7 +1822,7 @@ let RC=[],RCT='';
 async function openRcpts(L,title){RC=L;RCT=title||'رسیدهای واریز';
   sheet(`<div class="sh-h"><div><b>${esc(RCT)}</b><small class="shsub">${L.length?fmt(L.length)+' رسید · هر کدام جدا ذخیره یا ارسال می‌شود':'برای این لیست هنوز رسیدی ضمیمه نشده'}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   ${L.length?`<div class="rcall"><button class="xgo" data-act="rcShareAll">${ic('open')} اشتراک همه رسیدها</button><button class="rcsv" data-act="rcSaveAll">${ic('down')} ذخیره همه</button></div>
-  <div class="sgr smg rcl">${L.map((r,i)=>`<div class="rcr"><span class="rct" id="rct${i}"></span><span class="tx"><b>${esc(r.name)}</b><small>${fmt(r.amount)} تومان${r.tn?' · پیگیری '+esc(r.tn):''}${r.kind==='cust'?' · تسویه مشتری':r.src?' · '+esc(r.src):''}</small></span><button class="rcb" data-act="rcView" data-i="${i}" aria-label="دیدن">${ic('eye')}</button><button class="rcb" data-act="rcSave1" data-i="${i}" aria-label="ذخیره">${ic('down')}</button><button class="rcb p" data-act="rcShare1" data-i="${i}" aria-label="اشتراک">${ic('open')}</button></div>`).join('')}</div>`:`<div class="spempty" style="padding:22px 8px"><b>رسیدی نیست</b><span>رسید را از جزئیات هر واریزی، بخش «پیگیری و رسید» ضمیمه کنید.</span></div>`}`);
+  <div class="sgr smg rcl">${L.map((r,i)=>`<div class="rcr"><button class="rcm" data-act="rcView" data-i="${i}" aria-label="دیدن رسید ${esc(r.name)}"><span class="rct" id="rct${i}"></span><span class="tx"><b>${esc(r.name)}</b><small>${fmt(r.amount)} تومان${r.tn?' · پیگیری '+esc(r.tn):''}${r.kind==='cust'?' · تسویه مشتری':r.src?' · '+esc(r.src):''}</small></span></button><button class="rcb" data-act="rcSave1" data-i="${i}" aria-label="ذخیره">${ic('down')}</button><button class="rcb p" data-act="rcShare1" data-i="${i}" aria-label="اشتراک">${ic('open')}</button></div>`).join('')}</div>`:`<div class="spempty" style="padding:22px 8px"><b>رسیدی نیست</b><span>رسید را از جزئیات هر واریزی، بخش «پیگیری و رسید» ضمیمه کنید.</span></div>`}`);
   L.forEach(async(r,i)=>{const d=await imgGet(r.key),el=$('rct'+i);if(el&&d)el.style.backgroundImage=`url(${d})`})}
 function entBI(x){for(const b of batches){const i=b.items.findIndex(z=>z.id===x.id);if(i>=0)return{b,i,it:b.items[i]}}return null}
 function entTrack(x){const q=entBI(x);if(!q)return `<div class="esec"><b>پیگیری و رسید</b><div class="muted" style="font-size:12.5px">بعد از تقسیم و ارسال این واریزی، تأیید واریز، شماره پیگیری و عکس رسید از همین‌جا ثبت می‌شود.</div></div>`;
@@ -1922,7 +1923,7 @@ function paintBars(){const dark=document.documentElement.getAttribute('data-them
   const old=[...document.querySelectorAll('meta[name="theme-color"]')];if(!(old.length===1&&old[0].content===top&&!old[0].media)){old.forEach(m=>m.remove());const n=document.createElement('meta');n.name='theme-color';n.content=top;document.head.appendChild(n)}
   try{if(window.AndroidBridge&&AndroidBridge.setStatusBar)AndroidBridge.setStatusBar(top,home||dark)}catch(e){}}
 /* ترتیب لیست‌ها در خانه: واریز امروز بالا، بعد روزهای آینده به ترتیب، بعد روزهای گذشته */
-const pdOrd=K=>{const t=dateVal;return K.slice().sort((a,b)=>{const ra=a===t?0:a>t?1:2,rb=b===t?0:b>t?1:2;return ra!==rb?ra-rb:ra===2?(a<b?1:-1):(a<b?-1:1)})};
+const pdOrd=K=>{const t=todayISO();return K.slice().sort((a,b)=>{const ra=a===t?0:a>t?1:2,rb=b===t?0:b>t?1:2;return ra!==rb?ra-rb:ra===2?(a<b?1:-1):(a<b?-1:1)})};
 function vHome(){AM=allocMap();const lo=isoAdd(dateVal,-HOME_DAYS),L0=validated().filter(x=>x.entryDate===dateVal||PD(x)>=lo),r=relDay(dateVal),lab=['امروز','دیروز','فردا'].includes(r)?r:'این روز',PKH=pdOrd([...new Set(L0.map(PD))]);if(!homeP||!PKH.includes(homeP))homeP=PKH.includes(dateVal)?dateVal:(PKH[0]||'');const PKP=PKH.filter(k=>k>=dateVal),D=dates(homeP||dateVal),L=homeP?L0.filter(x=>PD(x)===homeP):[];
   const bad=L.filter(x=>x.level===2),ok=L.filter(isOkE),pend=L.filter(x=>x.level<2&&!isOkE(x)),f=flowState(),pa=pendingAll();
   if(homeF==='bad'&&!bad.length||homeF==='ok'&&!ok.length||homeF==='pend'&&!pend.length)homeF='all';
