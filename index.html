@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1574,7 +1574,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=50.1,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=50.2,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1810,8 +1810,8 @@ function entItems(x){const I=(x.items||[]).filter(z=>z.amt);if(!I.length||(I.len
   return `<div class="esec eit"><b>اقلام خرید</b><small class="emeta">${fmt(I.length)} قلم · جمع ${fmt(tot)} تومان</small><div class="eitl">${I.map(z=>{const K=BZK[z.k]||{},q=parseFloat(z.q)||0;return `<div class="eitr k${['طلا','سکه','دلار','یورو'].indexOf(z.k)}"><span class="ei">${icn[z.k]||'•'}</span><span class="tx"><b>${esc(z.k)}${z.t?` <em>${esc(z.t)}</em>`:''}${z.k==='سایر'&&z.n?' · '+esc(z.n):''}</b><small>${q?esc(toFa(z.q))+' '+(K.u||'')+(z.k==='طلا'?'':''):''}${q&&z.r?' × ':''}${z.r?(z.k==='سکه'?'نرخ لحظه ':'نرخ ')+fmt(z.r):''}${!q&&!z.r?'—':''}</small></span><b class="am">${fmt(z.amt)} <i>تومان</i></b></div>`}).join('')}</div>
   <div class="eits">${gw?`<span>وزن طلا <b>${esc(toFa(Math.round(gw*1000)/1000))} گرم</b></span>`:''}${pg?`<span>هر گرم تمام‌شده <b>${fmt(pg)}</b></span>`:''}<span class="t">جمع کل <b>${fmt(tot)} تومان</b></span></div></div>`}
 /* ---- تسویه از مشتری: واریز مستقیم مشتری دیگر به حساب این شخص ---- */
-function entSettle(x){const S=x.settles||[],ed=can('edit');if(!S.length&&!ed)return '';
-  return `<div class="esec stl"><div class="stlh"><div><b>تسویه از مشتری</b><small>${S.length?'از مانده کم شده؛ باقی از طریق بانک':'اگر مشتری دیگری مستقیم به این شخص پرداخت کرده، اینجا ثبت کنید'}</small></div>${ed&&!x.full?`<button class="stladd" data-act="stlNew">${ic('plus')} ثبت تسویه</button>`:''}</div>
+function entSettle(x){const S=x.settles||[],ed=can('edit'),open=!x.full&&x.amount>0&&!(x.sentBid&&stOf(x.id)==='ok');if(!S.length&&!(ed&&open))return '';
+  return `<div class="esec stl"><div class="stlh"><div><b>تسویه از مشتری</b><small>${S.length?'از مانده کم شده؛ باقی از طریق بانک':'اگر مشتری دیگری مستقیم به این شخص پرداخت کرده، اینجا ثبت کنید'}</small></div>${ed&&open?`<button class="stladd" data-act="stlNew">${ic('plus')} ثبت تسویه</button>`:''}</div>
   ${S.length?`<div class="stll">${S.map((z,i)=>`<button class="stlr" data-act="stlOpen" data-i="${i}"><span class="bri">${esc(userInit(z.name||'؟'))}</span><span class="tx"><b>${esc(z.name||'—')}</b><small>${[z.inv?'فاکتور '+esc(z.inv):'',z.tn?'پیگیری '+esc(z.tn):'',z.img?'رسید دارد':'',z.cuId?'در حساب مشتری':''].filter(Boolean).join(' · ')||'واریز مستقیم'}</small></span><b class="am">${fmt(z.amount)}</b></button>`).join('')}</div>
   <div class="stls"><span>مبلغ کل <b>${fmt(x.total)}</b></span><span class="g">از مشتری <b>${fmt(x.settled)}</b></span><span class="${x.full?'g':''}">${x.full?'تسویه کامل ✓':'مانده بانکی <b>'+fmt(x.amount)+'</b>'}</span></div>`:''}</div>`}
 let stl=null,cuStlQ='';
