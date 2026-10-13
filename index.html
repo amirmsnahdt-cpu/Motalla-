@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.6,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.7,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1587,7 +1587,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=50.6,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=50.7,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -3972,18 +3972,19 @@ ACT.arcCal=()=>{const M=new Set();validated().forEach(r=>{M.add(PD(r));M.add(r.e
 ACT.arcClr=()=>{arcQ='';arcD='';render()};
 ACT.cuStl=()=>{cuStlQ='';sheet(cuStlHTML());const q=$('csq');if(q){q.oninput=()=>{cuStlQ=q.value;$('csl').outerHTML=(()=>{const t=document.createElement('div');t.innerHTML=cuStlHTML();return t.querySelector('#csl').outerHTML})()}}};
 ACT.cuStlPick=d=>{const c=curCu(),r=validated().find(z=>String(z.id)===String(d.id));if(!c||!r)return;entId=r.id;stl={cuId:c.id,name:cuName(c),phone:c.phone||'',amount:r.amount,q:''};sheet(stlHTML());stlBind()};
-function stlHTML(){const x=entRow(),z=stl,L=custs.filter(c=>!c.del),q=(z.q||'').trim(),M=q?L.filter(c=>cuName(c).includes(q)||(c.phone||'').includes(toEn(q))).slice(0,8):L.slice().sort((a,b)=>String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,6);
+function stlChips(){const z=stl,L=custs.filter(c=>!c.del),q=(z.q||'').trim(),M=q?L.filter(c=>cuName(c).includes(q)||(c.phone||'').includes(toEn(q))).slice(0,8):L.slice().sort((a,b)=>String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,6);return `${z.cuId?`<button class="tch on" data-act="stlCu" data-id="">${esc(cuName(custs.find(c=>String(c.id)===String(z.cuId))||{name:z.name}))} ×</button>`:M.map(c=>`<button class="tch" data-act="stlCu" data-id="${c.id}">${esc(cuName(c))}</button>`).join('')+(q?`<button class="tch nw" data-act="stlCu" data-id="new">+ «${esc(q)}» بدون حساب</button>`:'')}`}
+function stlHTML(){const x=entRow(),z=stl;
   return `<div class="sh-h"><div><b>${z.i!=null?'ویرایش تسویه':'تسویه از مشتری'}</b><small class="shsub">مشتری مستقیم به «${esc(fullName(x))}» پرداخت کرده · از مانده کم می‌شود</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="bzw" style="animation:none">
   <div class="ef"><label for="stQ">پرداخت‌کننده <i>(از حساب‌های مشتری یا نام جدید)</i></label><div class="fsearch sm">${ic('search')}<input id="stQ" value="${esc(z.cuId?'':z.q||'')}" placeholder="جستجوی نام یا شماره مشتری…" autocomplete="off"></div>
-  <div class="kchs" id="stCs">${z.cuId?`<button class="tch on" data-act="stlCu" data-id="">${esc(cuName(custs.find(c=>String(c.id)===String(z.cuId))||{name:z.name}))} ×</button>`:M.map(c=>`<button class="tch" data-act="stlCu" data-id="${c.id}">${esc(cuName(c))}</button>`).join('')+(q?`<button class="tch nw" data-act="stlCu" data-id="new">+ «${esc(q)}» بدون حساب</button>`:'')}</div></div>
+  <div class="kchs" id="stCs">${stlChips()}</div></div>
   <div class="ef2"><div class="ef"><label for="stP">شماره تماس <i>(اختیاری)</i></label><input id="stP" class="ltr" inputmode="tel" value="${esc(z.phone||'')}" autocomplete="off"></div><div class="ef"><label for="stI">فاکتور فروش <i>(اختیاری)</i></label><input id="stI" class="ltr" inputmode="numeric" value="${esc(z.inv||'')}" autocomplete="off"></div></div>
   <div class="ef"><label for="stA">مبلغ پرداختی <i>(تومان)</i></label><input id="stA" class="ltr acbig" inputmode="numeric" value="${z.amount?Number(z.amount).toLocaleString('en-US'):''}" autocomplete="off"></div>
   <div class="ef2"><div class="ef"><label for="stT">شماره پیگیری <i>(اختیاری)</i></label><input id="stT" class="ltr" inputmode="numeric" value="${esc(z.tn||'')}" autocomplete="off"></div><div class="ef"><label>رسید <i>(اختیاری)</i></label><label class="stimg${z.imgD||z.img?' on':''}">${z.imgD?`<img src="${z.imgD}" alt="">`:`<i>${ic('cam')}</i>`}<span>${z.imgD?'تغییر رسید':z.img?'رسید دارد · تغییر':'افزودن عکس'}</span><input type="file" accept="image/*" id="stF" hidden></label></div></div>
   <div class="ef"><label for="stN">یادداشت <i>(اختیاری)</i></label><input id="stN" value="${esc(z.note||'')}" autocomplete="off"></div>
   <button class="xgo" data-act="stlSave">${ic('check')} ثبت و کسر از مانده</button>${z.i!=null?`<div class="txacts">${z.img?`<button data-act="stlImg">${ic('eye')} دیدن رسید</button>`:''}<button data-act="stlDel" style="color:var(--red);background:var(--red2)">${ic('trash')} حذف این تسویه</button></div>`:''}</div>`}
 function stlRead(){const g=id=>{const el=$(id);return el?el.value:undefined};if($('stQ')&&!stl.cuId)stl.q=g('stQ');if($('stP'))stl.phone=toEn(g('stP')).replace(/[^\d+]/g,'');if($('stI'))stl.inv=toEn(g('stI')).trim();if($('stA'))stl.amount=num(g('stA'));if($('stT'))stl.tn=toEn(g('stT')).trim();if($('stN'))stl.note=clean(g('stN'))}
-function stlBind(){const Q=$('stQ'),A=$('stA'),F=$('stF');if(Q)Q.oninput=()=>{stl.q=Q.value;stl.cuId='';const p=Q.selectionStart;stlRead();sheet(stlHTML());stlBind();const n=$('stQ');n.focus();try{n.setSelectionRange(p,p)}catch(e){}};if(A)A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''};
+function stlBind(){const Q=$('stQ'),A=$('stA'),F=$('stF');if(Q){Q.oninput=()=>{stl.q=Q.value;if(stl.cuId){stl.cuId='';stl.name=''}clearTimeout(Q._t);Q._t=setTimeout(()=>{const c=$('stCs');if(c)c.innerHTML=stlChips()},120)};const C=$('stCs');if(C)C.onpointerdown=e=>{if(e.target.closest('.tch'))e.preventDefault()}}if(A)A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''};
   if(F)F.onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{stl.imgD=await shrink(f);stlRead();sheet(stlHTML());stlBind()}catch(z){toast('این عکس خوانده نشد',true)}}}
 function stlSync(e){const st=(e.settles||[]).reduce((s,z)=>s+(+z.amount||0),0),rem=Math.max(0,(+e.amount||0)-st);batches.forEach(b=>b.items.forEach(it=>{if(it.id===e.id){it.amount=rem;it.settled=st;it.settles=e.settles;it.total=+e.amount||0}}));saveB()}
 ACT.stlNew=()=>{const x=entRow();if(!x)return;stl={amount:x.amount,q:''};sheet(stlHTML());stlBind();setTimeout(()=>{const q=$('stQ');if(q)q.focus()},300)};
