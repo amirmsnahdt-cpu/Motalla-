@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.9,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.91,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1557,7 +1557,7 @@ body{font-feature-settings:normal}
 .fsearch.ldq{margin:0 0 10px}
 .ldrw{display:flex;align-items:center}.ldrw .ldr{flex:1;min-width:0}.ldrw+.ldrw{border-top:1px solid var(--hair)}
 .ldrc{flex:none;width:36px;height:36px;margin-inline-end:10px;border:0;border-radius:11px;background:var(--blu2);color:var(--blu);display:grid;place-items:center;cursor:pointer}.ldrc svg{width:17px;height:17px}
-.blist.fcard.hit{box-shadow:0 0 0 1.5px var(--blu),0 6px 18px -10px var(--blu)!important}
+.blist.fcard.hit{border:1.5px solid var(--blu)!important;box-shadow:0 6px 18px -12px var(--blu)!important;margin-top:6px!important}
 </style>
 </head>
 <body>
@@ -1568,7 +1568,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.9,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.91,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
