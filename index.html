@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.5,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.6,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1576,6 +1576,7 @@ body{font-feature-settings:normal}
 .stlrw .brv{display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap}.stlrw .brv b{font-size:14px;font-weight:800}.stlrw .brv i{font-style:normal;font-size:10.5px;color:var(--mut)}.stlrw .brv small{font-size:11px;font-weight:700}.stlrw.w .brv small{color:#a37406}.stlrw.k .brv small{color:var(--ok)}
 .stlc{flex:none;width:36px;height:36px;border:1.5px dashed var(--line);border-radius:11px;background:var(--hair);color:var(--mut);display:grid;place-items:center;cursor:pointer;z-index:1}.stlc svg{width:17px;height:17px}.stlc.on{border:0;background:var(--blu2);color:var(--blu)}
 .stls .w,.stls .w b{color:#a37406}
+.eamr{display:flex;align-items:baseline;justify-content:center;gap:6px;margin:-2px 0 8px;color:var(--red)}.eamr span{font-size:13px;font-weight:700}.eamr b{font-size:22px;font-weight:900}.eamr small{font-size:12px}.eamr em{font-style:normal;font-size:11.5px;color:var(--mut);margin-inline-start:6px}.rmd{color:var(--red);font-weight:800}
 </style>
 </head>
 <body>
@@ -1586,7 +1587,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=50.5,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=50.6,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1802,7 +1803,8 @@ function vEnt(){const x=entRow();if(!x){setTimeout(()=>{if(cur==='ent')go('home'
     x.acct?kv('شماره حساب',`<span class="ltr">${esc(x.acct)}</span>`,x.acct):'',
     x.holder?kv('صاحب حساب',esc(x.holder)):'',
     kv('بانک',bankBadge(x.bankShow)+esc(x.bankShow||'نامشخص')),
-    kv('مبلغ',fmt(x.amount)+' <i>تومان</i>',x.amount),
+    x.settled?kv('مبلغ کل',fmt(x.total)+' <i>تومان</i>',x.total):kv('مبلغ',fmt(x.amount)+' <i>تومان</i>',x.amount),
+    x.settled?kv('مانده',`<span class="rmd">${fmt(x.amount)}</span> <i>تومان</i>`,x.amount):'',
     x.code?kv('فاکتور',`<span class="ltr">${esc(toEn(x.code))}</span>`,toEn(x.code)):'',
     x.weight?kv('وزن',esc(toFa(x.weight))+' <i>گرم</i>'):'',
     x.weight&&ppgOf(x.total||x.amount,x.weight)?kv('هر گرم تمام‌شده',fmt(x.ppg||ppgOf(x.total||x.amount,x.weight))+' <i>تومان</i>'):'',
@@ -1812,7 +1814,7 @@ function vEnt(){const x=entRow();if(!x){setTimeout(()=>{if(cur==='ent')go('home'
     kv('لیست',esc(D.fa)),
     si?kv('منبع',esc(si.src)+(si.tn?'، پیگیری '+esc(si.tn):'')):(al0&&al0.src?kv('منبع',esc(al0.src)+' <i>(آماده ارسال)</i>'):''),
     x.createdBy?kv('ثبت‌کننده',esc(x.createdBy)):''].join('');
-  return `<div class="ehead"><div class="eav ${st}">${esc(userInit(fullName(x)||'؟'))}</div>${honTag(x.name)}<b class="enm">${esc(fullName(x)||'—')}</b>${x.iban?`<span class="eib kc" data-cp="${ibd}">IR ${ibanGroups(ibd)}</span>`:''}<div class="eam">${fmt(x.amount)}<small>تومان</small></div><span class="est ${st}">${st==='bad'?'خطادار':t?t[0]:'ثبت شده'}</span></div>
+  return `<div class="ehead"><div class="eav ${st}">${esc(userInit(fullName(x)||'؟'))}</div>${honTag(x.name)}<b class="enm">${esc(fullName(x)||'—')}</b>${x.iban?`<span class="eib kc" data-cp="${ibd}">IR ${ibanGroups(ibd)}</span>`:''}${x.settled?`<div class="eam">${fmt(x.total)}<small>تومان</small></div><div class="eamr"><span>مانده</span><b>${fmt(x.amount)}</b><small>تومان</small><em>${fmt(x.settled)} از مشتری</em></div>`:`<div class="eam">${fmt(x.amount)}<small>تومان</small></div>`}<span class="est ${st}">${st==='bad'?'خطادار':t?t[0]:'ثبت شده'}</span></div>
   ${st==='bad'&&x.issues&&x.issues.length?`<div class="msg bad">${esc(x.issues.join('، '))}</div>`:''}
   <div class="kvs">${rows}</div>${entItems(x)}${entSettle(x)}${entTrack(x)}
   <div class="esec"><b>یادداشت</b><textarea id="enote" rows="2" placeholder="یادداشت برای این واریزی…"${can('edit')?'':' disabled'}>${esc(eD&&eD.note!=null?eD.note:(x.note||''))}</textarea></div>${can('del')?`<button class="edel" data-act="entDel" data-id="${x.id}">${ic('trash')} حذف این واریزی</button>`:''}`}
