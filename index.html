@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.5,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.6,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1545,6 +1545,13 @@ body{font-feature-settings:normal}
 .eform2 .er.col{padding:8px 0 2px}.eform2 .er.col input{padding:4px 0 8px!important;font-size:15.5px}
 .eform2 .erh{padding-inline-start:88px;margin:-6px 0 6px;font-size:11px}
 .eform2 .er.ebtn{min-height:46px}.eform2 .erv b{font-size:14px}
+
+.rcall{display:flex;gap:8px;align-items:stretch;margin-bottom:10px}.rcall .xgo{flex:1;margin:0!important}.rcsv{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;background:var(--blu2);color:var(--blu);font:inherit;font-size:13px;font-weight:700;border-radius:16px;padding:0 14px;cursor:pointer}.rcsv svg{width:16px;height:16px}
+.rcl{max-height:56vh;overflow:auto}.rcr{display:flex;align-items:center;gap:10px;padding:9px 12px}.rcr+.rcr{border-top:1px solid var(--hair)}
+.rct{width:44px;height:44px;border-radius:12px;background:var(--hair) center/cover no-repeat;flex:none}
+.rcr .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}.rcr .tx b{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rcr .tx small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcb{width:34px;height:34px;border-radius:11px;border:0;background:var(--hair);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}.rcb svg{width:16px;height:16px}.rcb.p{background:var(--blu2);color:var(--blu)}
+.ldacts button span{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1555,7 +1562,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.5,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.6,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1800,6 +1807,22 @@ function cuStlHTML(){const c=curCu(),q=toEn(cuStlQ.trim()),L=validated().filter(
   return `<div class="sh-h"><div><b>تسویه کدام واریزی؟</b><small class="shsub">پرداخت «${esc(cuName(c||{}))}» به حساب فروشنده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="fsearch sm">${ic('search')}<input id="csq" value="${esc(cuStlQ)}" placeholder="نام فروشنده، فاکتور یا مبلغ…" autocomplete="off"></div>
   <div class="sgr smg" id="csl">${L.length?L.map(r=>`<button class="acrow" data-act="cuStlPick" data-id="${r.id}">${bankBadge(r.bankShow,'lg')||`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(fullName(r)))}</span>`}<span class="tx"><b>${esc(fullName(r))}</b><small>واریز ${esc(payLab(PD(r)))}${r.code?' · فاکتور '+esc(toEn(r.code)):''}${r.settled?' · '+fmt(r.settled)+' تسویه شده':''}</small></span><span class="brv"><b>${fmt(r.amount)} <i>تومان</i></b></span></button>`).join(''):'<div class="spempty" style="padding:18px"><b>واریزی پیدا نشد</b></div>'}</div>`}
+/* ---- رسیدهای واریز: ذخیره و اشتراک تکی یا گروهی ---- */
+const d2b=d=>{const i=d.indexOf(','),h=d.slice(0,i),m=(h.match(/:(.*?);/)||[])[1]||'image/jpeg',bin=atob(d.slice(i+1)),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);return new Blob([u],{type:m})};
+const rcName=r=>('رسید '+(r.name||'')+' '+(r.amount?Number(r.amount):'')+(r.tn?' '+r.tn:'')).trim().replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,'-')+'.jpg';
+async function rcFiles(L){const out=[];for(const r of L){const d=await imgGet(r.key);if(d)out.push(new File([d2b(d)],rcName(r),{type:'image/jpeg'}))}return out}
+async function rcShare(files,title){if(!files.length){toast('رسیدی پیدا نشد',true);return}
+  try{if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files,title:title||'رسید واریز'});return}}catch(e){if(e&&e.name==='AbortError')return}
+  rcDown(files)}
+function rcDown(files){if(!files.length){toast('رسیدی پیدا نشد',true);return}files.forEach((f,i)=>setTimeout(()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000)}catch(e){}},i*350));toast(files.length>1?fmt(files.length)+' رسید ذخیره شد':'رسید ذخیره شد')}
+/* لیست رسیدهای یک مجموعه واریزی (رسید بانکی + رسید تسویه از مشتری) */
+function rcOf(items){const L=[];items.forEach(x=>{if(x.img&&x.bid!=null)L.push({key:x.bid+':'+x.id,name:x.name,amount:x.amount,tn:x.tn||'',src:x.src||'',kind:'bank'});(x.settles||[]).forEach(z=>{if(z.img)L.push({key:z.img,name:x.name+' (از '+z.name+')',amount:z.amount,tn:z.tn||'',kind:'cust'})})});return L}
+let RC=[],RCT='';
+async function openRcpts(L,title){RC=L;RCT=title||'رسیدهای واریز';
+  sheet(`<div class="sh-h"><div><b>${esc(RCT)}</b><small class="shsub">${L.length?fmt(L.length)+' رسید · هر کدام جدا ذخیره یا ارسال می‌شود':'برای این لیست هنوز رسیدی ضمیمه نشده'}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  ${L.length?`<div class="rcall"><button class="xgo" data-act="rcShareAll">${ic('open')} اشتراک همه رسیدها</button><button class="rcsv" data-act="rcSaveAll">${ic('down')} ذخیره همه</button></div>
+  <div class="sgr smg rcl">${L.map((r,i)=>`<div class="rcr"><span class="rct" id="rct${i}"></span><span class="tx"><b>${esc(r.name)}</b><small>${fmt(r.amount)} تومان${r.tn?' · پیگیری '+esc(r.tn):''}${r.kind==='cust'?' · تسویه مشتری':r.src?' · '+esc(r.src):''}</small></span><button class="rcb" data-act="rcView" data-i="${i}" aria-label="دیدن">${ic('eye')}</button><button class="rcb" data-act="rcSave1" data-i="${i}" aria-label="ذخیره">${ic('down')}</button><button class="rcb p" data-act="rcShare1" data-i="${i}" aria-label="اشتراک">${ic('open')}</button></div>`).join('')}</div>`:`<div class="spempty" style="padding:22px 8px"><b>رسیدی نیست</b><span>رسید را از جزئیات هر واریزی، بخش «پیگیری و رسید» ضمیمه کنید.</span></div>`}`);
+  L.forEach(async(r,i)=>{const d=await imgGet(r.key),el=$('rct'+i);if(el&&d)el.style.backgroundImage=`url(${d})`})}
 function entBI(x){for(const b of batches){const i=b.items.findIndex(z=>z.id===x.id);if(i>=0)return{b,i,it:b.items[i]}}return null}
 function entTrack(x){const q=entBI(x);if(!q)return `<div class="esec"><b>پیگیری و رسید</b><div class="muted" style="font-size:12.5px">بعد از تقسیم و ارسال این واریزی، تأیید واریز، شماره پیگیری و عکس رسید از همین‌جا ثبت می‌شود.</div></div>`;
   const {b,i}=q,it={...q.it,...(eD||{})},ed=!b.closed&&can('track');
@@ -1807,7 +1830,7 @@ function entTrack(x){const q=entBI(x);if(!q)return `<div class="esec"><b>پیگ�
   <div class="etog"><button class="ok${it.st==='ok'?' on':''}" data-act="entTk" data-st="ok"${ed?'':' disabled'}>${ic('check')} واریز شد</button><button class="no${it.st==='fail'?' on':''}" data-act="entTk" data-st="fail"${ed?'':' disabled'}>${XI} ناموفق</button></div>
   <div class="erow"><input id="etn" class="ltr" inputmode="numeric" enterkeyhint="done" autocomplete="off" placeholder="شماره پیگیری" value="${esc(it.tn||'')}"${ed?'':' disabled'}>
   <label class="eimg${it.img||eD&&eD.imgD?' on':''}${ed?'':' dis'}">${ic('cam')}<span>${eD&&eD.imgD?'رسید انتخاب شد':it.img?'تغییر رسید':'عکس رسید'}</span>${ed?'<input type="file" accept="image/*" id="eimg">':''}</label>
-  ${it.img?`<button class="eimg on" data-act="viewImg" data-b="${b.id}" data-id="${it.id}">${ic('eye')}<span>دیدن</span></button>`:''}</div></div>`}
+  ${it.img?`<button class="eimg on" data-act="viewImg" data-b="${b.id}" data-id="${it.id}">${ic('eye')}<span>دیدن</span></button><button class="eimg on" data-act="rcEnt" data-b="${b.id}" data-id="${it.id}">${ic('open')}<span>ارسال</span></button>`:''}</div></div>`}
 const eDirty=()=>{if(!eD)return false;const x=entRow();if(!x)return false;const q=entBI(x);return (eD.note!=null&&eD.note.trim()!==(x.note||''))||(q&&((eD.st!=null&&eD.st!==q.it.st)||(eD.tn!=null&&eD.tn!==(q.it.tn||''))||!!eD.imgD))};
 const eUpd=()=>{const a=$('act');if(a)a.innerHTML=aEnt()};
 function bindEnt(){const x=entRow();if(!x)return;if(entEdit){bindEntEdit();return}const n=$('enote');if(n)n.oninput=()=>{eD=eD||{};eD.note=n.value;eUpd()};
@@ -2144,7 +2167,7 @@ function closePrint(){$('pv').classList.add('hide');$('pvf').srcdoc='';document.
 async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){}
   try{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
 /* ذخیره فایل: اشتراک‌گذاری روی موبایل، دانلود روی کامپیوتر */
-const MIME={gz:'application/gzip',html:'text/html',txt:'text/plain',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+const MIME={jpg:'image/jpeg',gz:'application/gzip',html:'text/html',txt:'text/plain',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
 const isTouch=()=>matchMedia('(pointer:coarse)').matches;
 async function save(name,data,ok){const ext=name.split('.').pop(),type=MIME[ext]||'application/octet-stream';
   try{if(typeof claude!=='undefined'){const d=await claude.use('downloads');if(d){await d.save({filename:name,data});toast(ok);return}}}catch(e){if(e&&e.code==='declined'){toast('ذخیره لغو شد');return}}
@@ -2370,7 +2393,7 @@ function vLday(){const d=ldData(ldKey),D=dates(ldKey);if(!d.rows.length)return '
   let h=`<div class="ldtop"><span class="ldic">${ic('cal')}</span><div><b>${esc(pdHead(ldKey))}</b><small>${d.eds.length&&!(d.eds.length===1&&d.eds[0]===ldKey)?'ثبت '+d.eds.map(e=>esc(relDay(e))).join('، ')+' · ':''}${fmt(d.G.length+(d.FS.length?1:0))} منبع · ${fmt(all)} واریزی</small></div></div>
   <div class="ldhero${done?' ok':''}"><small>${done?'لیست کامل تسویه شد ✓':'تسویه شده تا الان'}</small><b>${fmt(okS)}<i>تومان</i></b><em>از کل ${fmt(tot)} تومان</em><span class="ldbar"><i style="width:${pc}%"></i></span>
   <div class="ldst"><div><small>کل</small><b>${fmt(all)}</b></div><div><small>تسویه شده</small><b>${fmt(okN)}</b></div><div><small>در انتظار</small><b>${fmt(pend)}</b></div><div><small>ناموفق</small><b>${fmt(d.c.fail)}</b></div></div></div>
-  <div class="ldacts">${can('split')?`<button data-act="ldSplit">${ic('split')}<span>تقسیم و ارسال</span></button>`:''}<button data-act="ldRows">${ic('search')}<span>همه واریزی‌ها</span></button>${can('add')?`<button data-act="entryMenu">${ic('plus')}<span>واریزی جدید</span></button>`:''}</div>
+  <div class="ldacts">${can('split')?`<button data-act="ldSplit">${ic('split')}<span>تقسیم و ارسال</span></button>`:''}<button data-act="ldRows">${ic('search')}<span>همه واریزی‌ها</span></button><button data-act="ldRc">${ic('cam')}<span>رسیدها${(()=>{const n=rcOf(d.it.concat(d.FS.map(r=>({...r,img:false})))).length;return n?' ('+toFa(n)+')':''})()}</span></button>${can('add')?`<button data-act="entryMenu">${ic('plus')}<span>واریزی جدید</span></button>`:''}</div>
   <div class="spsec ldsec"><div><b>منابع این لیست</b><small>برای خروجی انتخاب کنید · برای ریز واریزی‌ها بزنید</small></div><button class="link" data-act="ldAll">${ldSel.size===d.G.length+(d.FS.length?1:0)?'هیچ‌کدام':'انتخاب همه'}</button></div>`;
   const grp=(key,name,rows,amt,badge,sub,pcs)=>{const on=ldSel.has(key),op=ldOpen.has(key);return `<div class="ldg${on?' sel':''}${op?' open':''}"><div class="ldh"><button class="ldck" data-act="ldPick" data-k="${esc(key)}" aria-label="انتخاب برای خروجی">${on?ic('check'):''}</button><button class="ldm" data-act="ldTog" data-k="${esc(key)}">${badge}<span class="tx"><b>${esc(name)}</b><small>${sub}</small>${pcs}</span><span class="v"><b>${fmt(amt)}</b><small>تومان</small></span>${chevI()}</button></div><div class="ldb">${rows}</div></div>`};
   d.G.forEach(g=>{const gc=bStat({items:g.rows}),so=sources.find(z=>z.name===g.name),bd=so&&so.bank?bankBadge(so.bank,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(g.name))}</span>`,np=g.rows.filter(x=>x.st==='none'||x.st==='pending').length,pc=gc.all?gc.ok/gc.all*100:0,pf=gc.all?gc.fail/gc.all*100:0;
@@ -3939,6 +3962,14 @@ ACT.stlSave=async()=>{stlRead();const x=entRow(),e=x&&entries.find(z=>z.id===x.i
 ACT.stlDel=()=>{const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e||stl.i==null)return;askConfirm('این تسویه حذف شود؟ مبلغ دوباره به مانده بانکی برمی‌گردد.','حذف',()=>{const S=e.settles=(e.settles||[]).slice(),old=S[stl.i];if(old&&old.cuId&&old.txId){const oc=custs.find(c=>String(c.id)===String(old.cuId)),ot=oc&&(oc.txs||[]).find(t=>t.id===old.txId);if(ot){ot.del=true;oc.lastAt=new Date().toISOString();saveCu()}}S.splice(stl.i,1);e.updatedAt=new Date().toISOString();saveE();stlSync(e);stl=null;closeSheet();render();toast('تسویه حذف شد')})};
 ACT.ldSplit=()=>{const R=validated().filter(r=>PD(r)===ldKey);if(!R.length)return;const c={};R.forEach(r=>{const w=(!r.sentBid&&!r.full?10:0)+1;c[r.entryDate]=(c[r.entryDate]||0)+w});const iso=Object.keys(c).sort((a,b)=>c[b]-c[a])[0];spTab='split';spPay=ldKey;dateVal=iso;ls.set('m_date',dateVal);alloc=null;go('split1')};
 ACT.ldRows=()=>{fV='rows';fP=ldKey;fG='pay';fF='all';fS='';fQ='';fD='';fT='';fN=120;spTab='lists';go('split1')};
+ACT.ldRc=()=>{const d=ldData(ldKey),P=ldSel&&ldSel.size?ldPick():{G:d.G,FS:d.FS},items=P.G.flatMap(g=>g.rows).concat(P.FS.map(r=>({...r,img:false})));openRcpts(rcOf(items),'رسیدهای '+pdHead(ldKey))};
+ACT.rcView=async d=>{const r=RC[+d.i];if(!r)return;const v=await imgGet(r.key);if(!v){toast('عکس پیدا نشد',true);return}sheet(`<div class="sh-h"><div><b>${esc(r.name)}</b><small class="shsub">${fmt(r.amount)} تومان${r.tn?' · پیگیری '+esc(r.tn):''}</small></div><button class="x" data-act="rcBack">×</button></div><img src="${v}" class="rcpt" style="max-height:62vh" alt="رسید"><div class="txacts"><button data-act="rcSave1" data-i="${d.i}">${ic('down')} ذخیره</button><button data-act="rcShare1" data-i="${d.i}">${ic('open')} اشتراک</button></div>`)};
+ACT.rcBack=()=>openRcpts(RC,RCT);
+ACT.rcSave1=async d=>{const r=RC[+d.i];if(r)rcDown(await rcFiles([r]))};
+ACT.rcShare1=async d=>{const r=RC[+d.i];if(r)rcShare(await rcFiles([r]),r.name)};
+ACT.rcSaveAll=async()=>rcDown(await rcFiles(RC));
+ACT.rcShareAll=async()=>rcShare(await rcFiles(RC),RCT);
+ACT.rcEnt=async d=>{const b=batches.find(z=>z.id==d.b),x=b&&b.items.find(z=>String(z.id)===String(d.id));if(!x)return;rcShare(await rcFiles([{key:b.id+':'+x.id,name:x.name,amount:x.amount,tn:x.tn||''}]),x.name)};
 ACT.fV=d=>{fV=d.v;fN=120;render()};
 ACT.fG=d=>{fG=d.g;fN=120;render()};
 ACT.fCal=()=>{const M=new Set(validated().map(fTK));const tg=k=>`<button class="${fG===k?'on':''}" data-act="fCalG" data-g="${k}">${k==='pay'?'تاریخ واریز':'تاریخ ثبت'}</button>`;
@@ -3953,6 +3984,7 @@ ACT.ldExp=()=>{const P=ldPick(),n=P.G.reduce((a,g)=>a+g.rows.length,0)+P.FS.leng
   <div class="sgr">
   <button class="acrow" data-act="ldText"><span class="bri">${ic('copy')}</span><span class="tx"><b>متن کامل</b><small>برای تلگرام و واتس‌اپ؛ وضعیت و نوع تسویه هر واریزی</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
   <button class="acrow" data-act="ldPdf"><span class="bri">${ic('paste')}</span><span class="tx"><b>PDF</b><small>جدول منظم به تفکیک منبع + رسیدها</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
+  <button class="acrow" data-act="ldRc"><span class="bri">${ic('cam')}</span><span class="tx"><b>رسیدهای واریز</b><small>هر رسید جدا؛ ذخیره یا ارسال تکی و گروهی</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
   <button class="acrow" data-act="ldXls"${typeof XLSX==='undefined'?' disabled':''}><span class="bri">${ic('list')}</span><span class="tx"><b>Excel</b><small>${typeof XLSX==='undefined'?'برای Excel اینترنت لازم است':'یک برگه برای هر منبع، ستون وضعیت و نوع تسویه'}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button></div>`)};
 ACT.ldText=()=>{const P=ldPick();txtGen=()=>dayTxt(ldKey,P.G,P.FS,P.T);txtName='list-'+ldKey;openText()};
 ACT.ldPdf=async()=>{const P=ldPick();closeSheet();openPrint(await dayReport(ldKey,P.G,P.FS,P.T,P.reg))};
