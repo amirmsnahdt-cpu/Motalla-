@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.3,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.4,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1543,7 +1543,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.3,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.4,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2094,17 +2094,20 @@ const Bo=t=>txtStyle==='tg'?'**'+t+'**':txtStyle==='wa'?'*'+t+'*':t;
 const Mo=t=>txtStyle==='plain'?t:'`'+t+'`';
 const LINE='┈┈┈┈┈┈┈┈┈┈┈┈┈',DLINE='━━━━━━━━━━━━';
 function txtBlock(g,D){const tot=sum(g.rows);
-  let t=Bo('مطلا · '+g.name)+'\n'+D.fa+' — '+D.en+'\n'+toFa(g.rows.length)+' واریزی · جمع '+Bo(N(tot)+' تومان')+'\n'+LINE+'\n';
+  let t=Bo('مطلا · '+g.name)+'\n'+payLine()+'\n'+toFa(g.rows.length)+' واریزی · جمع '+Bo(N(tot)+' تومان')+'\n'+LINE+'\n';
   g.rows.forEach((r,i)=>{const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';t+='\n'+Bo(toFa(i+1)+') '+fullName(r))+'\nفاکتور '+(toEn(r.code||'')||'—')+(bk?' · بانک '+bk:'')+'\nمبلغ: '+N(r.amount)+' تومان'+'\n'+Mo(ibanSp(r.iban))+'\n'});
   return t+LINE+'\n'+Bo('جمع '+g.name+': '+N(tot)+' تومان')+'\n'+toFa(g.rows.length)+' واریزی'}
 function txt(sc){const D=alloc.D,G=groups(sc).filter(g=>g.rows.length);if(G.length===1)return txtBlock(G[0],D);
   const tc=G.reduce((s,g)=>s+g.rows.length,0),ta=G.reduce((s,g)=>s+sum(g.rows),0);
-  let t=Bo('مطلا · گزارش کلی واریزی')+'\n'+D.fa+' — '+D.en+'\n'+toFa(tc)+' واریزی · جمع '+Bo(N(ta)+' تومان')+'\n'+LINE+'\n';
+  let t=Bo('مطلا · گزارش کلی واریزی')+'\n'+payLine()+'\n'+toFa(tc)+' واریزی · جمع '+Bo(N(ta)+' تومان')+'\n'+LINE+'\n';
   G.forEach(g=>t+='▫ '+g.name+': '+N(sum(g.rows))+' ('+toFa(g.rows.length)+')\n');
   t+='\n'+DLINE+'\n\n'+G.map(g=>txtBlock(g,D)).join('\n\n'+DLINE+'\n\n');
   return t+'\n\n'+DLINE+'\n'+Bo('جمع کل همه منابع: '+N(ta)+' تومان')+'\n'+toFa(tc)+' واریزی'}
 /* ============ لایه خروجی (بدون نیاز به دانلود) ============ */
-function withCtx(f){const saved=alloc;alloc=expCtx.A;try{return f(expCtx.sc)}finally{alloc=saved}}
+function expDates(A){if(!A||A.Dp!==undefined)return;const rows=(A.res||[]).flatMap(r=>r.items||[]),P=[...new Set(rows.map(r=>r.payDate||r.entryDate).filter(Boolean))].sort(),E=[...new Set(rows.map(r=>r.entryDate).filter(Boolean))].sort();A.Dp=P.length===1?dates(P[0]):null;A.Pl=P;A.reg=E.length?E.map(e=>dates(e).fa).join('، '):''}
+function withCtx(f){const saved=alloc;alloc=expCtx.A;expDates(alloc);try{return f(expCtx.sc)}finally{alloc=saved}}
+const DP=()=>(alloc&&alloc.Dp)||(alloc&&alloc.D);
+const payLine=()=>{const A=alloc||{};return A.Dp?'تاریخ واریز: '+A.Dp.fa+' — '+A.Dp.en:A.Pl&&A.Pl.length>1?'تاریخ واریز: '+A.Pl.map(k=>dates(k).fa).join('، '):A.D.fa+' — '+A.D.en};
 function ctxName(){return withCtx(sc=>(sc==='all'?'all':alloc.res[+sc].src.name.replace(/\s+/g,'-'))+'-'+alloc.D.iso)}
 function openExport(A,sc){expCtx={A,sc};txtGen=null;const nm=withCtx(s=>s==='all'?'همه منابع':alloc.res[+s].src.name);
   sheet(`<div class="sh-h"><b>خروجی — ${esc(nm)}</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
@@ -2290,7 +2293,7 @@ function vDay(){const G=dayGroups(dayIso),it=G.flatMap(g=>g.rows),c=bStat({items
   h+=`<div class="row"><button class="link" data-act="reopenDay">بازگشایی برای ویرایش وضعیت‌ها</button></div>`;return h}
 const aDay=()=>'';
 function dayTxt(iso,G0,FS0,T0){const G=G0||dayGroups(iso),D=dates(iso),it=G.flatMap(g=>g.rows),c=bStat({items:it});
-  const sentN=it.filter(x=>x.st&&x.st!=='none').length;let t=Bo('مطلا | '+(T0||'لیست روزانه واریز'))+'\nتاریخ: '+D.fa+'  |  '+D.en+'\nتعداد: '+toFa(c.all)+' واریزی'+(sentN?' (موفق '+toFa(c.ok)+(c.fail?'، ناموفق '+toFa(c.fail):'')+(c.pending?'، در انتظار '+toFa(c.pending):'')+')':'')+'\n'+Bo('مجموع کل: '+N(c.sum)+' تومان')+(sentN?'\n'+Bo('واریز شده: '+N(c.okSum)+' تومان'):'')+'\n'+DLINE+'\n';
+  const sentN=it.filter(x=>x.st&&x.st!=='none').length;let t=Bo('مطلا | '+(T0||'لیست روزانه واریز'))+'\nتاریخ واریز: '+D.fa+'  |  '+D.en+'\nتعداد: '+toFa(c.all)+' واریزی'+(sentN?' (موفق '+toFa(c.ok)+(c.fail?'، ناموفق '+toFa(c.fail):'')+(c.pending?'، در انتظار '+toFa(c.pending):'')+')':'')+'\n'+Bo('مجموع کل: '+N(c.sum)+' تومان')+(sentN?'\n'+Bo('واریز شده: '+N(c.okSum)+' تومان'):'')+'\n'+DLINE+'\n';
   G.forEach(g=>{const gs=k=>g.rows.filter(x=>x.st===k);t+='\n'+Bo('◆ منبع واریزی: '+g.name)+'\nتعداد: '+toFa(g.rows.length)+'  |  جمع: '+N(sum(g.rows))+' تومان\n'+[['ok','✅ تسویه شده'],['fail','❌ ناموفق'],['pending','⏳ در انتظار'],['none','⚪ ارسال نشده']].filter(([k])=>gs(k).length).map(([k,l])=>l+': '+toFa(gs(k).length)+' ('+N(sum(gs(k)))+' تومان)').join('  |  ')+'\n'+LINE+'\n';
     g.rows.forEach((x,i)=>{t+='\n'+Bo(toFa(i+1)+'. '+fullName(x))+'\nشماره فاکتور: '+(toEn(x.code||'')||'—')+'\nمبلغ: '+Bo(N(x.amount)+' تومان')+'\nشماره شبا:\n'+Mo(ibanSp(x.iban))+(x.settled?'\nمبلغ کل: '+N(x.total)+' تومان\nنحوه تسویه:\n'+x.settles.map(z=>'• '+setLine(z)).join('\n')+'\n• باقی‌مانده از طریق بانک: '+N(x.amount)+' تومان':'')+'\nوضعیت: '+ST[x.st][1]+' '+ST[x.st][0]+'\nنوع تسویه: '+setType(x)+(x.tn?'\nشماره پیگیری: '+Mo(x.tn):'')+(x.time?'\nساعت واریز: '+x.time:'')+(x.note?'\nیادداشت: '+x.note:'')+'\n\n'+LINE+'\n'});
     t+=Bo('◆ جمع '+g.name+': '+N(sum(g.rows))+' تومان')+'\n'});
@@ -2366,7 +2369,7 @@ function vLday(){const d=ldData(ldKey),D=dates(ldKey);if(!d.rows.length)return '
   return h}
 const aLday=()=>{const n=ldSel?ldSel.size:0;return can('export')?`<button class="fab2" data-act="ldExp"${n?'':' disabled'}>${ic('open')} خروجی${n?' '+fmt(n)+' منبع':''}</button>`:''};
 const ST_ORD={ok:0,fail:1,pending:2,none:3};
-function ldPick(){const d=ldData(ldKey);return{G:d.G.filter(g=>ldSel.has(g.name)).map(g=>({...g,rows:g.rows.slice().sort((a,b)=>(ST_ORD[a.st]??9)-(ST_ORD[b.st]??9))})),FS:ldSel.has('__full')?d.FS:[],T:'لیست '+pdHead(ldKey)}}
+function ldPick(){const d=ldData(ldKey);return{reg:d.eds.map(e=>dates(e).fa).join('، '),G:d.G.filter(g=>ldSel.has(g.name)).map(g=>({...g,rows:g.rows.slice().sort((a,b)=>(ST_ORD[a.st]??9)-(ST_ORD[b.st]??9))})),FS:ldSel.has('__full')?d.FS:[],T:'لیست '+pdHead(ldKey)}}
 function vSplit1(){if(spTab==='lists')return spSeg()+vFind();if(spTab==='arch')return spSeg()+vArch();return spSeg()+vSplit1b()}
 function vSplit1b(){const DL0=dayList(),PDS={},US=new Set(parts().flatMap(p=>p.ids));DL0.forEach(r=>{const k=PD(r);PDS[k]=PDS[k]||{n:0,s:0};if(!r.sentBid&&!r.full&&r.level<2&&!US.has(r.id)){PDS[k].n++;PDS[k].s+=r.amount}});if(spPay&&!PDS[spPay])spPay='';const PK=Object.keys(PDS).sort();if(PK.length>1&&!spPay)spPay=PK.find(k=>PDS[k].n)||PK[0];if(PK.length<2)spPay='';
   const R=remainList(),ok=R.filter(r=>r.level<2),badL=R.filter(r=>r.level===2),P=parts().filter(p=>!(p.sent&&batches.some(b=>b.id===p.bid&&b.closed))&&pVis(p)),sentN=DL0.filter(r=>r.sentBid&&(!spPay||PD(r)===spPay)).length,D=dates(dateVal);
@@ -2727,15 +2730,16 @@ function reopen(id){const x=audit.find(a=>a.id==id);if(!x||!x.snap)return;const 
   alloc={res:s.res,left:s.left||[],excl:(s.excl||[]).map(r=>({...r,issues:r.issues||[]})),D:dates(s.date),fromHist:x.ts};go('split3')}
 /* ============ خروجی‌ها ============ */
 const rdate=(r,D)=>r&&r.entryDate?dates(r.entryDate):D;
+const pdate=(r,D)=>r&&(r.payDate||r.entryDate)?dates(r.payDate||r.entryDate):D;
 const groups=sc=>{const R=sc==='all'?alloc.res.filter(r=>r.items.length):[alloc.res[+sc]];return R.map(r=>({name:r.src.name,limit:+r.src.limit||0,rows:r.items}))};
 const amtS=n=>Number(n).toLocaleString('en-US').replace(/,/g,'/');
 function xlsx(sc){const D=alloc.D,G=groups(sc),wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};const used={};
   const nm=n=>{let b=n.replace(/[\\\/?*\[\]:]/g,'').slice(0,28)||'sheet',k=b,i=1;while(used[k])k=b+(++i);used[k]=1;return k};
-  if(sc==='all'){const a=[['منبع','تعداد','جمع مبلغ (تومان)','موجودی تعیین‌شده','تاریخ شمسی','تاریخ میلادی']];G.forEach(g=>a.push([g.name,g.rows.length,sum(g.rows),g.limit,rdate(g.rows[0],D).fa,rdate(g.rows[0],D).iso]));
-    a.push(['مجموع',G.reduce((s,g)=>s+g.rows.length,0),G.reduce((s,g)=>s+sum(g.rows),0),'','','']);const w=XLSX.utils.aoa_to_sheet(a);w['!cols']=[{wch:18},{wch:8},{wch:20},{wch:20},{wch:16},{wch:18}];
+  if(sc==='all'){const a=[['منبع','تعداد','جمع مبلغ (تومان)','موجودی تعیین‌شده','تاریخ واریز','تاریخ واریز (میلادی)','تاریخ ثبت']];G.forEach(g=>a.push([g.name,g.rows.length,sum(g.rows),g.limit,pdate(g.rows[0],D).fa,pdate(g.rows[0],D).iso,rdate(g.rows[0],D).fa]));
+    a.push(['مجموع',G.reduce((s,g)=>s+g.rows.length,0),G.reduce((s,g)=>s+sum(g.rows),0),'','','','']);const w=XLSX.utils.aoa_to_sheet(a);w['!cols']=[{wch:18},{wch:8},{wch:20},{wch:20},{wch:16},{wch:18}];
     for(let r=2;r<=a.length;r++)['C','D'].forEach(c=>{if(w[c+r]&&typeof w[c+r].v==='number')w[c+r].z='#,##0'});XLSX.utils.book_append_sheet(wb,w,nm('خلاصه'))}
-  G.forEach(g=>{const a=[['ردیف','نام و نام خانوادگی','شماره فاکتور','مبلغ (تومان)','بانک مقصد','شماره حساب','شماره کارت','شماره شبا','منبع واریزی','تاریخ شمسی','تاریخ میلادی','ثبت‌کننده']];
-    g.rows.forEach((r,i)=>a.push([i+1,r.name,r.code,r.amount,r.bankShow,r.acct,r.card,r.iban,g.name,rdate(r,D).fa,rdate(r,D).iso,r.createdBy||'']));a.push(['','جمع','',sum(g.rows),'','','','','','','','']);
+  G.forEach(g=>{const a=[['ردیف','نام و نام خانوادگی','شماره فاکتور','مبلغ (تومان)','بانک مقصد','شماره حساب','شماره کارت','شماره شبا','منبع واریزی','تاریخ واریز','تاریخ واریز (میلادی)','تاریخ ثبت','ثبت‌کننده']];
+    g.rows.forEach((r,i)=>a.push([i+1,r.name,r.code,r.amount,r.bankShow,r.acct,r.card,r.iban,g.name,pdate(r,D).fa,pdate(r,D).iso,rdate(r,D).fa,r.createdBy||'']));a.push(['','جمع','',sum(g.rows),'','','','','','','','','']);
     const w=XLSX.utils.aoa_to_sheet(a);w['!cols']=[{wch:6},{wch:22},{wch:12},{wch:16},{wch:14},{wch:18},{wch:20},{wch:30},{wch:16},{wch:16},{wch:14},{wch:14}];
     for(let r=2;r<=a.length;r++)if(w['D'+r])w['D'+r].z='#,##0';XLSX.utils.book_append_sheet(wb,w,nm(g.name))});
   return XLSX.write(wb,{bookType:'xlsx',type:'array'})}
@@ -2788,7 +2792,7 @@ body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;color:#16213a;font-
 .brand b{display:block;font-size:12.5pt;font-weight:800;line-height:1.2}.brand small{display:block;font-size:7.4pt;color:#9097a5;font-weight:500}
 .doc{font-size:7.6pt;color:#9097a5;text-align:left;line-height:1.5}
 h1{font-size:20pt;font-weight:800;margin:22px 0 0;letter-spacing:-.4px;line-height:1.35}
-.sub{color:#6b7385;font-size:9pt;margin-top:2px}.sub span{direction:ltr;display:inline-block}
+.sub{color:#6b7385;font-size:9pt;margin-top:2px}.sub .pd{color:#13284f;font-size:11pt;font-weight:800}.sub .rg{display:block;font-size:8pt;color:#8a90a0;margin-top:2px}.sub span{direction:ltr;display:inline-block}
 .bar{height:3px;width:46px;background:linear-gradient(90deg,#ecc874,#b8862b);border-radius:3px;margin:12px 0 16px}
 .kp{display:flex;border:1px solid #e7e9ef;border-radius:14px;margin-bottom:18px;overflow:hidden}
 .kp div{flex:1;padding:10px 14px;border-left:1px solid #e7e9ef}.kp div:last-child{border-left:0}
@@ -2815,24 +2819,24 @@ tr.tot td{border-bottom:0;border-top:1.2px solid #16213a;font-weight:800;padding
 function pdfTop(kind,D){const now=new Date();return `<div class="top"><div class="brand"><span class="mk">م</span><span><b>مطلا</b><small>طلا و جواهر</small></span></div><div class="doc">${esc(kind)}<br>${D.fa}</div></div>`}
 const pdfFoot=()=>`<div class="foot"><span>سامانه واریزی مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
 const pdfDoc=(title,body)=>`<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>${PDF_FONT}<style>${pdfCSS()}</style></head><body><button class="pb" onclick="window.print()">چاپ / ذخیره PDF</button>${body}</body></html>`;
-const pdfSub=D=>`<div class="sub">${D.fa} — <span>${D.en}</span></div>`;
+const pdfSub=(D,reg)=>`<div class="sub"><b class="pd">تاریخ واریز: ${D.fa}</b> — <span>${D.en}</span>${reg?`<small class="rg">تاریخ ثبت: ${esc(reg)}</small>`:''}</div>`;
 /* گزارش تخصیص / لیست (جایگزین نسخه قدیمی) */
-function reportHTML(sc){const D=alloc.D,G=groups(sc).filter(g=>g.rows.length),tc=G.reduce((s,g)=>s+g.rows.length,0),ta=G.reduce((s,g)=>s+sum(g.rows),0);let h='';
-  if(G.length>1)h+=`<section class="pg">${pdfTop('گزارش واریزی',D)}<h1>گزارش کلی واریزی</h1>${pdfSub(D)}<div class="bar"></div>
+function reportHTML(sc){const D=DP(),RG=alloc.reg||'',G=groups(sc).filter(g=>g.rows.length),tc=G.reduce((s,g)=>s+g.rows.length,0),ta=G.reduce((s,g)=>s+sum(g.rows),0);let h='';
+  if(G.length>1)h+=`<section class="pg">${pdfTop('گزارش واریزی',D)}<h1>گزارش کلی واریزی</h1>${pdfSub(D,RG)}<div class="bar"></div>
     <div class="kp"><div><small>تعداد واریزی</small><b>${fmt(tc)}</b></div><div class="g"><small>مجموع</small><b>${fmt(ta)}<em>تومان</em></b></div><div><small>منبع</small><b>${fmt(G.length)}</b></div></div>
     <table><thead><tr><th>#</th><th>منبع واریزی</th><th>تعداد</th><th class="am">مجموع (تومان)</th></tr></thead><tbody>${G.map((g,i)=>`<tr><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(g.name)}</span></td><td>${fmt(g.rows.length)}</td><td class="am">${fmt(sum(g.rows))}</td></tr>`).join('')}
     <tr class="tot"><td></td><td>جمع کل</td><td>${fmt(tc)}</td><td class="am">${fmt(ta)}</td></tr></tbody></table>
     <div class="sign"><div>تهیه‌کننده</div><div>تأیید مدیر</div></div>${pdfFoot()}</section>`;
-  G.forEach(g=>{const s=sum(g.rows);h+=`<section class="pg">${pdfTop('گزارش واریزی',D)}<h1>${esc(g.name)}</h1>${pdfSub(D)}<div class="bar"></div>
+  G.forEach(g=>{const s=sum(g.rows);h+=`<section class="pg">${pdfTop('گزارش واریزی',D)}<h1>${esc(g.name)}</h1>${pdfSub(D,RG)}<div class="bar"></div>
     <div class="kp"><div><small>تعداد واریزی</small><b>${fmt(g.rows.length)}</b></div><div class="g"><small>مجموع</small><b>${fmt(s)}<em>تومان</em></b></div></div>
     <table><thead><tr><th>#</th><th>نام و فاکتور</th><th>بانک</th><th>شماره شبا</th><th class="am">مبلغ (تومان)</th></tr></thead><tbody>
     ${g.rows.map((r,i)=>`<tr><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(r))}</span>${r.code?`<span class="s">فاکتور ${esc(toEn(r.code))}</span>`:''}${r.settled?`<span class="s">از ${fmt(r.total)}، ${fmt(r.settled)} مستقیم توسط مشتری</span>`:''}</td><td>${esc(r.bankShow||'—')}</td><td class="ib">${esc(ibanSp(r.iban))}</td><td class="am">${fmt(r.amount)}</td></tr>`).join('')}
     <tr class="tot"><td></td><td colspan="3">جمع ${esc(g.name)} — ${fmt(g.rows.length)} واریزی</td><td class="am">${fmt(s)}</td></tr></tbody></table>${pdfFoot()}</section>`});
   return pdfDoc('گزارش واریزی '+D.iso,h)}
 /* لیست روزانه با وضعیت، شماره پیگیری و رسیدها */
-async function dayReport(iso,G0,FS0,T0){const G=G0||dayGroups(iso),D=dates(iso),it=G.flatMap(g=>g.rows),c=bStat({items:it}),imgs={};
+async function dayReport(iso,G0,FS0,T0,R0){const G=G0||dayGroups(iso),D=dates(iso),it=G.flatMap(g=>g.rows),c=bStat({items:it}),imgs={};
   for(const x of it)if(x.img){const b=batches.find(z=>z.id===x.bid);if(b)imgs[x.bid+':'+x.id]=await imgGet(ikey(b,x))}
-  const TT=T0||'لیست روزانه واریز';let h=`<section class="pg">${pdfTop(TT,D)}<h1>${esc(TT)}</h1>${pdfSub(D)}<div class="bar"></div>
+  const TT=T0||'لیست روزانه واریز';let h=`<section class="pg">${pdfTop(TT,D)}<h1>${esc(TT)}</h1>${pdfSub(D,R0||'')}<div class="bar"></div>
   <div class="kp"><div><small>کل واریزی‌ها</small><b>${fmt(c.all)}</b></div><div class="ok"><small>انجام شد</small><b>${fmt(c.ok)}</b></div><div class="rd"><small>انجام نشد</small><b>${fmt(c.fail)}</b></div><div class="g"><small>واریز شده</small><b>${fmt(c.okSum)}<em>تومان</em></b></div></div>`;
   G.forEach(g=>{const s=sum(g.rows),gc=bStat({items:g.rows});h+=`<h2>${esc(g.name)}<small>${fmt(g.rows.length)} واریزی — ${fmt(s)} تومان${gc.fail?' — '+fmt(gc.fail)+' ناموفق':''}</small></h2>
     <table><thead><tr><th>#</th><th>نام و فاکتور</th><th>شبا و بانک</th><th>وضعیت و پیگیری</th><th class="am">مبلغ (تومان)</th></tr></thead><tbody>
@@ -3939,7 +3943,7 @@ ACT.ldExp=()=>{const P=ldPick(),n=P.G.reduce((a,g)=>a+g.rows.length,0)+P.FS.leng
   <button class="acrow" data-act="ldPdf"><span class="bri">${ic('paste')}</span><span class="tx"><b>PDF</b><small>جدول منظم به تفکیک منبع + رسیدها</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
   <button class="acrow" data-act="ldXls"${typeof XLSX==='undefined'?' disabled':''}><span class="bri">${ic('list')}</span><span class="tx"><b>Excel</b><small>${typeof XLSX==='undefined'?'برای Excel اینترنت لازم است':'یک برگه برای هر منبع، ستون وضعیت و نوع تسویه'}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button></div>`)};
 ACT.ldText=()=>{const P=ldPick();txtGen=()=>dayTxt(ldKey,P.G,P.FS,P.T);txtName='list-'+ldKey;openText()};
-ACT.ldPdf=async()=>{const P=ldPick();closeSheet();openPrint(await dayReport(ldKey,P.G,P.FS,P.T))};
+ACT.ldPdf=async()=>{const P=ldPick();closeSheet();openPrint(await dayReport(ldKey,P.G,P.FS,P.T,P.reg))};
 ACT.ldXls=()=>{if(typeof XLSX==='undefined')return;const P=ldPick();closeSheet();save('motalla-list-'+ldKey+'.xlsx',dayXlsx(ldKey,P.G,P.FS),'فایل Excel آماده شد')};
 ACT.fTClr=()=>{fT='';fN=120;render()};
 ACT.fP=d=>{fP=fP===d.iso?'':d.iso;if(fP)fG='pay';fN=120;render()};
