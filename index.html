@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.7,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.8,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1587,7 +1587,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=50.7,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=50.8,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1775,7 +1775,7 @@ function dstrip(){const L=datesWith(),t=todayISO();if(!L.some(x=>x.iso===t))L.un
 function greet(){const h=new Date().getHours();return h<5?'شب بخیر':h<12?'صبح بخیر':h<16?'ظهر بخیر':h<20?'عصر بخیر':'شب بخیر'}
 function userInit(u){return u?[...u.trim()][0]:'؟'}
 /* ============ خانه (سبک بلوبانک) ============ */
-let homeF='all',homeOpen=new Set(),homeP='';
+let homeF='all',homeOpen=new Set(),homeP='',homePick=false;
 const isOkE=x=>{const t=entSt(x);return !!t&&t[1]==='ok'};
 const ST_LAB={bad:'خطادار',ok:'تسویه شده',fail:'ناموفق',pend:'ارسال شده',new:'ثبت شده'};
 function rowSt(x){const t=entSt(x);return x.level===2?'bad':t?(t[1]==='ok'?'ok':(t[1]==='fail'||t[1]==='rd')?'fail':'pend'):'new'}
@@ -1960,8 +1960,8 @@ function vHome(){AM=allocMap();const lo=isoAdd(dateVal,-HOME_DAYS),L0=validated(
     ${PKP.length>1?`<div class="bhp${PKP.length>3?' scr':''}">${PKP.map(k=>[k,payLab(k),L0.filter(x=>PD(x)===k)]).map(([k,t,A])=>`<button class="${homeP===k?'on':''}" data-act="homeP" data-iso="${k}"><span>${esc(t)}</span><b>${fmt(sum(A))}</b><small>${fmt(A.length)} واریزی</small></button>`).join('')}</div>`:''}
     <div class="bhc">${chip('bad',bad.length,'خطادار','r')}${chip('ok',ok.length,'تسویه شده','g')}${chip('pend',pend.length,'در انتظار','w')}</div>
     <div class="bha"><button class="ba pri" data-act="entryMenu"><i>${ic('plus')}</i><span>ورود حساب</span></button><button class="ba" data-act="tab" data-n="split"><i>${ic('split')}</i><span>واریزها</span>${pa?`<em>${toFa(pa)}</em>`:''}</button></div></div>`;
-  const fOk=x=>homeF==='bad'?x.level===2:homeF==='ok'?isOkE(x):homeF==='pend'?(x.level<2&&!isOkE(x)):true,rows=L0.filter(fOk).slice().reverse();
-  h+=`<div class="bpanel"><div class="grab"><i class="pspin"></i></div><div class="bph"><div><b>لیست‌های واریز</b><small>به تفکیک روز · امروز بالا${L0.length?'، '+fmt(PKH.length)+' روز':''}${homeF!=='all'?'، فیلتر: '+({bad:'خطادار',ok:'تسویه شده',pend:'در انتظار'})[homeF]:''}</small></div>${homeF!=='all'?'<button class="link" data-act="homeF" data-f="all">همه</button>':''}</div>`;
+  const fOk=x=>homeF==='bad'?x.level===2:homeF==='ok'?isOkE(x):homeF==='pend'?(x.level<2&&!isOkE(x)):true,rows=L0.filter(x=>fOk(x)&&(!homePick||PD(x)===homeP)).slice().reverse();
+  h+=`<div class="bpanel"><div class="grab"><i class="pspin"></i></div><div class="bph"><div><b>${homePick?'لیست واریز '+esc(payLab(homeP)):'لیست‌های واریز'}</b><small>${homePick?fmt(L.length)+' واریزی · '+fmt(sum(L))+' تومان':'به تفکیک روز · امروز بالا'+(L0.length?'، '+fmt(PKH.length)+' روز':'')}${homeF!=='all'?'، فیلتر: '+({bad:'خطادار',ok:'تسویه شده',pend:'در انتظار'})[homeF]:''}</small></div>${homeF!=='all'?'<button class="link" data-act="homeF" data-f="all">همه</button>':homePick?`<button class="link" data-act="homeP" data-iso="${homeP}">همه روزها</button>`:''}</div>`;
   if(!storeOK)h+='<div class="msg warn">ذخیره خودکار در این مرورگر ممکن نیست.</div>';
   if(openCreds().length)h+=`<button class="lrow" data-act="tab" data-n="debt"><span class="ic gd">${ic('debt')}</span><span class="tx"><b>تسویه بدهی: ${fmt(openCreds().length)} حساب باز</b><small>مانده کل ${fmt(openCreds().reduce((s,c)=>s+cRem(c),0))} تومان</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`;
   if(!L0.length)h+=`<div class="bempty">${ic('list')}<b>برای ${D.fa} واریزی‌ای ثبت نشده</b><span>با «ورود حساب» بالای صفحه شروع کنید.</span></div>`;
@@ -3620,7 +3620,7 @@ ACT.settings=()=>go('settings');
 ACT.setTheme=d=>{const ch=themePref!==d.t;themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;
   if(ch&&IOS_SA)toast('برای هم‌رنگ شدن نوار بالا، برنامه را یک بار کامل ببندید و باز کنید');};
 ACT.applyUpd=()=>applyUpd();
-ACT.homeP=d=>{homeP=d.iso||'';homeF='all';if(homeP<dateVal)homeOpen.add('p'+homeP);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
+ACT.homeP=d=>{const k=d.iso||'';if(homePick&&homeP===k){homePick=false}else{homeP=k;homePick=true}homeF='all';if(homeP<dateVal)homeOpen.add('p'+homeP);const v=$('view');render();requestAnimationFrame(()=>{const P=v.querySelector('.bpanel');if(P&&homePick)v.scrollTo({top:Math.max(0,P.offsetTop-60),behavior:'smooth'})})};
 ACT.hpTog=d=>{const k='p'+d.iso;if(d.iso<dateVal){homeOpen.has(k)?homeOpen.delete(k):homeOpen.add(k)}homeP=d.iso;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.bTog=(d,e)=>{const r=e.target.closest('.brw');if(!r)return;const o=r.classList.toggle('open'),h=r.querySelector('.brh');if(h)h.setAttribute('aria-expanded',o);o?homeOpen.add(String(d.id)):homeOpen.delete(String(d.id))};
