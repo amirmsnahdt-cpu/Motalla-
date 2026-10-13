@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=51.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=51.3,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1618,6 +1618,19 @@ body{font-feature-settings:normal}
 .txacts label{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--blu2);color:var(--blu);font-size:13px;font-weight:700;border-radius:14px;padding:11px 8px;cursor:pointer}.txacts label svg{width:16px;height:16px}
 label.rcb{display:grid;place-items:center}
 .sprow.done,.sprow.sent{padding:12px 14px!important;border-radius:16px}.sprow.done .brv,.sprow.sent .brv{flex:none}.sprow .brv{flex:none;white-space:nowrap}
+
+/* منابع صفحه تقسیم: هر منبع یک کارت گرد جدا (مثل کارت‌های لیست‌ها)، بدون زمینه خاکستری دور */
+.blist:has(>.swr .sprow){background:transparent!important;box-shadow:none!important;border:0!important;border-radius:0!important;overflow:visible!important;padding:0!important}
+.blist>.swr:has(.sprow){background:transparent!important;border:0!important;border-top:0!important;border-radius:18px!important;margin:0 0 10px!important;box-shadow:none!important;overflow:hidden}
+.blist>.swr:has(.sprow)+.swr{border-top:0!important}
+.swr .sprow{border-radius:18px!important;background:var(--card)!important;padding:12px 14px!important;box-shadow:0 0 0 1px var(--hair)}
+.sprow.done,.sprow.sent{box-shadow:none}
+.sprow.done::after,.sprow.sent::after{inset:0!important;border-radius:18px!important}
+
+/* قاب ساده: فقط یک خط رنگی گرد، بدون هاله */
+.arcd.ok,.arcd:not(.ok){box-shadow:0 1px 3px #16213a0d!important}
+.ldg.gok,.ldg.gok.sel{box-shadow:0 0 0 1.5px var(--ok)!important}
+.ldg.gpe,.ldg.gpe.sel{box-shadow:0 0 0 1.5px var(--pe)!important}
 </style>
 </head>
 <body>
@@ -1628,7 +1641,7 @@ label.rcb{display:grid;place-items:center}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=51.2,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=51.3,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
