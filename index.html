@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.2,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.3,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1543,7 +1543,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.2,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.3,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1888,13 +1888,13 @@ function paintBars(){const dark=document.documentElement.getAttribute('data-them
   try{if(window.AndroidBridge&&AndroidBridge.setStatusBar)AndroidBridge.setStatusBar(top,home||dark)}catch(e){}}
 /* ترتیب لیست‌ها در خانه: واریز امروز بالا، بعد روزهای آینده به ترتیب، بعد روزهای گذشته */
 const pdOrd=K=>{const t=dateVal;return K.slice().sort((a,b)=>{const ra=a===t?0:a>t?1:2,rb=b===t?0:b>t?1:2;return ra!==rb?ra-rb:ra===2?(a<b?1:-1):(a<b?-1:1)})};
-function vHome(){AM=allocMap();const lo=isoAdd(dateVal,-HOME_DAYS),L0=validated().filter(x=>x.entryDate===dateVal||PD(x)>=lo),r=relDay(dateVal),lab=['امروز','دیروز','فردا'].includes(r)?r:'این روز',PKH=pdOrd([...new Set(L0.map(PD))]);if(!homeP||!PKH.includes(homeP))homeP=PKH.includes(dateVal)?dateVal:(PKH[0]||'');const D=dates(homeP||dateVal),L=homeP?L0.filter(x=>PD(x)===homeP):[];
+function vHome(){AM=allocMap();const lo=isoAdd(dateVal,-HOME_DAYS),L0=validated().filter(x=>x.entryDate===dateVal||PD(x)>=lo),r=relDay(dateVal),lab=['امروز','دیروز','فردا'].includes(r)?r:'این روز',PKH=pdOrd([...new Set(L0.map(PD))]);if(!homeP||!PKH.includes(homeP))homeP=PKH.includes(dateVal)?dateVal:(PKH[0]||'');const PKP=PKH.filter(k=>k>=dateVal),D=dates(homeP||dateVal),L=homeP?L0.filter(x=>PD(x)===homeP):[];
   const bad=L.filter(x=>x.level===2),ok=L.filter(isOkE),pend=L.filter(x=>x.level<2&&!isOkE(x)),f=flowState(),pa=pendingAll();
   if(homeF==='bad'&&!bad.length||homeF==='ok'&&!ok.length||homeF==='pend'&&!pend.length)homeF='all';
   const chip=(k,n,t,cls)=>n?`<button class="bhc-i ${cls}${homeF===k?' on':''}" data-act="homeF" data-f="${k}"><b>${fmt(n)}</b> ${t}</button>`:'';
   let h=`<div class="bhero"><div class="bhl">جمع واریز ${homeP?esc(payLab(homeP)):lab}</div><div class="bhv">${fmt(sum(L))}<small>تومان</small></div>
     <span class="bhd">${ic('cal')}<span>${esc(D.wd)}، ${D.fa}</span></span>
-    ${PKH.length>1?`<div class="bhp scr">${PKH.map(k=>[k,payLab(k),L0.filter(x=>PD(x)===k)]).map(([k,t,A])=>`<button class="${homeP===k?'on':''}" data-act="homeP" data-iso="${k}"><span>${esc(t)}</span><b>${fmt(sum(A))}</b><small>${fmt(A.length)} واریزی</small></button>`).join('')}</div>`:''}
+    ${PKP.length>1?`<div class="bhp${PKP.length>3?' scr':''}">${PKP.map(k=>[k,payLab(k),L0.filter(x=>PD(x)===k)]).map(([k,t,A])=>`<button class="${homeP===k?'on':''}" data-act="homeP" data-iso="${k}"><span>${esc(t)}</span><b>${fmt(sum(A))}</b><small>${fmt(A.length)} واریزی</small></button>`).join('')}</div>`:''}
     <div class="bhc">${chip('bad',bad.length,'خطادار','r')}${chip('ok',ok.length,'تسویه شده','g')}${chip('pend',pend.length,'در انتظار','w')}</div>
     <div class="bha"><button class="ba pri" data-act="entryMenu"><i>${ic('plus')}</i><span>ورود حساب</span></button><button class="ba" data-act="tab" data-n="split"><i>${ic('split')}</i><span>تقسیم و پیگیری</span>${pa?`<em>${toFa(pa)}</em>`:''}</button><button class="ba" data-act="spLists"><i>${ic('list')}</i><span>لیست‌ها</span>${bad.length?`<em class="r">${toFa(bad.length)}</em>`:''}</button></div></div>`;
   const fOk=x=>homeF==='bad'?x.level===2:homeF==='ok'?isOkE(x):homeF==='pend'?(x.level<2&&!isOkE(x)):true,rows=L0.filter(fOk).slice().reverse();
