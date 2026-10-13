@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.9,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.91,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1587,7 +1587,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=50.9,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=50.91,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -3620,7 +3620,7 @@ ACT.settings=()=>go('settings');
 ACT.setTheme=d=>{const ch=themePref!==d.t;themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;
   if(ch&&IOS_SA)toast('برای هم‌رنگ شدن نوار بالا، برنامه را یک بار کامل ببندید و باز کنید');};
 ACT.applyUpd=()=>applyUpd();
-ACT.homeP=d=>{const k=d.iso||'';if(homePick&&homeP===k){homePick=false}else{homeP=k;homePick=true}homeF='all';if(homeP<dateVal)homeOpen.add('p'+homeP);const v=$('view');render();requestAnimationFrame(()=>{const P=v.querySelector('.bpanel');if(P&&homePick)v.scrollTo({top:Math.max(0,P.offsetTop-60),behavior:'smooth'})})};
+ACT.homeP=d=>{const k=d.iso||'';if(homePick&&homeP===k){homePick=false}else{homeP=k;homePick=true}homeF='all';if(homeP<dateVal)homeOpen.add('p'+homeP);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.hpTog=d=>{const k='p'+d.iso;if(d.iso<dateVal){homeOpen.has(k)?homeOpen.delete(k):homeOpen.add(k)}homeP=d.iso;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.bTog=(d,e)=>{const r=e.target.closest('.brw');if(!r)return;const o=r.classList.toggle('open'),h=r.querySelector('.brh');if(h)h.setAttribute('aria-expanded',o);o?homeOpen.add(String(d.id)):homeOpen.delete(String(d.id))};
