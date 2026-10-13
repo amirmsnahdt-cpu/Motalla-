@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.92,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.93,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1568,7 +1568,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.92,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.93,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2415,7 +2415,7 @@ function vLday(){const d=ldData(ldKey),D=dates(ldKey);if(!d.rows.length)return '
 function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
 const aLday=()=>{const n=ldSel?ldSel.size:0;return can('export')?`<button class="fab2" data-act="ldExp"${n?'':' disabled'}>${ic('open')} خروجی${n?' '+fmt(n)+' منبع':''}</button>`:''};
 const ST_ORD={ok:0,fail:1,pending:2,none:3};
-function ldPick(){const d=ldData(ldKey);return{reg:d.eds.map(e=>dates(e).fa).join('، '),G:d.G.filter(g=>ldSel.has(g.name)).map(g=>({...g,rows:g.rows.slice().sort((a,b)=>(ST_ORD[a.st]??9)-(ST_ORD[b.st]??9))})),FS:ldSel.has('__full')?d.FS:[],T:'لیست '+pdHead(ldKey)}}
+function ldPick(){const d=ldData(ldKey);return{reg:d.eds.map(e=>dates(e).fa).join('، '),G:d.G.filter(g=>ldSel.has(g.name)).map(g=>({...g,rows:g.rows.slice().sort((a,b)=>(ST_ORD[a.st]??9)-(ST_ORD[b.st]??9))})),FS:ldSel.has('__full')?d.FS:[],T:'لیست واریز '+payLab(ldKey)}}
 function vSplit1(){if(spTab==='arch')spTab='lists';if(spTab==='lists')return spSeg()+vFind();if(spTab==='arch')return spSeg()+vArch();return spSeg()+vSplit1b()}
 function vSplit1b(){const DL0=dayList(),PDS={},US=new Set(parts().flatMap(p=>p.ids));DL0.forEach(r=>{const k=PD(r);PDS[k]=PDS[k]||{n:0,s:0};if(!r.sentBid&&!r.full&&r.level<2&&!US.has(r.id)){PDS[k].n++;PDS[k].s+=r.amount}});if(spPay&&!PDS[spPay])spPay='';const PK=Object.keys(PDS).sort();if(PK.length>1&&!spPay)spPay=PK.find(k=>PDS[k].n)||PK[0];if(PK.length<2)spPay='';
   const R=remainList(),ok=R.filter(r=>r.level<2),badL=R.filter(r=>r.level===2),P=parts().filter(p=>!(p.sent&&batches.some(b=>b.id===p.bid&&b.closed))&&pVis(p)),sentN=DL0.filter(r=>r.sentBid&&(!spPay||PD(r)===spPay)).length,D=dates(dateVal);
@@ -2838,7 +2838,7 @@ body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;color:#16213a;font-
 .brand b{display:block;font-size:12.5pt;font-weight:800;line-height:1.2}.brand small{display:block;font-size:7.4pt;color:#9097a5;font-weight:500}
 .doc{font-size:7.6pt;color:#9097a5;text-align:left;line-height:1.5}
 h1{font-size:20pt;font-weight:800;margin:22px 0 0;letter-spacing:-.4px;line-height:1.35}
-.sub{color:#6b7385;font-size:9pt;margin-top:2px}.sub .pd{color:#13284f;font-size:11pt;font-weight:800}.sub .rg{display:block;font-size:8pt;color:#8a90a0;margin-top:2px}.sub span{direction:ltr;display:inline-block}
+.sub{color:#6b7385;font-size:9pt;margin-top:2px}.sub{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}.sub .pdl{font-size:7.5pt!important;font-weight:700;color:#7a5a12;background:#f6ecd2;border-radius:6px;padding:1px 7px}.sub .pdv{font-size:9.5pt!important;font-weight:800;color:#13284f;direction:rtl;unicode-bidi:isolate}.sub .pde{direction:ltr;unicode-bidi:isolate}.sub .pde{font-size:8.5pt!important;color:#8a90a0}.sub .rg{font-size:8pt!important;color:#8a90a0;border-inline-start:1px solid #dfe3ea;padding-inline-start:8px}.sub span{direction:ltr;display:inline-block}
 .bar{height:3px;width:46px;background:linear-gradient(90deg,#ecc874,#b8862b);border-radius:3px;margin:12px 0 16px}
 .kp{display:flex;border:1px solid #e7e9ef;border-radius:14px;margin-bottom:18px;overflow:hidden}
 .kp div{flex:1;padding:10px 14px;border-left:1px solid #e7e9ef}.kp div:last-child{border-left:0}
@@ -2865,7 +2865,7 @@ tr.tot td{border-bottom:0;border-top:1.2px solid #16213a;font-weight:800;padding
 function pdfTop(kind,D){const now=new Date();return `<div class="top"><div class="brand"><span class="mk">م</span><span><b>مطلا</b><small>طلا و جواهر</small></span></div><div class="doc">${esc(kind)}<br>${D.fa}</div></div>`}
 const pdfFoot=()=>`<div class="foot"><span>سامانه واریزی مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
 const pdfDoc=(title,body)=>`<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>${PDF_FONT}<style>${pdfCSS()}</style></head><body><button class="pb" onclick="window.print()">چاپ / ذخیره PDF</button>${body}</body></html>`;
-const pdfSub=(D,reg)=>`<div class="sub"><b class="pd">تاریخ واریز: ${D.fa}</b> — <span>${D.en}</span>${reg?`<small class="rg">تاریخ ثبت: ${esc(reg)}</small>`:''}</div>`;
+const pdfSub=(D,reg)=>`<div class="sub"><span class="pdl">تاریخ واریز</span><span class="pdv">${D.fa}</span><span class="pde">${D.en}</span>${reg?`<span class="rg">ثبت: ${esc(reg)}</span>`:''}</div>`;
 /* گزارش تخصیص / لیست (جایگزین نسخه قدیمی) */
 function reportHTML(sc){const D=DP(),RG=alloc.reg||'',G=groups(sc).filter(g=>g.rows.length),tc=G.reduce((s,g)=>s+g.rows.length,0),ta=G.reduce((s,g)=>s+sum(g.rows),0);let h='';
   if(G.length>1)h+=`<section class="pg">${pdfTop('گزارش واریزی',D)}<h1>گزارش کلی واریزی</h1>${pdfSub(D,RG)}<div class="bar"></div>
