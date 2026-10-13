@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=50.1,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1563,6 +1563,7 @@ body{font-feature-settings:normal}
 .fcard .brw.ok,.blist .brw.ok{position:relative;border-radius:16px!important;overflow:hidden;background:color-mix(in srgb,var(--ok2) 45%,var(--card))!important}.fcard .brw.ok>.brh,.blist .brw.ok>.brh{background:transparent!important}.fcard .brw.ok::after,.blist .brw.ok::after{content:'';position:absolute;inset:0;border:1.5px solid var(--ok);border-radius:16px;pointer-events:none;z-index:2}
 .fcard>.swr:has(.brw.ok),.blist>.swr:has(.brw.ok){padding:3px 4px!important;background:var(--card)!important}
 .spsec.oksec{display:flex!important;flex-direction:column;align-items:flex-start;gap:2px}.spsec.oksec b{display:inline-flex;align-items:center;gap:5px;color:var(--ok)}.spsec.oksec b svg{width:16px;height:16px}.blist.fcard.okc{box-shadow:0 0 0 1.5px var(--ok)!important}
+.ef .stimg,.stimg{display:flex!important;flex-direction:row!important;flex-wrap:nowrap;margin:0!important;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;box-sizing:border-box;border:1.5px dashed var(--line);border-radius:16px;background:var(--bg);color:var(--blu);font-size:13px;font-weight:700;cursor:pointer;padding:6px 10px}.stimg i{font-style:normal;display:grid;place-items:center;flex:none}.stimg span{white-space:nowrap}.stimg img{flex:none}.stimg i svg{width:20px;height:20px}.stimg img{width:42px;height:42px;border-radius:10px;object-fit:cover}.stimg.on{border-style:solid;border-color:var(--ok);color:var(--ok);background:var(--ok2)}
 </style>
 </head>
 <body>
@@ -1573,7 +1574,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=50,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=50.1,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -3962,7 +3963,7 @@ function stlHTML(){const x=entRow(),z=stl,L=custs.filter(c=>!c.del),q=(z.q||'').
   <div class="kchs" id="stCs">${z.cuId?`<button class="tch on" data-act="stlCu" data-id="">${esc(cuName(custs.find(c=>String(c.id)===String(z.cuId))||{name:z.name}))} ×</button>`:M.map(c=>`<button class="tch" data-act="stlCu" data-id="${c.id}">${esc(cuName(c))}</button>`).join('')+(q?`<button class="tch nw" data-act="stlCu" data-id="new">+ «${esc(q)}» بدون حساب</button>`:'')}</div></div>
   <div class="ef2"><div class="ef"><label for="stP">شماره تماس <i>(اختیاری)</i></label><input id="stP" class="ltr" inputmode="tel" value="${esc(z.phone||'')}" autocomplete="off"></div><div class="ef"><label for="stI">فاکتور فروش <i>(اختیاری)</i></label><input id="stI" class="ltr" inputmode="numeric" value="${esc(z.inv||'')}" autocomplete="off"></div></div>
   <div class="ef"><label for="stA">مبلغ پرداختی <i>(تومان)</i></label><input id="stA" class="ltr acbig" inputmode="numeric" value="${z.amount?Number(z.amount).toLocaleString('en-US'):''}" autocomplete="off"></div>
-  <div class="ef2"><div class="ef"><label for="stT">شماره پیگیری <i>(اختیاری)</i></label><input id="stT" class="ltr" inputmode="numeric" value="${esc(z.tn||'')}" autocomplete="off"></div><div class="ef"><label>رسید <i>(اختیاری)</i></label><label class="eimg${z.imgD||z.img?' on':''}" style="width:100%;justify-content:center">${ic('cam')}<span>${z.imgD?'رسید انتخاب شد':z.img?'تغییر رسید':'عکس رسید'}</span><input type="file" accept="image/*" id="stF"></label></div></div>
+  <div class="ef2"><div class="ef"><label for="stT">شماره پیگیری <i>(اختیاری)</i></label><input id="stT" class="ltr" inputmode="numeric" value="${esc(z.tn||'')}" autocomplete="off"></div><div class="ef"><label>رسید <i>(اختیاری)</i></label><label class="stimg${z.imgD||z.img?' on':''}">${z.imgD?`<img src="${z.imgD}" alt="">`:`<i>${ic('cam')}</i>`}<span>${z.imgD?'تغییر رسید':z.img?'رسید دارد · تغییر':'افزودن عکس'}</span><input type="file" accept="image/*" id="stF" hidden></label></div></div>
   <div class="ef"><label for="stN">یادداشت <i>(اختیاری)</i></label><input id="stN" value="${esc(z.note||'')}" autocomplete="off"></div>
   <button class="xgo" data-act="stlSave">${ic('check')} ثبت و کسر از مانده</button>${z.i!=null?`<div class="txacts">${z.img?`<button data-act="stlImg">${ic('eye')} دیدن رسید</button>`:''}<button data-act="stlDel" style="color:var(--red);background:var(--red2)">${ic('trash')} حذف این تسویه</button></div>`:''}</div>`}
 function stlRead(){const g=id=>{const el=$(id);return el?el.value:undefined};if($('stQ')&&!stl.cuId)stl.q=g('stQ');if($('stP'))stl.phone=toEn(g('stP')).replace(/[^\d+]/g,'');if($('stI'))stl.inv=toEn(g('stI')).trim();if($('stA'))stl.amount=num(g('stA'));if($('stT'))stl.tn=toEn(g('stT')).trim();if($('stN'))stl.note=clean(g('stN'))}
