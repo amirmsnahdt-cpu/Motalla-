@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.4,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.5,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1533,6 +1533,18 @@ body{font-feature-settings:normal}
 .fwrap.cm .fchips:not(.pdc),.fwrap.cm .fgrp,.fwrap.cm .frnd{display:none!important}
 
 .ldacts{display:flex;gap:8px;margin:12px 0 4px}.ldacts button{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:var(--card);color:var(--ink);font:inherit;font-size:12px;font-weight:700;border-radius:16px;padding:10px 4px;cursor:pointer;box-shadow:0 0 0 1px var(--hair)}.ldacts svg{width:20px;height:20px;color:var(--blu)}
+
+/* فرم ویرایش جمع‌وجور: برچسب راست، مقدار چپ در یک خط */
+.eform2 .ehero{padding:4px 2px 8px!important}.eform2 .ehero .eav{width:46px!important;height:46px!important;font-size:18px!important}.eform2 .ehero b{font-size:16px!important}
+.eform2 .egh{margin:12px 6px 6px!important;font-size:12px!important}
+.eform2 .eg{padding:0 14px!important;border-radius:18px!important}
+.eform2 .er:not(.col){min-height:46px;gap:10px}
+.eform2 .er:not(.col) .erl{min-width:78px;font-size:12.5px}
+.eform2 .er:not(.col) input{padding:9px 0!important;font-size:15px;text-align:left!important;min-height:0!important;height:auto!important}.eform2 .er:not(.col){min-height:44px}
+.eform2 .er.big:not(.col) input{font-size:17px}
+.eform2 .er.col{padding:8px 0 2px}.eform2 .er.col input{padding:4px 0 8px!important;font-size:15.5px}
+.eform2 .erh{padding-inline-start:88px;margin:-6px 0 6px;font-size:11px}
+.eform2 .er.ebtn{min-height:46px}.eform2 .erv b{font-size:14px}
 </style>
 </head>
 <body>
@@ -1543,7 +1555,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.4,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.5,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -1809,7 +1821,7 @@ async function entCommit(){const x=entRow();if(!x||!eD)return;const e=entries.fi
 const aEnt=()=>{const x=entRow();if(x&&!entEdit&&eDirty())return `<button class="btn sec" data-act="entDraftOff">انصراف</button><button class="btn gold" data-act="entCommit">${ic('check')} ثبت تغییرات</button>`;if(x&&entEdit)return `<button class="btn sec" data-act="entEditOff">انصراف</button><button class="btn gold" data-act="entSave">${ic('check')} ذخیره</button>`;return x?`<button class="btn sec" data-act="cpEnt" data-id="${x.id}">${ic('copy')} کپی همه</button><button class="btn gold" data-act="entEditOn">${ic('edit')} ویرایش</button>`:''};
 let eeTitle='';
 function vEntEdit(x){const e=entries.find(y=>y.id===x.id)||x;eeTitle=e.title||'';
-  const row=(id,l,v,o={})=>`<label class="er col${o.big?' big':''}${o.ib?' ib':''}" for="${id}"><span class="erl">${l}${o.suf?` <i class="eu">(${o.suf})</i>`:''}</span><span class="erv">${id==='eeI'?'<span id="eeIb"></span>':''}${o.pre?`<em>${o.pre}</em>`:''}<input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(v||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="next"></span></label>${o.hint?`<small class="eh erh" id="${id}v"></small>`:''}`;
+  const row=(id,l,v,o={})=>`<label class="er${o.ib?' col ib':''}${o.big?' big':''}" for="${id}"><span class="erl">${l}${o.suf?` <i class="eu">(${o.suf})</i>`:''}</span><span class="erv">${id==='eeI'?'<span id="eeIb"></span>':''}${o.pre?`<em>${o.pre}</em>`:''}<input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(v||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="next"></span></label>${o.hint?`<small class="eh erh" id="${id}v"></small>`:''}`;
   return `<div class="eform2">
   <div class="ehero"><div class="eav">${esc(userInit(fullName(e)||'؟'))}</div><div>${honTag(e.name)}<b>${esc(fullName(e)||'—')}</b><small>ثبت ${esc(dates(e.entryDate).fa)}${e.createdBy?'، '+esc(e.createdBy):''}</small></div></div>
   <div class="egh">اطلاعات مشتری</div><div class="eg">
