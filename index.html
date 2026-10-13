@@ -10,7 +10,7 @@
 <link rel="preload" href="fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>/* فونت وزیرمتن از سرور خودمان (همان فونت PDF‌ها) */@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
 <script>/* MOTALLA-BOOT: اگر نسخه جدیدتری از قبل دریافت شده، همین‌جا جایگزین می‌شود (آدرس عوض نمی‌شود) */
-(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.93,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
+(function(){try{if(location.hostname!=='raw.githack.com')return;var V=49.94,s=localStorage.getItem('m_app_next'),v=+(localStorage.getItem('m_app_next_v')||0);
 if(s&&v>V&&s.indexOf('</html>')>0){window.__swapHTML=s;document.write('<plaintext style="display:none">');
 document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){var h=window.__swapHTML;if(!h)return;window.__swapHTML=null;document.open();document.write(h);document.close()},0)})}
 else if(!s&&v>V&&localStorage.getItem('m_app_next_c')==='1'&&window.caches){document.write('<plaintext style="display:none">');
@@ -1558,6 +1558,7 @@ body{font-feature-settings:normal}
 .ldrw{display:flex;align-items:center}.ldrw .ldr{flex:1;min-width:0}.ldrw+.ldrw{border-top:1px solid var(--hair)}
 .ldrc{flex:none;width:36px;height:36px;margin-inline-end:10px;border:0;border-radius:11px;background:var(--blu2);color:var(--blu);display:grid;place-items:center;cursor:pointer}.ldrc svg{width:17px;height:17px}
 .blist.fcard.hit{border:1.5px solid var(--blu)!important;box-shadow:0 6px 18px -12px var(--blu)!important;margin-top:6px!important}
+.ldrc.att{background:var(--hair);color:var(--mut);border:1.5px dashed var(--line)}
 </style>
 </head>
 <body>
@@ -1568,7 +1569,7 @@ body{font-feature-settings:normal}
 <div id="printArea"></div>
 <script>
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
-const APP_V=49.93,REPO='amirmsnahdt-cpu/Motalla-';
+const APP_V=49.94,REPO='amirmsnahdt-cpu/Motalla-';
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
 function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classList.contains('hide'),B=onAuth?au:document.getElementById('bottom');if(!B)return;let el=document.getElementById('upd');if(!UPD){if(el)el.remove();return}
@@ -2407,12 +2408,12 @@ function vLday(){const d=ldData(ldKey),D=dates(ldKey);if(!d.rows.length)return '
   d.G.forEach(g=>{const gc=bStat({items:g.rows}),so=sources.find(z=>z.name===g.name),bd=so&&so.bank?bankBadge(so.bank,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(g.name))}</span>`,np=g.rows.filter(x=>x.st==='none'||x.st==='pending').length,pc=gc.all?gc.ok/gc.all*100:0,pf=gc.all?gc.fail/gc.all*100:0;
     const sub=`${fmt(g.rows.length)} واریزی · ${gc.ok===gc.all&&gc.all?'<span class="k">تسویه کامل ✓</span>':`<span class="k">${fmt(gc.ok)} تسویه</span>`+(np?` · <span class="w">${fmt(np)} در انتظار</span>`:'')}${gc.fail?` · <span class="f">${fmt(gc.fail)} ناموفق</span>`:''}`;
     const GR=g.rows.filter(ldm);if(!GR.length)return;ldHits+=GR.length;
-    const rows=GR.map(x=>{const st=ldSt(x),rk=x.img&&x.bid!=null;return `<div class="ldrw"><button class="ldr" data-act="openEnt" data-id="${x.id}"><span class="tx"><b>${esc(fullName(x))}</b><small>${x.code?'فاکتور '+esc(toEn(x.code))+' · ':''}${esc(setType(x))}${x.tn?' · پیگیری <bdi dir="ltr">'+esc(x.tn)+'</bdi>':''}</small></span><span class="v"><b>${fmt(x.amount)}</b><em class="${st[1]}">${st[0]}</em></span></button>${rk?`<button class="ldrc" data-act="rcOne" data-k="${x.bid}:${x.id}" data-n="${esc(fullName(x))}" data-a="${x.amount}" data-t="${esc(x.tn||'')}" aria-label="رسید">${ic('cam')}</button>`:''}</div>`}).join('');
+    const rows=GR.map(x=>{const st=ldSt(x),rk=x.img&&x.bid!=null;return `<div class="ldrw"><button class="ldr" data-act="openEnt" data-id="${x.id}"><span class="tx"><b>${esc(fullName(x))}</b><small>${x.code?'فاکتور '+esc(toEn(x.code))+' · ':''}${esc(setType(x))}${x.tn?' · پیگیری <bdi dir="ltr">'+esc(x.tn)+'</bdi>':''}</small></span><span class="v"><b>${fmt(x.amount)}</b><em class="${st[1]}">${st[0]}</em></span></button>${rk?`<button class="ldrc" data-act="rcOne" data-k="${x.bid}:${x.id}" data-n="${esc(fullName(x))}" data-a="${x.amount}" data-t="${esc(x.tn||'')}" aria-label="رسید">${ic('cam')}</button>`:x.bid!=null&&can('track')?`<label class="ldrc att" aria-label="ضمیمه رسید">${ic('plus')}<input type="file" accept="image/*" data-ratt="${x.bid}:${x.id}" hidden></label>`:''}</div>`}).join('');
     h+=grp(g.name,g.name,rows,sum(g.rows),bd,sub,`<span class="pb2"><i class="ok" style="width:${pc}%"></i><i class="no" style="width:${pf}%"></i></span>`)});
   const FSq=d.FS.filter(ldm);ldHits+=FSq.length;if(lq&&!ldHits)h+='<div class="spempty" style="padding:20px 8px"><b>در این لیست پیدا نشد</b></div>';
   if(FSq.length)h+=grp('__full','تسویه با مشتری',FSq.map(r=>`<button class="ldr" data-act="openEnt" data-id="${r.id}"><span class="tx"><b>${esc(fullName(r))}</b><small>${esc((r.settles||[]).map(setLine).join('؛ '))}</small></span><span class="v"><b>${fmt(r.total)}</b><em class="g">تسویه کامل با مشتری</em></span></button>`).join(''),d.FS.reduce((a,r)=>a+r.total,0),`<span class="bkb lg" style="--bc:#15803d">م</span>`,`${fmt(d.FS.length)} واریزی · <span class="k">تسویه کامل ✓</span>`,'');
   return h}
-function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
+function bindLday(){{const V=$('view');if(V&&!V._ratt){V._ratt=1;V.addEventListener('change',async e=>{const k=e.target&&e.target.dataset&&e.target.dataset.ratt;if(!k||cur!=='lday')return;const f=e.target.files&&e.target.files[0];if(!f)return;const[bid,id]=k.split(':'),b=batches.find(z=>String(z.id)===bid),it=b&&b.items.find(z=>String(z.id)===id);if(!it)return;try{const d=await shrink(f);if(await imgPut(b.id+':'+it.id,d)){it.img=true;it.at=new Date().toISOString();saveB();const y=V.scrollTop;render();V.scrollTop=y;toast('رسید «'+it.name+'» ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(z){toast('این عکس خوانده نشد',true)}})}}const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
 const aLday=()=>{const n=ldSel?ldSel.size:0;return can('export')?`<button class="fab2" data-act="ldExp"${n?'':' disabled'}>${ic('open')} خروجی${n?' '+fmt(n)+' منبع':''}</button>`:''};
 const ST_ORD={ok:0,fail:1,pending:2,none:3};
 function ldPick(){const d=ldData(ldKey);return{reg:d.eds.map(e=>dates(e).fa).join('، '),G:d.G.filter(g=>ldSel.has(g.name)).map(g=>({...g,rows:g.rows.slice().sort((a,b)=>(ST_ORD[a.st]??9)-(ST_ORD[b.st]??9))})),FS:ldSel.has('__full')?d.FS:[],T:'لیست واریز '+payLab(ldKey)}}
