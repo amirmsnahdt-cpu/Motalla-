@@ -241,7 +241,7 @@ function doSync(user, body) {
 /* ---------- فایل‌های ثابت ---------- */
 const STATIC = {
   '/': ['index.html', 'text/html; charset=utf-8'], '/index.html': ['index.html', 'text/html; charset=utf-8'],
-  '/sw.js': ['sw.js', 'text/javascript; charset=utf-8'], '/manifest.json': ['manifest.json', 'application/manifest+json'],
+  '/sw.js': ['sw.js', 'text/javascript; charset=utf-8'], '/app.js': ['app.js', 'text/javascript; charset=utf-8'], '/styles.css': ['styles.css', 'text/css; charset=utf-8'], '/icon-512-maskable.png': ['icon-512-maskable.png', 'image/png'], '/manifest.json': ['manifest.json', 'application/manifest+json'],
   '/apple-touch-icon.png': ['apple-touch-icon.png', 'image/png'], '/icon-192.png': ['icon-192.png', 'image/png'], '/icon-512.png': ['icon-512.png', 'image/png'],
 };
 function serveStatic(req, res, p) {
@@ -264,7 +264,7 @@ function serveStatic(req, res, p) {
   const s = STATIC[p]; if (!s) return false;
   fs.readFile(path.join(ROOT, s[0]), (err, buf) => {
     if (err) { res.writeHead(404); res.end('not found'); return; }
-    const isApp = s[0] === 'index.html' || s[0] === 'sw.js';
+    const isApp = s[0] === 'index.html' || s[0] === 'sw.js' || s[0] === 'app.js' || s[0] === 'styles.css';
     if (s[0] === 'index.html') {
       // حالت روز/شب انتخابی کاربر از همان ابتدا در صفحه نوشته می‌شود تا نوار وضعیت آیفون هم‌رنگ برنامه باز شود
       const m = /(?:^|;\s*)m_theme=(light|dark)(?:;|$)/.exec(req.headers.cookie || '');
