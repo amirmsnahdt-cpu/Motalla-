@@ -38,7 +38,7 @@
 .er:focus-within .erl{color:var(--blu)}
 .erh{display:block;margin:-8px 0 8px;padding-inline-start:98px;min-height:0}.erh:empty{display:none}
 .ebtn{cursor:pointer}.ebtn .erv b{font-size:15px;font-weight:700}.ebtn .erv svg{width:18px;height:18px;color:var(--blu)}
-.eform2 .ettl .tch{font-size:12px;}
+.eform2 .ettl .tch{font-size:12px;padding:5px 12px}
 .eform2 .emore{margin-top:10px}
 .vspin{display:grid;place-items:center;overflow:hidden;transition:height .2s}
 .vspin .pspin{width:26px;height:26px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--blu);opacity:var(--pp,0);transform:rotate(calc(var(--pp,0)*300deg))}
@@ -48,12 +48,12 @@
 .vloading .bri{background:var(--hair)!important}
 .vloading .brv b i,.vloading .brh .tx b *,.vloading .brh .tx small *,.vloading .bri>*,.vloading .rsrc *,.bpanel.loading .rsrc *{visibility:hidden}
 /* پیش‌نمایش گزارش (تم جدید) */
-#pv{background:var(--bg)!important}
+
 #pv .pvt{order:0;display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;background:var(--card);border-bottom:1px solid var(--line)}
 #pv .pvt div{flex:1;display:flex;flex-direction:column;line-height:1.4}#pv .pvt b{font-size:17px;font-weight:800}#pv .pvt small{font-size:12px;color:var(--mut)}
 #pv .pvw{order:1;flex:1;min-height:0;position:relative;background:var(--bg)}
-#pv iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent!important}
-#pv .pvh{order:2;display:flex;gap:10px;background:var(--card)!important;border-top:1px solid var(--line)!important;box-shadow:none!important;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px))!important}
+
+
 #pv .pvh .btn{flex:1;min-height:52px;border-radius:16px;font-size:15px}
 #pv .pvh .btn.gold{background:var(--blu)!important;color:#fff!important;box-shadow:0 10px 22px -12px var(--blu)}
 #pv .pvh .btn.sec{background:var(--blu2)!important;color:var(--blu)!important;border-color:transparent!important;flex:0 0 auto;padding:0 18px}
@@ -62,22 +62,22 @@
 .er.col+.erh{padding-inline-start:0;margin-top:-6px}
 
 /* گوشه‌های گرد برای کارت‌های لیست */
-.fcard{overflow:hidden;overflow:clip;margin-bottom:6px}
+.fcard{margin-bottom:6px;background:transparent!important;box-shadow:none!important;padding:0!important;border-radius:0!important;overflow:visible!important}
 
 .fcard .brw,.fcard .brh{background:var(--card)}
-#app{overflow-x:hidden;overflow-x:clip}
+#app{display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:560px;height:auto;min-height:0;overflow:hidden;overflow-x:hidden;overflow-x:clip}
 
 /* ---------- v39 ---------- */
 .bkb{display:inline-grid;place-items:center;flex:none;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bc);color:#fff;font-size:9.5px;font-weight:800;line-height:1;vertical-align:-3px;margin-inline-end:4px;box-shadow:0 1px 2px #0002;font-style:normal}
 .bkb.lg{min-width:28px;height:28px;border-radius:14px;font-size:11px;margin:0}
 .brh .tx small .bkb{margin-inline-end:4px}
 .vloading .bkb,.bpanel.loading .bkb{visibility:hidden}
-.ibin{position:relative;display:flex;align-items:center;border:1.5px solid var(--line);background:var(--bg);border-radius:14px;min-height:52px;padding:0 12px;gap:8px;transition:border-color .15s,background .15s}
+.ibin{position:relative;display:flex;align-items:center;border:1.5px solid var(--line);background:var(--bg);border-radius:14px;min-height:52px;padding:0 12px;gap:8px;transition:border-color .15s,background .15s;direction:ltr}
 .ibin:focus-within{border-color:var(--blu);background:var(--card)}
 .ibin input{flex:1;min-width:0;border:0!important;background:none!important;box-shadow:none!important;outline:none;min-height:48px!important;padding:0!important;direction:ltr;text-align:left;font:inherit;font-size:16px;font-weight:700;color:var(--ink)}
 .ibin .ibir{font-size:14px;font-weight:800;color:var(--blu);order:-1;transition:opacity .15s,width .15s;direction:ltr}
 .ibin:not(:focus-within):has(input:placeholder-shown) .ibir{opacity:0;width:0;margin:0;overflow:hidden}
-.ibin .ibbk{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--mut);white-space:nowrap}
+.ibin .ibbk{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--mut);white-space:nowrap;direction:rtl}
 .ibin .ibbk:empty{display:none}
 /* چسباندن لیست (تم جدید) */
 .bkw .bkta{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:4px;transition:border-color .15s}
@@ -94,7 +94,7 @@
 .bkmore{text-align:center;font-size:12px;color:var(--mut);padding:8px 0 4px}
 .bknote{font-size:12px;color:var(--mut);margin:10px 4px 0}
 .brh .tx small.bkl{display:flex;align-items:center;gap:5px;min-width:0}.brh .tx small.bkl>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.brh .tx small.bkl .bkb{margin:0}
-.ibin{direction:ltr}.ibin .ibbk{direction:rtl}
+
 .vloading .brh .tx small.bkl>span,.bpanel.loading .brh .tx small.bkl>span{visibility:hidden}
 .bzppg{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--blu2);border-radius:16px;padding:14px 16px;margin-top:2px}.bzppg small{display:block;font-size:12px;color:var(--blu);font-weight:700}.bzppg b{font-size:20px;font-weight:800;color:var(--blu)}.bzppg b i{font-style:normal;font-size:12px;font-weight:600;margin-inline-start:4px}.bzppg span.m{font-size:11.5px;color:var(--mut);text-align:left}
 .bki{padding:0;background:#fff;object-fit:contain;width:18px;min-width:18px;height:18px;border-radius:50%;box-shadow:0 0 0 1px #0000000f}
@@ -109,7 +109,7 @@
 .acrow .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}.acrow .tx b{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.acrow .tx small{font-size:12px;color:var(--mut)}
 .acrow .v{display:flex;flex-direction:column;align-items:flex-end;line-height:1.5}.acrow .v b{font-size:15px;white-space:nowrap}.acrow .v b i{font-style:normal;font-size:11px;color:var(--mut);font-weight:500;margin-inline-start:3px}.acrow .v small{font-size:11px;color:var(--mut)}.acrow .v em{font-style:normal;font-size:12px;color:var(--mut)}
 .neg{color:var(--red)!important}
-#app.banks #act{background:transparent;border:0;box-shadow:none;justify-content:center;padding:6px 4px 8px}
+#app.banks #act{justify-content:center;padding:6px 4px 8px}
 .acpick{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px 12px;padding:2px 16px 6px}.acpick::-webkit-scrollbar{display:none}
 .acp{flex:none;width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:11px;font-weight:700;border-radius:16px;padding:10px 4px 8px;cursor:pointer}
 .acp span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -120,13 +120,13 @@
 .acnow>div:first-child{flex-wrap:wrap}.acnow>div:first-child span{flex-basis:100%;text-align:left;margin-top:-6px}
 .acnow .t{border-top:1px solid var(--line);padding-top:8px}.acnow .t b{color:var(--blu);font-size:17px}
 .acbig{font-size:20px!important;font-weight:800!important;min-height:58px!important}
-#dock .tb{min-width:0}
+
 #app.banks #act,#app.split #act{position:absolute;left:0;right:0;bottom:100%;margin:0!important;pointer-events:none;transition:transform .25s cubic-bezier(.3,.8,.3,1),opacity .2s}
 #app.banks #act>*,#app.split #act>*{pointer-events:auto}
 #app.banks #act.hid,#app.split #act.hid{transform:translateY(calc(100% + 90px));opacity:0}
 #app.banks #view,#app.split #view{padding-bottom:96px!important}
 
-.fcard>.swr .acrow{background:var(--card)}
+.fcard>.swr .acrow{background:var(--card);padding:13px 12px}
 .achero b.nb{font-size:18px;opacity:.9;margin:6px 0}
 /* هر واریزی یک کاشی با گوشه‌های گرد */
 .bpanel .blist>*+*{border-top:0!important}
@@ -134,11 +134,11 @@
 
 
 
-.fcard{background:transparent!important;box-shadow:none!important;padding:0!important;border-radius:0!important;overflow:visible!important}
+
 
 
 .fcard>.acrow,.fcard>.bkr{background:var(--card);border-radius:16px;padding:12px!important;margin-bottom:8px;border-top:0!important}
-.fcard>.swr .acrow{padding:13px 12px}
+
 .rchips{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}.rchips .rsrc{margin-top:0}
 .rdate{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1px 7px;white-space:nowrap}.rdate svg{width:12px;height:12px;color:var(--blu)}
 .fcard .rdate{background:var(--bg);border-color:transparent}
@@ -154,17 +154,17 @@
 #app.full .bknote{color:var(--mut)}
 #app.full .fcard>.swr,#app.full .fcard .brw{box-shadow:none}#app.full .fcard .brh{background:transparent!important}#app.full .fcard .rdate{background:var(--card)}
 /* پیام‌ها: کارت کوچک بالای صفحه، مثل اعلان آیفون؛ با لمس یا کشیدن به بالا بسته می‌شود */
-#toast{position:fixed!important;top:calc(env(safe-area-inset-top,0px) + 10px)!important;bottom:auto!important;left:50%!important;right:auto!important;transform:translate(-50%,-150%)!important;display:flex!important;align-items:center;gap:10px;width:min(440px,calc(100vw - 24px))!important;min-width:0!important;margin:0!important;padding:9px 9px 9px 14px!important;border-radius:18px!important;border:0!important;background:color-mix(in srgb,var(--card) 90%,transparent)!important;-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);color:var(--ink)!important;box-shadow:0 14px 34px -12px #0b1a4a55,0 0 0 1px color-mix(in srgb,var(--line) 70%,transparent)!important;font-size:13.5px!important;font-weight:700;line-height:1.5;z-index:95!important;opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.2,.9,.3,1.15),opacity .22s;cursor:pointer}
-#toast.show{transform:translate(-50%,0)!important;opacity:1;pointer-events:auto}
+
+#toast.show{opacity:1;pointer-events:auto}
 #toast .ti{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}
 #toast .ti svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 #toast.ok .ti{background:var(--ok2);color:var(--ok)}#toast.bad .ti{background:var(--red2);color:var(--red)}
 #toast .tm{flex:1;min-width:0;padding:2px 0!important}
-#toast button{flex:none;border:0!important;background:var(--blu2)!important;color:var(--blu)!important;font:inherit;font-size:13px;font-weight:800;padding:7px 12px!important;border-radius:12px!important;box-shadow:none!important;cursor:pointer}
-@media (prefers-reduced-motion:reduce){#toast{transition:opacity .2s}}
+
+
 /* تنظیمات با تم جدید */
-.stg .prof{background:var(--hero)!important;color:#fff!important;border:0!important;border-radius:24px!important;box-shadow:0 14px 30px -18px var(--hero)!important;padding:18px!important}
-.stg .prof .av{background:#ffffff2b!important;color:#fff!important;border:0!important;box-shadow:none!important}
+.stg .prof{display:flex;align-items:center;gap:14px;background:var(--hero)!important;color:#fff!important;border:0!important;border-radius:24px!important;box-shadow:0 14px 30px -18px var(--hero)!important;padding:18px!important}
+.stg .prof .av{background:#ffffff2b!important;color:#fff!important;}
 .stg .prof b{color:#fff!important}.stg .prof .ln,.stg .prof bdi,.stg .prof .slbl{color:#ffffffd0!important}
 .stg .prof .pill{background:#ffffff26!important;color:#fff!important;border:0!important}
 .stg .sgh{color:var(--mut)!important;font-size:12.5px!important;font-weight:800!important;margin:18px 6px 6px!important}
@@ -173,7 +173,7 @@
 .stg .sgi+.sgi{border-top:1px solid var(--hair)!important}
 .stg .si{background:var(--blu2)!important;color:var(--blu)!important;border-radius:50%!important}
 .stg .sgi.rd .si{background:var(--red2)!important;color:var(--red)!important}
-.stg .sgi .cv{color:var(--mut)!important;opacity:.6}
+.stg .sgi .cv{flex:none;color:var(--mut)!important;opacity:.6}
 .stg .thm button{border-color:var(--line)!important;background:var(--card)!important}
 .stg .thm button.on{border-color:var(--blu)!important;background:var(--blu2)!important;box-shadow:none!important}
 .stg .thm button.on span{color:var(--blu)!important}
