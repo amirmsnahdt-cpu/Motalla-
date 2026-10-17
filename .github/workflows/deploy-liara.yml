@@ -34,6 +34,9 @@ jobs:
       - uses: actions/setup-node@v4
         if: env.SKIP != '1'
         with: { node-version: '22' }
+      - name: بررسی به‌روز بودن app.js و styles.css (ساخته‌شده از src/)
+        if: env.SKIP != '1'
+        run: python3 tools/build.py --check
       - name: تست سرور
         if: env.SKIP != '1'
         run: node --experimental-sqlite --disable-warning=ExperimentalWarning -e "require('./server/server.js');console.log('server loads ok');process.exit(0)"
