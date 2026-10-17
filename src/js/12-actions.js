@@ -1,7 +1,7 @@
 const ACT={
   back,close:()=>{aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>go(d.n),date:openDate,user:()=>ACT.acct(),resetForm,resetBulk,saveEntry,bulkAdd,
   toastAct:()=>{const f=toastAct;toastHide();f&&f()},
-  tab:d=>{const n={custs:'custs',banks:'banks',home:'home',entry:'entry',list:'list',split:'split1',audit:'audit',track:'track',debt:'debt',settings:'settings'}[d.n];if(n==='entry')editId=null;if(n==='audit'&&cur!=='audit')histTab='ev';if(n==='track'&&cur!=='track'){gQ='';gF='all'}if(n==='list'&&cur!=='list'){listMode='all';openGroups=new Set()}if(n===cur&&n==='list'){window.scrollTo({top:0,behavior:'smooth'});return}go(n);if(d.n==='split'){const C=splitCands().filter(c=>c.ok&&c.ok.length);if(C.length&&!C.some(c=>c.iso===dateVal)){setDate(C[0].iso,true);toast('تقسیم لیست '+dates(C[0].iso).fa)}}},
+  tab:d=>{if(d&&d.n==='split')spTab='split';const n={custs:'custs',banks:'banks',home:'home',entry:'entry',list:'list',split:'split1',audit:'audit',track:'track',debt:'debt',settings:'settings'}[d.n];if(n==='entry')editId=null;if(n==='audit'&&cur!=='audit')histTab='ev';if(n==='track'&&cur!=='track'){gQ='';gF='all'}if(n==='list'&&cur!=='list'){listMode='all';openGroups=new Set()}if(n===cur&&n==='list'){window.scrollTo({top:0,behavior:'smooth'});return}go(n);if(d.n==='split'){const C=splitCands().filter(c=>c.ok&&c.ok.length);if(C.length&&!C.some(c=>c.iso===dateVal)){setDate(C[0].iso,true);toast('تقسیم لیست '+dates(C[0].iso).fa)}}},
   cancelEdit:()=>{editId=null;const b=editBack;editBack=null;go(b||'list')},
   pickDate:d=>{closeSheet();setDate(d.iso)},
   lsel:d=>{if(d.iso==='all'){listMode='all';openGroups=new Set();render()}else{listMode='day';setDate(d.iso,true)}window.scrollTo(0,0)},
@@ -81,7 +81,7 @@ const ACT={
   credPdf:()=>credPdf(),
   gFilter:d=>{gF=d.f;$('gres').innerHTML=gHTML()},
   gClear:()=>{gQ='';const q=$('gq');if(q){q.value='';q.focus()}$('gres').innerHTML='';$('tcont').classList.remove('hide');document.querySelector('#view .sbox .clr').classList.add('hide')},
-  openDay:d=>{dayIso=d.iso;go('day')},
+  openDay:d=>{dayOpen=new Set();dayIso=d.iso;go('day')},
   itOpen:d=>openItem(d.b,d.i),itSave:saveItem,
   itSt:d=>{tmpSt=d.st;document.querySelectorAll('#sheet .st3 button').forEach(x=>x.classList.toggle('on',x.dataset.st===d.st))},
   itNow:()=>{const n=new Date();$('itt').value=p2(n.getHours())+':'+p2(n.getMinutes())},
@@ -192,7 +192,6 @@ for(const k in PERM_OF){const f=ACT[k];if(typeof f!=='function')continue;ACT[k]=
   const p=permFor(k,d),L=p==='admin'?'مدیریت':(PERMS.find(x=>x[0]===p)||[,''])[1];toast('دسترسی «'+L+'» برای حساب شما فعال نیست؛ از مدیر بخواهید',true)}}
 ACT.homeSt=d=>{homeSt=d.t;ls.set('m_homest',homeSt);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.dayGrp=(d,e)=>{const g=e.target.closest('.tg2');if(!g)return;const o=g.classList.toggle('open');const h=g.querySelector('.tgh2');if(h)h.setAttribute('aria-expanded',o);o?dayOpen.add(d.s):dayOpen.delete(d.s)};
-{const _od=ACT.openDay;ACT.openDay=d=>{dayOpen=new Set();_od(d)}}
 ACT.settings=()=>go('settings');
 ACT.setTheme=d=>{const ch=themePref!==d.t;themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;
   if(ch&&IOS_SA)toast('برای هم‌رنگ شدن نوار بالا، برنامه را یک بار کامل ببندید و باز کنید');};
@@ -201,7 +200,7 @@ ACT.homeP=d=>{const k=d.iso||'';if(homePick&&homeP===k){homePick=false}else{home
 ACT.hpTog=d=>{const k='p'+d.iso;if(d.iso<dateVal){homeOpen.has(k)?homeOpen.delete(k):homeOpen.add(k)}homeP=d.iso;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.bTog=(d,e)=>{const r=e.target.closest('.brw');if(!r)return;const o=r.classList.toggle('open'),h=r.querySelector('.brh');if(h)h.setAttribute('aria-expanded',o);o?homeOpen.add(String(d.id)):homeOpen.delete(String(d.id))};
-ACT.hsearch=()=>go('find');{const _t=ACT.tab;ACT.tab=d=>{if(d&&d.n==='split')spTab='split';return _t(d)}}
+ACT.hsearch=()=>go('find');
 ACT.arcGo=()=>{trTab='arch';go('track')};
 function moveTo(ids,fromP,src,toP){const P=parts(),now=new Date().toISOString();let to=toP&&toP!=='new'?toP:null;
   if(to||toP==='new'){}else if(fromP.sent)to=P.find(z=>z!==fromP&&z.sent&&z.bid===fromP.bid&&String(z.src.id)===String(src.id));else to=P.find(z=>z!==fromP&&!z.sent&&String(z.src.id)===String(src.id));

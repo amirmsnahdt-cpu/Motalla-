@@ -76,7 +76,7 @@ const det=[x.tn?'پیگیری <bdi dir="ltr">'+esc(x.tn)+'</bdi>':'',x.time?'س�
   return `<div class="trow ${x.st}"><div class="tx" data-act="itOpen" data-b="${b.id}" data-i="${x.i}"><b>${q?hl(x.name,q):esc(x.name)}</b><small>${det?`<span class="det">${det}</span>`:`${x.code?'فاکتور '+esc(toEn(x.code))+'، ':''}${esc(x.bank)}، شبا <bdi dir="ltr">…${esc(x.iban.slice(-4))}</bdi>`}${x.requeued?'، <span style="color:var(--pri)">برای واریز مجدد منتقل شد</span>':''}</small></div><div class="am">${qd&&qd.length>=3&&String(x.amount).includes(qd)?'<mark>'+fmt(x.amount)+'</mark>':fmt(x.amount)}</div>
   ${b.closed?stMark(x.st):`<button class="tb ok${x.st==='ok'?' on':''}" data-act="tkSet" data-i="${x.i}" data-st="ok" aria-label="انجام شد">${ic('check')}</button><button class="tb no${x.st==='fail'?' on':''}" data-act="tkSet" data-i="${x.i}" data-st="fail" aria-label="انجام نشد">×</button>`}</div>`}
 const aBatch=()=>{const b=curB();if(!b)return '';return `<button class="btn sec" data-act="tkReport">${ic('copy')} کپی گزارش</button><button class="btn gold" data-act="closeBatch">ثبت نهایی و بایگانی</button>`};
-function bindBatch(){const q=$('tq'),t=$('tlist');t.innerHTML=tlistHTML();
+function bindBatch(){const q=$('tq'),t=$('tlist');if(!t)return;t.innerHTML=tlistHTML();
   t.oninput=e=>{const el=e.target;if(el.dataset.tn!==undefined)el.value=toEn(el.value).replace(/[^\dA-Za-z\-]/g,'')};
   t.onkeydown=e=>{if(e.key==='Enter'&&e.target.dataset.tn!==undefined){e.preventDefault();e.target.blur()}};
   t.onchange=async e=>{const el=e.target,b=curB();if(!b)return;

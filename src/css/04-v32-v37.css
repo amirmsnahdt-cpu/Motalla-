@@ -28,13 +28,13 @@ body{letter-spacing:0}
 #app.home #view{padding-top:0!important;padding-bottom:0!important}
 .bhero{position:sticky;top:0;z-index:0;margin:0 -16px;border-radius:0;box-shadow:none;background:var(--hero)!important;padding:4px 18px 46px}
 .bhero::after{display:none}
-.bhv{font-size:30px;font-weight:800}
+.bhv{font-size:30px;}
 .bha{gap:12px;margin-top:18px}
 .ba{width:78px}.ba span{white-space:nowrap}
 .ba i{width:56px;height:56px;background:#ffffff26}
 .ba.pri i{background:#fff;color:var(--hero)}
 .ba span{font-size:12px;font-weight:600}
-.ba em.r{background:#ff5d73;color:#fff}
+
 .bpanel{z-index:1;margin:-28px -16px 0;border:0;border-radius:24px 24px 0 0;padding:8px 16px 18px;box-shadow:0 -8px 24px -14px #0b1a4a59;display:flex;flex-direction:column}
 .bpanel .grab{width:42px;height:5px;background:var(--line);margin:4px auto 12px}
 .bpanel .ver{margin-top:auto;padding-top:18px}
@@ -64,23 +64,23 @@ body{letter-spacing:0}
 .eav.ok{background:var(--ok2);color:var(--ok)}.eav.bad,.eav.fail{background:var(--red2);color:var(--red)}.eav.pend{background:var(--warn2);color:var(--warn)}
 .enm{font-size:17px;font-weight:800}
 .eib{font-family:inherit!important;font-size:12.5px!important;color:var(--mut);direction:ltr;letter-spacing:.3px}
-.eam{font-size:28px;font-weight:800;margin-top:6px;line-height:1.3}.eam small{font-size:13px;color:var(--mut);font-weight:600;margin-inline-start:6px}
+.eam{font-size:28px;margin-top:6px;line-height:1.3}.eam small{font-size:13px;color:var(--mut);font-weight:600;margin-inline-start:6px}
 .est{margin-top:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--blu2);color:var(--blu)}
 .est.ok{background:var(--ok2);color:var(--ok)}.est.bad,.est.fail{background:var(--red2);color:var(--red)}.est.pend{background:var(--warn2);color:var(--warn)}
 .kvs{background:var(--card);border-radius:18px;border:1px solid var(--line);padding:2px 14px}
 .kv{display:flex;align-items:center;gap:10px;padding:11px 0;min-height:24px}
 .kv+.kv{border-top:1px solid var(--hair)}
-.kv small{color:var(--mut);font-size:12.5px;flex:none;min-width:78px}
-.kv b{flex:1;text-align:left;font-size:13.5px;font-weight:700;overflow-wrap:anywhere}.kv b i{font-style:normal;color:var(--mut);font-size:11.5px;font-weight:600}
-.kv b .ltr{direction:ltr;unicode-bidi:isolate;letter-spacing:.2px}
-.kv>svg{width:16px;height:16px;color:var(--blu);flex:none;opacity:.8}
+.kv small{color:var(--mut);font-size:12.5px;flex:none;}
+.kv b{flex:1;font-size:13.5px;overflow-wrap:anywhere}.kv b i{font-style:normal;color:var(--mut);font-size:11.5px;font-weight:600}
+.kv b .ltr{unicode-bidi:isolate;letter-spacing:.2px}
+.kv>svg{color:var(--blu);flex:none;opacity:.8}
 .kvx{width:16px;flex:none}
 .kv.cp{font-family:inherit!important;font-size:inherit!important;white-space:normal!important;cursor:pointer;border-radius:0}
 .kv.cp:active{background:var(--bg)}
 .edel{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:14px 0 4px;border:0;background:none;color:var(--red);font:inherit;font-size:13px;font-weight:700;padding:10px;cursor:pointer}.edel svg{width:16px;height:16px}
 .fsearch{position:relative;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 12px;margin:2px 0 10px}
 .fsearch>svg{width:19px;height:19px;color:var(--mut);flex:none}
-.fsearch input{flex:1;border:0!important;background:none!important;box-shadow:none!important;padding:12px 0!important;font:inherit;font-size:15px;min-height:0;outline:none;color:var(--ink)}
+.fsearch input{flex:1;border:0!important;background:none!important;box-shadow:none!important;padding:12px 0!important;font:inherit;min-height:0;outline:none;color:var(--ink)}
 .fsearch .x{border:0;background:var(--hair);width:24px;height:24px;border-radius:50%;color:var(--mut);cursor:pointer;flex:none;line-height:1}
 .fchips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;margin:0 -16px;padding-inline:16px}.fchips::-webkit-scrollbar{display:none}
 .fchip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;font-weight:600;border-radius:20px;padding:6px 14px;cursor:pointer;white-space:nowrap}
@@ -115,8 +115,8 @@ body{letter-spacing:0}
 body{font-feature-settings:normal}
 .fsearch input,.lsrch .sbox input,#view input,#view textarea,#sheet input,#sheet textarea{font-size:16px}
 .bhd{cursor:default}
-.brv b{font-weight:600;font-size:15px;letter-spacing:0}.brv b i{font-style:normal;font-size:11px;font-weight:500;color:var(--mut);margin-inline-start:2px}
-.bhv{font-weight:700;letter-spacing:0}.eam{font-weight:700}
+.brv b i{font-style:normal;font-size:11px;font-weight:500;color:var(--mut);margin-inline-start:2px}
+.bhv{letter-spacing:0}
 .ball{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:0;background:none;color:var(--blu);font:inherit;font-size:14px;font-weight:700;padding:16px 0 6px;cursor:pointer}.ball svg{width:16px;height:16px}
 /* بالا کشیدن در آیفون: فاصله خاکستری بین سربرگ و بخش آبی نیفتد */
 #app.home #view{background:linear-gradient(to bottom,var(--hero) 0,var(--hero) 50%,var(--card) 50%,var(--card) 100%)}
@@ -163,7 +163,7 @@ body{font-feature-settings:normal}
 
 /* ---------- v35: صفحه تقسیم مثل «باکس‌ها»ی بلو ---------- */
 .sphead{display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 0 6px}
-.spv{font-size:30px;font-weight:700;line-height:1.3}.spv small{font-size:13px;color:var(--mut);font-weight:600;margin-inline-start:6px}
+.spv{font-size:30px;line-height:1.3}.spv small{font-size:13px;color:var(--mut);font-weight:600;margin-inline-start:6px}
 .spl{font-size:13px;color:var(--mut);margin-top:2px}
 .spchip{display:inline-flex;align-items:center;gap:6px;margin-top:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:12.5px;font-weight:700;border-radius:20px;padding:6px 12px;cursor:pointer}.spchip svg{width:15px;height:15px;color:var(--blu)}.spchip svg:last-child{width:13px;height:13px;color:var(--mut)}
 .spst{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--mut)}.spst b{color:var(--ink);font-weight:700}
@@ -176,7 +176,7 @@ body{font-feature-settings:normal}
 .sprow:active{background:var(--bg)}
 .sprow .bri{background:var(--blu2);color:var(--blu);font-weight:800}
 .sprow.bad .bri{background:var(--red2);color:var(--red)}
-.sprow.sent .bri{background:var(--ok2);color:var(--ok)}
+
 .sprow .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}.sprow .tx b{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sprow .tx small{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sprow .brv small.d{color:var(--warn)}.sprow .brv small.s{color:var(--ok)}
 /* دکمه شناور پایین (مثل «باکس جدید») */

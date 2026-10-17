@@ -14,7 +14,17 @@ jobs:
         with: { distribution: temurin, java-version: '17' }
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: '8.7' }
+      - name: کلید امضا از Secrets (اگر تنظیم شده باشد)
+        env: { KS: '${{ secrets.ANDROID_KEYSTORE_B64 }}' }
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> $GITHUB_ENV
+          else
+            echo "::warning::کلید امضا در Secrets نیست؛ کلید قدیمی داخل مخزن استفاده شد"
+          fi
       - name: ساخت APK
+        env: { ANDROID_KEY_PASS: '${{ secrets.ANDROID_KEY_PASS }}', ANDROID_KEY_ALIAS: '${{ secrets.ANDROID_KEY_ALIAS }}' }
         run: gradle -p android assembleRelease --no-daemon --stacktrace
       - run: cp android/app/build/outputs/apk/release/app-release.apk motalla.apk
       - uses: actions/upload-artifact@v4

@@ -121,10 +121,10 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('online',()=>syncSoon(100));
 /* ---------- عکس رسیدها روی سرور ---------- */
 {const _put=imgPut,_get=imgGet,_del=imgDel;
-  imgPut=async(k,v)=>{const ok=await _put(k,v);if(TOKEN)api('/api/img/'+encodeURIComponent(k),{data:v},'PUT').catch(()=>{const q=ls.get('m_imgq',[]);if(!q.includes(k)){q.push(k);rawSet('m_imgq',q)}});return ok};
+  imgPut=async(k,v)=>{const ok=await _put(k,v);if(TOKEN)api('/api/img/'+encodeURIComponent(k),{data:v},'PUT').catch(e=>{if(e&&e.status===403){toast(e.message,true);return}const q=ls.get('m_imgq',[]);if(!q.includes(k)){q.push(k);rawSet('m_imgq',q)}});return ok};
   imgGet=async k=>{let v=await _get(k);if(!v&&TOKEN){try{const j=await api('/api/img/'+encodeURIComponent(k));if(j&&j.data){v=j.data;_put(k,v)}}catch(e){}}return v};
-  imgDel=async k=>{await _del(k);if(TOKEN)api('/api/img/'+encodeURIComponent(k),undefined,'DELETE').catch(()=>{})}}
-async function flushImgs(){const q=ls.get('m_imgq',[]);if(!q.length)return;const left=[];for(const k of q){try{const v=await imgGet(k);if(v)await api('/api/img/'+encodeURIComponent(k),{data:v},'PUT')}catch(e){left.push(k)}}rawSet('m_imgq',left)}
+  imgDel=async k=>{await _del(k);if(TOKEN)api('/api/img/'+encodeURIComponent(k),undefined,'DELETE').catch(e=>{if(e&&e.status===403)toast(e.message,true)})}}
+async function flushImgs(){const q=ls.get('m_imgq',[]);if(!q.length)return;const left=[];for(const k of q){try{const v=await imgGet(k);if(v)await api('/api/img/'+encodeURIComponent(k),{data:v},'PUT')}catch(e){if(!(e&&e.status===403))left.push(k)}}rawSet('m_imgq',left)}
 /* ---------- صفحه ورود و راه‌اندازی ---------- */
 function showAuth(msg){const a=$('auth');a.classList.remove('hide');a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">طلای مطلا</small><div class="aspin">در حال اتصال…</div></div>`;
   api('/api/status').then(s=>authForm(s.setup?'setup':'login',msg)).catch(e=>{a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">بده بستون</b><div class="msg bad" style="margin-top:14px">${esc(e.message)}</div><button class="btn gold" data-act="authRetry" style="width:100%">تلاش دوباره</button></div>`})}

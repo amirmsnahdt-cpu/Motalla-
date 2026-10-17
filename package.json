@@ -4,7 +4,9 @@
   "private": true,
   "description": "سامانه واریزی مطلا — سرور چندکاربره",
   "scripts": {
-    "start": "node --experimental-sqlite --disable-warning=ExperimentalWarning server/server.js"
+    "start": "node --experimental-sqlite --disable-warning=ExperimentalWarning server/server.js",
+    "test": "node --experimental-sqlite --disable-warning=ExperimentalWarning --test tests/server.test.js",
+    "smoke": "node tests/smoke.mjs"
   },
   "engines": {
     "node": ">=22.5"

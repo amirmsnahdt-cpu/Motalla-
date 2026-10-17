@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS docs(
 CREATE INDEX IF NOT EXISTS docs_ver ON docs(ver);
 CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT);
 CREATE TABLE IF NOT EXISTS imgs(k TEXT PRIMARY KEY, data TEXT NOT NULL, updated_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS imgs_old(n INTEGER PRIMARY KEY AUTOINCREMENT, k TEXT NOT NULL, data TEXT NOT NULL, updated_at TEXT NOT NULL, removed_at TEXT NOT NULL, removed_by TEXT);
 `);
 
 // ستون دسترسی‌ها (برای پایگاه‌داده‌های قدیمی اضافه می‌شود)
@@ -72,6 +73,7 @@ try { db.exec('ALTER TABLE users ADD COLUMN perms TEXT'); } catch (e) { /* از 
 /* ---------- دسترسی‌ها: مدیر همه را دارد؛ کارمند فقط آنچه مدیر روشن کرده ---------- */
 const PERMS = ['add', 'edit', 'del', 'split', 'track', 'close', 'unsend', 'debt', 'src', 'undo', 'export'];
 const DEF_STAFF = ['add', 'edit', 'split', 'track', 'close', 'debt', 'export'];
+const IMG_PERMS = ['edit', 'track', 'debt', 'del'];
 function userPerms(u) {
   if (!u) return [];
   if (u.role === 'admin') return PERMS.slice();
@@ -103,6 +105,9 @@ const q = {
   getImg: db.prepare('SELECT data FROM imgs WHERE k=?'),
   putImg: db.prepare('INSERT INTO imgs(k,data,updated_at) VALUES(?,?,?) ON CONFLICT(k) DO UPDATE SET data=excluded.data,updated_at=excluded.updated_at'),
   delImg: db.prepare('DELETE FROM imgs WHERE k=?'),
+  // نسخه قبلی هر عکس پیش از حذف یا جایگزینی اینجا نگه داشته می‌شود (۹۰ روز)
+  keepOldImg: db.prepare('INSERT INTO imgs_old(k,data,updated_at,removed_at,removed_by) SELECT k,data,updated_at,?,? FROM imgs WHERE k=?'),
+  purgeOldImgs: db.prepare('DELETE FROM imgs_old WHERE removed_at<?'),
   allDocs: db.prepare('SELECT coll,id,data,deleted,ver,updated_at,updated_by FROM docs WHERE deleted=0 ORDER BY coll,id'),
 };
 let VER = +(q.getMeta.get('ver') || { v: 0 }).v || 0;
@@ -164,6 +169,12 @@ function deny(user, coll, deleting, theirs) {
   return null;
 }
 
+function auditEditOk(theirs, merged) {
+  if (!isObj(merged)) return false;
+  const a = { ...theirs }, b = { ...merged }; delete a.undone; delete b.undone;
+  return eq(a, b) && (!theirs.undone || !!merged.undone);
+}
+
 /* ---------- محدودیت تلاش ورود ---------- */
 const fails = new Map();
 function throttled(key) { const f = fails.get(key); return f && f.until > Date.now() ? Math.ceil((f.until - Date.now()) / 1000) : 0; }
@@ -223,6 +234,8 @@ function doSync(user, body) {
         if (!isObj(ch.data)) continue;
         const merged = theirs ? merge3(ch.base === undefined ? null : ch.base, ch.data, theirs) : ch.data;
         if (isObj(merged)) merged.id = ch.data.id;
+        // تاریخچه: کارمند فقط ثبت تازه اضافه می‌کند؛ روی ثبت‌های قبلی تنها علامت «لغو شد» (undone) را می‌تواند بزند
+        if (coll === 'audit' && theirs && user.role !== 'admin' && !auditEditOk(theirs, merged)) { rejected.push({ coll, id, why: 'تغییر تاریخچه برای حساب شما مجاز نیست' }); touched.add(coll + '\u0000' + id); continue; }
         if (cur && !cur.deleted && eq(merged, theirs)) { touched.add(coll + '\u0000' + id); continue; }
         q.putDoc.run(coll, id, JSON.stringify(merged), 0, nextVer(), now(), user.name);
       }
@@ -343,18 +356,33 @@ async function handle(req, res) {
   if (imk && /^[A-Za-z0-9:_\-.]{1,120}$/.test(imk)) {
     const k = imk;
     if (req.method === 'GET') { const r = q.getImg.get(k); return r ? send(res, 200, { data: r.data }) : bad(res, 404, 'not found'); }
-    if (req.method === 'PUT') { const b = await readBody(req, 8e6); if (typeof b.data !== 'string' || !b.data.startsWith('data:image/')) return bad(res, 400, 'bad image'); q.putImg.run(k, b.data, now()); return send(res, 200, { ok: true }); }
-    if (req.method === 'DELETE') { q.delImg.run(k); return send(res, 200, { ok: true }); }
+    // عوض‌کردن یا حذف عکسی که از قبل هست فقط با مجوز ویرایش/پیگیری/بدهی/حذف؛ نسخه قبلی همیشه نگه داشته می‌شود
+    const mayChange = me.role === 'admin' || userPerms(me).some(x => IMG_PERMS.includes(x));
+    if (req.method === 'PUT') {
+      const b = await readBody(req, 8e6); if (typeof b.data !== 'string' || !b.data.startsWith('data:image/')) return bad(res, 400, 'bad image');
+      const old = q.getImg.get(k);
+      if (old && old.data === b.data) return send(res, 200, { ok: true });
+      if (old && !mayChange) return bad(res, 403, 'تغییر عکس برای حساب شما مجاز نیست');
+      tx(() => { if (old) q.keepOldImg.run(now(), me.name, k); q.putImg.run(k, b.data, now()); });
+      return send(res, 200, { ok: true });
+    }
+    if (req.method === 'DELETE') {
+      if (!q.getImg.get(k)) return send(res, 200, { ok: true });
+      if (!mayChange) return bad(res, 403, 'حذف عکس برای حساب شما مجاز نیست');
+      tx(() => { q.keepOldImg.run(now(), me.name, k); q.delImg.run(k); });
+      return send(res, 200, { ok: true });
+    }
   }
 
   /* ---- مدیریت کاربران (فقط مدیر) ---- */
   if (p.startsWith('/api/users') || p.startsWith('/api/backup')) {
     if (me.role !== 'admin') return bad(res, 403, 'فقط مدیر دسترسی دارد');
-    if (p === '/api/backups' && req.method === 'GET') return send(res, 200, { ...diskInfo(), last: (q.getMeta.get('last_backup') || {}).v || null });
+    if (p === '/api/backups' && req.method === 'GET') return send(res, 200, { ...diskInfo(), last: (q.getMeta.get('last_backup') || {}).v || null, lastDl: (q.getMeta.get('last_download') || {}).v || null });
     if (p === '/api/backups' && req.method === 'POST') { const f = makeBackup(true); return send(res, 200, { name: f, ...diskInfo() }); }
     const bm = p.match(/^\/api\/backups\/(motalla-\d{4}-\d{2}-\d{2}(?:-\d{4})?\.json\.gz)$/);
     if (bm && req.method === 'GET') {
       const f = path.join(BK_DIR, bm[1]); if (!fs.existsSync(f)) return bad(res, 404, 'پیدا نشد');
+      q.setMeta.run('last_download', now());
       res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Disposition': 'attachment; filename="' + bm[1] + '"', 'Cache-Control': 'no-store' });
       fs.createReadStream(f).pipe(res); return;
     }
@@ -363,6 +391,7 @@ async function handle(req, res) {
       // نسخه کامل با عکس‌ها (فشرده) برای نگهداری بیرون از سرور
       const out = { ...backupData(), kind: 'full', imgs: db.prepare('SELECT k,data,updated_at FROM imgs').all() };
       const gz = zlib.gzipSync(Buffer.from(JSON.stringify(out)));
+      q.setMeta.run('last_download', now());
       res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Length': gz.length, 'Content-Disposition': 'attachment; filename="motalla-full-' + tehranDay() + '.json.gz"', 'Cache-Control': 'no-store' });
       res.end(gz); return;
     }
@@ -460,7 +489,7 @@ function restoreBackup(name, byName) {
 const server = http.createServer((req, res) => {
   handle(req, res).catch(e => { const code = e && e.code >= 400 && e.code < 600 ? e.code : 500; if (code === 500) console.error(e); try { bad(res, code, code === 413 ? 'حجم درخواست زیاد است' : code === 400 ? 'درخواست نامعتبر' : 'خطای سرور'); } catch (_) { } });
 });
-setInterval(() => { try { q.purgeSessions.run(now()); } catch (e) { } }, 6 * 3600e3).unref();
-try { fs.watch(path.join(ROOT, 'index.html'), () => setTimeout(appVersion, 200)); } catch (e) { }
+setInterval(() => { try { q.purgeSessions.run(now()); q.purgeOldImgs.run(new Date(Date.now() - 90 * 864e5).toISOString()); } catch (e) { } }, 6 * 3600e3).unref();
+try { fs.watch(path.join(ROOT, 'index.html'), () => setTimeout(appVersion, 200)).unref(); } catch (e) { }
 if (require.main === module) server.listen(PORT, process.env.HOST || '0.0.0.0', () => console.log('motalla server on :' + PORT + ' data=' + DATA_DIR + ' app=' + APP_VER));
 module.exports = { server, merge3, db };

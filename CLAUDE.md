@@ -29,13 +29,15 @@ change the existing definition instead of adding a later redefinition). Section 
 | 09-gestures-ui | swipe gestures, dock, tracking list rows (`tlistHTML`), param/source manager |
 | 10-sync-auth-settings | permissions (`PERM_OF`, `can`), server sync (`SYNC`), login, users, Android bridge, home status list |
 | 11-backups | backups page |
-| 12-actions | the `ACT` table (all `data-act` handlers) + later `ACT.x=` additions/wrappers |
+| 12-actions | the `ACT` table (all `data-act` handlers) + later `ACT.x=` additions (no wrappers: change the handler itself) |
 | 13-bank-ledger | bank balances (`acEst`, `acSent`, `acFree`, `vBanks`) |
 | 14-customers | customer accounts (`vCusts`, `vCust`, `txCalc`) |
 | 15-calendar-settle | Persian calendar (`openCal`), settlements (`stlTx`/`stlUntx`, `e.settles` `st:'wait'|'ok'`) |
 | 16-boot | startup: initial render, listeners |
 
 CSS files are split by version era (01-base, 02-v21-v22 … 07-v48-v51), not by topic — grep the selector.
+`python3 tools/css_dedupe.py` reports declarations that a later identical selector always overrides (dead code);
+`--write` removes them. Run it after CSS work; verify with `tests/smoke.mjs --styles` before/after (computed styles must match).
 
 ## app.js concepts
 - render(): view table `R={view:[vX,aX]}`; navigate with `go('view')`. Actions: `ACT.name` + `data-act="name"`.
@@ -45,7 +47,8 @@ CSS files are split by version era (01-base, 02-v21-v22 … 07-v48-v51), not by 
 1. Edit `src/` with targeted greps; don't read whole files.
 2. `python3 tools/bump.py <new version>` (rebuilds app.js/styles.css, updates APP_V, boot V, `?v=`).
    Deploy fails if app.js/styles.css are stale (`python3 tools/build.py --check`).
-3. Smoke test in Playwright (open index.html via file://, check no `pageerror`).
+3. Tests: `npm test` (server API, no deps) and `node tests/smoke.mjs` (Playwright: real server with temp data,
+   opens all 26 views, fails on any JS error). Both run in CI (`.github/workflows/tests.yml`); deploy runs `npm test`.
 4. Commit, push to main, send the user:
    `https://raw.githack.com/amirmsnahdt-cpu/Motalla-/<SHA>/index.html`
 5. Production deploy runs nightly 00:05 Tehran (`.github/workflows/deploy-liara.yml`).
@@ -55,6 +58,13 @@ CSS files are split by version era (01-base, 02-v21-v22 … 07-v48-v51), not by 
 - Root-cause fixes, no leftover bugs. Simple iOS-like blue UI, rounded cards, bold amounts.
 - Status frames: green settled, yellow pending, red unconfirmed — one clean rounded border, no halo.
 - Repo is public: never commit customer data, phone numbers or national IDs. Liara token lives only in GitHub secrets.
+
+## Server data safety
+- Staff may only ADD audit rows; on existing rows only `undone:true` is accepted (`auditEditOk`). Audit is never deleted.
+- Replacing/deleting an existing image needs edit/track/debt/del (`IMG_PERMS`); the previous copy goes to `imgs_old` (kept 90 days).
+- `/api/backups` returns `lastDl` (last backup download from any device) for the off-server backup reminder.
+- Android signing: workflow uses secrets `ANDROID_KEYSTORE_B64`, `ANDROID_KEY_PASS`, `ANDROID_KEY_ALIAS` when set,
+  else the old keystore in the repo (which is public — replace it).
 
 ## In-app update (careful)
 - Production: client polls `/api/status` (version read from `const APP_V` in index.html) and reloads.

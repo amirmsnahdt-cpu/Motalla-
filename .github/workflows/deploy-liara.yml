@@ -39,8 +39,7 @@ jobs:
         run: python3 tools/build.py --check
       - name: تست سرور
         if: env.SKIP != '1'
-        run: node --experimental-sqlite --disable-warning=ExperimentalWarning -e "require('./server/server.js');console.log('server loads ok');process.exit(0)"
-        env: { DATA_DIR: /tmp/motalla-test }
+        run: npm test
       - name: استقرار
         if: env.SKIP != '1'
         env: { LIARA_API_TOKEN: '${{ secrets.LIARA_API_TOKEN }}', LIARA_APP: '${{ vars.LIARA_APP }}' }

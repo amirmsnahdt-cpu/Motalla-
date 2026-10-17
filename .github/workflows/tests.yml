@@ -1,0 +1,23 @@
+name: تست خودکار
+# با هر push و درخواست ادغام: تست‌های سرور + باز کردن همه صفحه‌ها در مرورگر
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions: { contents: read }
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: به‌روز بودن app.js و styles.css
+        run: python3 tools/build.py --check
+      - name: تست سرور
+        run: npm test
+      - name: نصب مرورگر تست (فقط داخل CI)
+        run: npm i --no-save playwright@1.56.0 && npx playwright install --with-deps chromium
+      - name: تست مرورگر (همه صفحه‌ها)
+        run: node tests/smoke.mjs

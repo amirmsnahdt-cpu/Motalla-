@@ -11,12 +11,14 @@ android {
     versionName '1.' + (System.getenv('GITHUB_RUN_NUMBER') ?: '0')
   }
   signingConfigs {
-    // کلید ثابت: همه نسخه‌ها با یک امضا ساخته می‌شوند و روی هم نصب می‌شوند
+    // کلید امضا از GitHub Secrets خوانده می‌شود (ANDROID_KEYSTORE_B64 / ANDROID_KEY_PASS / ANDROID_KEY_ALIAS).
+    // تا وقتی آن‌ها تنظیم نشده‌اند، کلید قدیمی داخل مخزن استفاده می‌شود تا ساخت APK نشکند.
     release {
-      storeFile file('motalla-release.keystore')
-      storePassword 'motalla2026'
-      keyAlias 'motalla'
-      keyPassword 'motalla2026'
+      def ks = System.getenv('ANDROID_KEYSTORE_FILE')
+      storeFile file(ks ?: 'motalla-release.keystore')
+      storePassword(System.getenv('ANDROID_KEY_PASS') ?: 'motalla2026')
+      keyAlias(System.getenv('ANDROID_KEY_ALIAS') ?: 'motalla')
+      keyPassword(System.getenv('ANDROID_KEY_PASS') ?: 'motalla2026')
     }
   }
   buildTypes {
