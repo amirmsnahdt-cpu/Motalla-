@@ -172,13 +172,6 @@
 .spill svg{width:42px;height:42px;color:var(--blu)}
 .spempty b{color:var(--ink);font-size:15px}
 .spsec{margin:18px 2px 4px}.spsec b{display:block;font-size:14px;font-weight:800}.spsec small{font-size:11.5px;color:var(--mut)}.spsec.bad b{color:var(--red)}
-.sprow{display:flex;align-items:center;gap:12px;width:100%;padding:12px 2px;border:0;background:var(--card);color:var(--ink);font:inherit;text-align:right;cursor:pointer}
-.sprow:active{background:var(--bg)}
-.sprow .bri{background:var(--blu2);color:var(--blu);font-weight:800}
-.sprow.bad .bri{background:var(--red2);color:var(--red)}
-
-.sprow .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}.sprow .tx b{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sprow .tx small{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sprow .brv small.d{color:var(--warn)}.sprow .brv small.s{color:var(--ok)}
 /* دکمه شناور پایین (مثل «باکس جدید») */
 #app.split #act{justify-content:center;gap:10px;padding:8px 4px 10px}
 .fab2{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:24px;background:var(--blu);color:#fff;font:inherit;font-size:14.5px;font-weight:700;padding:0 22px;min-height:48px;cursor:pointer;box-shadow:0 10px 24px -10px var(--blu);white-space:nowrap}

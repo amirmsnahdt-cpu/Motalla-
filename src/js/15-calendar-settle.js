@@ -14,19 +14,19 @@ ACT.calPick=d=>{const cb=cal.cb;cal.sel=d.iso;closeSheet();if(cb)cb(d.iso)};
 
 /* ---- خروجی گرفتن: انتخاب لیست‌ها + نوع خروجی ---- */
 let xSel=new Set(),xK='pdf';
-const xDays=()=>Object.keys(drafts||{}).filter(iso=>(drafts[iso]||[]).some(p=>(p.ids||[]).length)).sort().reverse().slice(0,20);
+const xDays=()=>[...new Set(allParts().filter(p=>(p.ids||[]).length).map(p=>partPay(p)).filter(Boolean))].sort().reverse().slice(0,20);
 function xSheetHTML(){const L=xDays(),noX=typeof XLSX==='undefined';if(noX&&xK==='xls')xK='pdf';
-  const rows=L.map(iso=>{const P=drafts[iso].filter(p=>(p.ids||[]).length),Rw=P.flatMap(partRows),D=dates(iso),r=relDay(iso);return `<button class="xrow${xSel.has(iso)?' on':''}" data-act="xTog" data-iso="${iso}"><span class="xck">${ic('check')}</span><span class="tx"><b>${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(D.fa)}</b><small>${fmt(P.length)} منبع، ${fmt(Rw.length)} واریزی</small></span><span class="v">${fmt(sum(Rw))}<i>تومان</i></span></button>`}).join('');
+  const rows=L.map(iso=>{const P=parts(iso).filter(p=>(p.ids||[]).length),Rw=P.flatMap(partRows),D=dates(iso),r=relDay(iso);return `<button class="xrow${xSel.has(iso)?' on':''}" data-act="xTog" data-iso="${iso}"><span class="xck">${ic('check')}</span><span class="tx"><b>${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(D.fa)}</b><small>${fmt(P.length)} منبع، ${fmt(Rw.length)} واریزی</small></span><span class="v">${fmt(sum(Rw))}<i>تومان</i></span></button>`}).join('');
   const T=[['pdf','PDF','paste','چاپ و ارسال'],['xls','Excel','list','هر منبع یک برگه'],['txt','متن','copy','تلگرام و بانک'],['all','هر سه','open','یکجا']];
   return `<div class="sh-h"><div><b>خروجی گرفتن</b><small class="shsub">لیست‌ها را انتخاب کنید و نوع خروجی را بزنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   ${L.length?`<div class="xlab">لیست‌ها</div><div class="xsel">${rows}</div><div class="xlab">نوع خروجی</div><div class="xtypes">${T.map(([k,l,i,d])=>`<button class="xt${xK===k?' on':''}" data-act="xK" data-k="${k}"${k==='xls'&&noX?' disabled':''}>${ic(i)}<b>${l}</b><small>${d}</small></button>`).join('')}</div>
   <button class="xgo" data-act="xGo"${xSel.size?'':' disabled'}>${ic('open')} دریافت خروجی${xSel.size>1?' '+fmt(xSel.size)+' لیست':''}</button>`:'<div class="xnone">هنوز هیچ لیستی تقسیم نشده است.</div>'}`}
-ACT.xOpen=()=>{const L=xDays();xSel=new Set(L.includes(dateVal)?[dateVal]:L.slice(0,1));sheet(xSheetHTML())};
+ACT.xOpen=()=>{const L=xDays();xSel=new Set(L.includes(ldKey)?[ldKey]:L.slice(0,1));sheet(xSheetHTML())};
 ACT.xTog=d=>{xSel.has(d.iso)?xSel.delete(d.iso):xSel.add(d.iso);const sc=document.querySelector('#sheet .xsel'),y=sc?sc.scrollTop:0;$('sheet').innerHTML=xSheetHTML();const s2=document.querySelector('#sheet .xsel');if(s2)s2.scrollTop=y};
 ACT.xK=d=>{xK=d.k;const sc=document.querySelector('#sheet .xsel'),y=sc?sc.scrollTop:0;$('sheet').innerHTML=xSheetHTML();const s2=document.querySelector('#sheet .xsel');if(s2)s2.scrollTop=y};
 ACT.xGo=()=>{const L=[...xSel].sort().reverse();if(!L.length)return;const k=xK;closeSheet();
-  if(L.length===1){const iso=L[0];if(iso!==dateVal)setDate(iso,true);const P=(drafts[iso]||[]).filter(p=>(p.ids||[]).length);txtGen=null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0',track:true,parts:P.filter(p=>!p.sent).map(p=>p.id)};}
-  else{const res=[],seen={};L.forEach(iso=>{const D=dates(iso);(drafts[iso]||[]).filter(p=>(p.ids||[]).length).forEach(p=>{let n=p.src.name+' '+toFa(D.jd)+' '+JM[D.jm-1];if(seen[n])n+=' ('+toFa(++seen[n])+')';else seen[n]=1;res.push({src:{...p.src,name:n,limit:0},items:partRows(p)})})});
+  if(L.length===1){const iso=L[0];ldKey=iso;const P=parts(iso).filter(p=>(p.ids||[]).length);txtGen=null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0',track:true,parts:P.filter(p=>!p.sent).map(p=>p.id)};}
+  else{const res=[],seen={};L.forEach(iso=>{const D=dates(iso);parts(iso).filter(p=>(p.ids||[]).length).forEach(p=>{let n=p.src.name+' '+toFa(D.jd)+' '+JM[D.jm-1];if(seen[n])n+=' ('+toFa(++seen[n])+')';else seen[n]=1;res.push({src:{...p.src,name:n,limit:0},items:partRows(p)})})});
     txtGen=null;expCtx={A:{res,left:[],excl:[],D:dates(L[0])},sc:'all',track:false}}
   if(k==='pdf'){autoTrack();openPrint();return}if(k==='txt'){openText();return}
   if(k==='xls'){if(typeof XLSX==='undefined')return;autoTrack();save('motalla-'+ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد');return}
@@ -51,7 +51,6 @@ ACT.fPayPick=()=>openCal(fPay||payDef(),iso=>ACT.fPay({iso}));
 ACT.openEnt=d=>{entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday'].includes(cur)?cur:'home';go('ent')};
 ACT.entDel=d=>{navBack=true;go(PARENT.ent||'home');delEntry(d.id)};
 ACT.fF=d=>{fF=d.f;fN=120;render()};
-ACT.spPay=d=>{spPay=d.iso||'';const v=$('view');render();v.scrollTop=0};
 ACT.arcCal=()=>{const M=new Set();validated().forEach(r=>{M.add(PD(r));M.add(r.entryDate)});openCal(arcD||qDate(arcQ)||todayISO(),iso=>{arcD=iso;arcQ='';render();$('view').scrollTop=0},{title:'لیست‌های کدام روز؟',sub:'روزهای نقطه‌دار لیست دارند',q:[[-1,'دیروز'],[0,'امروز'],[1,'فردا']],marks:M})};
 ACT.arcClr=()=>{arcQ='';arcD='';render()};
 ACT.cuStl=()=>{cuStlQ='';sheet(cuStlHTML());const q=$('csq');if(q){q.oninput=()=>{cuStlQ=q.value;$('csl').outerHTML=(()=>{const t=document.createElement('div');t.innerHTML=cuStlHTML();return t.querySelector('#csl').outerHTML})()}}};
@@ -79,13 +78,11 @@ ACT.stlBack=()=>{sheet(stlHTML());stlBind()};
 ACT.stlSave=async()=>{stlRead();const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e)return;const name=clean(stl.name||stl.q||'');if(!name){toast('پرداخت‌کننده را انتخاب یا نامش را بنویسید',true);return}const a=+stl.amount||0;if(!a){toast('مبلغ را وارد کنید',true);return}
   const S=e.settles=(e.settles||[]).slice(),others=S.filter((z,i)=>i!==stl.i).reduce((s,z)=>s+(+z.amount||0),0);if(others+a>(+e.amount||0)){toast('جمع تسویه‌ها از مبلغ کل این واریزی بیشتر می‌شود',true);return}
   const now=new Date().toISOString(),old=stl.i!=null?S[stl.i]:null,z={...(old||{}),st:old?(old.st||'ok'):'wait',id:(old&&old.id)||nid++,name,phone:stl.phone||'',inv:stl.inv||'',amount:a,tn:stl.tn||'',note:stl.note||'',cuId:stl.cuId||'',date:(old&&old.date)||todayISO(),at:now,by:who()};
-  if(stl.imgD){const k='stl:'+z.id;if(await imgPut(k,stl.imgD))z.img=k;else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
+  if(stl.imgD){const k=newImgKey('stl:'+z.id);if(await imgPut(k,stl.imgD)){z.imgs=stImgs(z).concat([k]);z.img=z.imgs[0]}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
   if(old&&old.cuId&&old.txId){const oc=custs.find(c=>String(c.id)===String(old.cuId)),ot=oc&&(oc.txs||[]).find(t=>t.id===old.txId);if(ot){ot.del=true;oc.lastAt=now}}
   delete z.txId;if(z.cuId&&z.st!=='wait'){const c=custs.find(q=>String(q.id)===String(z.cuId));if(c){const t={id:nid++,type:'pin',kind:'',weight:0,ppg:0,amount:a,note:'تسویه واریزی «'+fullName(e)+'»'+(z.inv?' · فاکتور '+z.inv:'')+(z.tn?' · پیگیری '+z.tn:''),date:todayISO(),at:now,by:who(),entId:e.id,stlId:z.id,img:z.img||''};(c.txs=c.txs||[]).push(t);c.lastAt=now;z.txId=t.id;saveCu()}}
   if(old)S[stl.i]=z;else S.push(z);e.updatedAt=now;e.updatedBy=who();saveE();stlSync(e);logA('edit','تسویه از مشتری',fullName(e)+' ← '+name+' | '+fmt(a)+' تومان');stl=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const r=entRow();toast(z.st==='wait'?'ثبت شد · از مانده کم شد، در انتظار تأیید':r&&r.full?'تسویه کامل شد ✓':'ثبت شد · مانده بانکی '+fmt(r?r.amount:0)+' تومان')};
 ACT.stlDel=()=>{const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e||stl.i==null)return;askConfirm('این تسویه حذف شود؟ مبلغ دوباره به مانده بانکی برمی‌گردد.','حذف',()=>{const S=e.settles=(e.settles||[]).slice(),old=S[stl.i];if(old&&old.cuId&&old.txId){const oc=custs.find(c=>String(c.id)===String(old.cuId)),ot=oc&&(oc.txs||[]).find(t=>t.id===old.txId);if(ot){ot.del=true;oc.lastAt=new Date().toISOString();saveCu()}}S.splice(stl.i,1);e.updatedAt=new Date().toISOString();saveE();stlSync(e);stl=null;closeSheet();render();toast('تسویه حذف شد')})};
-ACT.ldSplit=()=>{const R=validated().filter(r=>PD(r)===ldKey);if(!R.length)return;const c={};R.forEach(r=>{const w=(!r.sentBid&&!r.full?10:0)+1;c[r.entryDate]=(c[r.entryDate]||0)+w});const iso=Object.keys(c).sort((a,b)=>c[b]-c[a])[0];spTab='split';spPay=ldKey;dateVal=iso;ls.set('m_date',dateVal);alloc=null;go('split1')};
-ACT.ldRows=()=>{fV='rows';fP=ldKey;fG='pay';fF='all';fS='';fQ='';fD='';fT='';fN=120;spTab='lists';go('split1')};
 ACT.ldRc=()=>{const d=ldData(ldKey),P=ldSel&&ldSel.size?ldPick():{G:d.G,FS:d.FS},items=P.G.flatMap(g=>g.rows).concat(P.FS.map(r=>({...r,img:false})));openRcpts(rcOf(items),'رسیدهای '+pdHead(ldKey))};
 ACT.rcView=async d=>{const r=RC[+d.i];if(!r)return;const v=await imgGet(r.key);if(!v){toast('عکس پیدا نشد',true);return}sheet(`<div class="sh-h"><div><b>${esc(r.name)}</b><small class="shsub">${fmt(r.amount)} تومان${r.tn?' · پیگیری '+esc(r.tn):''}</small></div><button class="x" data-act="rcBack">×</button></div><img src="${v}" class="rcpt" style="max-height:62vh" alt="رسید"><div class="txacts"><label>${ic('edit')} تغییر رسید<input type="file" accept="image/*" data-rce="${d.i}" hidden></label><button data-act="rcSave1" data-i="${d.i}">${ic('down')} ذخیره</button><button data-act="rcShare1" data-i="${d.i}">${ic('open')} اشتراک</button></div>`)};
 ACT.rcBack=()=>{if(RC.one){closeSheet();return}openRcpts(RC,RCT)};
@@ -93,7 +90,7 @@ ACT.rcSave1=async d=>{const r=RC[+d.i];if(r)rcDown(await rcFiles([r]))};
 ACT.rcShare1=async d=>{const r=RC[+d.i];if(r)rcShare(await rcFiles([r]),r.name)};
 ACT.rcSaveAll=async()=>rcDown(await rcFiles(RC));
 ACT.rcShareAll=async()=>rcShare(await rcFiles(RC),RCT);
-ACT.rcEnt=async d=>{const b=batches.find(z=>z.id==d.b),x=b&&b.items.find(z=>String(z.id)===String(d.id));if(!x)return;rcShare(await rcFiles([{key:b.id+':'+x.id,name:x.name,amount:x.amount,tn:x.tn||''}]),x.name)};
+ACT.rcEnt=async d=>{const b=batches.find(z=>z.id==d.b),x=b&&b.items.find(z=>String(z.id)===String(d.id));if(!x)return;rcShare(await rcFiles(itImgs(b,x).map(k=>({key:k,name:x.name,amount:x.amount,tn:x.tn||''}))),x.name)};
 ACT.ldQClr=()=>{ldQ='';const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.rcOne=async d=>{RC=[{key:d.k,name:d.n,amount:+d.a,tn:d.t}];RC.one=1;RCT='رسید '+d.n;ACT.rcView({i:0})};
 function stlTx(e,z){const c=custs.find(q=>String(q.id)===String(z.cuId));if(!c)return;const now=new Date().toISOString(),t={id:nid++,type:'pin',kind:'',weight:0,ppg:0,amount:+z.amount||0,note:'تسویه واریزی «'+fullName(e)+'»'+(z.inv?' · فاکتور '+z.inv:'')+(z.tn?' · پیگیری '+z.tn:''),date:todayISO(),at:now,by:who(),entId:e.id,stlId:z.id,img:z.img||''};(c.txs=c.txs||[]).push(t);c.lastAt=now;z.txId=t.id;saveCu()}
@@ -103,7 +100,7 @@ const stlDone=(e,msg)=>{e.updatedAt=new Date().toISOString();e.updatedBy=who();s
 ACT.stlOk=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;z.st='ok';z.okAt=new Date().toISOString();if(z.cuId&&!z.txId)stlTx(e,z);logA('edit','تأیید تسویه از مشتری',fullName(e)+' ← '+z.name+' | '+fmt(z.amount));const r=()=>entRow();stlDone(e,'تأیید شد'+(z.cuId?' · در حساب مشتری ثبت شد':''))};
 ACT.stlUnok=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;z.st='wait';stlUntx(z);stlDone(e,'به «در انتظار تأیید» برگشت')};
 ACT.stlDelI=d=>{const e=stlE();if(!e)return;const z0=(e.settles||[])[+d.i];if(!z0)return;askConfirm((z0.st==='wait'?'این تسویه رد شود؟':'این تسویه حذف شود؟')+' مبلغ '+fmt(z0.amount)+' دوباره به مانده «'+fullName(e)+'» برمی‌گردد.',z0.st==='wait'?'رد':'حذف',()=>{const S=e.settles=(e.settles||[]).slice(),z=S[+d.i];if(!z)return;stlUntx(z);S.splice(+d.i,1);stlDone(e,'مبلغ به مانده برگشت')})};
-ACT.stlImgI=async d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z||!z.img)return;RC=[{key:z.img,name:z.name,amount:z.amount,tn:z.tn||''}];RC.one=1;RCT='رسید '+z.name;ACT.rcView({i:0})};
+ACT.stlImgI=d=>ACT.galSt(d);
 ACT.entTkF=d=>ACT.entTkQ({id:d.id,st:'fail'});
 ACT.rcEntAll=d=>{const x=validated().find(z=>String(z.id)===String(d.id));if(!x)return;openRcpts(rcOfEnt(x),'رسیدهای '+fullName(x))};
 ACT.fV=d=>{fV=d.v;fN=120;render()};
@@ -128,7 +125,7 @@ ACT.ldXls=()=>{if(typeof XLSX==='undefined')return;const P=ldPick();closeSheet()
 ACT.fTClr=()=>{fT='';fN=120;render()};
 ACT.fP=d=>{fP=fP===d.iso?'':d.iso;if(fP)fG='pay';fN=120;render()};
 ACT.fPClr=()=>{fP='';render()};
-ACT.payList=d=>{fP=d.iso;fG='pay';fF='all';fS='';fQ='';fD='';fN=120;spTab='lists';if(cur==='split1'){render();$('view').scrollTop=0}else go('split1')};
+ACT.payList=d=>ACT.arcDay(d);
 ACT.fS=d=>{fS=fS===d.s?'':d.s;fR=0;fN=120;render()};
 ACT.fR=d=>{fR=+d.r||0;fN=120;render()};
 ACT.spLists=()=>{spTab='lists';go('split1')};
@@ -155,3 +152,26 @@ ACT.bkRestore=d=>askConfirm('همه واریزی‌ها، لیست‌ها و ح�
 $('view').addEventListener('scroll',homeCmp,{passive:true});
 {let ly=0;$('view').addEventListener('scroll',()=>{const v=$('view'),y=v.scrollTop,a=$('act');if(!a||!(cur==='banks'||cur==='split1'||cur==='custs')){ly=y;return}if(y>ly+6&&y>40)a.classList.add('hid');else if(y<ly-6||y<=10)a.classList.remove('hid');ly=y},{passive:true})}addEventListener('resize',()=>{if(cur==='home')homeLayout()});
 try{sysDark.addEventListener('change',()=>paintBars())}catch(e){}
+/* ---------- لیست واحد: ارسال، تأیید گروهی، بایگانی ---------- */
+/* تخصیص قدیمی که ردیف‌هایی از تاریخ واریز دیگر هم دارد، موقع ارسال جدا می‌شود تا هر بخش در لیست خودش بماند */
+function partOwnPay(p){const M=vMap(),other={};p.ids.forEach(id=>{const r=M.get(id);if(r&&PD(r)!==ldKey)(other[PD(r)]=other[PD(r)]||[]).push(id)});
+  Object.keys(other).forEach(k=>{const ids=other[k];p.ids=p.ids.filter(id=>!ids.includes(id));addPart({...p,id:nid++,ids,sent:false,bid:undefined,param:{...(p.param||{})}},k)});p.pay=ldKey}
+async function hubSendParts(P){P=P.filter(p=>!p.sent&&p.ids.length);if(!P.length)return;P.forEach(partOwnPay);saveD();txtGen=null;
+  const A=partsAlloc(P),sc=P.length>1?'all':'0';expCtx={A,sc};const ok=await copyText(withCtx(txt)),ids=P.map(p=>p.id),b=commitParts(ids,true);
+  if(!ok){expCtx={A,sc};openText();toast('ارسال شد؛ متن را از اینجا کپی کنید');return}
+  toast('متن کپی شد و '+fmt(P.reduce((a,p)=>a+p.ids.length,0))+' واریزی ارسال شد','','برگرداندن',()=>uncommitParts(ids));if(b){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}}
+ACT.hubSend=d=>hubSendParts(parts().filter(p=>p.src.name===d.k));
+ACT.hubSendAll=()=>hubSendParts(parts());
+/* باز و بسته شدن منبع بدون ساختن دوباره صفحه؛ حرکت کوتاه با CSS (با «کاهش حرکت» حذف می‌شود) */
+ACT.hubTog=(d,e)=>{const el=e&&e.target.closest('.hubg');const g=hubData(ldKey).G.find(z=>z.name===d.k),o=d.k==='__full'?!hubOpen.get('__full'):!(g&&hubIsOpen(g));hubOpen.set(d.k,o);if(el){el.classList.toggle('open',o);const b=el.querySelector('.ldm');if(b)b.setAttribute('aria-expanded',o)}else{const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};
+ACT.hubOkAll=d=>{const g=hubData(ldKey).G.find(z=>z.name===d.k);if(!g)return;const L=g.rows.filter(z=>z.bi&&z.st==='pending'&&!z.bi.b.closed).map(z=>z.bi.x);if(!L.length)return;const now=new Date().toISOString();L.forEach(x=>{x.st='ok';x.at=now});saveB();logA('track','تأیید گروهی',d.k+' | '+fmt(L.length)+' واریزی');const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(fmt(L.length)+' واریز تسویه شد','','برگرداندن',()=>{L.forEach(x=>x.st='pending');saveB();render()})};
+/* بایگانی یک لیست: پیگیری‌هایی که فقط ردیف همین لیست را دارند بسته می‌شوند؛ پیگیری قدیمی مشترک بین چند لیست، ردیف‌های این لیست را به پیگیری جدید می‌دهد (کلید عکس‌ها همراه ردیف می‌رود) */
+function hubClose(k){const M=vMap(),now=new Date().toISOString(),inK=x=>{const r=M.get(x.id);return r?PD(r)===k:(x.pay||'')===k},touched=[];
+  batches.filter(b=>!b.closed&&b.items.some(inK)).forEach(b=>{let t=b;
+    if(!b.items.every(inK)){const mv=b.items.filter(inK);mv.forEach(x=>{x.imgs=itImgs(b,x)});t={id:nid++,date:k,pay:k,createdAt:now,by:who(),items:mv};b.items=b.items.filter(x=>!inK(x));batches.unshift(t);
+      const S=new Set(mv.map(x=>x.id));entries.forEach(e=>{if(S.has(e.id)&&e.sentBid===b.id)e.sentBid=t.id});allParts().forEach(p=>{if(p.bid===b.id&&p.ids.length&&p.ids.every(id=>S.has(id)))p.bid=t.id})}
+    const c=bStat(t);t.closed=now;t.arch={ok:c.ok,fail:c.fail,pending:c.pending,all:c.all,okSum:c.okSum||0,by:who()};touched.push(t)});
+  saveE();saveB();saveD();return touched}
+ACT.hubArch=()=>{const d=hubData(ldKey);if(!d.sent)return;const go2=()=>{const T=hubClose(ldKey);logA('close','بایگانی لیست',pdHead(ldKey)+' | موفق '+fmt(d.ok)+' از '+fmt(d.rows.length));const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(T.length?'لیست بایگانی شد':'چیزی برای بایگانی نبود')};
+  d.pend||d.un.length||d.dr.length?askConfirm([d.pend?fmt(d.pend)+' واریزی هنوز «در انتظار» است':'',d.un.length||d.dr.length?fmt(d.un.length+d.none)+' واریزی هنوز ارسال نشده':''].filter(Boolean).join(' و ')+'. با همین وضعیت بایگانی شود؟','بایگانی',go2):go2()};
+ACT.hubReopen=()=>{const M=vMap();let n=0;batches.forEach(b=>{if(b.closed&&b.items.some(x=>{const r=M.get(x.id);return r?PD(r)===ldKey:x.pay===ldKey})){delete b.closed;n++}});saveB();logA('close','بازگشایی لیست',pdHead(ldKey));render();toast(n?'لیست برای ویرایش باز شد':'لیست بسته‌ای نبود')};

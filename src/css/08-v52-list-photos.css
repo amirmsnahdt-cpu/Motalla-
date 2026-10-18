@@ -1,0 +1,110 @@
+/* ===== v52: لیست واحد هر تاریخ واریز ===== */
+.spsec.hubs,.spsec.bad{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.spsec.hubs>div,.spsec.bad>div{min-width:0}
+.hadd{flex:none;display:inline-flex;align-items:center;gap:4px;border:0;background:var(--blu);color:#fff;font:inherit;font-size:12.5px;font-weight:700;border-radius:12px;padding:8px 12px;cursor:pointer}
+.hadd svg{width:15px;height:15px}
+.hubg .ldh{padding-inline-start:0;padding-inline-end:6px}
+.hmore2{flex:none;width:38px;height:38px;border:0;border-radius:12px;background:var(--hair);color:var(--ink);font:inherit;font-size:18px;font-weight:800;line-height:1;cursor:pointer}
+.hmore2:active{background:var(--line)}
+.hubg .ldb{border-top:1px solid var(--hair)}
+.hubg .ldb .blist{background:none;box-shadow:none;margin:0;border-radius:0}
+.hsendr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--blu2)}
+.hsendr span{font-size:12px;color:var(--blu);font-weight:700;line-height:1.6}
+.hsend{flex:none;display:inline-flex;align-items:center;gap:5px;border:0;background:var(--blu);color:#fff;font:inherit;font-size:12.5px;font-weight:800;border-radius:12px;padding:8px 12px;cursor:pointer}
+.hsend svg{width:15px;height:15px}
+.ldm .tx .d{color:var(--blu);font-weight:700}
+.ldg.gdr{box-shadow:0 0 0 1.5px var(--blu2),0 1px 3px #16213a12}
+.hubg .okall{margin:8px 12px 12px;width:calc(100% - 24px)}
+/* ردیف پیگیری: واریز شد · ناموفق · رسید در یک خط */
+.rtk{grid-template-columns:1fr 1fr auto}
+.rtk .rc{padding:7px 12px;color:var(--mut)}
+.rtk .rc.on{color:var(--blu);border-color:var(--blu2);background:var(--blu2)}
+.rtk:has(> :only-child) {grid-template-columns:1fr}
+/* ===== v52: پرداخت از چند منبع ===== */
+.psl{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
+.psr{display:grid;grid-template-columns:26px 1fr 1fr auto;gap:6px;align-items:center}
+.psr .n{width:26px;height:26px;border-radius:50%;background:var(--blu2);color:var(--blu);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.psr select,.psr input{margin:0;min-width:0;height:46px;font-size:14px}
+.psx{width:34px;height:34px;border:0;border-radius:10px;background:var(--red2);color:var(--red);font:inherit;font-size:18px;font-weight:800;cursor:pointer}
+.pss{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 0;padding:10px 12px;border-radius:14px;background:var(--hair);font-size:12.5px}
+.pss.ok{background:var(--ok2);color:var(--ok)}
+.pss.bad{background:var(--warn2,#fff4dc);color:var(--warn)}
+.pss b{font-weight:800}
+.psplit .stlrw.me{box-shadow:inset 0 0 0 1.5px var(--blu)}
+.psplit .stlrw.d .brv small,.psplit .stlrw.n .brv small{color:var(--mut)}
+.psplit>.link{display:block;margin:8px auto 0;font-size:13px}
+/* ===== v52: عکس رسیدها ===== */
+.galg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 6px}
+.galt{position:relative;aspect-ratio:3/4;border:0;border-radius:14px;overflow:hidden;background:var(--hair);padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--blu);font:inherit;font-size:12px;font-weight:700}
+.galt .galim{position:absolute;inset:0;background:var(--hair) center/cover no-repeat}
+.galt i{position:absolute;bottom:6px;inset-inline-start:6px;font-style:normal;background:#0008;color:#fff;border-radius:8px;padding:1px 7px;font-size:11px}
+.galt.add{border:1.5px dashed var(--blu);background:var(--blu2)}
+.galt.add svg{width:24px;height:24px}
+.galnote{font-size:12px;color:var(--mut);line-height:1.8;margin:2px 2px 10px}
+.stlc{position:relative}
+.stlc em{position:absolute;top:-4px;inset-inline-end:-4px;font-style:normal;background:var(--blu);color:#fff;border-radius:8px;min-width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;padding:0 3px}
+/* نمایش تمام‌صفحه با بزرگ‌نمایی */
+.zv{position:fixed;inset:0;z-index:1000;background:#05080f;color:#fff;display:flex;flex-direction:column;touch-action:none;user-select:none;-webkit-user-select:none}
+.zv.hide{display:none}
+.zvt,.zvn{flex:none;display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top))}
+.zvn{padding-top:10px;padding-bottom:max(12px,env(safe-area-inset-bottom));justify-content:space-between}
+.zvn span{flex:1;text-align:center;font-size:12.5px;color:#ffffffc0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zc{font-size:13px;font-weight:700;color:#ffffffd0}
+.zsp{flex:1}
+.zb{flex:none;height:42px;border:0;border-radius:14px;background:#ffffff1a;color:#fff;font:inherit;font-size:22px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;cursor:pointer}
+.zb svg{width:20px;height:20px}
+.zb.t{font-size:13.5px}
+.zb.pri{background:var(--blu)}
+.zb:disabled{opacity:.3}
+.zvs{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.zvs img{max-width:100%;max-height:100%;object-fit:contain;transform-origin:center;will-change:transform;-webkit-user-drag:none}
+.zcr{position:absolute;border:2px solid #fff;box-shadow:0 0 0 9999px #000a;touch-action:none;cursor:move}
+.zcr i{position:absolute;width:26px;height:26px;border:4px solid #fff;border-radius:3px;background:none}
+.zcr i[data-h=nw]{top:-6px;left:-6px;border-right:0;border-bottom:0;cursor:nwse-resize}
+.zcr i[data-h=ne]{top:-6px;right:-6px;border-left:0;border-bottom:0;cursor:nesw-resize}
+.zcr i[data-h=sw]{bottom:-6px;left:-6px;border-right:0;border-top:0;cursor:nesw-resize}
+.zcr i[data-h=se]{bottom:-6px;right:-6px;border-left:0;border-top:0;cursor:nwse-resize}
+/* ===== v52: پایین صفحه اول ===== */
+.fday.hpd{align-items:center;background:var(--bg)}
+.hpd .hpt{flex:1;flex-direction:column;align-items:flex-start;gap:1px}
+.hpd .hpt span{font-size:14px}
+.hpd .hpt small{margin:0;font-size:11.5px;font-weight:600;color:var(--mut)}
+.hpd .hpt small b{color:var(--ink);font-weight:800}
+.hpd.sel .hpt span{border-bottom:0;padding-bottom:0}
+.pdl{padding:7px 10px 7px 12px;font-size:12.5px;border-radius:12px}
+.hpast{margin:18px 0 4px}
+.hpsh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 4px 8px}
+.hpsh b{font-size:14.5px;font-weight:800}
+.hpsh small{font-size:11.5px;color:var(--mut)}
+.hpast .arcd{margin-bottom:8px}
+/* ===== v52: قاب وضعیت — یک تعریف برای همه صفحه‌ها (جای چند قاعده پراکنده قبلی) =====
+   سبز: تسویه شده · زرد: ارسال شده و در انتظار · قرمز: ناموفق یا خطادار.
+   فقط یک خط گرد تمیز با زمینه کم‌رنگ، بدون هاله. رنگ‌ها فقط همین‌جا عوض می‌شوند. */
+.brw.ok,.stlrw.k{--fc:var(--ok);--fb:color-mix(in srgb,var(--ok2) 45%,var(--card))}
+.brw.pend,.stlrw.w{--fc:var(--pe);--fb:color-mix(in srgb,var(--warn2) 40%,var(--card))}
+.brw.fail,.brw.bad,.stlrw.f{--fc:var(--red);--fb:color-mix(in srgb,var(--red2) 45%,var(--card))}
+#app .blist .brw:is(.ok,.pend,.fail,.bad){position:relative;border-radius:16px!important;overflow:hidden;background:var(--fb)!important}
+#app .blist .brw:is(.ok,.pend,.fail,.bad)>.brh{background:transparent!important}
+#app .blist .brw:is(.ok,.pend,.fail,.bad)::after{content:'';position:absolute;inset:0;border:1.5px solid var(--fc);border-radius:16px;pointer-events:none;z-index:2}
+#app .blist>.swr:has(.brw:is(.ok,.pend,.fail,.bad)){padding:3px 4px!important;background:var(--card)!important}
+.stlrw:is(.k,.w,.f){background:var(--fb)}
+.stlrw:is(.k,.w,.f)::after{border-color:var(--fc)}
+.stlrw.w .bri{background:var(--warn2);color:var(--warn)}
+.stlrw.w .brv small{color:var(--warn)}
+.ldg.gok{box-shadow:0 0 0 1.5px var(--ok)!important}
+.ldg.gpe{box-shadow:0 0 0 1.5px var(--pe)!important}
+/* ===== v52: حرکت‌ها (کوتاه و قابل قطع؛ با «کاهش حرکت» سیستم خاموش می‌شوند) ===== */
+.hubg .ldb{display:grid!important;grid-template-rows:0fr;border-top-color:transparent;transition:grid-template-rows .26s cubic-bezier(.2,.8,.2,1),border-color .2s}
+.hubg.open .ldb{grid-template-rows:1fr;border-top-color:var(--hair)}
+.ldbi{min-height:0;overflow:hidden}
+.hubg:not(.open) .ldbi{visibility:hidden;transition:visibility 0s .26s}
+.zv{animation:zvIn .2s cubic-bezier(.2,.8,.2,1)}
+@keyframes zvIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.zvs img{transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.zv.drag .zvs img{transition:none}
+.galt{transition:transform .15s}
+.galt:active{transform:scale(.96)}
+/* اندازه لمس: حداقل ۴۴ نقطه برای دکمه‌های تازه */
+.hmore2,.psx,.zb{min-width:44px;min-height:44px}
+.rtk button{min-height:40px}
+.hsend,.hadd{min-height:40px}

@@ -95,7 +95,7 @@
 .taxck input:checked+.tgx{background:var(--blu)}.taxck input:checked+.tgx::after{right:21px}.taxck span:last-child{display:flex;flex-direction:column;line-height:1.4}.taxck b{font-size:14px;font-weight:800}.taxck small{font-size:11.5px;color:var(--mut)}
 .brk{background:var(--bg);border-radius:14px;padding:8px 12px;margin:0 0 12px;font-size:13px}.brk>div{display:flex;justify-content:space-between;padding:4px 0}.brk span{color:var(--mut)}.brk b{font-weight:700}.brk .t{border-top:1px solid var(--line);margin-top:4px;padding-top:8px}.brk .t b{color:var(--blu);font-weight:800;font-size:14.5px}.brk .z{color:var(--mut);font-size:12px;text-align:center}
 .stks{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}.stks>div{background:var(--card);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;box-shadow:0 1px 2px #16213a0a}.stks small{font-size:12px;color:var(--mut);font-weight:700}.stks b{font-size:16px;font-weight:800}.stks b i{font-style:normal;font-size:11px;color:var(--mut);margin-inline-start:3px}.stks .neg b{color:var(--red)}
-.rtk{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 12px 12px}
+.rtk{display:grid;gap:6px;padding:0 12px 12px}
 .rtk button{display:flex;align-items:center;justify-content:center;gap:4px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:12.5px;font-weight:800;border-radius:12px;padding:7px;cursor:pointer}.rtk svg{width:15px;height:15px}
 .rtk .ok.on{border-color:var(--ok);background:var(--ok2);color:var(--ok)}.rtk .no.on{border-color:var(--red);background:var(--red2);color:var(--red)}
 #app.full .fcard .rtk button{background:var(--card)}
@@ -143,7 +143,7 @@
 .ash .arow input{accent-color:var(--blu)}
 #sheet .ash .asave .btn,#sheet .ash .asave .btn.gold{background:var(--blu)!important;color:#fff!important;border:0!important;box-shadow:0 10px 22px -12px var(--blu)!important;border-radius:16px!important}
 /* مبالغ پررنگ‌تر */
-.brv b,.sprow .brv b,.acrow .v b,.txv b,.bkr .v,.cuv>span{font-weight:800!important}
+.brv b,.acrow .v b,.txv b,.bkr .v,.cuv>span{font-weight:800!important}
 .brv b{font-size:15.5px!important;letter-spacing:-.1px}
 .bhv,.spv,.ptv,.eam,.achero b,.cut b,.ingot .v{font-weight:900!important}
 .kv b{font-weight:800}
@@ -187,7 +187,7 @@
 .fday.pd span{color:var(--blu)}
 .fday.hpd{margin:0 -14px!important;padding:10px 18px 8px!important;top:-2px}
 .fday.hpd small{margin-inline-start:auto}
-.pdl{border:0;background:var(--blu2);color:var(--blu);font:inherit;font-size:11.5px;font-weight:800;border-radius:10px;padding:3px 6px 3px 9px;display:inline-flex;align-items:center;gap:2px;cursor:pointer;align-self:center}.pdl svg{width:13px;height:13px}
+.pdl{border:0;background:var(--blu2);color:var(--blu);font:inherit;font-weight:800;display:inline-flex;align-items:center;gap:2px;cursor:pointer;align-self:center}.pdl svg{width:13px;height:13px}
 .fgrp{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 8px}.fgrp>span{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--mut)}.fgrp>span svg{width:14px;height:14px}
 .fgrp .seg{margin:0!important;flex:none;display:flex!important;width:auto}.fgrp .seg button{font-size:12px!important;padding:6px 12px!important;white-space:nowrap;flex:none!important}
 

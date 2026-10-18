@@ -33,9 +33,19 @@ change the existing definition instead of adding a later redefinition). Section 
 | 13-bank-ledger | bank balances (`acEst`, `acSent`, `acFree`, `vBanks`) |
 | 14-customers | customer accounts (`vCusts`, `vCust`, `txCalc`) |
 | 15-calendar-settle | Persian calendar (`openCal`), settlements (`stlTx`/`stlUntx`, `e.settles` `st:'wait'|'ok'`) |
+| 15b-images | receipt photos: several per bank deposit (`x.imgs`) and per customer settlement (`z.imgs`), gallery (`openGal`), full-screen zoom/rotate/crop viewer (`zvOpen`) |
+| 15c-pay-split | pay one deposit from several sources: linked piece entries (`splitOf`), `famOf`, `psApply` |
 | 16-boot | startup: initial render, listeners |
 
-CSS files are split by version era (01-base, 02-v21-v22 … 07-v48-v51), not by topic — grep the selector.
+CSS files are split by version era (01-base, 02-v21-v22 … 08-v52-list-photos), not by topic — grep the selector.
+Status frames (green/yellow/red row borders) are defined ONCE at the end of 08-v52-list-photos.css (`--fc`/`--fb` per state); change them only there.
+
+## Lists (v52)
+- A list = one PAY date (`ldKey`, `PD(r)`), whatever the registration dates. Lists page = `split1` (cards, newest first);
+  one list = `lday` (`vLday`/`hubData`): errors, unallocated, each source (ready to send / sent with ✓ ✕ and receipts), customer-settled.
+- `parts()` = allocations of the current list from every `drafts` bucket (old buckets are keyed by registration date; membership comes
+  from the rows' pay date, nothing is migrated). Add/remove with `addPart`/`delPart`. New batches use `date=pay=ldKey`; items carry `pay`.
+- Archiving a list (`hubClose`) closes only its own rows; a shared legacy batch is split and moved items keep their photo keys (`imgs`).
 `python3 tools/css_dedupe.py` reports declarations that a later identical selector always overrides (dead code);
 `--write` removes them. Run it after CSS work; verify with `tests/smoke.mjs --styles` before/after (computed styles must match).
 

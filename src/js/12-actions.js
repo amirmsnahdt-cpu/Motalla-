@@ -5,7 +5,7 @@ const ACT={
   cancelEdit:()=>{editId=null;const b=editBack;editBack=null;go(b||'list')},
   pickDate:d=>{closeSheet();setDate(d.iso)},
   lsel:d=>{if(d.iso==='all'){listMode='all';openGroups=new Set();render()}else{listMode='day';setDate(d.iso,true)}window.scrollTo(0,0)},
-  splitPick:()=>openSplitPick(),spSel:d=>{closeSheet();spPay=d.pay||'';setDate(d.iso,true);render();toast('تقسیم لیست '+(spPay?'واریز '+payLab(spPay)+' · ':'')+dates(d.iso).fa)},aQuick:d=>aQuick(d.v),
+  splitPick:()=>openSplitPick(),spSel:d=>{closeSheet();ACT.arcDay({iso:d.pay||d.iso})},aQuick:d=>aQuick(d.v),
   showBad:()=>{listMode='day';listFilter='bad';listQ='';go('list')},
   saveUser:()=>{user=$('un').value.trim();ls.set('m_user',user);closeSheet();toast('نام کاربر ذخیره شد');render()},
   dtab:d=>{setDp(curISO(),d.t);document.querySelectorAll('#sheet .seg button').forEach(b=>b.classList.toggle('on',b.dataset.t===d.t));buildWheels()},
@@ -47,7 +47,7 @@ const ACT={
   tstyle:d=>{txtStyle=d.s;ls.set('m_txtstyle2',d.s);openText()},
   trackNow:()=>{const b=commitAlloc(alloc,true);if(b){batchId=b.id;tkFilter='all';tkQ='';go('batch');toast(fmt(b.items.length)+' واریزی به پیگیری رفت','','برگرداندن',()=>undoCommit(b.id))}},
   undoCommit:d=>askConfirm('واریزی‌های این لیست به تقسیم برگردند؟','برگردان',()=>undoCommit(+d.id)),
-  toSplit:()=>{const n=splitList().filter(r=>r.level===2).length;go('split1');if(n)toast(fmt(n)+' واریزی خطادار است؛ بالای صفحه اصلاحشان کنید',true)},
+  toSplit:()=>{const k=fPay||todayISO();ACT.arcDay({iso:k});const n=validated().filter(r=>PD(r)===k&&r.level===2&&!r.sentBid).length;if(n)toast(fmt(n)+' واریزی خطادار است؛ بالای صفحه اصلاحشان کنید',true)},
   newList:()=>{closeSheet();startList(todayISO())},
   flowGo:d=>{const s=d.s;if(s==='entry'){editId=null;go('entry')}else if(s==='split')go('split1');else if(s==='track'){const b=openB().find(x=>x.date===dateVal);if(b){batchId=b.id;tkFilter='all';tkQ='';go('batch')}else{trTab='open';go('track')}}else{if(dayBatches(dateVal).length){dayIso=dateVal;go('day')}else{trTab='arch';go('track')}}},
   archive:()=>{trTab='arch';go('track')},
@@ -124,7 +124,7 @@ const ACT={
   partsSend:async()=>{const P=parts().filter(p=>!p.sent&&pVis(p));if(!P.length)return;txtGen=null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0'};const t=withCtx(txt),ok=await copyText(t);const ids=P.map(p=>p.id),b=commitParts(ids,true);
     if(!ok){batchId=b?b.id:null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0'};openText();toast('به پیگیری رفت؛ متن را از اینجا کپی کنید');return}
     if(b){batchId=b.id;tkFilter='all';tkQ='';go('batch');toast('متن کپی شد و '+fmt(P.length)+' تخصیص به پیگیری رفت','','برگرداندن',()=>uncommitParts(ids))}},
-  partDel:()=>askConfirm('این تخصیص لغو شود؟ واریزی‌هایش به مانده برمی‌گردند.','لغو تخصیص',()=>{const p=curPart();drafts[dateVal]=parts().filter(z=>z.id!==partId);saveD();if(p)logA('undo','لغو تخصیص',p.src.name);go('split1')}),
+  partDel:()=>askConfirm('این تخصیص لغو شود؟ واریزی‌هایش به مانده برمی‌گردند.','لغو تخصیص',()=>{const p=curPart();if(p)delPart(p);saveD();if(p)logA('undo','لغو تخصیص',p.src.name);go('lday')}),
   partUnsend:()=>uncommitParts([partId]),
   tkTime:d=>{const b=curB();if(!b)return;const x=b.items[+d.i];if(x.time){openItem(b.id,+d.i);return}const n=new Date();x.time=p2(n.getHours())+':'+p2(n.getMinutes());saveB();refreshBatch();toast('ساعت '+toFa(x.time)+' ثبت شد')},
   saveSrc:d=>{const name=clean($('sn').value),bank=$('sb').value;if(!name){toast('نام منبع را بنویسید',true);return}let s;
@@ -137,7 +137,7 @@ const ACT={
   tkGrp:(d,e)=>{const g=e.target.closest('.tg2');if(!g)return;const o=g.classList.toggle('open');const h=g.querySelector('.tgh2');if(h)h.setAttribute('aria-expanded',o);o?tkOpen.add(d.s):tkOpen.delete(d.s)},
   tkBack:d=>{const b=batches.find(x=>x.id==d.b);if(!b)return;const x=b.items[+d.i];if(!x)return;
     askConfirm('«'+x.name+'» از پیگیری برداشته شود و به تقسیم برگردد؟','برگشت به تقسیم',()=>{const k=b.items.indexOf(x);if(k<0)return;b.items.splice(k,1);const e=entries.find(z=>z.id===x.id);if(e)delete e.sentBid;
-      const P=drafts[b.date]||[],p=P.find(z=>z.id===x.pid);if(p){p.ids=p.ids.filter(id=>id!==x.id);if(!p.ids.length)drafts[b.date]=P.filter(z=>z!==p)}
+      const p=findPart(x.pid);if(p){p.ids=p.ids.filter(id=>id!==x.id);if(!p.ids.length)delPart(p)}
       const empty=!b.items.length;if(empty)batches=batches.filter(z=>z!==b);saveE();saveB();saveD();logA('undo','برگشت به تقسیم',x.name+' | '+fmt(x.amount)+' تومان');
       if(empty)go('track');else refreshBatch();$('dock').innerHTML=dockHTML();dockInd();toast('«'+x.name+'» به تقسیم برگشت')})},
   tkFixBad:d=>{setDate(d.iso,true);ACT.showBad()},
@@ -149,7 +149,7 @@ const ACT={
   expAll:()=>expAllGo(),
   aCnt:d=>{setCnt((aSt.count||0)+(+d.v));paramRefresh();recalc()},
   partEdit:d=>allocEdit(+d.id),
-  partDelId:d=>{const p=parts().find(z=>z.id==d.id);if(!p)return;askConfirm('تخصیص «'+p.src.name+'» لغو شود؟ واریزی‌هایش به مانده برمی‌گردند.','لغو تخصیص',()=>{drafts[dateVal]=parts().filter(z=>z.id!=d.id);saveD();logA('undo','لغو تخصیص',p.src.name);render();toast('تخصیص «'+p.src.name+'» لغو شد')})},
+  partDelId:d=>{const p=parts().find(z=>z.id==d.id);if(!p)return;askConfirm('تخصیص «'+p.src.name+'» لغو شود؟ واریزی‌هایش به مانده برمی‌گردند.','لغو تخصیص',()=>{delPart(p);saveD();logA('undo','لغو تخصیص',p.src.name);render();toast('تخصیص «'+p.src.name+'» لغو شد')})},
   srcMgr:()=>srcMgr(),
   srcMgrBack:()=>{srcRet='';if(aSt){allocSheet();recalc()}else closeSheet()},
   srcBack:()=>srcBack(),
@@ -202,21 +202,30 @@ ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render
 ACT.bTog=(d,e)=>{const r=e.target.closest('.brw');if(!r)return;const o=r.classList.toggle('open'),h=r.querySelector('.brh');if(h)h.setAttribute('aria-expanded',o);o?homeOpen.add(String(d.id)):homeOpen.delete(String(d.id))};
 ACT.hsearch=()=>go('find');
 ACT.arcGo=()=>{trTab='arch';go('track')};
-function moveTo(ids,fromP,src,toP){const P=parts(),now=new Date().toISOString();let to=toP&&toP!=='new'?toP:null;
-  if(to||toP==='new'){}else if(fromP.sent)to=P.find(z=>z!==fromP&&z.sent&&z.bid===fromP.bid&&String(z.src.id)===String(src.id));else to=P.find(z=>z!==fromP&&!z.sent&&String(z.src.id)===String(src.id));
-  if(!to){to={id:nid++,src:{id:src.id,name:src.name,bank:src.bank||'',limit:0},method:'manual',param:{},ids:[],sent:!!fromP.sent};if(fromP.sent)to.bid=fromP.bid;P.push(to)}
-  ids.forEach(id=>{fromP.ids=fromP.ids.filter(z=>z!==id);if(!to.ids.includes(id))to.ids.push(id);if(fromP.sent){const b=batches.find(x=>x.id===fromP.bid),it=b&&b.items.find(x=>x.id===id);if(it){it.src=src.name;it.pid=to.id}}});
-  if(!fromP.ids.length)drafts[dateVal]=P.filter(z=>z!==fromP);saveD();saveB();alloc=null;logA('split','انتقال به منبع دیگر',fmt(ids.length)+' واریزی | '+fromP.src.name+' ← '+src.name);return to}
-function moveSheet(ids,title){const p=curPart();if(!p)return;const L=sources.filter(x=>String(x.id)!==String(p.src.id));
-  sheet(`<div class="sh-h"><div><b>انتقال به منبع دیگر</b><small class="shsub">${esc(title)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  ${L.length?`<div class="mvl">${L.map(x=>{const bk=acBank(x),inDay=parts().filter(z=>String(z.src.id)===String(x.id)),n=inDay.reduce((s2,z)=>s2+z.ids.length,0);const ok=inDay.filter(z=>!!z.sent===!!p.sent);return `<div class="mvs"><button class="acrow" data-act="mvGo" data-s="${x.id}">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(x.name))}</span>`}<span class="tx"><b>${esc(x.name)}</b><small>${esc(bk?'بانک '+bk:'بانک نامشخص')}${n?'، '+fmt(n)+' واریزی امروز':''}${inDay.length>1?'، '+toFa(inDay.length)+' مرحله':''}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>${inDay.length?`<div class="mvr">${inDay.map((z,k)=>ok.includes(z)?`<button class="tch" data-act="mvGo" data-s="${x.id}" data-p="${z.id}">مرحله ${toFa(k+1)} <i>${toFa(z.ids.length)}</i></button>`:`<span class="tch dis">مرحله ${toFa(k+1)} · ${z.sent?'ارسال شده':'ارسال نشده'}</span>`).join('')}<button class="tch nw" data-act="mvGo" data-s="${x.id}" data-p="new">+ مرحله جدید</button></div>`:''}</div>`}).join('')}</div>`:'<div class="xnone">منبع دیگری نیست.</div>'}${can('src')?`<button class="acrow mvnew" data-act="mvNew"><span class="bkb lg" style="--bc:var(--blu)">+</span><span class="tx"><b>تعریف منبع جدید</b><small>حساب بانکی دیگری که از آن برداشت می‌شود</small></span></button>`:''}`);mvIds=ids}
-let mvIds=[];
-ACT.entMove=d=>{{const own=parts().find(z=>z.ids.some(i=>String(i)===String(d.id)));if(own)partId=own.id}const id=+d.id||d.id,x=validated().find(r=>String(r.id)===String(d.id));moveSheet([x?x.id:id],x?fullName(x)+'، '+fmt(x.amount)+' تومان':'')};
-ACT.partMoveAll=()=>{const p=curPart();if(!p)return;moveSheet(p.ids.slice(),'همه '+fmt(p.ids.length)+' واریزی «'+p.src.name+'»')};
+/* انتقال به منبع دیگر — از هر جا (خانه، جستجو، لیست، منبع). واریزی تخصیص‌نیافته هم با همین کار به منبع داده می‌شود. */
+function moveTo(ids,fromP,src,toP){const P=parts(),sent=!!(fromP&&fromP.sent);let to=toP&&toP!=='new'?toP:null;
+  if(!to&&toP!=='new')to=P.find(z=>z!==fromP&&!!z.sent===sent&&(!sent||z.bid===fromP.bid)&&String(z.src.id)===String(src.id));
+  if(!to){to={id:nid++,src:{id:src.id,name:src.name,bank:src.bank||'',limit:0},method:'manual',param:{},ids:[],sent,at:new Date().toISOString()};if(sent)to.bid=fromP.bid;addPart(to)}
+  ids.forEach(id=>{if(fromP)fromP.ids=fromP.ids.filter(z=>z!==id);if(!to.ids.includes(id))to.ids.push(id);if(sent){const b=batches.find(x=>x.id===fromP.bid),it=b&&b.items.find(x=>x.id===id);if(it){it.src=src.name;it.pid=to.id}}});
+  if(fromP&&!fromP.ids.length)delPart(fromP);saveD();saveB();alloc=null;logA('split',fromP?'انتقال به منبع دیگر':'تخصیص به منبع',fmt(ids.length)+' واریزی | '+(fromP?fromP.src.name+' ← ':'')+src.name);return to}
+let mvIds=[],mvFrom=null;
+function moveSheet(ids,title,fromP){mvIds=ids;mvFrom=fromP?fromP.id:null;const p=fromP,L=sources.filter(x=>!p||String(x.id)!==String(p.src.id));
+  sheet(`<div class="sh-h"><div><b>${p?'انتقال به منبع دیگر':'تخصیص به منبع'}</b><small class="shsub">${esc(title)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  ${L.length?`<div class="mvl">${L.map(x=>{const bk=acBank(x),inDay=parts().filter(z=>String(z.src.id)===String(x.id)),n=inDay.reduce((s2,z)=>s2+z.ids.length,0);const ok=inDay.filter(z=>!!z.sent===!!(p&&p.sent));return `<div class="mvs"><button class="acrow" data-act="mvGo" data-s="${x.id}">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(x.name))}</span>`}<span class="tx"><b>${esc(x.name)}</b><small>${esc(bk?'بانک '+bk:'بانک نامشخص')}${n?'، '+fmt(n)+' واریزی در این لیست':''}${inDay.length>1?'، '+toFa(inDay.length)+' مرحله':''}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>${inDay.length>1||(inDay.length&&ok.length<inDay.length)?`<div class="mvr">${inDay.map((z,k)=>ok.includes(z)?`<button class="tch" data-act="mvGo" data-s="${x.id}" data-p="${z.id}">مرحله ${toFa(k+1)} <i>${toFa(z.ids.length)}</i></button>`:`<span class="tch dis">مرحله ${toFa(k+1)} · ${z.sent?'ارسال شده':'ارسال نشده'}</span>`).join('')}<button class="tch nw" data-act="mvGo" data-s="${x.id}" data-p="new">+ مرحله جدید</button></div>`:''}</div>`}).join('')}</div>`:'<div class="xnone">منبع دیگری نیست.</div>'}${can('src')?`<button class="acrow mvnew" data-act="mvNew"><span class="bkb lg" style="--bc:var(--blu)">+</span><span class="tx"><b>تعریف منبع جدید</b><small>حساب بانکی دیگری که از آن برداشت می‌شود</small></span></button>`:''}`)}
+ACT.entMove=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;if(x.full){toast('این واریزی کامل با مشتری تسویه شده است',true);return}ldKey=PD(x);
+  const own=parts().find(z=>z.ids.some(i=>String(i)===String(x.id)));if(own)partId=own.id;
+  if(x.sentBid&&!own){const q=entBI(x);if(!q||q.b.closed){toast('لیست این واریزی بایگانی شده است',true);return}}
+  else if(x.level===2&&!own){toast('اول خطای این واریزی را اصلاح کنید',true);return}
+  moveSheet([x.id],fullName(x)+'، '+fmt(x.amount)+' تومان',own)};
+ACT.partMoveAll=()=>{const p=curPart();if(!p)return;moveSheet(p.ids.slice(),'همه '+fmt(p.ids.length)+' واریزی «'+p.src.name+'»',p)};
 ACT.aNewSrc=()=>{const st=aSt;ACT.acNew();acTmp.after=src=>{aSt=st;aSt.srcId=src.id;allocSheet();recalc()}};
-ACT.mvNew=()=>{const ids=mvIds.slice();ACT.acNew();acTmp.after=src=>{mvIds=ids;ACT.mvGo({s:src.id})}};
-ACT.mvGo=d=>{const p=curPart(),src=sources.find(x=>String(x.id)===String(d.s));if(!p||!src)return;const ids=mvIds.slice();closeSheet();const tp=d.p==='new'?'new':d.p?parts().find(z=>String(z.id)===String(d.p)):null;const to=moveTo(ids,p,src,tp);
-  if(!p.ids.length){partId=to.id}const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(fmt(ids.length)+' واریزی به «'+src.name+'» منتقل شد','', 'برگرداندن',()=>{const P=parts();if(!P.includes(p))P.push(p);moveTo(ids,to,p.src);partId=p.id;render()})};
+ACT.mvNew=()=>{const ids=mvIds.slice(),fr=mvFrom;ACT.acNew();acTmp.after=src=>{mvIds=ids;mvFrom=fr;ACT.mvGo({s:src.id})}};
+ACT.mvGo=d=>{const p=mvFrom!=null?findPart(mvFrom):null,src=sources.find(x=>String(x.id)===String(d.s));if(!src)return;const ids=mvIds.slice();closeSheet();
+  if(!p){const x=validated().find(r=>r.id===ids[0]),q=x&&x.sentBid?entBI(x):null;
+    if(q){const old=q.it.src;q.it.src=src.name;saveB();logA('split','انتقال به منبع دیگر',fullName(x)+' | '+old+' ← '+src.name);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('«'+fullName(x)+'» به «'+src.name+'» منتقل شد');return}}
+  const tp=d.p==='new'?'new':d.p?parts().find(z=>String(z.id)===String(d.p)):null;const to=moveTo(ids,p,src,tp);
+  if(p&&!p.ids.length)partId=to.id;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;
+  toast(fmt(ids.length)+' واریزی '+(p?'به «'+src.name+'» منتقل شد':'به «'+src.name+'» تخصیص یافت'+(to.sent?'':' · آماده ارسال')),'', 'برگرداندن',()=>{if(p){if(!allParts().includes(p))addPart(p,p.pay||ldKey);moveTo(ids,to,p.src,p);partId=p.id}else{to.ids=to.ids.filter(z=>!ids.includes(z));if(!to.ids.length)delPart(to);saveD()}render()})};
 ACT.trkDay=d=>{setDate(d.iso,true);go('split1')};
 ACT.entTkQ=d=>{const e=entries.find(y=>String(y.id)===String(d.id));if(!e)return;const q=entBI(e);if(!q||q.b.closed){toast('لیست این واریزی بسته شده است',true);return}q.it.st=q.it.st===d.st?'pending':d.st;q.it.at=new Date().toISOString();saveB();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;if(!bStat(q.b).pending)toast('همه واریزی‌های این لیست بررسی شد؛ می‌توانید بایگانی کنید')};
 ACT.trkArch=()=>{const b=batches.find(x=>x.date===dateVal&&!x.closed);if(!b)return;const c=bStat(b);

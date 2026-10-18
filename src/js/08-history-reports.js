@@ -131,7 +131,7 @@ function reportHTML(sc){const D=DP(),RG=alloc.reg||'',G=groups(sc).filter(g=>g.r
   return pdfDoc('گزارش واریزی '+D.iso,h)}
 /* لیست روزانه با وضعیت، شماره پیگیری و رسیدها */
 async function dayReport(iso,G0,FS0,T0,R0){const G=G0||dayGroups(iso),D=dates(iso),it=G.flatMap(g=>g.rows),c=bStat({items:it}),imgs={};
-  for(const x of it)if(x.img){const b=batches.find(z=>z.id===x.bid);if(b)imgs[x.bid+':'+x.id]=await imgGet(ikey(b,x))}
+  const RI=[];for(const x of it){const b=batches.find(z=>z.id===x.bid);if(!b)continue;for(const k of itImgs(b,x)){const v=await imgGet(k);if(v)RI.push({x,v})}}
   const TT=T0||'لیست روزانه واریز';let h=`<section class="pg">${pdfTop(TT,D)}<h1>${esc(TT)}</h1>${pdfSub(D,R0||'')}<div class="bar"></div>
   <div class="kp"><div><small>کل واریزی‌ها</small><b>${fmt(c.all)}</b></div><div class="ok"><small>انجام شد</small><b>${fmt(c.ok)}</b></div><div class="rd"><small>انجام نشد</small><b>${fmt(c.fail)}</b></div><div class="g"><small>واریز شده</small><b>${fmt(c.okSum)}<em>تومان</em></b></div></div>`;
   G.forEach(g=>{const s=sum(g.rows),gc=bStat({items:g.rows});h+=`<h2>${esc(g.name)}<small>${fmt(g.rows.length)} واریزی — ${fmt(s)} تومان${gc.fail?' — '+fmt(gc.fail)+' ناموفق':''}</small></h2>
@@ -140,8 +140,8 @@ async function dayReport(iso,G0,FS0,T0,R0){const G=G0||dayGroups(iso),D=dates(is
     <tr class="tot"><td></td><td colspan="3">جمع ${esc(g.name)}</td><td class="am">${fmt(s)}</td></tr></tbody></table>`});
   const FS=FS0||fullSettled(iso);if(FS.length)h+=`<h2>تسویه کامل از طریق مشتری<small>${fmt(FS.length)} مورد — ${fmt(FS.reduce((s,r)=>s+r.total,0))} تومان</small></h2><table><thead><tr><th>#</th><th>نام و فاکتور</th><th>نحوه تسویه</th><th class="am">مبلغ (تومان)</th></tr></thead><tbody>${FS.map((r,i)=>`<tr><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(r))}</span>${r.code?`<span class="s">فاکتور ${esc(toEn(r.code))}</span>`:''}</td><td>${r.settles.map(z=>`<span class="s" style="color:#2a3550">${esc(setLine(z))}</span>`).join('')}</td><td class="am">${fmt(r.total)}</td></tr>`).join('')}</tbody></table>`;
   h+=`<div class="sign"><div>تهیه‌کننده</div><div>تأیید مدیر</div></div>${pdfFoot()}</section>`;
-  const ri=it.filter(x=>imgs[x.bid+':'+x.id]);
-  if(ri.length)h+=`<section class="pg">${pdfTop('رسیدهای واریز',D)}<h1>رسیدهای واریز</h1>${pdfSub(D)}<div class="bar"></div><div class="rc">${ri.map(x=>`<figure><img src="${imgs[x.bid+':'+x.id]}" alt=""><figcaption><b>${esc(x.name)}</b>${fmt(x.amount)} تومان${x.tn?'<br>پیگیری <span class="tn">'+esc(x.tn)+'</span>':''}</figcaption></figure>`).join('')}</div>${pdfFoot()}</section>`;
+  const ri=RI;
+  if(ri.length)h+=`<section class="pg">${pdfTop('رسیدهای واریز',D)}<h1>رسیدهای واریز</h1>${pdfSub(D)}<div class="bar"></div><div class="rc">${ri.map(({x,v})=>`<figure><img src="${v}" alt=""><figcaption><b>${esc(x.name)}</b>${fmt(x.amount)} تومان${x.tn?'<br>پیگیری <span class="tn">'+esc(x.tn)+'</span>':''}</figcaption></figure>`).join('')}</div>${pdfFoot()}</section>`;
   return pdfDoc('لیست روزانه '+D.iso,h)}
 /* چاپ داخل همین صفحه (بدون دانلود) */
 function printReport(){const html=window.__pv||withCtx(reportHTML),doc=new DOMParser().parseFromString(html,'text/html');doc.querySelectorAll('.pb').forEach(b=>b.remove());

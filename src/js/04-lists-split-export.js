@@ -148,9 +148,9 @@ let batches=ls.get('m_batches',[]).map(b=>({...b,items:(b.items||[]).map(x=>({..
 const saveB=()=>ls.set('m_batches',batches);
 /* ورژن‌های قبلی: واریزی‌های داخل لیست پیگیری را «ارسال‌شده» علامت بزن */
 (()=>{let ch=0;batches.forEach(b=>b.items.forEach(x=>{const e=entries.find(z=>z.id===x.id);if(e&&!e.sentBid){e.sentBid=b.id;ch=1}}));if(ch)saveE()})();
-let spPay='';
-const splitList=()=>dayList().filter(r=>!r.sentBid&&!r.full&&(!spPay||PD(r)===spPay));
-const pVis=p=>{if(!spPay)return true;const pp=partPay(p);if(pp)return pp===spPay;return partRows(p).some(r=>PD(r)===spPay)};
+/* مانده برای تخصیص در لیست جاری (همه واریزی‌های این تاریخ واریز، از هر روز ثبت) */
+const splitList=()=>validated().filter(r=>PD(r)===ldKey&&!r.sentBid&&!r.full);
+const pVis=()=>true;
 function stOf(id){if(!_stm){_stm=new Map();for(const b of batches)for(const x of b.items)if(!_stm.has(x.id))_stm.set(x.id,x.st);queueMicrotask(memoClear)}return _stm.has(id)?_stm.get(id):null}
 const entSt=r=>r.full?['تسویه با مشتری','ok']:r.sentBid?(s=>s==='ok'?['تسویه شده','ok']:s==='fail'?['واریز ناموفق','rd']:['ارسال شده','gd'])(stOf(r.id)):r.settled?['تسویه بخشی','g']:null;
 const stPill=r=>{const s=entSt(r);return s?`<span class="pill ${s[1]==='ok'?'okp':s[1]}">${s[0]}</span>`:''};

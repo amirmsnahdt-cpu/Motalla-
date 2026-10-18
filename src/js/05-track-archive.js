@@ -81,28 +81,25 @@ function bindBatch(){const q=$('tq'),t=$('tlist');if(!t)return;t.innerHTML=tlist
   t.onkeydown=e=>{if(e.key==='Enter'&&e.target.dataset.tn!==undefined){e.preventDefault();e.target.blur()}};
   t.onchange=async e=>{const el=e.target,b=curB();if(!b)return;
     if(el.dataset.tn!==undefined){const x=b.items[+el.dataset.tn];x.tn=toEn(el.value).trim();if(x.tn&&x.st==='pending')x.st='ok';if(x.tn&&!x.time){const n=new Date();x.time=p2(n.getHours())+':'+p2(n.getMinutes())}x.at=new Date().toISOString();saveB();refreshBatch();toast(x.tn?'شماره پیگیری «'+x.name+'» ثبت شد':'شماره پیگیری پاک شد')}
-    if(el.dataset.img!==undefined){const x=b.items[+el.dataset.img],f=el.files&&el.files[0];if(!f)return;try{const d=await shrink(f);if(await imgPut(ikey(b,x),d)){x.img=true;saveB();refreshBatch();toast('رسید «'+x.name+'» ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(z){toast('این عکس خوانده نشد',true)}}};q.oninput=()=>{tkQ=q.value;document.querySelector('#view .clr').classList.toggle('hide',!tkQ);clearTimeout(q._t);q._t=setTimeout(()=>{$('tlist').innerHTML=tlistHTML()},120)}}
+    if(el.dataset.img!==undefined){const x=b.items[+el.dataset.img],f=el.files&&el.files[0];if(!f)return;try{const d=await shrink(f),k=newImgKey('rc:'+x.id);if(await imgPut(k,d)){x.imgs=itImgs(b,x).concat([k]);x.img=true;saveB();refreshBatch();toast('رسید «'+x.name+'» ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(z){toast('این عکس خوانده نشد',true)}}};q.oninput=()=>{tkQ=q.value;document.querySelector('#view .clr').classList.toggle('hide',!tkQ);clearTimeout(q._t);q._t=setTimeout(()=>{$('tlist').innerHTML=tlistHTML()},120)}}
 function refreshBatch(){const y=window.scrollY;render();const t=$('tlist');if(t)t.innerHTML=tlistHTML();window.scrollTo(0,y)}
 /* ---------- جزئیات هر واریزی: شماره پیگیری، ساعت، عکس ---------- */
 async function openItem(bid,i){const b=batches.find(z=>z.id==bid);if(!b)return;const x=b.items[+i];if(!x)return;batchId=b.id;itemIdx=+i;tmpSt=x.st;tmpImg=undefined;
-  const img=x.img?await imgGet(ikey(b,x)):null;
   sheet(`<div class="sh-h"><b>${esc(x.name)}</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="ihead"><b>${fmt(x.amount)} <small>تومان</small></b><span class="pill g">${esc(x.src)}</span><span class="pill">${esc(x.bank||'—')}</span></div>
   <div class="seg st3">${['ok','fail','pending'].map(k=>`<button data-act="itSt" data-st="${k}" class="${k} ${tmpSt===k?'on':''}">${ST[k][1]} ${ST[k][0]}</button>`).join('')}</div>
   <div class="f"><label>شماره پیگیری بانک</label><input id="itn" class="ltr" inputmode="numeric" autocomplete="off" value="${esc(x.tn||'')}" placeholder="مثلاً 140507181234"></div>
   <div class="f"><label>ساعت واریز</label><div style="display:flex;gap:8px"><input id="itt" type="time" class="ltr" value="${esc(x.time||'')}"><button class="btn sec" style="flex:0 0 auto;padding:0 16px" data-act="itNow">الان</button></div></div>
-  <div class="f"><label>عکس رسید <i>(اختیاری)</i></label><div id="itimg">${img?`<img src="${img}" class="rcpt" alt="رسید">`:''}</div>
-  <div class="row"><label class="btn sec filebtn">${ic('paste')} <span id="itfl">${img?'تعویض عکس':'افزودن عکس رسید'}</span><input type="file" accept="image/*" id="itf"></label>${img?'<button class="btn sec" data-act="itImgDel" style="color:var(--red);flex:0 0 auto;padding:0 16px">حذف</button>':''}</div></div>
+  <div class="f"><label>عکس رسید <i>(اختیاری)</i></label><button class="btn sec" data-act="galIt" data-id="${x.id}">${ic('cam')} ${itImgs(b,x).length?'رسیدها ('+toFa(itImgs(b,x).length)+') · دیدن و افزودن':'افزودن عکس رسید'}</button></div>
   <div class="f"><label>یادداشت <i>(اختیاری)</i></label><input id="itno" value="${esc(x.note||'')}"></div>
   <div class="row"><button class="btn gold" data-act="itSave">ذخیره</button></div>`);
   $('itn').oninput=()=>{$('itn').value=toEn($('itn').value).replace(/[^\dA-Za-z\-]/g,'');if($('itn').value&&tmpSt==='pending')ACT.itSt({st:'ok'})};
-  $('itf').onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{tmpImg=await shrink(f);$('itimg').innerHTML=`<img src="${tmpImg}" class="rcpt" alt="رسید">`;$('itfl').textContent='تعویض عکس'}catch(x){toast('این عکس خوانده نشد',true)}}}
+}
 async function saveItem(){const b=curB();if(!b)return;const x=b.items[itemIdx];x.tn=toEn($('itn').value).trim();x.time=$('itt').value;x.note=clean($('itno').value);
   x.st=tmpSt==='pending'&&x.tn?'ok':tmpSt;x.at=new Date().toISOString();
   if(tmpImg===null){await imgDel(ikey(b,x));x.img=false}else if(typeof tmpImg==='string'){const ok=await imgPut(ikey(b,x),tmpImg);if(ok)x.img=true;else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
   saveB();closeSheet();if(cur==='day')render();else refreshBatch();toast('ذخیره شد')}
-async function viewImg(bid,id){const b=batches.find(z=>z.id==bid),x=b&&b.items.find(z=>z.id==id);if(!x)return;const img=await imgGet(ikey(b,x));if(!img){toast('عکس پیدا نشد',true);return}
-  sheet(`<div class="sh-h"><b>رسید ${esc(x.name)}</b><button class="x" data-act="close">×</button></div><img src="${img}" class="rcpt" style="max-height:70vh" alt="رسید">`)}
+function viewImg(bid,id){const b=batches.find(z=>z.id==bid),x=b&&b.items.find(z=>z.id==id);if(!x)return;openGal({k:'it',eid:x.id})}
 /* ---------- بایگانی روزانه ---------- */
 const fullSettled=iso=>validated().filter(r=>r.entryDate===iso&&r.full);
 const dayBatches=iso=>batches.filter(b=>b.date===iso&&b.closed);
@@ -148,18 +145,23 @@ function tkReportText(b){const c=bStat(b),f=b.items.filter(x=>x.st==='fail'),p=b
 /* ============ تخصیص منبع‌به‌منبع ============ */
 let drafts=ls.get('m_drafts',{}),partId=null,aSt=null;
 const saveD=()=>ls.set('m_drafts',drafts);
-const parts=()=>drafts[dateVal]||(drafts[dateVal]=[]);
-const partRows=p=>{const V=validated(),m=new Map(V.map(r=>[r.id,r]));return p.ids.map(id=>m.get(id)).filter(Boolean)};
+/* هر لیست = یک تاریخ واریز (ldKey)، حتی اگر واریزی‌ها در روزهای مختلف ثبت شده باشند.
+   تخصیص‌های قدیمی در drafts زیر تاریخ ثبت مانده‌اند؛ عضویت هر تخصیص از تاریخ واریز ردیف‌هایش خوانده می‌شود، پس داده جابه‌جا نمی‌شود. */
+const vMap=()=>{const V=validated();if(vMap.V!==V){vMap.V=V;vMap.M=new Map(V.map(r=>[r.id,r]))}return vMap.M};
+const partIn=(p,k,M)=>{const pp=partPay(p,M);if(pp)return pp===k;return (p.ids||[]).some(id=>{const r=M.get(id);return r&&PD(r)===k})};
+function parts(k){k=k||ldKey;const M=vMap(),out=[];for(const d in drafts)(drafts[d]||[]).forEach(p=>{if(p&&p.src&&partIn(p,k,M))out.push(p)});return out.sort((a,b)=>String(a.at||'').localeCompare(String(b.at||''))||a.id-b.id)}
+const allParts=()=>Object.values(drafts).flatMap(a=>(a||[]).filter(p=>p&&p.src));
+function addPart(p,k){k=k||ldKey;p.pay=k;drafts[k]=(drafts[k]||[]).concat([p])}
+function delPart(p){for(const d in drafts){const a=drafts[d];if(a&&a.includes(p))drafts[d]=a.filter(z=>z!==p)}}
+const findPart=id=>allParts().find(p=>p.id===id);
+const partRows=p=>{const m=vMap();return p.ids.map(id=>m.get(id)).filter(Boolean)};
 const methLabel=p=>methLabel0(p)+((p.param||{}).count?'، '+fmt(p.param.count)+' واریزی':'');
 function remainList(){const used=new Set(parts().filter(p=>!(aSt&&aSt.editPid===p.id)).flatMap(p=>p.ids));return splitList().filter(r=>!used.has(r.id))}
 const methLabel0=p=>{const q=p.param||{};return p.method==='amount'?'سقف '+fmt(q.amount):p.method==='range'?(q.min?'از '+fmt(q.min):'')+(q.max?' تا '+fmt(q.max):''):p.method==='bank'?'هم‌بانک: '+(q.bank||''):'انتخاب دستی'};
 function splitCands(){const V=validated(),m={};V.forEach(r=>{if(r.sentBid||r.full)return;(m[r.entryDate]=m[r.entryDate]||[]).push(r)});
   return Object.keys(m).sort().reverse().map(iso=>{const used=new Set((drafts[iso]||[]).flatMap(p=>p.ids)),Rm=m[iso].filter(r=>!used.has(r.id));return {iso,ok:Rm.filter(r=>r.level<2),bad:Rm.filter(r=>r.level===2).length,dr:(drafts[iso]||[]).filter(p=>!p.sent).length}})}
 const calB=iso=>{const D=dates(iso);return `<span class="cal2"><b>${toFa(D.jd)}</b><small>${JM[D.jm-1]}</small></span>`};
-function openSplitPick(){const C=splitCands(),V=validated(),doneN=datesWith().filter(x=>dayDone(x.iso,V)).length;
-  sheet(`<div class="sh-h"><div><b>تقسیم کدام لیست؟</b><small class="shsub">فقط لیست‌هایی که هنوز تقسیم یا تسویه نشده‌اند</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  ${C.length?C.flatMap(c=>{const G={};c.ok.forEach(r=>{(G[PD(r)]=G[PD(r)]||[]).push(r)});const K=Object.keys(G).sort().reverse();return K.length>1?K.map((k,i)=>({...c,ok:G[k],pay:k,bad:i?0:c.bad})):[{...c,pay:K[0]&&K[0]!==c.iso?K[0]:''}]}).map(c=>{const D=dates(c.iso),on=c.iso===dateVal&&(c.pay||'')===spPay;return `<button class="lpick${on?' on':''}" data-act="spSel" data-iso="${c.iso}" data-pay="${c.pay}">${calB(c.pay||c.iso)}<span class="tx"><b>${c.pay?'لیست واریز '+esc(payLab(c.pay)):relDay(c.iso)+'، '+D.fa}</b><small>${c.pay?'ثبت '+relDay(c.iso)+' · ':''}${c.ok.length?fmt(c.ok.length)+' واریزی مانده برای تخصیص':'همه تخصیص داده شده'}</small><span class="tags">${on?'<span class="pill okp">لیست فعلی</span>':''}${c.dr?`<span class="pill gd">${fmt(c.dr)} تخصیص آماده ارسال</span>`:''}${c.bad?`<span class="pill rd">${fmt(c.bad)} خطادار</span>`:''}</span></span><span class="v">${c.ok.length?`${fmt(sum(c.ok))}<small>تومان مانده</small>`:`<em class="okd">${ic('check')}</em>`}</span></button>`}).join(''):`<div class="spempty" style="padding:18px 8px 6px"><div class="spill" style="width:96px;height:96px"><span style="color:var(--ok)">${ic('check')}</span></div><b>لیستی برای تقسیم نمانده</b><span>همه لیست‌ها تقسیم و ارسال شده‌اند.</span></div><button class="xgo" data-act="entryMenu" style="margin-top:12px">${ic('plus')} ثبت واریزی جدید</button>`}
-  ${doneN?`<div class="muted" style="font-size:12px;text-align:center;margin-top:10px">${fmt(doneN)} لیست تسویه‌شده نمایش داده نمی‌شود</div>`:''}`)}
+function openSplitPick(){closeSheet();go('split1')}
 const lbar=()=>`<button class="lbar" data-act="splitPick">${calB(dateVal)}<span class="tx"><small>لیست در حال تقسیم</small><b>${relDay(dateVal)}، ${dates(dateVal).fa}</b></span><span class="chg">تغییر لیست</span></button>`;
 const fwd=()=>ic('back').replace('class="i"','class="i flip"');
 let spTab='split';
@@ -172,4 +174,5 @@ const listCard=d=>{const D=dates(d.iso),pc=d.R.length?d.ok.length/d.R.length*100
 function vArch(){const L=listsData(),card=listCard;
   const aq=arcD||qDate(arcQ),LF=aq?L.filter(d=>d.iso===aq||d.eds.includes(aq)):L,open=LF.filter(d=>!d.done),done=LF.filter(d=>d.done);
   const top=`<div class="fsearch">${ic('search')}<input id="arq" type="search" placeholder="جستجوی تاریخ: ۲۱ مهر، 1405/07/21، دیروز…" value="${esc(arcQ)}" autocomplete="off" enterkeyhint="search"><button class="fcal${arcD?' on':''}" data-act="arcCal" aria-label="انتخاب تاریخ">${ic('cal')}</button></div>${aq?`<div class="fdate">${ic('cal')} لیست‌های ${esc(relDay(aq))}، ${esc(dates(aq).fa)}<button data-act="arcClr" aria-label="حذف">×</button></div>`:''}${aq&&!LF.length?'<div class="spempty" style="padding:20px 8px"><b>برای این تاریخ لیستی نیست</b></div>':''}`;
-  return top+`${open.length?`<div class="spsec"><b>لیست‌های در جریان</b><small>به تفکیک تاریخ واریز · برای دیدن بزنید</small></div>${open.map(card).join('')}`:''}${done.length?`<div class="spsec"><b>لیست‌های تسویه‌شده</b><small>برای جستجو و خروجی باقی می‌مانند</small></div>${done.map(card).join('')}`:''}${!L.length?'<div class="spempty"><b>هنوز لیستی ثبت نشده</b></div>':''}`}
+  /* همه لیست‌ها به ترتیب تاریخ واریز، جدیدترین بالا؛ هر لیست همه واریزی‌های آن روز واریز است */
+  return top+(LF.length?`<div class="spsec"><div><b>لیست‌ها</b><small>${fmt(LF.length)} لیست · ${fmt(open.length)} در جریان · جدیدترین بالا</small></div></div>${LF.map(card).join('')}`:'')+(!L.length?'<div class="spempty"><div class="spill">'+ic('list')+'</div><b>هنوز لیستی ثبت نشده</b><span>با «ورود حساب» در صفحه اول شروع کنید.</span></div>':'')}
