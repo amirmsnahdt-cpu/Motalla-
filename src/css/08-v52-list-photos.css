@@ -280,3 +280,24 @@
 .svgc{margin:10px 0 0}
 .sv2 #svCu:has(.svcu)+#svRest .svbal{margin-top:-20px;padding-top:20px;border-top-left-radius:0;border-top-right-radius:0;box-shadow:var(--sh)}.sv2 #svCu .svcu{position:relative;z-index:1}.sv2 #svRest:empty{display:none}
 .qnew{margin-top:8px;display:inline-flex;align-items:center;min-height:38px;padding:0 13px;font-weight:700;border-style:dashed;color:var(--blu)}
+/* v55.1 فیلدهای مشخص: کادر روشن و واضح، موقع تایپ آبی؛ وزن طلایی، مبلغ سبز (یک خط تمیز، بدون هاله) */
+:root{--fld:#cdd5e3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fld:#34436a}}
+:root[data-theme="dark"]{--fld:#34436a}
+.fsearch{border:1.5px solid var(--fld);transition:border-color .15s}.fsearch:focus-within{border-color:var(--blu)}
+.qag label{background:var(--card);border:1.5px solid var(--fld);transition:border-color .15s}
+.qag label:has(#qW),.qag label:has(#pyW){border-color:var(--gold2)}
+.qag label:has(#pyA){border-color:color-mix(in srgb,var(--ok) 45%,var(--fld))}
+.qag label:focus-within{border-color:var(--blu)!important}
+.qag label:has(#pyA[readonly]){background:var(--bg)}
+.bzw input,.bzw select,.bzw textarea{border-color:var(--fld)}
+/* جستجو با فهرست چسبیده (مثل پیشنهاد نام در خرید طلا): کادر آبی یکپارچه */
+.cbx:has(.cbl)>.fsearch{border-color:var(--blu);border-bottom-left-radius:0;border-bottom-right-radius:0;margin-bottom:0}
+.cbx .cbl{border:1.5px solid var(--blu);border-top:1px solid var(--line);border-radius:0 0 16px 16px;margin:0 0 10px;box-shadow:0 12px 24px -16px rgba(20,40,90,.4)}
+.cbl .bzsr{min-height:56px}.cbl .bzsr .tx small .ltr{direction:ltr;unicode-bidi:isolate}
+.cbv{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px}.cbv .chv{font-size:13.5px;font-weight:800;font-feature-settings:"tnum"}
+.bzsr.gd .av{background:var(--goldbg);color:var(--gold)}.bzsr.ch .av{background:var(--blu2);color:var(--blu)}
+.bzsr.m-gold .av,.bzsr.m-disc .av{background:var(--goldbg);color:var(--gold)}.bzsr.m-cash .av{background:var(--ok2);color:var(--ok)}
+.bzsr.nw .av{background:var(--blu);color:#fff}
+.svpick .svrc{padding-top:10px}
+.qag input:focus,.qag select:focus,.qag input:focus-visible{outline:none!important;box-shadow:none!important;border:0!important;background:none!important}

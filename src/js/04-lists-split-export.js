@@ -88,7 +88,9 @@ function vSrc(){const S=srcRows();if(!S)return '';const s=sum(S.rows);
 const aSrc=()=>{const S=srcRows();return S&&S.rows.length&&!S.x?`<button class="btn sec" data-act="copySrc">${ic('copy')} کپی متن</button><button class="btn gold" data-act="expOpen" data-sc="${srcIdx}">خروجی</button>`:''};
 /* ============ خروجی: متن به فرمت بانک ============ */
 const N=n=>Number(n||0).toLocaleString('en-US');
-const ibanSp=i=>{const d=String(i||'').replace(/^IR/,'').replace(/\D/g,'');return d?'IR'+d:'—'};
+/* شبا در متن‌های ارسالی با همان فاصله‌های داخل برنامه: IR 12 3456 7890 … */
+const ibanSp=i=>{const d=String(i||'').replace(/^IR/,'').replace(/\D/g,'');return d?'IR '+ibanGroups(d):'—'};
+const ibanPdf=i=>{const d=String(i||'').replace(/^IR/,'').replace(/\D/g,'');return d?'IR'+d:'—'};/* ستون باریک PDF: بدون فاصله */
 let txtStyle=ls.get('m_txtstyle2','plain');
 const TS={plain:'ساده',tg:'تلگرام',wa:'واتس‌اپ'};
 const Bo=t=>txtStyle==='tg'?'**'+t+'**':txtStyle==='wa'?'*'+t+'*':t;
