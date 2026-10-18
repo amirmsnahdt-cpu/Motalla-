@@ -83,8 +83,12 @@ Status frames (green/yellow/red row borders) are defined ONCE at the end of 08-v
   stores it in localStorage, and the boot script swaps it in. Any new file loaded by index.html must be
   added to that rewrite regex in `checkUpdate` and to `STATIC` in server.js.
 
-## Customer accounts & sales (v53)
-- Everything lives in `custs` (synced). Real customers = `CU()` (no `sys`). System records: `{sys:'ch',kind:'pos'|'bank'}` (terminals/our accounts, ledger `txs` of `tin`/`tout`), `{sys:'cfg',groups,goods}`. Never list `custs` directly as customers — use `CU()`.
-- Balance per tx = `txD(t)` → `{r,g}` (positive = we owe). Types: buy/sell/pin/pout/gin/gout (old), `inv` (invoice: `items`, `pays[{m:cash|pos|hav|gold|cust}]`, `total`, `gc` = rest booked as gold), `xf` (transfer, `peer` or `inv` link), `cv` (gold↔rial).
-- A `pays` item with `m:'cust'` creates an `xf` on the paying customer (`xfId`); `txLinked` finds linked rows so delete/undo moves both.
-- Channel balance is derived (`chMoves`): invoice pays with `chId` + `tin` − `tout`. Invoice tax = 10% of (اجرت+سود), optional per invoice.
+## Customer accounts & documents (v53 → v56)
+- Everything lives in `custs` (synced). Real customers = `CU()` (no `sys`). System records: `{sys:'ch',kind:'pos'}` POS terminals (old `kind:'bank'` records still work), `{sys:'cfg',groups,goods}`. Never list `custs` directly as customers — use `CU()`.
+- Balance per tx = `txD(t)` → `{r,g,x}` (positive = we owe = customer «طلبکار از ما»; negative = «بدهکار به ما»). `cuBal(c)` → `{R,G,X}`; X = coins/currency per key of `XA` (امامی، بهار، نیم، ربع، گرمی، USD، EUR، AED).
+- One document type `inv` (UI calls it «سند»): `items` (goods with اجرت `ajP` % and `ajT` toman together; old rows `ajU/aj` read by `ajPT`), `xr` (gold/coin/currency rows: `t` sell|buy|in|out, `pul` = پولی: nothing delivered, amount and goods both go to the account), `pays` (`m` cash|pos|hav|cust; out = negative amount; havale to our bank `srcId` = a `sources` account, legacy `chId`), `total` (net rial of goods, may be negative), `ge` gold effect (g ۱۸), `xe` coin/currency effect, `gc` rest booked as gold.
+- Gold math: header has مظنه and «هر گرم ۱۸» linked (`MZK`=4.3318). Buy متفرقه = rate×735/750, sell متفرقه = rate×740/750 (`xrAy`); پولی rows default 750. Gold xr effect = weight×ayar/750.
+- Bank tab: POS balance (`chBal`) = cards taken in documents − deposits to a bank account (`posDep`: ch `tout` with `srcId` + source `led` row `pos` with `chTx`; deleting the ledger row also deletes the tout). Source balance `acEst` includes document havale (`srcMoves`).
+- Customer page quick actions open a new document with a prefilled row (`svNew({cu,pre:'in'|'out'|'gin'|'gout'})`). Customer form suggests name/phone/national ID from entries and accounts (`acList`, `bzPeople`), groups from `groupsList()`.
+- Day list export (`ldExp`): per-deposit checkboxes (`ldX`), default = all rows allocated to a source; `ldPick()` returns the selection.
+- Motion (09-v56 CSS): sheets slide up with an iOS spring and the page behind scales (`html.shopen`); `closeSheet` animates a cloned ghost so the real sheet closes synchronously; drag a sheet down to close.

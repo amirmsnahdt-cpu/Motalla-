@@ -151,8 +151,30 @@ function printReport(){const html=window.__pv||withCtx(reportHTML),doc=new DOMPa
 
 /* ============ برگه‌ها ============ */
 let tmpISO=null,confirmCb=null,dpMode='';
-function sheet(h){$('sheet').innerHTML=h;$('ov').classList.remove('hide')}
-function closeSheet(){$('ov').classList.add('hide');$('sheet').innerHTML=''}
+/* پنجره پایین مثل iOS: بالا آمدن فنری، صفحه پشت عقب می‌رود؛ بستن با یک نسخه تصویری که پایین می‌لغزد
+   (خود پنجره همان لحظه بسته و خالی می‌شود تا کدهایی که بلافاصله پنجره بعدی را باز می‌کنند درست کار کنند) */
+const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sheet(h){const o=$('ov'),s=$('sheet'),open=!o.classList.contains('hide');s.innerHTML=h;
+  if(open){if(!RM()){s.classList.remove('swap');void s.offsetWidth;s.classList.add('swap')}}
+  else{s.classList.remove('swap','drag','snap');s.style.transform='';s.scrollTop=0;o.classList.remove('hide');document.documentElement.classList.add('shopen')}}
+function closeSheet(){const o=$('ov'),s=$('sheet');if(o.classList.contains('hide')){s.innerHTML='';return}
+  if(!RM()&&s.innerHTML){try{const g=o.cloneNode(true);g.removeAttribute('id');g.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
+    const A=s.querySelectorAll('input,textarea,select'),B=g.querySelectorAll('input,textarea,select');A.forEach((e,i)=>{const x=B[i];if(!x)return;if(e.type==='checkbox'||e.type==='radio')x.checked=e.checked;else x.value=e.value});
+    const gs=g.querySelector('.sheet'),m=/translateY\(([-\d.]+)px\)/.exec(s.style.transform||'');gs.style.transform='';gs.classList.remove('drag','snap','swap');if(m)gs.style.setProperty('--dy',m[1]+'px');
+    g.classList.add('ghost','out');g.setAttribute('aria-hidden','true');document.body.appendChild(g);gs.scrollTop=s.scrollTop;setTimeout(()=>g.remove(),360)}catch(e){}}
+  o.classList.add('hide');s.innerHTML='';s.style.transform='';s.classList.remove('drag','snap','swap');document.documentElement.classList.remove('shopen')}
+/* بستن پنجره با کشیدن به پایین (از سربرگ، یا هر جا وقتی محتوا بالای خودش است) */
+(()=>{let g=null;
+  document.addEventListener('touchstart',e=>{const s=$('sheet');if(e.touches.length!==1||!s||$('ov').classList.contains('hide')||!s.contains(e.target))return;
+    const head=e.target.closest('.sh-h')||e.touches[0].clientY-s.getBoundingClientRect().top<34;if(!head&&(s.scrollTop>0||e.target.closest('input,textarea,select,.chps,.d6kd,.acpick,.wheels,.x6l,.swr')))return;
+    g={y:e.touches[0].clientY,x:e.touches[0].clientX,t:performance.now(),lk:null,d:0,head:!!head}},{passive:true});
+  document.addEventListener('touchmove',e=>{if(!g)return;const s=$('sheet'),t=e.touches[0],dy=t.clientY-g.y,dx=t.clientX-g.x;
+    if(!g.lk){if(Math.abs(dy)<6&&Math.abs(dx)<6)return;g.lk=dy>0&&dy>Math.abs(dx)*1.1&&(g.head||s.scrollTop<=0)?'v':'x';if(g.lk==='v'){s.classList.add('drag');s.classList.remove('snap')}}
+    if(g.lk!=='v')return;e.preventDefault();g.d=Math.max(0,dy);const v=g.d<0?g.d*.3:g.d;s.style.transform=`translateY(${v}px)`;g.v=(g.d)/(performance.now()-g.t)},{passive:false});
+  const end=()=>{if(!g)return;const z=g;g=null;const s=$('sheet');if(z.lk!=='v')return;s.classList.remove('drag');
+    if(z.d>Math.min(140,s.offsetHeight*.35)||(z.v>.6&&z.d>40)){if(typeof ACT!=='undefined'&&ACT.close)ACT.close();else closeSheet()}
+    else{s.classList.add('snap');s.style.transform='';setTimeout(()=>s.classList.remove('snap'),430)}};
+  document.addEventListener('touchend',end,{passive:true});document.addEventListener('touchcancel',end,{passive:true})})();
 function openDate(mode){dpMode=typeof mode==='string'?mode:'';const nw=dpMode==='new',ep=dpMode==='epay',py=dpMode==='pay'||ep;setDp(nw?todayISO():ep?((entRow()||{}).payDate||todayISO()):py?(fPay||payDef()):dateVal,'j');const dw=nw||py?[]:datesWith().slice(0,12);
   sheet(`<div class="sh-h"><b>${py?'تاریخ واریز':nw?'لیست جدید':'تاریخ گزارش'}</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="muted" style="font-size:12.5px;margin:-6px 0 10px">${py?'این واریزی برای چه روزی است؟ (لیست همچنان تاریخ امروز را می‌خورد)':nw?'اول تاریخ این لیست را انتخاب کنید؛ همه واریزی‌ها با همین تاریخ ثبت می‌شوند.':'این تاریخ در ثبت، لیست‌ها و تقسیم یکسان است.'}</div>

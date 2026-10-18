@@ -1,5 +1,5 @@
 /* ---------- جزئیات یک لیست (بر اساس تاریخ واریز) ---------- */
-let ldKey=todayISO(),ldSel=null,ldOpen=new Set(),ldQ='';
+let ldKey=todayISO(),ldX=null,ldOpen=new Set(),ldQ='';
 function ldData(key){AM=AM||allocMap();const rows=validated().filter(r=>PD(r)===key),BI=new Map();batches.forEach(b=>b.items.forEach(x=>{if(!BI.has(x.id))BI.set(x.id,{...x,bid:b.id})}));
   const G=[],FS=[];rows.forEach(r=>{if(r.full){FS.push(r);return}const bi=BI.get(r.id),al=AM.get(r.id);const x=bi?{...bi,name:bi.name||r.name}:{id:r.id,name:r.name,code:r.code||'',amount:r.amount,total:r.total,settled:r.settled,settles:r.settles,iban:r.iban,bank:r.bankShow||'',st:'none'};const k=(bi&&bi.src)||(al&&al.src)||'تخصیص نیافته';let g=G.find(z=>z.name===k);if(!g)G.push(g={name:k,rows:[]});g.rows.push(x)});
   const it=G.flatMap(g=>g.rows),c=bStat({items:it}),eds=[...new Set(rows.map(r=>r.entryDate))].sort();return{rows,G,FS,it,c,eds}}
@@ -22,7 +22,7 @@ function hubData(k){AM=allocMap();const M=vMap(),rows=validated().filter(r=>PD(r
 const hubOpen=new Map();
 /* منبع‌ها بسته باز می‌شوند (حتی اگر هنوز تسویه نشده باشند)؛ با زدن روی منبع باز و بسته می‌شود */
 const hubIsOpen=g=>hubOpen.has(g.name)?hubOpen.get(g.name):false;
-function vLday(){const d=hubData(ldKey);ldSel=null;
+function vLday(){const d=hubData(ldKey);ldX=null;
   if(!d.rows.length)return `<div class="spempty"><div class="spill">${ic('list')}</div><b>این لیست خالی است</b><span>برای ${esc(pdHead(ldKey))} واریزی‌ای ثبت نشده.</span></div>`;
   const all=d.rows.length,pc=d.tot?d.okS/d.tot*100:0,done=d.ok===all;
   let h=`<div class="ldtop"><span class="ldic">${ic('cal')}</span><div><b>${esc(pdHead(ldKey))}</b><small>${d.eds.length&&!(d.eds.length===1&&d.eds[0]===ldKey)?'ثبت '+d.eds.map(e=>esc(relDay(e))).join('، ')+' · ':''}${fmt(all)} واریزی${d.closed?' · بایگانی شده':''}</small></div></div>
@@ -53,10 +53,12 @@ const aLday=()=>{const d=hubData(ldKey);if(!d.rows.length)return '';const B=[];
   if(d.un.length&&can('split'))B.push(`<button class="btn ${d.dr.length?'sec':'gold'}" data-act="allocNew">${ic('plus')} تخصیص به منبع</button>`);
   if(d.dr.length&&can('split'))B.push(`<button class="btn gold" data-act="hubSendAll">${ic('copy')} کپی و ارسال${d.dr.length>1?' '+fmt(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''}</button>`);
   if(!B.length&&d.sent&&!d.closed&&can('close'))B.push(`<button class="btn ${d.pend?'sec':'gold'}" data-act="hubArch">${ic('check')} بایگانی لیست</button>`);
-  if(B.length<2&&can('export'))B.unshift(`<button class="btn sec" data-act="ldExp">${ic('open')} خروجی</button>`);
-  return B.slice(-2).join('')};
+  if(can('export'))B.unshift(`<button class="btn sec ico" data-act="ldExp" aria-label="خروجی">${ic('open')}</button>`);
+  return B.join('')};
 const ST_ORD={ok:0,fail:1,pending:2,none:3};
-function ldPick(){const d=ldData(ldKey),S=ldSel||new Set(d.G.map(g=>g.name).concat(d.FS.length?['__full']:[]));return{reg:d.eds.map(e=>dates(e).fa).join('، '),G:d.G.filter(g=>S.has(g.name)).map(g=>({...g,rows:g.rows.slice().sort((a,b)=>(ST_ORD[a.st]??9)-(ST_ORD[b.st]??9))})),FS:S.has('__full')?d.FS:[],T:'لیست واریز '+payLab(ldKey)}}
+/* انتخاب خروجی: واریزی‌های تیک‌خورده (پیش‌فرض: همه واریزی‌های تخصیص‌داده‌شده به منبع) */
+const ldXDef=d=>new Set(d.G.filter(g=>g.name!=='تخصیص نیافته').flatMap(g=>g.rows.map(r=>r.id)));
+function ldPick(){const d=ldData(ldKey),X=ldX||ldXDef(d);return{reg:d.eds.map(e=>dates(e).fa).join('، '),G:d.G.map(g=>({...g,rows:g.rows.filter(r=>X.has(r.id)).sort((a,b)=>(ST_ORD[a.st]??9)-(ST_ORD[b.st]??9))})).filter(g=>g.rows.length),FS:d.FS.filter(r=>X.has(r.id)),T:'لیست واریز '+payLab(ldKey)}}
 /* ---------- صفحه لیست‌ها: هر تاریخ واریز یک لیست، جدیدترین بالا ---------- */
 function vSplit1(){return vArch()}
 const aSplit1=()=>'';

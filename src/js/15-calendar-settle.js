@@ -12,25 +12,6 @@ function calHTML(){const{y,m}=cal,n=jDays(y,m),[gy,gm,gd]=j2g(y,m,1),first=(new 
 ACT.calMv=d=>{let m=cal.m+(+d.d),y=cal.y;if(m<1){m=12;y--}if(m>12){m=1;y++}cal.m=m;cal.y=y;$('sheet').innerHTML=calHTML()};
 ACT.calPick=d=>{const cb=cal.cb;cal.sel=d.iso;closeSheet();if(cb)cb(d.iso)};
 
-/* ---- خروجی گرفتن: انتخاب لیست‌ها + نوع خروجی ---- */
-let xSel=new Set(),xK='pdf';
-const xDays=()=>[...new Set(allParts().filter(p=>(p.ids||[]).length).map(p=>partPay(p)).filter(Boolean))].sort().reverse().slice(0,20);
-function xSheetHTML(){const L=xDays(),noX=typeof XLSX==='undefined';if(noX&&xK==='xls')xK='pdf';
-  const rows=L.map(iso=>{const P=parts(iso).filter(p=>(p.ids||[]).length),Rw=P.flatMap(partRows),D=dates(iso),r=relDay(iso);return `<button class="xrow${xSel.has(iso)?' on':''}" data-act="xTog" data-iso="${iso}"><span class="xck">${ic('check')}</span><span class="tx"><b>${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(D.fa)}</b><small>${fmt(P.length)} منبع، ${fmt(Rw.length)} واریزی</small></span><span class="v">${fmt(sum(Rw))}<i>تومان</i></span></button>`}).join('');
-  const T=[['pdf','PDF','paste','چاپ و ارسال'],['xls','Excel','list','هر منبع یک برگه'],['txt','متن','copy','تلگرام و بانک'],['all','هر سه','open','یکجا']];
-  return `<div class="sh-h"><div><b>خروجی گرفتن</b><small class="shsub">لیست‌ها را انتخاب کنید و نوع خروجی را بزنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  ${L.length?`<div class="xlab">لیست‌ها</div><div class="xsel">${rows}</div><div class="xlab">نوع خروجی</div><div class="xtypes">${T.map(([k,l,i,d])=>`<button class="xt${xK===k?' on':''}" data-act="xK" data-k="${k}"${k==='xls'&&noX?' disabled':''}>${ic(i)}<b>${l}</b><small>${d}</small></button>`).join('')}</div>
-  <button class="xgo" data-act="xGo"${xSel.size?'':' disabled'}>${ic('open')} دریافت خروجی${xSel.size>1?' '+fmt(xSel.size)+' لیست':''}</button>`:'<div class="xnone">هنوز هیچ لیستی تقسیم نشده است.</div>'}`}
-ACT.xOpen=()=>{const L=xDays();xSel=new Set(L.includes(ldKey)?[ldKey]:L.slice(0,1));sheet(xSheetHTML())};
-ACT.xTog=d=>{xSel.has(d.iso)?xSel.delete(d.iso):xSel.add(d.iso);const sc=document.querySelector('#sheet .xsel'),y=sc?sc.scrollTop:0;$('sheet').innerHTML=xSheetHTML();const s2=document.querySelector('#sheet .xsel');if(s2)s2.scrollTop=y};
-ACT.xK=d=>{xK=d.k;const sc=document.querySelector('#sheet .xsel'),y=sc?sc.scrollTop:0;$('sheet').innerHTML=xSheetHTML();const s2=document.querySelector('#sheet .xsel');if(s2)s2.scrollTop=y};
-ACT.xGo=()=>{const L=[...xSel].sort().reverse();if(!L.length)return;const k=xK;closeSheet();
-  if(L.length===1){const iso=L[0];ldKey=iso;const P=parts(iso).filter(p=>(p.ids||[]).length);txtGen=null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0',track:true,parts:P.filter(p=>!p.sent).map(p=>p.id)};}
-  else{const res=[],seen={};L.forEach(iso=>{const D=dates(iso);parts(iso).filter(p=>(p.ids||[]).length).forEach(p=>{let n=p.src.name+' '+toFa(D.jd)+' '+JM[D.jm-1];if(seen[n])n+=' ('+toFa(++seen[n])+')';else seen[n]=1;res.push({src:{...p.src,name:n,limit:0},items:partRows(p)})})});
-    txtGen=null;expCtx={A:{res,left:[],excl:[],D:dates(L[0])},sc:'all',track:false}}
-  if(k==='pdf'){autoTrack();openPrint();return}if(k==='txt'){openText();return}
-  if(k==='xls'){if(typeof XLSX==='undefined')return;autoTrack();save('motalla-'+ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد');return}
-  expAllGo()};
 ACT.entTk=d=>{const x=entRow(),q=x&&entBI(x);if(!q||q.b.closed)return;eD=eD||{};const curS=eD.st!=null?eD.st:q.it.st;eD.st=curS===d.st?'pending':d.st;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.entCommit=()=>entCommit();
 ACT.entDraftOff=()=>{eD=null;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
@@ -83,7 +64,7 @@ ACT.stlSave=async()=>{stlRead();const x=entRow(),e=x&&entries.find(z=>z.id===x.i
   delete z.txId;if(z.cuId&&z.st!=='wait'){const c=custs.find(q=>String(q.id)===String(z.cuId));if(c){const t={id:nid++,type:'pin',kind:'',weight:0,ppg:0,amount:a,note:'تسویه واریزی «'+fullName(e)+'»'+(z.inv?' · فاکتور '+z.inv:'')+(z.tn?' · پیگیری '+z.tn:''),date:todayISO(),at:now,by:who(),entId:e.id,stlId:z.id,img:z.img||''};(c.txs=c.txs||[]).push(t);c.lastAt=now;z.txId=t.id;saveCu()}}
   if(old)S[stl.i]=z;else S.push(z);e.updatedAt=now;e.updatedBy=who();saveE();stlSync(e);logA('edit','تسویه از مشتری',fullName(e)+' ← '+name+' | '+fmt(a)+' تومان');stl=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const r=entRow();toast(z.st==='wait'?'ثبت شد · از مانده کم شد، در انتظار تأیید':r&&r.full?'تسویه کامل شد ✓':'ثبت شد · مانده بانکی '+fmt(r?r.amount:0)+' تومان')};
 ACT.stlDel=()=>{const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e||stl.i==null)return;askConfirm('این تسویه حذف شود؟ مبلغ دوباره به مانده بانکی برمی‌گردد.','حذف',()=>{const S=e.settles=(e.settles||[]).slice(),old=S[stl.i];if(old&&old.cuId&&old.txId){const oc=custs.find(c=>String(c.id)===String(old.cuId)),ot=oc&&(oc.txs||[]).find(t=>t.id===old.txId);if(ot){ot.del=true;oc.lastAt=new Date().toISOString();saveCu()}}S.splice(stl.i,1);e.updatedAt=new Date().toISOString();saveE();stlSync(e);stl=null;closeSheet();render();toast('تسویه حذف شد')})};
-ACT.ldRc=()=>{const d=ldData(ldKey),P=ldSel&&ldSel.size?ldPick():{G:d.G,FS:d.FS},items=P.G.flatMap(g=>g.rows).concat(P.FS.map(r=>({...r,img:false})));openRcpts(rcOf(items),'رسیدهای '+pdHead(ldKey))};
+ACT.ldRc=()=>{const P=ldPick();if(!P.G.length&&!P.FS.length){toast('واریزی‌ای انتخاب نشده',true);return}const items=P.G.flatMap(g=>g.rows).concat(P.FS.map(r=>({...r,img:false})));openRcpts(rcOf(items),'رسیدهای '+pdHead(ldKey))};
 ACT.rcView=async d=>{const r=RC[+d.i];if(!r)return;const v=await imgGet(r.key);if(!v){toast('عکس پیدا نشد',true);return}sheet(`<div class="sh-h"><div><b>${esc(r.name)}</b><small class="shsub">${fmt(r.amount)} تومان${r.tn?' · پیگیری '+esc(r.tn):''}</small></div><button class="x" data-act="rcBack">×</button></div><img src="${v}" class="rcpt" style="max-height:62vh" alt="رسید"><div class="txacts"><label>${ic('edit')} تغییر رسید<input type="file" accept="image/*" data-rce="${d.i}" hidden></label><button data-act="rcSave1" data-i="${d.i}">${ic('down')} ذخیره</button><button data-act="rcShare1" data-i="${d.i}">${ic('open')} اشتراک</button></div>`)};
 ACT.rcBack=()=>{if(RC.one){closeSheet();return}openRcpts(RC,RCT)};
 ACT.rcSave1=async d=>{const r=RC[+d.i];if(r)rcDown(await rcFiles([r]))};
@@ -109,16 +90,19 @@ ACT.fCal=()=>{const M=new Set(validated().map(fTK));const tg=k=>`<button class="
   openCal(fT||todayISO(),iso=>{fT=iso;fP='';fD='';fN=120;render();$('view').scrollTop=0},{title:'جستجوی تاریخ',sub:'روزهای نقطه‌دار واریزی دارند',q:[[-1,'دیروز'],[0,'امروز'],[1,'فردا']],marks:M,top:`<div class="seg calg2">${tg('entry')}${tg('pay')}</div>`})};
 ACT.fCalG=d=>{fG=d.g;cal.o.marks=new Set(validated().map(fTK));cal.o.top=`<div class="seg calg2">${['entry','pay'].map(k=>`<button class="${fG===k?'on':''}" data-act="fCalG" data-g="${k}">${k==='pay'?'تاریخ واریز':'تاریخ ثبت'}</button>`).join('')}</div>`;$('sheet').innerHTML=calHTML()};
 ACT.ldTog=d=>{ldOpen.has(d.k)?ldOpen.delete(d.k):ldOpen.add(d.k);const g=document.querySelector(`.ldg [data-act="ldTog"][data-k="${CSS.escape(d.k)}"]`);if(g)g.closest('.ldg').classList.toggle('open',ldOpen.has(d.k));else render()};
-ACT.ldPick=d=>{ldSel.has(d.k)?ldSel.delete(d.k):ldSel.add(d.k);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
-ACT.ldAll=()=>{const d=ldData(ldKey),K=d.G.map(g=>g.name).concat(d.FS.length?['__full']:[]);ldSel=ldSel.size===K.length?new Set():new Set(K);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
-ACT.ldExp=()=>{const P=ldPick(),n=P.G.reduce((a,g)=>a+g.rows.length,0)+P.FS.length;if(!n){toast('حداقل یک منبع انتخاب کنید',true);return}
-  sheet(`<div class="sh-h"><div><b>خروجی ${esc(pdHead(ldKey))}</b><small class="shsub">${fmt(P.G.length+(P.FS.length?1:0))} منبع · ${fmt(n)} واریزی · با وضعیت و نوع تسویه</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="ldchips">${P.G.map(g=>`<span>${esc(g.name)}</span>`).join('')}${P.FS.length?'<span>تسویه با مشتری</span>':''}</div>
-  <div class="sgr">
-  <button class="acrow" data-act="ldText"><span class="bri">${ic('copy')}</span><span class="tx"><b>متن کامل</b><small>برای تلگرام و واتس‌اپ؛ وضعیت و نوع تسویه هر واریزی</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
-  <button class="acrow" data-act="ldPdf"><span class="bri">${ic('paste')}</span><span class="tx"><b>PDF</b><small>جدول منظم به تفکیک منبع + رسیدها</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
-  <button class="acrow" data-act="ldRc"><span class="bri">${ic('cam')}</span><span class="tx"><b>رسیدهای واریز</b><small>هر رسید جدا؛ ذخیره یا ارسال تکی و گروهی</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
-  <button class="acrow" data-act="ldXls"${typeof XLSX==='undefined'?' disabled':''}><span class="bri">${ic('list')}</span><span class="tx"><b>Excel</b><small>${typeof XLSX==='undefined'?'برای Excel اینترنت لازم است':'یک برگه برای هر منبع، ستون وضعیت و نوع تسویه'}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button></div>`)};
+/* خروجی لیست روز: هر واریزی با تیک انتخاب می‌شود؛ پیش‌فرض همه واریزی‌های تخصیص‌داده‌شده */
+function ldXHTML(){const d=ldData(ldKey),X=ldX,G=d.G.slice().sort((a,b)=>(a.name==='تخصیص نیافته')-(b.name==='تخصیص نیافته'));
+  const all=[...G.flatMap(g=>g.rows),...d.FS],sel=all.filter(r=>X.has(r.id)),amt=r=>r.full?(r.total||r.amount||0):(+r.amount||0),tot=sel.reduce((a,r)=>a+amt(r),0);
+  const grp=(k,name,rows,ico)=>{const n=rows.filter(r=>X.has(r.id)).length,st=n===rows.length?' on':n?' part':'';return `<button class="x6g" data-act="ldXG" data-k="${esc(k)}"><span class="x6c${st}">${ic('check')}</span><span class="tx"><b>${esc(name)}</b><small>${fmt(n)} از ${fmt(rows.length)} واریزی</small></span>${ico||''}</button>${rows.map(r=>`<button class="x6r${X.has(r.id)?' on':''}" data-act="ldXR" data-id="${r.id}"><span class="x6c">${ic('check')}</span><span class="tx"><b>${esc(r.name||fullName(r)||'—')}</b><small>${[r.code?'فاکتور '+esc(toEn(r.code)):'',r.st&&r.st!=='none'?esc(ldSt(r)[0]):''].filter(Boolean).join(' · ')||'&nbsp;'}</small></span><span class="v">${fmt(amt(r))}</span></button>`).join('')}`};
+  return `<div class="sh-h"><div><b>خروجی ${esc(pdHead(ldKey))}</b><small class="shsub">${fmt(sel.length)} واریزی انتخاب شده · ${fmt(tot)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="x6top"><b>واریزی‌ها</b><button data-act="ldXAll">${sel.length===all.length?'هیچ‌کدام':'همه'}</button></div>
+  <div class="x6l">${G.map(g=>grp(g.name,g.name==='تخصیص نیافته'?'تخصیص‌نیافته':g.name,g.rows)).join('')}${d.FS.length?grp('__full','تسویه با مشتری',d.FS):''}</div>
+  <div class="x6t"><button data-act="ldText"${sel.length?'':' disabled'}>${ic('copy')}<span><b>متن</b><small>تلگرام و واتس‌اپ</small></span></button><button data-act="ldPdf"${sel.length?'':' disabled'}>${ic('paste')}<span><b>PDF</b><small>جدول به تفکیک منبع</small></span></button><button data-act="ldRc"${sel.length?'':' disabled'}>${ic('cam')}<span><b>رسیدها</b><small>تکی یا گروهی</small></span></button><button data-act="ldXls"${sel.length&&typeof XLSX!=='undefined'?'':' disabled'}>${ic('list')}<span><b>Excel</b><small>${typeof XLSX==='undefined'?'نیاز به اینترنت':'هر منبع یک برگه'}</small></span></button></div>`}
+const ldXRe=()=>{const L=document.querySelector('#sheet .x6l'),y=L?L.scrollTop:0;$('sheet').innerHTML=ldXHTML();const L2=document.querySelector('#sheet .x6l');if(L2)L2.scrollTop=y};
+ACT.ldExp=()=>{const d=ldData(ldKey);if(!d.rows.length){toast('این لیست واریزی ندارد',true);return}ldX=ldXDef(d);sheet(ldXHTML())};
+ACT.ldXR=d=>{const id=+d.id||d.id;[...ldX].some(x=>String(x)===String(id))?[...ldX].forEach(x=>{if(String(x)===String(id))ldX.delete(x)}):ldX.add(id);ldXRe()};
+ACT.ldXG=d=>{const D=ldData(ldKey),rows=d.k==='__full'?D.FS:((D.G.find(g=>g.name===d.k)||{}).rows||[]),on=rows.every(r=>ldX.has(r.id));rows.forEach(r=>on?ldX.delete(r.id):ldX.add(r.id));ldXRe()};
+ACT.ldXAll=()=>{const D=ldData(ldKey),all=[...D.G.flatMap(g=>g.rows),...D.FS];ldX=all.every(r=>ldX.has(r.id))?new Set():new Set(all.map(r=>r.id));ldXRe()};
 ACT.ldText=()=>{const P=ldPick();txtGen=()=>dayTxt(ldKey,P.G,P.FS,P.T);txtName='list-'+ldKey;openText()};
 ACT.ldPdf=async()=>{const P=ldPick();closeSheet();openPrint(await dayReport(ldKey,P.G,P.FS,P.T,P.reg))};
 ACT.ldXls=()=>{if(typeof XLSX==='undefined')return;const P=ldPick();closeSheet();save('motalla-list-'+ldKey+'.xlsx',dayXlsx(ldKey,P.G,P.FS),'فایل Excel آماده شد')};
@@ -130,7 +114,7 @@ ACT.fS=d=>{fS=fS===d.s?'':d.s;fR=0;fN=120;render()};
 ACT.fR=d=>{fR=+d.r||0;fN=120;render()};
 ACT.spLists=()=>{spTab='lists';go('split1')};
 ACT.spTab=d=>{spTab=d.t;AM=null;render();$('view').scrollTop=0};
-ACT.arcDay=d=>{ldKey=d.iso;ldSel=null;ldOpen=new Set();ldQ='';go('lday')};
+ACT.arcDay=d=>{ldKey=d.iso;ldX=null;ldOpen=new Set();ldQ='';go('lday')};
 ACT.arcDayL=d=>{fD='';fP=d.iso;fG='pay';fF='all';fS='';fQ='';spTab='lists';render();$('view').scrollTop=0};
 ACT.fDClr=()=>{fD='';render()};
 ACT.fClr=()=>{fQ='';fN=120;render()};
