@@ -28,7 +28,7 @@ jobs:
         run: |
           if [ -z "$LIARA_API_TOKEN" ]; then echo "::warning::توکن لیارا (LIARA_API_TOKEN) تنظیم نشده"; echo "SKIP=1" >> $GITHUB_ENV; exit 0; fi
           WANT=$(grep -o 'const APP_V=[0-9.]*' index.html | head -1 | cut -d= -f2)
-          HAVE=$(curl -s -m 30 --retry 3 https://talamotalla.ir/api/status | grep -o '"v":[0-9.]*' | cut -d: -f2 || true)
+          HAVE=$(curl -s -m 30 --retry 3 https://talayemotalla.ir/api/status | grep -o '"v":[0-9.]*' | cut -d: -f2 || true)
           echo "::notice::repo=$WANT server=$HAVE"
           if [ "${{ github.event_name }}" = "schedule" ] && [ -n "$HAVE" ] && [ "$WANT" = "$HAVE" ]; then echo "::notice::سرور به‌روز است یا در دسترس نیست؛ استقرار زمان‌بندی‌شده لازم نیست"; echo "SKIP=1" >> $GITHUB_ENV; fi
       - uses: actions/setup-node@v4

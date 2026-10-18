@@ -1,5 +1,5 @@
 /* ================= v28: سرور، ورود، کاربران و همگام‌سازی زنده ================= */
-const SERVER_URL='https://talamotalla.ir';
+const SERVER_URL='https://talayemotalla.ir';
 const API_BASE=location.protocol==='file:'?(window.__API||SERVER_URL):(location.hostname==='raw.githack.com'?SERVER_URL:'');
 let TOKEN=(()=>{try{return localStorage.getItem('m_token')||''}catch(e){return ''}})(),ME=ls.get('m_me',null);
 const isAdmin=()=>!!ME&&ME.role==='admin';
@@ -229,7 +229,7 @@ function onSysTheme(){if(themePref==='auto')applyTheme()}
 document.addEventListener('visibilitychange',()=>{if(themeReload&&document.visibilityState==='visible'&&safeIdle())location.reload()});
 applyTheme();try{sysDark.addEventListener('change',onSysTheme)}catch(e){try{sysDark.addListener(onSysTheme)}catch(_){}}
 const THEMES=[['light','روز','همیشه روشن','l'],['dark','شب','همیشه تیره','d'],['auto','خودکار','مثل گوشی','a']];
-const APK_URL='https://talamotalla.ir/app.apk',WEB_URL='https://talamotalla.ir';
+const APK_URL='https://talayemotalla.ir/app.apk',WEB_URL='https://talayemotalla.ir';
 function vSettings(){const sgi=(act,icn,cls,t,sub,extra,attrs)=>`<button class="sgi${cls.indexOf('rd')>=0?' rd':''}" data-act="${act}"${attrs||''}><span class="si ${cls.replace('rd','')}">${ic(icn)}</span><span class="tx"><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span>${extra==null?`<span class="cv">${ic('back')}</span>`:extra}</button>`;
   const pv=k=>k==='a'?'<div class="pv a"><span></span></div>':`<div class="pv ${k}"><i class="b"></i><i></i><i class="g"></i></div>`;
   let h='<div class="stg">';
