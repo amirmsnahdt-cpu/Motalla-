@@ -52,42 +52,70 @@ function itCalc(it,rate,tax){const w=+it.w||0,ay=+it.ay||750,gold=Math.round(w*(
 function svTot(){let gold=0,aj=0,pr=0,tax=0,w=0;for(const it of sv.items){const c=itCalc(it,sv.rate,sv.tax);gold+=c.gold;aj+=c.aj;pr+=c.pr;tax+=c.tax;w+=+it.w||0}
   const sub=gold+aj+pr+tax,disc=Math.min(+sv.disc||0,sub),total=sub-disc,paid=sv.pays.reduce((s,p)=>s+(+p.amount||0),0);return{gold,aj,pr,tax,w:Math.round(w*1000)/1000,sub,disc,total,paid,rest:total-paid}}
 const svCu=()=>sv&&sv.cuId?CU().find(c=>String(c.id)===String(sv.cuId))||null:null;
-function vSell(){if(!sv){sv=ls.get('m_svd',null)||svBlank('')}const D=dates(sv.date);
-  return `<div class="svw">
-  <div class="ivpaper svhead"><div class="ivh"><span class="ivmk">م</span><span class="ivbr"><b>فاکتور فروش</b><small>طلا و جواهر مطلا</small></span><span class="ivno"><small>شماره</small><b>${toFa(invNext())}</b></span></div>
-    <div class="svmeta"><button class="svdate" data-act="svCal">${ic('cal')}<span><small>تاریخ</small><b>${esc(payLab(sv.date)||D.fa)}</b></span></button>
-    <label class="svrate"><small>نرخ روز هر گرم <i>(۱۸ عیار، تومان)</i></small><input id="svR" class="ltr" inputmode="numeric" value="${sv.rate?Number(sv.rate).toLocaleString('en-US'):''}" placeholder="مثلاً 7,450,000" autocomplete="off"></label></div></div>
-  <div class="spsec"><b>مشتری</b><small>جستجو با نام، شماره یا کد ملی؛ یا مشتری جدید اضافه کنید</small></div><div id="svCu">${svCuHTML()}</div>
-  <div class="spsec"><b>کالاها</b><small id="svItS">${svItSub()}</small></div><div id="svIt">${svItHTML()}</div>
-  <button class="addit" data-act="svItNew">${ic('plus')} افزودن کالا <small>(جستجوی انگشتر، النگو، سکه…)</small></button>
-  <div class="svopt"><label class="taxck"><input type="checkbox" id="svT"${sv.tax?' checked':''}><span class="tgx"></span><span><b>مالیات</b><small>۱۰٪ از اجرت و سود</small></span></label>
-  <label class="svdisc"><small>تخفیف <i>(تومان)</i></small><input id="svDs" class="ltr" inputmode="numeric" value="${sv.disc?Number(sv.disc).toLocaleString('en-US'):''}" placeholder="0" autocomplete="off"></label></div>
+function vSell(){if(!sv){sv=ls.get('m_svd',null)||svBlank('')}if(!sv.qa)sv.qa=qaBlank();svUsed=goodsUsed();const D=dates(sv.date);
+  return `<div class="svw sv2">
+  <div class="ivpaper svhead2"><div class="ivh"><span class="ivmk">م</span><button class="svdt" data-act="svCal"><b>فاکتور ${toFa(invNext())}</b><small>${ic('cal')} ${esc(payLab(sv.date)||D.fa)}</small></button>
+    <label class="svrt${sv.rate?'':' need'}"><small>نرخ هر گرم ۱۸</small><input id="svR" class="ltr" inputmode="numeric" value="${sv.rate?Number(sv.rate).toLocaleString('en-US'):''}" placeholder="نرخ روز" autocomplete="off" enterkeyhint="next"></label></div></div>
+  <div id="svCu">${svCuHTML()}</div>
+  <div class="qa" id="qa">${qaHTML()}</div>
+  <div id="svIt">${svItHTML()}</div>
   <div id="svSum">${svSumHTML()}</div>
-  <div class="spsec"><b>تسویه</b><small>هر چند روش که لازم است؛ باقی‌مانده به حساب مشتری می‌رود</small></div>
+  <div class="svopt"><label class="taxck sm"><input type="checkbox" id="svT"${sv.tax?' checked':''}><span class="tgx"></span><span><b>مالیات</b><small>۱۰٪ اجرت و سود</small></span></label>
+  <label class="svdisc"><small>تخفیف <i>(تومان)</i></small><input id="svDs" class="ltr" inputmode="numeric" value="${sv.disc?Number(sv.disc).toLocaleString('en-US'):''}" placeholder="0" autocomplete="off"></label></div>
+  <div class="spsec sm"><b>تسویه</b><small>مبلغ خودکار = مانده فاکتور؛ باقی به حساب مشتری</small></div>
   <div class="svpm">${Object.entries(PM).map(([k,v])=>`<button class="svpb p-${k}" data-act="svPay" data-m="${k}">${ic(v.i)}<b>${v.t}</b></button>`).join('')}</div>
   <div id="svPays">${svPaysHTML()}</div><div id="svRest">${svRestHTML()}</div></div>`}
-const aSell=()=>`<button class="btn gold bzgo" data-act="svSave">${ic('check')} ثبت فاکتور</button>`;
+const aSell=()=>`<button class="btn gold bzgo" data-act="svSave">${ic('check')} ثبت فاکتور<span id="svBt">${svBtTxt()}</span></button>`;
+const svBtTxt=()=>sv&&sv.items.length&&sv.rate?fmt(svTot().total)+' تومان':'';
 /* ----- مشتری ----- */
 function svCuHTML(){const c=svCu();if(c){const b=cuBal(c);return `<div class="svcu"><span class="bri">${esc(userInit(c.name))}</span><span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}</b><small>${[c.grp?'گروه '+esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(c.phone)+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><button class="lnk" data-act="svCuX">تغییر</button>
     <div class="svcub"><div><small>مانده ریالی</small>${balTag(b.R)}<em>${balLab(b.R)}</em></div><div><small>مانده طلایی</small>${balTag(b.G,1)}<em>${balLab(b.G)}</em></div></div></div>`}
-  const GL=groupsList();
-  return `<div class="svpick"><div class="fsearch">${ic('search')}<input id="svQ" type="search" value="${esc(sv.q||'')}" placeholder="جستجوی مشتری…" autocomplete="off"></div>
-  ${GL.length?`<div class="fchips grp">${[['','همه'],...GL.map(g=>[g,g])].map(([k,t])=>`<button class="fchip${(sv.g||'')===k?' on':''}" data-act="svG" data-g="${esc(k)}">${esc(t)}</button>`).join('')}</div>`:''}<div id="svCr">${svCrHTML()}</div></div>`}
-function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0));let L=CU();if(sv.g)L=L.filter(c=>c.grp===sv.g);if(q)L=L.filter(c=>nzName([c.name,c.phone,c.nid,c.grp].join(' ')).includes(q));
-  L=L.sort((a,b)=>q?(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||'')):String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,7);
-  const add=q0&&!/^\d+$/.test(toEn(q0))&&!CU().some(c=>nzName(c.name)===nzName(q0));
-  return (L.length?`<div class="fcard blist">${L.map(c=>{const b=cuBal(c);return `<button class="curow" data-act="svCu" data-id="${c.id}"><span class="bri">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${c.grp?'<em class="cgp">'+esc(c.grp)+'</em> ':''}${c.phone?'<bdi dir="ltr">'+esc(c.phone)+'</bdi>':'بدون شماره'}</small></span><span class="cuv">${balTag(b.R)}${balTag(b.G,1)}</span></button>`}).join('')}</div>`:q0?'':`<div class="bempty sm">${ic('users')}<b>هنوز مشتری ثبت نشده</b></div>`)
-    +`<button class="cuadd" data-act="svCuNew">${ic('plus')}<span><b>${add?'مشتری جدید «'+esc(q0)+'»':'افتتاح حساب مشتری جدید'}</b><small>${sv.g?'در گروه «'+esc(sv.g)+'» · ':''}مشخصات را بزنید و روی همین فاکتور می‌نشیند</small></span></button>`}
-function svPick(id){sv.cuId=id;sv.q='';svKeep();const v=$('view'),y=v?v.scrollTop:0;if(cur!=='sell')go('sell');else{render();$('view').scrollTop=y}const e=document.querySelector('.svcu');if(e){e.classList.add('pop')}}
+  return `<div class="svpick"><div class="fsearch">${ic('search')}<input id="svQ" type="search" value="${esc(sv.q||'')}" placeholder="مشتری: نام، شماره یا کد ملی…" autocomplete="off" enterkeyhint="search"></div><div id="svCr">${svCrHTML()}</div></div>`}
+function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
+  if(!q){const L=A.slice().sort((a,b)=>String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,8);
+    return `<div class="svrc">${L.map(c=>`<button class="svrcb" data-act="svCu" data-id="${c.id}">${esc(cuName(c))}</button>`).join('')}<button class="svrcb nw" data-act="svCuNew">${ic('plus')} مشتری جدید</button></div>`}
+  const L=A.filter(c=>nzName([c.name,c.phone,c.nid,c.grp].join(' ')).includes(q)).sort((a,b)=>(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,6);
+  const add=!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0));
+  return `<div class="fcard blist svdd">${L.map(c=>{const b=cuBal(c);return `<button class="curow" data-act="svCu" data-id="${c.id}"><span class="bri">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${c.grp?'<em class="cgp">'+esc(c.grp)+'</em> ':''}${c.phone?'<bdi dir="ltr">'+esc(c.phone)+'</bdi>':'بدون شماره'}</small></span><span class="cuv">${balTag(b.R)}${balTag(b.G,1)}</span></button>`}).join('')}
+    <button class="curow nw" data-act="svCuNew"><span class="bri">${ic('plus')}</span><span class="tx"><b>${add?'مشتری جدید «'+esc(q0)+'»':'افتتاح حساب جدید'}</b><small>${L.length?'':'مشتری‌ای پیدا نشد · '}مشخصات را بزنید و روی همین فاکتور می‌نشیند</small></span></button></div>`}
+function svPick(id){sv.cuId=id;sv.q='';svKeep();if(cur!=='sell')go('sell');else{$('svCu').innerHTML=svCuHTML();svRe()}const e=document.querySelector('.svcu');if(e){e.classList.add('pop')}setTimeout(()=>{const f=!sv.rate?$('svR'):$('qK');if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
 ACT.svCu=d=>svPick(d.id);
-ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();render();setTimeout(()=>{const q=$('svQ');if(q)q.focus()},60)};
-ACT.svG=d=>{sv.g=d.g;svKeep();$('svCu').innerHTML=svCuHTML();svBindCu()};
+ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();$('svCu').innerHTML=svCuHTML();svBindCu();svRe();setTimeout(()=>{const q=$('svQ');if(q)q.focus()},60)};
 ACT.svCuNew=()=>{cuRet='sell';sheet(cuFormHTML({name:clean(sv.q||''),grp:sv.g||''}));cuBind();setTimeout(()=>{const n=$(sv.q?'cuP':'cuN');if(n)n.focus()},300)};
 ACT.svCal=()=>openCal(sv.date,iso=>{sv.date=iso;svKeep();closeSheet();render()});
 /* ----- کالاها ----- */
-const svItSub=()=>sv.items.length?toFa(sv.items.length)+' قلم · '+wFmt(svTot().w)+' گرم':'هنوز کالایی اضافه نشده';
-function svItHTML(){if(!sv.items.length)return `<div class="svempty">${ic('ring')}<span>کالا را جستجو و اضافه کنید؛ بهای طلا، اجرت، سود و مالیات خودکار حساب می‌شود</span></div>`;
-  return `<div class="fcard blist svits">${sv.items.map((it,i)=>{const c=itCalc(it,sv.rate,sv.tax);return `<button class="svir${i===svAdd?' new':''}" data-act="svItEdit" data-i="${i}"><span class="bri gk">${esc(userInit(it.k))}</span><span class="tx"><b>${esc(it.k)}${it.n?' <i>'+esc(it.n)+'</i>':''}</b><small>${wFmt(it.w)} گرم · عیار ${toFa(it.ay||750)} · اجرت ${it.ajU==='p'?toFa(+it.aj||0)+'٪':fmt(+it.aj||0)} · سود ${toFa(+it.pp||0)}٪</small></span><span class="txv"><b>${sv.rate?fmt(c.tot):'—'}</b><small>${sv.rate?'تومان':'نرخ را بزنید'}</small></span></button>`}).join('')}</div>`}
+/* ورود سریع کالا روی خود صفحه: کالا ← وزن ← افزودن؛ اجرت و سود از قلم قبلی می‌ماند. ریزتر (موجودی، توضیح) با زدن ردیف کالا */
+let svUsed={};
+function goodsUsed(){const u={};for(const c of custs)if(!c.del)for(const t of c.txs||[])if(t.type==='inv'&&!t.del)for(const i of t.items||[])u[i.k]=(u[i.k]||0)+1;return u}
+function qaBlank(){const L=sv&&sv.items[sv.items.length-1];return{k:'',q:'',w:'',ay:750,ajU:L?L.ajU:ls.get('m_ajU','p'),aj:L?L.aj:(+ls.get('m_aj',0)||''),pp:L?L.pp:PROFIT_DEF()}}
+function qaChips(){const a=sv.qa,q=nzName(a.q||''),L=goodsList().filter(k=>!q||nzName(k).includes(q)).sort((x,y)=>q?(nzName(y).startsWith(q)-nzName(x).startsWith(q))||(svUsed[y]||0)-(svUsed[x]||0):(svUsed[y]||0)-(svUsed[x]||0)).slice(0,q?6:9);
+  return L.map(k=>`<button class="kch${a.k===k?' on':''}" data-act="qaK" data-k="${esc(k)}">${esc(k)}</button>`).join('')+(q&&!L.some(k=>nzName(k)===q)?`<button class="kch new" data-act="qaK" data-k="${esc(clean(a.q))}">+ ${esc(clean(a.q))}</button>`:'')}
+function qaHTML(){const a=sv.qa,AY=[750,740,705,585,900];if(!AY.includes(+a.ay))AY.push(+a.ay);
+  return `<div class="qah"><b>${a.k?esc(a.k):'افزودن کالا'}</b>${a.k?`<button class="lnk" data-act="qaK" data-k="">تغییر کالا</button>`:''}</div>
+  ${a.k?'':`<div class="fsearch sm">${ic('search')}<input id="qK" value="${esc(a.q||'')}" placeholder="جستجوی کالا: انگشتر، النگو، سکه…" autocomplete="off" enterkeyhint="next"></div><div class="qks" id="qKs">${qaChips()}</div>`}
+  <div class="qag${a.k?'':' off'}"><label><small>وزن (گرم)</small><input id="qW" class="ltr" inputmode="decimal" value="${esc(a.w||'')}" placeholder="0.000" autocomplete="off" enterkeyhint="done"></label>
+  <label><small>عیار</small><select id="qY">${AY.map(x=>`<option value="${x}"${+a.ay===x?' selected':''}>${toFa(x)}</option>`).join('')}</select></label>
+  <label><small>اجرت <span class="uns"><button type="button" class="${a.ajU==='p'?'on':''}" data-act="qaU" data-u="p">٪</button><button type="button" class="${a.ajU!=='p'?'on':''}" data-act="qaU" data-u="t">ت</button></span></small><input id="qJ" class="ltr" inputmode="decimal" value="${a.aj?(a.ajU==='p'?a.aj:Number(a.aj).toLocaleString('en-US')):''}" placeholder="${a.ajU==='p'?'٪':'تومان'}" autocomplete="off" enterkeyhint="done"></label>
+  <label><small>سود ٪</small><input id="qS" class="ltr" inputmode="decimal" value="${esc(a.pp)}" autocomplete="off" enterkeyhint="done"></label></div>
+  <div class="qaf"><span id="qB"></span><button class="qago" data-act="qaAdd"${a.k?'':' disabled'}>${ic('plus')} افزودن</button></div>`}
+function qaRead(){const a=sv.qa,g=id=>{const e=$(id);return e?e.value:undefined};if($('qW'))a.w=decIn(g('qW'));if($('qY'))a.ay=+g('qY')||750;if($('qJ'))a.aj=a.ajU==='p'?parseFloat(decIn(g('qJ')))||0:num(g('qJ'));if($('qS'))a.pp=parseFloat(decIn(g('qS')))||0;if($('qK'))a.q=g('qK')}
+function qaCalc(){const B=$('qB');if(!B)return;qaRead();const a=sv.qa;B.innerHTML=!a.k?'<small>اول کالا را انتخاب کنید</small>':!sv.rate?'<small>نرخ روز را بالا بزنید</small>':!(+a.w)?'<small>وزن را بزنید</small>':`<small>مبلغ این قلم</small><b>${fmt(itCalc(a,sv.rate,sv.tax).tot)}</b>`}
+function qaBind(){const K=$('qK'),W=$('qW'),J=$('qJ'),S=$('qS'),Y=$('qY'),a=sv.qa,keep=()=>{qaRead();svKeep()};
+  if(K){K.oninput=()=>{a.q=K.value;const r=$('qKs');if(r)r.innerHTML=qaChips();svKeep()};K.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const f=document.querySelector('#qKs .kch');if(f)ACT.qaK({k:f.dataset.k})}};const KS=$('qKs');if(KS)KS.onpointerdown=e=>{if(e.target.closest('.kch'))e.preventDefault()}}
+  const ent=e=>{if(e.key==='Enter'){e.preventDefault();ACT.qaAdd()}};
+  if(W){W.oninput=()=>{W.value=decIn(W.value);keep();qaCalc()};W.onkeydown=ent}
+  if(S){S.oninput=()=>{S.value=decIn(S.value);keep();qaCalc()};S.onkeydown=ent}
+  if(J){J.oninput=()=>{if(a.ajU==='p')J.value=decIn(J.value);else{const v=num(J.value);J.value=v?v.toLocaleString('en-US'):''}keep();qaCalc()};J.onkeydown=ent}
+  if(Y)Y.onchange=()=>{keep();qaCalc()};qaCalc()}
+const qaRe=f=>{$('qa').innerHTML=qaHTML();qaBind();const e=f&&$(f);if(e)e.focus()};
+ACT.qaK=d=>{qaRead();const a=sv.qa;a.k=d.k?clean(d.k):'';if(a.k)addGoods(a.k);a.q='';svKeep();qaRe(a.k?'qW':'qK')};
+ACT.qaU=d=>{qaRead();const a=sv.qa;if(a.ajU===d.u)return;a.ajU=d.u;a.aj=0;ls.set('m_ajU',d.u);svKeep();qaRe('qJ')};
+ACT.qaAdd=()=>{qaRead();const a=sv.qa;if(!a.k){toast('کالا را انتخاب کنید',true);const k=$('qK');if(k)k.focus();return}const w=parseFloat(a.w)||0;if(!w){toast('وزن را بزنید',true);$('qW').focus();return}
+  const it={k:a.k,w,ay:+a.ay||750,ajU:a.ajU,aj:+a.aj||0,pp:+a.pp||0,cat:GK.includes(a.k)?a.k:'نو',n:''};if(it.pp)ls.set('m_profit',it.pp);ls.set('m_aj',it.ajU==='t'?0:it.aj);
+  sv.items.push(it);svAdd=sv.items.length-1;sv.qa={...qaBlank(),ay:it.ay};svKeep();svUsed[it.k]=(svUsed[it.k]||0)+1;qaRe();svRe();
+  setTimeout(()=>{const k=$('qK');if(k&&$('ov').classList.contains('hide'))k.focus({preventScroll:true})},30)};
+function svItHTML(){if(!sv.items.length)return '';
+  return `<div class="svith"><b>${toFa(sv.items.length)} قلم · ${wFmt(svTot().w)} گرم</b><small>برای ویرایش یا حذف، ردیف را بزنید</small></div><div class="fcard blist svits">${sv.items.map((it,i)=>{const c=itCalc(it,sv.rate,sv.tax);return `<button class="svir${i===svAdd?' new':''}" data-act="svItEdit" data-i="${i}"><span class="bri gk">${esc(userInit(it.k))}</span><span class="tx"><b>${esc(it.k)}${it.n?' <i>'+esc(it.n)+'</i>':''}</b><small>${wFmt(it.w)} گرم · عیار ${toFa(it.ay||750)} · اجرت ${it.ajU==='p'?toFa(+it.aj||0)+'٪':fmt(+it.aj||0)} · سود ${toFa(+it.pp||0)}٪</small></span><span class="txv"><b>${sv.rate?fmt(c.tot):'—'}</b><small>${sv.rate?'تومان':'نرخ را بزنید'}</small></span></button>`}).join('')}</div>`}
 function svSumHTML(){const T=svTot();if(!sv.items.length)return '';const row=(l,v,c)=>`<div${c?' class="'+c+'"':''}><span>${l}</span><b>${v}</b></div>`;
   return `<div class="svsum">${row('بهای طلا · '+wFmt(T.w)+' گرم',fmt(T.gold))}${row('اجرت ساخت',fmt(T.aj))}${row('سود فروشنده',fmt(T.pr))}${sv.tax?row('مالیات ۱۰٪',fmt(T.tax)):''}${T.disc?row('تخفیف','− '+fmt(T.disc),'dc'):''}
   <div class="svtot"><span>جمع فاکتور</span><b><span id="svTotN" data-v="${T.total}">${fmt(T.total)}</span> <i>تومان</i></b></div></div>`}
@@ -102,15 +130,16 @@ function svRestHTML(){if(!sv.items.length)return '';const T=svTot(),c=svCu(),b=c
   return h}
 function tween(el,to){if(!el)return;const from=+el.dataset.v||0;el.dataset.v=to;if(from===to||matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=fmt(to);return}const t0=performance.now(),D=420;cancelAnimationFrame(el._r);
   const st=n=>{const k=Math.min(1,(n-t0)/D),e=1-Math.pow(1-k,3);el.textContent=fmt(Math.round(from+(to-from)*e));if(k<1)el._r=requestAnimationFrame(st)};el._r=requestAnimationFrame(st);const p=el.closest('.svtot');if(p){p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump')}}
-function svRe(){const o=$('svTotN'),old=o?+o.dataset.v||0:0;const set=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};set('svIt',svItHTML());set('svItS',svItSub());set('svSum',svSumHTML());set('svPays',svPaysHTML());set('svRest',svRestHTML());
+function svRe(){const o=$('svTotN'),old=o?+o.dataset.v||0:0;const set=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};set('svIt',svItHTML());set('svSum',svSumHTML());set('svPays',svPaysHTML());set('svRest',svRestHTML());const bt=$('svBt');if(bt)bt.textContent=svBtTxt();qaCalc();
   const n=$('svTotN');if(n){const to=+n.dataset.v;n.dataset.v=old;n.textContent=fmt(old);tween(n,to)}svBindRest();svAdd=-1}
 function svBindRest(){const G=$('svGc');if(G)G.onchange=()=>{sv.gconv=G.checked;svKeep();$('svRest').innerHTML=svRestHTML();svBindRest()}}
-function svBindCu(){const Q=$('svQ');if(!Q)return;Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{const r=$('svCr');if(r)r.innerHTML=svCrHTML()},100)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const f=document.querySelector('#svCr [data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}}}
-function bindSell(){if(!sv)return;svBindCu();svBindRest();const R=$('svR'),T=$('svT'),D=$('svDs');
-  if(R)R.oninput=()=>{const v=num(R.value);R.value=v?v.toLocaleString('en-US'):'';sv.rate=v;if(v)ls.set('m_rate',v);svKeep();clearTimeout(R._t);R._t=setTimeout(()=>{if(cur==='sell')svRe()},160)};
+function svBindCu(){const Q=$('svQ');if(!Q)return;Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{const r=$('svCr');if(r)r.innerHTML=svCrHTML()},80)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(Q._t);sv.q=Q.value;const r=$('svCr');if(r)r.innerHTML=svCrHTML();const f=document.querySelector('#svCr .curow[data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}};const C=$('svCr');if(C)C.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
+function bindSell(){if(!sv)return;svBindCu();svBindRest();qaBind();const R=$('svR'),T=$('svT'),D=$('svDs');
+  if(R)R.oninput=()=>{const v=num(R.value);R.value=v?v.toLocaleString('en-US'):'';sv.rate=v;if(v)ls.set('m_rate',v);svKeep();R.parentNode.classList.toggle('need',!v);clearTimeout(R._t);R._t=setTimeout(()=>{if(cur==='sell')svRe()},160)};
   if(T)T.onchange=()=>{sv.tax=T.checked;ls.set('m_tax',sv.tax);svKeep();svRe()};
   if(D)D.oninput=()=>{const v=num(D.value);D.value=v?v.toLocaleString('en-US'):'';sv.disc=v;svKeep();clearTimeout(D._t);D._t=setTimeout(()=>{if(cur==='sell')svRe()},160)};
-  if(!sv.rate&&R&&!svCu())setTimeout(()=>{if(cur==='sell'&&$('ov').classList.contains('hide')){const q=$('svQ');if(q)q.focus()}},380)}
+  if(R)R.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const f=!svCu()?$('svQ'):$('qK')||$('qW');if(f)f.focus()}};
+  setTimeout(()=>{if(cur!=='sell'||!$('ov').classList.contains('hide'))return;const f=!svCu()?$('svQ'):!sv.rate?R:!sv.items.length?($('qK')||$('qW')):null;if(f)f.focus()},380)}
 /* ----- پنجره کالا: جستجوی نوع کالا، وزن، عیار، اجرت، سود ----- */
 function siChips(){const q=nzName(si.q||''),L=goodsList().filter(k=>!q||nzName(k).includes(q)),used={};for(const c of custs)for(const t of c.txs||[])if(t.type==='inv'&&!t.del)(t.items||[]).forEach(i=>used[i.k]=(used[i.k]||0)+1);
   L.sort((a,b)=>q?(nzName(b).startsWith(q)-nzName(a).startsWith(q))||(used[b]||0)-(used[a]||0):(used[b]||0)-(used[a]||0));
@@ -135,7 +164,6 @@ function siBind(){const B=$('siB'),upd=()=>{siRead();const c=itCalc(si,sv.rate,s
   Q.oninput=()=>{si.q=Q.value;$('siKs').innerHTML=siChips()};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const f=document.querySelector('#siKs .kch');if(f)ACT.siK({k:f.dataset.k})}};
   upd();setTimeout(()=>{const f=si.k?W:Q;if(f&&!f.value)f.focus()},320)}
 const siOpen=()=>{sheet(siHTML());siBind()};
-ACT.svItNew=()=>{const L=sv.items[sv.items.length-1];si={k:'',q:'',w:'',ay:750,ajU:L?L.ajU:ls.get('m_ajU','p'),aj:L?L.aj:0,pp:L?L.pp:PROFIT_DEF(),cat:'نو',n:''};siOpen()};
 ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;si={...it,i:+d.i,q:''};siOpen()};
 ACT.siK=d=>{siRead();si.k=d.k;addGoods(d.k);si.q='';sheet(siHTML());siBind();const W=$('siW');if(W)setTimeout(()=>W.focus(),40)};
 ACT.siAy=d=>{siRead();si.ay=+d.a;sheet(siHTML());siBind()};
@@ -190,8 +218,8 @@ ACT.spSave=()=>{spRead();if(sp.m==='gold'){spGoldCalc();if(!(parseFloat(sp.w)>0)
   const p={m:sp.m,amount:+sp.amount};if(sp.chId&&(sp.m==='pos'||sp.m==='hav')){p.chId=sp.chId;p.tn=sp.tn||'';ls.set('m_ch_'+sp.m,sp.chId)}if(sp.m==='gold')Object.assign(p,{w:parseFloat(sp.w),ay:+sp.ay||750,gr:+sp.gr,cat:sp.cat||'کارکرده'});if(sp.m==='cust')Object.assign(p,{cuId:sp.cuId,cuName:sp.cuName||''});
   if(sp.i!=null)sv.pays[sp.i]=p;else sv.pays.push(p);sp=null;svKeep();closeSheet();svRe()};
 /* ----- ثبت فاکتور ----- */
-ACT.svSave=()=>{const c=svCu();if(!c){toast('مشتری فاکتور را انتخاب کنید',true);const q=$('svQ');if(q){q.focus();q.closest('.svpick').scrollIntoView({behavior:'smooth',block:'center'})}return}
-  if(!sv.items.length){toast('حداقل یک کالا اضافه کنید',true);return}if(!sv.rate){toast('نرخ روز هر گرم را بزنید',true);$('svR').focus();return}
+ACT.svSave=()=>{const c=svCu();if(!c){toast('مشتری فاکتور را انتخاب کنید',true);const q=$('svQ');if(q){q.focus();q.scrollIntoView({behavior:'smooth',block:'center'})}return}
+  if(!sv.items.length){if(sv.qa&&sv.qa.k&&parseFloat(sv.qa.w)){ACT.qaAdd();if(!sv.items.length)return}else{toast('حداقل یک کالا اضافه کنید',true);const k=$('qK')||$('qW');if(k)k.focus();return}}if(!sv.rate){toast('نرخ روز هر گرم را بزنید',true);$('svR').focus();return}
   for(const p of sv.pays)if(p.m==='cust'&&!CU().some(z=>String(z.id)===String(p.cuId))){toast('حساب پرداخت‌کننده «'+(p.cuName||'')+'» پیدا نشد',true);return}
   const T=svTot(),now=ns(),no=invNext(),items=sv.items.map(it=>({...it,...(c2=>({gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}))(itCalc(it,sv.rate,sv.tax))}));
   const t={id:nid++,type:'inv',no,date:sv.date,rate:sv.rate,items,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>({...p})),at:now,by:who()};
