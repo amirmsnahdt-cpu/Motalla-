@@ -46,7 +46,7 @@ function entSetSt(id,st){const e=entries.find(y=>String(y.id)===String(id));if(!
 ACT.entOk=d=>entSetSt(d.id,'ok');
 ACT.entUnok=d=>entSetSt(d.id,'pending');
 ACT.entEditGo=d=>{ACT.openEnt(d);ACT.entEditOn()};
-ACT.fPay=d=>{fPay=d.iso;ls.set('m_pay_off',Math.round((new Date(d.iso+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5));updPay()};
+ACT.fPay=d=>{fPay=d.iso;updPay()};
 ACT.fPayPick=()=>openCal(fPay||payDef(),iso=>ACT.fPay({iso}));
 ACT.openEnt=d=>{entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday'].includes(cur)?cur:'home';go('ent')};
 ACT.entDel=d=>{navBack=true;go(PARENT.ent||'home');delEntry(d.id)};
@@ -56,8 +56,8 @@ ACT.arcClr=()=>{arcQ='';arcD='';render()};
 ACT.cuStl=()=>{cuStlQ='';sheet(cuStlHTML());const q=$('csq');if(q){q.oninput=()=>{cuStlQ=q.value;$('csl').outerHTML=(()=>{const t=document.createElement('div');t.innerHTML=cuStlHTML();return t.querySelector('#csl').outerHTML})()}}};
 ACT.cuStlPick=d=>{const c=curCu(),r=validated().find(z=>String(z.id)===String(d.id));if(!c||!r)return;entId=r.id;stl={cuId:c.id,name:cuName(c),phone:c.phone||'',amount:r.amount,q:''};sheet(stlHTML());stlBind()};
 function stlChips(){const z=stl,L=custs.filter(c=>!c.del),q=(z.q||'').trim(),M=q?L.filter(c=>cuName(c).includes(q)||(c.phone||'').includes(toEn(q))).slice(0,8):L.slice().sort((a,b)=>String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,6);return `${z.cuId?`<button class="tch on" data-act="stlCu" data-id="">${esc(cuName(custs.find(c=>String(c.id)===String(z.cuId))||{name:z.name}))} ×</button>`:M.map(c=>`<button class="tch" data-act="stlCu" data-id="${c.id}">${esc(cuName(c))}</button>`).join('')+(q?`<button class="tch nw" data-act="stlCu" data-id="new">+ «${esc(q)}» بدون حساب</button>`:'')}`}
-function stlHTML(){const x=entRow(),z=stl;
-  return `<div class="sh-h"><div><b>${z.i!=null?'ویرایش تسویه':'تسویه از مشتری'}</b><small class="shsub">مشتری مستقیم به «${esc(fullName(x))}» پرداخت کرده · از مانده کم می‌شود</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+function stlHTML(){const z=stl,who0=z.bz?clean(bz.d.name||''):fullName(entRow()||{});
+  return `<div class="sh-h"><div><b>${z.i!=null?'ویرایش تسویه':'تسویه از مشتری'}</b><small class="shsub">مشتری مستقیم به «${esc(who0)}» پرداخت کرده · از مانده کم می‌شود</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="bzw" style="animation:none">
   <div class="ef"><label for="stQ">پرداخت‌کننده <i>(از حساب‌های مشتری یا نام جدید)</i></label><div class="fsearch sm">${ic('search')}<input id="stQ" value="${esc(z.cuId?'':z.q||'')}" placeholder="جستجوی نام یا شماره مشتری…" autocomplete="off"></div>
   <div class="kchs" id="stCs">${stlChips()}</div></div>
@@ -65,7 +65,7 @@ function stlHTML(){const x=entRow(),z=stl;
   <div class="ef"><label for="stA">مبلغ پرداختی <i>(تومان)</i></label><input id="stA" class="ltr acbig" inputmode="numeric" value="${z.amount?Number(z.amount).toLocaleString('en-US'):''}" autocomplete="off"></div>
   <div class="ef2"><div class="ef"><label for="stT">شماره پیگیری <i>(اختیاری)</i></label><input id="stT" class="ltr" inputmode="numeric" value="${esc(z.tn||'')}" autocomplete="off"></div><div class="ef"><label>رسید <i>(اختیاری)</i></label><label class="stimg${z.imgD||z.img?' on':''}">${z.imgD?`<img src="${z.imgD}" alt="">`:`<i>${ic('cam')}</i>`}<span>${z.imgD?'تغییر رسید':z.img?'رسید دارد · تغییر':'افزودن عکس'}</span><input type="file" accept="image/*" id="stF" hidden></label></div></div>
   <div class="ef"><label for="stN">یادداشت <i>(اختیاری)</i></label><input id="stN" value="${esc(z.note||'')}" autocomplete="off"></div>
-  <button class="xgo" data-act="stlSave">${ic('check')} ثبت و کسر از مانده</button>${z.i!=null?`<div class="txacts">${z.img?`<button data-act="stlImg">${ic('eye')} دیدن رسید</button>`:''}<button data-act="stlDel" style="color:var(--red);background:var(--red2)">${ic('trash')} حذف این تسویه</button></div>`:''}</div>`}
+  ${z.bz?`<button class="xgo" data-act="bzStlSave">${ic('check')} ${z.i!=null?'ذخیره تسویه':'افزودن تسویه'}</button>`:`<button class="xgo" data-act="stlSave">${ic('check')} ثبت و کسر از مانده</button>`}${z.i!=null&&!z.bz?`<div class="txacts">${z.img?`<button data-act="stlImg">${ic('eye')} دیدن رسید</button>`:''}<button data-act="stlDel" style="color:var(--red);background:var(--red2)">${ic('trash')} حذف این تسویه</button></div>`:''}</div>`}
 function stlRead(){const g=id=>{const el=$(id);return el?el.value:undefined};if($('stQ')&&!stl.cuId)stl.q=g('stQ');if($('stP'))stl.phone=toEn(g('stP')).replace(/[^\d+]/g,'');if($('stI'))stl.inv=toEn(g('stI')).trim();if($('stA'))stl.amount=num(g('stA'));if($('stT'))stl.tn=toEn(g('stT')).trim();if($('stN'))stl.note=clean(g('stN'))}
 function stlBind(){const Q=$('stQ'),A=$('stA'),F=$('stF');if(Q){Q.oninput=()=>{stl.q=Q.value;if(stl.cuId){stl.cuId='';stl.name=''}clearTimeout(Q._t);Q._t=setTimeout(()=>{const c=$('stCs');if(c)c.innerHTML=stlChips()},120)};const C=$('stCs');if(C)C.onpointerdown=e=>{if(e.target.closest('.tch'))e.preventDefault()}}if(A)A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''};
   if(F)F.onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{stl.imgD=await shrink(f);stlRead();sheet(stlHTML());stlBind()}catch(z){toast('این عکس خوانده نشد',true)}}}

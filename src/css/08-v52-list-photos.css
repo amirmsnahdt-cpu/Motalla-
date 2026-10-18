@@ -108,3 +108,23 @@
 .brw.hasrc>.brh{flex:1;min-width:0}
 .brw.hasrc>.brc{width:44px;height:44px;border-radius:13px}
 .brw.hasrc>.brc svg{width:19px;height:19px}
+/* v52.2: پیشنهاد مشتری چسبیده زیر فیلد نام (خرید طلا) */
+.bzw .ef:has(> .bzsug:not(.hide)) > input{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:var(--line)}
+.bzsug{border:1.5px solid var(--blu);border-top:0;border-radius:0 0 14px 14px;background:var(--card);overflow:hidden;margin-top:-1px;box-shadow:0 10px 24px -14px rgba(20,40,90,.35)}
+.bzsug.hide{display:none}
+.bzw .ef:has(> .bzsug:not(.hide)) > input:focus{border-color:var(--blu);box-shadow:none}
+.bzsr{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:6px 14px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;text-align:right;cursor:pointer}
+.bzsr:first-child{border-top:0}
+.bzsr:active{background:var(--hair)}
+.bzsr .av{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--blu2);color:var(--blu);font-weight:800;font-size:14px}
+.bzsr .av svg{width:17px;height:17px}
+.bzsr .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}
+.bzsr .tx b{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bzsr .tx small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bzsr .ltr{direction:ltr;unicode-bidi:isolate}
+.bzsr.nw .tx b{color:var(--blu)}
+/* v52.2: تسویه از مشتری هنگام ثبت */
+.bzstl .stll2{display:grid;gap:8px;margin-bottom:10px}
+.bzstl .addit{margin-bottom:0;flex-wrap:wrap;padding:8px 12px;text-align:center}
+.bzstl .stlc{width:44px;height:44px;border-radius:13px;border-style:solid;color:var(--red)}
+@media (prefers-reduced-motion:reduce){.bzsr{transition:none}}

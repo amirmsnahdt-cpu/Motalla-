@@ -175,15 +175,15 @@ function bzRead(){if(cur!=='buy')return;const g=id=>{const el=$(id);return el?el
   if(bz.step===2){bzItRead()}
   if(bz.step===3){d.iban=g('bzI');d.card=g('bzK');d.holder=g('bzH')}
   Object.keys(d).forEach(k=>{if(d[k]===undefined)delete d[k]})}
-const bzF=(id,label,val,o={})=>`<div class="ef"><label for="${id}">${label}${o.opt?' <i>(اختیاری)</i>':''}</label>${o.pre?`<div class="eib2"><span>${o.pre}</span>`:''}<input id="${id}"${o.ltr?' class="ltr"':''} ${o.im?`inputmode="${o.im}"`:''} value="${esc(val||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="${o.last?'done':'next'}">${o.pre?'</div>':''}<small class="eh" id="${id}v"></small></div>`;
+const bzF=(id,label,val,o={})=>`<div class="ef"><label for="${id}">${label}${o.opt?' <i>(اختیاری)</i>':''}</label>${o.pre?`<div class="eib2"><span>${o.pre}</span>`:''}<input id="${id}"${o.ltr?' class="ltr"':''} ${o.im?`inputmode="${o.im}"`:''} value="${esc(val||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="${o.last?'done':'next'}"${o.sug?` aria-autocomplete="list" aria-controls="${id}s"`:''}>${o.pre?'</div>':''}${o.sug?`<div class="bzsug hide" id="${id}s" role="listbox"></div>`:''}<small class="eh" id="${id}v"></small></div>`;
 function vBuy(){const d=bz.d,st=bz.step,T=['اطلاعات مشتری','وزن و مبلغ','حساب و تاریخ واریز'];
   let h=`<div class="bzp">${[1,2,3].map(i=>`<i class="${i<st?'done':i===st?'on':''}"></i>`).join('')}</div><div class="bzh"><small>مرحله ${toFa(st)} از ۳</small><b>${T[st-1]}</b></div>`;
   if(bz.msg)h+=`<div class="bzok">${ic('check')}<span>${bz.msg}</span></div>`;
-  if(st===1)h+=bzF('bzN','نام و نام خانوادگی',d.name,{ph:'مثلاً علی رضایی'})+bzF('bzP','شماره تماس',d.phone,{ltr:1,im:'tel',ph:'09xxxxxxxxx',opt:1})+bzF('bzM','کد ملی',d.nid,{ltr:1,im:'numeric',ph:'۱۰ رقم',opt:1})+bzF('bzC','شماره فاکتور',d.code,{ltr:1,im:'numeric',last:1});
+  if(st===1)h+=bzF('bzN','نام و نام خانوادگی',d.name,{ph:'مثلاً علی رضایی',sug:1})+bzF('bzP','شماره تماس',d.phone,{ltr:1,im:'tel',ph:'09xxxxxxxxx',opt:1})+bzF('bzM','کد ملی',d.nid,{ltr:1,im:'numeric',ph:'۱۰ رقم',opt:1})+bzF('bzC','شماره فاکتور',d.code,{ltr:1,im:'numeric',last:1});
   if(st===2){bzItems();h+=`<div id="bzIt">${bzItemsHTML()}</div><button class="addit" data-act="bzAddIt">${ic('plus')} افزودن قلم دیگر <small>(سکه، دلار، طلای دیگر…)</small></button><div id="bzS"></div>`}
-  if(st===3){h+=`<div class="ef"><label for="bzI">شماره شبا</label><div class="ibin"><input id="bzI" inputmode="numeric" value="${esc(d.iban||'')}" placeholder="شماره شبا (۲۴ رقم)" autocomplete="off" enterkeyhint="next"><span class="ibir">IR</span><span class="ibbk" id="bzIb"></span></div><small class="eh" id="bzIv"></small></div>`+bzF('bzK','شماره کارت',d.card,{ltr:1,im:'numeric',ph:'۱۶ رقم',opt:1})+bzF('bzH','نام صاحب حساب',d.holder!=null?d.holder:clean(d.name||''),{last:1})
+  if(st===3){h+=`<div class="ef"><label for="bzI">شماره شبا</label><div class="ibin"><input id="bzI" inputmode="numeric" value="${esc(d.iban||'')}" placeholder="شماره شبا (۲۴ رقم)" autocomplete="off" enterkeyhint="next"><span class="ibir">IR</span><span class="ibbk" id="bzIb"></span></div><small class="eh" id="bzIv"></small></div>`+bzF('bzK','شماره کارت',d.card,{ltr:1,im:'numeric',ph:'۱۶ رقم',opt:1})+bzF('bzH','نام صاحب حساب',d.holder!=null?d.holder:clean(d.name||''),{last:1})+bzStlHTML()
     +`<div class="ef"><label>تاریخ واریز</label><button class="bzdate" data-act="bzCal">${ic('cal')}<span><b>${esc(payLab(d.pay))}</b><small>${esc(dates(d.pay).wd+' '+dates(d.pay).fa)}</small></span>${ic('chev')}</button></div>`
-    +`<div class="bzrev"><div><small>مشتری</small><b>${esc(clean(d.name||'')||'—')}</b></div><div><small>مبلغ</small><b>${fmt(num(d.amount||0))} <i>تومان</i></b></div>${d.weight?`<div><small>وزن طلا</small><b>${esc(toFa(d.weight))} <i>گرم</i></b></div>`:''}${(d.items||[]).filter(x=>x.k!=='طلا'&&x.amt).map(x=>`<div><small>${esc(x.k+(x.t?' '+x.t:''))}</small><b>${x.q?esc(toFa(x.q))+' '+((BZK[x.k]||{}).u||'')+' · ':''}${fmt(x.amt)}</b></div>`).join('')}${ppgOf(bzGoldAmt(),d.weight)?`<div><small>هر گرم تمام‌شده</small><b>${fmt(ppgOf(bzGoldAmt(),d.weight))} <i>تومان</i></b></div>`:''}${d.code?`<div><small>فاکتور</small><b>${esc(toEn(d.code))}</b></div>`:''}</div>`}
+    +`<div class="bzrev"><div><small>مشتری</small><b>${esc(clean(d.name||'')||'—')}</b></div><div><small>مبلغ</small><b>${fmt(num(d.amount||0))} <i>تومان</i></b></div>${bzStlSum()?`<div><small>تسویه از مشتری</small><b>${fmt(bzStlSum())} <i>تومان</i></b></div><div><small>مانده واریز بانکی</small><b>${fmt(Math.max(0,num(d.amount||0)-bzStlSum()))} <i>تومان</i></b></div>`:''}${d.weight?`<div><small>وزن طلا</small><b>${esc(toFa(d.weight))} <i>گرم</i></b></div>`:''}${(d.items||[]).filter(x=>x.k!=='طلا'&&x.amt).map(x=>`<div><small>${esc(x.k+(x.t?' '+x.t:''))}</small><b>${x.q?esc(toFa(x.q))+' '+((BZK[x.k]||{}).u||'')+' · ':''}${fmt(x.amt)}</b></div>`).join('')}${ppgOf(bzGoldAmt(),d.weight)?`<div><small>هر گرم تمام‌شده</small><b>${fmt(ppgOf(bzGoldAmt(),d.weight))} <i>تومان</i></b></div>`:''}${d.code?`<div><small>فاکتور</small><b>${esc(toEn(d.code))}</b></div>`:''}</div>`}
   return `<div class="bzw">${h}</div>`}
 const aBuy=()=>`<button class="btn gold bzgo" data-act="bzNext">${bz.step<3?'تأیید و ادامه':ic('check')+' ثبت واریزی'}</button>`;
 function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.textContent=t;o.className='eh'+(c?' '+c:'')}};
@@ -193,21 +193,62 @@ function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.te
     P.oninput=()=>{const v=toEn(P.value).replace(/\D/g,'').slice(0,11);P.value=v;hint('bzP',!v?'':v.length<11?toFa(v.length)+' از ۱۱ رقم':phoneMsg(v)[0],v.length===11?(phoneOk(v)?'ok':'bad'):'')};
     M.oninput=()=>{const v=toEn(M.value).replace(/\D/g,'').slice(0,10);M.value=v;hint('bzM',!v?'':v.length<10?toFa(v.length)+' از ۱۰ رقم':nidOk(v)?'کد ملی معتبر است':'کد ملی معتبر نیست',v.length===10?(nidOk(v)?'ok':'bad'):'')};
     C.oninput=()=>{C.value=toEn(C.value).replace(/[^0-9A-Za-z\-\/]/g,'');const c=C.value.trim(),dup=c&&entries.some(e=>e.entryDate===todayISO()&&toEn(e.code||'')===c);hint('bzC',dup?'این شماره فاکتور امروز قبلاً ثبت شده':'',dup?'bad':'')};
-    [P,M,C].forEach(el=>{if(el.value)el.oninput()})}
+    [P,M,C].forEach(el=>{if(el.value)el.oninput()});bzSugBind()}
   if(st===2)bzItBind();
   if(st===3){const I=$('bzI'),K=$('bzK');
     I.oninput=()=>{const v=dg(I.value).slice(0,24);I.value=ibanGroups(v);const bb=$('bzIb'),b5=v.length>=5?BANKS[v.slice(2,5)]||'':'';if(bb)bb.innerHTML=b5?bankBadge(b5,'lg')+'<span>'+esc(b5)+'</span>':'';if(!v){hint('bzI','اگر شبا را ندارید خالی بگذارید؛ واریزی خطادار علامت می‌خورد');return}if(v.length<24){hint('bzI',toFa(v.length)+' از ۲۴ رقم');return}if(!ibanOk('IR'+v)){hint('bzI','شماره شبا اشتباه است','bad');return}hint('bzI','شماره شبا معتبر است','ok')};
     K.oninput=()=>{const v=dg(K.value).slice(0,16);K.value=grp4(v);hint('bzK',!v?'':v.length<16?toFa(v.length)+' از ۱۶ رقم':luhn(v)?'معتبر':'رقم کنترلی نمی‌خواند',v.length===16?(luhn(v)?'ok':'bad'):'')};
     I.oninput();if(K.value)K.oninput()}
   const first=ids.map(id=>$(id)).find(el=>el&&!el.value);if(first)setTimeout(()=>{if(cur==='buy'&&$('ov').classList.contains('hide')&&document.body.contains(first))first.focus()},380)}
-ACT.bzNext=()=>{bzRead();const d=bz.d;
+ACT.bzNext=async()=>{bzRead();const d=bz.d;
   if(bz.step===1){if(!clean(d.name||'')){toast('نام مشتری را وارد کنید',true);$('bzN').focus();return}const ph=toEn(d.phone||'');if(ph&&!phoneOk(ph)){toast('شماره تماس درست نیست',true);$('bzP').focus();return}const n=toEn(d.nid||'');if(n&&!nidOk(n)){toast('کد ملی معتبر نیست',true);$('bzM').focus();return}bz.step=2;bz.msg='';render();return}
   if(bz.step===2){if(!num(d.amount||0)){toast('مبلغ را وارد کنید',true);const a=document.querySelector('#bzIt [data-f=amt]');if(a)a.focus();return}bz.step=3;bz.msg='';render();return}
   const dI=dg(d.iban||'').slice(0,24);
   const card=dg(d.card||'').slice(0,16),now=new Date().toISOString(),iban=dI?'IR'+dI:'',name=stripName(d.name),holder=clean(d.holder||'');
   if(dateVal!==todayISO()){dateVal=todayISO();ls.set('m_date',dateVal)}
-  const ne={id:nid++,name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),ppg:ppgOf(bzGoldAmt(),d.weight),items:(d.items||[]).filter(x=>x.amt).map(x=>({...x})),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:[],entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
-  entries.push(ne);saveE();alloc=null;logA('add','ثبت واریزی (خرید)',name+' | '+fmt(ne.amount)+' تومان | واریز '+dates(ne.payDate).fa,{ids:[ne.id],after:pick(ne)});
-  const bad=!iban||!ibanOk(iban),why=!iban?'شبا ندارد':'شبا اشتباه است';bz={step:1,d:{pay:ne.payDate},msg:`«${esc(name)}» ثبت شد — ${fmt(ne.amount)} تومان، واریز ${esc(payLab(ne.payDate))}${bad?' <em>('+why+'؛ در لیست خطادار علامت خورد)</em>':''}`};
+  if(bzStlSum()>num(d.amount)){toast('جمع تسویه‌ها از مبلغ این واریزی بیشتر است',true);return}
+  if(bz.saving)return;bz.saving=true;let S=[];try{S=await bzStlMake()}finally{bz.saving=false}
+  const ne={id:nid++,name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),ppg:ppgOf(bzGoldAmt(),d.weight),items:(d.items||[]).filter(x=>x.amt).map(x=>({...x})),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:S,entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
+  entries.push(ne);saveE();alloc=null;logA('add','ثبت واریزی (خرید)',name+' | '+fmt(ne.amount)+' تومان | واریز '+dates(ne.payDate).fa+(S.length?' | تسویه از مشتری '+fmt(bzStlSum(S))+' تومان':''),{ids:[ne.id],after:pick(ne)});
+  const rest=ne.amount-bzStlSum(S),bad=rest>0&&(!iban||!ibanOk(iban)),why=!iban?'شبا ندارد':'شبا اشتباه است';bz={step:1,d:{pay:payDef()},msg:`«${esc(name)}» ثبت شد — ${fmt(ne.amount)} تومان، واریز ${esc(payLab(ne.payDate))}${bad?' <em>('+why+'؛ در لیست خطادار علامت خورد)</em>':''}`};
   render();$('view').scrollTop=0;toast(bad?'ثبت شد، اما '+why+' (خطادار)':'ثبت شد ✓ — ثبت بعدی',bad)};
-ACT.bzCal=()=>{bzRead();openCal(bz.d.pay||todayISO(),iso=>{bz.d.pay=iso;ls.set('m_pay_off',Math.round((new Date(iso+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5));render()})};
+ACT.bzCal=()=>{bzRead();openCal(bz.d.pay||todayISO(),iso=>{bz.d.pay=iso;render()})};
+
+/* ---------- خرید طلا: پیشنهاد مشتری زیر فیلد نام (از حساب‌های مشتری و نام‌های ثبت‌شده قبلی) ---------- */
+const nzName=s=>clean(String(s||'')).replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/\u200c/g,' ').toLowerCase();
+function bzPeople(){const M=new Map(),add=(name,o)=>{const k=nzName(name);if(!k)return;const p=M.get(k)||{name:clean(name),k,n:0,last:'',phone:'',nid:'',cuId:''};
+    if(o.phone&&!p.phone)p.phone=o.phone;if(o.nid&&!p.nid)p.nid=o.nid;if(o.cuId&&!p.cuId)p.cuId=o.cuId;if(o.n)p.n+=o.n;if(o.last&&o.last>p.last)p.last=o.last;M.set(k,p)};
+  entries.slice().sort((a,b)=>String(b.entryDate||'').localeCompare(String(a.entryDate||''))).forEach(e=>add(e.name,{phone:toEn(e.phone||''),nid:toEn(e.nid||''),n:1,last:e.entryDate||''}));
+  custs.filter(c=>!c.del).forEach(c=>add(cuName(c),{phone:toEn(c.phone||''),cuId:c.id,last:String(c.lastAt||'').slice(0,10)}));
+  return [...M.values()]}
+function bzSugHTML(q){const nq=nzName(q),qd=toEn(q).replace(/\D/g,'');if(!nq)return '';
+  const L=bzPeople().filter(p=>p.k.includes(nq)||(qd.length>=3&&(p.phone.includes(qd)||p.nid.includes(qd))))
+    .sort((a,b)=>(b.k.startsWith(nq)-a.k.startsWith(nq))||(b.n-a.n)||String(b.last).localeCompare(String(a.last))).slice(0,6);
+  const exact=L.some(p=>p.k===nq);
+  return L.map((p,i)=>`<button type="button" class="bzsr" role="option" data-i="${i}" data-k="${esc(p.k)}"><span class="av">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.cuId?'حساب مشتری':'',p.n?toFa(p.n)+' بار ثبت شده':'',p.phone?'<span class="ltr">'+esc(toFa(p.phone))+'</span>':''].filter(Boolean).join(' · ')||'مشتری'}</small></span></button>`).join('')
+    +(exact?'':`<button type="button" class="bzsr nw" data-k=""><span class="av">${ic('plus')}</span><span class="tx"><b>مشتری جدید: «${esc(clean(q))}»</b><small>با همین نام ثبت می‌شود</small></span></button>`)}
+function bzSugBind(){const N=$('bzN'),B=$('bzNs');if(!N||!B)return;
+  const hide=()=>{B.classList.add('hide');B.innerHTML='';N.setAttribute('aria-expanded','false')};
+  const show=()=>{const h=bzSugHTML(N.value);if(!h||document.activeElement!==N){hide();return}B.innerHTML=h;B.classList.remove('hide');N.setAttribute('aria-expanded','true')};
+  N.addEventListener('input',()=>{clearTimeout(N._t);N._t=setTimeout(show,90)});N.addEventListener('focus',show);
+  N.addEventListener('blur',()=>setTimeout(hide,150));N.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape')hide()});
+  B.onpointerdown=e=>{if(e.target.closest('.bzsr'))e.preventDefault()};
+  B.onclick=e=>{const r=e.target.closest('.bzsr');if(!r)return;const p=r.dataset.k?bzPeople().find(z=>z.k===r.dataset.k):null;hide();
+    if(p){N.value=p.name;const P=$('bzP'),M=$('bzM');if(P&&!P.value&&p.phone){P.value=p.phone;P.oninput&&P.oninput()}if(M&&!M.value&&p.nid){M.value=p.nid;M.oninput&&M.oninput()}bz.d.cuId=p.cuId||''}else bz.d.cuId='';
+    const nx=[$('bzP'),$('bzM'),$('bzC')].find(el=>el&&!el.value)||$('bzC');if(nx)nx.focus()}}
+/* ---------- خرید طلا: تسویه از مشتری همان موقع ثبت (همان پنجره صفحه جزئیات؛ با ثبت واریزی ذخیره می‌شود) ---------- */
+const bzStlSum=S=>(S||bz.d.settles||[]).reduce((a,z)=>a+(+z.amount||0),0);
+function bzStlHTML(){const S=bz.d.settles||[],tot=num(bz.d.amount||0),rest=Math.max(0,tot-bzStlSum());
+  return `<div class="ef bzstl"><label>تسویه از مشتری <i>(اختیاری)</i></label>${S.length?`<div class="stll2">${S.map((z,i)=>`<div class="stlrw w"><button class="stlr" data-act="bzStlOpen" data-i="${i}"><span class="bri">${ic('user')}</span><span class="tx"><b>${esc(z.name)}</b><small>${['در انتظار تأیید',z.inv?'فاکتور '+esc(z.inv):'',z.tn?'پیگیری '+esc(z.tn):'',z.imgD?'رسید دارد':''].filter(Boolean).join(' · ')}</small></span><span class="brv"><b>${fmt(z.amount)} <i>تومان</i></b></span></button><button class="stlc" data-act="bzStlDel" data-i="${i}" aria-label="حذف این تسویه">${ic('x')}</button></div>`).join('')}</div>`:''}
+  ${rest>0?`<button class="addit" data-act="bzStlNew">${ic('plus')} ${S.length?'تسویه دیگر':'ثبت تسویه از مشتری'} <small>(مشتری دیگری مستقیم به این شخص پرداخت کرده)</small></button>`:`<div class="eh ok">کل مبلغ با تسویه از مشتری پرداخت می‌شود</div>`}</div>`}
+const bzStlRe=()=>{const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
+ACT.bzStlNew=()=>{bzRead();stl={bz:1,amount:Math.max(0,num(bz.d.amount||0)-bzStlSum()),q:''};sheet(stlHTML());stlBind();setTimeout(()=>{const q=$('stQ');if(q)q.focus()},300)};
+ACT.bzStlOpen=d=>{bzRead();const z=(bz.d.settles||[])[+d.i];if(!z)return;stl={...z,bz:1,i:+d.i,q:z.cuId?'':z.name};sheet(stlHTML());stlBind()};
+ACT.bzStlDel=d=>{bzRead();(bz.d.settles||[]).splice(+d.i,1);bzStlRe()};
+ACT.bzStlSave=()=>{stlRead();const name=clean(stl.name||stl.q||'');if(!name){toast('پرداخت‌کننده را انتخاب یا نامش را بنویسید',true);return}const a=+stl.amount||0;if(!a){toast('مبلغ را وارد کنید',true);return}
+  const S=bz.d.settles=(bz.d.settles||[]).slice(),others=S.filter((z,i)=>i!==stl.i).reduce((s,z)=>s+(+z.amount||0),0);if(others+a>num(bz.d.amount||0)){toast('جمع تسویه‌ها از مبلغ این واریزی بیشتر می‌شود',true);return}
+  const z={name,phone:stl.phone||'',inv:stl.inv||'',amount:a,tn:stl.tn||'',note:stl.note||'',cuId:stl.cuId||'',imgD:stl.imgD||''};
+  if(stl.i!=null)S[stl.i]=z;else S.push(z);stl=null;closeSheet();bzStlRe();toast('تسویه اضافه شد · با ثبت واریزی ذخیره می‌شود')};
+/* هنگام ثبت واریزی: تسویه‌ها با وضعیت «در انتظار تأیید» ساخته می‌شوند، مثل ثبت از صفحه جزئیات */
+async function bzStlMake(){const now=new Date().toISOString(),R=[];for(const s of (bz.d.settles||[])){const z={st:'wait',id:nid++,name:s.name,phone:s.phone,inv:s.inv,amount:s.amount,tn:s.tn,note:s.note,cuId:s.cuId,date:todayISO(),at:now,by:who()};
+    if(s.imgD){const k=newImgKey('stl:'+z.id);if(await imgPut(k,s.imgD)){z.imgs=[k];z.img=k}else toast('حافظه پر است؛ عکس رسید ذخیره نشد',true)}R.push(z)}return R}

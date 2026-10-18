@@ -20,7 +20,8 @@ function hubData(k){AM=allocMap();const M=vMap(),rows=validated().filter(r=>PD(r
   const sent=it.filter(z=>z.bi),closed=sent.length>0&&sent.every(z=>z.bi.b.closed)&&!un.length&&!dr.size&&!bad.length;
   return{k,rows,G:GL,un,bad,FS,dr:[...dr],tot,okS,ok:cnt('ok')+FS.length,pend:cnt('pending'),fail:cnt('fail'),none:cnt('none'),sent:sent.length,closed,eds:[...new Set(rows.map(r=>r.entryDate))].sort()}}
 const hubOpen=new Map();
-const hubIsOpen=g=>hubOpen.has(g.name)?hubOpen.get(g.name):(!!g.dr.length||g.c.pending>0||g.c.fail>0);
+/* منبع‌ها بسته باز می‌شوند (حتی اگر هنوز تسویه نشده باشند)؛ با زدن روی منبع باز و بسته می‌شود */
+const hubIsOpen=g=>hubOpen.has(g.name)?hubOpen.get(g.name):false;
 function vLday(){const d=hubData(ldKey);ldSel=null;
   if(!d.rows.length)return `<div class="spempty"><div class="spill">${ic('list')}</div><b>این لیست خالی است</b><span>برای ${esc(pdHead(ldKey))} واریزی‌ای ثبت نشده.</span></div>`;
   const all=d.rows.length,pc=d.tot?d.okS/d.tot*100:0,done=d.ok===all;
@@ -33,7 +34,7 @@ function vLday(){const d=hubData(ldKey);ldSel=null;
   const B=d.bad.filter(r=>hit(r));hits+=B.length;
   if(B.length)h+=`<div class="spsec bad"><div><b>${fmt(B.length)} واریزی خطادار</b><small>تا اصلاح نشوند تخصیص داده نمی‌شوند؛ برای اصلاح بزنید</small></div></div><div class="blist fcard">${rowsHTML(B)}</div>`;
   const U=d.un.filter(r=>hit(r));hits+=U.length;
-  if(U.length)h+=`<div class="spsec hubs"><div><b>تخصیص‌نیافته</b><small>${fmt(U.length)} واریزی · ${fmt(sum(U))} تومان · کشیدن به چپ: انتقال به یک منبع</small></div>${can('split')?`<button class="hadd" data-act="allocNew">${ic('plus')} تخصیص</button>`:''}</div><div class="blist fcard">${rowsHTML(U)}</div>`;
+  if(U.length)h+=`<div class="spsec hubs"><div><b>تخصیص‌نیافته</b><small>${fmt(U.length)} واریزی · ${fmt(sum(U))} تومان · کشیدن به چپ: انتقال به یک منبع</small></div></div><div class="blist fcard">${rowsHTML(U)}</div>`;
   if(d.G.length)h+=`<div class="spsec"><div><b>منبع‌ها</b><small>برای باز و بسته شدن بزنید · «⋯» تنظیمات منبع</small></div></div>`;
   /* منبع‌هایی که هنوز کار دارند بالا، منبع‌های کاملاً تسویه‌شده پایین؛ داخل هر منبع هم تسویه‌شده‌ها پایین */
   const gDone=g=>g.c.ok===g.rows.length,RO={fail:0,pending:1,none:2,ok:3};

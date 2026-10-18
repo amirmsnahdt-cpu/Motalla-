@@ -66,7 +66,8 @@ const HOME_N=30,HOME_DAYS=7;
 const FLD=['fn','fc','fa','fi','fk'];
 let fSet=[],fTitle='',fPay=null;
 /* تاریخ واریز: برای هر ثبت پرسیده می‌شود (لیست همیشه تاریخ روز ثبت را می‌خورد) */
-const payDef=()=>isoAdd(todayISO(),Math.max(0,+ls.get('m_pay_off',1)||0));
+/* پیش‌فرض تاریخ واریز همیشه «فردا»؛ تغییر تاریخ فقط برای همان ثبت است و ثبت بعدی دوباره فردا می‌شود */
+const payDef=()=>isoAdd(todayISO(),1);
 function payChips(){const t=todayISO(),opts=[[t,'امروز'],[isoAdd(t,1),'فردا'],[isoAdd(t,2),'پس‌فردا']],cus=fPay&&!opts.some(o=>o[0]===fPay);
   return `<div class="paybox"><div class="lblrow"><label>تاریخ واریز</label><small>${fPay?esc(dates(fPay).wd+' '+dates(fPay).fa):'انتخاب کنید'}</small></div><div class="paych">${opts.map(([iso,l])=>`<button class="pch${fPay===iso?' on':''}" data-act="fPay" data-iso="${iso}"><b>${l}</b><small>${esc(toFa(dates(iso).jd)+' '+JM[dates(iso).jm-1])}</small></button>`).join('')}<button class="pch${cus?' on':''}" data-act="fPayPick">${ic('cal')}<small>${cus?esc(payLab(fPay)):'تاریخ دیگر'}</small></button></div></div>`}
 const updPay=()=>{const b=$('paybox');if(b)b.innerHTML=payChips()};
@@ -123,7 +124,7 @@ function saveEntry(){const m=$('fm'),dgI=dg($('fi').value).slice(0,24);
     saveE();alloc=null;editId=null;toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد',bad);go(editBack||'list');editBack=null;return}
   const ne={...e,id:nid++,entryDate:dateVal,createdBy:who(),updatedBy:who(),updatedAt:now};entries.push(ne);saveE();alloc=null;
   logA('add','ثبت واریزی',e.name+' | '+fmt(e.amount)+' تومان | '+dates(dateVal).fa,{ids:[ne.id],after:pick(ne)});
-  FLD.forEach(i=>$(i).value='');fSet=[];fTitle='';$('ftl').innerHTML=titleChips();updSet();$('fiv').textContent='';$('fkv').textContent='';$('finfo').innerHTML='';$('rn').textContent=fmt(dayEntries().length+1);$('recent').innerHTML=recentHTML();$('dock').innerHTML=dockHTML();$('act').innerHTML=aEntry();{const fb=document.querySelector('#view .flow');if(fb)fb.outerHTML=flowBar(1)}
+  FLD.forEach(i=>$(i).value='');fSet=[];fTitle='';$('ftl').innerHTML=titleChips();updSet();fPay=payDef();updPay();$('fiv').textContent='';$('fkv').textContent='';$('finfo').innerHTML='';$('rn').textContent=fmt(dayEntries().length+1);$('recent').innerHTML=recentHTML();$('dock').innerHTML=dockHTML();$('act').innerHTML=aEntry();{const fb=document.querySelector('#view .flow');if(fb)fb.outerHTML=flowBar(1)}
   m.innerHTML=bad?'<div class="msg bad"><b>شماره شبا اشتباه است.</b> واریزی ذخیره شد و در لیست قرمز علامت خورد؛ بعداً اصلاحش کنید.</div>':'<div class="msg ok">ذخیره شد ✓ — واریز '+payLab(ne.payDate)+' · '+fmt(dayEntries().length)+' واریزی در لیست امروز</div>';
   if(bad)toast('شماره شبا اشتباه است',true);$('fn').focus()}
 /* ============ چسباندن گروهی ============ */
@@ -138,7 +139,7 @@ function bkPrev(){const el=$('bkprev');if(!el)return;const t=($('bulk')||{}).val
   el.innerHTML=`<div class="bkh"><span>${fmt(r.length)} واریزی پیدا شد</span><small>جمع ${fmt(sum(r))} تومان${badN?'، '+fmt(badN)+' خطادار':''}</small></div><div class="fcard">${r.slice(0,8).map((x,i)=>{const bk=ibanBank(x.iban)||x.bank||'',bad=!x.iban?'شبا ندارد':!ibanOk(x.iban)?'شبا اشتباه':!x.amount?'مبلغ ندارد':!x.name?'نام ندارد':'';
     return `<div class="bkr${bad?' bad':''}"><span class="n">${toFa(i+1)}</span><span class="tx"><b>${esc(x.name||'بدون نام')}</b><small class="${bad?'bad':''}">${bad?esc(bad):bankBadge(bk)+esc(bk||'بانک نامشخص')}${x.code?' · فاکتور '+esc(x.code):''}</small></span><span class="v">${fmt(x.amount||0)}<i>تومان</i></span></div>`}).join('')}${r.length>8?`<div class="bkmore">و ${fmt(r.length-8)} واریزی دیگر</div>`:''}</div>`}
 function bindBulk(){const b=$('bulk');if(!b)return;b.oninput=()=>{clearTimeout(b._t);b._t=setTimeout(bkPrev,180)};bkPrev()}
-function resetBulk(){const b=$('bulk');if(!b||!b.value.trim())return;askConfirm('متن چسبانده‌شده پاک شود؟','پاک شود',()=>{$('bulk').value='';$('bm').innerHTML='';bkPrev();toast('پاک شد')})}
+function resetBulk(){const b=$('bulk');if(!b||!b.value.trim())return;askConfirm('متن چسبانده‌شده پاک شود؟','پاک شود',()=>{$('bulk').value='';fPay=payDef();$('bm').innerHTML='';bkPrev();toast('پاک شد')})}
 function bulkAdd(){const r=parse($('bulk').value),m=$('bm');if(!r.length){m.innerHTML='<div class="msg bad">واریزی‌ای در متن پیدا نشد.</div>';return}
   const now=new Date().toISOString(),ids=[];r.forEach(x=>{const id=nid++;ids.push(id);entries.push({...x,card:'',id,entryDate:dateVal,payDate:fPay||payDef(),createdBy:who(),updatedBy:who(),updatedAt:now})});
   saveE();alloc=null;logA('bulk','ورود گروهی',fmt(r.length)+' واریزی | '+fmt(sum(r))+' تومان | '+dates(dateVal).fa,{ids});$('bulk').value='';
