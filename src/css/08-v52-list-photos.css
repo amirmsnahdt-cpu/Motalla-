@@ -16,10 +16,6 @@
 .ldg.gdr{box-shadow:0 0 0 1.5px var(--blu2),0 1px 3px #16213a12}
 .hubg .okall{margin:8px 12px 12px;width:calc(100% - 24px)}
 /* ردیف پیگیری: واریز شد · ناموفق · رسید در یک خط */
-.rtk{grid-template-columns:1fr 1fr auto}
-.rtk .rc{padding:7px 12px;color:var(--mut)}
-.rtk .rc.on{color:var(--blu);border-color:var(--blu2);background:var(--blu2)}
-.rtk:has(> :only-child) {grid-template-columns:1fr}
 /* ===== v52: پرداخت از چند منبع ===== */
 .psl{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
 .psr{display:grid;grid-template-columns:26px 1fr 1fr auto;gap:6px;align-items:center}
@@ -106,5 +102,9 @@
 .galt:active{transform:scale(.96)}
 /* اندازه لمس: حداقل ۴۴ نقطه برای دکمه‌های تازه */
 .hmore2,.psx,.zb{min-width:44px;min-height:44px}
-.rtk button{min-height:40px}
 .hsend,.hadd{min-height:40px}
+/* v52.1: ردیف ارسال‌شده در لیست — تأیید/ناموفق با کشیدن، فقط دکمه رسید مثل جزئیات واریزی */
+.brw.hasrc{display:flex;align-items:center;gap:6px;padding-inline-end:10px}
+.brw.hasrc>.brh{flex:1;min-width:0}
+.brw.hasrc>.brc{width:44px;height:44px;border-radius:13px}
+.brw.hasrc>.brc svg{width:19px;height:19px}

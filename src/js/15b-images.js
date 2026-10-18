@@ -6,7 +6,8 @@ const newImgKey=p=>p+':'+Date.now().toString(36)+Math.random().toString(36).slic
 let GAL=null;
 /* صاحب عکس‌ها: {k:'it',eid} = رسید واریز بانکی یک واریزی، {k:'st',eid,sid} = رسید یک تسویه مشتری */
 function galCtx(){if(!GAL)return null;const e=entries.find(z=>String(z.id)===String(GAL.eid));if(!e)return null;const now=()=>new Date().toISOString();
-  if(GAL.k==='it'){const q=entBI(e);if(!q)return null;return{keys:itImgs(q.b,q.it),ed:!q.b.closed&&can('track'),pre:'rc:'+e.id,
+  if(GAL.k==='it'){const q=entBI(e);if(!q)return null;/* رسید حتی بعد از تأیید و بایگانی لیست هم اضافه می‌شود؛ وضعیت واریز در لیست بسته تغییر نمی‌کند */
+    return{keys:itImgs(q.b,q.it),ed:can('track'),pre:'rc:'+e.id,
     set:K=>{q.it.imgs=K;q.it.img=K.length>0;q.it.at=now();saveB()},
     meta:{name:fullName(e),holder:e.holder||fullName(e),amount:q.it.amount,tn:q.it.tn||'',src:q.it.src||'',date:PD(e),kind:'bank'}}}
   const z=(e.settles||[]).find(s=>String(s.id)===String(GAL.sid));if(!z)return null;
