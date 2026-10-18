@@ -14,7 +14,7 @@ const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'motalla-smoke-'));
 const PORT = 3900 + Math.floor(Math.random() * 90), BASE = 'http://127.0.0.1:' + PORT;
 const si = process.argv.indexOf('--styles'), STYLES = si > 0 ? process.argv[si + 1] : null;
 const VIEWS = ['home', 'find', 'entry', 'bulk', 'list', 'lday', 'split1', 'split3', 'srcview', 'part', 'track', 'batch', 'day',
-  'ent', 'buy', 'banks', 'custs', 'cust', 'debt', 'cred', 'cwiz', 'pwiz', 'audit', 'users', 'settings', 'backups'];
+  'ent', 'buy', 'banks', 'custs', 'cust', 'sell', 'inv', 'debt', 'cred', 'cwiz', 'pwiz', 'audit', 'users', 'settings', 'backups'];
 
 const srv = spawn(process.execPath, ['--experimental-sqlite', '--disable-warning=ExperimentalWarning', 'server/server.js'],
   { cwd: ROOT, env: { ...process.env, DATA_DIR: DATA, PORT: String(PORT), HOST: '127.0.0.1' }, stdio: 'inherit' });

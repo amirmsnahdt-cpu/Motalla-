@@ -34,6 +34,7 @@ change the existing definition instead of adding a later redefinition). Section 
 | 14-customers | customer accounts (`vCusts`, `vCust`, `txCalc`) |
 | 15-calendar-settle | Persian calendar (`openCal`), settlements (`stlTx`/`stlUntx`, `e.settles` `st:'wait'|'ok'`) |
 | 15b-images | receipt photos: several per bank deposit (`x.imgs`) and per customer settlement (`z.imgs`), gallery (`openGal`), full-screen zoom/rotate/crop viewer (`zvOpen`) |
+| 15d-sales | sales invoice (`vSell`, `sv`, `itCalc`, `svTot`), invoice page/print (`vInv`, `invDoc`), POS terminals & our bank accounts (`CH`, `chBal`, `chMoves`), balance transfer between customers (`xs`) and gold↔rial conversion (`cv`), customer groups & goods list (`cfgRec`) |
 | 15c-pay-split | pay one deposit from several sources: linked piece entries (`splitOf`), `famOf`, `psApply` |
 | 16-boot | startup: initial render, listeners |
 
@@ -81,3 +82,9 @@ Status frames (green/yellow/red row borders) are defined ONCE at the end of 08-v
 - githack: client fetches `<sha>/index.html`, rewrites `app.js`/`styles.css` to that sha's absolute URL,
   stores it in localStorage, and the boot script swaps it in. Any new file loaded by index.html must be
   added to that rewrite regex in `checkUpdate` and to `STATIC` in server.js.
+
+## Customer accounts & sales (v53)
+- Everything lives in `custs` (synced). Real customers = `CU()` (no `sys`). System records: `{sys:'ch',kind:'pos'|'bank'}` (terminals/our accounts, ledger `txs` of `tin`/`tout`), `{sys:'cfg',groups,goods}`. Never list `custs` directly as customers — use `CU()`.
+- Balance per tx = `txD(t)` → `{r,g}` (positive = we owe). Types: buy/sell/pin/pout/gin/gout (old), `inv` (invoice: `items`, `pays[{m:cash|pos|hav|gold|cust}]`, `total`, `gc` = rest booked as gold), `xf` (transfer, `peer` or `inv` link), `cv` (gold↔rial).
+- A `pays` item with `m:'cust'` creates an `xf` on the paying customer (`xfId`); `txLinked` finds linked rows so delete/undo moves both.
+- Channel balance is derived (`chMoves`): invoice pays with `chId` + `tin` − `tout`. Invoice tax = 10% of (اجرت+سود), optional per invoice.
