@@ -128,3 +128,6 @@
 .bzstl .addit{margin-bottom:0;flex-wrap:wrap;padding:8px 12px;text-align:center}
 .bzstl .stlc{width:44px;height:44px;border-radius:13px;border-style:solid;color:var(--red)}
 @media (prefers-reduced-motion:reduce){.bzsr{transition:none}}
+/* v52.3: مشتری ثبت‌شده — شبای قبلی و دکمه شبای جدید */
+.eh.warn{color:var(--warn)}
+.bzni{display:inline-flex;align-items:center;gap:5px;min-height:44px;margin-top:2px;padding:0 4px;border:0;background:none;color:var(--blu);font:inherit;font-size:13px;font-weight:800;cursor:pointer}.bzni svg{width:15px;height:15px}
