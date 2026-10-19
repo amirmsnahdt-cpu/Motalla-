@@ -100,3 +100,34 @@ test('پشتیبان: ساخت، فهرست و ثبت زمان دانلود', as
   assert.equal((await api('/api/backup/saved', { method: 'POST', token: admin })).status, 200);
   l = await api('/api/backups', { token: admin }); assert.ok(l.j.lastDl);
 });
+
+test('بازگردانی از فایل پشتیبان: تکه‌تکه، بررسی، بازگردانی؛ تاریخچه و عکس‌های فعلی می‌مانند', async () => {
+  const zlib = require('zlib'), H = t => ({ Authorization: 'Bearer ' + t, 'Content-Type': 'application/octet-stream' });
+  const up = (t, q, body) => fetch(base + '/api/backup/upload?' + q, { method: 'POST', headers: H(t), body });
+  await api('/api/sync', { method: 'POST', token: admin, body: { since: 0, changes: [{ coll: 'entries', id: 'rx1', data: { id: 'rx1', amt: 5, name: 'قبل' } }] } });
+  const full = await (await fetch(base + '/api/backup/full', { headers: { Authorization: 'Bearer ' + admin } })).arrayBuffer();
+  // بعد از پشتیبان: تغییر واریزی، یک واریزی تازه و یک ردیف تاریخچه
+  await api('/api/sync', { method: 'POST', token: admin, body: { since: 0, changes: [{ coll: 'entries', id: 'rx1', data: { id: 'rx1', amt: 9, name: 'بعد' } }, { coll: 'entries', id: 'rx2', data: { id: 'rx2', amt: 1 } }, { coll: 'audit', id: 'ax9', data: { id: 'ax9', type: 'add', summary: 'بعد از پشتیبان' } }] } });
+  const id = 'a1b2c3d4e5f60718', buf = Buffer.from(full), half = Math.ceil(buf.length / 2);
+  assert.equal((await up(staff, 'id=' + id + '&i=0&off=0', buf.subarray(0, half))).status, 403);
+  assert.equal((await up(admin, 'id=' + id + '&i=1&off=0', buf.subarray(half))).status, 409, 'out of order chunk');
+  assert.equal((await up(admin, 'id=' + id + '&i=0&off=0', buf.subarray(0, half))).status, 200);
+  assert.equal((await up(admin, 'id=' + id + '&i=1&off=' + half, buf.subarray(half))).status, 200);
+  const s = await (await up(admin, 'id=' + id + '&done=1')).json(); assert.equal(s.kind, 'full'); assert.ok(s.entries >= 1);
+  const r = await up(admin, 'id=' + id + '&restore=1'); assert.equal(r.status, 200);
+  const all = (await api('/api/sync', { method: 'POST', token: admin, body: { since: 0, changes: [] } })).j;
+  const docs = all.docs || all.changes || [];
+  const get = (c, i) => docs.find(d => d.coll === c && d.id === i);
+  assert.equal(get('entries', 'rx1').data.name, 'قبل');
+  assert.ok(!get('entries', 'rx2') || get('entries', 'rx2').deleted);
+  const { db } = require('../server/server.js');
+  assert.ok(db.prepare("SELECT 1 FROM docs WHERE coll='audit' AND id='ax9' AND deleted=0").get(), 'audit added after the backup is kept');
+  assert.ok(db.prepare("SELECT 1 FROM docs WHERE coll='audit' AND data LIKE '%بازگردانی از فایل%'").get(), 'restore is logged');
+  assert.equal((await up(admin, 'id=' + id + '&restore=1')).status, 404, 'upload is consumed');
+  // فایل نامربوط رد می‌شود
+  const bid = 'ffffffffffffffff';
+  await up(admin, 'id=' + bid + '&i=0&off=0', zlib.gzipSync(Buffer.from('{"x":1}')));
+  assert.equal((await up(admin, 'id=' + bid + '&done=1')).status, 400);
+  assert.equal((await up(admin, 'id=' + bid + '&i=0&off=0', Buffer.from('not gzip'))).status, 200);
+  assert.equal((await up(admin, 'id=' + bid + '&done=1')).status, 400);
+});

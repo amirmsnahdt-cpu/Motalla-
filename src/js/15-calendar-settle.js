@@ -129,7 +129,11 @@ ACT.acct=()=>{if(!ME){showAuth();return}sheet(`<div class="sh-h"><b>حساب ک�
 ACT.bkLoad=()=>{BK=null;loadBk();render()};
 ACT.bkTog=(d,e)=>{const r=e.target.closest('.hrow');if(!r)return;r.classList.toggle('open')?bkOpen.add(d.n):bkOpen.delete(d.n)};
 ACT.bkShare=async()=>{const k=bkReady;if(!k)return;try{await navigator.share({files:[k.f],title:k.name});bkReady=null;closeSheet();toast('پشتیبان ذخیره شد ✓');bkSaved()}catch(e){if(e&&e.name==='AbortError')return;toast('ذخیره انجام نشد: '+(e&&e.message||''),true)}};
-ACT.bkDl=d=>bkFetch('/api/backups/'+d.n,d.n);
+ACT.bkUpPick=()=>{if(bkBusy)return;const i=document.createElement('input');i.type='file';i.style.display='none';i.onchange=()=>{const f=i.files&&i.files[0];i.remove();if(f)bkUpload(f)};document.body.appendChild(i);i.click()};
+ACT.bkUpGo=()=>{const u=bkUp;if(!u)return;askConfirm('مطمئنید؟ اطلاعات برنامه به وضعیت این فایل برمی‌گردد (از وضعیت فعلی پشتیبان گرفته می‌شود).','بله، بازگردانی',async()=>{
+  bkSet('bkUpPick','',null,'در حال بازگردانی…');try{const r=await fetch(API_BASE+'/api/backup/upload?id='+u.id+'&restore=1',{method:'POST',headers:{Authorization:'Bearer '+TOKEN},cache:'no-store'});let j=null;try{j=await r.json()}catch(e){}if(!r.ok)throw new Error((j&&j.error)||('خطای سرور ('+r.status+')'));
+    bkUp=null;closeSheet();await refreshAll();bkBusy=null;await loadBk();toast(j.changed||j.imgs?'بازگردانی انجام شد ✓ '+toFa(j.changed)+' مورد'+(j.imgs?' و '+toFa(j.imgs)+' عکس':''):'اطلاعات برنامه از قبل با این فایل یکی بود ✓')}catch(e){bkIdle();toast('بازگردانی انجام نشد: '+e.message,true)}})};
+ACT.bkDl=d=>bkFetch('/api/backups/'+d.n,d.n,d.n);
 ACT.bkFull=()=>bkFetch('/api/backup/full','motalla-full-'+todayISO()+'.json.gz');
 ACT.bkRestore=d=>askConfirm('همه واریزی‌ها، لیست‌ها و حساب‌ها به وضعیت این نسخه برمی‌گردند و تغییرات بعد از آن کنار می‌روند (قبلش از وضعیت فعلی نسخه گرفته می‌شود). ادامه می‌دهید؟','بله، بازگردانی',async()=>{
   toast('در حال بازگردانی…');try{const j=await api('/api/backups/'+d.n+'?restore=1',{});await syncNow();BK=await api('/api/backups');render();toast('بازگردانی انجام شد ✓ · '+toFa(j.changed)+' مورد تغییر کرد')}catch(e){toast(e.message,true)}});

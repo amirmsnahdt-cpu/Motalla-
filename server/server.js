@@ -199,6 +199,13 @@ function readBody(req, limit) {
     req.on('error', reject);
   });
 }
+function readRaw(req, limit) {
+  return new Promise((resolve, reject) => {
+    let size = 0; const chunks = [];
+    req.on('data', c => { size += c.length; if (size > limit) { reject(Object.assign(new Error('too large'), { code: 413 })); req.destroy(); return; } chunks.push(c); });
+    req.on('end', () => resolve(Buffer.concat(chunks))); req.on('error', reject);
+  });
+}
 function auth(req) {
   const h = req.headers.authorization || ''; const m = h.match(/^Bearer\s+([a-f0-9]{64})$/i); if (!m) return null;
   const row = q.session.get(sha(m[1])); if (!row || !row.active || row.expires_at < now()) return null;
@@ -378,6 +385,24 @@ async function handle(req, res) {
   if (p.startsWith('/api/users') || p.startsWith('/api/backup')) {
     if (me.role !== 'admin') return bad(res, 403, 'فقط مدیر دسترسی دارد');
     if (p === '/api/backups' && req.method === 'GET') return send(res, 200, { ...diskInfo(), last: (q.getMeta.get('last_backup') || {}).v || null, lastDl: (q.getMeta.get('last_download') || {}).v || null });
+    if (p === '/api/backup/upload' && req.method === 'POST') {
+      const id = String(url.searchParams.get('id') || ''); if (!UP_RE.test(id)) return bad(res, 400, 'درخواست نامعتبر');
+      const part = upPath(id, '.part');
+      if (url.searchParams.get('restore') === '1') return send(res, 200, { ok: true, ...restoreUpload(id, me.name) });
+      if (url.searchParams.get('done') === '1') {
+        if (!fs.existsSync(part)) return bad(res, 404, 'فایل کامل نرسید؛ دوباره انتخاب کنید');
+        let bk; try { bk = readBackupFile(fs.readFileSync(part)); } catch (e) { try { fs.unlinkSync(part); } catch (_) { } throw e; }
+        fs.renameSync(part, upPath(id, '.json.gz')); return send(res, 200, { ok: true, ...backupSummary(bk) });
+      }
+      // هر تکه با شماره‌اش؛ تکه اول فایل را از نو می‌سازد، بقیه به ترتیب اضافه می‌شوند
+      const i = +url.searchParams.get('i'), off = +url.searchParams.get('off'); if (!Number.isInteger(i) || i < 0 || !Number.isInteger(off) || off < 0) return bad(res, 400, 'درخواست نامعتبر');
+      const have = i === 0 ? 0 : (fs.existsSync(part) ? fs.statSync(part).size : -1);
+      if (have !== off) return bad(res, 409, 'ترتیب بارگذاری به هم خورد؛ دوباره انتخاب کنید');
+      const buf = await readRaw(req, 8 * 1048576);
+      if (have + buf.length > 1024 * 1048576) return bad(res, 413, 'فایل خیلی بزرگ است');
+      if (i === 0) fs.writeFileSync(part, buf); else fs.appendFileSync(part, buf);
+      return send(res, 200, { ok: true, size: have + buf.length });
+    }
     // گوشی بعد از ذخیره واقعی فایل خبر می‌دهد (دریافت فایل به‌تنهایی یعنی ذخیره شده نیست)
     if (p === '/api/backup/saved' && req.method === 'POST') { q.setMeta.run('last_download', now()); return send(res, 200, { ok: true }); }
     if (p === '/api/backups' && req.method === 'POST') { const f = makeBackup(true); return send(res, 200, { name: f, ...diskInfo() }); }
@@ -466,25 +491,59 @@ function diskInfo() {
   const bks = listBackups(); return { total, free, dbSize, imgCount: imgs.n, imgBytes: imgs.b, backups: bks, backupsSize: bks.reduce((a, b) => a + b.size, 0) };
 }
 // هر ۳۰ دقیقه: اگر ساعت تهران از ۳ گذشته و نسخه امروز ساخته نشده، بساز (بعد از هر راه‌اندازی هم بررسی می‌شود)
-function backupTick() { try { const h = new Date(Date.now() + 3.5 * 3600e3).getUTCHours(); if (h >= 3 || !listBackups().length) makeBackup(false); } catch (e) { console.error('backup failed', e); } }
+function backupTick() { cleanUploads(); try { const h = new Date(Date.now() + 3.5 * 3600e3).getUTCHours(); if (h >= 3 || !listBackups().length) makeBackup(false); } catch (e) { console.error('backup failed', e); } }
 setTimeout(backupTick, 60e3).unref(); setInterval(backupTick, 30 * 60e3).unref();
 /* بازگردانی: اسناد به وضعیت نسخه پشتیبان برمی‌گردند (کاربران و عکس‌ها دست نمی‌خورند)؛ همه گوشی‌ها با همگام‌سازی بعدی به‌روز می‌شوند */
 function restoreBackup(name, byName) {
   const f = path.join(BK_DIR, path.basename(name)); if (!/^motalla-\d{4}-\d{2}-\d{2}(?:-\d{4})?\.json\.gz$/.test(path.basename(name)) || !fs.existsSync(f)) throw Object.assign(new Error('نسخه پشتیبان پیدا نشد'), { code: 404 });
-  const bk = JSON.parse(zlib.gunzipSync(fs.readFileSync(f)).toString('utf8'));
+  return restoreDocs(JSON.parse(zlib.gunzipSync(fs.readFileSync(f)).toString('utf8')), byName);
+}
+/* تاریخچه (audit) فقط افزودنی است: ردیف‌های فعلی تاریخچه با بازگردانی پاک یا عوض نمی‌شوند، فقط ردیف‌های جاافتاده اضافه می‌شوند */
+function restoreDocs(bk, byName, extra) {
   makeBackup(true);   // قبل از بازگردانی، از وضعیت فعلی هم نسخه بگیر
   const want = new Map(bk.docs.map(d => [d.coll + '\u0000' + d.id, d])); let n = 0;
   tx(() => {
     for (const r of db.prepare('SELECT coll,id,data FROM docs WHERE deleted=0').all()) {
       const k = r.coll + '\u0000' + r.id, b = want.get(k);
+      if (r.coll === 'audit') { want.delete(k); continue; }
       if (!b) { q.putDoc.run(r.coll, r.id, null, 1, nextVer(), now(), byName); n++; }
       else if (JSON.stringify(b.data) !== r.data) { q.putDoc.run(r.coll, r.id, JSON.stringify(b.data), 0, nextVer(), now(), byName); n++; }
       want.delete(k);
     }
     for (const b of want.values()) { if (!COLLS.has(b.coll)) continue; q.putDoc.run(b.coll, String(b.id), JSON.stringify(b.data), 0, nextVer(), now(), byName); n++; }
+    if (extra) extra();
   });
   return n;
 }
+/* فایل پشتیبان بارگذاری‌شده از گوشی مدیر: تکه‌تکه می‌رسد، بررسی می‌شود، بعد با تأیید بازگردانی می‌شود */
+const UP_RE = /^[a-f0-9]{16}$/, upPath = (id, ext) => path.join(BK_DIR, 'up-' + id + ext);
+function readBackupFile(buf) {
+  let bk; try { bk = JSON.parse(zlib.gunzipSync(buf, { maxOutputLength: 2 ** 31 - 1 }).toString('utf8')); } catch (e) { throw Object.assign(new Error('این فایل پشتیبان بده بستون نیست یا خراب است'), { code: 400 }); }
+  if (!bk || bk.app !== 'motalla' || !Array.isArray(bk.docs)) throw Object.assign(new Error('این فایل پشتیبان بده بستون نیست'), { code: 400 });
+  return bk;
+}
+function backupSummary(bk) {
+  const c = k => bk.docs.filter(d => d.coll === k).length;
+  return { created_at: bk.created_at || null, kind: bk.kind || 'data', docs: bk.docs.length, entries: c('entries'), batches: c('batches'), custs: bk.docs.filter(d => d.coll === 'custs' && !(d.data && d.data.sys)).length, imgs: Array.isArray(bk.imgs) ? bk.imgs.length : 0 };
+}
+function restoreUpload(id, byName) {
+  const f = upPath(id, '.json.gz'); if (!fs.existsSync(f)) throw Object.assign(new Error('فایل بارگذاری‌شده پیدا نشد؛ دوباره انتخاب کنید'), { code: 404 });
+  const bk = readBackupFile(fs.readFileSync(f)), at = now(); let img = 0;
+  const n = restoreDocs(bk, byName, () => {
+    // عکس‌ها: عکس‌های فایل برمی‌گردند، عکس‌های فعلی پاک نمی‌شوند، و نسخه فعلی هر عکسِ عوض‌شده ۹۰ روز در imgs_old می‌ماند
+    for (const im of Array.isArray(bk.imgs) ? bk.imgs : []) {
+      if (!im || typeof im.k !== 'string' || typeof im.data !== 'string') continue;
+      const cur = q.getImg.get(im.k); if (cur && cur.data === im.data) continue;
+      if (cur) q.keepOldImg.run(at, byName, im.k);
+      q.putImg.run(im.k, im.data, im.updated_at || at); img++;
+    }
+    const aid = Date.now();
+    q.putDoc.run('audit', String(aid), JSON.stringify({ id: aid, type: 'restore', user: byName, ts: at, summary: 'بازگردانی از فایل پشتیبان', detail: 'فایل ' + (bk.created_at ? 'ساخته‌شده ' + bk.created_at.slice(0, 16).replace('T', ' ') : 'بدون تاریخ') + ' · ' + bk.docs.length + ' سند' }), 0, nextVer(), at, byName);
+  });
+  try { fs.unlinkSync(f); } catch (e) { }
+  return { changed: n, imgs: img };
+}
+function cleanUploads() { try { for (const f of fs.readdirSync(BK_DIR)) if (/^up-/.test(f) && Date.now() - fs.statSync(path.join(BK_DIR, f)).mtimeMs > 3 * 3600e3) fs.unlinkSync(path.join(BK_DIR, f)); } catch (e) { } }
 
 const server = http.createServer((req, res) => {
   handle(req, res).catch(e => { const code = e && e.code >= 400 && e.code < 600 ? e.code : 500; if (code === 500) console.error(e); try { bad(res, code, code === 413 ? 'حجم درخواست زیاد است' : code === 400 ? 'درخواست نامعتبر' : 'خطای سرور'); } catch (_) { } });

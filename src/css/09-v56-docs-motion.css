@@ -254,3 +254,15 @@ html.shopen body{background:#000}
 @media (prefers-reduced-motion:reduce){html.shopen #app{transform:none;filter:none;border-radius:0}.ov.ghost{display:none}#sheet.swap>*{animation:none}}
 /* v56.1: صفحه پشتیبان‌ها — دکمه دانلود به رنگ اصلی برنامه (آبی) در روشن و تیره */
 .btn.bkgo{background:var(--blu);color:#fff;box-shadow:0 10px 22px -12px var(--blu);border:0}
+/* v56.3: پیشرفت دانلود/بارگذاری روی خود دکمه (پر شدن از راست، با درصد) */
+.bkp{position:relative;overflow:hidden;isolation:isolate}
+.bkp .bkfill{position:absolute;inset:0 0 0 auto;width:calc(var(--p,0)*100%);background:currentColor;opacity:0;z-index:-1;transition:width .3s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.bkp.busy .bkfill{opacity:.2}
+.bkp.busy.ind .bkfill{width:38%;animation:bkind 1.15s cubic-bezier(.45,0,.55,1) infinite alternate}
+@keyframes bkind{from{transform:translateX(0)}to{transform:translateX(-163%)}}
+.bkp .bkl{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-variant-numeric:tabular-nums}
+.bkp.busy{cursor:default;opacity:1}
+.bkp:disabled{opacity:1}
+.bkspin{width:15px;height:15px;border-radius:50%;border:2.2px solid currentColor;border-top-color:transparent;animation:bkspin .8s linear infinite;flex:none}
+@keyframes bkspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.bkp.busy.ind .bkfill{animation:none;width:100%;opacity:.12}.bkspin{animation:none;border-top-color:currentColor;opacity:.6}.bkp .bkfill{transition:none}}
