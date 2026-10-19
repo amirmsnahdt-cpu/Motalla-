@@ -266,3 +266,54 @@ html.shopen body{background:#000}
 .bkspin{width:15px;height:15px;border-radius:50%;border:2.2px solid currentColor;border-top-color:transparent;animation:bkspin .8s linear infinite;flex:none}
 @keyframes bkspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.bkp.busy.ind .bkfill{animation:none;width:100%;opacity:.12}.bkspin{animation:none;border-top-color:currentColor;opacity:.6}.bkp .bkfill{transition:none}}
+/* v57: تغییرات شبا و مبلغ (مدیر) */
+.lrow.chgw .ic{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.lrow.chgw{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--warn) 55%,transparent)}
+.chl{display:flex;flex-direction:column;gap:8px}
+.chr{background:var(--card);border-radius:16px;padding:12px 14px;box-shadow:inset 0 0 0 1px var(--line)}
+.chr.new{box-shadow:inset 0 0 0 1.5px var(--warn)}
+.chr .cht{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chr .cht b{font-weight:800;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chr .chf{flex:none;font-size:11.5px;font-weight:800;color:var(--mut);background:var(--bg);border-radius:8px;padding:3px 8px}
+.chr.al .chf{color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.chr .chv{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 6px;font-size:13.5px;font-weight:800}
+.chr .chv .o{color:var(--mut);text-decoration:line-through;text-decoration-thickness:1px}
+.chr .chv .ar{color:var(--mut);font-weight:400}
+.chr .chv .nw{color:var(--ink)}
+.chr small{color:var(--mut);font-size:11.5px}
+.chx{font-style:normal;font-weight:600;opacity:.7}
+/* v57: قفل برنامه — صفحه رمز ۶ رقمی (شبیه آیفون، آبی برنامه) */
+.lk{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:max(24px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));overflow-y:auto;-webkit-user-select:none;user-select:none;animation:lkin .22s ease-out}
+.lk.hide{display:none}
+html.locked,html.locked body{overflow:hidden}
+@keyframes lkin{from{opacity:0}to{opacity:1}}
+.lkw{width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.lkmark{width:64px;height:64px;border-radius:20px;background:var(--blu);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 26px -14px var(--blu);margin-bottom:14px}
+.lkmark svg{width:30px;height:30px}
+.lkm{font-size:34px;font-weight:900;line-height:1}
+.lkt{font-size:21px;font-weight:900;color:var(--ink)}
+.lks{margin:6px 0 0;font-size:13.5px;color:var(--mut);line-height:1.8;min-height:22px}
+.lkd{display:flex;gap:14px;direction:ltr;margin:22px 0 4px}
+.lkd i{width:14px;height:14px;border-radius:50%;border:1.8px solid var(--blu);transition:background .12s,transform .12s}
+.lkd i.on{background:var(--blu);transform:scale(1.05)}
+.lkd.shake{animation:lkshake .38s cubic-bezier(.36,.07,.19,.97)}
+@keyframes lkshake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.lkerr{margin:6px 0 0;min-height:20px;font-size:12.5px;font-weight:800;color:var(--red);line-height:1.7}
+.lkp{display:grid;grid-template-columns:repeat(3,76px);gap:16px 22px;direction:ltr;margin-top:12px}
+.lkp button{width:76px;height:76px;border-radius:50%;border:0;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line),0 6px 16px -12px rgba(15,30,70,.35);font:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s}
+.lkp button b{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
+.lkp button:active{transform:scale(.92);background:var(--blu);color:#fff}
+.lkp .lkf{background:none;box-shadow:none;color:var(--blu)}
+.lkp .lkf svg{width:30px;height:30px}
+.lkp .lkf:active{background:none;color:var(--blu);opacity:.6}
+.lkl{margin-top:20px;min-height:44px;padding:0 12px;border:0;background:none;color:var(--blu);font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.lkbtns{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:22px}
+.lkbtns .btn{flex:none;width:100%}
+.lkrows{display:flex;flex-direction:column;gap:8px}
+.lkrow{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:8px 12px;border:0;border-radius:16px;background:var(--card);box-shadow:0 1px 0 var(--line);color:var(--ink);font:inherit;text-align:start;cursor:pointer}
+.lkrow .lki{width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--blu) 12%,transparent);color:var(--blu);display:flex;align-items:center;justify-content:center;flex:none}
+.lkrow .lki svg{width:20px;height:20px}
+.lkrow .tx{display:flex;flex-direction:column;gap:2px}.lkrow .tx b{font-size:15px}.lkrow .tx small{font-size:12px;color:var(--mut)}
+.lkrow.r{color:var(--red)}.lkrow.r .lki{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
+@media (max-height:640px){.lkp{grid-template-columns:repeat(3,66px);gap:12px 20px}.lkp button{width:66px;height:66px}.lkd{margin-top:14px}}
+@media (prefers-reduced-motion:reduce){.lk,.lkd.shake{animation:none}}

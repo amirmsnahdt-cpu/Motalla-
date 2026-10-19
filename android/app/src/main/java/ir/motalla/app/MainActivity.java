@@ -3,11 +3,13 @@ package ir.motalla.app;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CancellationSignal;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,6 +27,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -149,8 +153,44 @@ public class MainActivity extends Activity {
         runOnUiThread(() -> Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show());
     }
 
+    /** نتیجه اثر انگشت به صفحه برمی‌گردد (قفل برنامه) */
+    private void bioResult(final boolean ok, final String msg) {
+        ui.post(() -> { if (web != null) web.evaluateJavascript("window.__bioDone&&window.__bioDone(" + ok + "," + JSONObject.quote(msg == null ? "" : msg) + ")", null); });
+    }
+
     /** پل جاوااسکریپت ← اندروید */
     private class Bridge {
+        /** آیا این گوشی اثر انگشت/چهره ثبت‌شده دارد؟ (اندروید ۹ به بالا) */
+        @JavascriptInterface
+        public boolean bioAvailable() {
+            try {
+                if (Build.VERSION.SDK_INT >= 29) {
+                    android.hardware.biometrics.BiometricManager bm = getSystemService(android.hardware.biometrics.BiometricManager.class);
+                    return bm != null && bm.canAuthenticate() == android.hardware.biometrics.BiometricManager.BIOMETRIC_SUCCESS;
+                }
+                if (Build.VERSION.SDK_INT >= 28) return getPackageManager().hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
+            } catch (Exception ignored) { }
+            return false;
+        }
+
+        /** پنجره اثر انگشت سیستم؛ نتیجه با window.__bioDone(ok, msg) */
+        @JavascriptInterface
+        public void bioAuth(final String title) {
+            if (Build.VERSION.SDK_INT < 28) { bioResult(false, "unsupported"); return; }
+            runOnUiThread(() -> {
+                try {
+                    android.hardware.biometrics.BiometricPrompt p = new android.hardware.biometrics.BiometricPrompt.Builder(MainActivity.this)
+                        .setTitle(title == null || title.isEmpty() ? "بده بستون" : title)
+                        .setNegativeButton("رمز عددی", getMainExecutor(), (d, w) -> bioResult(false, "cancel"))
+                        .build();
+                    p.authenticate(new CancellationSignal(), getMainExecutor(), new android.hardware.biometrics.BiometricPrompt.AuthenticationCallback() {
+                        @Override public void onAuthenticationSucceeded(android.hardware.biometrics.BiometricPrompt.AuthenticationResult r) { bioResult(true, ""); }
+                        @Override public void onAuthenticationError(int code, CharSequence msg) { bioResult(false, String.valueOf(msg)); }
+                    });
+                } catch (Exception e) { bioResult(false, String.valueOf(e.getMessage())); }
+            });
+        }
+
         @JavascriptInterface
         public boolean saveFile(String name, String base64, String mime) {
             try {

@@ -131,3 +131,62 @@ test('بازگردانی از فایل پشتیبان: تکه‌تکه، برر�
   assert.equal((await up(admin, 'id=' + bid + '&i=0&off=0', Buffer.from('not gzip'))).status, 200);
   assert.equal((await up(admin, 'id=' + bid + '&done=1')).status, 400);
 });
+
+test('امنیت: کارمند بدون مجوز ویرایش، شبا و مبلغ را عوض نمی‌کند؛ تغییرها روی سرور ثبت و به مدیر اعلام می‌شوند', async () => {
+  const sync = (t, changes) => api('/api/sync', { method: 'POST', token: t, body: { since: 0, changes } });
+  const IB = 'IR000000000000000000000001', IB2 = 'IR000000000000000000000002';
+  // کارمندی که فقط پیگیری دارد
+  assert.equal((await api('/api/users', { method: 'POST', token: admin, body: { username: 'tracker', name: 'پیگیر', password: 'secret123', perms: ['track', 'add'] } })).status, 200);
+  const tr = (await api('/api/login', { method: 'POST', body: { username: 'tracker', password: 'secret123' } })).j.token;
+  const e0 = { id: 's1', name: 'مشتری', amount: 1000, iban: IB, settles: [] };
+  assert.equal((await sync(tr, [{ coll: 'entries', id: 's1', data: e0 }])).j.rejected.length, 0, 'add is allowed');
+  let r = await sync(tr, [{ coll: 'entries', id: 's1', base: e0, data: { ...e0, iban: IB2 } }]);
+  assert.equal(r.j.rejected.length, 1); assert.equal(r.j.changes.find(c => c.coll === 'entries' && c.id === 's1').data.iban, IB, 'server keeps the old IBAN');
+  r = await sync(tr, [{ coll: 'entries', id: 's1', base: e0, data: { ...e0, amount: 5 } }]); assert.equal(r.j.rejected.length, 1);
+  // کارهای عادی پیگیری (تسویه، وضعیت) همچنان مجاز است
+  const e1 = { ...e0, status: 'ok', settles: [{ amount: 200 }] };
+  r = await sync(tr, [{ coll: 'entries', id: 's1', base: e0, data: e1 }]); assert.equal(r.j.rejected.length, 0);
+  // لیست پیگیری: ردیف تازه با شبای جعلی رد، با شبای درست قبول؛ مبلغ مانده بعد از تسویه مجاز، مبلغ دلخواه رد
+  r = await sync(tr, [{ coll: 'batches', id: 'b1', data: { id: 'b1', items: [{ id: 's1', iban: IB2, amount: 1000 }] } }]); assert.equal(r.j.rejected.length, 1);
+  const b0 = { id: 'b1', items: [{ id: 's1', iban: IB, amount: 1000, name: 'مشتری' }] };
+  r = await sync(tr, [{ coll: 'batches', id: 'b1', data: b0 }]); assert.equal(r.j.rejected.length, 0);
+  r = await sync(tr, [{ coll: 'batches', id: 'b1', base: b0, data: { id: 'b1', items: [{ ...b0.items[0], amount: 800 }] } }]); assert.equal(r.j.rejected.length, 0, 'remaining after settlement');
+  const b1 = { id: 'b1', items: [{ ...b0.items[0], amount: 800 }] };
+  r = await sync(tr, [{ coll: 'batches', id: 'b1', base: b1, data: { id: 'b1', items: [{ ...b1.items[0], amount: 50 }] } }]); assert.equal(r.j.rejected.length, 1);
+  r = await sync(tr, [{ coll: 'batches', id: 'b1', base: b1, data: { id: 'b1', items: [{ ...b1.items[0], iban: IB2 }] } }]); assert.equal(r.j.rejected.length, 1);
+  // کارمند با مجوز ویرایش می‌تواند؛ و تغییر ثبت می‌شود
+  r = await sync(staff, [{ coll: 'entries', id: 's1', base: e1, data: { ...e1, iban: IB2 } }]); assert.equal(r.j.rejected.length, 0);
+  const lg = await api('/api/changes', { token: admin }); assert.equal(lg.status, 200);
+  const row = lg.j.rows.find(x => x.doc === 's1' && x.field === 'iban'); assert.ok(row); assert.equal(row.old, IB); assert.equal(row.new, IB2); assert.equal(row.user, 'clerk'); assert.equal(row.alert, 1);
+  assert.ok(!lg.j.rows.some(x => x.coll === 'batches' && x.field === 'amount'), 'settlement-driven amount is not an alert');
+  // اعلان به مدیر و «دیدم»
+  let a = await sync(admin, []); assert.ok(a.j.chg >= 1);
+  assert.equal((await api('/api/changes', { token: staff })).status, 403);
+  assert.equal((await api('/api/changes/seen', { method: 'POST', token: admin, body: { n: Math.max(...lg.j.rows.map(x => x.n)) } })).status, 200);
+  a = await sync(admin, []); assert.equal(a.j.chg, 0);
+  assert.equal((await sync(staff, [])).j.chg, undefined, 'staff gets no count');
+});
+
+test('امنیت: قفل ورود با IP جعلی دور زده نمی‌شود، رمز تازه ۸ حرفی، هدرهای امنیتی', async () => {
+  const login = (xff, pw) => fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': xff + ', 10.0.0.7' }, body: JSON.stringify({ username: 'viewer', password: pw }) });
+  for (let i = 0; i < 5; i++) await login('1.1.1.' + i, 'nope-' + i);
+  assert.equal((await login('9.9.9.9', 'secret123')).status, 429, 'changing the forged first IP does not reset the lock');
+  assert.equal((await api('/api/users', { method: 'POST', token: admin, body: { username: 'short', name: 's', password: 'abc123' } })).status, 400);
+  assert.equal((await api('/api/users', { method: 'POST', token: admin, body: { username: 'longok', name: 's', password: 'abcd1234' } })).status, 200);
+  const h = await fetch(base + '/index.html', { headers: { 'X-Forwarded-Proto': 'https' } });
+  assert.equal(h.headers.get('x-frame-options'), 'DENY'); assert.match(h.headers.get('content-security-policy'), /frame-ancestors 'none'/);
+  assert.ok(h.headers.get('strict-transport-security')); assert.equal(h.headers.get('referrer-policy'), 'same-origin');
+  assert.equal((await fetch(base + '/api/status')).headers.get('x-frame-options'), 'DENY');
+});
+
+test('پیش‌نمایش githack فقط برای مدیر؛ نشست ۳۰ روزه', async () => {
+  const P = { Origin: 'https://raw.githack.com', 'Content-Type': 'application/json' };
+  const lg = (u) => fetch(base + '/api/login', { method: 'POST', headers: P, body: JSON.stringify({ username: u, password: 'secret123' }) });
+  assert.equal((await lg('clerk')).status, 403, 'staff cannot log in from preview');
+  const ad = await lg('boss'); assert.equal(ad.status, 200, 'admin can log in from preview');
+  assert.equal((await fetch(base + '/api/me', { headers: { ...P, Authorization: 'Bearer ' + staff } })).status, 403, 'staff token rejected from preview');
+  assert.equal((await fetch(base + '/api/me', { headers: { Authorization: 'Bearer ' + staff } })).status, 200, 'staff still fine in the real app');
+  const { db } = require('../server/server.js');
+  const max = db.prepare('SELECT MAX(expires_at) m FROM sessions').get().m;
+  assert.ok(Date.parse(max) <= Date.now() + 30 * 864e5 + 60e3, 'sessions last at most 30 days');
+});

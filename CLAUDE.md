@@ -36,6 +36,7 @@ change the existing definition instead of adding a later redefinition). Section 
 | 15b-images | receipt photos: several per bank deposit (`x.imgs`) and per customer settlement (`z.imgs`), gallery (`openGal`), full-screen zoom/rotate/crop viewer (`zvOpen`) |
 | 15d-sales | sales invoice (`vSell`, `sv`, `itCalc`, `svTot`), invoice page/print (`vInv`, `invDoc`), POS terminals & our bank accounts (`CH`, `chBal`, `chMoves`), balance transfer between customers (`xs`) and gold↔rial conversion (`cv`), customer groups & goods list (`cfgRec`) |
 | 15c-pay-split | pay one deposit from several sources: linked piece entries (`splitOf`), `famOf`, `psApply` |
+| 15f-lock | app lock: 6-digit PIN per device (`m_lock`, PBKDF2 hash, tied to the username), auto-lock after 20 min idle (`m_lock_at`), Face ID via WebAuthn / Android fingerprint via `AndroidBridge.bioAuth`, 5 wrong = sync then safe logout; settings sheet `lockSheet`, one-time offer `lockOffer` |
 | 16-boot | startup: initial render, listeners |
 
 CSS files are split by version era (01-base, 02-v21-v22 … 08-v52-list-photos), not by topic — grep the selector.

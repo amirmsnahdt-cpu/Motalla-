@@ -17,7 +17,7 @@ const PERM_OF={entCommit:'track',mvNew:'src',entMove:'split',partMoveAll:'split'
   credNew:'debt',credSave:'debt',credEdit:'debt',payNew:'debt',paySave:'debt',payEdit:'debt',payOk:'debt',wzSave:'debt',toDebt:'debt',
   srcMgr:'src',srcSet:'src',saveSrc:'src',addSrc:'src',delSrc:'src',delSrcGo:'src',undoEv:'undo',restoreOne:'undo',restoreAll:'undo',
   expAll:'export',expOpen:'export',expPdf:'export',expText:'export',expXls:'export',dayExp:'export',dayPdf:'export',ldExp:'export',ldText:'export',ldPdf:'export',ldXls:'export',dayText:'export',dayXls:'export',partsExp:'export',partExp:'export',lexp:'export',tkReport:'export',credPdf:'export',credStmt:'export',
-  bkShare:'admin',bkUpPick:'admin',bkUpGo:'admin',bkDl:'admin',bkFull:'admin',bkRestore:'admin',userNew:'admin',userEdit:'admin',userCreate:'admin',userSave:'admin',userDel:'admin',backup:'admin'};
+  bkShare:'admin',chgOpen:'admin',chgSeen:'admin',bkUpPick:'admin',bkUpGo:'admin',bkDl:'admin',bkFull:'admin',bkRestore:'admin',userNew:'admin',userEdit:'admin',userCreate:'admin',userSave:'admin',userDel:'admin',backup:'admin'};
 const permFor=(k,d)=>{const v=PERM_OF[k];return typeof v==='function'?v(d):v||null};
 const canAct=(k,d)=>{const p=permFor(k,d);return !p||(p==='admin'?isAdmin():can(p))};
 /* دکمه‌هایی که بدون دسترسی پنهان می‌شوند (ردیف‌ها پنهان نمی‌شوند؛ فقط کار مسدود می‌شود) */
@@ -80,7 +80,7 @@ async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.bu
       const j=r?sj(r):null;sent[pk]=j;changes.push({coll:c,id,base:SY.pend[pk]===null?null:JSON.parse(SY.pend[pk]),data:r?JSON.parse(j):null})}
     if(changes.length)setSync('busy');
     let res=await api('/api/sync',{since:SY.since,changes});try{if(res&&res.me)meUpdate(res.me)}catch(e){}try{if(res&&+res.v>APP_V){if(location.hostname==='raw.githack.com')checkUpdate(false);else updFound(+res.v)}}catch(e){}
-    applyRemote(res,sent);
+    applyRemote(res,sent);try{chgNote(res.chg)}catch(e){}
     while(res.more){res=await api('/api/sync',{since:SY.since,changes:[]});applyRemote(res,{})}
     if(res.rejected&&res.rejected.length)toast(res.rejected[0].why||'این تغییر مجاز نبود',true);
     SY.last=Date.now();rawSet('m_srv',1);setSync(pendN()?'busy':'ok','');flushImgs();
@@ -141,7 +141,7 @@ function authForm(mode,msg){const a=$('auth'),su=mode==='setup';
   const f=a.querySelector('#authf');f.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ACT[su?'authSetup':'authLogin']()}});setTimeout(()=>{const i=$(su?'an':'au');if(i)i.focus()},80)}
 function authErr(m){const e=$('aerr');if(e)e.innerHTML=`<div class="msg bad">${esc(m)}</div>`;const b=$('abtn');if(b){b.disabled=false;b.classList.remove('wait')}}
 function authBusy(){const b=$('abtn');if(b){b.disabled=true;b.classList.add('wait')}const e=$('aerr');if(e)e.innerHTML=''}
-function loggedIn(r){TOKEN=r.token;try{localStorage.setItem('m_token',TOKEN)}catch(e){}ME=r.user;rawSet('m_me',ME);user=ME.name;applyPerms();$('auth').classList.add('hide');$('auth').innerHTML='';
+function loggedIn(r){TOKEN=r.token;try{localStorage.setItem('m_token',TOKEN)}catch(e){}ME=r.user;rawSet('m_me',ME);user=ME.name;applyPerms();$('auth').classList.add('hide');$('auth').innerHTML='';try{lockTouch(true);setTimeout(lockOffer,2500)}catch(e){}
   const hasLocal=entries.length||batches.length||creds.length||Object.values(drafts).some(v=>v&&v.length);
   if(hasLocal&&!ls.get('m_srv',0)&&isAdmin()){render(true);sheet(`<div class="sh-h"><b>انتقال اطلاعات این گوشی به سرور</b></div><div class="muted" style="font-size:13.5px;line-height:1.9;margin:-4px 2px 12px">این گوشی ${fmt(entries.length)} واریزی، ${fmt(batches.length)} لیست پیگیری و ${fmt(creds.length)} حساب بدهی دارد که قبل از اتصال به سرور ثبت شده‌اند. منتقل شوند تا همه همکاران ببینند؟</div><div class="row"><button class="btn sec" data-act="migNo">نه، فقط اطلاعات سرور</button><button class="btn gold" data-act="migYes">انتقال به سرور</button></div>`);return}
   startFresh(false)}
@@ -153,7 +153,7 @@ function forceLogout(msg){TOKEN='';ME=null;try{localStorage.removeItem('m_token'
 const ROLE={admin:'مدیر',staff:'کارمند'};
 function pwSheet(){sheet(`<div class="sh-h"><b>تغییر رمز عبور</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="f"><label>رمز فعلی</label><input id="po" class="ltr" type="password" autocomplete="current-password"></div>
-  <div class="f"><label>رمز جدید <i>(حداقل ۶ کاراکتر)</i></label><input id="pn1" class="ltr" type="password" autocomplete="new-password"></div>
+  <div class="f"><label>رمز جدید <i>(حداقل ۸ کاراکتر)</i></label><input id="pn1" class="ltr" type="password" autocomplete="new-password"></div>
   <div class="f"><label>تکرار رمز جدید</label><input id="pn2" class="ltr" type="password" autocomplete="new-password"></div>
   <div class="row"><button class="btn gold" data-act="pwSave">ذخیره رمز جدید</button></div>`);setTimeout(()=>$('po')&&$('po').focus(),60)}
 /* ---------- مدیریت کاربران ---------- */
@@ -235,9 +235,9 @@ function vSettings(){const sgi=(act,icn,cls,t,sub,extra,attrs)=>`<button class="
   let h='<div class="stg">';
   if(ME)h+=`<div class="prof"><div class="av">${esc(userInit(ME.name))}</div><div class="tx"><b>${esc(ME.name)}</b><div class="ln"><span class="pill ${isAdmin()?'gd':'g'}">${ROLE[ME.role]||ME.role}</span><bdi dir="ltr">@${esc(ME.username)}</bdi></div><div class="ln"><span class="sdot ${SY.state}"></span><span class="slbl">${esc(syncLabel())}</span></div></div></div>`;
   h+=`<div class="sgh">ظاهر</div><div class="sgr"><div class="thm">${THEMES.map(([k,t,sub,c])=>`<button class="${themePref===k?'on':''}" data-act="setTheme" data-t="${k}" aria-pressed="${themePref===k}">${pv(c)}<span>${t}</span><small>${sub}</small></button>`).join('')}</div>${IOS_SA?`<div class="thn">آیفون رنگ نوار ساعت و باتری را فقط موقع باز شدن برنامه می‌خواند؛ بعد از عوض کردن حالت، برنامه را یک بار کامل ببندید و دوباره باز کنید.</div>`:''}</div>`;
-  if(ME){h+=`<div class="sgh">حساب</div><div class="sgr">${sgi('pwSheet','key','','تغییر رمز عبور','رمز ورود خودتان را عوض کنید')}</div>`;
+  if(ME){h+=`<div class="sgh">حساب</div><div class="sgr">${sgi('pwSheet','key','','تغییر رمز عبور','رمز ورود خودتان را عوض کنید')}${sgi('lockSheet','padlock','',"قفل برنامه",lockCfg()?'روشن · رمز ۶ رقمی'+(lockCfg().bio?' و '+bioName():''):'خاموش · رمز ۶ رقمی و '+bioName())}</div>`;
     if(!isAdmin())h+=`<div class="sgh">دسترسی‌های من</div><div class="sgr"><div class="mpl">${PERMS.map(([k,t])=>`<span class="pill ${can(k)?'okp':'g off'}">${can(k)?'✓':'—'} ${t}</span>`).join('')}</div></div>`+(can('src')?`<div class="sgh">مدیریت</div><div class="sgr">${sgi('tab','bank','g','حساب‌های بانکی','موجودی، لوگو و منبع‌های تقسیم',null,' data-n="banks"')}</div>`:'');
-    if(isAdmin())h+=`<div class="sgh">مدیریت</div><div class="sgr">${sgi('go','users','g','کاربران','افزودن همکار، رمز عبور و دسترسی',null,' data-n="users"')}${sgi('tab','bank','g','حساب‌های بانکی','موجودی، لوگو و منبع‌های تقسیم',null,' data-n="banks"')}${sgi('go','down','g','پشتیبان‌ها','خودکار هر شب · دانلود و بازگردانی'+(bkDlAgo()===null||bkDlAgo()>=7?' · نسخه روی گوشی قدیمی است':''),null,' data-n="backups"')}${sgi('shareInstall','share','g','لینک نصب آیفون','برای همکاران · از Safari به صفحه اصلی',null,' data-os="ios"')}${sgi('shareInstall','share','g','لینک نصب اندروید','برای همکاران · فایل نصب اپ',null,' data-os="and"')}</div>`}
+    if(isAdmin())h+=`<div class="sgh">مدیریت</div><div class="sgr">${sgi('go','users','g','کاربران','افزودن همکار، رمز عبور و دسترسی',null,' data-n="users"')}${sgi('tab','bank','g','حساب‌های بانکی','موجودی، لوگو و منبع‌های تقسیم',null,' data-n="banks"')}${sgi('chgOpen','clock','g','تغییرات شبا و مبلغ','چه کسی، کی، از چه به چه'+(CHG?' · '+toFa(CHG)+' تغییر تازه':''))}${sgi('go','down','g','پشتیبان‌ها','خودکار هر شب · دانلود و بازگردانی'+(bkDlAgo()===null||bkDlAgo()>=7?' · نسخه روی گوشی قدیمی است':''),null,' data-n="backups"')}${sgi('shareInstall','share','g','لینک نصب آیفون','برای همکاران · از Safari به صفحه اصلی',null,' data-os="ios"')}${sgi('shareInstall','share','g','لینک نصب اندروید','برای همکاران · فایل نصب اپ',null,' data-os="and"')}</div>`}
   const isAnd=/MotallaAndroid/.test(navigator.userAgent),oldApk=isAnd&&!(window.AndroidBridge&&AndroidBridge.version);
   if(oldApk)h+=`<div class="sgr" style="margin-top:12px;border-color:var(--gold)">${sgi('getApk','down','g','نسخه جدید اپ اندروید آماده است','برای چاپ PDF و امکانات جدید نصب کنید؛ روی همین برنامه نصب می‌شود و اطلاعات پاک نمی‌شود')}</div>`;
   h+=`<div class="sgh">برنامه</div><div class="sgr">${sgi('checkUpd','refresh','k','بررسی به‌روزرسانی','نسخه '+toFa(APP_V),'')}${!isAnd&&/Android/i.test(navigator.userAgent)?sgi('getApk','down','k','نصب اپ اندروید','دانلود فایل نصب'):''}</div>`;
