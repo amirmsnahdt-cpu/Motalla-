@@ -378,11 +378,12 @@ async function handle(req, res) {
   if (p.startsWith('/api/users') || p.startsWith('/api/backup')) {
     if (me.role !== 'admin') return bad(res, 403, 'فقط مدیر دسترسی دارد');
     if (p === '/api/backups' && req.method === 'GET') return send(res, 200, { ...diskInfo(), last: (q.getMeta.get('last_backup') || {}).v || null, lastDl: (q.getMeta.get('last_download') || {}).v || null });
+    // گوشی بعد از ذخیره واقعی فایل خبر می‌دهد (دریافت فایل به‌تنهایی یعنی ذخیره شده نیست)
+    if (p === '/api/backup/saved' && req.method === 'POST') { q.setMeta.run('last_download', now()); return send(res, 200, { ok: true }); }
     if (p === '/api/backups' && req.method === 'POST') { const f = makeBackup(true); return send(res, 200, { name: f, ...diskInfo() }); }
     const bm = p.match(/^\/api\/backups\/(motalla-\d{4}-\d{2}-\d{2}(?:-\d{4})?\.json\.gz)$/);
     if (bm && req.method === 'GET') {
       const f = path.join(BK_DIR, bm[1]); if (!fs.existsSync(f)) return bad(res, 404, 'پیدا نشد');
-      q.setMeta.run('last_download', now());
       res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Disposition': 'attachment; filename="' + bm[1] + '"', 'Cache-Control': 'no-store' });
       fs.createReadStream(f).pipe(res); return;
     }
@@ -391,7 +392,6 @@ async function handle(req, res) {
       // نسخه کامل با عکس‌ها (فشرده) برای نگهداری بیرون از سرور
       const out = { ...backupData(), kind: 'full', imgs: db.prepare('SELECT k,data,updated_at FROM imgs').all() };
       const gz = zlib.gzipSync(Buffer.from(JSON.stringify(out)));
-      q.setMeta.run('last_download', now());
       res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Length': gz.length, 'Content-Disposition': 'attachment; filename="motalla-full-' + tehranDay() + '.json.gz"', 'Cache-Control': 'no-store' });
       res.end(gz); return;
     }

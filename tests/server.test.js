@@ -95,5 +95,8 @@ test('پشتیبان: ساخت، فهرست و ثبت زمان دانلود', as
   const mk = await api('/api/backups', { method: 'POST', token: admin }); assert.equal(mk.status, 200);
   let l = await api('/api/backups', { token: admin }); assert.ok(l.j.backups.length >= 1); assert.equal(l.j.lastDl, null);
   const r = await fetch(base + '/api/backup/full', { headers: { Authorization: 'Bearer ' + admin } }); assert.equal(r.status, 200); await r.arrayBuffer();
+  l = await api('/api/backups', { token: admin }); assert.equal(l.j.lastDl, null, 'fetching alone is not a saved backup');
+  assert.equal((await api('/api/backup/saved', { method: 'POST', token: staff })).status, 403);
+  assert.equal((await api('/api/backup/saved', { method: 'POST', token: admin })).status, 200);
   l = await api('/api/backups', { token: admin }); assert.ok(l.j.lastDl);
 });

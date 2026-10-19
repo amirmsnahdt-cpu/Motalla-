@@ -17,7 +17,7 @@ const PERM_OF={entCommit:'track',mvNew:'src',entMove:'split',partMoveAll:'split'
   credNew:'debt',credSave:'debt',credEdit:'debt',payNew:'debt',paySave:'debt',payEdit:'debt',payOk:'debt',wzSave:'debt',toDebt:'debt',
   srcMgr:'src',srcSet:'src',saveSrc:'src',addSrc:'src',delSrc:'src',delSrcGo:'src',undoEv:'undo',restoreOne:'undo',restoreAll:'undo',
   expAll:'export',expOpen:'export',expPdf:'export',expText:'export',expXls:'export',dayExp:'export',dayPdf:'export',ldExp:'export',ldText:'export',ldPdf:'export',ldXls:'export',dayText:'export',dayXls:'export',partsExp:'export',partExp:'export',lexp:'export',tkReport:'export',credPdf:'export',credStmt:'export',
-  bkNow:'admin',bkDl:'admin',bkFull:'admin',bkRestore:'admin',userNew:'admin',userEdit:'admin',userCreate:'admin',userSave:'admin',userDel:'admin',backup:'admin'};
+  bkShare:'admin',bkDl:'admin',bkFull:'admin',bkRestore:'admin',userNew:'admin',userEdit:'admin',userCreate:'admin',userSave:'admin',userDel:'admin',backup:'admin'};
 const permFor=(k,d)=>{const v=PERM_OF[k];return typeof v==='function'?v(d):v||null};
 const canAct=(k,d)=>{const p=permFor(k,d);return !p||(p==='admin'?isAdmin():can(p))};
 /* دکمه‌هایی که بدون دسترسی پنهان می‌شوند (ردیف‌ها پنهان نمی‌شوند؛ فقط کار مسدود می‌شود) */
@@ -274,7 +274,7 @@ let quietT=0;function quietRefresh(){if(!TOKEN||Date.now()-quietT<2500)return;qu
     if(st.lk!=='v')return;e.preventDefault();d=Math.min(MAX,dy*0.5);show(d,false);if(d>=TH&&!st.hp){st.hp=1;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}}},{passive:false});
   const end=async()=>{if(!st)return;const lk=st.lk;st=null;if(lk!=='v')return;const v=V();v.style.transition='transform .3s cubic-bezier(.2,.8,.2,1)';P.style.transition='transform .3s,opacity .3s';{const pn=hp(),l=pn&&pn.querySelector('.blist,.bempty');if(l)l.style.transition='transform .3s cubic-bezier(.2,.8,.2,1)'}
     if(d<TH){show(0,false);return}
-    busy=true;show(56,true);loading(true);const t0=Date.now();let r;try{r=await refreshAll()}catch(_){r={off:true}}
+    busy=true;show(56,true);loading(true);const t0=Date.now();let r;try{r=await refreshAll();if(cur==='backups'&&isAdmin())await loadBk()}catch(_){r={off:true}}
     const w=600-(Date.now()-t0);if(w>0)await new Promise(x=>setTimeout(x,w));
     loading(false);busy=false;show(0,false);
     const vv=V(),y=vv.scrollTop;render();vv.scrollTop=y;flashNew();vv.classList.remove('in','bk');void vv.offsetWidth;vv.classList.add('in');refreshMsg(r)};

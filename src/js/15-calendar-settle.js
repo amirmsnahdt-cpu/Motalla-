@@ -128,7 +128,7 @@ ACT.acct=()=>{if(!ME){showAuth();return}sheet(`<div class="sh-h"><b>حساب ک�
   <div class="ver">مطلا · نسخه ${toFa(APP_V)}</div>`)};
 ACT.bkLoad=()=>{BK=null;loadBk();render()};
 ACT.bkTog=(d,e)=>{const r=e.target.closest('.hrow');if(!r)return;r.classList.toggle('open')?bkOpen.add(d.n):bkOpen.delete(d.n)};
-ACT.bkNow=async()=>{toast('در حال ساخت پشتیبان…');try{await api('/api/backups',{});BK=await api('/api/backups');render();toast('پشتیبان روی سرور ساخته شد ✓')}catch(e){toast(e.message,true)}};
+ACT.bkShare=async()=>{const k=bkReady;if(!k)return;try{await navigator.share({files:[k.f],title:k.name});bkReady=null;closeSheet();toast('پشتیبان ذخیره شد ✓');bkSaved()}catch(e){if(e&&e.name==='AbortError')return;toast('ذخیره انجام نشد: '+(e&&e.message||''),true)}};
 ACT.bkDl=d=>bkFetch('/api/backups/'+d.n,d.n);
 ACT.bkFull=()=>bkFetch('/api/backup/full','motalla-full-'+todayISO()+'.json.gz');
 ACT.bkRestore=d=>askConfirm('همه واریزی‌ها، لیست‌ها و حساب‌ها به وضعیت این نسخه برمی‌گردند و تغییرات بعد از آن کنار می‌روند (قبلش از وضعیت فعلی نسخه گرفته می‌شود). ادامه می‌دهید؟','بله، بازگردانی',async()=>{

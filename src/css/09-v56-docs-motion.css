@@ -252,3 +252,5 @@ html.shopen body{background:#000}
 /* پیام پایین (toast): فنری */
 #toast{transition:transform .5s var(--spring),opacity .25s!important}
 @media (prefers-reduced-motion:reduce){html.shopen #app{transform:none;filter:none;border-radius:0}.ov.ghost{display:none}#sheet.swap>*{animation:none}}
+/* v56.1: صفحه پشتیبان‌ها — دکمه دانلود به رنگ اصلی برنامه (آبی) در روشن و تیره */
+.btn.bkgo{background:var(--blu);color:#fff;box-shadow:0 10px 22px -12px var(--blu);border:0}
