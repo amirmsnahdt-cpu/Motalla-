@@ -14,15 +14,15 @@ jobs:
         with: { distribution: temurin, java-version: '17' }
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: '8.7' }
-      - name: کلید امضا از Secrets (اگر تنظیم شده باشد)
-        env: { KS: '${{ secrets.ANDROID_KEYSTORE_B64 }}' }
+      - name: کلید امضا از Secrets (بدون آن، APK ساخته نمی‌شود)
+        env: { KS: '${{ secrets.ANDROID_KEYSTORE_B64 }}', KP: '${{ secrets.ANDROID_KEY_PASS }}', KA: '${{ secrets.ANDROID_KEY_ALIAS }}' }
         run: |
-          if [ -n "$KS" ]; then
-            echo "$KS" | base64 -d > "$RUNNER_TEMP/release.keystore"
-            echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> $GITHUB_ENV
-          else
-            echo "::warning::کلید امضا در Secrets نیست؛ کلید قدیمی داخل مخزن استفاده شد"
+          if [ -z "$KS" ] || [ -z "$KP" ] || [ -z "$KA" ]; then
+            echo "::error::کلید امضا در GitHub Secrets نیست (ANDROID_KEYSTORE_B64، ANDROID_KEY_PASS، ANDROID_KEY_ALIAS)؛ APK ساخته نشد"
+            exit 1
           fi
+          echo "$KS" | base64 -d > "$RUNNER_TEMP/release.keystore"
+          echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> $GITHUB_ENV
       - name: ساخت APK
         env: { ANDROID_KEY_PASS: '${{ secrets.ANDROID_KEY_PASS }}', ANDROID_KEY_ALIAS: '${{ secrets.ANDROID_KEY_ALIAS }}' }
         run: gradle -p android assembleRelease --no-daemon --stacktrace
@@ -42,9 +42,11 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           mkdir -p dist && cp motalla.apk dist/motalla.apk
+          # نسل کلید امضا: ۲ = کلید جدید (Secrets). اپ‌های قدیمی با دیدن این، راهنمای نصب دوباره را نشان می‌دهند
+          echo 2 > dist/apk-key.txt
           git config user.name "motalla-bot"
           git config user.email "motalla-bot@users.noreply.github.com"
-          git add dist/motalla.apk
+          git add dist/motalla.apk dist/apk-key.txt
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "فایل نصب اندروید جدید برای دانلود از سرور"
           # فقط main؛ استقرار لیارا با کار «استقرار روی لیارا» انجام می‌شود

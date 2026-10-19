@@ -29,7 +29,7 @@ ACT.checkUpd0=()=>{if(location.hostname!=='raw.githack.com'){if(location.protoco
    - مرورگر: مستقیم دانلود
    - اپ جدید (version دارد): به مرورگر گوشی سپرده می‌شود
    - اپ قدیمی: فایل از سرور گرفته و با پل اندروید در پوشه Download/Motalla ذخیره می‌شود (در همه نسخه‌ها هست) */
-ACT.getApk=async()=>{const B=window.AndroidBridge,inApp=/MotallaAndroid/.test(navigator.userAgent);
+ACT.getApk=async()=>{if(apkMove&&apkOldKey()){apkMoveSheet();return}const B=window.AndroidBridge,inApp=/MotallaAndroid/.test(navigator.userAgent);
   if(!inApp||!B){location.href=APK_URL;return}
   if(B.version){location.href=APK_URL;return}
   try{toast('در حال دانلود نسخه جدید…');const r=await fetch(APK_URL+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error(r.status);

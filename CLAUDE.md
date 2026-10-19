@@ -37,6 +37,7 @@ change the existing definition instead of adding a later redefinition). Section 
 | 15d-sales | sales invoice (`vSell`, `sv`, `itCalc`, `svTot`), invoice page/print (`vInv`, `invDoc`), POS terminals & our bank accounts (`CH`, `chBal`, `chMoves`), balance transfer between customers (`xs`) and gold↔rial conversion (`cv`), customer groups & goods list (`cfgRec`) |
 | 15c-pay-split | pay one deposit from several sources: linked piece entries (`splitOf`), `famOf`, `psApply` |
 | 15f-lock | app lock: 6-digit PIN per device (`m_lock`, PBKDF2 hash, tied to the username), auto-lock after 20 min idle (`m_lock_at`), Face ID via WebAuthn / Android fingerprint via `AndroidBridge.bioAuth`, 5 wrong = sync then safe logout; settings sheet `lockSheet`, one-time offer `lockOffer` |
+| 15g-android-key | one-time reinstall guide for Android apps signed with the old key: sync first, then download, uninstall, install (`apkMoveSheet`, `apkOldKey`) |
 | 16-boot | startup: initial render, listeners |
 
 CSS files are split by version era (01-base, 02-v21-v22 … 08-v52-list-photos), not by topic — grep the selector.
@@ -75,8 +76,10 @@ Status frames (green/yellow/red row borders) are defined ONCE at the end of 08-v
 - Staff may only ADD audit rows; on existing rows only `undone:true` is accepted (`auditEditOk`). Audit is never deleted.
 - Replacing/deleting an existing image needs edit/track/debt/del (`IMG_PERMS`); the previous copy goes to `imgs_old` (kept 90 days).
 - `/api/backups` returns `lastDl` (last backup download from any device) for the off-server backup reminder.
-- Android signing: workflow uses secrets `ANDROID_KEYSTORE_B64`, `ANDROID_KEY_PASS`, `ANDROID_KEY_ALIAS` when set,
-  else the old keystore in the repo (which is public — replace it).
+- Android signing: ONLY from secrets `ANDROID_KEYSTORE_B64`, `ANDROID_KEY_PASS`, `ANDROID_KEY_ALIAS` (build fails without them).
+  No key or password may ever be committed (`*.keystore`, `*.jks` are gitignored). Key generation 2 (v57.1): the APK reports
+  `AndroidBridge.keyGen()==2` and the workflow writes `dist/apk-key.txt`; `/api/status.apkKey` tells old apps (old leaked key)
+  to show the one-time reinstall guide (`15g-android-key.js`). Never change the key again without the same migration.
 
 ## In-app update (careful)
 - Production: client polls `/api/status` (version read from `const APP_V` in index.html) and reloads.

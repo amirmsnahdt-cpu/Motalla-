@@ -233,6 +233,8 @@ function auth(req) {
 }
 /* نشست‌های قدیمی (۱۸۰ روزه) به حداکثر ۳۰ روز از همین حالا کوتاه می‌شوند؛ کسی همین الان بیرون نمی‌افتد */
 try { const cap = new Date(Date.now() + SESSION_DAYS * 864e5).toISOString(); db.prepare('UPDATE sessions SET expires_at=? WHERE expires_at>?').run(cap, cap); } catch (e) { }
+/* نسل کلید امضای فایل نصب اندروید روی سرور (dist/apk-key.txt که workflow ساخت APK می‌نویسد) */
+function apkKey() { try { return +fs.readFileSync(path.join(ROOT, 'dist', 'apk-key.txt'), 'utf8').trim() || 1; } catch (e) { return 1; } }
 /* لینک‌های پیش‌نمایش (githack) دامنه‌ای مشترک بین همه کاربران گیت‌هاب دارند؛ فقط مدیر می‌تواند از آنجا وارد شود */
 const PREVIEW_ORIGIN = 'https://raw.githack.com', fromPreview = req => req.headers.origin === PREVIEW_ORIGIN;
 const PREVIEW_MSG = 'لینک پیش‌نمایش فقط برای مدیر است؛ برنامه اصلی را باز کنید';
@@ -389,7 +391,7 @@ async function handle(req, res) {
   }
   if (!p.startsWith('/api/')) { if (req.method === 'GET' && serveStatic(req, res, p)) return; res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); return; }
 
-  if (p === '/api/status' && req.method === 'GET') return send(res, 200, { ok: true, setup: q.userCount.get().n === 0, app: APP_VER, v: APP_V });
+  if (p === '/api/status' && req.method === 'GET') return send(res, 200, { ok: true, setup: q.userCount.get().n === 0, app: APP_VER, v: APP_V, apkKey: apkKey() });
 
   if (p === '/api/setup' && req.method === 'POST') {
     const b = await readBody(req, 1e5);

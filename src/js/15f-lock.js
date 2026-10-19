@@ -122,7 +122,8 @@ ACT.lockBio=async()=>{const c=lockCfg();if(!c)return;closeSheet();
   if(c.bio){c.bio=null;ls.set('m_lock',c);toast(bioName()+' خاموش شد؛ فقط رمز ۶ رقمی');if(cur==='settings')render();return}
   lockShow('verify',ok=>{if(ok){lockUI=null;setTimeout(()=>{lockShow('bio',()=>{if(cur==='settings')render()})},150)}})};
 /* بعد از ورود، یک بار روی هر گوشی پیشنهاد روشن کردن قفل */
-function lockOffer(){if(!TOKEN||!ME||lockCfg()||ls.get('m_lock_ask','')===ME.username||lockUI)return;if(!$('ov').classList.contains('hide')){setTimeout(lockOffer,20e3);return}
+/* اپ اندروید قدیمی (کلید امضای قبلی) باید نصب دوباره شود؛ پیشنهاد قفل می‌ماند برای اپ جدید */
+function lockOffer(){if(!TOKEN||!ME||lockCfg()||ls.get('m_lock_ask','')===ME.username||lockUI||apkOldKey())return;if(!$('ov').classList.contains('hide')){setTimeout(lockOffer,20e3);return}
   ls.set('m_lock_ask',ME.username);sheet(`<div class="sh-h"><b>قفل برنامه را روشن کنید</b><button class="x" data-act="close">×</button></div>
     <div class="muted" style="font-size:13.5px;line-height:1.9;margin:-4px 2px 14px">اطلاعات مشتری‌ها روی این گوشی است. با یک رمز ۶ رقمی${'PublicKeyCredential' in window||window.AndroidBridge?' (و '+bioName()+')':''}، اگر گوشی گم شود یا دست کس دیگری بیفتد، برنامه باز نمی‌شود.</div>
     <div class="row"><button class="btn sec" data-act="close">بعداً</button><button class="btn bkgo" data-act="lockSet">روشن کردن</button></div>`)}

@@ -1,2 +1,6 @@
 data/
 node_modules/
+
+# کلیدهای امضا هرگز در مخزن (عمومی) نیایند
+*.keystore
+*.jks

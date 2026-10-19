@@ -11,14 +11,16 @@ android {
     versionName '1.' + (System.getenv('GITHUB_RUN_NUMBER') ?: '0')
   }
   signingConfigs {
-    // کلید امضا از GitHub Secrets خوانده می‌شود (ANDROID_KEYSTORE_B64 / ANDROID_KEY_PASS / ANDROID_KEY_ALIAS).
-    // تا وقتی آن‌ها تنظیم نشده‌اند، کلید قدیمی داخل مخزن استفاده می‌شود تا ساخت APK نشکند.
+    // کلید امضا فقط از GitHub Secrets (ANDROID_KEYSTORE_B64 / ANDROID_KEY_PASS / ANDROID_KEY_ALIAS) می‌آید؛
+    // هیچ کلید یا رمزی داخل مخزن نیست (کلید قدیمی چون مخزن عمومی است لو رفته بود و کنار گذاشته شد).
     release {
       def ks = System.getenv('ANDROID_KEYSTORE_FILE')
-      storeFile file(ks ?: 'motalla-release.keystore')
-      storePassword(System.getenv('ANDROID_KEY_PASS') ?: 'motalla2026')
-      keyAlias(System.getenv('ANDROID_KEY_ALIAS') ?: 'motalla')
-      keyPassword(System.getenv('ANDROID_KEY_PASS') ?: 'motalla2026')
+      if (ks) {
+        storeFile file(ks)
+        storePassword System.getenv('ANDROID_KEY_PASS')
+        keyAlias System.getenv('ANDROID_KEY_ALIAS')
+        keyPassword System.getenv('ANDROID_KEY_PASS')
+      }
     }
   }
   buildTypes {

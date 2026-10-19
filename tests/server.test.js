@@ -21,7 +21,7 @@ const IMG = 'data:image/png;base64,iVBORw0KGgo=', IMG2 = 'data:image/png;base64,
 let admin = '', staff = '', viewer = '';
 
 test('وضعیت و فایل‌های ثابت', async () => {
-  const s = await api('/api/status'); assert.equal(s.status, 200); assert.equal(s.j.ok, true); assert.ok(s.j.v > 0);
+  const s = await api('/api/status'); assert.equal(s.status, 200); assert.equal(s.j.ok, true); assert.ok(s.j.v > 0); assert.ok(s.j.apkKey >= 1);
   const r = await fetch(base + '/index.html'); assert.equal(r.status, 200);
   for (const f of ['/app.js', '/styles.css', '/sw.js', '/manifest.json']) assert.equal((await fetch(base + f)).status, 200, f);
   assert.equal((await fetch(base + '/server/server.js')).status, 404);

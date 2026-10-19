@@ -160,6 +160,10 @@ public class MainActivity extends Activity {
 
     /** پل جاوااسکریپت ← اندروید */
     private class Bridge {
+        /** نسل کلید امضای این APK: ۲ = کلید جدید (۱۴۰۵). اپ‌هایی که این متد را ندارند با کلید قدیمی امضا شده‌اند */
+        @JavascriptInterface
+        public int keyGen() { return 2; }
+
         /** آیا این گوشی اثر انگشت/چهره ثبت‌شده دارد؟ (اندروید ۹ به بالا) */
         @JavascriptInterface
         public boolean bioAvailable() {
