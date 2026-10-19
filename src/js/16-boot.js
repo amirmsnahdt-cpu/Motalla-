@@ -44,8 +44,8 @@ ACT.getApk=async()=>{const B=window.AndroidBridge,inApp=/MotallaAndroid/.test(na
       <div class="muted" style="font-size:13.5px;line-height:2;margin:-4px 2px 12px">این آدرس را کپی کنید و در <b>Chrome</b> باز کنید؛ فایل را نصب کنید (روی همین برنامه نصب می‌شود):</div>
       <div class="card cinfo"><div class="ci"><b class="ltrv">${APK_URL}</b></div></div><div class="row"><button class="btn gold" data-act="copyApk">${ic('copy')} کپی آدرس</button></div>`)}};
 ACT.copyApk=()=>copyText(APK_URL).then(ok=>toast(ok?'آدرس کپی شد ✓':'کپی نشد؛ روی آدرس انگشت نگه دارید و کپی کنید',!ok));
-ACT.shareInstall=()=>{const t='نصب برنامه واریزی مطلا\n\nآیفون: این لینک را در Safari باز کنید، دکمه اشتراک‌گذاری ← Add to Home Screen\n'+WEB_URL+'\n\nاندروید: فایل نصب را دانلود و نصب کنید\n'+APK_URL+'\n\nنام کاربری و رمز را از مدیر بگیرید.';
-  if(navigator.share)navigator.share({text:t}).catch(()=>{});else copyText(t)};
+ACT.shareInstall=d=>{const ios=d.os==='ios',t='نصب برنامه «بده بستون» — طلای مطلا\n\n'+(ios?'آیفون: این لینک را در Safari باز کنید، دکمه اشتراک‌گذاری ← Add to Home Screen\n'+WEB_URL:'اندروید: فایل نصب را دانلود و نصب کنید\n'+APK_URL)+'\n\nنام کاربری و رمز را از مدیر بگیرید.';
+  if(window.AndroidBridge&&AndroidBridge.share){AndroidBridge.share(t);return}if(navigator.share)navigator.share({text:t}).catch(()=>{});else copyText(t)};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const f=ACT[t.dataset.act];if(f){e.preventDefault();f(t.dataset,e)}});
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov'){aSt=null;srcRet='';closeSheet()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('ov').classList.contains('hide')){aSt=null;srcRet='';closeSheet()}});
