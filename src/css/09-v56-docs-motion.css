@@ -394,3 +394,10 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 .lksw[aria-checked=true] .lktg{background:var(--ok)}
 .lksw[aria-checked=true] .lktg i{transform:translateX(-20px)}
 @media (prefers-reduced-motion:reduce){.lktg,.lktg i{transition:none}}
+/* v58.9: روانی اسکرول — محو کردن پشت (blur) روی آیفون هر فریم اسکرول را دوباره می‌کشید.
+   نوار بالا و نوار پایین روی محتوای در حال اسکرول نیستند (blur بی‌اثر بود)؛ سرتیترهای چسبان پس‌زمینه مات می‌گیرند */
+#bar,#dock{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.fday.sticky,.x6g{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--bg)!important}
+/* v58.9: نوار نامرئی لبه راست برای برگشت با کشیدن (فقط در صفحه‌هایی که برگشت دارند) */
+#edgez{position:fixed;top:0;bottom:0;right:max(0px,calc((100vw - 560px)/2));width:14px;z-index:35;display:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+@media (pointer:coarse){#edgez.on{display:block}}

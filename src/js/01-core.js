@@ -89,11 +89,24 @@ const GM=['January','February','March','April','May','June','July','August','Sep
 function j2g(jy,jm,jd){jy+=1595;let days=-355668+(365*jy)+(~~(jy/33))*8+~~(((jy%33)+3)/4)+jd+((jm<7)?(jm-1)*31:((jm-7)*30)+186);let gy=400*~~(days/146097);days%=146097;
   if(days>36524){gy+=100*~~(--days/36524);days%=36524;if(days>=365)days++}gy+=4*~~(days/1461);days%=1461;if(days>365){gy+=~~((days-1)/365);days=(days-1)%365}
   let gd=days+1;const sal=[0,31,((gy%4==0&&gy%100!=0)||gy%400==0)?29:28,31,30,31,30,31,31,30,31,30,31];let gm=0;for(gm=0;gm<13&&gd>sal[gm];gm++)gd-=sal[gm];return[gy,gm,gd]}
-function g2j(iso){let r;try{const o={};new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(new Date(iso+'T12:00:00')).forEach(x=>o[x.type]=+x.value);r=[o.year||o.relatedYear,o.month,o.day]}catch(e){}
+const G2J_C=new Map();
+function g2j(iso){const c=G2J_C.get(iso);if(c)return c.slice();const r=g2j0(iso);if(G2J_C.size>3000)G2J_C.clear();G2J_C.set(iso,r.slice());return r}
+function g2j0(iso){let r;try{const o={};new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(new Date(iso+'T12:00:00')).forEach(x=>o[x.type]=+x.value);r=[o.year||o.relatedYear,o.month,o.day]}catch(e){}
   if(r&&r.every(n=>n>0)&&r[0]>1200&&r[0]<1700)return r;
   const[gy,gm,gd]=iso.split('-').map(Number),gdm=[0,31,59,90,120,151,181,212,243,273,304,334],g2=gm>2?gy+1:gy;let days=355666+365*gy+~~((g2+3)/4)-~~((g2+99)/100)+~~((g2+399)/400)+gd+gdm[gm-1],jy=-1595+33*~~(days/12053);days%=12053;jy+=4*~~(days/1461);days%=1461;if(days>365){jy+=~~((days-1)/365);days=(days-1)%365}
   return days<186?[jy,1+~~(days/31),1+days%31]:[jy,7+~~((days-186)/30),1+(days-186)%30]}
-function dates(v){const d=v?new Date(v+'T12:00:00'):new Date(),iso=d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),[jy,jm,jd]=g2j(iso);return{fa:toFa(jd)+' '+JM[jm-1]+' '+toFa(jy),en:new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'long',year:'numeric'}).format(d),iso,jd,jm,jy,wd:new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(d)}}
+/* v58.9: هر تاریخ یک بار محاسبه می‌شود (ساختن Intl.DateTimeFormat در هر بار صدا زدن، رسم لیست‌ها را کند می‌کرد) */
+/* v58.9: گوش دادن «مسدودکننده» به حرکت انگشت (برای کشیدن پنجره، کشیدن برای تازه‌سازی، بستن صفحه با کشیدن به پایین، برگشت از لبه)
+   فقط وقتی لازم است وصل می‌ماند: بالای صفحه یا وقتی پنجره باز است. وقتی صفحه پایین‌تر اسکرول شده، آیفون بی‌معطلی اسکرول می‌کند
+   (قبلاً هر حرکت انگشت در هر جای برنامه منتظر جاوااسکریپت می‌ماند → اسکرول گیر می‌کرد و یک‌باره می‌پرید). */
+const TMV=[];let tmOn=false;
+function tmMove(e){for(const f of TMV)f(e)}
+function tmAdd(fn){TMV.push(fn);tmSync()}
+function tmSync(){const v=document.getElementById('view'),ov=document.getElementById('ov'),n=!v||v.scrollTop<=1||!!(ov&&!ov.classList.contains('hide'));
+  if(n===tmOn)return;tmOn=n;if(n)document.addEventListener('touchmove',tmMove,{passive:false});else document.removeEventListener('touchmove',tmMove,{passive:false})}
+const DATES_C=new Map();
+function dates(v){if(v){let c=DATES_C.get(v);if(!c){c=dates0(v);if(DATES_C.size>3000)DATES_C.clear();DATES_C.set(v,c)}return {...c}}return dates0(v)}
+function dates0(v){const d=v?new Date(v+'T12:00:00'):new Date(),iso=d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),[jy,jm,jd]=g2j(iso);return{fa:toFa(jd)+' '+JM[jm-1]+' '+toFa(jy),en:new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'long',year:'numeric'}).format(d),iso,jd,jm,jy,wd:new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(d)}}
 function relDay(iso){const t=todayISO();if(iso===t)return 'امروز';const y=new Date(t+'T12:00:00');y.setDate(y.getDate()-1);const yi=y.getFullYear()+'-'+p2(y.getMonth()+1)+'-'+p2(y.getDate());if(iso===yi)return 'دیروز';const f=new Date(t+'T12:00:00');f.setDate(f.getDate()+1);if(iso===f.getFullYear()+'-'+p2(f.getMonth()+1)+'-'+p2(f.getDate()))return 'فردا';return dates(iso).wd}
 let dateVal=todayISO();
 const stripName=s=>{let c=clean(String(s||''));const tg=c.match(/^[A-Za-z][A-Za-z0-9 ._'’()\-]{0,40}?\s*[:：]\s*(.+)$/);if(tg&&/[\u0600-\u06FF]/.test(tg[1]))c=tg[1].trim();const t=c.replace(/^[\s\-–—:•▪*.)(]*(?:واریزی|واریز)(?:\s+(?:بانکی|بانک))?\s*[:：\-–—]?\s+/,'').trim();return t||c};
@@ -179,7 +192,7 @@ function render(anim){const V=$('view'),B=$('bar'),A=$('act'),turn=anim&&turnDir
   $('app').classList.toggle('home',cur==='home');$('act').classList.remove('hid');$('app').classList.toggle('ent',cur==='ent');$('app').classList.toggle('banks',cur==='banks');$('app').classList.toggle('custs',cur==='custs');$('app').classList.toggle('editing',cur==='ent'&&entEdit);{const ap=$('app'),was=ap.classList.contains('full'),fu=FULLP.has(cur);ap.classList.toggle('full',fu);ap.classList.toggle('split',cur==='split1');if(fu&&anim&&!turn&&!navBack&&render._v!==cur&&(!was||SLIDEP.has(cur))){ap.classList.add('fullin');clearTimeout(render._fi);render._fi=setTimeout(()=>ap.classList.remove('fullin'),420)}if(!fu)ap.classList.remove('fullin')}B.classList.remove('cmp');
   /* همان صفحه دوباره ساخته می‌شود (نه رفتن به صفحه دیگر): ردیف‌ها از جای قبلی به جای تازه بلغزند */
   const sameV=render._v===cur,same=!anim&&sameV,sy=V.scrollTop,fs=same?flipSnap(V):null;render._v=cur;
-  V.innerHTML=R[0]();if(same&&V.scrollTop!==sy)V.scrollTop=sy;A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();if(cur==='home')homeLayout();paintBars();if(fs)flipPlay(V,fs);
+  V.innerHTML=R[0]();if(same&&V.scrollTop!==sy)V.scrollTop=sy;A.innerHTML=R[1]?R[1]():'';$('dock').innerHTML=dockHTML();dockInd();if(cur==='home')homeLayout();paintBars();if(fs)flipPlay(V,fs);tmSync();if(window.edgeZ)edgeZ();
   if(turn){V.classList.remove('in','bk');turn()}else if(anim&&!noAnim&&!sameV){V.classList.remove('in','bk');void V.offsetWidth;V.classList.add('in');if(navBack)V.classList.add('bk')}else V.classList.remove('in','bk');navBack=false;noAnim=false;
   ({sell:bindSell,custs:bindCusts,buy:bindBuy,ent:bindEnt,find:bindFind,backups:()=>{if(!BK&&!bkErr)loadBk()},entry:bindEntry,bulk:bindBulk,list:bindList,split1:bindSplit1,lday:bindLday,batch:bindBatch,track:bindTrack,debt:bindDebt,cwiz:bindWiz,pwiz:bindWiz,users:bindUsers})[cur]?.()}
 /* ============ نوار تاریخ‌ها (هوشمند) ============ */

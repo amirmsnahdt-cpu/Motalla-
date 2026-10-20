@@ -48,17 +48,25 @@ function segFx(){segQ=0;const seen={};document.querySelectorAll('.seg:not(.st2):
 new MutationObserver(()=>{if(!segQ)segQ=requestAnimationFrame(segFx)}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
 window.addEventListener('resize',()=>requestAnimationFrame(segFx));
 /* ================= v22: بازگشت با کشیدن از لبه راست (مثل آیفون) ================= */
+/* v58.9: کشیدن از لبه روی یک نوار نامرئی باریک لبه راست (#edgez) گوش داده می‌شود، نه روی کل صفحه —
+   تا اسکرول بقیه صفحه منتظر جاوااسکریپت نماند. ضربه کوتاه روی نوار به چیزی که زیرش است می‌رسد. */
 (()=>{let g=null;const V=()=>$('view'),EP=()=>['view','bar','act'].map(i=>$(i)).filter(Boolean);
-  document.addEventListener('touchstart',e=>{if(e.touches.length!==1||!edgeOK()||(e.target.closest&&e.target.closest('.swr')))return;const t=e.touches[0];if(t.clientX<innerWidth-24)return;g={x:t.clientX,y:t.clientY,lk:null,dx:0}},{passive:true});
-  document.addEventListener('touchmove',e=>{if(!g)return;const t=e.touches[0],dx=g.x-t.clientX,dy=t.clientY-g.y;
-    if(!g.lk){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;g.lk=dx>0&&dx>Math.abs(dy)?'h':'v';if(g.lk!=='h'){g=null;return}V().classList.add('edge');EP().forEach(el=>{el.style.transition='none'})}
-    e.preventDefault();g.dx=Math.max(0,dx);EP().forEach(el=>{el.style.transform=`translateX(${-g.dx}px)`})},{passive:false});
-  const fin=()=>{if(!g)return;const z=g;g=null;const v=V();v.classList.remove('edge');if(z.lk!=='h')return;
+  const Z=document.createElement('div');Z.id='edgez';Z.setAttribute('aria-hidden','true');document.body.appendChild(Z);
+  window.edgeZ=()=>{Z.classList.toggle('on',edgeOK())};
+  Z.addEventListener('touchstart',e=>{if(e.touches.length!==1||!edgeOK())return;const t=e.touches[0];g={x:t.clientX,y:t.clientY,lk:null,dx:0}},{passive:true});
+  Z.addEventListener('touchmove',e=>{if(!g){e.preventDefault();return}const t=e.touches[0],dx=g.x-t.clientX,dy=t.clientY-g.y;
+    if(!g.lk){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;g.lk=dx>0&&dx>Math.abs(dy)?'h':'v';if(g.lk!=='h'){g.lk='v'}else{V().classList.add('edge');EP().forEach(el=>{el.style.transition='none'})}}
+    e.preventDefault();if(g.lk==='v'){const v=V();if(v)v.scrollTop-=(t.clientY-(g.ly||g.y));g.ly=t.clientY;return}
+    g.dx=Math.max(0,dx);EP().forEach(el=>{el.style.transform=`translateX(${-g.dx}px)`})},{passive:false});
+  const fin=e=>{if(!g)return;const z=g;g=null;const v=V();v.classList.remove('edge');
+    if(!z.lk){/* ضربه کوتاه: به عنصر زیر نوار برسان */if(e&&e.cancelable)e.preventDefault();Z.style.pointerEvents='none';const el=document.elementFromPoint(z.x,z.y);Z.style.pointerEvents='';
+      if(el){if(el.matches('input,textarea,select'))el.focus();else{const b=el.closest(PRESS_SEL)||el;b.click()}}return}
+    if(z.lk!=='h')return;
     const P=EP(),clr=()=>P.forEach(el=>{el.style.transition='';el.style.transform='';el.style.opacity=''});
     if(z.dx>innerWidth*.28){/* صفحه قبلی همان لحظه زیر ساخته می‌شود و این صفحه از جای انگشت کنار می‌رود (بدون سفیدی) */
       if(cur==='entry'&&editId){clr();ACT.cancelEdit()}else if(FULLP.has(cur))pageLeave((cur==='ent'?PARENT.ent:PARENT[cur])||'home',{side:1,dx:z.dx});else{clr();back()}}
     else{P.forEach(el=>{el.style.transition='transform .26s cubic-bezier(.2,.9,.3,1)';el.style.transform=''});setTimeout(()=>P.forEach(el=>{el.style.transition=''}),280)}};
-  document.addEventListener('touchend',fin);document.addEventListener('touchcancel',fin);
+  Z.addEventListener('touchend',fin,{passive:false});Z.addEventListener('touchcancel',()=>fin(),{passive:true});
 })();
 /* ================= v21: نوار ناوبری با نشانگر متحرک ================= */
 function dockInd(){const d=$('dock');if(!d)return;const o=d.querySelector('.tb.on');if(o){d.style.setProperty('--ix',o.offsetLeft+'px');d.style.setProperty('--iw',o.offsetWidth+'px');d.style.setProperty('--io','1')}else d.style.setProperty('--io','0')}

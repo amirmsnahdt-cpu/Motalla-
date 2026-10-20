@@ -270,9 +270,9 @@ let quietT=0;function quietRefresh(){if(!TOKEN||Date.now()-quietT<2500)return;qu
     const v=V();let sp=v.querySelector(':scope>.vspin');if(!sp&&(y||spin)){sp=document.createElement('div');sp.className='vspin';sp.innerHTML='<i class="pspin"></i>';v.prepend(sp)}
     if(sp){sp.style.height=(spin?54:Math.min(y,70))+'px';sp.style.setProperty('--pp',Math.min(1,y/TH));sp.classList.toggle('spin',!!spin);if(!y&&!spin)sp.remove()}v.classList.toggle('vloading',!!spin);P.style.opacity=0;return;P.style.opacity=Math.min(1,y/TH);P.style.transform=`translate(-50%,${Math.min(y,MAX)*0.55-40}px) rotate(${y*3}deg)`;P.classList.toggle('spin',!!spin);P.classList.toggle('ready',y>=TH&&!spin)};
   document.addEventListener('touchstart',e=>{const v=V();if(e.touches.length!==1||!v||!v.contains(e.target)||v.scrollTop>0||!okStart())return;const t=e.touches[0];if(t.clientX>innerWidth-26)return;st={x:t.clientX,y:t.clientY,lk:null};d=0},{passive:true});
-  document.addEventListener('touchmove',e=>{if(!st)return;const t=e.touches[0],dx=t.clientX-st.x,dy=t.clientY-st.y;
+  tmAdd(e=>{if(!st)return;const t=e.touches[0],dx=t.clientX-st.x,dy=t.clientY-st.y;
     if(!st.lk){if(Math.abs(dx)<6&&Math.abs(dy)<6)return;st.lk=(dy>0&&Math.abs(dy)>Math.abs(dx)*1.2&&V().scrollTop<=0)?'v':'x';if(st.lk==='v'){place();V().style.transition='none';P.style.transition='none';const pn=hp(),l=pn&&pn.querySelector('.blist,.bempty');if(l)l.style.transition='none'}}
-    if(st.lk!=='v')return;e.preventDefault();d=Math.min(MAX,dy*0.5);show(d,false);if(d>=TH&&!st.hp){st.hp=1;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}}},{passive:false});
+    if(st.lk!=='v')return;e.preventDefault();d=Math.min(MAX,dy*0.5);show(d,false);if(d>=TH&&!st.hp){st.hp=1;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}}});
   const end=async()=>{if(!st)return;const lk=st.lk;st=null;if(lk!=='v')return;const v=V();v.style.transition='transform .3s cubic-bezier(.2,.8,.2,1)';P.style.transition='transform .3s,opacity .3s';{const pn=hp(),l=pn&&pn.querySelector('.blist,.bempty');if(l)l.style.transition='transform .3s cubic-bezier(.2,.8,.2,1)'}
     if(d<TH){show(0,false);return}
     busy=true;show(56,true);loading(true);const t0=Date.now();let r;try{r=await refreshAll();if(cur==='backups'&&isAdmin())await loadBk()}catch(_){r={off:true}}

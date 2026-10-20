@@ -18,11 +18,13 @@ const PRESS_SEL='button,[data-act],a[href],.opt,.lrow,.tcard,label.chk';
       if(!el.isConnected)return;el.animate([{scale:String(s)},{scale:'1.012'},{scale:'1'}],{duration:420,easing:'cubic-bezier(.32,.72,0,1)'})},wait)};
   document.addEventListener('pointerdown',e=>{if(RMq.matches||e.button>0)return;const el=target(e);if(!el)return;cur=el;x0=e.clientX;y0=e.clientY;t0=performance.now();down(el)},{passive:true,capture:true});
   const end=()=>{if(cur){up(cur);cur=null}};
+  /* v58.9: اسکرول یا کشیدن = لمس لغو شد → بی‌صدا به اندازه اصلی برگردد (بدون فنر اضافه روی ردیف هنگام اسکرول) */
+  const drop=()=>{if(!cur)return;const el=cur,a=el._pa;cur=null;el._pa=null;if(a){try{a.cancel()}catch(_){}}};
   document.addEventListener('pointerup',end,{passive:true,capture:true});
-  document.addEventListener('pointercancel',end,{passive:true,capture:true});
-  document.addEventListener('pointermove',e=>{if(cur&&(Math.abs(e.clientX-x0)>9||Math.abs(e.clientY-y0)>9))end()},{passive:true,capture:true});
-  document.addEventListener('scroll',end,{passive:true,capture:true});
-  document.addEventListener('dragstart',end,{capture:true});
+  document.addEventListener('pointercancel',drop,{passive:true,capture:true});
+  document.addEventListener('pointermove',e=>{if(cur&&(Math.abs(e.clientX-x0)>9||Math.abs(e.clientY-y0)>9))drop()},{passive:true,capture:true});
+  document.addEventListener('scroll',drop,{passive:true,capture:true});
+  document.addEventListener('dragstart',drop,{capture:true});
 })();
 
 /* ۲) جابه‌جایی نرم (FLIP) — v58.6: هر بار که همان صفحه دوباره ساخته می‌شود (جستجو، زدن روی تاریخ/روز، فیلتر، تسویه، همگام‌سازی…)
@@ -68,11 +70,18 @@ const TAB_ORD=['home','banks','custs','audit','settings'];
 function tabTurnDir(from,to){if(!TAB_ORD.includes(to))return 0;const a=TAB_ORD.indexOf(TAB[from]),b=TAB_ORD.indexOf(to);if(a<0||a===b)return 0;return b>a?-1:1}/* RTL: تب بعدی سمت چپ است */
 let turnTok=0;
 /* نسخه تصویری کامل صفحه فعلی (کپی #app) کنار DOM واقعی؛ z=0 زیر صفحه واقعی، z=3 روی آن */
+/* v58.9: فقط بخش دیده‌شده صفحه کپی می‌شود؛ ردیف‌های بیرون از صفحه با جای خالی هم‌قد عوض می‌شوند
+   (کپی کامل یک لیست بلند، هر باز/بسته شدن صفحه را ده‌ها میلی‌ثانیه قفل می‌کرد) */
+function ghostPrune(real,clone,vh,d,ref){const R=real.children,C=clone.children;if(R.length!==C.length||d>6)return;
+  for(let i=R.length-1;i>=0;i--){const re=R[i],ce=C[i],r=re.getBoundingClientRect();if(!r.height)continue;
+    if(r.bottom<-60||r.top>vh+60){const sp=document.createElement('div');sp.style.cssText=`height:${r.height}px;margin:0;padding:0;border:0;flex:none`;ce.replaceWith(sp)}
+    else{if(getComputedStyle(re).position!=='sticky'&&getComputedStyle(re).position!=='fixed'){ref.re=re;ref.ce=ce}if(r.height>vh*.6&&re.children.length>3)ghostPrune(re,ce,vh,d+1,ref)}}}
 function appGhost(z){const ap=$('app');document.querySelectorAll('.pgghost').forEach(g=>g.remove());
-  const g=ap.cloneNode(true),V=$('view'),sy=V?V.scrollTop:0;g.classList.add('pgghost');g.classList.remove('fullin','entout','turning','layered');g.setAttribute('aria-hidden','true');g.style.pointerEvents='none';g.style.zIndex=String(z);g.style.transition='none';
-  g.querySelectorAll('input,textarea,select,button').forEach(e=>{e.tabIndex=-1});
+  const g=ap.cloneNode(true),V=$('view'),sy=V?V.scrollTop:0,gv=g.querySelector('#view'),ref={};g.classList.add('pgghost');g.classList.remove('fullin','entout','turning','layered');g.setAttribute('aria-hidden','true');g.inert=true;g.style.pointerEvents='none';g.style.zIndex=String(z);g.style.transition='none';
+  if(V&&gv)ghostPrune(V,gv,innerHeight,0,ref);
   const gb=g.querySelector('#bottom');if(gb)gb.style.visibility='hidden';
-  ap.after(g);const gv=g.querySelector('#view');if(gv)gv.scrollTop=sy;return g}
+  ap.after(g);if(gv){gv.scrollTop=sy;/* جای خالی‌ها حاشیه ندارند؛ اولین چیز دیده‌شده را دقیقاً سر جایش بگذار */
+    if(ref.re&&ref.ce){const dy=ref.ce.getBoundingClientRect().top-ref.re.getBoundingClientRect().top;if(Math.abs(dy)>.5)gv.scrollTop=sy+dy}}return g}
 function pageTurn(dir){const ap=$('app');if(!dir||!ap||RM()||!ap.animate)return null;
   const g=appGhost(0);ap.style.zIndex='1';ap.classList.add('turning');const tok=++turnTok;
   return ()=>{const w=ap.offsetWidth||innerWidth,E='cubic-bezier(.32,.72,0,1)',D=440;
@@ -99,3 +108,8 @@ function pageLeave(to,o){o=o||{};const ap=$('app');
   const a=g.animate(K,{duration:D,easing:E,fill:'forwards'});
   ap.animate([{transform:'scale(.95)',opacity:.6},{transform:'none',opacity:1}],{duration:D,easing:E});
   const done=()=>g.remove();a.onfinish=done;setTimeout(done,D+250)}
+
+/* ۷) v58.9: وضعیت گوش دادن مسدودکننده به حرکت انگشت را با اسکرول، باز/بسته شدن پنجره و هر بار ساخته شدن صفحه به‌روز کن (tmSync در 01-core) */
+(()=>{const v=$('view'),ov=$('ov');if(v)v.addEventListener('scroll',tmSync,{passive:true});
+  if(ov&&window.MutationObserver)new MutationObserver(()=>{tmSync();if(window.edgeZ)edgeZ()}).observe(ov,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('touchstart',tmSync,{passive:true,capture:true});tmSync()})();
