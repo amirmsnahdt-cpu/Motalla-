@@ -406,3 +406,12 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 /* v59: تازه‌سازی با کشیدن در خانه — فقط چرخنده؛ ردیف‌ها سر جایشان می‌مانند */
 .bpanel.ptrspin .grab .pspin{opacity:1;transform:none;animation:pspin .7s linear infinite}
 .bpanel.ptrspin .blist{pointer-events:none}
+/* v59.2: لیست‌های تمام‌صفحه (لیست واریز، منبع، پیگیری) — هر واریزی یک کارت گرد جدا با عرض یکسان.
+   قبلاً ردیف‌های ساده مستطیل خاکستری تمام‌عرض بودند و ردیف‌های قاب‌دار کارت گرد با حاشیه سفید؛ کنار هم کج دیده می‌شد. */
+#app.full .fcard.blist{background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important;margin:0 0 10px!important;padding:0!important;display:flex;flex-direction:column;gap:8px}
+#app.full .fcard.blist>.swr{margin:0!important;padding:0!important;border-top:0!important;border-radius:16px!important;background:transparent!important}
+#app.full .fcard.blist .brw{position:relative;border-radius:16px!important}
+#app.full .fcard.blist .brw.new{background:var(--card)!important}
+#app.full .fcard.blist .brw.new::after{content:'';position:absolute;inset:0;border:1px solid var(--line);border-radius:16px;pointer-events:none;z-index:2}
+#app.full .fcard.blist .brw.new .bri{background:var(--blu2)!important}
+#app.full .fcard.blist.okc{box-shadow:none!important}
