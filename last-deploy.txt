@@ -6,7 +6,7 @@ Disks:
   data -> /app/data
 node version: 22
 - Creating an archive...
-Compressed size: 1.18MB (use .gitignore to reduce the size)
+Compressed size: 1.19MB (use .gitignore to reduce the size)
 ✖ Upload failed.
 
  ›   Error: Authentication failed.
