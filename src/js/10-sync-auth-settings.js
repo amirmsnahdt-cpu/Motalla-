@@ -130,15 +130,15 @@ async function flushImgs(){const q=ls.get('m_imgq',[]);if(!q.length)return;const
 function showAuth(msg){const a=$('auth');a.classList.remove('hide');a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">طلای مطلا</small><div class="aspin">در حال اتصال…</div></div>`;
   api('/api/status').then(s=>authForm(s.setup?'setup':'login',msg)).catch(e=>{a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">بده بستون</b><div class="msg bad" style="margin-top:14px">${esc(e.message)}</div><button class="btn gold" data-act="authRetry" style="width:100%">تلاش دوباره</button></div>`})}
 function authForm(mode,msg){const a=$('auth'),su=mode==='setup';
-  a.innerHTML=`<form class="authc" id="authf" autocomplete="on" onsubmit="return false"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">${su?'راه‌اندازی اولیه — ساخت حساب مدیر':'ورود به بده بستون'}</small>
+  a.innerHTML=`<form class="authc" id="authf" autocomplete="on" action="#"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">${su?'راه‌اندازی اولیه — ساخت حساب مدیر':'ورود به بده بستون'}</small>
   ${msg?`<div class="msg warn">${esc(msg)}</div>`:''}
   ${su?`<div class="f"><label>نام شما</label><input id="an" autocomplete="name" placeholder="مثلاً علی رضایی"></div>`:''}
   <div class="f"><label>نام کاربری</label><input id="au" class="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="latin" placeholder="username"></div>
   <div class="f"><label>رمز عبور</label><div class="pw"><input id="ap" class="ltr" type="password" autocomplete="${su?'new-password':'current-password'}" placeholder="••••••"><button type="button" class="pwt" data-act="pwToggle" data-t="ap" aria-label="نمایش رمز">${ic('eye')}</button></div></div>
   ${su?`<div class="f"><label>تکرار رمز عبور</label><input id="ap2" class="ltr" type="password" autocomplete="new-password"></div>`:''}
-  <div id="aerr"></div><button class="btn gold" id="abtn" data-act="${su?'authSetup':'authLogin'}" style="width:100%">${su?'ساخت حساب مدیر و ورود':'ورود'}</button>
+  <div id="aerr"></div><button class="btn gold" id="abtn" type="submit" style="width:100%">${su?'ساخت حساب مدیر و ورود':'ورود'}</button>
   ${su?'':'<div class="ahint">نام کاربری و رمز را از مدیر مغازه بگیرید.</div>'}</form>`;
-  const f=a.querySelector('#authf');f.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ACT[su?'authSetup':'authLogin']()}});setTimeout(()=>{const i=$(su?'an':'au');if(i)i.focus()},80)}
+  const f=a.querySelector('#authf');f.addEventListener('submit',e=>{e.preventDefault();ACT[su?'authSetup':'authLogin']()});setTimeout(()=>{const i=$(su?'an':'au');if(i)i.focus()},80)}
 function authErr(m){const e=$('aerr');if(e)e.innerHTML=`<div class="msg bad">${esc(m)}</div>`;const b=$('abtn');if(b){b.disabled=false;b.classList.remove('wait')}}
 function authBusy(){const b=$('abtn');if(b){b.disabled=true;b.classList.add('wait')}const e=$('aerr');if(e)e.innerHTML=''}
 function loggedIn(r){TOKEN=r.token;try{localStorage.setItem('m_token',TOKEN)}catch(e){}ME=r.user;rawSet('m_me',ME);user=ME.name;applyPerms();$('auth').classList.add('hide');$('auth').innerHTML='';try{lockTouch(true);setTimeout(lockOffer,2500)}catch(e){}
@@ -152,10 +152,11 @@ function forceLogout(msg){TOKEN='';ME=null;try{localStorage.removeItem('m_token'
 /* ---------- حساب کاربری ---------- */
 const ROLE={admin:'مدیر',staff:'کارمند'};
 function pwSheet(){sheet(`<div class="sh-h"><b>تغییر رمز عبور</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <form id="pwf" autocomplete="on" action="#" onsubmit="event.preventDefault();ACT.pwSave()"><input class="lkpu" type="text" name="username" autocomplete="username" value="${esc(ME?ME.username:'')}" tabindex="-1" aria-hidden="true">
   <div class="f"><label>رمز فعلی</label><input id="po" class="ltr" type="password" autocomplete="current-password"></div>
   <div class="f"><label>رمز جدید <i>(حداقل ۸ کاراکتر)</i></label><input id="pn1" class="ltr" type="password" autocomplete="new-password"></div>
   <div class="f"><label>تکرار رمز جدید</label><input id="pn2" class="ltr" type="password" autocomplete="new-password"></div>
-  <div class="row"><button class="btn gold" data-act="pwSave">ذخیره رمز جدید</button></div>`);sheetFocus($('po'))}
+  <div class="row"><button class="btn gold" type="submit">ذخیره رمز جدید</button></div></form>`);sheetFocus($('po'))}
 /* ---------- مدیریت کاربران ---------- */
 let USERS=null,usersErr='';
 function vUsers(){if(!isAdmin())return '<div class="card empty"><b>فقط مدیر دسترسی دارد</b></div>';

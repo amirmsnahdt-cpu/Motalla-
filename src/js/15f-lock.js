@@ -24,6 +24,14 @@ async function bioAvail(){try{if(window.AndroidBridge)return !!(AndroidBridge.bi
      به این سؤال «نه» جواب می‌دهد و گزینه اصلاً دیده نمی‌شد. روی آیفون همیشه گزینه را نشان بده؛ اگر وصل نشد، پیام روشن می‌دهیم. */
   if(isIOS())return true;
   return !!(PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return isIOS()}}
+/* آیفون: Face ID از راه «رمزها»ی خود آیفون (مثل اپ بلو): رمز حساب در Passwords گوشی ذخیره می‌شود و آیفون با Face ID آن را پر می‌کند.
+   برای باز کردن قفل بدون اینترنت، فقط هش PBKDF2 رمز حساب روی همین گوشی نگه داشته می‌شود (خود رمز هرگز). */
+const bioPw=()=>!window.AndroidBridge&&isIOS();
+async function pwhSet(pw){try{if(!ME||!pw)return;const salt=b64u(crypto.getRandomValues(new Uint8Array(16)));ls.set('m_pwh',{u:ME.username,salt,hash:await pinHash(pw,salt)})}catch(e){}}
+async function pwhOk(pw){const h=ls.get('m_pwh',null);if(!h||!ME||h.u!==ME.username||!pw)return false;return (await pinHash(pw,h.salt))===h.hash}
+const pwForm=(id,btn,ph)=>`<form class="lkpwf" id="${id}" autocomplete="on" action="#"><input class="lkpu" type="text" name="username" autocomplete="username" value="${esc(ME?ME.username:'')}" tabindex="-1" aria-hidden="true">
+  <input class="lkpi ltr" id="${id}p" type="password" name="password" autocomplete="current-password" placeholder="${ph}" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
+  <button class="btn bkgo" type="submit">${btn}</button></form>`;
 let bioWait=null;
 window.__bioDone=(ok,msg)=>{const w=bioWait;bioWait=null;if(w)w(ok?{ok:true}:{ok:false,msg:msg||''})};
 function bioAndroid(title){return new Promise(r=>{bioWait=r;try{AndroidBridge.bioAuth(title)}catch(e){bioWait=null;r({ok:false,msg:String(e)})}})}
@@ -51,10 +59,21 @@ function lockEl(){let e=$('lock');if(!e){e=document.createElement('div');e.id='l
   e.addEventListener('click',ev=>{const b=ev.target.closest('[data-lk]');if(!b||b.disabled)return;ev.preventDefault();ev.stopPropagation();lockKey(b.dataset.lk)});}return e}
 /* m: unlock | set1 | set2 | verify | bio | forgot */
 function lockShow(m,cb){lockUI={m,pin:'',first:'',cb,err:'',busy:false};lockDraw();const e=lockEl();e.classList.remove('hide');document.documentElement.classList.add('locked');try{document.activeElement&&document.activeElement.blur()}catch(_){}
-  if(m==='unlock'&&lockCfg().bio)setTimeout(()=>{if(lockUI&&lockUI.m==='unlock'&&document.visibilityState==='visible')lockKey('bio',true)},350)}
+  if(m==='unlock'&&lockCfg().bio&&lockCfg().bio.t!=='pw')setTimeout(()=>{if(lockUI&&lockUI.m==='unlock'&&document.visibilityState==='visible')lockKey('bio',true)},350)}
 function lockHide(){const e=$('lock');if(e)e.classList.add('hide');document.documentElement.classList.remove('locked');lockUI=null;lockLast=Date.now();lockTouch(true)}
 function lockDraw(){const S=lockUI,e=lockEl();if(!S)return;const c=lockCfg(),bio=c&&c.bio&&S.m==='unlock';
   const T={unlock:['بده بستون',ME?esc(ME.name):''],set1:['رمز قفل تازه','یک رمز ۶ رقمی انتخاب کنید'],set2:['تکرار رمز','همان ۶ رقم را دوباره بزنید'],verify:['رمز فعلی','برای ادامه، رمز قفل را وارد کنید']}[S.m];
+  if(S.m==='pwset'||S.m==='pwun'){const st=S.m==='pwset';
+    e.innerHTML=`<div class="lkw"><div class="lkmark">${lkI('face')}</div><b class="lkt">${st?'Face ID با رمزهای آیفون':'باز کردن با Face ID'}</b>
+      <p class="lks">${st?'رمز عبور حساب برنامه را یک بار بزنید و «ذخیره» را بزنید؛ آیفون می‌پرسد در «Passwords» ذخیره شود → <b>Save</b>. از این به بعد آیفون با Face ID آن را پر می‌کند.':'روی خانه رمز بزنید؛ آیفون رمز ذخیره‌شده را با Face ID پر می‌کند.'}</p>
+      ${pwForm('lkpf',st?'ذخیره و روشن کردن':'باز کن','رمز عبور حساب')}
+      <p class="lkerr" aria-live="polite">${esc(S.err||'')}</p><button class="lkl" data-lk="${st?'bioNo':'back'}">${st?'فعلاً نه':'با رمز ۶ رقمی'}</button></div>`;
+    const fm=$('lkpf'),pi=$('lkpfp');let t=0;
+    const go=async()=>{const v=pi.value;if(!v||S.busy)return;S.busy=true;fm.classList.add('busy');const r=await lockPw(v);S.busy=false;if(lockUI===S&&!r){fm.classList.remove('busy');pi.value='';S.err=st?'رمز عبور حساب درست نیست':'رمز اشتباه است';const er=e.querySelector('.lkerr');if(er)er.textContent=S.err;e.querySelector('.lkw').classList.add('shake2');setTimeout(()=>{const w=e.querySelector('.lkw');w&&w.classList.remove('shake2')},400)}};
+    fm.addEventListener('submit',ev=>{ev.preventDefault();go()});
+    /* پر شدن خودکار با Face ID: آیفون مقدار را یکجا می‌گذارد → بلافاصله بررسی */
+    pi.addEventListener('input',()=>{clearTimeout(t);if(pi.value.length>=6)t=setTimeout(go,450)});
+    return}
   if(S.m==='bio'||S.m==='forgot'){const f=S.m==='forgot';
     e.innerHTML=`<div class="lkw"><div class="lkmark">${f?lkI('pad'):lkI(window.AndroidBridge?'fp':'face')}</div><b class="lkt">${f?'رمز را فراموش کرده‌اید؟':bioName()+' هم وصل شود؟'}</b>
       <p class="lks">${f?'برای رمز تازه باید یک بار با نام کاربری و رمز عبور وارد شوید. اطلاعات روی سرور می‌ماند و فقط این گوشی خارج می‌شود.':'از این به بعد برنامه را با '+bioName()+' باز کنید؛ رمز ۶ رقمی همیشه به‌عنوان راه دوم کار می‌کند.'}</p>
@@ -65,7 +84,7 @@ function lockDraw(){const S=lockUI,e=lockEl();if(!S)return;const c=lockCfg(),bio
   e.innerHTML=`<div class="lkw"><div class="lkmark">${S.m==='unlock'?'<span class="lkm">م</span>':lkI('pad')}</div><b class="lkt">${T[0]}</b><p class="lks">${T[1]}</p>
     <div class="lkd${S.shake?' shake':''}" aria-label="${toFa(S.pin.length)} رقم از ۶">${dots}</div><p class="lkerr" aria-live="polite">${esc(S.err||'')}</p>
     <div class="lkp">${[1,2,3,4,5,6,7,8,9].map(k).join('')}${left}${k(0)}<button data-lk="del" class="lkf" aria-label="پاک کردن">${lkI('del')}</button></div>
-    <button class="lkl" data-lk="${S.m==='unlock'?'forgot':'cancel'}">${S.m==='unlock'?'رمز را فراموش کرده‌ام':'انصراف'}</button></div>`;
+    ${bio&&c.bio.t==='pw'?`<button class="btn bkgo lkfid" data-lk="bio">${lkI('face')} باز کردن با Face ID</button>`:''}<button class="lkl" data-lk="${S.m==='unlock'?'forgot':'cancel'}">${S.m==='unlock'?'رمز را فراموش کرده‌ام':'انصراف'}</button></div>`;
   S.shake=false}
 async function lockKey(k,auto){const S=lockUI;if(!S||S.busy)return;
   if(k==='cancel'){const cb=S.cb;lockHide();cb&&cb(false);return}
@@ -73,6 +92,8 @@ async function lockKey(k,auto){const S=lockUI;if(!S||S.busy)return;
   if(k==='back'){S.m='unlock';S.pin='';S.err='';lockDraw();return}
   if(k==='logout'){S.busy=true;lockDraw();await lockWipe('برای رمز قفل تازه دوباره وارد شوید');return}
   if(k==='bioNo'){const cb=S.cb,set=!!S.first;lockHide();if(set)toast('قفل برنامه روشن شد ✓');cb&&cb(true);return}
+  if(k==='bioYes'&&bioPw()){S.m='pwset';S.err='';lockDraw();const p=$('lkpfp');if(p)p.focus();return}
+  if(k==='bio'&&lockCfg()&&lockCfg().bio&&lockCfg().bio.t==='pw'){if(auto)return;S.m='pwun';S.err='';lockDraw();const p=$('lkpfp');if(p)p.focus();return}
   if(k==='bioYes'){S.busy=true;S.err='';lockDraw();let r=null,er='';try{r=await bioEnroll()}catch(e){r=null;er=e&&e.name||''}
     if(!lockUI)return;S.busy=false;if(!r){S.err=er==='NotAllowedError'?bioName()+' لغو شد یا اجازه داده نشد؛ دوباره «وصل کن» را بزنید':er==='NotSupportedError'||er==='SecurityError'?'این مرورگر '+bioName()+' را پشتیبانی نمی‌کند؛ برنامه را در Safari باز کنید':bioName()+' وصل نشد؛ دوباره امتحان کنید یا «فعلاً نه» را بزنید';lockDraw();return}
     const c=lockCfg();c.bio=r;ls.set('m_lock',c);const cb=S.cb;lockHide();toast('قفل برنامه با '+bioName()+' روشن شد ✓');cb&&cb(true);return}
@@ -95,6 +116,18 @@ async function lockKey(k,auto){const S=lockUI;if(!S||S.busy)return;
   c.fails=(c.fails||0)+1;ls.set('m_lock',c);S.pin='';S.shake=true;
   if(S.m==='unlock'&&c.fails>=LOCK_MAX_FAIL){S.err='رمز ۵ بار اشتباه بود؛ خروج امن…';lockDraw();S.busy=true;await lockWipe('رمز قفل ۵ بار اشتباه وارد شد؛ دوباره وارد شوید');return}
   S.err=S.m==='unlock'?'رمز اشتباه است؛ '+toFa(LOCK_MAX_FAIL-c.fails)+' بار دیگر فرصت دارید':'رمز اشتباه است';setTimeout(lockDraw,60)}
+/* رمز حساب از فرم Face ID: هنگام وصل کردن با سرور بررسی می‌شود (ورود تازه)، هنگام باز کردن قفل با هش روی گوشی (بدون اینترنت هم) */
+async function lockPw(pw){const S=lockUI;if(!S)return false;
+  if(S.m==='pwset'){let ok=await pwhOk(pw);
+    if(!ok){try{const r=await api('/api/login',{username:ME.username,password:pw});if(r&&r.token){TOKEN=r.token;try{localStorage.setItem('m_token',TOKEN)}catch(e){}ok=true}}catch(e){if(lockUI&&/اینترنت|سرور|fetch|network/i.test(e.message||''))S.err='برای وصل کردن Face ID اینترنت لازم است';ok=false}}
+    if(!ok||!lockUI)return false;await pwhSet(pw);const c=lockCfg();c.bio={t:'pw'};ls.set('m_lock',c);const cb=S.cb;
+    /* فرم کمی بماند تا آیفون پیشنهاد ذخیره در Passwords را نشان دهد، بعد بسته شود */
+    setTimeout(()=>{if(lockUI===S){lockHide();toast('قفل برنامه با Face ID روشن شد ✓');cb&&cb(true)}},600);return true}
+  const c=lockCfg(),ok=await pwhOk(pw);if(!lockUI)return false;
+  if(ok){c.fails=0;ls.set('m_lock',c);const cb=S.cb;lockHide();cb&&cb(true);return true}
+  c.fails=(c.fails||0)+1;ls.set('m_lock',c);
+  if(c.fails>=LOCK_MAX_FAIL){S.busy=true;await lockWipe('رمز ۵ بار اشتباه وارد شد؛ دوباره وارد شوید');return true}
+  return false}
 /* خروج امن: اول تغییرهای ثبت‌نشده به سرور فرستاده می‌شوند، بعد این گوشی خارج می‌شود */
 async function lockWipe(msg){try{if(typeof syncNow==='function'&&navigator.onLine){await Promise.race([syncNow(),new Promise(r=>setTimeout(r,8000))])}}catch(e){}
   try{await api('/api/logout',{})}catch(e){}ls.set('m_lock',null);try{localStorage.removeItem('m_lock')}catch(e){}lockHide();forceLogout(msg)}
@@ -116,7 +149,7 @@ async function lockSheet(){const c=lockCfg(),av=await bioAvail(),on=!!c;
   sheet(`<div class="sh-h"><b>قفل برنامه</b><button class="x" data-act="close">×</button></div>
     <div class="muted" style="font-size:13px;line-height:1.9;margin:-4px 2px 12px">${on?'روشن است. بعد از ۲۰ دقیقه بیکاری، برای باز کردن برنامه رمز ۶ رقمی'+(c.bio?' یا '+bioName():'')+' لازم است.':'اگر گوشی گم شود یا دست کس دیگری بیفتد، بدون رمز ۶ رقمی برنامه باز نمی‌شود. بعد از ۲۰ دقیقه بیکاری قفل می‌شود.'}</div>
     <div class="lkrows">${on?
-      (av||c.bio?row('lockBio',lkI(window.AndroidBridge?'fp':'face'),c.bio?bioName()+' روشن است':'وصل کردن '+bioName(),c.bio?'برای خاموش کردن بزنید':'باز کردن برنامه بدون زدن رمز'):'')+
+      (av||c.bio?row('lockBio',lkI(window.AndroidBridge?'fp':'face'),c.bio?bioName()+' روشن است':'وصل کردن '+bioName(),c.bio?'برای خاموش کردن بزنید':bioPw()?'با رمزهای ذخیره‌شده خود آیفون (Passwords)':'باز کردن برنامه بدون زدن رمز'):'')+
       row('lockChange',lkI('pad'),'تغییر رمز ۶ رقمی','')+row('lockNow',lkI('pad'),'قفل کن، همین الان','')+row('lockOff',lkI('pad'),'خاموش کردن قفل','با وارد کردن رمز فعلی','r')
       :`<button class="btn bkgo" data-act="lockSet">${lkI('pad')} روشن کردن قفل</button>`}</div>`)}
 ACT.lockSheet=()=>{if(!TOKEN){toast('اول وارد شوید');return}lockSheet()};
