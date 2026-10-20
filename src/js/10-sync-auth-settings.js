@@ -279,5 +279,6 @@ let quietT=0;function quietRefresh(){if(!TOKEN||Date.now()-quietT<2500)return;qu
     busy=true;show(56,true);loading(true);const t0=Date.now();let r;try{r=await refreshAll();if(cur==='backups'&&isAdmin())await loadBk()}catch(_){r={off:true}}
     const w=600-(Date.now()-t0);if(w>0)await new Promise(x=>setTimeout(x,w));
     loading(false);busy=false;show(0,false);
-    const vv=V(),y=vv.scrollTop;render();vv.scrollTop=y;flashNew();refreshMsg(r)};
+    /* v59.1: بعد از تازه‌سازی، ردیف‌های خانه از پایین پشت سر هم بالا بیایند (قبلاً فقط ۳۴ پیکسل سر جایشان می‌لغزیدند) */
+    const vv=V(),y=vv.scrollTop,fr=cur==='home';if(fr)render._v='';render();vv.scrollTop=y;if(fr){const pn=hp();if(pn){pn.querySelectorAll(':scope>*:not(.grab)').forEach(l=>{l.style.transition='';l.style.transform=''});riseIn(pn,':scope>.bph,:scope>.fday,.blist>.swr,:scope>.hmore,:scope>.lrow,:scope>.hpast,:scope>.ball')}}flashNew();refreshMsg(r)};
   document.addEventListener('touchend',end,{passive:true});document.addEventListener('touchcancel',end,{passive:true});})();
