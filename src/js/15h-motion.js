@@ -77,7 +77,7 @@ function ghostPrune(real,clone,vh,d,ref){const R=real.children,C=clone.children;
     if(r.bottom<-60||r.top>vh+60){const sp=document.createElement('div');sp.style.cssText=`height:${r.height}px;margin:0;padding:0;border:0;flex:none`;ce.replaceWith(sp)}
     else{if(getComputedStyle(re).position!=='sticky'&&getComputedStyle(re).position!=='fixed'){ref.re=re;ref.ce=ce}if(r.height>vh*.6&&re.children.length>3)ghostPrune(re,ce,vh,d+1,ref)}}}
 function appGhost(z){const ap=$('app');document.querySelectorAll('.pgghost').forEach(g=>g.remove());
-  const g=ap.cloneNode(true),V=$('view'),sy=V?V.scrollTop:0,gv=g.querySelector('#view'),ref={};g.classList.add('pgghost');g.classList.remove('fullin','entout','turning','layered');g.setAttribute('aria-hidden','true');g.inert=true;g.style.pointerEvents='none';g.style.zIndex=String(z);g.style.transition='none';
+  const g=ap.cloneNode(true),V=$('view'),sy=V?V.scrollTop:0,gv=g.querySelector('#view'),ref={};g.classList.add('pgghost');g.classList.remove('fullin','entout','turning','layered');g.querySelectorAll('#view,#bar,#act').forEach(e=>e.classList.remove('in','bk'));g.setAttribute('aria-hidden','true');g.inert=true;g.style.pointerEvents='none';g.style.zIndex=String(z);g.style.transition='none';
   if(V&&gv)ghostPrune(V,gv,innerHeight,0,ref);
   const gb=g.querySelector('#bottom');if(gb)gb.style.visibility='hidden';
   ap.after(g);if(gv){gv.scrollTop=sy;/* جای خالی‌ها حاشیه ندارند؛ اولین چیز دیده‌شده را دقیقاً سر جایش بگذار */
@@ -97,17 +97,23 @@ function pageTurn(dir){const ap=$('app');if(!dir||!ap||RM()||!ap.animate)return 
 let fullTok=0;
 function fullEnterGhost(){const ap=$('app');if(!ap||RM()||!ap.animate)return;const g=appGhost(0),tok=++fullTok;ap.style.zIndex='1';ap.classList.add('layered');
   g.animate([{transform:'none',opacity:1},{transform:'scale(.95)',opacity:.55}],{duration:520,easing:'cubic-bezier(.32,.72,0,1)',fill:'forwards'});
-  setTimeout(()=>{g.remove();if(tok!==fullTok)return;ap.style.zIndex='';ap.classList.remove('layered')},580)}
+  setTimeout(()=>{g.remove();if(tok!==fullTok)return;ap.style.zIndex='';ap.classList.remove('layered')},640)}
+let leaveTok=0;
 function pageLeave(to,o){o=o||{};const ap=$('app');
   const reset=()=>{['view','bar','act'].forEach(id=>{const e=$(id);if(e){e.style.transition='';e.style.transform='';e.style.opacity=''}});const v=$('view');if(v)v.classList.remove('edge','edgeback');if(ap)ap.classList.remove('entout')};
   if(!ap||RM()||!ap.animate){reset();noAnim=true;navBack=true;go(to);return}
   const g=appGhost(3);g.querySelectorAll('#view,#bar,#act').forEach(e=>{e.style.transform='';e.style.opacity=''});
-  reset();++fullTok;ap.classList.remove('layered');noAnim=true;navBack=true;go(to);
-  const w=ap.offsetWidth||innerWidth,h=ap.offsetHeight||innerHeight,D=o.side?320:400,E='cubic-bezier(.32,.72,0,1)';
+  const w=ap.offsetWidth||innerWidth,h=ap.offsetHeight||innerHeight,D=o.side?340:420,E='cubic-bezier(.32,.72,0,1)';
   const K=o.side?[{transform:`translateX(${-(o.dx||0)}px)`},{transform:`translateX(${-w}px)`}]:[{transform:`translateY(${o.dy||0}px)`},{transform:`translateY(${h}px)`}];
-  const a=g.animate(K,{duration:D,easing:E,fill:'forwards'});
-  ap.animate([{transform:'scale(.95)',opacity:.6},{transform:'none',opacity:1}],{duration:D,easing:E});
-  const done=()=>g.remove();a.onfinish=done;setTimeout(done,D+250)}
+  g.style.transform=K[0].transform;/* کپی تا شروع حرکت دقیقاً همان‌جا که انگشت رها شد بماند */
+  reset();++fullTok;ap.style.zIndex='';ap.classList.remove('layered');noAnim=true;navBack=true;go(to);
+  /* v59: حرکت در فریم بعد شروع شود؛ ساختن صفحه مقصد (کار سنگین) قبل از آن تمام شده، پس زمان حرکت از صفر حساب می‌شود
+     (قبلاً حرکت هم‌زمان با ساختن صفحه شروع می‌شد و چند فریم اولش جا می‌افتاد = پرش اول بسته شدن) */
+  const tok=++leaveTok;requestAnimationFrame(()=>{if(tok!==leaveTok||!g.isConnected)return;
+    const a=g.animate(K,{duration:D,easing:E,fill:'forwards'});
+    ap.animate([{transform:'scale(.96)'},{transform:'none'}],{duration:D,easing:E});
+    a.onfinish=()=>g.remove()});
+  setTimeout(()=>g.remove(),D+400)}
 
 /* ۷) v58.9: وضعیت گوش دادن مسدودکننده به حرکت انگشت را با اسکرول، باز/بسته شدن پنجره و هر بار ساخته شدن صفحه به‌روز کن (tmSync در 01-core) */
 (()=>{const v=$('view'),ov=$('ov');if(v)v.addEventListener('scroll',tmSync,{passive:true});
