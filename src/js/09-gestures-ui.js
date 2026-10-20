@@ -48,14 +48,16 @@ function segFx(){segQ=0;const seen={};document.querySelectorAll('.seg:not(.st2):
 new MutationObserver(()=>{if(!segQ)segQ=requestAnimationFrame(segFx)}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
 window.addEventListener('resize',()=>requestAnimationFrame(segFx));
 /* ================= v22: بازگشت با کشیدن از لبه راست (مثل آیفون) ================= */
-(()=>{let g=null;const V=()=>$('view');
+(()=>{let g=null;const V=()=>$('view'),EP=()=>['view','bar','act'].map(i=>$(i)).filter(Boolean);
   document.addEventListener('touchstart',e=>{if(e.touches.length!==1||!edgeOK()||(e.target.closest&&e.target.closest('.swr')))return;const t=e.touches[0];if(t.clientX<innerWidth-24)return;g={x:t.clientX,y:t.clientY,lk:null,dx:0}},{passive:true});
   document.addEventListener('touchmove',e=>{if(!g)return;const t=e.touches[0],dx=g.x-t.clientX,dy=t.clientY-g.y;
-    if(!g.lk){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;g.lk=dx>0&&dx>Math.abs(dy)?'h':'v';if(g.lk!=='h'){g=null;return}V().classList.add('edge')}
-    e.preventDefault();g.dx=Math.max(0,dx);V().style.transform=`translateX(${-g.dx}px)`;V().style.opacity=String(1-Math.min(.5,g.dx/innerWidth))},{passive:false});
-  const fin=()=>{if(!g)return;const z=g;g=null;const v=V();v.classList.remove('edge');if(z.lk!=='h')return;v.classList.add('edgeback');
-    if(z.dx>innerWidth*.28){v.style.transform=`translateX(${-innerWidth}px)`;v.style.opacity='0';setTimeout(()=>{v.classList.remove('edgeback');v.style.transform='';v.style.opacity='';cur==='entry'&&editId?ACT.cancelEdit():SLIDEP.has(cur)?(navBack=true,go((cur==='ent'?PARENT.ent:PARENT[cur])||'home')):back()},200)}
-    else{v.style.transform='';v.style.opacity='';setTimeout(()=>v.classList.remove('edgeback'),260)}};
+    if(!g.lk){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;g.lk=dx>0&&dx>Math.abs(dy)?'h':'v';if(g.lk!=='h'){g=null;return}V().classList.add('edge');EP().forEach(el=>{el.style.transition='none'})}
+    e.preventDefault();g.dx=Math.max(0,dx);EP().forEach(el=>{el.style.transform=`translateX(${-g.dx}px)`})},{passive:false});
+  const fin=()=>{if(!g)return;const z=g;g=null;const v=V();v.classList.remove('edge');if(z.lk!=='h')return;
+    const P=EP(),clr=()=>P.forEach(el=>{el.style.transition='';el.style.transform='';el.style.opacity=''});
+    if(z.dx>innerWidth*.28){/* صفحه قبلی همان لحظه زیر ساخته می‌شود و این صفحه از جای انگشت کنار می‌رود (بدون سفیدی) */
+      if(cur==='entry'&&editId){clr();ACT.cancelEdit()}else if(FULLP.has(cur))pageLeave((cur==='ent'?PARENT.ent:PARENT[cur])||'home',{side:1,dx:z.dx});else{clr();back()}}
+    else{P.forEach(el=>{el.style.transition='transform .26s cubic-bezier(.2,.9,.3,1)';el.style.transform=''});setTimeout(()=>P.forEach(el=>{el.style.transition=''}),280)}};
   document.addEventListener('touchend',fin);document.addEventListener('touchcancel',fin);
 })();
 /* ================= v21: نوار ناوبری با نشانگر متحرک ================= */

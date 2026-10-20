@@ -376,3 +376,14 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 /* v58.4: صفحه قفل کل صفحه را غیرقابل انتخاب می‌کرد؛ آیفون در چنین جایی صفحه‌کلید را خالی باز می‌کرد و نمی‌شد تایپ کرد */
 .lk input,.lk textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .lk .lkpi{font-size:18px}
+/* v58.7: هنگام ورق زدن تب‌ها نوار بالای خانه سفید و خالی می‌شد (پس‌زمینه --bg روی متن سفید) — آبی خودش بماند */
+#app.turning.home #bar{background:var(--hero)!important}
+/* v58.7: باز شدن صفحه تمام‌صفحه روی کپی صفحه قبلی (نه روی سفیدی) و کپی صفحه هنگام بسته شدن، هر دو مات */
+#app.layered{background:transparent!important;box-shadow:none}
+#app.layered #view,#app.layered #bar{background-color:var(--bg)!important}
+#app.layered.home #bar{background:var(--hero)!important}
+.pgghost #view,.pgghost #bar{background-color:var(--bg)}
+.pgghost.home #bar{background:var(--hero)!important}
+/* v58.7: باز شدن صفحه تمام‌صفحه — نوار بالا و صفحه با هم بالا بیایند (قبلاً نوار فقط به اندازه قد خودش جابه‌جا می‌شد و زودتر می‌رسید) */
+@keyframes fullUp2{from{transform:translateY(100vh)}to{transform:none}}
+#app.fullin #view,#app.fullin #bar,#app.fullin #act{animation-name:fullUp2!important}

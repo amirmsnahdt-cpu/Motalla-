@@ -3,9 +3,9 @@
   document.addEventListener('touchstart',e=>{const v=$('view');if(e.touches.length!==1||!SLIDEP.has(cur)||!v||v.scrollTop>0||!$('ov').classList.contains('hide')||(cur==='ent'&&entEdit)||e.target.closest('input,textarea,select,.swr'))return;const t=e.touches[0];g={y:t.clientY,x:t.clientX,lk:null,d:0}},{passive:true});
   document.addEventListener('touchmove',e=>{if(!g)return;const t=e.touches[0],dy=t.clientY-g.y,dx=t.clientX-g.x;
     if(!g.lk){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;g.lk=dy>0&&dy>Math.abs(dx)*1.2&&$('view').scrollTop<=0?'v':'x';if(g.lk==='v')els().forEach(el=>{if(el)el.style.transition='none'})}
-    if(g.lk!=='v')return;e.preventDefault();g.d=Math.max(0,dy);els().forEach(el=>{if(el){el.style.transform=`translateY(${g.d}px)`;el.style.opacity=String(1-Math.min(.4,g.d/900))}})},{passive:false});
+    if(g.lk!=='v')return;e.preventDefault();g.d=Math.max(0,dy);els().forEach(el=>{if(el)el.style.transform=`translateY(${g.d}px)`})},{passive:false});
   const end=()=>{if(!g)return;const z=g;g=null;if(z.lk!=='v')return;const E=els();
-    if(z.d>110){E.forEach(el=>{if(el){el.style.transition='transform .16s ease-in,opacity .16s';el.style.transform='translateY(70vh)';el.style.opacity='0'}});setTimeout(()=>{noAnim=true;navBack=true;go((cur==='ent'?PARENT.ent:PARENT[cur])||'home');E.forEach(el=>{if(el){el.style.transition='';el.style.transform='';el.style.opacity=''}})},160)}
+    if(z.d>110){pageLeave((cur==='ent'?PARENT.ent:PARENT[cur])||'home',{dy:z.d})}
     else E.forEach(el=>{if(el){el.style.transition='transform .25s cubic-bezier(.2,.9,.3,1.2),opacity .25s';el.style.transform='';el.style.opacity='';setTimeout(()=>{el.style.transition=''},260)}})};
   document.addEventListener('touchend',end,{passive:true});document.addEventListener('touchcancel',end,{passive:true})})();
 /* دکمه برگشت اندروید: اول پنجره باز، بعد صفحه قبلی، در خانه خروج */

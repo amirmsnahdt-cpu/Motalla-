@@ -67,14 +67,35 @@ function sheetFocus(el){if(!el)return;const w=Math.max(0,(RM()?0:480)-(Date.now(
 const TAB_ORD=['home','banks','custs','audit','settings'];
 function tabTurnDir(from,to){if(!TAB_ORD.includes(to))return 0;const a=TAB_ORD.indexOf(TAB[from]),b=TAB_ORD.indexOf(to);if(a<0||a===b)return 0;return b>a?-1:1}/* RTL: تب بعدی سمت چپ است */
 let turnTok=0;
-function pageTurn(dir){const ap=$('app');if(!dir||!ap||RM()||!ap.animate)return null;
-  document.querySelectorAll('.pgghost').forEach(g=>g.remove());
-  const g=ap.cloneNode(true),V=$('view'),sy=V?V.scrollTop:0;g.classList.add('pgghost');g.classList.remove('fullin');g.setAttribute('aria-hidden','true');g.style.pointerEvents='none';g.style.zIndex='0';g.style.transition='none';
+/* نسخه تصویری کامل صفحه فعلی (کپی #app) کنار DOM واقعی؛ z=0 زیر صفحه واقعی، z=3 روی آن */
+function appGhost(z){const ap=$('app');document.querySelectorAll('.pgghost').forEach(g=>g.remove());
+  const g=ap.cloneNode(true),V=$('view'),sy=V?V.scrollTop:0;g.classList.add('pgghost');g.classList.remove('fullin','entout','turning','layered');g.setAttribute('aria-hidden','true');g.style.pointerEvents='none';g.style.zIndex=String(z);g.style.transition='none';
   g.querySelectorAll('input,textarea,select,button').forEach(e=>{e.tabIndex=-1});
   const gb=g.querySelector('#bottom');if(gb)gb.style.visibility='hidden';
-  ap.after(g);const gv=g.querySelector('#view');if(gv)gv.scrollTop=sy;ap.style.zIndex='1';ap.classList.add('turning');const tok=++turnTok;
+  ap.after(g);const gv=g.querySelector('#view');if(gv)gv.scrollTop=sy;return g}
+function pageTurn(dir){const ap=$('app');if(!dir||!ap||RM()||!ap.animate)return null;
+  const g=appGhost(0);ap.style.zIndex='1';ap.classList.add('turning');const tok=++turnTok;
   return ()=>{const w=ap.offsetWidth||innerWidth,E='cubic-bezier(.32,.72,0,1)',D=440;
     const inn=[{transform:`translateX(${dir*w}px)`,boxShadow:'0 0 0 0 transparent'},{transform:'none',boxShadow:'0 0 40px -10px #0b142640'}];
     ['bar','view'].forEach(id=>{const e=$(id);if(e)e.animate(inn,{duration:D,easing:E})});{const ac=$('act');if(ac&&ac.innerHTML)ac.animate([{opacity:0},{opacity:1}],{duration:D*.7,delay:D*.3,easing:'ease-out',fill:'backwards'})}
     const a=g.animate([{transform:'none',opacity:1},{transform:`translateX(${-dir*w*.3}px)`,opacity:.85}],{duration:D,easing:E,fill:'forwards'});
     const done=()=>{g.remove();if(tok!==turnTok)return;ap.style.zIndex='';ap.classList.remove('turning')};a.onfinish=done;setTimeout(done,D+200)}}
+
+/* ۶) v58.7: باز و بسته شدن صفحه‌های تمام‌صفحه (لیست‌ها، حساب مشتری، جزئیات واریزی…) بدون سفیدی:
+   باز شدن: صفحه قبلی (کپی تصویری) زیر صفحه تازه می‌ماند و کمی عقب می‌رود تا صفحه تازه رویش بالا بیاید.
+   بسته شدن (دکمه برگشت، کشیدن از لبه، کشیدن به پایین): صفحه مقصد همان لحظه زیر ساخته می‌شود و کپی صفحه فعلی
+   از همان جایی که انگشت رها شد پایین/کنار می‌رود — دیگر صفحه سفید یا پرش آخر حرکت نیست. */
+let fullTok=0;
+function fullEnterGhost(){const ap=$('app');if(!ap||RM()||!ap.animate)return;const g=appGhost(0),tok=++fullTok;ap.style.zIndex='1';ap.classList.add('layered');
+  g.animate([{transform:'none',opacity:1},{transform:'scale(.95)',opacity:.55}],{duration:520,easing:'cubic-bezier(.32,.72,0,1)',fill:'forwards'});
+  setTimeout(()=>{g.remove();if(tok!==fullTok)return;ap.style.zIndex='';ap.classList.remove('layered')},580)}
+function pageLeave(to,o){o=o||{};const ap=$('app');
+  const reset=()=>{['view','bar','act'].forEach(id=>{const e=$(id);if(e){e.style.transition='';e.style.transform='';e.style.opacity=''}});const v=$('view');if(v)v.classList.remove('edge','edgeback');if(ap)ap.classList.remove('entout')};
+  if(!ap||RM()||!ap.animate){reset();noAnim=true;navBack=true;go(to);return}
+  const g=appGhost(3);g.querySelectorAll('#view,#bar,#act').forEach(e=>{e.style.transform='';e.style.opacity=''});
+  reset();++fullTok;ap.classList.remove('layered');noAnim=true;navBack=true;go(to);
+  const w=ap.offsetWidth||innerWidth,h=ap.offsetHeight||innerHeight,D=o.side?320:400,E='cubic-bezier(.32,.72,0,1)';
+  const K=o.side?[{transform:`translateX(${-(o.dx||0)}px)`},{transform:`translateX(${-w}px)`}]:[{transform:`translateY(${o.dy||0}px)`},{transform:`translateY(${h}px)`}];
+  const a=g.animate(K,{duration:D,easing:E,fill:'forwards'});
+  ap.animate([{transform:'scale(.95)',opacity:.6},{transform:'none',opacity:1}],{duration:D,easing:E});
+  const done=()=>g.remove();a.onfinish=done;setTimeout(done,D+250)}
