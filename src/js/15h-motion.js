@@ -48,3 +48,21 @@ function flipPlay(root,m){if(!m||!root||!m.size)return;const vh=innerHeight,N=[]
 /* ۳) پنجره پایین: صفحه‌کلید تا پایان بالا آمدن پنجره باز نشود (باز شدن هم‌زمان = لگ و پرش پنجره) */
 let shOpenT=0;
 function sheetFocus(el){if(!el)return;const w=Math.max(0,(RM()?0:480)-(Date.now()-shOpenT));setTimeout(()=>{if(el.isConnected&&!$('ov').classList.contains('hide')){try{el.focus({preventScroll:true})}catch(_){el.focus()}}},w)}
+
+/* ۴) ورق زدن بین تب‌های نوار پایین: صفحه قبلی (با سربرگش) کمی کنار می‌رود و صفحه تازه از همان سمت تب روی آن می‌لغزد.
+   نسخه تصویری صفحه قبلی یک کپی کامل از #app است (پس شکل و رنگ‌ها دقیقاً همان می‌ماند)، بعد از DOM واقعی قرار می‌گیرد
+   تا getElementById همیشه عنصر واقعی را بدهد، و بعد از حرکت پاک می‌شود. نوار پایین ثابت می‌ماند. */
+const TAB_ORD=['home','banks','custs','audit','settings'];
+function tabTurnDir(from,to){if(!TAB_ORD.includes(to))return 0;const a=TAB_ORD.indexOf(TAB[from]),b=TAB_ORD.indexOf(to);if(a<0||a===b)return 0;return b>a?-1:1}/* RTL: تب بعدی سمت چپ است */
+let turnTok=0;
+function pageTurn(dir){const ap=$('app');if(!dir||!ap||RM()||!ap.animate)return null;
+  document.querySelectorAll('.pgghost').forEach(g=>g.remove());
+  const g=ap.cloneNode(true),V=$('view'),sy=V?V.scrollTop:0;g.classList.add('pgghost');g.classList.remove('fullin');g.setAttribute('aria-hidden','true');g.style.pointerEvents='none';g.style.zIndex='0';g.style.transition='none';
+  g.querySelectorAll('input,textarea,select,button').forEach(e=>{e.tabIndex=-1});
+  const gb=g.querySelector('#bottom');if(gb)gb.style.visibility='hidden';
+  ap.after(g);const gv=g.querySelector('#view');if(gv)gv.scrollTop=sy;ap.style.zIndex='1';ap.classList.add('turning');const tok=++turnTok;
+  return ()=>{const w=ap.offsetWidth||innerWidth,E='cubic-bezier(.32,.72,0,1)',D=440;
+    const inn=[{transform:`translateX(${dir*w}px)`,boxShadow:'0 0 0 0 transparent'},{transform:'none',boxShadow:'0 0 40px -10px #0b142640'}];
+    ['bar','view'].forEach(id=>{const e=$(id);if(e)e.animate(inn,{duration:D,easing:E})});{const ac=$('act');if(ac&&ac.innerHTML)ac.animate([{opacity:0},{opacity:1}],{duration:D*.7,delay:D*.3,easing:'ease-out',fill:'backwards'})}
+    const a=g.animate([{transform:'none',opacity:1},{transform:`translateX(${-dir*w*.3}px)`,opacity:.85}],{duration:D,easing:E,fill:'forwards'});
+    const done=()=>{g.remove();if(tok!==turnTok)return;ap.style.zIndex='';ap.classList.remove('turning')};a.onfinish=done;setTimeout(done,D+200)}}

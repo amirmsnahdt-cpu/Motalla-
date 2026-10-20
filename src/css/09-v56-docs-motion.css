@@ -352,3 +352,14 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]):focus,select:focu
 /* حس لمس: ردیف‌های لیست هنگام لمس کمی روشن می‌شوند (فرورفتن با برنامه انجام می‌شود) */
 .brh{transition:background-color .3s ease}.brh:active{background-color:color-mix(in srgb,var(--ink) 5%,transparent);transition-duration:0s}
 @media (prefers-reduced-motion:reduce){.brh{transition:none}}
+/* v58.1: نسخه تصویری صفحه قبلی هنگام ورق زدن تب‌ها — هیچ انیمیشن داخلی دوباره پخش نشود */
+.pgghost,.pgghost *{animation:none!important;transition:none!important}
+/* v58.1: پنجره پایین — صفحه پشت فقط کمی عقب می‌رود (کوچک و گرد می‌شود)، تیره نمی‌شود */
+.ov,.ov:not(.hide),.ov.ghost.out{background:transparent!important;animation:none}
+.ov.ghost.out{animation:none}
+html.shopen body{background:color-mix(in srgb,var(--ink) 9%,var(--bg))}
+html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparent),0 18px 40px -20px #0b142640;overflow:hidden}
+#sheet{box-shadow:0 -10px 40px -12px #0b142638,0 -1px 0 var(--hair)!important}
+#app.turning{background:transparent!important;box-shadow:none}
+#app.turning #view,#app.turning #bar{background-color:var(--bg)!important}
+#app.turning #bottom{background:var(--card)!important}

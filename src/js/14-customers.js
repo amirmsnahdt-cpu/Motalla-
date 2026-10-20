@@ -42,7 +42,7 @@ function cuListHTML(){const q0=clean(cuQ||''),q=nzName(toEn(q0)),A=CU();let B=A.
   const G=q&&groupsList().find(g=>nzName(g)===q);
   return `${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l">${B.map(([c,b])=>swW(`<button class="c6r" data-act="cuOpen" data-id="${c.id}"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="c6v">${balPills(b)}</span></button>`,{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})).join('')}</div>${add}`}
 const cuName=c=>(c.name||'');
-const aCusts=()=>can('debt')?`<button class="fab2" data-act="cuNew">${ic('plus')} افتتاح حساب</button>`:'';
+const aCusts=()=>'';/* افتتاح حساب از همان جستجو (نام را بنویسید → «حساب تازه») */
 function bindCusts(){const q=$('cuq');if(!q)return;q.oninput=()=>{cuQ=q.value;clearTimeout(q._t);q._t=setTimeout(()=>{const r=$('cures');if(r)r.innerHTML=cuListHTML();else if(cuQ){const v=$('view');v.innerHTML=vCusts();bindCusts();const n=$('cuq');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}},90)};
   q.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const f=document.querySelector('#cures [data-act=cuOpen]');if(f)ACT.cuOpen({id:f.dataset.id});else if(clean(q.value))ACT.cuNewQ()}}
 ACT.cuQClr=()=>{cuQ='';const v=$('view');v.innerHTML=vCusts();bindCusts()};
@@ -100,7 +100,7 @@ function cuBind(){const N=$('cuN'),P=$('cuP'),M=$('cuM'),G=$('cuG'),h=(id,t,c)=>
   let GL=[];acList(G,$('cuGs'),q=>{const nq=nzName(q),A=groupsList();GL=A.filter(g=>!nq||nzName(g).includes(nq)).slice(0,6);const ex=A.some(g=>nzName(g)===nq);const cnt=g=>CU().filter(c=>c.grp===g).length;
     const R=GL.map((g,i)=>sugRow(i,ic('users'),esc(g),fmt(cnt(g))+' مشتری','gr'));if(nq&&!ex){GL.push(clean(q));R.push(sugRow(GL.length-1,ic('plus'),'گروه تازه «'+esc(clean(q))+'»','بعداً با جستجوی همین نام پیدا می‌شود','nw'))}if(G.value&&!nq)return R.join('');return R.join('')},i=>{G.value=GL[+i]||'';$('cuA').focus()});
   ['cuN','cuP','cuM','cuG','cuA'].forEach((id,i,A)=>{const el=$(id);el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(i<A.length-1)$(A[i+1]).focus();else el.blur()}})})}
-ACT.cuNew=()=>{cuRet='';sheet(cuFormHTML({}));cuBind();setTimeout(()=>{const n=$('cuN');if(n)n.focus()},320)};
+ACT.cuNew=()=>{cuRet='';sheet(cuFormHTML({}));cuBind();sheetFocus($('cuN'))};
 ACT.cuEdit=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;sheet(cuFormHTML(c));cuBind()};
 ACT.cuSave=d=>{const name=clean($('cuN').value),phone=toEn($('cuP').value).replace(/\D/g,''),nidv=toEn($('cuM').value).replace(/\D/g,''),note=clean($('cuA').value||''),grp=clean($('cuG').value||'');
   if(!name){toast('نام مشتری را وارد کنید',true);$('cuN').focus();return}if(phone&&!phoneOk(phone)){toast('شماره تماس درست نیست',true);$('cuP').focus();return}if(nidv&&!nidOk(nidv)){toast('کد ملی معتبر نیست',true);$('cuM').focus();return}
@@ -110,7 +110,7 @@ ACT.cuSave=d=>{const name=clean($('cuN').value),phone=toEn($('cuP').value).repla
   saveCu();closeSheet();if(d.id==='new'&&cuRet==='sell'){cuRet='';svPick(c.id);toast('حساب «'+cuName(c)+'» باز شد و روی سند نشست');return}if(d.id==='new'){cuQ='';custId=c.id;go('cust');toast('حساب «'+cuName(c)+'» باز شد')}else{const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('مشخصات ذخیره شد')}};
 ACT.cuDel=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;const b=cuBal(c);askConfirm('حساب «'+cuName(c)+'» حذف شود؟'+(b.R||b.G||Object.keys(b.X).length?' (ته حساب صفر نیست)':''),'حذف',()=>{c.del=true;c.delAt=new Date().toISOString();saveCu();logA('cust','حذف حساب مشتری',cuName(c));if(cur==='cust')go('custs');else render();toast('حساب حذف شد','', 'بازگردانی',()=>{c.del=false;saveCu();render()})})};
 ACT.cuOpen=d=>{custId=d.id;go('cust')};
-ACT.cuNewQ=()=>{cuRet='';const q=clean(cuQ||'');sheet(cuFormHTML({name:q}));cuBind();setTimeout(()=>{const p=$('cuP');if(p)p.focus()},320)};
+ACT.cuNewQ=()=>{cuRet='';const q=clean(cuQ||'');sheet(cuFormHTML({name:q}));cuBind();sheetFocus($('cuP'))};
 /* موجودی مغازه به تفکیک نوع طلا: خرید و دریافت اضافه می‌کند، فروش و تحویل کم می‌کند (پولی‌ها موجودی را تغییر نمی‌دهند) */
 function goldStock(){const m={};GK.forEach(k=>m[k]=0);for(const c of custs){if(c.del||c.sys)continue;for(const t of (c.txs||[])){if(t.del)continue;
     if(t.type==='inv'){for(const it of t.items||[]){const k=it.cat||'نو';m[k]=(m[k]||0)-(+it.w||0)}for(const p of t.pays||[])if(p.m==='gold'){const k=p.cat||'کارکرده';m[k]=(m[k]||0)+(+p.w||0)}

@@ -17,7 +17,11 @@ async function pinHash(pin,salt){const k=await crypto.subtle.importKey('raw',new
 
 /* ---- بیومتریک ---- */
 async function bioAvail(){try{if(window.AndroidBridge)return !!(AndroidBridge.bioAvailable&&AndroidBridge.bioAvailable());
-  return !!(window.PublicKeyCredential&&PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return false}}
+  if(!window.PublicKeyCredential||!window.isSecureContext)return false;
+  /* آیفون: همه آیفون‌های امروزی Face ID یا Touch ID دارند، ولی Safari در بعضی حالت‌ها (مرورگر داخل برنامه‌ها، صفحه افزوده به خانه)
+     به این سؤال «نه» جواب می‌دهد و گزینه اصلاً دیده نمی‌شد. روی آیفون همیشه گزینه را نشان بده؛ اگر وصل نشد، پیام روشن می‌دهیم. */
+  if(isIOS())return true;
+  return !!(PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return isIOS()}}
 let bioWait=null;
 window.__bioDone=(ok,msg)=>{const w=bioWait;bioWait=null;if(w)w(ok?{ok:true}:{ok:false,msg:msg||''})};
 function bioAndroid(title){return new Promise(r=>{bioWait=r;try{AndroidBridge.bioAuth(title)}catch(e){bioWait=null;r({ok:false,msg:String(e)})}})}
@@ -67,8 +71,8 @@ async function lockKey(k,auto){const S=lockUI;if(!S||S.busy)return;
   if(k==='back'){S.m='unlock';S.pin='';S.err='';lockDraw();return}
   if(k==='logout'){S.busy=true;lockDraw();await lockWipe('برای رمز قفل تازه دوباره وارد شوید');return}
   if(k==='bioNo'){const cb=S.cb,set=!!S.first;lockHide();if(set)toast('قفل برنامه روشن شد ✓');cb&&cb(true);return}
-  if(k==='bioYes'){S.busy=true;S.err='';lockDraw();let r=null;try{r=await bioEnroll()}catch(e){r=null}
-    if(!lockUI)return;S.busy=false;if(!r){S.err=bioName()+' وصل نشد؛ دوباره امتحان کنید یا «فعلاً نه» را بزنید';lockDraw();return}
+  if(k==='bioYes'){S.busy=true;S.err='';lockDraw();let r=null,er='';try{r=await bioEnroll()}catch(e){r=null;er=e&&e.name||''}
+    if(!lockUI)return;S.busy=false;if(!r){S.err=er==='NotAllowedError'?bioName()+' لغو شد یا اجازه داده نشد؛ دوباره «وصل کن» را بزنید':er==='NotSupportedError'||er==='SecurityError'?'این مرورگر '+bioName()+' را پشتیبانی نمی‌کند؛ برنامه را در Safari باز کنید':bioName()+' وصل نشد؛ دوباره امتحان کنید یا «فعلاً نه» را بزنید';lockDraw();return}
     const c=lockCfg();c.bio=r;ls.set('m_lock',c);const cb=S.cb;lockHide();toast('قفل برنامه با '+bioName()+' روشن شد ✓');cb&&cb(true);return}
   if(k==='bio'){S.busy=true;const ok=await bioCheck();if(!lockUI)return;S.busy=false;if(ok){const c=lockCfg();c.fails=0;ls.set('m_lock',c);const cb=S.cb;lockHide();cb&&cb(true)}else if(!auto){S.err=bioName()+' تأیید نشد؛ رمز را وارد کنید';lockDraw()}return}
   if(k==='del'){S.pin=S.pin.slice(0,-1);S.err='';lockDraw();return}
