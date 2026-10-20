@@ -52,7 +52,7 @@ const ACT={
   flowGo:d=>{const s=d.s;if(s==='entry'){editId=null;go('entry')}else if(s==='split')go('split1');else if(s==='track'){const b=openB().find(x=>x.date===dateVal);if(b){batchId=b.id;tkFilter='all';tkQ='';go('batch')}else{trTab='open';go('track')}}else{if(dayBatches(dateVal).length){dayIso=dateVal;go('day')}else{trTab='arch';go('track')}}},
   archive:()=>{trTab='arch';go('track')},
   trTab:d=>{trTab=d.t;render()},
-  dTab:d=>{dTab=d.t;render()},dClear:()=>{dQ='';srchFx=1;render()},
+  dTab:d=>{dTab=d.t;render()},dClear:()=>{dQ='';render()},
   credOpen:d=>{credId=+d.id;go('cred')},credNew:()=>startCW(null),credEdit:()=>startCW(credId),credSave:()=>credSave(),
   toDebt:()=>{const e=entries.find(z=>z.id===editId);if(!e)return;const ex=creds.find(c=>c.linkId===e.id);if(ex){credId=ex.id;editId=null;go('cred');return}if(e.sentBid){startCW(null);Object.assign(wz.d,{title:e.title||'',name:e.name,debt:e.amount,iban:(e.iban||'').replace(/^IR/,'')});wz.step=2;render();toast('این واریزی ارسال شده؛ حساب بدون اتصال ساخته می‌شود');return}startCW(null,e.id)},
   cTitle:d=>{dTmp.title=d.t;$('ctl').innerHTML=tChips(d.t,'cTitle')},pTitle:d=>{dTmp.title=d.t;$('ptl').innerHTML=tChips(d.t,'pTitle')},

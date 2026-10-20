@@ -48,7 +48,7 @@ function vLday(){const d=hubData(ldKey);ldX=null;
   if(lq&&!hits)h+='<div class="spempty" style="padding:20px 8px"><b>در این لیست پیدا نشد</b></div>';
   if(d.closed&&can('close'))h+=`<div class="row"><button class="link" data-act="hubReopen">بازگشایی لیست برای تغییر وضعیت‌ها</button></div>`;
   return h}
-function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;srchFx=1;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;srchFx=1;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
+function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
 const aLday=()=>{const d=hubData(ldKey);if(!d.rows.length)return '';const B=[];
   if(d.un.length&&can('split'))B.push(`<button class="btn ${d.dr.length?'sec':'gold'}" data-act="allocNew">${ic('plus')} تخصیص به منبع</button>`);
   if(d.dr.length&&can('split'))B.push(`<button class="btn gold" data-act="hubSendAll">${ic('copy')} کپی و ارسال${d.dr.length>1?' '+fmt(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''}</button>`);
@@ -61,7 +61,7 @@ function ldPick(){const d=ldData(ldKey),X=ldX||ldXDef(d);return{reg:d.eds.map(e=
 /* ---------- صفحه لیست‌ها: هر تاریخ واریز یک لیست، جدیدترین بالا ---------- */
 function vSplit1(){return vArch()}
 const aSplit1=()=>'';
-function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();srchFx=1;render()}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{const was=qDate(arcQ);arcQ=q.value;arcD='';if(qDate(arcQ)!==was){const pos=q.selectionStart;srchFx=1;render();const n=$('arq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}},250)}}
+function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();render()}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{const was=qDate(arcQ);arcQ=q.value;arcD='';if(qDate(arcQ)!==was){const pos=q.selectionStart;render();const n=$('arq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}},250)}}
 /* ---------- پنجره تخصیص ---------- */
 function allocNew(){const s0=sources[0]||{};aSt={srcId:s0.id,method:s0.bank?'bank':'amount',amount:0,min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
 const aPool=()=>remainList().filter(r=>r.level<2);

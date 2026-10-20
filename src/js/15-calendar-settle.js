@@ -33,7 +33,7 @@ ACT.openEnt=d=>{entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcv
 ACT.entDel=d=>{navBack=true;go(PARENT.ent||'home');delEntry(d.id)};
 ACT.fF=d=>{fF=d.f;fN=120;render()};
 ACT.arcCal=()=>{const M=new Set();validated().forEach(r=>{M.add(PD(r));M.add(r.entryDate)});openCal(arcD||qDate(arcQ)||todayISO(),iso=>{arcD=iso;arcQ='';render();$('view').scrollTop=0},{title:'لیست‌های کدام روز؟',sub:'روزهای نقطه‌دار لیست دارند',q:[[-1,'دیروز'],[0,'امروز'],[1,'فردا']],marks:M})};
-ACT.arcClr=()=>{arcQ='';arcD='';srchFx=1;render()};
+ACT.arcClr=()=>{arcQ='';arcD='';render()};
 ACT.cuStl=()=>{cuStlQ='';sheet(cuStlHTML());const q=$('csq');if(q){q.oninput=()=>{cuStlQ=q.value;$('csl').outerHTML=(()=>{const t=document.createElement('div');t.innerHTML=cuStlHTML();return t.querySelector('#csl').outerHTML})()}}};
 ACT.cuStlPick=d=>{const c=curCu(),r=validated().find(z=>String(z.id)===String(d.id));if(!c||!r)return;entId=r.id;stl={cuId:c.id,name:cuName(c),phone:c.phone||'',amount:r.amount,q:''};sheet(stlHTML());stlBind()};
 function stlChips(){const z=stl,L=CU(),q=(z.q||'').trim(),M=q?L.filter(c=>cuName(c).includes(q)||(c.phone||'').includes(toEn(q))).slice(0,8):L.slice().sort((a,b)=>String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,6);return `${z.cuId?`<button class="tch on" data-act="stlCu" data-id="">${esc(cuName(custs.find(c=>String(c.id)===String(z.cuId))||{name:z.name}))} ×</button>`:M.map(c=>`<button class="tch" data-act="stlCu" data-id="${c.id}">${esc(cuName(c))}</button>`).join('')+(q?`<button class="tch nw" data-act="stlCu" data-id="new">+ «${esc(q)}» بدون حساب</button>`:'')}`}
@@ -72,7 +72,7 @@ ACT.rcShare1=async d=>{const r=RC[+d.i];if(r)rcShare(await rcFiles([r]),r.name)}
 ACT.rcSaveAll=async()=>rcDown(await rcFiles(RC));
 ACT.rcShareAll=async()=>rcShare(await rcFiles(RC),RCT);
 ACT.rcEnt=async d=>{const b=batches.find(z=>z.id==d.b),x=b&&b.items.find(z=>String(z.id)===String(d.id));if(!x)return;rcShare(await rcFiles(itImgs(b,x).map(k=>({key:k,name:x.name,amount:x.amount,tn:x.tn||''}))),x.name)};
-ACT.ldQClr=()=>{ldQ='';const v=$('view'),y=v.scrollTop;srchFx=1;render();v.scrollTop=y};
+ACT.ldQClr=()=>{ldQ='';const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.rcOne=async d=>{RC=[{key:d.k,name:d.n,amount:+d.a,tn:d.t}];RC.one=1;RCT='رسید '+d.n;ACT.rcView({i:0})};
 function stlTx(e,z){const c=custs.find(q=>String(q.id)===String(z.cuId));if(!c)return;const now=new Date().toISOString(),t={id:nid++,type:'pin',kind:'',weight:0,ppg:0,amount:+z.amount||0,note:'تسویه واریزی «'+fullName(e)+'»'+(z.inv?' · فاکتور '+z.inv:'')+(z.tn?' · پیگیری '+z.tn:''),date:todayISO(),at:now,by:who(),entId:e.id,stlId:z.id,img:z.img||''};(c.txs=c.txs||[]).push(t);c.lastAt=now;z.txId=t.id;saveCu()}
 function stlUntx(z){if(!z.cuId||!z.txId)return;const c=custs.find(q=>String(q.id)===String(z.cuId)),t=c&&(c.txs||[]).find(q=>q.id===z.txId);if(t){t.del=true;c.lastAt=new Date().toISOString();saveCu()}delete z.txId}
@@ -117,7 +117,7 @@ ACT.spTab=d=>{spTab=d.t;AM=null;render();$('view').scrollTop=0};
 ACT.arcDay=d=>{ldKey=d.iso;ldX=null;ldOpen=new Set();ldQ='';go('lday')};
 ACT.arcDayL=d=>{fD='';fP=d.iso;fG='pay';fF='all';fS='';fQ='';spTab='lists';render();$('view').scrollTop=0};
 ACT.fDClr=()=>{fD='';render()};
-ACT.fClr=()=>{fQ='';fN=120;srchFx=1;render()};
+ACT.fClr=()=>{fQ='';fN=120;render()};
 ACT.findMore=()=>{fN+=200;$('fres').innerHTML=findHTML()};
 ACT.acct=()=>{if(!ME){showAuth();return}sheet(`<div class="sh-h"><b>حساب کاربری</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="uh2"><div class="av">${esc(userInit(ME.name))}</div><div class="ux"><b>${esc(ME.name)}</b><span>${ROLE[ME.role]||ME.role} · <i class="ltrv">@${esc(ME.username)}</i></span></div></div>

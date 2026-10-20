@@ -45,7 +45,7 @@ const cuName=c=>(c.name||'');
 const aCusts=()=>'';/* افتتاح حساب از همان جستجو (نام را بنویسید → «حساب تازه») */
 function bindCusts(){const q=$('cuq');if(!q)return;q.oninput=()=>{cuQ=q.value;clearTimeout(q._t);q._t=setTimeout(()=>{const r=$('cures');if(r)srchSwap(r,cuListHTML());else if(cuQ){const v=$('view');v.innerHTML=vCusts();bindCusts();const n=$('cuq');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}},90)};
   q.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const f=document.querySelector('#cures [data-act=cuOpen]');if(f)ACT.cuOpen({id:f.dataset.id});else if(clean(q.value))ACT.cuNewQ()}}
-ACT.cuQClr=()=>{cuQ='';const m=srchSnap($('cures')),v=$('view');v.innerHTML=vCusts();bindCusts();srchPlay($('cures'),m)};
+ACT.cuQClr=()=>{cuQ='';const m=flipSnap($('cures')),v=$('view');v.innerHTML=vCusts();bindCusts();flipPlay($('cures'),m)};
 /* ---- صفحه یک مشتری ---- */
 function vCust(){const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust')go('custs',true)},0);return ''}const b=cuBal(c),T=(c.txs||[]).filter(t=>!t.del).slice().sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
   const tile=(k,v)=>`<div class="c6t ${k==='r'||k==='g'?k:'x'} ${v<0?'d':v>0?'c':'z'}"><small>${k==='r'?'مانده ریالی':k==='g'?'مانده طلایی':esc((XA[k]||{t:k}).t)}</small><b>${v?balV(k,v):'۰'}<i>${balU(k)}</i></b><span>${cuLab(v)}</span></div>`;

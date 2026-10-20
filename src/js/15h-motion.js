@@ -25,25 +25,37 @@ const PRESS_SEL='button,[data-act],a[href],.opt,.lrow,.tcard,label.chk';
   document.addEventListener('dragstart',end,{capture:true});
 })();
 
-/* ۲) جابه‌جایی نرم (FLIP): وقتی همان صفحه دوباره ساخته می‌شود (تسویه، تأیید، همگام‌سازی، مرتب‌سازی)،
-   هر ردیف یا کارت (data-fk) از جای قبلی‌اش به جای تازه می‌لغزد؛ ردیف تازه آرام ظاهر می‌شود.
-   فقط عناصری که قبل یا بعد در دید هستند حرکت می‌کنند (لیست‌های بلند سنگین نشوند). */
-function flipSnap(root){if(!root||RM())return null;const m=new Map(),vh=innerHeight;
-  root.querySelectorAll('[data-fk]').forEach(el=>{const k=el.dataset.fk;if(m.has(k)){m.set(k,null);return}const r=el.getBoundingClientRect();m.set(k,r.height?{x:r.left,y:r.top,h:r.height,vis:r.bottom>-40&&r.top<vh+40}:null)});
+/* ۲) جابه‌جایی نرم (FLIP) — v58.6: هر بار که همان صفحه دوباره ساخته می‌شود (جستجو، زدن روی تاریخ/روز، فیلتر، تسویه، همگام‌سازی…)
+   ردیف‌ها و کارت‌هایی که می‌مانند از جای قبلی‌شان به جای تازه می‌لغزند و ردیف‌های تازه پشت سر هم از پایین بالا می‌آیند
+   (همان حس عوض شدن روز در خانه) — در همه صفحه‌ها، نه فقط ردیف‌های data-fk.
+   کلید هر عنصر: data-fk، وگرنه data-act با همه data-*های دیگرش (مثلاً کارت لیست = arcDay|تاریخ)، وگرنه تیک انتخاب (data-sel).
+   فقط عناصر داخل دید حرکت می‌کنند؛ حرکت کم (reduced motion) رعایت می‌شود. */
+const FLIP_SEL='[data-fk],[data-act]:not(.swb):not(input):not(textarea):not(select),label.arow,.bempty,.card.empty';
+function flipKey(el){const d=el.dataset;if(d.fk)return d.fk;
+  if(d.act){let k=d.act;for(const n in d)if(n!=='act'&&n!=='fk')k+='|'+n+'='+d[n];return k}
+  const s=el.querySelector(':scope>input[data-sel]');if(s)return 'sel:'+s.dataset.sel;return 'c:'+el.className}
+function flipEls(root){return root.querySelectorAll(FLIP_SEL)}/* دکمه‌های پنهان کشیدن ردیف (.swb) و فیلدها حساب نمی‌شوند */
+function flipSnap(root){if(!root||RM()||!root.animate)return null;const m=new Map(),vh=innerHeight;
+  flipEls(root).forEach(el=>{if(el.matches('input,textarea,select,option'))return;const k=flipKey(el);if(m.has(k)){m.set(k,null);return}const r=el.getBoundingClientRect();m.set(k,r.height?{x:r.left,y:r.top,vis:r.bottom>-40&&r.top<vh+40}:null)});
   return m}
-function flipPlay(root,m){if(!m||!root||!m.size)return;const vh=innerHeight,N=[],seen=new Set();
-  root.querySelectorAll('[data-fk]').forEach(el=>{const k=el.dataset.fk;if(seen.has(k)){el._fd=null;return}seen.add(k);const r=el.getBoundingClientRect(),o=m.get(k);
-    const vis=r.bottom>-40&&r.top<vh+40;
-    if(o===undefined){el._fd=null;if(vis&&r.height)N.push([el,'new']);return}
-    if(!o||!(o.vis||vis)){el._fd=null;return}
-    const dx=o.x-r.left,dy=o.y-r.top;el._fd=(Math.abs(dx)>.5||Math.abs(dy)>.5)?{dx,dy}:null;if(el._fd)N.push([el,'mv'])});
-  N.forEach(([el,t])=>{if(t==='new'){el.animate([{opacity:0,transform:'translateY(-6px) scale(.985)'},{opacity:1,transform:'none'}],{duration:340,easing:'cubic-bezier(.22,.8,.26,1)'});return}
-    /* اگر پدرِ این عنصر هم حرکت می‌کند، فقط اختلاف را حرکت بده (حرکت تو در تو دوبرابر نشود) */
-    let dx=el._fd.dx,dy=el._fd.dy;for(let p=el.parentElement;p&&p!==root;p=p.parentElement){if(p._fd){dx-=p._fd.dx;dy-=p._fd.dy;break}}
+function flipPlay(root,m){if(!m||!root)return;const vh=innerHeight,N=[],seen=new Set(),E=[];
+  flipEls(root).forEach(el=>{el._fd=null;el._fn=0;if(el.matches('input,textarea,select,option'))return;const k=flipKey(el);if(seen.has(k))return;seen.add(k);const r=el.getBoundingClientRect(),o=m.get(k);
+    if(!r.height)return;const vis=r.bottom>-40&&r.top<vh+40;E.push(el);
+    if(o===undefined){el._fn=1;if(vis)N.push([el,'new']);return}
+    if(!o||!(o.vis||vis))return;
+    const dx=o.x-r.left,dy=o.y-r.top;if(Math.abs(dx)>.5||Math.abs(dy)>.5){el._fd={dx,dy};N.push([el,'mv'])}});
+  let n=0;
+  N.forEach(([el,t])=>{
+    /* پدرِ این عنصر هم تازه است → فقط پدر بالا بیاید؛ پدر حرکت می‌کند → فقط اختلاف را حرکت بده (حرکت تو در تو دوبرابر نشود) */
+    let dx=t==='mv'?el._fd.dx:0,dy=t==='mv'?el._fd.dy:0;
+    for(let p=el.parentElement;p&&p!==root;p=p.parentElement){if(p._fn)return;if(p._fd){dx-=p._fd.dx;dy-=p._fd.dy;break}}
+    if(t==='new'){el.animate([{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'none'}],{duration:460,delay:Math.min(n++,10)*34,easing:'cubic-bezier(.22,.8,.26,1)',fill:'backwards',composite:'add'});return}
     if(Math.abs(dx)<.5&&Math.abs(dy)<.5)return;
-    const far=Math.min(1,Math.abs(dy)/900),dur=380+far*180;
+    const far=Math.min(1,Math.abs(dy)/900),dur=420+far*180;
     el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:dur,easing:'cubic-bezier(.32,.72,0,1)',composite:'add'})});
-  setTimeout(()=>root.querySelectorAll('[data-fk]').forEach(el=>{el._fd=null}),0)}
+  setTimeout(()=>E.forEach(el=>{el._fd=null;el._fn=0}),0)}
+/* جای‌گذاری نتیجه تازه در یک ظرف (جستجوهایی که فقط بخش نتیجه را عوض می‌کنند) با همین حرکت؛ اگر کاربر از صفحه رفته باشد کاری نمی‌کند */
+function srchSwap(id,html){const el=typeof id==='string'?$(id):id;if(!el)return;const m=flipSnap(el);el.innerHTML=html;flipPlay(el,m)}
 
 /* ۳) پنجره پایین: صفحه‌کلید تا پایان بالا آمدن پنجره باز نشود (باز شدن هم‌زمان = لگ و پرش پنجره) */
 let shOpenT=0;
@@ -66,25 +78,3 @@ function pageTurn(dir){const ap=$('app');if(!dir||!ap||RM()||!ap.animate)return 
     ['bar','view'].forEach(id=>{const e=$(id);if(e)e.animate(inn,{duration:D,easing:E})});{const ac=$('act');if(ac&&ac.innerHTML)ac.animate([{opacity:0},{opacity:1}],{duration:D*.7,delay:D*.3,easing:'ease-out',fill:'backwards'})}
     const a=g.animate([{transform:'none',opacity:1},{transform:`translateX(${-dir*w*.3}px)`,opacity:.85}],{duration:D,easing:E,fill:'forwards'});
     const done=()=>{g.remove();if(tok!==turnTok)return;ap.style.zIndex='';ap.classList.remove('turning')};a.onfinish=done;setTimeout(done,D+200)}}
-
-/* ۵) نتیجه جستجو (v58.5): مثل عوض شدن روز در خانه — ردیف‌هایی که می‌مانند از جای قبلی‌شان نرم بالا/پایین می‌لغزند
-   و ردیف‌های تازه پشت سر هم از پایین بالا می‌آیند. برای همه جستجوها (لیست، پیگیری، حساب‌ها، بدهی، سند، تخصیص…).
-   کلید هر ردیف: data-fk، وگرنه data-act+data-id، وگرنه تیک انتخاب (data-sel)؛ فقط ردیف‌های بیرونی (نه دکمه‌های داخل ردیف).
-   فقط ردیف‌های داخل دید حرکت می‌کنند؛ حرکت کم (reduced motion) رعایت می‌شود. */
-const SRCH_SEL='[data-fk],[data-act][data-id],label.arow,.bempty,.card.empty,.c6add';
-let srchFx=0;/* جستجویی که کل صفحه را دوباره می‌سازد (render) این را روشن می‌کند تا همین حرکت به جای FLIP معمولی اجرا شود */
-function srchKey(el){if(el.dataset.fk)return el.dataset.fk;if(el.dataset.act&&el.dataset.id!=null)return el.dataset.act+':'+el.dataset.id;
-  const s=el.querySelector(':scope>input[data-sel]');if(s)return 'sel:'+s.dataset.sel;return 'c:'+el.className}
-function srchItems(root){return [...root.querySelectorAll(SRCH_SEL)].filter(el=>{const p=el.parentElement&&el.parentElement.closest(SRCH_SEL);return !p||!root.contains(p)})}
-function srchSnap(root){if(!root||RM()||!root.animate)return null;const m=new Map(),vh=innerHeight;
-  srchItems(root).forEach(el=>{const k=srchKey(el);if(m.has(k)){m.set(k,null);return}const r=el.getBoundingClientRect();m.set(k,r.height?{y:r.top,vis:r.bottom>-40&&r.top<vh+40}:null)});
-  return m}
-function srchPlay(root,m){if(!m||!root)return;const vh=innerHeight,seen=new Set();let n=0;
-  srchItems(root).forEach(el=>{const k=srchKey(el);if(seen.has(k))return;seen.add(k);const r=el.getBoundingClientRect();if(!r.height)return;
-    const vis=r.bottom>-40&&r.top<vh+40,o=m.get(k);
-    if(o===undefined){if(!vis)return;/* تازه: از پایین بالا می‌آید، پشت سر هم */
-      el.animate([{opacity:0,transform:'translateY(22px)'},{opacity:1,transform:'none'}],{duration:440,delay:Math.min(n++,10)*32,easing:'cubic-bezier(.22,.8,.26,1)',fill:'backwards'});return}
-    if(!o||!(o.vis||vis))return;const dy=o.y-r.top;if(Math.abs(dy)<.5)return;
-    el.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:420+Math.min(1,Math.abs(dy)/900)*180,easing:'cubic-bezier(.32,.72,0,1)'})})}
-/* جای‌گذاری نتیجه تازه در یک ظرف با همین حرکت؛ اگر کاربر از صفحه رفته باشد (ظرف نیست) کاری نمی‌کند */
-function srchSwap(id,html){const el=typeof id==='string'?$(id):id;if(!el)return;const m=srchSnap(el);el.innerHTML=html;srchPlay(el,m)}
