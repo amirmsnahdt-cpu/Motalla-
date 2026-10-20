@@ -155,7 +155,7 @@ function pwSheet(){sheet(`<div class="sh-h"><b>تغییر رمز عبور</b><bu
   <div class="f"><label>رمز فعلی</label><input id="po" class="ltr" type="password" autocomplete="current-password"></div>
   <div class="f"><label>رمز جدید <i>(حداقل ۸ کاراکتر)</i></label><input id="pn1" class="ltr" type="password" autocomplete="new-password"></div>
   <div class="f"><label>تکرار رمز جدید</label><input id="pn2" class="ltr" type="password" autocomplete="new-password"></div>
-  <div class="row"><button class="btn gold" data-act="pwSave">ذخیره رمز جدید</button></div>`);setTimeout(()=>$('po')&&$('po').focus(),60)}
+  <div class="row"><button class="btn gold" data-act="pwSave">ذخیره رمز جدید</button></div>`);sheetFocus($('po'))}
 /* ---------- مدیریت کاربران ---------- */
 let USERS=null,usersErr='';
 function vUsers(){if(!isAdmin())return '<div class="card empty"><b>فقط مدیر دسترسی دارد</b></div>';
@@ -180,7 +180,7 @@ function userNew(){uTmp={role:'staff'};const p=genPass();
   <div class="f"><label>نام کاربری <i>(انگلیسی، برای ورود)</i></label><input id="uun" class="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="maryam" autocomplete="off"></div>
   <div class="f"><label>رمز عبور</label><div class="pw"><input id="upw" class="ltr" value="${p}" autocomplete="off"><button type="button" class="pwt" data-act="uGen" aria-label="رمز تصادفی">${ic('refresh')}</button></div></div>
   <label class="albl" style="margin-top:4px">نقش</label>${roleSeg('staff')}${permList('staff',DEF_STAFF)}
-  <div class="row"><button class="btn gold" data-act="userCreate">ساخت حساب</button></div>`);setTimeout(()=>$('unm')&&$('unm').focus(),60)}
+  <div class="row"><button class="btn gold" data-act="userCreate">ساخت حساب</button></div>`);sheetFocus($('unm'))}
 function userEdit(id){const u=(USERS||[]).find(x=>x.id==id);if(!u)return;uTmp={id:u.id,role:u.role,active:u.active};
   sheet(`<div class="sh-h"><div><b>${esc(u.name)}</b><small class="shsub ltrv">@${esc(u.username)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="f"><label>نام کامل</label><input id="unm" value="${esc(u.name)}" autocomplete="off"></div>
@@ -277,5 +277,5 @@ let quietT=0;function quietRefresh(){if(!TOKEN||Date.now()-quietT<2500)return;qu
     busy=true;show(56,true);loading(true);const t0=Date.now();let r;try{r=await refreshAll();if(cur==='backups'&&isAdmin())await loadBk()}catch(_){r={off:true}}
     const w=600-(Date.now()-t0);if(w>0)await new Promise(x=>setTimeout(x,w));
     loading(false);busy=false;show(0,false);
-    const vv=V(),y=vv.scrollTop;render();vv.scrollTop=y;flashNew();vv.classList.remove('in','bk');void vv.offsetWidth;vv.classList.add('in');refreshMsg(r)};
+    const vv=V(),y=vv.scrollTop;render();vv.scrollTop=y;flashNew();refreshMsg(r)};
   document.addEventListener('touchend',end,{passive:true});document.addEventListener('touchcancel',end,{passive:true});})();

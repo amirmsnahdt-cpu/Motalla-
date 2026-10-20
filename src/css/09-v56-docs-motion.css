@@ -222,8 +222,8 @@
 .sheet.drag{animation:none!important;transition:none!important}
 .sheet.snap{transition:transform .42s var(--spring)!important}
 #sheet .sh-h{touch-action:pan-x}
-html.shopen #app{transform:scale(.94) translateY(8px);border-radius:16px;filter:brightness(.92)}
-#app{transition:transform .5s var(--spring),border-radius .5s var(--spring),filter .4s;transform-origin:50% 0}
+html.shopen #app{transform:scale(.94) translateY(8px);border-radius:16px}
+#app{transition:transform .5s var(--spring),border-radius .5s var(--spring);transform-origin:50% 0;backface-visibility:hidden}
 html.shopen body{background:#000}
 @media(min-width:600px){html.shopen #app{transform:scale(.97) translateY(6px)}}
 /* تغییر محتوای همان پنجره */
@@ -239,8 +239,6 @@ html.shopen body{background:#000}
 #view.edgeback{transition:transform .36s var(--spring),opacity .3s ease!important}
 /* حس لمس: دکمه‌ها کمی فرو می‌روند، ردیف‌های فهرست روشن‌تر می‌شوند */
 .btn,.xgo,.qago,.c6new,.c6qb,.c6add,.c6lnk,.cuqb,.posdep,.fab2,.bkdone .row2 button,.x6t button,.d6pm button,.d6kd button,.chp,.tch,.fchip,.d6no,.ib0,.tb,.addit,.bzgo,.seg2 button,.seg button{transition:transform .32s var(--spring),background-color .2s,box-shadow .25s,opacity .2s}
-.btn:active,.xgo:active,.qago:active,.c6new:active,.c6qb:active,.c6add:active,.c6lnk:active,.cuqb:active,.posdep:active,.fab2:active,.bkdone .row2 button:active,.x6t button:active,.d6pm button:active,.d6kd button:active,.chp:active,.tch:active,.fchip:active,.d6no:active,.ib0:active,.addit:active,.bzgo:active{transform:scale(.96);transition-duration:.08s}
-.tb:active{transform:scale(.9);transition-duration:.08s}
 .c6r,.d6rb,.txr,.bzsr,.x6r,.x6g,.chrow,.acrow,.brh,.curow,.opt,.lpick{transition:background-color .35s ease}
 .c6r:active,.d6rb:active,.txr:active,.bzsr:active,.x6r:active,.chrow:active,.acrow:active,.curow:active{background-color:color-mix(in srgb,var(--ink) 7%,var(--card))!important;transition-duration:0s}
 .d6x:active{background:var(--red2);color:var(--red)}
@@ -302,7 +300,7 @@ html.locked,html.locked body{overflow:hidden}
 .lkp{display:grid;grid-template-columns:repeat(3,76px);gap:16px 22px;direction:ltr;margin-top:12px}
 .lkp button{width:76px;height:76px;border-radius:50%;border:0;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line),0 6px 16px -12px rgba(15,30,70,.35);font:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s}
 .lkp button b{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
-.lkp button:active{transform:scale(.92);background:var(--blu);color:#fff}
+.lkp button:active{background:var(--blu);color:#fff}
 .lkp .lkf{background:none;box-shadow:none;color:var(--blu)}
 .lkp .lkf svg{width:30px;height:30px}
 .lkp .lkf:active{background:none;color:var(--blu);opacity:.6}
@@ -326,3 +324,31 @@ html.locked,html.locked body{overflow:hidden}
 .apks.ok b{color:var(--ok)}
 .apks.off{opacity:.45}
 .apks .sm{flex:none}.apks .sm.go{background:var(--blu);color:#fff;border:0}
+/* ================= v58: یکدست شدن صفحه‌های قدیمی با تم آبی برنامه ================= */
+/* رنگ‌های نسخه اول (دکمه طلایی، رنگ سرمه‌ای فوکوس) از ریشه به آبی برنامه وصل می‌شوند؛ روشن و تیره هر دو */
+:root:root:root{--pri:var(--blu);--pri2:var(--blu2);--cta:var(--blu);--ctaink:#fff}
+.btn.gold,button.sm.gold{background:var(--blu);color:#fff;box-shadow:0 10px 22px -12px var(--blu);border:0}
+.btn.gold:disabled{opacity:.45;box-shadow:none}
+/* آیکون داخل دکمه‌ها همیشه اندازه درست (آیکون قفل در دکمه «روشن کردن قفل» تمام دکمه را پر می‌کرد) */
+:where(.btn,.ib0,.xgo,.okall,.hsend)>svg{width:20px;height:20px;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+/* خانه‌های ورود اطلاعات: یک شکل در همه صفحه‌ها و پنجره‌ها — قاب روشن و واضح، فوکوس آبی */
+input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{border:1.5px solid var(--fld);background:var(--card);border-radius:14px;transition:border-color .18s,box-shadow .18s,background-color .18s}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):focus,select:focus,textarea:focus{border-color:var(--blu);box-shadow:0 0 0 4px color-mix(in srgb,var(--blu) 14%,transparent);background:var(--card);outline:0}
+.qag input,.qag select,.qag input:focus,.qag select:focus,.fsearch input,.fsearch input:focus,.lkw input{border:0!important;box-shadow:none!important;background:none!important}
+.f>label,.ef>label{font-weight:700;color:var(--mut)}
+.f>label i{font-style:normal;font-weight:500;opacity:.8}
+/* حالت خالی صفحه‌ها: آیکون آبی در دایره (نه طلایی) */
+.empty svg{width:64px;height:64px;padding:17px;box-sizing:border-box;border-radius:50%;background:var(--blu2);color:var(--blu);margin-bottom:10px}
+/* انتخاب تاریخ بالای صفحه: چیپ آبی ساده، فقط فارسی */
+.dchip{border:0;background:var(--blu2);color:var(--ink);border-radius:14px;padding:6px 12px 6px 10px}
+.dchip svg{color:var(--blu)}
+.dchip small{direction:rtl;text-align:right}
+.dchip.flash{animation:fl2 .7s ease}@keyframes fl2{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--blu) 55%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
+/* دکمه بستن پنجره */
+.sh-h .x{display:grid;place-items:center;background:var(--bg);color:var(--mut);font-size:20px}
+/* پس‌زمینه پنجره: بدون محو کردن (blur) — روی گوشی‌های اندروید هنگام باز شدن پنجره لگ می‌انداخت */
+.ov{-webkit-backdrop-filter:none;backdrop-filter:none}
+/* حس لمس: ردیف‌های لیست هنگام لمس کمی روشن می‌شوند (فرورفتن با برنامه انجام می‌شود) */
+.brh{transition:background-color .3s ease}.brh:active{background-color:color-mix(in srgb,var(--ink) 5%,transparent);transition-duration:0s}
+@media (prefers-reduced-motion:reduce){.brh{transition:none}}

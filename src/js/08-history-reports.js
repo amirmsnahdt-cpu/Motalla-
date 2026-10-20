@@ -156,7 +156,7 @@ let tmpISO=null,confirmCb=null,dpMode='';
 const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 function sheet(h){const o=$('ov'),s=$('sheet'),open=!o.classList.contains('hide');s.innerHTML=h;
   if(open){if(!RM()){s.classList.remove('swap');void s.offsetWidth;s.classList.add('swap')}}
-  else{s.classList.remove('swap','drag','snap');s.style.transform='';s.scrollTop=0;o.classList.remove('hide');document.documentElement.classList.add('shopen')}}
+  else{shOpenT=Date.now();s.classList.remove('swap','drag','snap');s.style.transform='';s.scrollTop=0;o.classList.remove('hide');document.documentElement.classList.add('shopen')}}
 function closeSheet(){const o=$('ov'),s=$('sheet');if(o.classList.contains('hide')){s.innerHTML='';return}
   if(!RM()&&s.innerHTML){try{const g=o.cloneNode(true);g.removeAttribute('id');g.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
     const A=s.querySelectorAll('input,textarea,select'),B=g.querySelectorAll('input,textarea,select');A.forEach((e,i)=>{const x=B[i];if(!x)return;if(e.type==='checkbox'||e.type==='radio')x.checked=e.checked;else x.value=e.value});

@@ -35,7 +35,7 @@
 .ingot .pbar.gold{background:var(--hair)}
 /* دکمه‌ها */
 .btn{min-height:52px;border-radius:15px;font-weight:800;background:var(--btn);}
-.btn:active,button.sm:active,.lrow:active,.tcard:active,.opt:active{transform:scale(.98)}
+
 .btn.gold{background:var(--cta);color:var(--ctaink);box-shadow:0 8px 18px -8px #b8862b99}
 .btn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 button.sm{border-radius:10px;background:var(--btn)}button.sm.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}

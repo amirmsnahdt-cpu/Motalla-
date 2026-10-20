@@ -5,7 +5,8 @@ function swW(inner,o){let R=o.r,L=o.l;
   R=R.filter(a=>canAct(a[0],o.data));L=L.filter(a=>canAct(a[0],o.data));
   const da=Object.entries(o.data||{}).map(([k,v])=>` data-${k}="${esc(v)}"`).join('');
   const btn=a=>`<button class="swb" data-act="${a[0]}"${da} style="--c:${a[3]}">${ic(a[2])}<span>${a[1]}</span></button>`;
-  return `<div class="swr" data-nr="${R.length}" data-nl="${L.length}">${R.length?`<div class="swa r">${R.map(btn).join('')}</div>`:''}${L.length?`<div class="swa l">${L.map(btn).join('')}</div>`:''}<div class="swc">${inner}</div></div>`}
+  const fk=o.data&&o.data.id!=null?` data-fk="r${esc(o.data.id)}"`:'';
+  return `<div class="swr"${fk} data-nr="${R.length}" data-nl="${L.length}">${R.length?`<div class="swa r">${R.map(btn).join('')}</div>`:''}${L.length?`<div class="swa l">${L.map(btn).join('')}</div>`:''}<div class="swc">${inner}</div></div>`}
 let swT=0;
 const swTip=()=>ls.get('m_swiped2',false)?'':`<div class="swtip">ردیف را بکشید: <i>به چپ ← ویرایش و کپی</i><i>به راست → حذف</i></div>`;
 const edgeOK=()=>!SLIDEP.has(cur)&&(!!PARENT[cur]||(cur==='entry'&&editId))&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide');

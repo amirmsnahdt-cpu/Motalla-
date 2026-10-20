@@ -99,7 +99,7 @@
 .zvs img{transition:transform .22s cubic-bezier(.2,.8,.2,1)}
 .zv.drag .zvs img{transition:none}
 .galt{transition:transform .15s}
-.galt:active{transform:scale(.96)}
+
 /* اندازه لمس: حداقل ۴۴ نقطه برای دکمه‌های تازه */
 .hmore2,.psx,.zb{min-width:44px;min-height:44px}
 .hsend,.hadd{min-height:40px}
@@ -135,7 +135,7 @@
 /* ===== v53: فاکتور فروش، گروه مشتری، کارتخوان و حساب‌ها، انتقال مانده ===== */
 .cuqa{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 4px}
 .cuqb{display:flex;align-items:center;gap:10px;text-align:right;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;border-radius:18px;padding:12px;cursor:pointer;box-shadow:var(--sh);transition:transform .15s}
-.cuqb:active{transform:scale(.97)}.cuqb>svg{width:34px;height:34px;padding:7px;border-radius:11px;background:var(--blu2);color:var(--blu);flex:none}
+.cuqb>svg{width:34px;height:34px;padding:7px;border-radius:11px;background:var(--blu2);color:var(--blu);flex:none}
 .cuqb span{min-width:0}.cuqb b{display:block;font-size:13.5px;font-weight:800;line-height:1.35}.cuqb small{display:block;font-size:11px;color:var(--mut);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cuqb.inv>svg{background:var(--cta);color:var(--ctaink)}
 .fchips.grp{margin-top:-2px}.fchips.grp .fchip{font-size:12px}
@@ -179,7 +179,7 @@
 :root[data-theme="dark"] .svtot b{color:var(--gold)!important}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .svtot b{color:var(--gold)!important}}
 .svtot.bump b{animation:svbump .45s ease}@keyframes svbump{40%{transform:scale(1.05)}}.svtot b{display:inline-block;transform-origin:left center}
 .svpm{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.svpb{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;border-radius:14px;padding:9px 2px;cursor:pointer;transition:transform .12s}
-.svpb:active{transform:scale(.94)}.svpb svg{width:22px;height:22px;color:var(--blu)}.svpb b{font-size:10.5px;font-weight:700;line-height:1.25;text-align:center}.svpb.p-gold svg,.svpb.p-cust svg{color:var(--gold)}
+.svpb svg{width:22px;height:22px;color:var(--blu)}.svpb b{font-size:10.5px;font-weight:700;line-height:1.25;text-align:center}.svpb.p-gold svg,.svpb.p-cust svg{color:var(--gold)}
 .svpays{margin-top:10px}.svpr{display:flex;align-items:center}.svpr+.svpr{border-top:1px solid var(--hair)}.svprb{flex:1;display:flex;align-items:center;gap:10px;text-align:right;border:0;background:none;color:var(--ink);font:inherit;padding:10px 12px;cursor:pointer;min-width:0}
 .svprb .tx{flex:1;min-width:0}.svprb .tx b{display:block;font-size:13.5px}.svprb .tx small{display:block;font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.svprb .txv{text-align:left}.svprb .txv b{display:block;font-feature-settings:"tnum"}.svprb .txv small{font-size:10.5px;color:var(--mut)}
 .bri.pm-cash{background:var(--ok2);color:var(--ok)}.bri.pm-pos,.bri.pm-hav{background:var(--blu2);color:var(--blu)}.bri.pm-gold,.bri.pm-cust{background:var(--goldbg);color:var(--gold)}
@@ -243,7 +243,7 @@
 .qaf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
 #qB small{display:block;font-size:11px;color:var(--mut)}#qB b{font-size:17px;font-weight:900;font-feature-settings:"tnum"}
 .qago{display:flex;align-items:center;gap:6px;min-height:44px;border:0;border-radius:14px;padding:0 18px;background:var(--blu);color:#fff;font:inherit;font-size:14.5px;font-weight:800;cursor:pointer;transition:transform .12s}
-.qago:active{transform:scale(.96)}.qago:disabled{opacity:.4}.qago svg{width:18px;height:18px}
+.qago:disabled{opacity:.4}.qago svg{width:18px;height:18px}
 .svith{display:flex;align-items:baseline;justify-content:space-between;margin:0 4px 6px}.svith b{font-size:13.5px}.svith small{font-size:11px;color:var(--mut)}
 .spsec.sm{margin-bottom:6px}.sv2 .svopt{margin:12px 0 0}
 #svBt{font-feature-settings:"tnum";font-weight:900}

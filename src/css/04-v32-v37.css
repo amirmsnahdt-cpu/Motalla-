@@ -14,7 +14,7 @@
 #dock .tb svg{width:25px!important;height:25px!important;stroke-width:1.9;transition:transform .2s,color .2s}
 #dock .tb.on,#dock .tb.on svg{color:var(--blu)!important}
 #dock .tb.on svg{fill:color-mix(in srgb,var(--blu) 22%,transparent);transform:scale(1.08)}
-#dock .tb:active svg{transform:scale(.88)}
+
 
 /* سربرگ خانه: آبی یکپارچه با بخش بالا */
 #app.home #bar{background:var(--hero)!important;color:#fff;-webkit-backdrop-filter:none;border-bottom-color:transparent}
@@ -177,7 +177,7 @@
 .fab2{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:24px;background:var(--blu);color:#fff;font:inherit;font-size:14.5px;font-weight:700;padding:0 22px;min-height:48px;cursor:pointer;box-shadow:0 10px 24px -10px var(--blu);white-space:nowrap}
 .fab2 svg{width:18px;height:18px}
 .fab2.sec{background:var(--blu2);color:var(--blu);box-shadow:none}
-.fab2:active{transform:scale(.96)}
+
 
 /* ---------- v36: منبع تخصیص در ردیف‌ها، ویرایش داخل صفحه جزئیات ---------- */
 .rsrc{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:3px;font-size:11px;font-weight:700;color:var(--blu);background:var(--blu2);border-radius:8px;padding:1px 7px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
