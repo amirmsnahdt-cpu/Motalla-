@@ -387,3 +387,10 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 /* v58.7: باز شدن صفحه تمام‌صفحه — نوار بالا و صفحه با هم بالا بیایند (قبلاً نوار فقط به اندازه قد خودش جابه‌جا می‌شد و زودتر می‌رسید) */
 @keyframes fullUp2{from{transform:translateY(100vh)}to{transform:none}}
 #app.fullin #view,#app.fullin #bar,#app.fullin #act{animation-name:fullUp2!important}
+/* v58.8: کلید روشن/خاموش Face ID در پنجره «قفل برنامه» (مثل تنظیمات آیفون) */
+.lkrow.lksw .tx{flex:1;min-width:0}
+.lktg{flex:none;width:51px;height:31px;border-radius:16px;background:var(--line);position:relative;transition:background-color .25s ease}
+.lktg i{position:absolute;top:2px;right:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 6px #0003,0 0 0 .5px #0000000f;transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.lksw[aria-checked=true] .lktg{background:var(--ok)}
+.lksw[aria-checked=true] .lktg i{transform:translateX(-20px)}
+@media (prefers-reduced-motion:reduce){.lktg,.lktg i{transition:none}}

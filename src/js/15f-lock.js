@@ -150,7 +150,7 @@ async function lockSheet(){const c=lockCfg(),av=await bioAvail(),on=!!c;
   sheet(`<div class="sh-h"><b>قفل برنامه</b><button class="x" data-act="close">×</button></div>
     <div class="muted" style="font-size:13px;line-height:1.9;margin:-4px 2px 12px">${on?'روشن است. بعد از ۲۰ دقیقه بیکاری، برای باز کردن برنامه رمز ۶ رقمی'+(c.bio?' یا '+bioName():'')+' لازم است.':'اگر گوشی گم شود یا دست کس دیگری بیفتد، بدون رمز ۶ رقمی برنامه باز نمی‌شود. بعد از ۲۰ دقیقه بیکاری قفل می‌شود.'}</div>
     <div class="lkrows">${on?
-      (av||c.bio?row('lockBio',lkI(window.AndroidBridge?'fp':'face'),c.bio?bioName()+' روشن است':'وصل کردن '+bioName(),c.bio?'برای خاموش کردن بزنید':bioPw()?'با رمزهای ذخیره‌شده خود آیفون (Passwords)':'باز کردن برنامه بدون زدن رمز'):'')+
+      (av||c.bio?`<button class="lkrow lksw" data-act="lockBio" role="switch" aria-checked="${c.bio?'true':'false'}"><span class="lki">${lkI(window.AndroidBridge?'fp':'face')}</span><span class="tx"><b>${bioName()}</b><small>${c.bio?'روشن · برنامه با '+bioName()+' باز می‌شود':bioPw()?'خاموش · با رمزهای ذخیره‌شده خود آیفون (Passwords)':'خاموش · فقط رمز ۶ رقمی'}</small></span><span class="lktg" aria-hidden="true"><i></i></span></button>`:'')+
       row('lockChange',lkI('pad'),'تغییر رمز ۶ رقمی','')+row('lockNow',lkI('pad'),'قفل کن، همین الان','')+row('lockOff',lkI('pad'),'خاموش کردن قفل','با وارد کردن رمز فعلی','r')
       :`<button class="btn bkgo" data-act="lockSet">${lkI('pad')} روشن کردن قفل</button>`}</div>`)}
 ACT.lockSheet=()=>{if(!TOKEN){toast('اول وارد شوید');return}lockSheet()};
@@ -158,9 +158,17 @@ ACT.lockSet=()=>{closeSheet();lockShow('set1',()=>{if(cur==='settings')render()}
 ACT.lockChange=()=>{closeSheet();lockShow('verify',ok=>{if(ok)setTimeout(()=>lockShow('set1'),150)})};
 ACT.lockNow=()=>{closeSheet();lockShow('unlock')};
 ACT.lockOff=()=>{closeSheet();lockShow('verify',ok=>{if(!ok)return;ls.set('m_lock',null);try{localStorage.removeItem('m_lock')}catch(e){}toast('قفل برنامه خاموش شد');if(cur==='settings')render()})};
-ACT.lockBio=async()=>{const c=lockCfg();if(!c)return;closeSheet();
-  if(c.bio){c.bio=null;ls.set('m_lock',c);toast(bioName()+' خاموش شد؛ فقط رمز ۶ رقمی');if(cur==='settings')render();return}
-  lockShow('verify',ok=>{if(ok){lockUI=null;setTimeout(()=>{lockShow('bio',()=>{if(cur==='settings')render()})},150)}})};
+/* v58.8: Face ID یک کلید روشن/خاموش است: کلید اول جابه‌جا می‌شود (دیده شود)، بعد
+   خاموش کردن → پرسش تأیید در همین پنجره؛ روشن کردن → تأیید رمز ۶ رقمی و وصل کردن، و برگشت به همین پنجره با وضع تازه */
+const lockBack=()=>{if(cur==='settings')render();setTimeout(()=>{if(TOKEN&&lockCfg()&&!lockUI)lockSheet()},120)};
+ACT.lockBio=async(d,el)=>{const c=lockCfg();if(!c)return;const sw=document.querySelector('#sheet .lksw');
+  if(sw){if(sw._busy)return;sw._busy=1;sw.setAttribute('aria-checked',c.bio?'false':'true')}
+  await new Promise(r=>setTimeout(r,RM()?0:260));
+  if(c.bio){sheet(`<div class="sh-h"><b>${bioName()} خاموش شود؟</b></div>
+    <div class="muted" style="font-size:13.5px;line-height:1.9;margin:-4px 2px 14px">از این به بعد برنامه فقط با رمز ۶ رقمی باز می‌شود. هر وقت خواستید دوباره روشنش کنید.</div>
+    <div class="row"><button class="btn sec" data-act="lockSheet">انصراف</button><button class="btn red" data-act="lockBioOff">خاموش کن</button></div>`);return}
+  closeSheet();lockShow('verify',ok=>{if(!ok){lockBack();return}lockUI=null;setTimeout(()=>{lockShow('bio',lockBack)},150)})};
+ACT.lockBioOff=()=>{const c=lockCfg();if(!c)return;c.bio=null;ls.set('m_lock',c);toast(bioName()+' خاموش شد؛ فقط رمز ۶ رقمی');if(cur==='settings')render();lockSheet()};
 /* بعد از ورود، یک بار روی هر گوشی پیشنهاد روشن کردن قفل */
 /* اپ اندروید قدیمی (کلید امضای قبلی) باید نصب دوباره شود؛ پیشنهاد قفل می‌ماند برای اپ جدید */
 function lockOffer(){if(!TOKEN||!ME||lockCfg()||ls.get('m_lock_ask','')===ME.username||lockUI||apkOldKey())return;if(!$('ov').classList.contains('hide')){setTimeout(lockOffer,20e3);return}
