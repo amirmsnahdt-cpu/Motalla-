@@ -190,3 +190,31 @@ test('پیش‌نمایش githack فقط برای مدیر؛ نشست ۳۰ رو�
   const max = db.prepare('SELECT MAX(expires_at) m FROM sessions').get().m;
   assert.ok(Date.parse(max) <= Date.now() + 30 * 864e5 + 60e3, 'sessions last at most 30 days');
 });
+
+test('ورود با اثر انگشت: کلید دستگاه، خروج، باطل شدن', async () => {
+  const k = await api('/api/bio/enroll', { method: 'POST', token: staff, body: {} });
+  assert.equal(k.status, 200); assert.match(k.j.id, /^[a-f0-9]{32}$/); assert.ok(k.j.secret.length >= 64);
+  const { db } = require('../server/server.js');
+  assert.notEqual(db.prepare('SELECT secret FROM bio_keys WHERE id=?').get(k.j.id).secret, k.j.secret, 'only a hash is stored');
+  assert.equal((await api('/api/bio/enroll', { method: 'POST', body: {} })).status, 401, 'enroll needs a session');
+  // خروج عادی کلید را باطل نمی‌کند → ورود با اثر انگشت بعد از خروج
+  const s1 = await api('/api/login', { method: 'POST', body: { username: 'clerk', password: 'secret123' } });
+  await api('/api/logout', { method: 'POST', token: s1.j.token });
+  const b = await api('/api/bio/login', { method: 'POST', body: { id: k.j.id, secret: k.j.secret } });
+  assert.equal(b.status, 200); assert.equal(b.j.user.username, 'clerk');
+  assert.equal((await api('/api/me', { token: b.j.token })).status, 200);
+  assert.equal((await api('/api/bio/login', { method: 'POST', body: { id: k.j.id, secret: 'f'.repeat(64) } })).status, 401, 'wrong secret');
+  assert.equal((await api('/api/bio/login', { method: 'POST', body: { id: 'x', secret: k.j.secret } })).status, 401, 'bad id');
+  // کاربر دیگر نمی‌تواند کلید این کاربر را باطل کند
+  await api('/api/bio/revoke', { method: 'POST', token: viewer, body: { id: k.j.id } });
+  assert.equal((await api('/api/bio/login', { method: 'POST', body: { id: k.j.id, secret: k.j.secret } })).status, 200);
+  // خاموش کردن اثر انگشت روی گوشی
+  await api('/api/bio/revoke', { method: 'POST', token: staff, body: { id: k.j.id } });
+  assert.equal((await api('/api/bio/login', { method: 'POST', body: { id: k.j.id, secret: k.j.secret } })).status, 401);
+  // رمز تازه از طرف مدیر → همه ورودهای اثر انگشت آن کاربر باطل
+  const k2 = await api('/api/bio/enroll', { method: 'POST', token: staff, body: {} });
+  const uid = db.prepare("SELECT id FROM users WHERE username='clerk'").get().id;
+  assert.equal((await api('/api/users/' + uid, { method: 'PATCH', token: admin, body: { password: 'secret123' } })).status, 200);
+  assert.equal((await api('/api/bio/login', { method: 'POST', body: { id: k2.j.id, secret: k2.j.secret } })).status, 401, 'admin reset revokes');
+  staff = (await api('/api/login', { method: 'POST', body: { username: 'clerk', password: 'secret123' } })).j.token;
+});

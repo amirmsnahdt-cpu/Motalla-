@@ -67,7 +67,7 @@ async function api(path,body,method){let r;
   catch(e){throw Object.assign(new Error('اتصال به سرور برقرار نشد؛ اینترنت را بررسی کنید'),{net:true})}
   const av=r.headers.get('X-App-Version');if(av)noteApp(av);
   let j=null;try{j=await r.json()}catch(e){}
-  if(r.status===401&&TOKEN&&!/\/api\/(login|setup)$/.test(path)){forceLogout('نشست شما تمام شده یا رمز تغییر کرده؛ دوباره وارد شوید');throw Object.assign(new Error('auth'),{status:401})}
+  if(r.status===401&&TOKEN&&!/\/api\/(login|setup|bio\/login)$/.test(path)){forceLogout('نشست شما تمام شده یا رمز تغییر کرده؛ دوباره وارد شوید');throw Object.assign(new Error('auth'),{status:401})}
   if(!r.ok)throw Object.assign(new Error((j&&j.error)||('خطای سرور ('+r.status+')')),{status:r.status});return j}
 function noteApp(v){if(!SY.app){SY.app=v;return}if(v!==SY.app&&!SY.updNote){SY.updNote=true;toast('نسخه جدید برنامه آماده است','','به‌روزرسانی',()=>location.reload())}}
 function findIdx(arr){const m=new Map();arr.forEach((r,i)=>{if(r&&r.id!=null)m.set(String(r.id),i)});return m}
@@ -129,16 +129,19 @@ async function flushImgs(){const q=ls.get('m_imgq',[]);if(!q.length)return;const
 /* ---------- صفحه ورود و راه‌اندازی ---------- */
 function showAuth(msg){const a=$('auth');a.classList.remove('hide');a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">طلای مطلا</small><div class="aspin">در حال اتصال…</div></div>`;
   api('/api/status').then(s=>authForm(s.setup?'setup':'login',msg)).catch(e=>{a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">بده بستون</b><div class="msg bad" style="margin-top:14px">${esc(e.message)}</div><button class="btn gold" data-act="authRetry" style="width:100%">تلاش دوباره</button></div>`})}
-function authForm(mode,msg){const a=$('auth'),su=mode==='setup';
+/* اثر انگشت فقط در اولین باز شدن برنامه خودکار پرسیده می‌شود؛ درست بعد از «خروج» نه (دکمه‌اش هست) */
+let authBioAuto=!TOKEN;
+function authForm(mode,msg){const a=$('auth'),su=mode==='setup',bm=su?null:bioLoginMeta(),auto=!!(bm&&authBioAuto&&!msg);authBioAuto=false;
   a.innerHTML=`<form class="authc" id="authf" autocomplete="on" action="#"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">${su?'راه‌اندازی اولیه — ساخت حساب مدیر':'ورود به بده بستون'}</small>
   ${msg?`<div class="msg warn">${esc(msg)}</div>`:''}
+  ${bm?`<button type="button" class="btn bkgo abio" id="abio" data-act="authBio">${lkI('fp')}<span>ورود با اثر انگشت<small>${esc(bm.n||bm.u)}</small></span></button><div class="aor"><span>یا با نام کاربری و رمز</span></div>`:''}
   ${su?`<div class="f"><label>نام شما</label><input id="an" autocomplete="name" placeholder="مثلاً علی رضایی"></div>`:''}
-  <div class="f"><label>نام کاربری</label><input id="au" class="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="latin" placeholder="username"></div>
+  <div class="f"><label>نام کاربری</label><input id="au" class="ltr"${bm?` value="${esc(bm.u)}"`:''} autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="latin" placeholder="username"></div>
   <div class="f"><label>رمز عبور</label><div class="pw"><input id="ap" class="ltr" type="password" autocomplete="${su?'new-password':'current-password'}" placeholder="••••••"><button type="button" class="pwt" data-act="pwToggle" data-t="ap" aria-label="نمایش رمز">${ic('eye')}</button></div></div>
   ${su?`<div class="f"><label>تکرار رمز عبور</label><input id="ap2" class="ltr" type="password" autocomplete="new-password"></div>`:''}
-  <div id="aerr"></div><button class="btn gold" id="abtn" type="submit" style="width:100%">${su?'ساخت حساب مدیر و ورود':'ورود'}</button>
+  <div id="aerr"></div><button class="btn ${bm?'sec':'gold'}" id="abtn" type="submit" style="width:100%">${su?'ساخت حساب مدیر و ورود':'ورود'}</button>
   ${su?'':'<div class="ahint">نام کاربری و رمز را از مدیر مغازه بگیرید.</div>'}</form>`;
-  const f=a.querySelector('#authf');f.addEventListener('submit',e=>{e.preventDefault();ACT[su?'authSetup':'authLogin']()});setTimeout(()=>{const i=$(su?'an':'au');if(i)i.focus()},80)}
+  const f=a.querySelector('#authf');f.addEventListener('submit',e=>{e.preventDefault();ACT[su?'authSetup':'authLogin']()});if(auto){setTimeout(()=>{if($('abio'))ACT.authBio()},350);return}if(!bm)setTimeout(()=>{const i=$(su?'an':'au');if(i)i.focus()},80)}
 function authErr(m){const e=$('aerr');if(e)e.innerHTML=`<div class="msg bad">${esc(m)}</div>`;const b=$('abtn');if(b){b.disabled=false;b.classList.remove('wait')}}
 function authBusy(){const b=$('abtn');if(b){b.disabled=true;b.classList.add('wait')}const e=$('aerr');if(e)e.innerHTML=''}
 function loggedIn(r){TOKEN=r.token;try{localStorage.setItem('m_token',TOKEN)}catch(e){}ME=r.user;rawSet('m_me',ME);user=ME.name;applyPerms();$('auth').classList.add('hide');$('auth').innerHTML='';try{lockTouch(true);setTimeout(lockOffer,2500)}catch(e){}

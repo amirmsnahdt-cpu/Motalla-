@@ -415,3 +415,14 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 #app.full .fcard.blist .brw.new::after{content:'';position:absolute;inset:0;border:1px solid var(--line);border-radius:16px;pointer-events:none;z-index:2}
 #app.full .fcard.blist .brw.new .bri{background:var(--blu2)!important}
 #app.full .fcard.blist.okc{box-shadow:none!important}
+/* v59.3: ورود با اثر انگشت در صفحه ورود + ردیف «اثر انگشت» وقتی روی این گوشی کار نمی‌کند (به‌جای پنهان شدن) */
+.authc .abio{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;margin:4px 0 2px}
+.authc .abio svg{width:26px;height:26px;flex:none}
+.authc .abio span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.35;font-weight:800}
+.authc .abio small{font-size:12px;font-weight:600;opacity:.85}
+.authc .abio.wait{opacity:.7}
+.authc .aor{display:flex;align-items:center;gap:10px;margin:14px 0 6px;color:var(--mut);font-size:12.5px}
+.authc .aor::before,.authc .aor::after{content:'';flex:1;border-top:1px solid var(--line)}
+.lkrow.lkna .tx{flex:1;min-width:0}.lkrow.lkna .tx small{color:var(--warn)}
+.lkrow.lkna .lki{background:color-mix(in srgb,var(--mut) 14%,transparent);color:var(--mut)}
+.lkrow.lkna .lkgo{color:var(--mut);display:flex}.lkrow.lkna .lkgo svg{width:18px;height:18px;transform:rotate(90deg)}

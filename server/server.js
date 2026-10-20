@@ -45,6 +45,15 @@ CREATE TABLE IF NOT EXISTS users(
   created_at TEXT NOT NULL,
   last_login TEXT
 );
+/* ورود با اثر انگشت: هر گوشی یک کلید ورود؛ روی سرور فقط هش رمزش. خود رمز در Android Keystore گوشی است و فقط با اثر انگشت باز می‌شود */
+CREATE TABLE IF NOT EXISTS bio_keys(
+  id TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  secret TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  last_used TEXT,
+  device TEXT
+);
 CREATE TABLE IF NOT EXISTS sessions(
   token TEXT PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -93,6 +102,12 @@ const q = {
   session: db.prepare('SELECT s.expires_at, u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?'),
   delSession: db.prepare('DELETE FROM sessions WHERE token=?'),
   delUserSessions: db.prepare('DELETE FROM sessions WHERE user_id=?'),
+  addBioKey: db.prepare('INSERT INTO bio_keys(id,user_id,secret,created_at,device) VALUES(?,?,?,?,?)'),
+  bioKey: db.prepare('SELECT * FROM bio_keys WHERE id=?'),
+  delBioKey: db.prepare('DELETE FROM bio_keys WHERE id=? AND user_id=?'),
+  delUserBioKeys: db.prepare('DELETE FROM bio_keys WHERE user_id=?'),
+  usedBioKey: db.prepare('UPDATE bio_keys SET last_used=? WHERE id=?'),
+  trimBioKeys: db.prepare('DELETE FROM bio_keys WHERE user_id=? AND id NOT IN (SELECT id FROM bio_keys WHERE user_id=? ORDER BY created_at DESC LIMIT 10)'),
   delOtherSessions: db.prepare('DELETE FROM sessions WHERE user_id=? AND token<>?'),
   purgeSessions: db.prepare('DELETE FROM sessions WHERE expires_at<?'),
   getDoc: db.prepare('SELECT * FROM docs WHERE coll=? AND id=?'),
@@ -418,6 +433,20 @@ async function handle(req, res) {
     return send(res, 200, { token: newSession(u, req), user: pubUser(u) });
   }
 
+  /* ورود با اثر انگشت: گوشی بعد از تأیید اثر انگشت، کلید ورود خودش را از Keystore باز می‌کند و این‌جا می‌فرستد */
+  if (p === '/api/bio/login' && req.method === 'POST') {
+    const b = await readBody(req, 1e4), key = clientIp(req) + '|bio', wait = throttled(key);
+    if (wait) return bad(res, 429, 'تلاش زیاد بود؛ ' + Math.ceil(wait / 60) + ' دقیقه دیگر دوباره امتحان کنید');
+    const k = /^[a-f0-9]{32}$/.test(String(b.id || '')) ? q.bioKey.get(String(b.id)) : null;
+    const given = Buffer.from(sha(String(b.secret || '')), 'hex'), saved = k ? Buffer.from(k.secret, 'hex') : null;
+    if (!k || !saved || saved.length !== given.length || !crypto.timingSafeEqual(saved, given)) { failed(key); return bad(res, 401, 'ورود با اثر انگشت باطل شده است؛ با نام کاربری و رمز وارد شوید'); }
+    const u = q.userById.get(k.user_id);
+    if (!u || !u.active) return bad(res, 403, 'این حساب غیرفعال است؛ با مدیر تماس بگیرید');
+    if (fromPreview(req) && u.role !== 'admin') return bad(res, 403, PREVIEW_MSG);
+    fails.delete(key); q.usedBioKey.run(now(), k.id);
+    return send(res, 200, { token: newSession(u, req), user: pubUser(u) });
+  }
+
   const a = auth(req);
   if (!a) return bad(res, 401, 'دوباره وارد شوید');
   const me = a.user;
@@ -425,6 +454,13 @@ async function handle(req, res) {
 
   if (p === '/api/me' && req.method === 'GET') return send(res, 200, { user: pubUser(me), app: APP_VER });
   if (p === '/api/logout' && req.method === 'POST') { q.delSession.run(a.tokenHash); return send(res, 200, { ok: true }); }
+  /* کلید ورود با اثر انگشت برای همین گوشی (نشست فعلی لازم است)؛ کلید قبلی همین گوشی جداگانه با revoke پاک می‌شود */
+  if (p === '/api/bio/enroll' && req.method === 'POST') {
+    const id = crypto.randomBytes(16).toString('hex'), secret = crypto.randomBytes(32).toString('hex');
+    q.addBioKey.run(id, me.id, sha(secret), now(), String(req.headers['user-agent'] || '').slice(0, 200)); q.trimBioKeys.run(me.id, me.id);
+    return send(res, 200, { id, secret });
+  }
+  if (p === '/api/bio/revoke' && req.method === 'POST') { const b = await readBody(req, 1e4); q.delBioKey.run(String(b.id || ''), me.id); return send(res, 200, { ok: true }); }
   if (p === '/api/password' && req.method === 'POST') {
     const b = await readBody(req, 1e5);
     if (!checkPass(b.old, me.pass)) return bad(res, 400, 'رمز فعلی اشتباه است');
@@ -525,8 +561,8 @@ async function handle(req, res) {
         if (b.name !== undefined) { const n = String(b.name).trim(); if (!n) return bad(res, 400, 'نام خالی است'); db.prepare('UPDATE users SET name=? WHERE id=?').run(n.slice(0, 60), u.id); }
         if (b.role !== undefined) { const role = b.role === 'admin' ? 'admin' : 'staff'; if (u.role === 'admin' && role !== 'admin' && admins <= 1) return bad(res, 400, 'حداقل یک مدیر لازم است'); db.prepare('UPDATE users SET role=? WHERE id=?').run(role, u.id); }
         if (b.perms !== undefined) { const pp = cleanPerms(b.perms); if (pp) db.prepare('UPDATE users SET perms=? WHERE id=?').run(JSON.stringify(pp), u.id); }
-        if (b.active !== undefined) { const act = b.active ? 1 : 0; if (!act && u.id === me.id) return bad(res, 400, 'نمی‌توانید حساب خودتان را غیرفعال کنید'); if (!act && u.role === 'admin' && admins <= 1) return bad(res, 400, 'حداقل یک مدیر فعال لازم است'); db.prepare('UPDATE users SET active=? WHERE id=?').run(act, u.id); if (!act) q.delUserSessions.run(u.id); }
-        if (b.password !== undefined) { if (!validPass(b.password)) return bad(res, 400, 'رمز عبور باید حداقل ۸ کاراکتر باشد'); db.prepare('UPDATE users SET pass=? WHERE id=?').run(hashPass(b.password), u.id); if (u.id !== me.id) q.delUserSessions.run(u.id); }
+        if (b.active !== undefined) { const act = b.active ? 1 : 0; if (!act && u.id === me.id) return bad(res, 400, 'نمی‌توانید حساب خودتان را غیرفعال کنید'); if (!act && u.role === 'admin' && admins <= 1) return bad(res, 400, 'حداقل یک مدیر فعال لازم است'); db.prepare('UPDATE users SET active=? WHERE id=?').run(act, u.id); if (!act) { q.delUserSessions.run(u.id); q.delUserBioKeys.run(u.id); } }
+        if (b.password !== undefined) { if (!validPass(b.password)) return bad(res, 400, 'رمز عبور باید حداقل ۸ کاراکتر باشد'); db.prepare('UPDATE users SET pass=? WHERE id=?').run(hashPass(b.password), u.id); if (u.id !== me.id) { q.delUserSessions.run(u.id); q.delUserBioKeys.run(u.id); } }
         return send(res, 200, { user: pubUser(q.userById.get(u.id)) });
       }
       if (req.method === 'DELETE') {
