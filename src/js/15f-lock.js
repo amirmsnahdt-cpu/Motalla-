@@ -18,6 +18,8 @@ async function pinHash(pin,salt){const k=await crypto.subtle.importKey('raw',new
 /* ---- بیومتریک ---- */
 async function bioAvail(){try{if(window.AndroidBridge)return !!(AndroidBridge.bioAvailable&&AndroidBridge.bioAvailable());
   if(!window.PublicKeyCredential||!window.isSecureContext)return false;
+  /* اندروید در مرورگر (نه اپ): کلید در حساب گوگل ذخیره می‌شد؛ مالک فقط اثر انگشت خود گوشی را می‌خواهد → فقط در اپ اندروید (BiometricPrompt، بدون هیچ حساب ابری) */
+  if(/Android/i.test(navigator.userAgent))return false;
   /* آیفون: همه آیفون‌های امروزی Face ID یا Touch ID دارند، ولی Safari در بعضی حالت‌ها (مرورگر داخل برنامه‌ها، صفحه افزوده به خانه)
      به این سؤال «نه» جواب می‌دهد و گزینه اصلاً دیده نمی‌شد. روی آیفون همیشه گزینه را نشان بده؛ اگر وصل نشد، پیام روشن می‌دهیم. */
   if(isIOS())return true;
