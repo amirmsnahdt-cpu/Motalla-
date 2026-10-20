@@ -48,7 +48,7 @@ function vLday(){const d=hubData(ldKey);ldX=null;
   if(lq&&!hits)h+='<div class="spempty" style="padding:20px 8px"><b>در این لیست پیدا نشد</b></div>';
   if(d.closed&&can('close'))h+=`<div class="row"><button class="link" data-act="hubReopen">بازگشایی لیست برای تغییر وضعیت‌ها</button></div>`;
   return h}
-function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
+function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;srchFx=1;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;srchFx=1;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
 const aLday=()=>{const d=hubData(ldKey);if(!d.rows.length)return '';const B=[];
   if(d.un.length&&can('split'))B.push(`<button class="btn ${d.dr.length?'sec':'gold'}" data-act="allocNew">${ic('plus')} تخصیص به منبع</button>`);
   if(d.dr.length&&can('split'))B.push(`<button class="btn gold" data-act="hubSendAll">${ic('copy')} کپی و ارسال${d.dr.length>1?' '+fmt(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''}</button>`);
@@ -61,7 +61,7 @@ function ldPick(){const d=ldData(ldKey),X=ldX||ldXDef(d);return{reg:d.eds.map(e=
 /* ---------- صفحه لیست‌ها: هر تاریخ واریز یک لیست، جدیدترین بالا ---------- */
 function vSplit1(){return vArch()}
 const aSplit1=()=>'';
-function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();render()}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{const was=qDate(arcQ);arcQ=q.value;arcD='';if(qDate(arcQ)!==was){const pos=q.selectionStart;render();const n=$('arq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}},250)}}
+function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();srchFx=1;render()}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{const was=qDate(arcQ);arcQ=q.value;arcD='';if(qDate(arcQ)!==was){const pos=q.selectionStart;srchFx=1;render();const n=$('arq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}},250)}}
 /* ---------- پنجره تخصیص ---------- */
 function allocNew(){const s0=sources[0]||{};aSt={srcId:s0.id,method:s0.bank?'bank':'amount',amount:0,min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
 const aPool=()=>remainList().filter(r=>r.level<2);
@@ -101,17 +101,17 @@ function allocSheet(){const S=sources,P=aPool();
   <div id="aprev"></div>
   <div class="asave"><div class="atot"><small>جمع انتخاب</small><b id="atot">۰</b><small id="arem"></small></div><button class="btn gold xgo" data-act="aSave" id="asv">${aSt.editPid?'ذخیره تغییرات':'ثبت تخصیص'}</button></div></div>`);
   const sh=$('sheet');sh.oninput=e=>{const t=e.target;if(t.classList.contains('num')){const n=num(t.value);t.value=n?n.toLocaleString('en-US'):''}
-    if(t.id==='aq'){aSt.q=t.value;renderPrev();return}
+    if(t.id==='aq'){aSt.q=t.value;renderPrev(true);return}
     if(t.id==='pa'){const w=$('pwords');if(w)w.textContent=num(t.value)?shortAmt(num(t.value)):'مثلاً ۱ میلیارد'}
     if(t.id==='pcnt'){const v=num(t.value);setCnt(v);t.value=v?toFa(v):'';clearTimeout(sh._t);sh._t=setTimeout(()=>{paramRefresh();recalc()},250);return}
     const map={pa:'amount',pmin:'min',pmax:'max',pcap:'cap'};if(map[t.id]){aSt[map[t.id]]=num(t.value);clearTimeout(sh._t);sh._t=setTimeout(recalc,200)}};
   sh.onchange=e=>{const t=e.target;if(t.id==='pbk'){aSt.bank=t.value;recalc()}if(t.id==='psf'){aSt.sameFirst=t.checked;recalc()}if(t.dataset.sel){const id=+t.dataset.sel;t.checked?aSt.sel.add(id):aSt.sel.delete(id);renderPrev()}}}
 function aQuick(v){const P=aPool(),tot=sum(P),so=sources.find(x=>x.id==aSt.srcId),fr=so?acFree(so,aSt.editPid)||0:0;aSt.amount=v==='bal'?Math.min(tot,Math.max(0,fr)):v==='all'?tot:v==='half'?Math.round(tot/2):+v;const i=$('pa');if(i)i.value=aSt.amount.toLocaleString('en-US');const w=$('pwords');if(w)w.textContent=shortAmt(aSt.amount);recalc()}
-function renderPrev(){const P=aPool(),q=aSt.q.trim(),sel=P.filter(x=>aSt.sel.has(x.id)),un=P.filter(x=>!aSt.sel.has(x.id)).filter(x=>!q||match(x,q)),sb=canon((sources.find(x=>x.id==aSt.srcId)||{}).bank||'');
+function renderPrev(fx){const P=aPool(),q=aSt.q.trim(),sel=P.filter(x=>aSt.sel.has(x.id)),un=P.filter(x=>!aSt.sel.has(x.id)).filter(x=>!q||match(x,q)),sb=canon((sources.find(x=>x.id==aSt.srcId)||{}).bank||'');
   const row=x=>`<label class="arow${aSt.sel.has(x.id)?' on':''}"><input type="checkbox" data-sel="${x.id}"${aSt.sel.has(x.id)?' checked':''}><span class="tx"><b>${esc(x.name)}</b><small>${sb&&bankKey(x)===sb?'<span class="sbk">هم‌بانک</span>':''}${esc(x.bankShow||'—')}${x.code?'، فاکتور '+esc(toEn(x.code)):''}</small></span><span class="am">${fmt(x.amount)}</span></label>`;
   let h=sel.length?`<div class="albl2"><span>${fmt(sel.length)} انتخاب‌شده</span><button class="link" data-act="aNone">برداشتن همه</button></div><div class="agrp on">${sel.map(row).join('')}</div>`:`<div class="aempty">${aSt.method==='manual'?'از لیست پایین، واریزی‌ها را تیک بزنید.':'با پر کردن بخش ۲، واریزی‌ها خودشان انتخاب می‌شوند.'}</div>`;
   if(un.length)h+=`<div class="albl2" style="margin-top:12px"><span>بقیه مانده <small class="muted">(${fmt(un.length)} واریزی، ${fmt(sum(un))})</small></span><button class="link" data-act="aAll">${q?'انتخاب همه نتایج':'انتخاب همه'}</button></div><div class="agrp">${un.map(row).join('')}</div>`;
-  const el=$('aprev');if(el)el.innerHTML=h;const s=sum(sel),a=$('asum');if(a)a.textContent=sel.length?fmt(sel.length)+' واریزی، '+fmt(s):'';
+  const el=$('aprev');if(el){if(fx)srchSwap(el,h);else el.innerHTML=h}const s=sum(sel),a=$('asum');if(a)a.textContent=sel.length?fmt(sel.length)+' واریزی، '+fmt(s):'';
   const tgt=aSt.method==='amount'?aSt.amount:0,base=tgt||sum(P),pc=base?Math.min(100,s/base*100):0,m=$('ameter');
   if(m)m.innerHTML=(sel.length||tgt)?`<div class="meter"><div class="mt"><span>${tgt?'از هدف '+fmt(tgt):'از کل مانده '+fmt(sum(P))}</span><b>${toFa(String(Math.round(pc)))}٪</b></div><div class="bar"><i style="width:${pc}%"></i></div>${tgt?`<div class="mn">${s===tgt?'<span class="okc">✓ دقیقاً برابر هدف</span>':s<tgt?'کمتر از هدف: <b>'+fmt(tgt-s)+'</b>':'بیشتر از هدف: <b>'+fmt(s-tgt)+'</b>'}</div>`:''}${aSt.count&&aSt.method!=='manual'?`<div class="mn">تعداد: <b>${fmt(sel.length)}</b> از ${fmt(aSt.count)} ${sel.length===aSt.count?'<span class="okc">✓</span>':sel.length<aSt.count?'— ترکیبی با این تعداد زیر هدف پیدا نشد':''}</div>`:''}</div>`:'';
   const tt=$('atot');if(tt)tt.textContent=fmt(s);{const ab=$('abal'),so=sources.find(x=>x.id==aSt.srcId),f=so?acFree(so,aSt.editPid):null;if(ab)ab.innerHTML=f==null?'':`<div class="abal${s>f?' over':''}"><div><small>موجودی قابل تخصیص «${esc(so.name)}»</small><b>${fmt(f)}</b></div><div><small>بعد از این تخصیص</small><b>${fmt(f-s)}</b></div>${f>0&&aSt.method==='amount'?`<button data-act="aQuick" data-v="bal">تا سقف موجودی</button>`:''}</div>${s>f?'<div class="abw">مبلغ انتخاب‌شده از موجودی این حساب بیشتر است</div>':''}`}

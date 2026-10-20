@@ -51,8 +51,8 @@ function listBody(){const V=validated(),q=listQ.trim(),base=listMode==='day'?V.f
     h+=`<div class="dgrp${op?' open':''}${dn?' done':''}" data-g="${k}"><button class="h" data-act="tgl" data-g="${k}" aria-expanded="${op}"><span class="cal"><b>${toFa(D.jd)}</b><small>${JM[D.jm-1]}</small></span><span class="mid"><b>${relDay(k)}، ${D.fa}</b><small>${fmt(g.length)} واریزی${gb?`، <span style="color:var(--red)">${fmt(gb)} خطادار</span>`:''}</small><span class="tags">${dn?'<span class="pill okp">✓ تسویه کامل</span>':dc?`<span class="pill gd">${fmt(dc)} از ${fmt(V.filter(r=>r.entryDate===k).length)} تسویه</span>`:'<span class="pill g">در جریان</span>'}</span></span><span class="sum">${fmt(sum(g))}</span>${ic('chev').replace('class="i"','class="i chev"')}</button>
     <div class="in">${g.map(r=>slipHTML(r,q,H.get(r.id),false)).join('')}</div></div>`});
   return h}
-function refreshList(){const l=$('lst');if(l)l.innerHTML=listBody();const c=document.querySelector('.sbox .clr');if(c)c.classList.toggle('hide',!listQ)}
-function bindList(){const q=$('lq');if(!q)return;q.oninput=()=>{listQ=q.value;clearTimeout(q._t);q._t=setTimeout(refreshList,140)};
+function refreshList(fx){const l=$('lst');if(l){if(fx)srchSwap(l,listBody());else l.innerHTML=listBody()}const c=document.querySelector('.sbox .clr');if(c)c.classList.toggle('hide',!listQ)}
+function bindList(){const q=$('lq');if(!q)return;q.oninput=()=>{listQ=q.value;clearTimeout(q._t);q._t=setTimeout(()=>refreshList(true),140)};
   q.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);listQ=q.value;refreshList();q.blur()}});refreshList()}
 function openSort(){sheet(`<div class="sh-h"><b>مرتب‌سازی لیست</b><button class="x" data-act="close" aria-label="بستن">×</button></div>${Object.entries(SORTS).map(([k,t])=>`<button class="opt${listSort===k?' on':''}" data-act="setSort" data-s="${k}">${ic(listSort===k?'check':'sort')}<span>${t}</span></button>`).join('')}`)}
 /* ============ الگوریتم تقسیم ============ */
