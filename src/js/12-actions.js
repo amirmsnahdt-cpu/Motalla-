@@ -164,7 +164,7 @@ const ACT={
   authRetry:()=>showAuth(),
   pwToggle:d=>{const i=$(d.t);if(i)i.type=i.type==='password'?'text':'password'},
   authLogin:async()=>{const u=($('au').value||'').trim(),p=$('ap').value||'';if(!u||!p){authErr('نام کاربری و رمز را بنویسید');return}authBusy();
-    try{const r=await api('/api/login',{username:u,password:p});loggedIn(r);pwhSet(p)}catch(e){authErr(e.message)}},
+    try{const r=await api('/api/login',{username:u,password:p});loggedIn(r)}catch(e){authErr(e.message)}},
   authSetup:async()=>{const n=($('an').value||'').trim(),u=($('au').value||'').trim(),p=$('ap').value||'',p2=$('ap2').value||'';
     if(!n||!u||!p){authErr('همه کادرها را پر کنید');return}if(p!==p2){authErr('تکرار رمز یکسان نیست');return}authBusy();
     try{loggedIn(await api('/api/setup',{name:n,username:u,password:p}))}catch(e){authErr(e.message)}},
@@ -173,7 +173,7 @@ const ACT={
   logout:()=>askConfirm('از حساب خارج می‌شوید؟'+(pendN()?' '+toFa(pendN())+' تغییر هنوز به سرور نرسیده و از بین می‌رود.':''),'خروج',async()=>{try{await api('/api/logout',{})}catch(e){}forceLogout()}),
   pwSheet:()=>pwSheet(),
   pwSave:async()=>{const o=$('po').value,a=$('pn1').value,b=$('pn2').value;if(a!==b){toast('تکرار رمز یکسان نیست',true);return}
-    try{await api('/api/password',{old:o,password:a});pwhSet(a);closeSheet();toast('رمز عبور عوض شد؛ بقیه دستگاه‌های شما خارج شدند')}catch(e){toast(e.message,true)}},
+    try{await api('/api/password',{old:o,password:a});closeSheet();toast('رمز عبور عوض شد؛ بقیه دستگاه‌های شما خارج شدند')}catch(e){toast(e.message,true)}},
   backup:async()=>{closeSheet();try{toast('در حال آماده‌سازی پشتیبان…');const j=await api('/api/backup');save('motalla-backup-'+todayISO()+'.txt',JSON.stringify(j,null,1),'فایل پشتیبان آماده شد')}catch(e){toast(e.message,true)}},
   usersLoad:()=>{usersErr='';USERS=null;render();loadUsers()},
   userNew:()=>userNew(),
