@@ -363,12 +363,19 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 #app.turning{background:transparent!important;box-shadow:none}
 #app.turning #view,#app.turning #bar{background-color:var(--bg)!important}
 #app.turning #bottom{background:var(--card)!important}
-/* v58.3: نام کاربری پنهان فرم‌ها (برای ذخیره رمز در Passwords آیفون) */
+/* v58.3: Face ID آیفون با «رمزها»ی خود گوشی */
 .lkpu{position:absolute!important;width:1px!important;height:1px!important;min-height:0!important;padding:0!important;border:0!important;opacity:0;pointer-events:none;overflow:hidden}
+.lkpwf{width:100%;display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.lkpwf .lkpi{text-align:center;font-size:18px;letter-spacing:.5px;border:1.5px solid var(--fld)!important;background:var(--card)!important;min-height:54px}
+.lkpwf .lkpi:focus{border-color:var(--blu)!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--blu) 14%,transparent)!important}
+.lkpwf .btn{width:100%;flex:none}
+.lkpwf.busy .btn{opacity:.6;pointer-events:none}
 .lkfid{width:100%;flex:none;margin-top:14px}
+.lkw.shake2{animation:lkshake .38s cubic-bezier(.36,.07,.19,.97)}
 .lks b{color:var(--ink)}
 /* v58.4: صفحه قفل کل صفحه را غیرقابل انتخاب می‌کرد؛ آیفون در چنین جایی صفحه‌کلید را خالی باز می‌کرد و نمی‌شد تایپ کرد */
 .lk input,.lk textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+.lk .lkpi{font-size:18px}
 /* v58.7: هنگام ورق زدن تب‌ها نوار بالای خانه سفید و خالی می‌شد (پس‌زمینه --bg روی متن سفید) — آبی خودش بماند */
 #app.turning.home #bar{background:var(--hero)!important}
 /* v58.7: باز شدن صفحه تمام‌صفحه روی کپی صفحه قبلی (نه روی سفیدی) و کپی صفحه هنگام بسته شدن، هر دو مات */
