@@ -111,11 +111,32 @@ tr.tot td{border-bottom:0;border-top:1.2px solid #16213a;font-weight:800;padding
 .foot{margin-top:20px;padding-top:8px;border-top:1px solid #eef0f4;display:flex;justify-content:space-between;font-size:7.2pt;color:#a0a6b2}
 .rc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.rc figure{margin:0;border:1px solid #eef0f4;border-radius:12px;padding:7px;page-break-inside:avoid}
 .rc img{width:100%;height:200px;object-fit:contain;background:#f7f8fa;border-radius:8px;display:block}.rc figcaption{font-size:8pt;margin-top:5px;line-height:1.5}.rc figcaption b{display:block}
+tbody.en{page-break-inside:avoid;break-inside:avoid}tr.hs td{border-bottom:0;padding-bottom:4px}
+tr.stlr td{padding:0 6px 11px}
+.stb{border:1px solid #ecd9a6;background:linear-gradient(180deg,#fdf9ee,#fbf6e8);border-radius:11px;padding:7px 11px 6px;position:relative}
+.stb:before{content:'';position:absolute;top:0;right:14px;left:14px;height:2px;border-radius:0 0 2px 2px;background:linear-gradient(90deg,#ecc874,#b8862b)}
+.stbh{display:flex;justify-content:space-between;align-items:baseline;padding:2px 0 6px;border-bottom:1px dashed #e3cf98;margin-bottom:3px}
+.stbh span{font-size:7.8pt;font-weight:700;color:#7a5a12}.stbh b{font-size:11.5pt;font-weight:900;color:#13284f;white-space:nowrap}.stbh b em{font-style:normal;font-size:7.4pt;color:#9097a5;font-weight:500;margin-right:3px}
+.stbr{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:8.2pt}.stbr+.stbr{border-top:1px solid #f1e6c6}
+.stbr i{font-style:normal;width:15px;height:15px;border-radius:50%;background:#13284f;color:#ecc874;font-size:6.8pt;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.stk{font-weight:800;color:#16213a;white-space:nowrap}.std{flex:1;color:#6b7385;font-size:7.6pt}.stbr b{font-weight:800;white-space:nowrap;color:#16213a}
+.stw{display:inline-block;font-size:6.8pt;font-weight:700;color:#946200;background:#fbf4e1;border-radius:6px;padding:0 5px}
+.stbr.bk .stk{color:#2a4fb8}.stbr.bk i{background:#2a4fb8;color:#fff}.stbr.bk b{color:#2a4fb8}
 .pb{position:fixed;top:10px;left:10px;padding:9px 16px;background:#13284f;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}@media print{.pb{display:none}}`}
 function pdfTop(kind,D){const now=new Date();return `<div class="top"><div class="brand"><span class="mk">م</span><span><b>مطلا</b><small>طلا و جواهر</small></span></div><div class="doc">${esc(kind)}<br>${D.fa}</div></div>`}
 const pdfFoot=()=>`<div class="foot"><span>بده بستون · مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
 const pdfDoc=(title,body)=>`<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>${PDF_FONT}<style>${pdfCSS()}</style></head><body><button class="pb" onclick="window.print()">چاپ / ذخیره PDF</button>${body}</body></html>`;
 const pdfSub=(D,reg)=>`<div class="sub"><span class="pdl">تاریخ واریز</span><span class="pdv">${D.fa}</span><span class="pde">${D.en}</span>${reg?`<span class="rg">ثبت: ${esc(reg)}</span>`:''}</div>`;
+/* v59.8: نام فایل خروجی (PDF و Excel) = تاریخ واریز، مثل «مطلا ( تاریخ ۲۹/۰۷/۱۴۰۵ )».
+   «/» در نام فایل مجاز نیست (اندروید و آیفون آن را حذف یا عوض می‌کنند)، پس «∕» (هم‌شکل) گذاشته می‌شود؛
+   تاریخ داخل جداساز چپ‌به‌راست است تا ترتیب روز/ماه/سال همان‌طور که تایپ می‌کنید دیده شود. */
+function fileBase(iso,extra){const D=dates(iso);return 'مطلا ( تاریخ \u2066'+toFa(p2(D.jd))+'∕'+toFa(p2(D.jm))+'∕'+toFa(D.jy)+'\u2069 )'+(extra?' '+String(extra).replace(/[\\/:*?"<>|]/g,'-'):'')}
+/* v59.8: جزئیات تسویه زیر ردیف واریزی: مبلغ کل بالا، بعد هر واریزی انجام‌شده (نوع/پرداخت‌کننده، مشخصات، مبلغ) و در آخر سهم واریز بانکی */
+function stlBox(x,cols){const S=x.settles||[];if(!S.length)return '';const bank=x.full?0:(+x.amount||0);
+  const det=z=>[z.inv?'فاکتور فروش '+toEn(String(z.inv)):'',z.phone?'تلفن <span class="tn">'+esc(toEn(String(z.phone)))+'</span>':'',z.tn?'پیگیری <span class="tn">'+esc(toEn(String(z.tn)))+'</span>':'',/^\d{4}-\d\d-\d\d/.test(z.date||'')?dates(z.date.slice(0,10)).fa:''].filter(Boolean).map(v=>v.startsWith('فاکتور')?esc(v):v).join(' · ');
+  return `<tr class="stlr"><td></td><td colspan="${cols-1}"><div class="stb"><div class="stbh"><span>مبلغ کل فاکتور</span><b>${fmt(x.total)}<em>تومان</em></b></div>
+    ${S.map((z,i)=>`<div class="stbr"><i>${fmt(i+1)}</i><span class="stk">${esc(z.name||'مشتری')}</span><span class="std">${det(z)||'&nbsp;'}${z.st==='wait'?' <span class="stw">در انتظار تأیید</span>':''}</span><b>${fmt(+z.amount||0)}</b></div>`).join('')}
+    ${bank?`<div class="stbr bk"><i>${fmt(S.length+1)}</i><span class="stk">واریز بانکی</span><span class="std">همین لیست — به شبای بالا</span><b>${fmt(bank)}</b></div>`:''}</div></td></tr>`}
 /* گزارش تخصیص / لیست (جایگزین نسخه قدیمی) */
 function reportHTML(sc){const D=DP(),RG=alloc.reg||'',G=groups(sc).filter(g=>g.rows.length),tc=G.reduce((s,g)=>s+g.rows.length,0),ta=G.reduce((s,g)=>s+sum(g.rows),0);let h='';
   if(G.length>1)h+=`<section class="pg">${pdfTop('گزارش واریزی',D)}<h1>گزارش کلی واریزی</h1>${pdfSub(D,RG)}<div class="bar"></div>
@@ -125,29 +146,31 @@ function reportHTML(sc){const D=DP(),RG=alloc.reg||'',G=groups(sc).filter(g=>g.r
     <div class="sign"><div>تهیه‌کننده</div><div>تأیید مدیر</div></div>${pdfFoot()}</section>`;
   G.forEach(g=>{const s=sum(g.rows);h+=`<section class="pg">${pdfTop('گزارش واریزی',D)}<h1>${esc(g.name)}</h1>${pdfSub(D,RG)}<div class="bar"></div>
     <div class="kp"><div><small>تعداد واریزی</small><b>${fmt(g.rows.length)}</b></div><div class="g"><small>مجموع</small><b>${fmt(s)}<em>تومان</em></b></div></div>
-    <table><thead><tr><th>#</th><th>نام و فاکتور</th><th>بانک</th><th>شماره شبا</th><th class="am">مبلغ (تومان)</th></tr></thead><tbody>
-    ${g.rows.map((r,i)=>`<tr><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(r))}</span>${r.code?`<span class="s">فاکتور ${esc(toEn(r.code))}</span>`:''}${r.settled?`<span class="s">از ${fmt(r.total)}، ${fmt(r.settled)} مستقیم توسط مشتری</span>`:''}</td><td>${esc(r.bankShow||'—')}</td><td class="ib">${esc(ibanPdf(r.iban))}</td><td class="am">${fmt(r.amount)}</td></tr>`).join('')}
-    <tr class="tot"><td></td><td colspan="3">جمع ${esc(g.name)} — ${fmt(g.rows.length)} واریزی</td><td class="am">${fmt(s)}</td></tr></tbody></table>${pdfFoot()}</section>`});
-  return pdfDoc('گزارش واریزی '+D.iso,h)}
+    <table><thead><tr><th>#</th><th>نام و فاکتور</th><th>بانک</th><th>شماره شبا</th><th class="am">مبلغ (تومان)</th></tr></thead>
+    ${g.rows.map((r,i)=>`<tbody class="en"><tr${r.settled&&(r.settles||[]).length?' class="hs"':''}><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(r))}</span>${r.code?`<span class="s">فاکتور ${esc(toEn(r.code))}</span>`:''}${r.settled&&!(r.settles||[]).length?`<span class="s">از ${fmt(r.total)}، ${fmt(r.settled)} مستقیم توسط مشتری</span>`:''}</td><td>${esc(r.bankShow||'—')}</td><td class="ib">${esc(ibanPdf(r.iban))}</td><td class="am">${fmt(r.amount)}</td></tr>${r.settled?stlBox(r,5):''}</tbody>`).join('')}
+    <tbody><tr class="tot"><td></td><td colspan="3">جمع ${esc(g.name)} — ${fmt(g.rows.length)} واریزی</td><td class="am">${fmt(s)}</td></tr></tbody></table>${pdfFoot()}</section>`});
+  return pdfDoc(fileBase(alloc.Dp?alloc.Dp.iso:D.iso,G.length===1&&sc!=='all'?G[0].name:''),h)}
 /* لیست روزانه با وضعیت، شماره پیگیری و رسیدها */
 async function dayReport(iso,G0,FS0,T0,R0){const G=G0||dayGroups(iso),D=dates(iso),it=G.flatMap(g=>g.rows),c=bStat({items:it}),imgs={};
   const RI=[];for(const x of it){const b=batches.find(z=>z.id===x.bid);if(!b)continue;for(const k of itImgs(b,x)){const v=await imgGet(k);if(v)RI.push({x,v})}}
   const TT=T0||'لیست روزانه واریز';let h=`<section class="pg">${pdfTop(TT,D)}<h1>${esc(TT)}</h1>${pdfSub(D,R0||'')}<div class="bar"></div>
   <div class="kp"><div><small>کل واریزی‌ها</small><b>${fmt(c.all)}</b></div><div class="ok"><small>انجام شد</small><b>${fmt(c.ok)}</b></div><div class="rd"><small>انجام نشد</small><b>${fmt(c.fail)}</b></div><div class="g"><small>واریز شده</small><b>${fmt(c.okSum)}<em>تومان</em></b></div></div>`;
   G.forEach(g=>{const s=sum(g.rows),gc=bStat({items:g.rows});h+=`<h2>${esc(g.name)}<small>${fmt(g.rows.length)} واریزی — ${fmt(s)} تومان${gc.fail?' — '+fmt(gc.fail)+' ناموفق':''}</small></h2>
-    <table><thead><tr><th>#</th><th>نام و فاکتور</th><th>شبا و بانک</th><th>وضعیت و پیگیری</th><th class="am">مبلغ (تومان)</th></tr></thead><tbody>
-    ${g.rows.map((x,i)=>`<tr><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(x))}</span>${x.code?`<span class="s">فاکتور ${esc(toEn(x.code))}</span>`:''}${x.settled?`<span class="s">مبلغ کل ${fmt(x.total)}؛ تسویه: ${esc((x.settles||[]).map(setLine).join('؛ '))}</span>`:''}</td><td><span class="ib">${esc(ibanPdf(x.iban))}</span><span class="s">${esc(x.bank||'—')}</span></td><td><span class="st ${x.st}">${ST[x.st][0]}</span><br><span class="sty">${setType(x)}</span>${x.tn?`<span class="s">پیگیری <span class="tn">${esc(x.tn)}</span></span>`:''}${x.time||x.note?`<span class="s">${x.time?'ساعت '+toFa(x.time):''}${x.time&&x.note?' — ':''}${esc(x.note||'')}</span>`:''}</td><td class="am">${fmt(x.amount)}</td></tr>`).join('')}
-    <tr class="tot"><td></td><td colspan="3">جمع ${esc(g.name)}</td><td class="am">${fmt(s)}</td></tr></tbody></table>`});
-  const FS=FS0||fullSettled(iso);if(FS.length)h+=`<h2>تسویه کامل از طریق مشتری<small>${fmt(FS.length)} مورد — ${fmt(FS.reduce((s,r)=>s+r.total,0))} تومان</small></h2><table><thead><tr><th>#</th><th>نام و فاکتور</th><th>نحوه تسویه</th><th class="am">مبلغ (تومان)</th></tr></thead><tbody>${FS.map((r,i)=>`<tr><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(r))}</span>${r.code?`<span class="s">فاکتور ${esc(toEn(r.code))}</span>`:''}</td><td>${r.settles.map(z=>`<span class="s" style="color:#2a3550">${esc(setLine(z))}</span>`).join('')}</td><td class="am">${fmt(r.total)}</td></tr>`).join('')}</tbody></table>`;
+    <table><thead><tr><th>#</th><th>نام و فاکتور</th><th>شبا و بانک</th><th>وضعیت و پیگیری</th><th class="am">مبلغ (تومان)</th></tr></thead>
+    ${g.rows.map((x,i)=>`<tbody class="en"><tr${x.settled?' class="hs"':''}><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(x))}</span>${x.code?`<span class="s">فاکتور ${esc(toEn(x.code))}</span>`:''}</td><td><span class="ib">${esc(ibanPdf(x.iban))}</span><span class="s">${esc(x.bank||'—')}</span></td><td><span class="st ${x.st}">${ST[x.st][0]}</span><br><span class="sty">${setType(x)}</span>${x.tn?`<span class="s">پیگیری <span class="tn">${esc(x.tn)}</span></span>`:''}${x.time||x.note?`<span class="s">${x.time?'ساعت '+toFa(x.time):''}${x.time&&x.note?' — ':''}${esc(x.note||'')}</span>`:''}</td><td class="am">${fmt(x.amount)}</td></tr>${x.settled?stlBox(x,5):''}</tbody>`).join('')}
+    <tbody><tr class="tot"><td></td><td colspan="3">جمع ${esc(g.name)}</td><td class="am">${fmt(s)}</td></tr></tbody></table>`});
+  const FS=FS0||fullSettled(iso);if(FS.length)h+=`<h2>تسویه کامل از طریق مشتری<small>${fmt(FS.length)} مورد — ${fmt(FS.reduce((s,r)=>s+r.total,0))} تومان</small></h2><table><thead><tr><th>#</th><th>نام و فاکتور</th><th>نوع تسویه</th><th class="am">مبلغ کل (تومان)</th></tr></thead>${FS.map((r,i)=>`<tbody class="en"><tr class="hs"><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(r))}</span>${r.code?`<span class="s">فاکتور ${esc(toEn(r.code))}</span>`:''}</td><td><span class="sty">${esc(setType(r))}</span></td><td class="am">${fmt(r.total)}</td></tr>${stlBox(r,4)}</tbody>`).join('')}</table>`;
   h+=`<div class="sign"><div>تهیه‌کننده</div><div>تأیید مدیر</div></div>${pdfFoot()}</section>`;
   const ri=RI;
   if(ri.length)h+=`<section class="pg">${pdfTop('رسیدهای واریز',D)}<h1>رسیدهای واریز</h1>${pdfSub(D)}<div class="bar"></div><div class="rc">${ri.map(({x,v})=>`<figure><img src="${v}" alt=""><figcaption><b>${esc(x.name)}</b>${fmt(x.amount)} تومان${x.tn?'<br>پیگیری <span class="tn">'+esc(x.tn)+'</span>':''}</figcaption></figure>`).join('')}</div>${pdfFoot()}</section>`;
-  return pdfDoc('لیست روزانه '+D.iso,h)}
+  return pdfDoc(fileBase(iso),h)}
 /* چاپ داخل همین صفحه (بدون دانلود) */
 function printReport(){const html=window.__pv||withCtx(reportHTML),doc=new DOMParser().parseFromString(html,'text/html');doc.querySelectorAll('.pb').forEach(b=>b.remove());
   let css=[...doc.querySelectorAll('style')].map(s=>s.textContent).join('\n');const pg=(css.match(/@page\{[^}]*\}/)||[''])[0];css=css.replace(pg,'').replace(/(^|\})\s*body\{/g,'$1 #printArea{');
   $('printArea').innerHTML='<style>'+pg+'@media print{'+css+'}</style>'+doc.body.innerHTML;
-  setTimeout(()=>{try{window.print()}catch(e){toast('چاپ در این برنامه ممکن نیست؛ از «متن» استفاده کنید',true)}},80)}
+  /* نام فایل PDF ذخیره‌شده = عنوان صفحه هنگام چاپ؛ پس عنوان گزارش (مثلاً «مطلا ( تاریخ … )») موقتاً عنوان برنامه می‌شود */
+  const t0=window.__docT||(window.__docT=document.title),tt=(doc.title||'').trim();if(tt)document.title=tt;let back=false;const restore=()=>{if(back)return;back=true;document.title=t0;removeEventListener('afterprint',restore)};addEventListener('afterprint',restore);
+  setTimeout(()=>{try{window.print()}catch(e){toast('چاپ در این برنامه ممکن نیست؛ از «متن» استفاده کنید',true)}setTimeout(restore,60000)},80)}
 
 /* ============ برگه‌ها ============ */
 let tmpISO=null,confirmCb=null,dpMode='';

@@ -37,10 +37,10 @@ const ACT={
     if(d.a==='cp'){expCtx={A,sc};const ok=await copyText(withCtx(txt));ok?toast('متن کپی شد'):openText();return}openExport(A,sc)},
   expOpen:d=>{openExport(alloc,d.sc);expCtx.track=true},
   expText:()=>openText(),expPdf:()=>{closeSheet();autoTrack();openPrint()},
-  expXls:()=>{if(typeof XLSX==='undefined')return;closeSheet();autoTrack();save('motalla-'+ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد')},
+  expXls:()=>{if(typeof XLSX==='undefined')return;closeSheet();autoTrack();save(ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد')},
   copyOut:async()=>{const ta=$('tout'),ok=await copyText(ta.value);if(ok){toast('متن کپی شد');setTimeout(autoTrack,900)}else{ta.focus();ta.select();toast('متن انتخاب شد؛ «Copy» را بزنید')}},
   shareOut:async()=>{if(window.AndroidBridge){window.AndroidBridge.share($('tout').value);return}try{await navigator.share({text:$('tout').value})}catch(e){}},
-  saveTxt:()=>{autoTrack();save('motalla-'+(txtGen?txtName:ctxName())+'.txt','﻿'+(txtGen?txtGen():withCtx(txt)),'فایل متنی آماده شد')},
+  saveTxt:()=>{autoTrack();save((txtGen?txtName:ctxName())+'.txt','﻿'+(txtGen?txtGen():withCtx(txt)),'فایل متنی آماده شد')},
   pvClose:closePrint,pvPrint:printReport,pvShareP:async()=>{const h=window.__pv||'';try{const fl=new File([h],'motalla-report.html',{type:'text/html'});if(navigator.canShare&&navigator.canShare({files:[fl]})){await navigator.share({files:[fl],title:'گزارش مطلا'});return}}catch(e){if(e&&e.name==='AbortError')return}printReport()},
   copySrc:async()=>{txtGen=null;expCtx={A:alloc,sc:String(srcIdx),track:true};const ok=await copyText(withCtx(txt));if(ok){toast('متن «'+srcRows().name+'» کپی شد');setTimeout(autoTrack,900)}else openText()},
   srcView:d=>{srcIdx=d.i;go('srcview')},
@@ -92,9 +92,9 @@ const ACT={
     p?askConfirm(fmt(p)+' واریزی هنوز «در انتظار» است. با همین وضعیت بایگانی شود؟','بایگانی',done):done()},
   reopenDay:()=>{const bs=dayBatches(dayIso);bs.forEach(b=>delete b.closed);saveB();if(bs[0]){batchId=bs[0].id;go('batch')}toast('برای ویرایش باز شد')},
   dayExp:()=>openDayExport(dayIso),
-  dayText:()=>{txtGen=()=>dayTxt(dayIso);txtName='daily-'+dayIso;openText()},
+  dayText:()=>{txtGen=()=>dayTxt(dayIso);txtName=fileBase(dayIso);openText()},
   dayPdf:async()=>{closeSheet();openPrint(await dayReport(dayIso))},
-  dayXls:()=>{if(typeof XLSX==='undefined')return;closeSheet();save('motalla-daily-'+dayIso+'.xlsx',dayXlsx(dayIso),'فایل Excel آماده شد')},
+  dayXls:()=>{if(typeof XLSX==='undefined')return;closeSheet();save(fileBase(dayIso)+'.xlsx',dayXlsx(dayIso),'فایل Excel آماده شد')},
   openBatch:d=>{batchId=+d.id;tkFilter='all';tkQ='';tkOpen=new Set();go('batch')},
   tkFilter:d=>{tkFilter=d.f;refreshBatch()},tkClear:()=>{tkQ='';refreshBatch()},
   tkSet:d=>{const b=batches.find(x=>x.id===batchId);if(!b)return;const x=b.items[+d.i];x.st=x.st===d.st?'pending':d.st;x.at=new Date().toISOString();saveB();refreshBatch();if(!bStat(b).pending)toast('همه واریزی‌های این لیست بررسی شد ✓')},
@@ -144,7 +144,7 @@ const ACT={
   xAll:d=>{const P=dayParts();if(!P.length)return;txtGen=null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0',track:true,parts:P.filter(p=>!p.sent).map(p=>p.id)};
     if(d.k==='pdf'){autoTrack();openPrint();return}
     if(d.k==='txt'){openText();return}
-    if(d.k==='xls'){if(typeof XLSX==='undefined')return;autoTrack();save('motalla-'+ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد');return}
+    if(d.k==='xls'){if(typeof XLSX==='undefined')return;autoTrack();save(ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد');return}
     expAllGo()},
   expAll:()=>expAllGo(),
   aCnt:d=>{setCnt((aSt.count||0)+(+d.v));paramRefresh();recalc()},
@@ -186,7 +186,7 @@ const ACT={
     try{const j=await api('/api/users/'+uTmp.id,b,'PATCH');if(j.user.id===ME.id){ME={...ME,...j.user};rawSet('m_me',ME);user=ME.name;applyPerms()}
       USERS=(USERS||[]).map(x=>x.id===j.user.id?j.user:x);closeSheet();render();toast(p?'ذخیره شد — رمز جدید: '+p:'ذخیره شد')}catch(e){toast(e.message,true)}},
   userDel:()=>{const u=(USERS||[]).find(x=>x.id===uTmp.id);if(!u)return;askConfirm('حساب «'+u.name+'» حذف شود؟ ثبت‌های قبلی او باقی می‌ماند.','حذف حساب',async()=>{try{await api('/api/users/'+u.id,undefined,'DELETE');USERS=USERS.filter(x=>x.id!==u.id);render();toast('حساب حذف شد')}catch(e){toast(e.message,true)}})},
-  credCopyU:async d=>{const t='مطلا | ورود به بده بستون\n'+d.n+'\nآدرس: '+appURL()+'\nنام کاربری: '+d.u+'\nرمز عبور: '+d.p;(await copyText(t))?toast('کپی شد؛ برای همکارتان بفرستید'):(txtGen=()=>t,txtName='login',openText())},
+  credCopyU:async d=>{const t='مطلا | ورود به بده بستون\n'+d.n+'\nآدرس: '+appURL()+'\nنام کاربری: '+d.u+'\nرمز عبور: '+d.p;(await copyText(t))?toast('کپی شد؛ برای همکارتان بفرستید'):(txtGen=()=>t,txtName='motalla-login',openText())},
 };
 for(const k in PERM_OF){const f=ACT[k];if(typeof f!=='function')continue;ACT[k]=function(d,...r){if(canAct(k,d))return f.call(this,d,...r);
   const p=permFor(k,d),L=p==='admin'?'مدیریت':(PERMS.find(x=>x[0]===p)||[,''])[1];toast('دسترسی «'+L+'» برای حساب شما فعال نیست؛ از مدیر بخواهید',true)}}

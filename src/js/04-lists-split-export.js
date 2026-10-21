@@ -111,7 +111,7 @@ function expDates(A){if(!A||A.Dp!==undefined)return;const rows=(A.res||[]).flatM
 function withCtx(f){const saved=alloc;alloc=expCtx.A;expDates(alloc);try{return f(expCtx.sc)}finally{alloc=saved}}
 const DP=()=>(alloc&&alloc.Dp)||(alloc&&alloc.D);
 const payLine=()=>{const A=alloc||{};return A.Dp?'تاریخ واریز: '+A.Dp.fa+' — '+A.Dp.en:A.Pl&&A.Pl.length>1?'تاریخ واریز: '+A.Pl.map(k=>dates(k).fa).join('، '):A.D.fa+' — '+A.D.en};
-function ctxName(){return withCtx(sc=>(sc==='all'?'all':alloc.res[+sc].src.name.replace(/\s+/g,'-'))+'-'+alloc.D.iso)}
+function ctxName(){return withCtx(sc=>fileBase(alloc.Dp?alloc.Dp.iso:alloc.D.iso,sc==='all'?'':alloc.res[+sc].src.name))}
 function openExport(A,sc){expCtx={A,sc};txtGen=null;const nm=withCtx(s=>s==='all'?'همه منابع':alloc.res[+s].src.name);
   sheet(`<div class="sh-h"><b>خروجی — ${esc(nm)}</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <button class="opt big" data-act="expText">${ic('copy')}<span><b>متن برای تلگرام و بانک</b><small>نمایش، کپی یا اشتراک‌گذاری</small></span></button>

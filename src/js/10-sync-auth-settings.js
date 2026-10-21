@@ -205,7 +205,7 @@ if(window.AndroidBridge){
   /* چاپ در اپ اندروید: منابع بیرونی حذف می‌شوند تا صفحه چاپ بدون معطلی آماده شود */
   printReport=function(){if(!window.AndroidBridge.version){askConfirm('برای چاپ و ذخیره PDF، نسخه جدید اپ اندروید لازم است. الان دانلود شود؟ (اطلاعات روی سرور است و چیزی پاک نمی‌شود)','دانلود نسخه جدید',()=>ACT.getApk());return}
     let html=(window.__pv||withCtx(reportHTML)).replace(/<button class="pb"[^>]*>.*?<\/button>/,'').replace(/<link[^>]+(googleapis|gstatic)[^>]*>/g,'').replace(/<script[\s\S]*?<\/script>/g,'');
-    toast('در حال آماده‌سازی چاپ…');try{window.AndroidBridge.printHtml(html,'Motalla')}catch(e){toast('چاپ در این گوشی ممکن نشد',true)}};
+    toast('در حال آماده‌سازی چاپ…');try{window.AndroidBridge.printHtml(html,((html.match(/<title>([^<]*)<\/title>/)||[])[1]||'Motalla').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>'))}catch(e){toast('چاپ در این گوشی ممکن نشد',true)}};
 }
 /* ---------- خانه: فهرست عمودی وضعیت واریزی‌ها ---------- */
 let homeSt=ls.get('m_homest','pend');

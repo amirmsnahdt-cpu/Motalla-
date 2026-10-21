@@ -103,7 +103,7 @@ function badNotice(iso){const n=validated().filter(r=>r.entryDate===iso&&r.level
 /* ================= v21: خروجی کامل همه تخصیص‌های روز ================= */
 const dayParts=()=>parts().filter(p=>!(p.sent&&batches.some(b=>b.id===p.bid&&b.closed)));
 function dlFile(f){try{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000);return true}catch(e){return false}}
-async function expAllGo(){closeSheet();const nm='motalla-'+ctxName(),hasX=typeof XLSX!=='undefined',files=[];
+async function expAllGo(){closeSheet();const nm=ctxName(),hasX=typeof XLSX!=='undefined',files=[];
   try{if(hasX)files.push(new File([withCtx(xlsx)],nm+'.xlsx',{type:MIME.xlsx}))}catch(e){}
   files.push(new File(['﻿'+withCtx(txt)],nm+'.txt',{type:'text/plain'}));
   const html=withCtx(reportHTML);autoTrack();let done=false;
@@ -136,7 +136,7 @@ function srcInfo(id){for(const b of batches){const x=b.items.find(z=>z.id===id);
 /* ================= v22: متن کپی یک واریزی ================= */
 function entTxt(r){const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';
   const pd=r.payDate||r.entryDate;return 'نام: '+Bo(fullName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+(bk?'\nبانک: '+bk:'')+'\nمبلغ: '+Bo(N(r.amount)+' تومان')+(pd?'\nتاریخ واریز: '+dates(pd).fa:'')+(r.iban?'\nشبا: '+Mo(ibanSp(r.iban)):'')+(r.card?'\nکارت: '+Mo(r.card):'')+(r.holder?'\nصاحب حساب: '+r.holder:'')}
-async function cpOut(t,ok){(await copyText(t))?toast(ok):(txtGen=()=>t,txtName='copy',openText())}
+async function cpOut(t,ok){(await copyText(t))?toast(ok):(txtGen=()=>t,txtName='motalla-copy',openText())}
 /* ================= v22: منوی هر واریزی (⋯) ================= */
 function entMenu(id){const r=validated().find(x=>x.id==id);if(!r)return;const si=r.sentBid?srcInfo(r.id):null;
   sheet(`<div class="sh-h"><div><b>${esc(fullName(r))}</b><small class="shsub">${fmt(r.amount)} تومان${r.code?' · فاکتور '+esc(toEn(r.code)):''}${si?' · منبع: '+esc(si.src):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
