@@ -283,6 +283,10 @@ html.shopen body{background:#000}
 /* v57: قفل برنامه — صفحه رمز ۶ رقمی (شبیه آیفون، آبی برنامه) */
 .lk{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:max(24px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));overflow-y:auto;-webkit-user-select:none;user-select:none;animation:lkin .22s ease-out}
 .lk.hide{display:none}
+/* v59.7: دکمه‌های صفحه رمز برجسته، مثل یک لایه جدا روی زمینه (سایه چندلایه + لبه نازک + نور بالای دکمه) */
+.lk{--lkk:linear-gradient(180deg,#fff,#f7f9fd);--lksh:0 0 0 1px #16213a12,0 1px 1px #16213a14,0 4px 8px -2px #16213a1f,0 14px 26px -12px #2152d933,inset 0 1px 0 #fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lk{--lkk:linear-gradient(180deg,#1f2d4d,#17223c);--lksh:0 0 0 1px #ffffff14,0 2px 4px #0008,0 12px 24px -10px #000c,inset 0 1px 0 #ffffff1f}}
+:root[data-theme="dark"] .lk{--lkk:linear-gradient(180deg,#1f2d4d,#17223c);--lksh:0 0 0 1px #ffffff14,0 2px 4px #0008,0 12px 24px -10px #000c,inset 0 1px 0 #ffffff1f}
 .lk,.lk button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 html.locked,html.locked body{overflow:hidden}
 @keyframes lkin{from{opacity:0}to{opacity:1}}
@@ -299,7 +303,7 @@ html.locked,html.locked body{overflow:hidden}
 @keyframes lkshake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
 .lkerr{margin:6px 0 0;min-height:20px;font-size:12.5px;font-weight:800;color:var(--red);line-height:1.7}
 .lkp{display:grid;grid-template-columns:repeat(3,76px);gap:16px 22px;direction:ltr;margin-top:12px}
-.lkp button{width:76px;height:76px;border-radius:50%;border:0;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line),0 6px 16px -12px rgba(15,30,70,.35);font:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .38s ease-out,color .38s ease-out,opacity .38s ease-out}
+.lkp button{width:76px;height:76px;border-radius:50%;border:0;background:var(--lkk);color:var(--ink);box-shadow:var(--lksh);font:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .38s ease-out,color .38s ease-out,opacity .38s ease-out}
 .lkp button b{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
 .lkp button.hit{background:var(--blu);color:#fff;transition:none}
 .lkp .lkf{background:none;box-shadow:none;color:var(--blu)}
