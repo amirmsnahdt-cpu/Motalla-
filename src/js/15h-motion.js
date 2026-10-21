@@ -51,7 +51,8 @@ function flipPlay(root,m){if(!m||!root)return;const vh=innerHeight,N=[],seen=new
     /* پدرِ این عنصر هم تازه است → فقط پدر بالا بیاید؛ پدر حرکت می‌کند → فقط اختلاف را حرکت بده (حرکت تو در تو دوبرابر نشود) */
     let dx=t==='mv'?el._fd.dx:0,dy=t==='mv'?el._fd.dy:0;
     for(let p=el.parentElement;p&&p!==root;p=p.parentElement){if(p._fn)return;if(p._fd){dx-=p._fd.dx;dy-=p._fd.dy;break}}
-    if(t==='new'){riseEl(el,n++);return}
+    /* v59.6: سرتیتر تاریخِ روزها (fday) بالا نمی‌آید؛ فقط متنش همان‌جا عوض می‌شود */
+    if(t==='new'){if(!el.closest('.fday'))riseEl(el,n++);return}
     if(Math.abs(dx)<.5&&Math.abs(dy)<.5)return;
     const far=Math.min(1,Math.abs(dy)/900),dur=420+far*180;
     el.animate([{translate:`${dx}px ${dy}px`},{translate:'0 0'}],{duration:dur,easing:'cubic-bezier(.32,.72,0,1)'})});
@@ -60,7 +61,8 @@ function flipPlay(root,m){if(!m||!root)return;const vh=innerHeight,N=[],seen=new
    آیفون (Safari) ترکیب add را درست اجرا نمی‌کرد: محو شدن اصلاً دیده نمی‌شد (ردیف یک‌باره ظاهر می‌شد) و جابه‌جایی ۲۴ پیکسلی
    در اولین فریم تقریباً تمام بود. translate با transform خود عناصر (کشیدن ردیف، کشیدن برای تازه‌سازی) و scale لمس تداخل ندارد. */
 const RISE_E='cubic-bezier(.22,.9,.28,1)';
-function riseEl(el,i){el.animate([{opacity:0,translate:'0 56px'},{opacity:1,translate:'0 0'}],{duration:560,delay:Math.min(i,10)*45,easing:RISE_E,fill:'backwards'})}
+/* v59.6: مسیر بالا آمدن بلندتر (۵۶ → ۱۲۰ پیکسل) تا حرکت از پایین به بالا واضح دیده شود، مخصوصاً در آیفون */
+function riseEl(el,i){el.animate([{opacity:0,translate:'0 120px'},{opacity:1,translate:'0 0'}],{duration:680,delay:Math.min(i,10)*55,easing:RISE_E,fill:'backwards'})}
 /* همه چیزهای دیده‌شده یک ظرف را پشت سر هم از پایین بالا بیاور (بعد از تازه‌سازی لیست با کشیدن به پایین) */
 function riseIn(root,sel){if(!root||RM()||!root.animate)return;const vh=innerHeight;let i=0;
   root.querySelectorAll(sel).forEach(el=>{const r=el.getBoundingClientRect();if(!r.height||r.bottom<-40||r.top>vh+40)return;riseEl(el,i++)})}

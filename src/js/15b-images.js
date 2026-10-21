@@ -4,6 +4,9 @@ const itImgs=(b,x)=>Array.isArray(x.imgs)?x.imgs.slice():x.img?[ikey(b,x)]:[];
 const stImgs=z=>Array.isArray(z.imgs)?z.imgs.slice():z.img&&typeof z.img==='string'?[z.img]:[];
 const newImgKey=p=>p+':'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let GAL=null;
+/* v59.6: اپ اندرویدِ قدیمی نتیجه «چند عکس با هم» گالری را به صفحه نمی‌داد (عکس انتخاب می‌شد ولی اضافه نمی‌شد)؛
+   در آن نسخه‌ها انتخاب تک‌عکسی است تا همیشه کار کند. اپ جدید (multiPick) و آیفون/مرورگر چند عکس با هم. */
+const picMulti=()=>!/MotallaAndroid/.test(navigator.userAgent)||!!(window.AndroidBridge&&AndroidBridge.multiPick);
 /* صاحب عکس‌ها: {k:'it',eid} = رسید واریز بانکی یک واریزی، {k:'st',eid,sid} = رسید یک تسویه مشتری */
 function galCtx(){if(!GAL)return null;const e=entries.find(z=>String(z.id)===String(GAL.eid));if(!e)return null;const now=()=>new Date().toISOString();
   if(GAL.k==='it'){const q=entBI(e);if(!q)return null;/* رسید حتی بعد از تأیید و بایگانی لیست هم اضافه می‌شود؛ وضعیت واریز در لیست بسته تغییر نمی‌کند */
@@ -16,8 +19,8 @@ function galCtx(){if(!GAL)return null;const e=entries.find(z=>String(z.id)===Str
     meta:{name:fullName(e)+' (از '+z.name+')',holder:e.holder||fullName(e),payer:z.name,amount:z.amount,tn:z.tn||'',date:z.date,kind:'cust'}}}
 function galHTML(){const c=galCtx();if(!c)return `<div class="sh-h"><b>رسید</b><button class="x" data-act="close" aria-label="بستن">×</button></div><div class="spempty"><b>پیدا نشد</b></div>`;const K=c.keys;
   return `<div class="sh-h"><div><b>${GAL.k==='it'?'رسید واریز بانکی':'رسید تسویه مشتری'}</b><small class="shsub">${esc(c.meta.name)} · ${fmt(c.meta.amount)} تومان${K.length?' · '+fmt(K.length)+' عکس':''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="galg">${K.map((k,i)=>`<button class="galt" data-act="galView" data-i="${i}" aria-label="دیدن عکس ${toFa(i+1)}"><span class="galim" id="gal${i}"></span><i>${toFa(i+1)}</i></button>`).join('')}${c.ed?`<label class="galt add">${ic('plus')}<span>${K.length?'عکس دیگر':'افزودن عکس'}</span><input type="file" accept="image/*" multiple data-galadd="1" hidden></label>`:''}</div>
-  ${!K.length?`<div class="galnote">${c.ed?'می‌توانید چند عکس با هم انتخاب کنید؛ هر عکس را بعداً بزرگ کنید، بچرخانید یا برش بزنید.':'برای این واریز عکسی ثبت نشده است.'}</div>`:`<div class="galnote">برای بزرگ‌نمایی، چرخش یا برش روی عکس بزنید.</div><div class="txacts"><button data-act="galShare">${ic('open')} اشتراک${K.length>1?' همه':''}</button><button data-act="galSave">${ic('down')} ذخیره${K.length>1?' همه':''}</button></div>`}`}
+  <div class="galg">${K.map((k,i)=>`<button class="galt" data-act="galView" data-i="${i}" aria-label="دیدن عکس ${toFa(i+1)}"><span class="galim" id="gal${i}"></span><i>${toFa(i+1)}</i></button>`).join('')}${c.ed?`<label class="galt add">${ic('plus')}<span>${K.length?'عکس دیگر':'افزودن عکس'}</span><input type="file" accept="image/*"${picMulti()?' multiple':''} data-galadd="1" hidden></label>`:''}</div>
+  ${!K.length?`<div class="galnote">${c.ed?(picMulti()?'می‌توانید چند عکس با هم انتخاب کنید؛':'عکس‌ها را یکی‌یکی اضافه کنید؛')+' هر عکس را بعداً بزرگ کنید، بچرخانید یا برش بزنید.':'برای این واریز عکسی ثبت نشده است.'}</div>`:`<div class="galnote">برای بزرگ‌نمایی، چرخش یا برش روی عکس بزنید.</div><div class="txacts"><button data-act="galShare">${ic('open')} اشتراک${K.length>1?' همه':''}</button><button data-act="galSave">${ic('down')} ذخیره${K.length>1?' همه':''}</button></div>`}`}
 function openGal(ref){GAL=ref;sheet(galHTML());galThumbs()}
 function galThumbs(){const c=galCtx();if(!c)return;c.keys.forEach(async(k,i)=>{const d=await imgGet(k),el=$('gal'+i);if(el&&d)el.style.backgroundImage=`url(${d})`})}
 function galRefresh(){if(!$('ov').classList.contains('hide')&&GAL&&$('sheet').querySelector('.galg'))$('sheet').innerHTML=galHTML(),galThumbs();if(['ent','lday','part','batch','day'].includes(cur)){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}}

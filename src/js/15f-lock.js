@@ -100,7 +100,18 @@ const LKI={face:'<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a
   pad:'<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
 const lkI=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${LKI[k]}</svg>`;
 function lockEl(){let e=$('lock');if(!e){e=document.createElement('div');e.id='lock';e.className='lk hide';e.setAttribute('role','dialog');e.setAttribute('aria-modal','true');document.body.appendChild(e);
-  e.addEventListener('click',ev=>{const b=ev.target.closest('[data-lk]');if(!b||b.disabled)return;ev.preventDefault();ev.stopPropagation();lockKey(b.dataset.lk)});}return e}
+  /* v59.6: صفحه‌کلید رمز مثل آیفون همان لحظه لمس (pointerdown) عمل می‌کند، نه بعد از برداشتن انگشت؛
+     دکمه هنگام لمس آبی می‌شود و با محو نرم برمی‌گردد. click بعدی همان لمس نادیده گرفته می‌شود (دو بار ثبت نشود)؛
+     صفحه‌کلید سخت‌افزاری/دسترس‌پذیری (click بدون لمس) مثل قبل کار می‌کند. */
+  let padAt=0;
+  const flash=b=>{b.classList.add('hit');clearTimeout(b._ht);b._ht=setTimeout(()=>b.classList.remove('hit'),140)};
+  e.addEventListener('pointerdown',ev=>{if(ev.button>0)return;const b=ev.target.closest('.lkp [data-lk]');if(!b||b.disabled)return;padAt=Date.now();flash(b);lockKey(b.dataset.lk)});
+  e.addEventListener('click',ev=>{const b=ev.target.closest('[data-lk]');if(!b||b.disabled)return;ev.preventDefault();ev.stopPropagation();
+    if(b.closest('.lkp')&&Date.now()-padAt<1500&&ev.detail)return;if(b.closest('.lkp'))flash(b);lockKey(b.dataset.lk)});}return e}
+/* فقط نقطه‌ها و پیام خطا عوض می‌شوند (نه کل صفحه) تا دکمه زیر انگشت از بین نرود و حرکت لمس و پر شدن نقطه دیده شود */
+function lockDots(){const S=lockUI,e=$('lock');if(!S||!e)return false;const d=e.querySelector('.lkd');if(!d)return false;
+  d.querySelectorAll('i').forEach((el,i)=>{const on=i<S.pin.length;if(on&&!el.classList.contains('on')&&!RM()&&el.animate)el.animate([{scale:'.55'},{scale:'1.22'},{scale:'1'}],{duration:280,easing:'cubic-bezier(.3,1.4,.5,1)'});el.classList.toggle('on',on)});
+  d.setAttribute('aria-label',toFa(S.pin.length)+' رقم از ۶');const er=e.querySelector('.lkerr');if(er)er.textContent=S.err||'';return true}
 /* m: unlock | set1 | set2 | verify | bio | forgot */
 function lockShow(m,cb){lockUI={m,pin:'',first:'',cb,err:'',busy:false};lockDraw();const e=lockEl();e.classList.remove('hide');document.documentElement.classList.add('locked');try{document.activeElement&&document.activeElement.blur()}catch(_){}
   if(m==='unlock'&&lockCfg().bio&&lockCfg().bio.t!=='pw')setTimeout(()=>{if(lockUI&&lockUI.m==='unlock'&&document.visibilityState==='visible')lockKey('bio',true)},350)}
@@ -150,9 +161,9 @@ async function lockKey(k,auto){const S=lockUI;if(!S||S.busy)return;
     if(!lockUI)return;S.busy=false;if(!r){S.err=er==='NotAllowedError'?bioName()+' لغو شد یا اجازه داده نشد؛ دوباره «وصل کن» را بزنید':er==='NotSupportedError'||er==='SecurityError'?'این مرورگر '+bioName()+' را پشتیبانی نمی‌کند؛ برنامه را در Safari باز کنید':bioName()+' وصل نشد؛ دوباره امتحان کنید یا «فعلاً نه» را بزنید';lockDraw();return}
     const c=lockCfg();c.bio=r;ls.set('m_lock',c);const cb=S.cb;lockHide();toast('قفل برنامه با '+bioName()+' روشن شد ✓');cb&&cb(true);return}
   if(k==='bio'){S.busy=true;const ok=await bioCheck();if(!lockUI)return;S.busy=false;if(ok){const c=lockCfg();c.fails=0;ls.set('m_lock',c);const cb=S.cb;lockHide();cb&&cb(true)}else if(!auto){S.err=bioName()+' تأیید نشد؛ رمز را وارد کنید';lockDraw()}return}
-  if(k==='del'){S.pin=S.pin.slice(0,-1);S.err='';lockDraw();return}
+  if(k==='del'){if(!S.pin)return;S.pin=S.pin.slice(0,-1);S.err='';lockDots()||lockDraw();return}
   if(!/^\d$/.test(k)||S.pin.length>=6)return;
-  S.pin+=k;S.err='';lockDraw();try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}
+  S.pin+=k;S.err='';lockDots()||lockDraw();try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}
   if(S.pin.length<6)return;
   const pin=S.pin;
   if(S.m==='set1'){S.first=pin;S.pin='';S.m='set2';setTimeout(lockDraw,120);return}
@@ -167,7 +178,9 @@ async function lockKey(k,auto){const S=lockUI;if(!S||S.busy)return;
   if(ok){c.fails=0;ls.set('m_lock',c);const cb=S.cb;lockHide();cb&&cb(true);return}
   c.fails=(c.fails||0)+1;ls.set('m_lock',c);S.pin='';S.shake=true;
   if(S.m==='unlock'&&c.fails>=LOCK_MAX_FAIL){S.err='رمز ۵ بار اشتباه بود؛ خروج امن…';lockDraw();S.busy=true;await lockWipe('رمز قفل ۵ بار اشتباه وارد شد؛ دوباره وارد شوید');return}
-  S.err=S.m==='unlock'?'رمز اشتباه است؛ '+toFa(LOCK_MAX_FAIL-c.fails)+' بار دیگر فرصت دارید':'رمز اشتباه است';setTimeout(lockDraw,60)}
+  S.err=S.m==='unlock'?'رمز اشتباه است؛ '+toFa(LOCK_MAX_FAIL-c.fails)+' بار دیگر فرصت دارید':'رمز اشتباه است';setTimeout(lockShake,60)}
+/* رمز اشتباه: نقطه‌ها خالی می‌شوند و می‌لرزند، بدون ساختن دوباره صفحه */
+function lockShake(){const S=lockUI;if(!S)return;const d=$('lock')&&$('lock').querySelector('.lkd');if(!d||!lockDots()){lockDraw();return}S.shake=false;d.classList.remove('shake');void d.offsetWidth;d.classList.add('shake');try{navigator.vibrate&&navigator.vibrate([30,40,30])}catch(_){}}
 /* رمز حساب از فرم Face ID: هنگام وصل کردن با سرور بررسی می‌شود (ورود تازه)، هنگام باز کردن قفل با هش روی گوشی (بدون اینترنت هم) */
 async function lockPw(pw){const S=lockUI;if(!S)return false;
   if(S.m==='pwset'){let ok=await pwhOk(pw);

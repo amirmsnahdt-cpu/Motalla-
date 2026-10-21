@@ -114,9 +114,24 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
         if (req == FILE_REQ && fileCb != null) {
-            fileCb.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(res, data));
+            fileCb.onReceiveValue(pickedUris(res, data));
             fileCb = null;
         }
+    }
+
+    /** عکس‌های انتخاب‌شده از گالری. وقتی صفحه اجازه چند عکس می‌دهد، گالری اندروید نتیجه را در ClipData می‌فرستد
+        و getData() خالی است؛ parseResult خود اندروید فقط getData() را می‌خواند، پس عکس‌ها به صفحه نمی‌رسید. */
+    private Uri[] pickedUris(int res, Intent data) {
+        if (res != RESULT_OK || data == null) return null;
+        java.util.ArrayList<Uri> out = new java.util.ArrayList<>();
+        android.content.ClipData cd = data.getClipData();
+        if (cd != null) for (int i = 0; i < cd.getItemCount(); i++) { Uri u = cd.getItemAt(i).getUri(); if (u != null && !out.contains(u)) out.add(u); }
+        if (out.isEmpty() && data.getData() != null) out.add(data.getData());
+        if (out.isEmpty()) {
+            Uri[] r = WebChromeClient.FileChooserParams.parseResult(res, data);
+            return r;
+        }
+        return out.toArray(new Uri[0]);
     }
 
     @Override
@@ -243,6 +258,10 @@ public class MainActivity extends Activity {
         /** نسل کلید امضای این APK: ۲ = کلید جدید (۱۴۰۵). اپ‌هایی که این متد را ندارند با کلید قدیمی امضا شده‌اند */
         @JavascriptInterface
         public int keyGen() { return 2; }
+
+        /** این نسخه انتخاب چند عکس با هم از گالری را درست برمی‌گرداند (نسخه‌های قبلی نه) */
+        @JavascriptInterface
+        public boolean multiPick() { return true; }
 
         /** آیا این گوشی اثر انگشت/چهره ثبت‌شده دارد؟ (اندروید ۹ به بالا) */
         @JavascriptInterface
