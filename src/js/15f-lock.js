@@ -29,7 +29,9 @@ async function bioAvail(){try{if(window.AndroidBridge)return !!(AndroidBridge.bi
 const bioPw=()=>!window.AndroidBridge&&isIOS();
 async function pwhSet(pw){try{if(!ME||!pw)return;const salt=b64u(crypto.getRandomValues(new Uint8Array(16)));ls.set('m_pwh',{u:ME.username,salt,hash:await pinHash(pw,salt)})}catch(e){}}
 async function pwhOk(pw){const h=ls.get('m_pwh',null);if(!h||!ME||h.u!==ME.username||!pw)return false;return (await pinHash(pw,h.salt))===h.hash}
-const pwForm=(id,btn,ph)=>`<form class="lkpwf" id="${id}" autocomplete="on" action="#"><input class="lkpu" type="text" name="username" autocomplete="username" value="${esc(ME?ME.username:'')}" tabindex="-1" aria-hidden="true">
+/* نام کاربری دیده می‌شود (نه فیلد پنهان ۱ پیکسلی): آیفون رمز را به «نام کاربری + همین سایت» گره می‌زند و از آن به بعد
+   همان یک رمز را بالای صفحه‌کلید پیشنهاد می‌کند؛ با فیلد پنهان گاهی بدون نام کاربری ذخیره می‌شد و هر بار فهرست همه رمزها می‌آمد */
+const pwForm=(id,btn,ph)=>`<form class="lkpwf" id="${id}" autocomplete="on" action="#"><label class="lkpn"><span>نام کاربری</span><input class="ltr" type="text" name="username" autocomplete="username" value="${esc(ME?ME.username:'')}" autocapitalize="off" autocorrect="off" spellcheck="false" tabindex="-1"></label>
   <input class="lkpi ltr" id="${id}p" type="password" name="password" autocomplete="current-password" placeholder="${ph}" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
   <button class="btn bkgo" type="submit">${btn}</button></form>`;
 let bioWait=null;
@@ -109,7 +111,13 @@ function lockDraw(){const S=lockUI,e=lockEl();if(!S)return;const c=lockCfg(),bio
     e.innerHTML=`<div class="lkw"><div class="lkmark">${lkI('face')}</div><b class="lkt">${st?'Face ID با رمزهای آیفون':'باز کردن با Face ID'}</b>
       <p class="lks">${st?'رمز عبور حساب برنامه را یک بار بزنید و «ذخیره» را بزنید؛ آیفون می‌پرسد در «Passwords» ذخیره شود → <b>Save</b>. از این به بعد آیفون با Face ID آن را پر می‌کند.':'روی خانه رمز بزنید؛ آیفون رمز ذخیره‌شده را با Face ID پر می‌کند.'}</p>
       ${pwForm('lkpf',st?'ذخیره و روشن کردن':'باز کن','رمز عبور حساب')}
-      <p class="lkerr" aria-live="polite">${esc(S.err||'')}</p><button class="lkl" data-lk="${st?'bioNo':'back'}">${st?'فعلاً نه':'با رمز ۶ رقمی'}</button></div>`;
+      <p class="lkerr" aria-live="polite">${esc(S.err||'')}</p>
+      ${st?'':S.help?`<div class="lkhelp"><b>آیفون به‌جای رمز «بده بستون» فهرست همه رمزها را نشان می‌دهد؟</b>
+        یعنی رمز برای این سایت ذخیره نشده. یکی از این دو کار را یک بار انجام دهید:
+        <ol><li>در برنامه: «با رمز ۶ رقمی» ← تنظیمات ← قفل برنامه ← Face ID را خاموش و دوباره روشن کنید، رمز حساب را بزنید و وقتی آیفون پرسید <b>Save Password</b> را بزنید.</li>
+        <li>یا در برنامه Passwords آیفون: همان رمزی که هر بار انتخاب می‌کنید ← Edit ← Add Website ← <span class="ltr">${esc(location.hostname)}</span></li></ol>
+        منوی «Google / Passwords» هم وقتی می‌آید که Google در تنظیمات آیفون ← General ← AutoFill &amp; Passwords روشن است؛ خاموشش کنید تا فقط Passwords بماند.</div>`:`<button class="lkl lkq" data-lk="pwhelp">هر بار باید رمز را از فهرست انتخاب کنم؟</button>`}
+      <button class="lkl" data-lk="${st?'bioNo':'back'}">${st?'فعلاً نه':'با رمز ۶ رقمی'}</button></div>`;
     const fm=$('lkpf'),pi=$('lkpfp');let t=0;
     const go=async()=>{const v=pi.value;if(!v||S.busy)return;S.busy=true;fm.classList.add('busy');const r=await lockPw(v);S.busy=false;if(lockUI===S&&!r){fm.classList.remove('busy');pi.value='';S.err=st?'رمز عبور حساب درست نیست':'رمز اشتباه است';const er=e.querySelector('.lkerr');if(er)er.textContent=S.err;e.querySelector('.lkw').classList.add('shake2');setTimeout(()=>{const w=e.querySelector('.lkw');w&&w.classList.remove('shake2')},400)}};
     fm.addEventListener('submit',ev=>{ev.preventDefault();go()});
@@ -131,6 +139,7 @@ function lockDraw(){const S=lockUI,e=lockEl();if(!S)return;const c=lockCfg(),bio
   S.shake=false}
 async function lockKey(k,auto){const S=lockUI;if(!S||S.busy)return;
   if(k==='cancel'){const cb=S.cb;lockHide();cb&&cb(false);return}
+  if(k==='pwhelp'){S.help=true;lockDraw();return}
   if(k==='forgot'){S.m='forgot';S.err='';lockDraw();return}
   if(k==='back'){S.m='unlock';S.pin='';S.err='';lockDraw();return}
   if(k==='logout'){S.busy=true;lockDraw();await lockWipe('برای رمز قفل تازه دوباره وارد شوید');return}
@@ -164,8 +173,10 @@ async function lockPw(pw){const S=lockUI;if(!S)return false;
   if(S.m==='pwset'){let ok=await pwhOk(pw);
     if(!ok){try{const r=await api('/api/login',{username:ME.username,password:pw});if(r&&r.token){TOKEN=r.token;try{localStorage.setItem('m_token',TOKEN)}catch(e){}ok=true}}catch(e){if(lockUI&&/اینترنت|سرور|fetch|network/i.test(e.message||''))S.err='برای وصل کردن Face ID اینترنت لازم است';ok=false}}
     if(!ok||!lockUI)return false;await pwhSet(pw);const c=lockCfg();c.bio={t:'pw'};ls.set('m_lock',c);const cb=S.cb;
-    /* فرم کمی بماند تا آیفون پیشنهاد ذخیره در Passwords را نشان دهد، بعد بسته شود */
-    setTimeout(()=>{if(lockUI===S){lockHide();toast('قفل برنامه با Face ID روشن شد ✓');cb&&cb(true)}},600);return true}
+    /* آیفون «ذخیره رمز» را وقتی پیشنهاد می‌دهد که فرمِ فرستاده‌شده از صفحه برداشته شود (فقط پنهان شدن کافی نیست)؛
+       پس فرم همین حالا برداشته می‌شود و پیام «وصل شد» کمی می‌ماند تا پنجره Save Password آیفون بیاید */
+    const w=lockEl().querySelector('.lkw');if(w)w.innerHTML=`<div class="lkmark">${lkI('face')}</div><b class="lkt">Face ID وصل شد ✓</b><p class="lks">اگر آیفون پرسید، <b>Save Password</b> را بزنید.</p>`;
+    setTimeout(()=>{if(lockUI===S){lockHide();toast('قفل برنامه با Face ID روشن شد ✓');cb&&cb(true)}},1800);return true}
   const c=lockCfg(),ok=await pwhOk(pw);if(!lockUI)return false;
   if(ok){c.fails=0;ls.set('m_lock',c);const cb=S.cb;lockHide();cb&&cb(true);return true}
   c.fails=(c.fails||0)+1;ls.set('m_lock',c);

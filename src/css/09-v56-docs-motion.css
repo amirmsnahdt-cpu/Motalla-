@@ -426,3 +426,11 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 .lkrow.lkna .tx{flex:1;min-width:0}.lkrow.lkna .tx small{color:var(--warn)}
 .lkrow.lkna .lki{background:color-mix(in srgb,var(--mut) 14%,transparent);color:var(--mut)}
 .lkrow.lkna .lkgo{color:var(--mut);display:flex}.lkrow.lkna .lkgo svg{width:18px;height:18px;transform:rotate(90deg)}
+/* v59.5: فرم Face ID آیفون — نام کاربری دیده می‌شود (برای گره خوردن رمز ذخیره‌شده به همین سایت) + راهنمای «هر بار فهرست رمزها» */
+.lkpn{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:46px;padding:0 14px;border-radius:14px;background:var(--card);border:1.5px solid var(--fld)}
+.lkpn span{font-size:13px;color:var(--mut);white-space:nowrap}
+.lkpn input{flex:1;min-width:0;min-height:0!important;height:40px;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;font-size:15px;font-weight:700;text-align:left;color:var(--ink)}
+.lkq{font-size:13px;margin-top:2px}
+.lkhelp{width:100%;text-align:right;font-size:12.5px;line-height:1.9;color:var(--mut);background:var(--card);border-radius:14px;padding:12px 14px;margin:4px 0 2px}
+.lkhelp b{color:var(--ink)}
+.lkhelp ol{margin:6px 0;padding-right:18px}
