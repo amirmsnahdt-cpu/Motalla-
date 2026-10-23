@@ -732,3 +732,67 @@ button.d6tot>span{display:flex;flex-direction:column}button.d6tot>span small{fon
 .psadd{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:10px 0 6px;padding:10px;border:1.5px dashed color-mix(in srgb,var(--blu) 40%,transparent);border-radius:14px;background:none;color:var(--blu);font:inherit;font-size:13px;font-weight:800;cursor:pointer}.psadd svg{width:16px;height:16px}
 .psnote{font-size:11.5px;line-height:1.8;margin:4px 2px 10px}
 #psGo:disabled{opacity:.45}
+/* ===== v61.6: ردیف‌های سند با کشیدن (بدون ضربدر)، برچسب تشخیص، جزئیات خواناتر ===== */
+.d6rows .swr+.swr{border-top:1px solid var(--hair)}
+.d6rows .swc{background:var(--card)}
+.d6rows .d6rb{align-items:flex-start;padding:10px 12px 10px 10px}
+.d6rows .d6n,.d6rows .d6ti{margin-top:4px}
+.d6rb .tx b{white-space:normal;display:flex;align-items:center;flex-wrap:wrap;gap:5px;line-height:1.35}
+.d6rb .tx small{white-space:normal;overflow:visible;font-size:12px;line-height:1.55;margin-top:2px;color:color-mix(in srgb,var(--ink) 62%,var(--mut))}
+.d6rows .d6v{margin-inline-start:auto;padding-inline-start:4px;align-self:center}
+.d6k{font-style:normal;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:7px;line-height:1.5;background:var(--hair);color:var(--mut);flex:none}
+.d6k.k-sell{background:color-mix(in srgb,var(--blu) 14%,transparent);color:var(--blu)}
+.d6k.k-buy{background:var(--goldbg);color:var(--gold)}
+.d6k.k-swap{background:var(--goldbg);color:var(--gold)}
+.d6k.k-in{background:var(--ok2);color:var(--ok)}
+.d6k.k-out{background:var(--red2);color:var(--red)}
+.d6k.k-ret{background:var(--hair);color:var(--ink)}
+/* ===== v61.6: نوار یک‌ردیفی: تشخیص + کالا + پله‌های جزئیات ===== */
+.stbar{gap:6px;padding:5px 6px 5px 5px;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;margin:0!important}
+.stbar::-webkit-scrollbar{display:none}
+.stbar>input{min-width:110px}
+.stg{flex:none;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 10px;border:0;border-radius:11px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;background:var(--blu);color:#fff}
+.stg svg{width:14px;height:14px}.stg i{font-style:normal;opacity:.75;font-weight:600;margin-inline-start:2px}
+.stg.k-buy{background:linear-gradient(135deg,#ecc874,#b8862b);color:#1b1404}.stg.k-swap{background:var(--goldbg);color:var(--gold)}
+.stg.k-in{background:var(--ok);color:#fff}.stg.k-out{background:var(--red);color:#fff}.stg.k-ret{background:var(--ink);color:var(--card)}
+.stg.it{background:color-mix(in srgb,var(--blu) 12%,var(--card));color:var(--blu)}
+.stc{flex:none;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:11px;background:var(--hair);color:var(--mut);font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}
+.stc b{color:var(--ink);font-weight:800;font-size:13px}.stc.em{border-style:dashed}
+.stf{flex:1;min-width:120px;display:flex;flex-direction:column;justify-content:center;padding:0 4px}
+.stf small{font-size:10.5px;color:var(--blu);font-weight:800;line-height:1.2}
+.stf .stin{border:0!important;background:none!important;box-shadow:none!important;padding:2px 0 3px!important;font:inherit;font-size:17px!important;font-weight:800;color:var(--ink);outline:none;width:100%;min-height:0}
+.stf .stin.ltr{direction:ltr;text-align:right}.stf .stin.pk{font-size:13px!important;color:var(--mut);font-weight:600}
+.stnx{flex:none;width:40px;height:40px;border:0;border-radius:13px;background:var(--blu);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 14px -8px var(--blu)}
+.stnx svg{width:18px;height:18px}.stnx.go{background:var(--ok);box-shadow:0 6px 14px -8px var(--ok)}
+.stft{display:flex;align-items:center;gap:10px;min-height:30px;padding:6px 4px 0;font-size:12px;color:var(--mut)}
+.stdots{display:flex;gap:4px;flex:none}.stdots i{width:6px;height:6px;border-radius:3px;background:var(--line);transition:width .25s,background .25s}
+.stdots i.d{background:color-mix(in srgb,var(--blu) 45%,transparent)}.stdots i.c{width:16px;background:var(--blu)}
+#stPv{flex:1;min-width:0}.stpv b{color:var(--ink);font-weight:800}
+.stdel{flex:none;width:32px;height:32px;border:0;border-radius:10px;background:var(--red2);color:var(--red);display:grid;place-items:center;cursor:pointer}.stdel svg{width:15px;height:15px}
+.stdone{flex:none;font-size:13px}
+#stPk{margin-top:8px}
+/* ===== v61.6: باز کردن سند = جزئیات؛ فاکتور فقط با دکمه ===== */
+.ivd6h{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:20px;padding:12px 14px;margin-bottom:12px;box-shadow:inset 0 1px 0 #ffffff80,0 0 0 1px var(--line),0 12px 26px -18px color-mix(in srgb,var(--blu) 55%,transparent)}
+.ivd6n{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:64px;height:58px;border-radius:15px;background:var(--blu);color:#fff;padding:0 8px}
+.ivd6n small{font-size:10.5px;opacity:.85}.ivd6n b{font-size:19px;font-weight:900;line-height:1.1}
+.ivd6h .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.ivd6h .tx b{font-size:16px;font-weight:900}.ivd6h .tx small{font-size:12px;color:var(--mut);line-height:1.5}
+.ivd6 .d6rb{cursor:default}
+.ivd6e{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:18px;padding:12px 14px;margin:0 0 12px;box-shadow:0 0 0 1px var(--line)}
+.ivd6e>span:first-child{font-weight:800;font-size:13.5px}.ivd6e .d6v{margin-inline-start:auto}.ivd6e .ok{color:var(--ok);display:inline-flex;align-items:center;gap:4px}.ivd6e .ok svg{width:15px;height:15px}
+.ivpwrap{margin-bottom:12px;animation:ivpin .32s cubic-bezier(.2,.9,.25,1)}
+@keyframes ivpin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cuqb.on{box-shadow:0 0 0 1.5px var(--blu)}
+/* ===== v61.6: سند ثبت‌نشده در صفحه مشتری ===== */
+.c6dr{display:flex;gap:8px;margin:-2px 0 12px;animation:ivpin .36s cubic-bezier(.2,.9,.25,1)}
+.c6drb{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px dashed color-mix(in srgb,var(--gold) 55%,transparent);border-radius:18px;background:var(--goldbg);color:var(--ink);font:inherit;text-align:right;cursor:pointer}
+.c6drb .c6ni{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:none;background:var(--gold);color:#fff}.c6drb>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}.c6drb b{font-size:14.5px;font-weight:900}.c6drb small{font-size:12px;color:var(--mut)}
+.c6drb>svg{width:16px;height:16px;color:var(--mut)}
+.c6drx{flex:none;width:48px;border:0;border-radius:16px;background:var(--red2);color:var(--red);display:grid;place-items:center;cursor:pointer}.c6drx svg{width:17px;height:17px}
+/* ===== v61.6: مانده‌های فهرست مشتری از دید مغازه: طلبکاریم قرمز، بدهکاریم آبی ===== */
+.bp.d{background:var(--red2)}.bp.d b{color:var(--red)}.bp.d small{color:var(--red)}
+.bp.c{background:color-mix(in srgb,var(--blu) 11%,transparent)}.bp.c b{color:var(--blu)}.bp.c small{color:var(--blu)}
+.stbar .stg,.stbar .stc{flex-direction:row!important;white-space:nowrap;flex-wrap:nowrap;width:auto!important;min-width:0}
+.stbar .stg svg{flex:none;display:inline-block}
+.stbar .stx{opacity:.7;font-weight:600;margin-inline-start:2px;font-size:14px}
+.stbar .stf{flex:1 0 100px}
+.stbar .stf .stin.pk{white-space:nowrap}

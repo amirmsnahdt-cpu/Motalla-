@@ -25,7 +25,7 @@ const cuLab=(v,short)=>!v?'تسویه':v<0?(short?'بدهکار':'بدهکار �
 const balV=(k,v)=>k==='r'?fmt(Math.abs(v)):k==='g'?wFmt(Math.abs(v)):qFmt(Math.abs(v));
 const balU=k=>k==='r'?'تومان':k==='g'?'گرم':(XA[k]||{u:''}).u;
 /* قرص مانده در فهرست: مبلغ و وزن کنار هم */
-const bpill=(k,v)=>v?`<span class="bp ${k==='r'?'r':k==='g'?'g':'x'} ${v<0?'d':'c'}"><b>${balV(k,v)}<i>${k==='r'?'ت':k==='g'?'گ':esc((XA[k]||{s:k}).s)}</i></b><small>${cuLab(v,1)}</small></span>`:'';
+const bpill=(k,v)=>v?`<span class="bp ${k==='r'?'r':k==='g'?'g':'x'} ${v<0?'d':'c'}"><b>${balV(k,v)}<i>${k==='r'?'ت':k==='g'?'گ':esc((XA[k]||{s:k}).s)}</i></b><small>${ourLab(v)}</small></span>`:'';/* v61.6: از دید مغازه: طلبکاریم قرمز، بدهکاریم آبی */
 function balPills(b){const P=[bpill('r',b.R),bpill('g',b.G),...Object.keys(b.X||{}).map(k=>bpill(k,b.X[k]))].filter(Boolean);return P.length?P.join(''):`<span class="bp z"><small>تسویه</small></span>`}
 const curCu=()=>custs.find(c=>String(c.id)===String(custId))||null;
 /* ---- فهرست حساب‌ها: فقط جستجو و فهرست؛ مشتری تازه از همین جستجو ---- */
@@ -58,7 +58,7 @@ function vCust(){xaSync();const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust'
   /* v60.5: کارت مشخصات مشتری برجسته؛ زدن روی کارت = ویرایش مشخصات */
   let h=`<button class="c6h c6hc" data-act="cuEdit" data-id="${c.id}" aria-label="ویرایش مشخصات ${esc(cuName(c))}"><span class="c6a lg">${esc(userInit(c.name))}</span><span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'',c.nid?'کد ملی <bdi dir="ltr">'+esc(toFa(c.nid))+'</bdi>':''].filter(Boolean).join('، ')||'مشخصات تکمیل نشده · برای تکمیل بزنید'}</small></span><span class="c6ed">${ic('edit')}</span></button>
   <div class="c6tl">${tile('r',b.R)}${tile('g',b.G)}${Object.keys(b.X).map(k=>tile(k,b.X[k])).join('')}</div>
-  ${can('debt')?`<button class="c6new c6one" data-act="svNew" data-cu="${c.id}"><span class="c6ni">${ic('inv')}</span><span><b>سند جدید</b><small>فروش، خرید، تعویض، دریافت، پرداخت، مرجوعی</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
+  ${can('debt')?`<button class="c6new c6one" data-act="svNew" data-cu="${c.id}"><span class="c6ni">${ic('inv')}</span><span><b>سند جدید</b><small>فروش، خرید، تعویض، دریافت، پرداخت، مرجوعی</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>${svDraftHTML(c)}
   `:''}
   <div class="spsec"><b>گردش حساب</b><small>${T.length?fmt(T.length)+' ردیف · برای جزئیات بزنید':'هنوز سندی ثبت نشده'}</small></div>`;
   if(T.length){let last=null;h+=T.map(t=>{let d='';if(t.date!==last){last=t.date;const r=relDay(t.date);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(t.date).fa)}</div>`}return d+`<div class="fcard">${txRow(c,t)}</div>`}).join('')}
