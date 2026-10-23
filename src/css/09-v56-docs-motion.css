@@ -552,3 +552,16 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;displ
 .d6rv i{font-style:normal;font-size:11px;font-weight:700;color:var(--mut)}
 .d6rx{font-size:11.5px;font-weight:700;color:var(--mut);padding:0 4px}.d6rx b{color:var(--blu);font-weight:900;font-feature-settings:"tnum"}
 .d6rate.flip .d6rv,.d6rate.flip .d6rx{animation:d6flip .4s cubic-bezier(.2,.9,.3,1)}@keyframes d6flip{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* v60.6: سرتیتر همه بخش‌های جزئیات: متن راست، دکمه چپ */
+.esec .stlh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.esec .stlh>div{flex:1}
+.esec .stlh .stladd{flex:none;align-self:center}
+/* پرداخت‌کننده تسویه: نتیجه جستجو زیر همان فیلد، در یک قاب */
+#sheet .fsearch:has(+#stCs .stsug){border-bottom-left-radius:6px;border-bottom-right-radius:6px;margin-bottom:0}
+.stsug{margin-top:-1px;background:var(--card);border:1.5px solid color-mix(in srgb,var(--blu) 35%,transparent);border-top:0;border-radius:0 0 16px 16px;overflow:hidden;box-shadow:0 14px 26px -18px #16213a66;animation:stsIn .22s ease-out}
+@keyframes stsIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.stsr{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:0;background:none;font:inherit;color:var(--ink);text-align:right;cursor:pointer;min-height:52px}.stsr+.stsr{border-top:1px solid var(--hair)}
+.stsr .tx,.stsel .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}.stsr b,.stsel b{font-size:14px;font-weight:800}.stsr small,.stsel small{font-size:11.5px;color:var(--mut)}
+.stsr .c6a,.stsel .c6a{width:34px;height:34px;font-size:14px;flex:none}.c6a.m{background:var(--goldbg);color:var(--gold)}
+.stsr.nw .c6a{background:var(--blu);color:#fff}.stsr.nw b{color:var(--blu)}
+.stsh{padding:6px 12px 4px;font-size:11px;font-weight:800;color:var(--gold);background:color-mix(in srgb,var(--goldbg) 70%,var(--card));border-top:1px solid var(--hair)}
+.stsel{display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px 10px;border-radius:14px;background:var(--blu2);box-shadow:0 0 0 1px color-mix(in srgb,var(--blu) 25%,transparent);animation:stsIn .25s ease-out}

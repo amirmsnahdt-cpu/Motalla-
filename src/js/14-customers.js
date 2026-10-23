@@ -35,14 +35,13 @@ function vCusts(){const L=CU();
 const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${n?'جستجو در '+fmt(n)+' حساب: نام، تلفن، کد ملی، گروه…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search">${cuQ?`<button class="x" data-act="cuQClr" aria-label="پاک کردن">×</button>`:''}</div>`;
 function cuListHTML(){const q0=clean(cuQ||''),q=nzName(toEn(q0)),A=CU();let B=A.map(c=>[c,cuBal(c)]);
   /* v60.3: جستجو در همه مشخصات حساب (نام، تلفن، کد ملی، گروه، یادداشت، کارت، شبا…)؛ عدد با و بدون فاصله/صفر اول */
-  const qd=toEn(q0).replace(/\D/g,''),dOk=v=>qd.length>=3&&toEn(String(v||'')).replace(/\D/g,'').includes(qd);
-  const cHay=c=>Object.keys(c).filter(k=>typeof c[k]==='string'&&!/^(id|sys|createdAt|lastAt|updatedAt|by|createdBy|updatedBy)$/.test(k)).map(k=>c[k]).join(' ');
-  if(q)B=B.filter(([c])=>nzName(cHay(c)).includes(q)||dOk(cHay(c)));
+  const dOk=pDig(q0);
+  if(q)B=B.filter(([c])=>cuHit(c,q,dOk));
   B.sort((a,b)=>(q?(nzName(b[0].name).startsWith(q)-nzName(a[0].name).startsWith(q)):0)||String(b[0].lastAt||b[0].createdAt||'').localeCompare(String(a[0].lastAt||a[0].createdAt||'')));
   const canAdd=q0&&can('debt')&&!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0))&&!groupsList().some(g=>nzName(g)===q);
   const add=canAdd?`<button class="c6add" data-act="cuNewQ">${ic('plus')}<span><b>حساب تازه برای «${esc(q0)}»</b><small>${B.length?'اگر هیچ‌کدام از این‌ها نیست':'این نام حسابی ندارد'} · اول مشخصات، بعد ورود به حساب</small></span></button>`:'';
   /* افراد واریزی‌ها و خریدها که هنوز حساب ندارند (از حافظه برنامه): با زدن، حساب با همان مشخصات باز می‌شود */
-  const P=q?bzPeople().filter(p=>!p.cuId&&!A.some(c=>nzName(c.name)===p.k)&&(p.k.includes(q)||nzName(p.holder||'').includes(q)||dOk([p.phone,p.nid,p.iban,p.card].join(' ')))).sort((a,b)=>(b.k.startsWith(q)-a.k.startsWith(q))||String(b.last).localeCompare(String(a.last))).slice(0,12):[];
+  const P=q?memPeople(q,dOk,12):[];
   CUP=P;
   const mem=P.length?`<div class="c6gh">از واریزی‌ها و خریدها · بدون حساب</div><div class="c6l c6mem">${P.map((p,i)=>`<button class="c6r" data-act="cuNewP" data-i="${i}"><span class="c6a m">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.nid?'کد ملی <bdi dir="ltr">'+esc(toFa(p.nid))+'</bdi>':'',p.n?fmt(p.n)+' واریزی':'',p.last?esc(dates(p.last).fa):''].filter(Boolean).join('، ')}</small></span><span class="c6go">${ic('plus')} حساب</span></button>`).join('')}</div>`:'';
   if(!B.length)return (mem+add)||`<div class="bempty">${ic('search')}<b>حسابی پیدا نشد</b></div>`;
@@ -220,6 +219,11 @@ ACT.bzCal=()=>{bzRead();openCal(bz.d.pay||todayISO(),iso=>{bz.d.pay=iso;render()
 
 /* ---------- خرید طلا: پیشنهاد مشتری زیر فیلد نام (از حساب‌های مشتری و نام‌های ثبت‌شده قبلی) ---------- */
 const nzName=s=>clean(String(s||'')).replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/\u200c/g,' ').toLowerCase();
+/* v60.6: جستجوی مشترک افراد (صفحه مشتریان، تسویه از مشتری، …): همه مشخصات حساب + افراد واریزی/خرید بدون حساب */
+const pDig=q0=>{const qd=toEn(q0||'').replace(/\D/g,'');return v=>qd.length>=3&&toEn(String(v||'')).replace(/\D/g,'').includes(qd)};
+const cuHay=c=>Object.keys(c).filter(k=>typeof c[k]==='string'&&!/^(id|sys|createdAt|lastAt|updatedAt|by|createdBy|updatedBy)$/.test(k)).map(k=>c[k]).join(' ');
+const cuHit=(c,q,dOk)=>{const h=cuHay(c);return nzName(h).includes(q)||dOk(h)};
+function memPeople(q,dOk,n){const A=CU();return bzPeople().filter(p=>!p.cuId&&!A.some(c=>nzName(c.name)===p.k)&&(p.k.includes(q)||nzName(p.holder||'').includes(q)||dOk([p.phone,p.nid,p.iban,p.card].join(' ')))).sort((a,b)=>(b.k.startsWith(q)-a.k.startsWith(q))||String(b.last).localeCompare(String(a.last))).slice(0,n)}
 function bzPeople(){const M=new Map(),add=(name,o)=>{const k=nzName(name);if(!k)return;const p=M.get(k)||{name:clean(name),k,n:0,last:'',phone:'',nid:'',cuId:'',iban:'',card:'',holder:''};
     if(o.phone&&!p.phone)p.phone=o.phone;if(o.iban&&!p.iban){p.iban=o.iban;p.card=o.card||'';p.holder=o.holder||''}if(o.nid&&!p.nid)p.nid=o.nid;if(o.cuId&&!p.cuId)p.cuId=o.cuId;if(o.n)p.n+=o.n;if(o.last&&o.last>p.last)p.last=o.last;M.set(k,p)};
   entries.slice().sort((a,b)=>String(b.entryDate||'').localeCompare(String(a.entryDate||''))).forEach(e=>add(e.name,{phone:toEn(e.phone||''),nid:toEn(e.nid||''),iban:e.iban||'',card:e.card||'',holder:clean(e.holder||'')||clean(e.name||''),n:1,last:e.entryDate||''}));
