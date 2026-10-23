@@ -80,8 +80,9 @@ function onWheel(w){const el=$('w'+w),n=+el.dataset.n,c=wcfg();let i=Math.max(0,
 /* ============ PDF مدرن و مینیمال ============ */
 const PDF_FONT='<style>@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format(\'woff2\')}</style>';
 function pdfCSS(){return `@page{size:A4;margin:14mm 12mm 12mm}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{box-sizing:border-box}
-body{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;color:#16213a;font-size:9.4pt;line-height:1.6;margin:0;background:#fff;font-feature-settings:"tnum";-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;color:#16213a;font-size:9.4pt;line-height:1.6;margin:0;background:#fff;font-feature-settings:"tnum";-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .pg{page-break-after:always;max-width:186mm;margin:0 auto;padding:6mm 0}.pg:last-child{page-break-after:auto}
 .top{display:flex;justify-content:space-between;align-items:center}
 .brand{display:flex;align-items:center;gap:9px}.mk{width:30px;height:30px;border-radius:9px 9px 9px 3px;background:#13284f;color:#ecc874;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14pt;line-height:1}
@@ -113,13 +114,12 @@ tr.tot td{border-bottom:0;border-top:1.2px solid #16213a;font-weight:800;padding
 .rc img{width:100%;height:200px;object-fit:contain;background:#f7f8fa;border-radius:8px;display:block}.rc figcaption{font-size:8pt;margin-top:5px;line-height:1.5}.rc figcaption b{display:block}
 tbody.en{page-break-inside:avoid;break-inside:avoid}tr.hs td{border-bottom:0;padding-bottom:4px}
 tr.stlr td{padding:0 6px 11px}
-.stb{border:1px solid #ecd9a6;background:linear-gradient(180deg,#fdf9ee,#fbf6e8);border-radius:11px;padding:7px 11px 6px;position:relative}
-.stb:before{content:'';position:absolute;top:0;right:14px;left:14px;height:2px;border-radius:0 0 2px 2px;background:linear-gradient(90deg,#ecc874,#b8862b)}
-.stbh{display:flex;justify-content:space-between;align-items:baseline;padding:2px 0 6px;border-bottom:1px dashed #e3cf98;margin-bottom:3px}
-.stbh span{font-size:7.8pt;font-weight:800;color:#7a5a12}.stbh small{font-size:7.4pt;color:#9a7a3a;font-weight:600}
+.stb{border:1px solid #eceef3;background:#fafbfc;border-radius:10px;padding:5px 11px 4px;position:relative}.stb.many{border-color:#dfe3ea;background:#f6f7fa;box-shadow:0 1px 0 #e7e9ef}
+.stbh{display:flex;justify-content:space-between;align-items:baseline;padding:1px 0 4px;border-bottom:1px solid #eceef3;margin-bottom:2px}
+.stbh span{font-size:7.4pt;font-weight:700;color:#6b7385}.stbh small{font-size:7.2pt;color:#9097a5;font-weight:600}
 .aml{display:block;font-size:6.8pt;font-weight:700;color:#9a7a3a;text-align:left}.ams{display:block;font-size:7.2pt;font-weight:700;color:#2a4fb8;text-align:left;margin-top:1px}.stbh b{font-size:11.5pt;font-weight:900;color:#13284f;white-space:nowrap}.stbh b em{font-style:normal;font-size:7.4pt;color:#9097a5;font-weight:500;margin-right:3px}
-.stbr{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:8.2pt}.stbr+.stbr{border-top:1px solid #f1e6c6}
-.stbr i{font-style:normal;width:15px;height:15px;border-radius:50%;background:#13284f;color:#ecc874;font-size:6.8pt;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.stbr{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:8.2pt}.stbr+.stbr{border-top:1px solid #f0f2f5}
+.stbr i{font-style:normal;width:14px;height:14px;border-radius:50%;background:#e7eaf0;color:#2a3550;font-size:6.6pt;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none}
 .stk{font-weight:800;color:#16213a;white-space:nowrap}.std{flex:1;color:#6b7385;font-size:7.6pt}.stbr b{font-weight:800;white-space:nowrap;color:#16213a}
 .stw{display:inline-block;font-size:6.8pt;font-weight:700;color:#946200;background:#fbf4e1;border-radius:6px;padding:0 5px}
 .stbr.bk .stk{color:#2a4fb8}.stbr.bk i{background:#2a4fb8;color:#fff}.stbr.bk b{color:#2a4fb8}
@@ -134,11 +134,11 @@ const pdfSub=(D,reg)=>`<div class="sub"><span class="pdl">تاریخ واریز<
 function fileBase(iso,extra){const D=dates(iso);return 'مطلا ( تاریخ \u2066'+toFa(p2(D.jd))+'∕'+toFa(p2(D.jm))+'∕'+toFa(D.jy)+'\u2069 )'+(extra?' '+String(extra).replace(/[\\/:*?"<>|]/g,'-'):'')}
 /* v60.1: مبلغ کل خرید روبه‌روی نام (فقط وقتی بخشی از آن غیر از همین واریز بانکی پرداخت شده) */
 /* v60.2: ستون مبلغ برای واریزی ترکیبی = کل خرید (تومان)؛ سهم بانکی این منبع زیرش و در فهرست پایین ردیف */
-const amCell=x=>x.settled&&(x.settles||[]).length&&+x.total?`<td class="am"><span class="aml">کل خرید</span>${fmt(x.total)}<span class="ams">بانکی ${fmt(x.amount)}</span></td>`:`<td class="am">${fmt(x.amount)}</td>`;
+const amCell=x=>x.settled&&(x.settles||[]).length&&+x.total?`<td class="am">${fmt(x.total)}</td>`:`<td class="am">${fmt(x.amount)}</td>`;
 /* v59.8: جزئیات تسویه زیر ردیف واریزی: مبلغ کل بالا، بعد هر واریزی انجام‌شده (نوع/پرداخت‌کننده، مشخصات، مبلغ) و در آخر سهم واریز بانکی */
 function stlBox(x,cols,src){const S=x.settles||[];if(!S.length)return '';const bank=x.full?0:(+x.amount||0);
   const det=z=>[z.inv?'فاکتور فروش '+toEn(String(z.inv)):'',z.phone?'تلفن <span class="tn">'+esc(toEn(String(z.phone)))+'</span>':'',z.tn?'پیگیری <span class="tn">'+esc(toEn(String(z.tn)))+'</span>':'',/^\d{4}-\d\d-\d\d/.test(z.date||'')?dates(z.date.slice(0,10)).fa:''].filter(Boolean).map(v=>v.startsWith('فاکتور')?esc(v):v).join(' · ');
-  return `<tr class="stlr"><td></td><td colspan="${cols-1}"><div class="stb"><div class="stbh"><span>واریزی‌ها و منابع</span><small>${fmt(S.length+(bank?1:0))} واریزی</small></div>
+  return `<tr class="stlr"><td></td><td colspan="${cols-1}"><div class="stb${S.length+(bank?1:0)>=3?' many':''}"><div class="stbh"><span>واریزی‌ها و منابع</span><small>${fmt(S.length+(bank?1:0))} واریزی</small></div>
     ${S.map((z,i)=>`<div class="stbr"><i>${fmt(i+1)}</i><span class="stk">${esc(z.name||'مشتری')}</span><span class="std">${det(z)||'&nbsp;'}${z.st==='wait'?' <span class="stw">در انتظار تأیید</span>':''}</span><b>${fmt(+z.amount||0)}</b></div>`).join('')}
     ${bank?`<div class="stbr bk"><i>${fmt(S.length+1)}</i><span class="stk">واریز بانکی${src?' · '+esc(src):''}</span><span class="std">${[x.bank||x.bankShow?esc(x.bank||x.bankShow):'',x.iban?'<span class="tn">'+esc(ibanPdf(x.iban))+'</span>':'',x.tn?'پیگیری <span class="tn">'+esc(x.tn)+'</span>':''].filter(Boolean).join(' · ')||'همین لیست'}</span><b>${fmt(bank)}</b></div>`:''}</div></td></tr>`}
 /* گزارش تخصیص / لیست (جایگزین نسخه قدیمی) */
@@ -193,7 +193,7 @@ function closeSheet(){const o=$('ov'),s=$('sheet');if(o.classList.contains('hide
 /* بستن پنجره با کشیدن به پایین (از سربرگ، یا هر جا وقتی محتوا بالای خودش است) */
 (()=>{let g=null;
   document.addEventListener('touchstart',e=>{const s=$('sheet');if(e.touches.length!==1||!s||$('ov').classList.contains('hide')||!s.contains(e.target))return;
-    const head=e.target.closest('.sh-h')||e.touches[0].clientY-s.getBoundingClientRect().top<34;if(!head&&(s.scrollTop>0||e.target.closest('input,textarea,select,.chps,.d6kd,.acpick,.wheels,.x6l,.swr')))return;
+    const head=e.target.closest('.sh-h')||e.touches[0].clientY-s.getBoundingClientRect().top<34;if(!head&&(s.scrollTop>0||e.target.closest('input,textarea,select,.chps,.d6kd,.acpick,.wheels,.x6l,.rcl,.ckl,.stsug,.swr')))return;
     g={y:e.touches[0].clientY,x:e.touches[0].clientX,t:performance.now(),lk:null,d:0,head:!!head}},{passive:true});
   tmAdd(e=>{if(!g)return;const s=$('sheet'),t=e.touches[0],dy=t.clientY-g.y,dx=t.clientX-g.x;
     if(!g.lk){if(Math.abs(dy)<6&&Math.abs(dx)<6)return;g.lk=dy>0&&dy>Math.abs(dx)*1.1&&(g.head||s.scrollTop<=0)?'v':'x';if(g.lk==='v'){s.classList.add('drag');s.classList.remove('snap')}}

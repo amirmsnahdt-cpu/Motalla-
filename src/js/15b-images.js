@@ -31,6 +31,10 @@ document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.datase
   const K=c.keys;let n=0;for(const f of F){try{const d=await shrink(f),k=newImgKey(c.pre);if(await imgPut(k,d)){K.push(k);n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}catch(e){toast('این عکس خوانده نشد',true)}}
   if(n){galCtx().set(K);logA('edit','افزودن رسید',c.meta.name+' | '+fmt(n)+' عکس');galRefresh();toast(n>1?fmt(n)+' عکس اضافه شد':'عکس اضافه شد')}});
 ACT.galIt=d=>{const e=entries.find(z=>String(z.id)===String(d.id));if(!e||!entBI(e)){toast('این واریزی هنوز ارسال نشده است',true);return}openGal({k:'it',eid:e.id})};
+/* رسید تسویه‌های یک واریزیِ کامل با مشتری؛ اگر چند تسویه دارد، اول انتخاب */
+ACT.galFs=d=>{const e=entries.find(z=>String(z.id)===String(d.id)),S=e&&(e.settles||[]);if(!S||!S.length)return;if(S.length===1){openGal({k:'st',eid:e.id,sid:S[0].id});return}
+  sheet(`<div class="sh-h"><div><b>رسید کدام تسویه؟</b><small class="shsub">${esc(fullName(e))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div><div class="sgr smg">${S.map(z=>`<button class="acrow" data-act="galFsP" data-id="${e.id}" data-sid="${z.id}"><span class="bkb lg" style="--bc:#15803d">${esc(userInit(z.name||'؟'))}</span><span class="tx"><b>${esc(z.name||'—')}</b><small>${fmt(z.amount)} تومان${stImgs(z).length?' · '+toFa(stImgs(z).length)+' عکس':''}</small></span>${ic('cam')}</button>`).join('')}</div>`)};
+ACT.galFsP=d=>openGal({k:'st',eid:+d.id||d.id,sid:+d.sid||d.sid});
 ACT.galSt=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;openGal({k:'st',eid:e.id,sid:z.id})};
 ACT.galView=d=>zvOpen(+d.i);
 ACT.galShare=async()=>{const c=galCtx();if(c)rcShare(await rcFiles(galFiles(c)),'رسید '+c.meta.name)};

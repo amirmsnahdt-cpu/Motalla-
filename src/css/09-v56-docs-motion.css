@@ -655,3 +655,7 @@ button.d6tot>span{display:flex;flex-direction:column}button.d6tot>span small{fon
 .xrpi{flex:none;width:48px;height:48px;border-radius:12px;background:var(--goldbg) center/cover no-repeat;color:var(--gold);display:grid;place-items:center}.xrpi svg{width:22px;height:22px}
 .xrph>span:nth-child(2){display:flex;flex-direction:column}.xrph b{font-size:13.5px;font-weight:800}.xrph small{font-size:11px;color:var(--mut)}.xrph.on b{color:var(--ok)}
 .ckt.out{grid-template-columns:repeat(3,1fr)}
+/* v61.1: فهرست رسیدها در پنجره اسکرول شود */
+#sheet .sgr.smg.rcl{overflow-y:auto!important;max-height:56vh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+/* v61.1: فهرست رسیدها در پنجره اسکرول شود */
+#sheet .sgr.smg.rcl{overflow-y:auto!important;max-height:56vh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
