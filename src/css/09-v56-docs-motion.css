@@ -524,3 +524,31 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 .c6mem .c6a.m{background:var(--goldbg);color:var(--gold)}
 .c6go{flex:none;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:var(--blu);background:var(--blu2);border-radius:14px;padding:5px 10px}.c6go svg{width:14px;height:14px}
 input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+/* v60.5: کارت مشخصات مشتری — برجسته، با زدن ویرایش */
+.c6h.c6hc{width:100%;border:0;font:inherit;color:inherit;text-align:right;cursor:pointer;background:var(--card);border-radius:22px;padding:14px;box-shadow:inset 0 1px 0 #ffffff80,0 0 0 1px var(--line),0 2px 4px #16213a0f,0 16px 30px -18px color-mix(in srgb,var(--blu) 55%,transparent);animation:c6hIn .55s cubic-bezier(.2,.9,.25,1.12) both;position:relative;overflow:hidden}
+.c6h.c6hc .tx{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.c6h.c6hc .c6a.lg{box-shadow:0 0 0 3px var(--card),0 0 0 4.5px color-mix(in srgb,var(--blu) 35%,transparent),0 8px 16px -8px var(--blu)}
+.c6h.c6hc::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,color-mix(in srgb,var(--blu) 10%,transparent) 50%,transparent 65%);transform:translateX(100%);animation:c6shine 1.4s .35s ease-out 1 both;pointer-events:none}
+.c6ed{flex:none;width:36px;height:36px;border-radius:12px;background:var(--blu2);color:var(--blu);display:grid;place-items:center}.c6ed svg{width:18px;height:18px}
+@keyframes c6hIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes c6shine{to{transform:translateX(-100%)}}
+@media (prefers-reduced-motion:reduce){.c6h.c6hc,.c6h.c6hc::after{animation:none}}
+/* سند فروش / سند خرید */
+.c6docs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c6docs .c6new{margin:0;flex-direction:column;align-items:flex-start;gap:8px;padding:14px}
+.c6docs .c6new>span:last-child{display:flex;flex-direction:column}
+.c6docs .c6new.buy{background:linear-gradient(135deg,#ecc874,#b8862b);color:#1b1404;box-shadow:0 12px 24px -14px #b8862b}
+.c6docs .c6new.buy small{color:#3a2a06;opacity:.85}.c6docs .c6new.buy .c6ni{background:#ffffff59;color:#1b1404}
+/* نرخ طلا: یک فیلد با انتخاب مظنه / هر گرم */
+.d6hd{grid-template-columns:auto 1fr}
+.d6rate{display:flex;flex-direction:column;gap:6px;padding:8px 10px 8px;border-radius:20px;background:var(--card);box-shadow:inset 0 1px 0 #ffffff80,0 0 0 1.5px color-mix(in srgb,var(--blu) 25%,transparent),0 12px 24px -16px color-mix(in srgb,var(--blu) 70%,transparent);transition:box-shadow .3s}
+.d6rate:focus-within{box-shadow:0 0 0 2px var(--blu),0 14px 26px -14px color-mix(in srgb,var(--blu) 80%,transparent)}
+.d6rate.need{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--pe) 75%,transparent),0 12px 24px -16px var(--pe);background:color-mix(in srgb,var(--warn2) 70%,var(--card))}
+.d6seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--seg);border-radius:11px;padding:2px}
+.d6seg i{position:absolute;top:2px;bottom:2px;right:2px;width:calc(50% - 2px);border-radius:9px;background:var(--card);box-shadow:0 1px 3px #16213a26;transform:translateX(calc(var(--i) * -100%));transition:transform .38s cubic-bezier(.3,1.25,.4,1)}
+.d6seg button{position:relative;z-index:1;border:0;background:none;font:inherit;font-size:12px;font-weight:800;color:var(--mut);padding:5px 4px;cursor:pointer;transition:color .25s}.d6seg button.on{color:var(--ink)}
+.d6rv{display:flex;align-items:baseline;gap:6px;padding:0 4px;cursor:text}
+#view .d6rv input{flex:1;min-width:0;border:0!important;background:none!important;box-shadow:none!important;padding:0!important;min-height:0;font-size:22px;font-weight:900;color:var(--ink);outline:none;font-feature-settings:"tnum";letter-spacing:-.2px}
+.d6rv i{font-style:normal;font-size:11px;font-weight:700;color:var(--mut)}
+.d6rx{font-size:11.5px;font-weight:700;color:var(--mut);padding:0 4px}.d6rx b{color:var(--blu);font-weight:900;font-feature-settings:"tnum"}
+.d6rate.flip .d6rv,.d6rate.flip .d6rx{animation:d6flip .4s cubic-bezier(.2,.9,.3,1)}@keyframes d6flip{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}

@@ -36,7 +36,7 @@ function txLinked(c,t){const R=[],find=(cu,tx)=>{const C=custs.find(z=>String(z.
   if((t.type==='xf'||t.type==='cv')&&t.peer)find(t.peer.cu,t.peer.tx);
   if(t.type==='xf'&&t.inv)find(t.inv.cu,t.inv.tx);
   return R.filter(x=>x.t!==t)}
-const invTitle=t=>((t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
+const invTitle=t=>(t.dk==='buy'?'سند خرید ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
 function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'r':'b'}">${x>0?'+':'−'} ${balV(k,x)} <i>${balU(k)}</i></b>`;
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t);ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
@@ -57,7 +57,9 @@ const svKeep=()=>ls.set('m_svd',sv);
 function svBlank(cu){const r=+ls.get('m_rate',0)||0;return{v:2,cuId:cu||'',date:todayISO(),rate:r,mz:+ls.get('m_mz',0)||mzOf(r),items:[],xr:[],tax:!!ls.get('m_tax',false),disc:0,pays:[],gconv:false,q:''}}
 const svFix=()=>{if(!sv.xr)sv.xr=[];if(!sv.items)sv.items=[];if(!sv.pays)sv.pays=[];if(sv.mz==null)sv.mz=mzOf(sv.rate);if(!sv.qa)sv.qa=qaBlank()};
 ACT.svNew=d=>{if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}closeSheet();const cu=d&&d.cu?d.cu:'',old=ls.get('m_svd',null);
-  if(old&&(old.v===1||old.v===2)&&((old.items||[]).length||(old.pays||[]).length||(old.xr||[]).length)&&(!cu||String(old.cuId||'')===String(cu)||!old.cuId)){sv=old;if(cu)sv.cuId=cu;toast('پیش‌نویس سند قبلی باز شد','', 'سند تازه',()=>{sv=svBlank(cu);svFix();svKeep();render()})}else sv=svBlank(cu);
+  if(old&&(old.v===1||old.v===2)&&((old.items||[]).length||(old.pays||[]).length||(old.xr||[]).length)&&(!cu||String(old.cuId||'')===String(cu)||!old.cuId)){sv=old;if(cu)sv.cuId=cu;toast('پیش‌نویس سند قبلی باز شد','', 'سند تازه',()=>{const dk=sv.dk,fc=sv.fixCu;sv=svBlank(cu);sv.dk=dk;sv.fixCu=fc;svFix();svKeep();render()})}else sv=svBlank(cu);
+  /* v60.5: نوع سند: فروش یا خرید (فقط عنوان و پیشنهادهای جستجو را عوض می‌کند؛ ساختار سند همان است) */
+  if(d&&d.dk)sv.dk=d.dk==='buy'?'buy':'sell';else if(!sv.dk)sv.dk='sell';sv.fixCu=!!cu;
   svFix();const k=d&&d.pre;if(k==='in'||k==='out')sv.qa={...qaBlank(),p:pyNew('cash',{dir:k})};else if(k==='gin'||k==='gout')sv.qa={...qaBlank(),x:xrNew(k==='gin'?'in':'out','gold')};
   PARENT.sell=cur==='cust'?'cust':'custs';svKeep();go('sell')};
 /* اجرت: درصدی و تومانی با هم (ردیف‌های قدیمی فقط یکی از این دو را دارند) */
@@ -86,18 +88,26 @@ const svCu=()=>sv&&sv.cuId?CU().find(c=>String(c.id)===String(sv.cuId))||null:nu
 const svHasG=()=>sv.items.length||(sv.xr||[]).some(x=>x.a==='gold'&&(x.t==='sell'||x.t==='buy')&&!x.pgM);
 function vSell(){if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();svUsed=goodsUsed();const D=dates(sv.date);
   return `<div class="d6">
-  <div class="d6hd"><button class="d6no" data-act="svCal"><small>${sv.items.length?'فاکتور':'سند'}</small><b>${toFa(invNext())}</b><span>${ic('cal')}${esc(payLab(sv.date)||D.fa)}</span></button>
-    <label class="d6rt${sv.rate?'':' need'}"><small>مظنه</small><input id="svM" class="ltr" inputmode="numeric" value="${sv.mz?Number(sv.mz).toLocaleString('en-US'):''}" placeholder="مظنه روز" autocomplete="off" enterkeyhint="next"></label>
-    <label class="d6rt${sv.rate?'':' need'}"><small>هر گرم ۱۸</small><input id="svR" class="ltr" inputmode="numeric" value="${sv.rate?Number(sv.rate).toLocaleString('en-US'):''}" placeholder="نرخ گرم" autocomplete="off" enterkeyhint="next"></label></div>
+  <div class="d6hd"><button class="d6no" data-act="svCal"><small>${sv.dk==='buy'?'سند خرید':sv.items.length?'فاکتور':'سند'}</small><b>${toFa(invNext())}</b><span>${ic('cal')}${esc(payLab(sv.date)||D.fa)}</span></button>
+    ${rateHTML()}</div>
   <div id="svCu">${svCuHTML()}</div>
   <div id="svRows">${svRowsHTML()}</div>
   <div class="d6q" id="qa">${qaHTML()}</div>
   <div id="svSum">${svSumHTML()}</div>
 </div>`}
+/* v60.5: نرخ طلا: فقط یکی (مظنه یا هر گرم ۱۸) وارد می‌شود و دیگری خودکار حساب می‌شود (×/÷ ۴٫۳۳۱۸) */
+const rtK=()=>ls.get('m_rtk','mz')==='g'?'g':'mz';
+function rateHTML(){const k=rtK(),v=k==='mz'?sv.mz:sv.rate;
+  return `<div class="d6rate${sv.rate?'':' need'}" id="svRate"><div class="d6seg" style="--i:${k==='mz'?0:1}"><i></i><button type="button" data-act="svRk" data-k="mz" class="${k==='mz'?'on':''}">مظنه</button><button type="button" data-act="svRk" data-k="g" class="${k==='g'?'on':''}">هر گرم ۱۸</button></div>
+  <label class="d6rv"><input id="svM" class="ltr" inputmode="numeric" value="${v?Number(v).toLocaleString('en-US'):''}" placeholder="${k==='mz'?'مظنه روز':'نرخ هر گرم'}" autocomplete="off" enterkeyhint="next"><i>تومان</i></label>
+  <div class="d6rx" id="svRx">${rateX()}</div></div>`}
+const rateX=()=>sv.rate?(rtK()==='mz'?'هر گرم ۱۸: <b>'+fmt(sv.rate)+'</b>':'مظنه: <b>'+fmt(sv.mz)+'</b>'):'یکی را بزنید؛ دیگری خودکار حساب می‌شود';
+ACT.svRk=d=>{const k=d.k==='g'?'g':'mz';if(k===rtK())return;ls.set('m_rtk',k);const w=$('svRate');if(!w)return;const s=w.querySelector('.d6seg');s.style.setProperty('--i',k==='mz'?0:1);s.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+  const M=$('svM'),v=k==='mz'?sv.mz:sv.rate;M.value=v?Number(v).toLocaleString('en-US'):'';M.placeholder=k==='mz'?'مظنه روز':'نرخ هر گرم';$('svRx').innerHTML=rateX();w.classList.remove('flip');void w.offsetWidth;w.classList.add('flip');M.focus()};
 const aSell=()=>`<div class="d6foot"><div id="svBal">${svBalHTML()}</div><button class="btn gold bzgo" data-act="svSave">${ic('check')} ثبت سند<span id="svBt">${svBtTxt()}</span></button></div>`;
 const svBtTxt=()=>{if(!sv)return '';const T=svTot();return T.total&&(sv.rate||!svHasG())?fmt(Math.abs(T.total))+' تومان':''};
 /* ----- مشتری ----- */
-function svCuHTML(){const c=svCu();if(c){return `<div class="d6cu"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><button class="lnk" data-act="svCuX">تغییر</button></div>`}
+function svCuHTML(){const c=svCu();if(c){return `<div class="d6cu"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span>${sv.fixCu?"":`<button class="lnk" data-act="svCuX">تغییر</button>`}</div>`}
   return `<div class="d6pick cbx"><div class="fsearch">${ic('search')}<input id="svQ" type="search" value="${esc(sv.q||'')}" placeholder="مشتری: نام، شماره، کد ملی یا گروه…" autocomplete="off" enterkeyhint="search"></div><div id="svCr">${svCrHTML()}</div></div>`}
 function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
   if(!q)return '';
@@ -136,10 +146,10 @@ function pyLab(p,long){const ch=p.chId&&custs.find(z=>String(z.id)===String(p.ch
     case 'gold':return 'طلای مشتری · '+wFmt(p.w)+' گرم'+(long?' عیار '+toFa(p.ay||750):'');case 'cust':return out?'حواله به حساب «'+nm+'»':'حواله از حساب «'+nm+'»';default:return (PM[p.m]||{}).t||''}}
 function qaChips(){const a=sv.qa,q=nzName(toEn(a.q||''));if(!q)return '';
   const A=goodsList().filter(k=>nzName(k).includes(q)).sort((x,y)=>(nzName(y).startsWith(q)-nzName(x).startsWith(q))||(svUsed[y]||0)-(svUsed[x]||0)).slice(0,5);
-  const S=SPK.filter(s=>nzName(s.t+' '+s.al).includes(q)).slice(0,6);
+  const bu=sv.dk==='buy',S=SPK.filter(s=>nzName(s.t+' '+s.al).includes(q)).sort((a,b)=>bu?((b.x&&b.x[0]==='buy')-(a.x&&a.x[0]==='buy')):0).slice(0,6);
   const P=CH('pos').filter(c=>nzName(c.name).includes(q)).slice(0,3),B=sources.filter(s=>nzName(s.name+' '+(s.bank||'')).includes(q)).slice(0,3),U=CU().filter(c=>String(c.id)!==String(sv.cuId)&&nzName([c.name,c.phone,c.grp].join(' ')).includes(q)).slice(0,4);
-  const rows=A.map(k=>cbRow('qaK',{k},ic('ring'),esc(k),'کالا · با اجرت و سود'+(svUsed[k]?' · '+toFa(svUsed[k])+' بار فروخته شده':''),'','gd'))
-    .concat(S.map(s=>cbRow('qaS',{s:s.id},ic(s.i),s.t,s.d,'','spk')))
+  const rA=A.map(k=>cbRow('qaK',{k},ic('ring'),esc(k),'کالا · با اجرت و سود'+(svUsed[k]?' · '+toFa(svUsed[k])+' بار فروخته شده':''),'','gd')),rS=S.map(s=>cbRow('qaS',{s:s.id},ic(s.i),s.t,s.d,'','spk'));
+  const rows=(bu?rS.concat(rA):rA.concat(rS))
     .concat(P.map(c=>cbRow('qaCh',{id:c.id},ic('card'),esc(c.name),'کارتخوان ما','<b class="chv">'+fmt(chBal(c))+'</b>','ch')))
     .concat(B.map(s=>{const e=acEst(s);return cbRow('qaSrc',{id:s.id},ic('bank'),esc(s.name),'حواله با حساب ما',e==null?'':'<b class="chv">'+fmt(e)+'</b>','ch')}))
     .concat(U.map(c=>cbRow('qaCu',{id:c.id},esc(userInit(c.name)),esc(cuName(c)),'حواله با حساب این مشتری',`<span class="c6v">${bpill('r',cuBal(c).R)}</span>`)));
@@ -149,7 +159,7 @@ const numV=(v,dec)=>v===''||v==null||(!dec&&!+v)?'':dec?esc(v):Number(v).toLocal
 const cell=(id,lab,val,o={})=>`<label class="d6c${o.cls?' '+o.cls:''}"><small>${lab}</small><input id="${id}" class="ltr" inputmode="${o.im||'decimal'}" value="${val}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="done"${o.ro?' readonly':''}></label>`;
 function qaHTML(){const a=sv.qa;if(a.p)return pyHTML();if(a.x)return xrHTML();
   if(!a.k)return `<div class="d6qh"><b>ردیف تازه</b><small>کالا، خرید و فروش طلا، سکه، ارز، دریافت و پرداخت</small></div>
-  <div class="cbx"><div class="fsearch sm">${ic('search')}<input id="qK" value="${esc(a.q||'')}" placeholder="جستجو: انگشتر، خرید، پولی، امامی، دلار، دریافت…" autocomplete="off" enterkeyhint="next"></div><div id="qKs">${qaChips()}</div></div>`;
+  <div class="cbx"><div class="fsearch sm">${ic('search')}<input id="qK" value="${esc(a.q||'')}" placeholder="${sv.dk==='buy'?'جستجو: خرید طلا، سکه امامی، دلار، پرداخت…':'جستجو: انگشتر، خرید، پولی، امامی، دلار، دریافت…'}" autocomplete="off" enterkeyhint="next"></div><div id="qKs">${qaChips()}</div></div>`;
   const ed=a.i!=null;
   return `<div class="d6qh"><b><span class="d6ti gd">${ic('ring')}</span>${esc(a.k)}</b><button class="lnk" data-act="${ed?'qaX':'qaK'}" data-k="">${ed?'بستن':'تغییر'}</button></div>
   <div class="d6g">${cell('qW','وزن (گرم)',numV(a.w,1),{ph:'0.000',cls:'w'})}${cell('qY','عیار',esc(a.ay||750),{im:'numeric'})}${cell('qJ','اجرت ٪',numV(a.ajP,1),{ph:'۰'})}${cell('qJT','اجرت تومانی',numV(a.ajT),{im:'numeric',ph:'۰'})}${cell('qS','سود ٪',numV(a.pp,1),{ph:'۰'})}<div class="d6c ro"><small>هر گرم این عیار</small><b id="qPg">—</b></div></div>
@@ -310,11 +320,10 @@ function svRe(){const o=$('svTotN'),old=o?+o.dataset.v||0:0;const set=(id,h)=>{c
   const n=$('svTotN');if(n){const to=+n.dataset.v;n.dataset.v=old;n.textContent=fmt(old);tween(n,to)}svBindRest();svAdd=-1}
 function svBindRest(){const G=$('svGc');if(G)G.onchange=()=>{sv.gconv=G.checked;svKeep();svRe()};const T=$('svT');if(T)T.onchange=()=>{sv.tax=T.checked;ls.set('m_tax',sv.tax);svKeep();svRe()}}
 function svBindCu(){const Q=$('svQ');if(!Q)return;Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{srchSwap('svCr',svCrHTML())},80)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(Q._t);sv.q=Q.value;const r=$('svCr');if(r)r.innerHTML=svCrHTML();const f=document.querySelector('#svCr [data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}};const C=$('svCr');if(C)C.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
-function bindSell(){if(!sv)return;svBindCu();svBindRest();qaBind();const R=$('svR'),M=$('svM');
-  const setRate=(r,m,src)=>{sv.rate=r;sv.mz=m;if(r)ls.set('m_rate',r);if(m)ls.set('m_mz',m);if(src!=='R'&&R)R.value=r?r.toLocaleString('en-US'):'';if(src!=='M'&&M)M.value=m?m.toLocaleString('en-US'):'';svKeep();clearTimeout(bindSell._t);bindSell._t=setTimeout(()=>{if(cur!=='sell')return;svRe();if(sv.qa.x)xrHint()},140)};
-  if(M){selOnFocus(M);M.oninput=()=>{const v=num(M.value);M.value=v?v.toLocaleString('en-US'):'';setRate(rOfMz(v),v,'M')}}
-  if(R){selOnFocus(R);R.oninput=()=>{const v=num(R.value);R.value=v?v.toLocaleString('en-US'):'';setRate(v,mzOf(v),'R')}}
-  [M,R].forEach(el=>{if(el)el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const f=!svCu()?$('svQ'):$('qK')||$('qW')||$('xrW')||$('pyA');if(f)f.focus()}}});
+function bindSell(){if(!sv)return;svBindCu();svBindRest();qaBind();const M=$('svM');TITLES.sell=sv.dk==='buy'?'سند خرید':'سند فروش';
+  const setRate=(r,m)=>{sv.rate=r;sv.mz=m;if(r)ls.set('m_rate',r);if(m)ls.set('m_mz',m);const x=$('svRx'),w=$('svRate');if(x)x.innerHTML=rateX();if(w)w.classList.toggle('need',!r);svKeep();clearTimeout(bindSell._t);bindSell._t=setTimeout(()=>{if(cur!=='sell')return;svRe();if(sv.qa.x)xrHint()},140)};
+  if(M){selOnFocus(M);M.oninput=()=>{const v=num(M.value);M.value=v?v.toLocaleString('en-US'):'';if(rtK()==='mz')setRate(rOfMz(v),v);else setRate(v,mzOf(v))}}
+  [M].forEach(el=>{if(el)el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const f=!svCu()?$('svQ'):$('qK')||$('qW')||$('xrW')||$('pyA');if(f)f.focus()}}});
   setTimeout(()=>{if(cur!=='sell'||!$('ov').classList.contains('hide'))return;const f=!svCu()?$('svQ'):sv.qa.p||sv.qa.x?null:!sv.rate?M:!sv.items.length&&!sv.xr.length?$('qK'):null;if(f)f.focus()},380)}
 /* ----- ثبت سند ----- */
 ACT.svSave=()=>{const c=svCu();if(!c){toast('مشتری سند را انتخاب کنید',true);const q=$('svQ');if(q){q.focus();q.scrollIntoView({behavior:'smooth',block:'center'})}return}
@@ -324,7 +333,7 @@ ACT.svSave=()=>{const c=svCu();if(!c){toast('مشتری سند را انتخاب
   for(const p of sv.pays)if(p.m==='cust'&&!CU().some(z=>String(z.id)===String(p.cuId))){toast('حساب «'+(p.cuName||'')+'» پیدا نشد',true);return}
   const T=svTot(),now=ns(),no=invNext(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}});
   const xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e}});
-  const t={id:nid++,type:'inv',no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>({...p})),at:now,by:who()};
+  const t={id:nid++,type:'inv',dk:sv.dk==='buy'?'buy':'sell',no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>({...p})),at:now,by:who()};
   if(T.ge)t.ge=T.ge;if(Object.keys(T.xe).length)t.xe=T.xe;
   if(sv.gconv&&T.rest>0&&sv.rate)t.gc={r:T.rest,g:Math.round(T.rest/sv.rate*1000)/1000};
   for(const p of t.pays){if(p.m!=='cust')continue;const Y=custs.find(z=>String(z.id)===String(p.cuId)),x={id:nid++,type:'xf',r:-p.amount,g:0,note:'پرداخت سند '+toFa(no)+' «'+cuName(c)+'»',inv:{cu:c.id,tx:t.id},date:sv.date,at:now,by:who()};(Y.txs=Y.txs||[]).push(x);Y.lastAt=now;p.xfId=x.id}
