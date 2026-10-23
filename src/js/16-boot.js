@@ -9,7 +9,11 @@
     else E.forEach(el=>{if(el){el.style.transition='transform .25s cubic-bezier(.2,.9,.3,1.2),opacity .25s';el.style.transform='';el.style.opacity='';setTimeout(()=>{el.style.transition=''},260)}})};
   document.addEventListener('touchend',end,{passive:true});document.addEventListener('touchcancel',end,{passive:true})})();
 /* دکمه برگشت اندروید: اول پنجره باز، بعد صفحه قبلی، در خانه خروج */
+/* v59.9: اول هر لایه‌ای که روی بقیه است بسته شود: نمایش تمام‌صفحه عکس (#zv، بالاتر از پنجره) — قبلاً پنجره زیرش بسته می‌شد
+   و عکس همان‌جا می‌ماند، پس برگشت «کار نمی‌کرد» — بعد صفحه قفل، بعد پنجره، پیش‌نمایش و صفحه قبلی */
 window.__androidBack=()=>{try{const au=$('auth');if(au&&!au.classList.contains('hide'))return false;
+  if(typeof ZV!=='undefined'&&ZV){if(ZV.crop)ACT.zvCropNo();else zvClose();return true}
+  if(typeof lockUI!=='undefined'&&lockUI){const m=lockUI.m;if(m==='unlock')return false;lockKey(m==='pwun'||m==='forgot'?'back':m==='bio'||m==='pwset'?'bioNo':'cancel');return true}
   if(!$('ov').classList.contains('hide')){ACT.close();return true}
   const pv=$('pv');if(pv&&!pv.classList.contains('hide')){closePrint();return true}
   if(cur==='entry'&&editId){ACT.cancelEdit();return true}

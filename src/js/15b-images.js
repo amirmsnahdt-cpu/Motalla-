@@ -6,6 +6,8 @@ const newImgKey=p=>p+':'+Date.now().toString(36)+Math.random().toString(36).slic
 let GAL=null;
 /* v59.6: اپ اندرویدِ قدیمی نتیجه «چند عکس با هم» گالری را به صفحه نمی‌داد (عکس انتخاب می‌شد ولی اضافه نمی‌شد)؛
    در آن نسخه‌ها انتخاب تک‌عکسی است تا همیشه کار کند. اپ جدید (multiPick) و آیفون/مرورگر چند عکس با هم. */
+/* v59.9: اپ اندروید جدید دوربین را مستقیم باز می‌کند (عکس همان لحظه)؛ آیفون خودش در منوی انتخاب «Take Photo» دارد */
+const picCam=()=>!!(window.AndroidBridge&&AndroidBridge.camera&&(()=>{try{return AndroidBridge.camera()}catch(e){return false}})());
 const picMulti=()=>!/MotallaAndroid/.test(navigator.userAgent)||!!(window.AndroidBridge&&AndroidBridge.multiPick);
 /* صاحب عکس‌ها: {k:'it',eid} = رسید واریز بانکی یک واریزی، {k:'st',eid,sid} = رسید یک تسویه مشتری */
 function galCtx(){if(!GAL)return null;const e=entries.find(z=>String(z.id)===String(GAL.eid));if(!e)return null;const now=()=>new Date().toISOString();
@@ -19,7 +21,7 @@ function galCtx(){if(!GAL)return null;const e=entries.find(z=>String(z.id)===Str
     meta:{name:fullName(e)+' (از '+z.name+')',holder:e.holder||fullName(e),payer:z.name,amount:z.amount,tn:z.tn||'',date:z.date,kind:'cust'}}}
 function galHTML(){const c=galCtx();if(!c)return `<div class="sh-h"><b>رسید</b><button class="x" data-act="close" aria-label="بستن">×</button></div><div class="spempty"><b>پیدا نشد</b></div>`;const K=c.keys;
   return `<div class="sh-h"><div><b>${GAL.k==='it'?'رسید واریز بانکی':'رسید تسویه مشتری'}</b><small class="shsub">${esc(c.meta.name)} · ${fmt(c.meta.amount)} تومان${K.length?' · '+fmt(K.length)+' عکس':''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="galg">${K.map((k,i)=>`<button class="galt" data-act="galView" data-i="${i}" aria-label="دیدن عکس ${toFa(i+1)}"><span class="galim" id="gal${i}"></span><i>${toFa(i+1)}</i></button>`).join('')}${c.ed?`<label class="galt add">${ic('plus')}<span>${K.length?'عکس دیگر':'افزودن عکس'}</span><input type="file" accept="image/*"${picMulti()?' multiple':''} data-galadd="1" hidden></label>`:''}</div>
+  <div class="galg">${K.map((k,i)=>`<button class="galt" data-act="galView" data-i="${i}" aria-label="دیدن عکس ${toFa(i+1)}"><span class="galim" id="gal${i}"></span><i>${toFa(i+1)}</i></button>`).join('')}${c.ed?`<label class="galt add">${ic('plus')}<span>${K.length?'عکس دیگر':'افزودن عکس'}</span><input type="file" accept="image/*"${picMulti()?' multiple':''} data-galadd="1" hidden></label>${picCam()?`<label class="galt add">${ic('cam')}<span>دوربین</span><input type="file" accept="image/*" capture="environment" data-galadd="1" hidden></label>`:''}`:''}</div>
   ${!K.length?`<div class="galnote">${c.ed?(picMulti()?'می‌توانید چند عکس با هم انتخاب کنید؛':'عکس‌ها را یکی‌یکی اضافه کنید؛')+' هر عکس را بعداً بزرگ کنید، بچرخانید یا برش بزنید.':'برای این واریز عکسی ثبت نشده است.'}</div>`:`<div class="galnote">برای بزرگ‌نمایی، چرخش یا برش روی عکس بزنید.</div><div class="txacts"><button data-act="galShare">${ic('open')} اشتراک${K.length>1?' همه':''}</button><button data-act="galSave">${ic('down')} ذخیره${K.length>1?' همه':''}</button></div>`}`}
 function openGal(ref){GAL=ref;sheet(galHTML());galThumbs()}
 function galThumbs(){const c=galCtx();if(!c)return;c.keys.forEach(async(k,i)=>{const d=await imgGet(k),el=$('gal'+i);if(el&&d)el.style.backgroundImage=`url(${d})`})}
@@ -53,7 +55,7 @@ function zvBind(z){const P=new Map();let st=null,lastTap=0;
     if(P.size===2&&st.d){const [a,b]=[...P.values()],d=Math.hypot(a.x-b.x,a.y-b.y);ZV.s=Math.max(1,Math.min(6,st.s*d/st.d));const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2;ZV.x=st.x+(cx-st.cx);ZV.y=st.y+(cy-st.cy);zvClamp();zvApply();return}
     if(P.size===1&&st.px!=null){const dx=e.clientX-st.px,dy=e.clientY-st.py;if(Math.abs(dx)+Math.abs(dy)>6)st.moved=true;if(ZV.s>1){ZV.x=st.x+dx;ZV.y=st.y+dy;zvClamp();zvApply()}}});
   const up=e=>{if(!ZV||!P.has(e.pointerId))return;P.delete(e.pointerId);if(!P.size)z.classList.remove('drag');
-    if(!P.size&&st&&st.px!=null){const dx=e.clientX-st.px,dy=e.clientY-st.py;if(st.moved&&ZV.s<=1&&dy>90&&Math.abs(dy)>Math.abs(dx)*1.5){zvClose();return}
+    if(!P.size&&st&&st.px!=null){const dx=e.clientX-st.px,dy=e.clientY-st.py;/* v59.9: کشیدن از لبه راست به چپ = برگشت (مثل بقیه صفحه‌ها در آیفون) */if(st.moved&&ZV.s<=1&&st.px>innerWidth-32&&dx<-70&&Math.abs(dx)>Math.abs(dy)){zvClose();return}if(st.moved&&ZV.s<=1&&dy>90&&Math.abs(dy)>Math.abs(dx)*1.5){zvClose();return}
       if(!st.moved){const t=Date.now();if(t-lastTap<300){const s=$('zvs'),r=s.getBoundingClientRect();if(ZV.s>1){ZV.s=1;ZV.x=0;ZV.y=0}else{ZV.s=2.5;ZV.x=(r.left+r.width/2-e.clientX)*1.5;ZV.y=(r.top+r.height/2-e.clientY)*1.5;zvClamp()}zvApply();lastTap=0}else lastTap=t}
       else if(ZV.s<=1&&Math.abs(dx)>60){const c=galCtx();if(c){const ni=ZV.i+(dx<0?1:-1);if(ni>=0&&ni<c.keys.length)zvOpen(ni)}}}
     if(P.size<2)st=P.size===1?(()=>{const p=[...P.values()][0];return{px:p.x,py:p.y,x:ZV.x,y:ZV.y,moved:true}})():null};

@@ -51,6 +51,7 @@ public class MainActivity extends Activity {
     private WebView web;
     private WebView printView;
     private ValueCallback<Uri[]> fileCb;
+    private Uri camUri;
     private String serverUrl;
     private final Handler ui = new Handler(Looper.getMainLooper());
 
@@ -95,8 +96,23 @@ public class MainActivity extends Activity {
             public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams params) {
                 if (fileCb != null) fileCb.onReceiveValue(null);
                 fileCb = cb;
+                camUri = null;
                 try {
-                    startActivityForResult(params.createIntent(), FILE_REQ);
+                    boolean img = false;
+                    for (String t : params.getAcceptTypes()) if (t != null && (t.startsWith("image") || t.isEmpty())) img = true;
+                    Intent cam = img ? camIntent() : null;
+                    if (cam != null && params.isCaptureEnabled()) {
+                        // دکمه «دوربین» صفحه: مستقیم دوربین باز شود
+                        startActivityForResult(cam, FILE_REQ);
+                    } else if (cam != null) {
+                        // انتخاب عکس: گالری، با گزینه «دوربین» در همان پنجره
+                        Intent ch = Intent.createChooser(params.createIntent(), "افزودن عکس");
+                        ch.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cam});
+                        startActivityForResult(ch, FILE_REQ);
+                    } else {
+                        camUri = null;
+                        startActivityForResult(params.createIntent(), FILE_REQ);
+                    }
                 } catch (Exception e) {
                     fileCb = null;
                     toast("انتخاب فایل در این گوشی ممکن نیست");
@@ -121,8 +137,36 @@ public class MainActivity extends Activity {
 
     /** عکس‌های انتخاب‌شده از گالری. وقتی صفحه اجازه چند عکس می‌دهد، گالری اندروید نتیجه را در ClipData می‌فرستد
         و getData() خالی است؛ parseResult خود اندروید فقط getData() را می‌خواند، پس عکس‌ها به صفحه نمی‌رسید. */
+    /** دوربین گوشی؛ عکس در پوشه موقت برنامه (CamProvider) ذخیره می‌شود. اگر دوربینی نبود null */
+    private Intent camIntent() {
+        try {
+            Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (i.resolveActivity(getPackageManager()) == null) return null;
+            File d = CamProvider.dir(this);
+            File[] old = d.listFiles();
+            if (old != null) for (File f : old) if (System.currentTimeMillis() - f.lastModified() > 86400000L) f.delete();
+            String name = "rc_" + System.currentTimeMillis() + ".jpg";
+            new File(d, name).createNewFile();
+            Uri u = new Uri.Builder().scheme("content").authority(CamProvider.AUTH).appendPath(name).build();
+            i.putExtra(MediaStore.EXTRA_OUTPUT, u);
+            i.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            i.setClipData(android.content.ClipData.newRawUri("", u));
+            camUri = u;
+            return i;
+        } catch (Exception e) { camUri = null; return null; }
+    }
+
     private Uri[] pickedUris(int res, Intent data) {
-        if (res != RESULT_OK || data == null) return null;
+        Uri cu = camUri;
+        camUri = null;
+        if (res != RESULT_OK) return null;
+        // عکس دوربین: نتیجه خالی برمی‌گردد و خود عکس در فایل ماست (اگر از گالری انتخاب شده باشد، data آن را دارد)
+        boolean fromPick = data != null && (data.getData() != null || data.getClipData() != null && !(cu != null && data.getClipData().getItemCount() == 1 && cu.equals(data.getClipData().getItemAt(0).getUri())));
+        if (cu != null && !fromPick) {
+            File f = new File(CamProvider.dir(this), cu.getLastPathSegment());
+            return f.length() > 0 ? new Uri[]{cu} : null;
+        }
+        if (data == null) return null;
         java.util.ArrayList<Uri> out = new java.util.ArrayList<>();
         android.content.ClipData cd = data.getClipData();
         if (cd != null) for (int i = 0; i < cd.getItemCount(); i++) { Uri u = cd.getItemAt(i).getUri(); if (u != null && !out.contains(u)) out.add(u); }
@@ -262,6 +306,10 @@ public class MainActivity extends Activity {
         /** این نسخه انتخاب چند عکس با هم از گالری را درست برمی‌گرداند (نسخه‌های قبلی نه) */
         @JavascriptInterface
         public boolean multiPick() { return true; }
+
+        /** این نسخه دکمه دوربین (عکس گرفتن همان لحظه) را پشتیبانی می‌کند */
+        @JavascriptInterface
+        public boolean camera() { return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY); }
 
         /** آیا این گوشی اثر انگشت/چهره ثبت‌شده دارد؟ (اندروید ۹ به بالا) */
         @JavascriptInterface
