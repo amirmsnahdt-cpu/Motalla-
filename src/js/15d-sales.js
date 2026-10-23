@@ -91,8 +91,8 @@ function vSell(){if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();svUsed=goo
   <div class="d6hd"><button class="d6no" data-act="svCal"><small>${sv.dk==='buy'?'سند خرید':sv.items.length?'فاکتور':'سند'}</small><b>${toFa(invNext())}</b><span>${ic('cal')}${esc(payLab(sv.date)||D.fa)}</span></button>
     ${rateHTML()}</div>
   <div id="svCu">${svCuHTML()}</div>
-  <div id="svRows">${svRowsHTML()}</div>
   <div class="d6q" id="qa">${qaHTML()}</div>
+  <div id="svRows">${svRowsHTML()}</div>
   <div id="svSum">${svSumHTML()}</div>
 </div>`}
 /* v60.5: نرخ طلا: فقط یکی (مظنه یا هر گرم ۱۸) وارد می‌شود و دیگری خودکار حساب می‌شود (×/÷ ۴٫۳۳۱۸) */
@@ -168,7 +168,19 @@ function qaHTML(){const a=sv.qa;if(a.p)return pyHTML();if(a.x)return xrHTML();
 function qaRead(){const a=sv.qa,g=id=>{const e=$(id);return e?e.value:undefined};if($('qW'))a.w=decIn(g('qW'));if($('qY'))a.ay=+toEn(g('qY')).replace(/\D/g,'')||'';if($('qJ'))a.ajP=decIn(g('qJ'));if($('qJT'))a.ajT=num(g('qJT'));if($('qS'))a.pp=decIn(g('qS'));if($('qK'))a.q=g('qK');if(a.p)pyRead();if(a.x)xrRead()}
 const qaIt=a=>({k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:parseFloat(a.ajP)||0,ajT:+a.ajT||0,pp:parseFloat(a.pp)||0});
 function qaCalc(){const B=$('qB');if(!B)return;qaRead();const a=sv.qa;if(a.p){pyHint();return}if(a.x){xrHint();return}const it=qaIt(a),c=itCalc(it,sv.rate,sv.tax),pg=$('qPg');if(pg)pg.textContent=sv.rate?fmt(Math.round(sv.rate*it.ay/750)):'—';
-  B.innerHTML=!sv.rate?'<small>مظنه یا نرخ گرم را بالای سند بزنید</small>':!it.w?'<small>وزن را بزنید</small>':`<span>طلا <b>${fmt(c.gold)}</b></span><span>اجرت <b>${fmt(c.aj)}</b></span><span>سود <b>${fmt(c.pr)}</b></span>${c.tax?`<span>مالیات <b>${fmt(c.tax)}</b></span>`:''}<span class="t">مبلغ <b>${fmt(c.tot)}</b></span>`}
+  B.innerHTML=!sv.rate?'<small>مظنه یا نرخ گرم را بالای سند بزنید</small>':!it.w?'<small>وزن را بزنید</small>':`<button type="button" class="d6bt" data-act="qaBrk"><span>مبلغ این کالا</span><b>${fmt(c.tot)}</b><i>جزئیات ${ic('back').replace('class="i"','class="i flip"')}</i></button>`}
+/* v60.8: جزئیات طلا/اجرت/سود پنهان؛ با زدن (یا نگه داشتن) روی مبلغ، در یک حباب کوچک مثل پیام نشان داده می‌شود */
+const brkRows=(L,t)=>`<div class="bubt">${t}</div>${L.filter(Boolean).map(([l,v,c])=>`<div class="bubr${c?' '+c:''}"><span>${l}</span><b>${v}</b></div>`).join('')}`;
+function bubble(el,html){bubClose();if(!el)return;const b=document.createElement('div');b.className='bub';b.setAttribute('role','dialog');b.innerHTML=html;document.body.appendChild(b);
+  const r=el.getBoundingClientRect(),W=Math.min(300,innerWidth-24);b.style.width=W+'px';const x=Math.max(12,Math.min(innerWidth-W-12,r.left+r.width/2-W/2));b.style.left=x+'px';
+  const h=b.offsetHeight,up=r.top-h-12>60;b.style.top=(up?r.top-h-10:r.bottom+10)+'px';b.classList.add(up?'up':'dn');b.style.setProperty('--ax',(r.left+r.width/2-x)+'px');
+  try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}setTimeout(()=>{document.addEventListener('pointerdown',bubOut,true);addEventListener('scroll',bubClose,true)},0)}
+function bubOut(e){if(!e.target.closest('.bub'))bubClose()}
+function bubClose(){document.removeEventListener('pointerdown',bubOut,true);removeEventListener('scroll',bubClose,true);document.querySelectorAll('.bub').forEach(b=>{b.classList.add('out');setTimeout(()=>b.remove(),180)})}
+ACT.qaBrk=(d,el)=>{qaRead();const it=qaIt(sv.qa),c=itCalc(it,sv.rate,sv.tax);bubble(document.querySelector('.d6bt'),brkRows([['طلا · '+wFmt(it.w)+' گرم',fmt(c.gold)],['اجرت',fmt(c.aj)],['سود',fmt(c.pr)],c.tax?['مالیات',fmt(c.tax)]:null,['مبلغ',fmt(c.tot),'t']],esc(it.k)))};
+ACT.svBrk=()=>{const T=svTot();bubble(document.querySelector('.d6tot'),brkRows([sv.items.length?['بهای طلا · '+wFmt(T.w)+' گرم',fmt(T.gold)]:null,sv.items.length?['اجرت ساخت',fmt(T.aj)]:null,sv.items.length?['سود فروشنده',fmt(T.pr)]:null,T.tax?['مالیات',fmt(T.tax)]:null,T.xs?['فروش طلا، سکه و ارز',fmt(T.xs)]:null,T.disc?['تخفیف','− '+fmt(T.disc)]:null,T.xb?['خرید از مشتری','− '+fmt(T.xb)]:null,['جمع سند',fmt(Math.abs(T.total)),'t']],'جزئیات سند'))};
+/* در سند: رنگ و نوشته از دید مغازه — طلبکاریم (مشتری به ما بدهکار) قرمز، بدهکاریم (ما به مشتری) آبی */
+const ourLab=v=>!v?'تسویه':v<0?'طلبکاریم':'بدهکاریم';
 /* عیار و عددها: با زدن روی کادر، کل عدد انتخاب می‌شود و با تایپ جایگزین */
 const selOnFocus=el=>{if(el&&!el.readOnly)el.addEventListener('focus',()=>setTimeout(()=>{try{el.select()}catch(e){}},0))};
 function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};
@@ -290,19 +302,20 @@ ACT.svDisc=()=>{qaRead();pyStart(pyNew('disc'));const q=$('qa');if(q)q.scrollInt
 ACT.svRowDel=d=>{const L=d.k==='it'?sv.items:d.k==='xr'?sv.xr:d.k==='py'?sv.pays:null;let o;if(d.k==='dc'){o=sv.disc;sv.disc=0}else if(L)o=L.splice(+d.i,1)[0];if(sv.qa.i!=null||(sv.qa.p&&sv.qa.p.i!=null)||(sv.qa.x&&sv.qa.x.i!=null))sv.qa=qaBlank();svKeep();qaRe();svRe();
   toast('ردیف حذف شد','', 'بازگردانی',()=>{if(d.k==='dc')sv.disc=o;else if(L&&o)L.splice(+d.i,0,o);svKeep();svRe()})};
 /* ----- ردیف‌های سند: مثل جدول کیمیا، هر ردیف با اثرش بر حساب مشتری (بدهکار / طلبکار) ----- */
-function svRowsHTML(){const R=[],eff=(v,k)=>v?`<span class="d6e ${v<0?'d':'c'}"><b>${balV(k||'r',v)}${k&&k!=='r'?' <i>'+balU(k)+'</i>':''}</b><small>${cuLab(v,1)}</small></span>`:'';
-  const row=(k,i,act,ico,cls,b,sub,v)=>`<div class="d6r${k==='it'&&i===svAdd?' new':''}"><button class="d6rb" data-act="${act}" data-i="${i}"><span class="d6ti ${cls}">${ic(ico)}</span><span class="tx"><b>${b}</b><small>${sub}</small></span><span class="d6v">${v}</span></button><button class="d6x" data-act="svRowDel" data-k="${k}" data-i="${i}" aria-label="حذف">${ic('x')}</button></div>`;
+function svRowsHTML(){const R=[],eff=(v,k)=>v?`<span class="d6e ${v<0?'d':'c'}"><b>${balV(k||'r',v)}${k&&k!=='r'?' <i>'+balU(k)+'</i>':''}</b><small>${ourLab(v)}</small></span>`:'';
+  const row=(k,i,act,ico,cls,b,sub,v)=>`<div class="d6r${k==='it'&&i===svAdd?' new':''}"><button class="d6rb" data-act="${act}" data-i="${i}"><span class="d6n">${toFa(R.length+1)}</span><span class="d6ti ${cls}">${ic(ico)}</span><span class="tx"><b>${b}</b><small>${sub}</small></span><span class="d6v">${v}</span></button><button class="d6x" data-act="svRowDel" data-k="${k}" data-i="${i}" aria-label="حذف">${ic('x')}</button></div>`;
   sv.items.forEach((it,i)=>{const c=itCalc(it,sv.rate,sv.tax);R.push(row('it',i,'svItEdit','ring','gd',esc(it.k)+(it.n?' <i>'+esc(it.n)+'</i>':''),`${wFmt(it.w)} گرم · عیار ${toFa(it.ay||750)} · اجرت ${ajLab(it)} · سود ${toFa(+it.pp||0)}٪`,sv.rate?eff(-c.tot):'<small class="d6nr">نرخ را بزنید</small>'))});
   (sv.xr||[]).forEach((x,i)=>{const C=xrCalc(x,sv.rate),R0=x.t==='sell'?-C.amount:x.t==='buy'?C.amount:0;R.push(row('xr',i,'svXrEdit',x.a==='gold'?'coin':(XA[x.a]||{}).k==='f'?'usd':'coin','x-'+x.t,esc(xrLab(x)),esc(xrSub(x,C)),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a)))});
   if(+sv.disc)R.push(row('dc',0,'svDisc','tag','pm-disc','تخفیف','از جمع سند کم می‌شود',eff(+sv.disc)));
   sv.pays.forEach((p,i)=>{const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row('py',i,'svPayEdit',M.i,out?'pm-out':'pm-in',esc(pyLab(p)),(out?'پرداخت به مشتری':'دریافت از مشتری')+(p.tn?' · پیگیری '+esc(p.tn):''),eff(pAmt(p))))});
   if(!R.length)return '';
-  return `<div class="d6sh"><b>ردیف‌های سند</b><small>${toFa(R.length)} ردیف · برای ویرایش بزنید</small></div><div class="d6rows">${R.join('')}</div>`}
+  const nI=sv.items.length;
+  return `<div class="d6sh"><b>ردیف‌های سند</b><small>${nI?toFa(nI)+' قلم کالا، ':''}${toFa(R.length)} ردیف · برای ویرایش بزنید</small></div><div class="d6rows">${R.join('')}</div>`}
 function svSumHTML(){const T=svTot();if(!sv.items.length&&!(sv.xr||[]).length)return '';const row=(l,v,c)=>`<div${c?' class="'+c+'"':''}><span>${l}</span><b>${v}</b></div>`;
-  return `<div class="d6sum">${sv.items.length?row('بهای طلا · '+wFmt(T.w)+' گرم',fmt(T.gold))+row('اجرت ساخت',fmt(T.aj))+row('سود فروشنده',fmt(T.pr)):''}
+  return `<div class="d6sum">
   ${sv.items.length?`<label class="d6sw sm"><input type="checkbox" id="svT"${sv.tax?' checked':''}><span class="tgx"></span><span><b>مالیات</b><small>۱۰٪ اجرت و سود${sv.tax?' · '+fmt(T.tax):''}</small></span></label>`:''}
-  ${T.xs?row('فروش طلا، سکه و ارز',fmt(T.xs)):''}${T.disc?row('تخفیف','− '+fmt(T.disc),'dc'):''}${T.xb?row('خرید از مشتری','− '+fmt(T.xb),'dc'):''}
-  <div class="d6tot"><span>${T.total<0?'خالص خرید (طلب مشتری)':'جمع سند'}</span><b><span id="svTotN" data-v="${Math.abs(T.total)}">${fmt(Math.abs(T.total))}</span> <i>تومان</i></b></div></div>
+  ${T.disc?row('تخفیف','− '+fmt(T.disc),'dc'):''}
+  <button type="button" class="d6tot" data-act="svBrk"><span>${T.total<0?'خالص خرید (طلب مشتری)':'جمع سند'}<small>${toFa(sv.items.length+(sv.xr||[]).length)} قلم · جزئیات</small></span><b><span id="svTotN" data-v="${Math.abs(T.total)}">${fmt(Math.abs(T.total))}</span> <i>تومان</i></b></button></div>
   ${T.rest>0&&sv.rate?`<label class="d6sw svgc"><input type="checkbox" id="svGc"${sv.gconv?' checked':''}><span class="tgx"></span><span><b>مانده ریالی این سند طلایی ثبت شود</b><small>${wFmt(Math.round(T.rest/sv.rate*1000)/1000)} گرم با نرخ امروز</small></span></label>`:''}`}
 /* نوار مانده‌ها پایین صفحه (ثابت هنگام پیمایش): قبلی · این سند · نهایی برای ریالی، طلایی، سکه و ارز */
 function svBalHTML(){if(!sv)return '';const c=svCu(),T=svTot(),b=c?cuBal(c):{R:0,G:0,X:{}},gc=sv.gconv&&T.rest>0&&sv.rate;
@@ -310,7 +323,7 @@ function svBalHTML(){if(!sv)return '';const c=svCu(),T=svTot(),b=c?cuBal(c):{R:0
   const keys=[...new Set([...Object.keys(b.X||{}),...Object.keys(T.xe||{})])];
   const L=[['r',b.R,dr],['g',b.G,dg],...keys.map(k=>[k,(b.X||{})[k]||0,(T.xe||{})[k]||0])].filter(([k,p,d],i)=>i===0||d||(c&&p&&k==='g'));
   if(!c&&!sv.items.length&&!sv.pays.length&&!(sv.xr||[]).length)return '';
-  const v=(x,k,cls)=>`<span class="${cls||''} ${x<0?'d':x>0?'c':'z'}"><b>${x?balV(k,x):'۰'}</b><small>${cuLab(x,1)}</small></span>`;
+  const v=(x,k,cls)=>`<span class="${cls||''} ${x<0?'d':x>0?'c':'z'}"><b>${x?balV(k,x):'۰'}</b><small>${ourLab(x)}</small></span>`;
   const lg=L.some(([k,p,d])=>[p,d,p+d].some(x=>balV(k,x).length>11));
   return `<div class="d6bal${c?'':' noc'}${lg?' lg':''}">${c?'<div class="d6bh"><i></i><span>قبلی</span><span>این سند</span><span>نهایی</span></div>':''}${L.map(([k,p,d])=>{const f=k==='r'?Math.round(p+d):k==='g'?Math.round((p+d)*1000)/1000:Math.round((p+d)*100)/100;return `<div class="d6bl"><i>${k==='r'?'تومان':k==='g'?'طلا':esc((XA[k]||{s:k}).s)}</i>${c?v(p,k):''}${v(d,k,'doc')}${c?v(f,k,'fin'):''}</div>`}).join('')}</div>`}
 function tween(el,to){if(!el)return;const from=+el.dataset.v||0;el.dataset.v=to;if(from===to||matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=fmt(to);return}const t0=performance.now(),D=420;cancelAnimationFrame(el._r);

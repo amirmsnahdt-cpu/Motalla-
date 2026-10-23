@@ -572,3 +572,22 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;displ
 .kv.kc.cpok .kcp{background:var(--ok2);color:var(--ok);animation:kcpop .38s cubic-bezier(.3,1.5,.5,1)}
 @keyframes kcpop{0%{transform:scale(.7)}100%{transform:scale(1)}}
 .kv.col.kc{position:relative}.kv.col .kcp{position:absolute;left:0;top:10px}.kv.col.kc>small{padding-left:110px}
+/* v60.8: سند — مبلغ کالا و جمع سند با «جزئیات» در حباب؛ شماره ردیف؛ رنگ از دید مغازه */
+.d6bt{display:flex;align-items:center;gap:8px;width:100%;margin:0;padding:10px 12px;border:0;border-radius:14px;background:color-mix(in srgb,var(--blu2) 75%,var(--card));box-shadow:0 0 0 1px color-mix(in srgb,var(--blu) 20%,transparent);font:inherit;color:var(--ink);cursor:pointer;text-align:right}
+.d6bt span{font-size:12.5px;font-weight:700;color:var(--mut)}.d6bt b{flex:1;font-size:18px;font-weight:900;color:var(--blu);font-feature-settings:"tnum";text-align:left}
+.d6bt i{flex:none;display:inline-flex;align-items:center;gap:2px;font-style:normal;font-size:11.5px;font-weight:800;color:var(--blu)}.d6bt i svg{width:13px;height:13px}
+button.d6tot{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-top:1px solid var(--line);background:none;font:inherit;color:inherit;cursor:pointer;padding:9px 0 0;text-align:right}
+button.d6tot>span{display:flex;flex-direction:column}button.d6tot>span small{font-size:11px;font-weight:700;color:var(--blu)}
+.bub{position:fixed;z-index:1200;background:var(--card);color:var(--ink);border-radius:18px;padding:12px 14px 10px;box-shadow:0 0 0 1px var(--line),0 20px 40px -12px #16213a59,0 4px 10px #16213a1a;animation:bubIn .28s cubic-bezier(.2,1.2,.35,1) both}
+.bub.up{transform-origin:var(--ax) 100%}.bub.dn{transform-origin:var(--ax) 0}
+.bub::after{content:'';position:absolute;left:calc(var(--ax) - 8px);width:16px;height:16px;background:var(--card);transform:rotate(45deg);border-radius:3px}
+.bub.up::after{bottom:-7px;box-shadow:1px 1px 0 var(--line)}.bub.dn::after{top:-7px;box-shadow:-1px -1px 0 var(--line)}
+.bub.out{animation:bubOut .18s ease-in forwards}
+@keyframes bubIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}@keyframes bubOut{to{opacity:0;transform:scale(.9)}}
+.bubt{font-size:12px;font-weight:800;color:var(--mut);margin-bottom:6px}
+.bubr{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}.bubr+.bubr{border-top:1px solid var(--hair)}.bubr span{color:var(--mut);font-weight:600}.bubr b{font-weight:800;font-feature-settings:"tnum"}
+.bubr.t span{color:var(--ink);font-weight:800}.bubr.t b{color:var(--blu);font-size:15px;font-weight:900}
+.d6n{flex:none;width:20px;height:20px;border-radius:50%;background:var(--seg);color:var(--mut);font-size:11px;font-weight:800;display:grid;place-items:center}
+.d6e.d b,.d6e.d small{color:var(--red)}.d6e.c b,.d6e.c small{color:var(--blu)}
+.d6bl>span.d b,.d6bl>span.d small{color:var(--red)!important}.d6bl>span.c b,.d6bl>span.c small{color:var(--blu)!important}
+@media (prefers-reduced-motion:reduce){.bub,.bub.out{animation:none}}
