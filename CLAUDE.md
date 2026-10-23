@@ -40,6 +40,7 @@ change the existing definition instead of adding a later redefinition). Section 
 | 15g-android-key | one-time reinstall guide for Android apps signed with the old key: sync first, then download, uninstall, install (`apkMoveSheet`, `apkOldKey`) |
 | 15h-motion | v58 motion: unified press feedback for every tappable element (WAAPI on `scale`, depth by size; no CSS `:active` transforms elsewhere), FLIP row moves on same-view re-render (`flipSnap`/`flipPlay`, keys `data-fk`: rows from `swW`, list groups `g:<name>`), `sheetFocus` (keyboard waits until the sheet finished rising) |
 | 15i-checkout | v60.9 sale checkout sheet after «ثبت سند» (`ckOpen`, `CK`): حواله از مشتری (customers we owe → pay `cust`; unsent deposits → pay `m:'dep'` + pending settle on that entry with `byInv`, never a `pin` tx), کارتخوان, حواله به بانک, نقد, تعویض طلا (xr buy `cat:'تعویض'`); `ckDepApply` on save, `invDepOff` on invoice delete/undo |
+| 15j-detect | v61 «تشخیص» document entry: `DK` (فروش/خرید/تعویض/دریافت/پرداخت/مرجوعی), `DKS` sub-kinds, `dkHTML`/`dkList`, `ACT.dkD/dkS/dkGo` open the existing item/xr/pay panels with `fl` (flow) set; melted-gold sale = item `ab:1` (+`lab`,`ang`, no ajrat/tax); coin photo `x.img` |
 | 16-boot | startup: initial render, listeners |
 
 CSS files are split by version era (01-base, 02-v21-v22 … 08-v52-list-photos), not by topic — grep the selector.
