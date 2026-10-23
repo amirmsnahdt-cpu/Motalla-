@@ -659,3 +659,25 @@ button.d6tot>span{display:flex;flex-direction:column}button.d6tot>span small{fon
 #sheet .sgr.smg.rcl{overflow-y:auto!important;max-height:56vh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
 /* v61.1: فهرست رسیدها در پنجره اسکرول شود */
 #sheet .sgr.smg.rcl{overflow-y:auto!important;max-height:56vh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+/* v61.2: تشخیص و نوع کالا = فیلد جستجو با فهرست زیرش؛ موارد ثابت با نشان «ثابت» */
+.dkbox:not(.open) #qKs{display:none}
+.dkl{max-height:min(46vh,380px);overflow-y:auto;overscroll-behavior:contain}
+.dkrw .av{border-radius:12px}.dkrw.fix .av{background:var(--blu2);color:var(--blu)}.dkrw.fix.gd .av{background:var(--goldbg);color:var(--gold)}
+.dkrw.fix.k-sell .av{background:var(--blu);color:#fff}.dkrw.fix.k-buy .av{background:linear-gradient(135deg,#ecc874,#b8862b);color:#1b1404}.dkrw.fix.k-in .av{background:var(--ok2);color:var(--ok)}.dkrw.fix.k-out .av{background:var(--red2);color:var(--red)}.dkrw.fix.k-swap .av{background:var(--goldbg);color:var(--gold)}
+.dkrw.fix b{font-weight:900}
+.dkfx{flex:none;font-style:normal;font-size:10px;font-weight:800;color:var(--gold);background:var(--goldbg);border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);border-radius:8px;padding:1px 7px}
+.dkcat{padding:10px 12px;border-top:1px solid var(--hair)}.dkcat small{display:block;font-size:11.5px;font-weight:800;color:var(--mut);margin-bottom:6px}
+.dkf{margin-bottom:8px}
+/* نوار مانده‌ها جمع‌وجور */
+.d6bal2{background:var(--bg);border-radius:14px;padding:2px 10px;box-shadow:inset 0 0 0 1px var(--hair)}
+.d6b2{display:flex;align-items:center;gap:8px;min-height:34px}.d6b2+.d6b2{border-top:1px solid var(--hair)}
+.d6b2>i{font-style:normal;font-size:11px;font-weight:800;color:var(--mut);width:34px;flex:none}
+.d6b2 .pv{display:flex;align-items:baseline;gap:4px;font-size:10.5px;color:var(--mut);font-weight:700;min-width:0;white-space:nowrap;overflow:hidden}.d6b2 .pv b{font-size:12px;font-weight:800;color:var(--ink);font-feature-settings:"tnum"}.d6b2 .pv small{font-size:9.5px}.d6b2 .pv small.d{color:var(--red)}.d6b2 .pv small.c{color:var(--blu)}
+.d6b2 .ar{flex:none;color:var(--mut);display:grid}.d6b2 .ar svg{width:13px;height:13px;transform:scaleX(-1)}
+.d6b2 .fv{margin-inline-start:auto;display:flex;align-items:baseline;gap:5px;background:var(--card);border-radius:10px;padding:2px 9px;box-shadow:var(--lift);white-space:nowrap}
+.d6b2 .fv b{font-size:14px;font-weight:900;font-feature-settings:"tnum"}.d6b2 .fv small{font-size:10px;font-weight:800}
+.d6b2 .fv.d b,.d6b2 .fv.d small{color:var(--red)}.d6b2 .fv.c b,.d6b2 .fv.c small{color:var(--blu)}.d6b2 .fv.z small{color:var(--mut)}
+.d6tax{padding:4px 10px;margin-bottom:4px}
+/* v61.2: رسیدهای تسویه با مشتری */
+.fss{background:var(--card);border-radius:18px;padding:10px 12px;box-shadow:0 0 0 1px var(--line);margin-bottom:10px;animation:d6rIn .35s both}
+.fsh{display:flex;align-items:center;gap:10px;margin-bottom:8px}.fsh .tx{display:flex;flex-direction:column}.fsh b{font-size:14px;font-weight:900}.fsh small{font-size:11.5px;color:var(--mut)}

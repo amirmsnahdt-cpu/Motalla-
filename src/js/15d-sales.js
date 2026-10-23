@@ -87,7 +87,7 @@ function svTot(){let gold=0,aj=0,pr=0,tax=0,w=0;for(const it of sv.items){const 
   return{gold,aj,pr,tax,w:Math.round(w*1000)/1000,sub,xs,xb,disc,total,paid,rest:total-paid,ge:Math.round(ge*1000)/1000,xe}}
 const svCu=()=>sv&&sv.cuId?CU().find(c=>String(c.id)===String(sv.cuId))||null:null;
 const svHasG=()=>sv.items.length||(sv.xr||[]).some(x=>x.a==='gold'&&(x.t==='sell'||x.t==='buy')&&!x.pgM);
-function vSell(){if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();svUsed=goodsUsed();const D=dates(sv.date);
+function vSell(){xaSync();if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();svUsed=goodsUsed();const D=dates(sv.date);
   return `<div class="d6">
   <div class="d6hd"><button class="d6no" data-act="svCal"><small>${sv.items.length?'فاکتور':'سند'}</small><b>${toFa(invNext())}</b><span>${ic('cal')}${esc(payLab(sv.date)||D.fa)}</span></button>
     ${rateHTML()}</div>
@@ -149,7 +149,7 @@ function qaChips(){const a=sv.qa,q=nzName(toEn(a.q||''));if(!q)return '';
   const A=goodsList().filter(k=>nzName(k).includes(q)).sort((x,y)=>(nzName(y).startsWith(q)-nzName(x).startsWith(q))||(svUsed[y]||0)-(svUsed[x]||0)).slice(0,5);
   const bu=sv.dk==='buy',S=SPK.filter(s=>nzName(s.t+' '+s.al).includes(q)).sort((a,b)=>bu?((b.x&&b.x[0]==='buy')-(a.x&&a.x[0]==='buy')):0).slice(0,6);
   const P=CH('pos').filter(c=>nzName(c.name).includes(q)).slice(0,3),B=sources.filter(s=>nzName(s.name+' '+(s.bank||'')).includes(q)).slice(0,3),U=CU().filter(c=>String(c.id)!==String(sv.cuId)&&nzName([c.name,c.phone,c.grp].join(' ')).includes(q)).slice(0,4);
-  const rA=A.map(k=>cbRow('qaK',{k},ic('ring'),esc(k),'کالا · با اجرت و سود'+(svUsed[k]?' · '+toFa(svUsed[k])+' بار فروخته شده':''),'','gd')),rS=S.map(s=>cbRow('qaS',{s:s.id},ic(s.i),s.t,s.d,'','spk'));
+  const rA=A.map(k=>cbRow('qaK',{k},ic('ring'),esc(k),'کالا · با اجرت و سود'+(svUsed[k]?'، '+toFa(svUsed[k])+' بار فروخته شده':''),'','gd')),rS=S.map(s=>cbRow('qaS',{s:s.id},ic(s.i),s.t,s.d,'','spk'));
   const rows=(bu?rS.concat(rA):rA.concat(rS))
     .concat(P.map(c=>cbRow('qaCh',{id:c.id},ic('card'),esc(c.name),'کارتخوان ما','<b class="chv">'+fmt(chBal(c))+'</b>','ch')))
     .concat(B.map(s=>{const e=acEst(s);return cbRow('qaSrc',{id:s.id},ic('bank'),esc(s.name),'حواله با حساب ما',e==null?'':'<b class="chv">'+fmt(e)+'</b>','ch')}))
@@ -189,6 +189,8 @@ const ourLab=v=>!v?'تسویه':v<0?'طلبکاریم':'بدهکاریم';
 const selOnFocus=el=>{if(el&&!el.readOnly)el.addEventListener('focus',()=>setTimeout(()=>{try{el.select()}catch(e){}},0))};
 function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};
   if(a.p){pyBind();return}if(a.x){xrBind();return}
+  /* v61.2: فهرست تشخیص/نوع با لمس فیلد باز و با ترک آن (اگر خالی است) بسته می‌شود */
+  if(K&&!a.k){const B=K.closest('.dkbox');if(B){K.onfocus=()=>B.classList.add('open');K.onblur=()=>setTimeout(()=>{if(!K.value&&!sv.qa.d&&K.isConnected&&document.activeElement!==K)B.classList.remove('open')},180)}}
   if(K){K.oninput=()=>{a.q=K.value;clearTimeout(K._t);K._t=setTimeout(()=>{const r=$('qKs');if(r)r.innerHTML=dkList()},60);svKeep()};
     K.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();a.q=K.value;const r=$('qKs');if(r)r.innerHTML=dkList();const f=document.querySelector('#qKs [data-act]');if(f)ACT[f.dataset.act]({...f.dataset})}};
     const KS=$('qKs');if(KS)KS.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
@@ -196,7 +198,7 @@ function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};
   ['qL','qN'].forEach(id=>{const el=$(id);if(el){el.oninput=keep;el.onkeydown=ent}});[['qW','d'],['qY','i'],['qJ','d'],['qJT','n'],['qS','d']].forEach(([id,k])=>{const el=$(id);if(!el)return;selOnFocus(el);el.onkeydown=ent;el.oninput=()=>{if(k==='d')el.value=decIn(el.value);else if(k==='i')el.value=toEn(el.value).replace(/\D/g,'').slice(0,3);else{const v=num(el.value);el.value=v?v.toLocaleString('en-US'):''}keep();qaCalc()}});
   qaCalc()}
 const qaRe=f=>{const q=$('qa');if(!q)return;q.innerHTML=qaHTML();qaBind();const e=f&&$(f);if(e)e.focus({preventScroll:false});q.classList.remove('swap');void q.offsetWidth;q.classList.add('swap')};
-const qaDone=()=>{sv.qa=qaBlank();svKeep();qaRe();svRe();setTimeout(()=>{const k=$('qK');if(k&&$('ov').classList.contains('hide'))k.focus({preventScroll:true})},30)};
+const qaDone=()=>{sv.qa=qaBlank();svKeep();qaRe();svRe()};/* v61.2: بعد از افزودن، فهرست تشخیص بسته می‌ماند تا ردیف‌ها دیده شوند */
 ACT.qaK=d=>{qaRead();const a=sv.qa;a.k=d.k?clean(d.k):'';a.i=null;if(a.k)addGoods(a.k);a.q='';svKeep();qaRe(a.k?'qW':'qK')};
 ACT.qaS=d=>{const s=SPK.find(z=>z.id===d.s);if(!s)return;qaRead();if(s.x){if(s.x[1]==='gold'&&s.x[0]!=='in'&&s.x[0]!=='out'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);$('svM').focus();return}xrStart(xrNew(s.x[0],s.x[1],{pul:!!s.x[2]}));return}
   if(s.p[0]==='disc'){pyStart(pyNew('disc'));return}pyStart(pyNew(s.p[0],{dir:s.p[1]}))};
@@ -209,8 +211,8 @@ ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;qaRead();const J=ajPT(it)
 const xrStart=x=>{qaRead();sv.qa.x=x;sv.qa.p=null;sv.qa.q='';svKeep();qaRe()};
 function xrHTML(){const x=sv.qa.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ed=x.i!=null,C=xrCalc(x,sv.rate),fl=x.fl||'';
   /* v61: پنجره از «تشخیص» باز شده → فقط همان نوع جنس، بدون انتخاب دوباره فروش/خرید/دریافت/تحویل */
-  const KL=fl==='coin'?COINS():fl==='fx'?FXS():fl==='gold'?[]:['gold',...Object.keys(XA)];
-  const ttl=fl?esc((x.fd==='swap'?'تعویض':x.fd==='ret'?'مرجوعی':dkT(x.fd||({sell:'sell',buy:'buy',in:'in',out:'out'})[x.t]))+(x.fd==='swap'||x.fd==='ret'?' · طلای مشتری':' › '+(g?(x.cat||'طلا'):(XA[x.a]||{}).t||''))):esc(xrLab(x));
+  const KL=fl==='coin'?COINS():fl==='fx'?FXS():fl==='gold'||fl==='one'?[]:['gold',...Object.keys(XA)];
+  const ttl=fl?esc((x.fd==='swap'?'تعویض':x.fd==='ret'?'مرجوعی':dkT(x.fd||({sell:'sell',buy:'buy',in:'in',out:'out'})[x.t]))+(x.fd==='swap'||x.fd==='ret'?' · طلای مشتری':' › '+(g?(x.pul?'پولی':x.cat||'طلا'):(XA[x.a]||{}).t||''))):esc(xrLab(x));
   const kinds=KL.map(k=>`<button class="${x.a===k?'on':''}" data-act="xrA" data-a="${k}">${k==='gold'?'طلا':esc(XA[k].s)}</button>`).join('');
   return `<div class="d6qh"><b><span class="d6ti x-${x.t}">${ic(g?'coin':(XA[x.a]||{}).k==='f'?'usd':'coin')}</span>${ttl}</b><button class="lnk" data-act="qaX">${ed?'بستن':'انصراف'}</button></div>
   ${KL.length>1?`<div class="d6kd">${kinds}</div>`:''}
@@ -332,11 +334,10 @@ function svBalHTML(){if(!sv)return '';const c=svCu(),T=svTot(),b=c?cuBal(c):{R:0
   const keys=[...new Set([...Object.keys(b.X||{}),...Object.keys(T.xe||{})])];
   const L=[['r',b.R,dr],['g',b.G,dg],...keys.map(k=>[k,(b.X||{})[k]||0,(T.xe||{})[k]||0])].filter(([k,p,d],i)=>i===0||d||(c&&p&&k==='g'));
   if(!c&&!sv.items.length&&!sv.pays.length&&!(sv.xr||[]).length)return '';
-  const v=(x,k,cls)=>`<span class="${cls||''} ${x<0?'d':x>0?'c':'z'}"><b>${x?balV(k,x):'۰'}</b><small>${ourLab(x)}</small></span>`;
-  const lg=L.some(([k,p,d])=>[p,d,p+d].some(x=>balV(k,x).length>11));
-  /* v60.9: کلید مالیات کنار مانده‌ها */
+  /* v61.2: نوار مانده‌ها جمع‌وجور: هر جنس یک خط، «قبلی ← نهایی» (اثر این سند روی دکمه ثبت دیده می‌شود) */
   const tx=sv.items.some(i=>!i.ab)?`<label class="d6sw sm d6tax${sv.tax?' on':''}"><input type="checkbox" id="svT"${sv.tax?' checked':''}><span class="tgx"></span><span><b>مالیات ۱۰٪</b><small>${sv.tax?fmt(T.tax)+' تومان':'اجرت و سود'}</small></span></label>`:'';
-  return `${tx}<div class="d6bal${c?'':' noc'}${lg?' lg':''}">${c?'<div class="d6bh"><i></i><span>قبلی</span><span>این سند</span><span>نهایی</span></div>':''}${L.map(([k,p,d])=>{const f=k==='r'?Math.round(p+d):k==='g'?Math.round((p+d)*1000)/1000:Math.round((p+d)*100)/100;return `<div class="d6bl"><i>${k==='r'?'تومان':k==='g'?'طلا':esc((XA[k]||{s:k}).s)}</i>${c?v(p,k):''}${v(d,k,'doc')}${c?v(f,k,'fin'):''}</div>`}).join('')}</div>`}
+  const vv=(x,k)=>`<span class="fv ${x<0?'d':x>0?'c':'z'}"><b>${x?balV(k,x):'۰'}</b><small>${ourLab(x)}</small></span>`;
+  return `${tx}<div class="d6bal2">${L.map(([k,p,d])=>{const f=k==='r'?Math.round(p+d):k==='g'?Math.round((p+d)*1000)/1000:Math.round((p+d)*100)/100;return `<div class="d6b2"><i>${k==='r'?'تومان':k==='g'?'طلا':esc((XA[k]||{s:k}).s)}</i>${c?`<span class="pv">قبلی <b>${p?balV(k,p):'۰'}</b>${p?`<small class="${p<0?'d':'c'}">${ourLab(p)}</small>`:''}</span><span class="ar">${ic('back')}</span>`:''}${vv(c?f:d,k)}</div>`}).join('')}</div>`}
 function tween(el,to){if(!el)return;const from=+el.dataset.v||0;el.dataset.v=to;if(from===to||matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=fmt(to);return}const t0=performance.now(),D=420;cancelAnimationFrame(el._r);
   const st=n=>{const k=Math.min(1,(n-t0)/D),e=1-Math.pow(1-k,3);el.textContent=fmt(Math.round(from+(to-from)*e));if(k<1)el._r=requestAnimationFrame(st)};el._r=requestAnimationFrame(st);const p=el.closest('.d6tot');if(p){p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump')}}
 function svRe(){const o=$('svTotN'),old=o?+o.dataset.v||0:0;const set=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};set('svRows',svRowsHTML());set('svSum',svSumHTML());set('svBal',svBalHTML());

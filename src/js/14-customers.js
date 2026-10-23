@@ -53,13 +53,13 @@ function bindCusts(){const q=$('cuq');if(!q)return;q.oninput=()=>{cuQ=q.value;cl
   q.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const f=document.querySelector('#cures [data-act=cuOpen]');if(f)ACT.cuOpen({id:f.dataset.id});else if(clean(q.value))ACT.cuNewQ()}}
 ACT.cuQClr=()=>{cuQ='';const m=flipSnap($('cures')),v=$('view');v.innerHTML=vCusts();bindCusts();flipPlay($('cures'),m)};
 /* ---- صفحه یک مشتری ---- */
-function vCust(){const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust')go('custs',true)},0);return ''}const b=cuBal(c),T=(c.txs||[]).filter(t=>!t.del).slice().sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
+function vCust(){xaSync();const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust')go('custs',true)},0);return ''}const b=cuBal(c),T=(c.txs||[]).filter(t=>!t.del).slice().sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
   const tile=(k,v)=>`<div class="c6t ${k==='r'||k==='g'?k:'x'} ${v<0?'d':v>0?'c':'z'}"><small>${k==='r'?'مانده ریالی':k==='g'?'مانده طلایی':esc((XA[k]||{t:k}).t)}</small><b>${v?balV(k,v):'۰'}<i>${balU(k)}</i></b><span>${cuLab(v)}</span></div>`;
   /* v60.5: کارت مشخصات مشتری برجسته؛ زدن روی کارت = ویرایش مشخصات */
   let h=`<button class="c6h c6hc" data-act="cuEdit" data-id="${c.id}" aria-label="ویرایش مشخصات ${esc(cuName(c))}"><span class="c6a lg">${esc(userInit(c.name))}</span><span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'',c.nid?'کد ملی <bdi dir="ltr">'+esc(toFa(c.nid))+'</bdi>':''].filter(Boolean).join('، ')||'مشخصات تکمیل نشده · برای تکمیل بزنید'}</small></span><span class="c6ed">${ic('edit')}</span></button>
   <div class="c6tl">${tile('r',b.R)}${tile('g',b.G)}${Object.keys(b.X).map(k=>tile(k,b.X[k])).join('')}</div>
   ${can('debt')?`<button class="c6new c6one" data-act="svNew" data-cu="${c.id}"><span class="c6ni">${ic('inv')}</span><span><b>سند جدید</b><small>فروش، خرید، تعویض، دریافت، پرداخت، مرجوعی</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>
-  <button class="c6lnk" data-act="cuStl">${ic('check')}<span><b>تسویه واریزی از طرف این مشتری</b><small>مشتری مستقیم به فروشنده‌ای که از او خریده‌ایم پرداخت کرده</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:''}
+  `:''}
   <div class="spsec"><b>گردش حساب</b><small>${T.length?fmt(T.length)+' ردیف · برای جزئیات بزنید':'هنوز سندی ثبت نشده'}</small></div>`;
   if(T.length){let last=null;h+=T.map(t=>{let d='';if(t.date!==last){last=t.date;const r=relDay(t.date);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(t.date).fa)}</div>`}return d+`<div class="fcard">${txRow(c,t)}</div>`}).join('')}
   return h}

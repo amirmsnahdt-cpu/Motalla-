@@ -126,7 +126,7 @@ function saveEntry(){const m=$('fm'),dgI=dg($('fi').value).slice(0,24);
   const ne={...e,id:nid++,entryDate:dateVal,createdBy:who(),updatedBy:who(),updatedAt:now};entries.push(ne);saveE();alloc=null;
   logA('add','ثبت واریزی',e.name+' | '+fmt(e.amount)+' تومان | '+dates(dateVal).fa,{ids:[ne.id],after:pick(ne)});
   FLD.forEach(i=>$(i).value='');fSet=[];fTitle='';$('ftl').innerHTML=titleChips();updSet();fPay=payDef();updPay();$('fiv').textContent='';$('fkv').textContent='';$('finfo').innerHTML='';$('rn').textContent=fmt(dayEntries().length+1);$('recent').innerHTML=recentHTML();$('dock').innerHTML=dockHTML();$('act').innerHTML=aEntry();{const fb=document.querySelector('#view .flow');if(fb)fb.outerHTML=flowBar(1)}
-  m.innerHTML=bad?'<div class="msg bad"><b>شماره شبا اشتباه است.</b> واریزی ذخیره شد و در لیست قرمز علامت خورد؛ بعداً اصلاحش کنید.</div>':'<div class="msg ok">ذخیره شد ✓ — واریز '+payLab(ne.payDate)+' · '+fmt(dayEntries().length)+' واریزی در لیست امروز</div>';
+  m.innerHTML=bad?'<div class="msg bad"><b>شماره شبا اشتباه است.</b> واریزی ذخیره شد و در لیست قرمز علامت خورد؛ بعداً اصلاحش کنید.</div>':'<div class="msg ok">ذخیره شد ✓ — واریز '+payLab(ne.payDate)+'، '+fmt(dayEntries().length)+' واریزی در لیست امروز</div>';
   if(bad)toast('شماره شبا اشتباه است',true);$('fn').focus()}
 /* ============ چسباندن گروهی ============ */
 const vBulk=()=>{if(!fPay||fPay<todayISO())fPay=payDef();return `<div class="bkw bzw"><div class="bzh"><small>چند واریزی یکجا · لیست امروز ${esc(dates(todayISO()).fa)}</small><b>چسباندن لیست</b></div>
