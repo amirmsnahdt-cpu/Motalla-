@@ -565,3 +565,10 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;displ
 .stsr.nw .c6a{background:var(--blu);color:#fff}.stsr.nw b{color:var(--blu)}
 .stsh{padding:6px 12px 4px;font-size:11px;font-weight:800;color:var(--gold);background:color-mix(in srgb,var(--goldbg) 70%,var(--card));border-top:1px solid var(--hair)}
 .stsel{display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px 10px;border-radius:14px;background:var(--blu2);box-shadow:0 0 0 1px color-mix(in srgb,var(--blu) 25%,transparent);animation:stsIn .25s ease-out}
+/* v60.7: آیکن کپی کنار هر ردیف؛ پس از کپی همان‌جا «✓ کپی شد» */
+.kcp{flex:none;display:inline-flex;align-items:center;gap:4px;min-width:28px;height:28px;padding:0 6px;border-radius:14px;color:var(--blu);background:color-mix(in srgb,var(--blu2) 70%,transparent);transition:background-color .25s,color .25s}
+.kcp svg{width:15px;height:15px}.kcp em{font-style:normal;font-size:11.5px;font-weight:800;white-space:nowrap}
+.kv.kc.cpok{background:none;margin-inline:0;padding-inline:0}
+.kv.kc.cpok .kcp{background:var(--ok2);color:var(--ok);animation:kcpop .38s cubic-bezier(.3,1.5,.5,1)}
+@keyframes kcpop{0%{transform:scale(.7)}100%{transform:scale(1)}}
+.kv.col.kc{position:relative}.kv.col .kcp{position:absolute;left:0;top:10px}.kv.col.kc>small{padding-left:110px}
