@@ -140,7 +140,9 @@ ACT.bkFull=()=>bkFetch('/api/backup/full','motalla-full-'+todayISO()+'.json.gz')
 ACT.bkRestore=d=>askConfirm('همه واریزی‌ها، لیست‌ها و حساب‌ها به وضعیت این نسخه برمی‌گردند و تغییرات بعد از آن کنار می‌روند (قبلش از وضعیت فعلی نسخه گرفته می‌شود). ادامه می‌دهید؟','بله، بازگردانی',async()=>{
   toast('در حال بازگردانی…');try{const j=await api('/api/backups/'+d.n+'?restore=1',{});await syncNow();BK=await api('/api/backups');render();toast('بازگردانی انجام شد ✓ · '+toFa(j.changed)+' مورد تغییر کرد')}catch(e){toast(e.message,true)}});
 $('view').addEventListener('scroll',homeCmp,{passive:true});
-{let ly=0;$('view').addEventListener('scroll',()=>{const v=$('view'),y=v.scrollTop,a=$('act');if(!a||!(cur==='banks'||cur==='split1'||cur==='custs')){ly=y;return}if(y>ly+6&&y>40)a.classList.add('hid');else if(y<ly-6||y<=10)a.classList.remove('hid');ly=y},{passive:true})}addEventListener('resize',()=>{if(cur==='home')homeLayout()});
+{let ly=0;$('view').addEventListener('scroll',()=>{const v=$('view'),y=v.scrollTop,a=$('act');const eh=cur==='ent'&&!!a&&!!a.querySelector('[data-act="cpEnt"]');/* v60.3: در جزئیات واریزی، «کپی همه/ویرایش» با اسکرول به پایین پنهان و با اسکرول به بالا یا رسیدن به انتها پیدا می‌شود */
+  if(eh&&v.scrollHeight-y-v.clientHeight<24){a.classList.remove('hid');ly=y;return}
+  if(!a||!(cur==='banks'||cur==='split1'||cur==='custs'||eh)){if(a&&cur==='ent')a.classList.remove('hid');ly=y;return}if(y>ly+6&&y>40)a.classList.add('hid');else if(y<ly-6||y<=10)a.classList.remove('hid');ly=y},{passive:true})}addEventListener('resize',()=>{if(cur==='home')homeLayout()});
 try{sysDark.addEventListener('change',()=>paintBars())}catch(e){}
 /* ---------- لیست واحد: ارسال، تأیید گروهی، بایگانی ---------- */
 /* تخصیص قدیمی که ردیف‌هایی از تاریخ واریز دیگر هم دارد، موقع ارسال جدا می‌شود تا هر بخش در لیست خودش بماند */

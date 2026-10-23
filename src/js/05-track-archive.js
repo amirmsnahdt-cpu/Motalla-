@@ -84,21 +84,32 @@ function bindBatch(){const q=$('tq'),t=$('tlist');if(!t)return;t.innerHTML=tlist
     if(el.dataset.img!==undefined){const x=b.items[+el.dataset.img],f=el.files&&el.files[0];if(!f)return;try{const d=await shrink(f),k=newImgKey('rc:'+x.id);if(await imgPut(k,d)){x.imgs=itImgs(b,x).concat([k]);x.img=true;saveB();refreshBatch();toast('رسید «'+x.name+'» ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(z){toast('این عکس خوانده نشد',true)}}};q.oninput=()=>{tkQ=q.value;document.querySelector('#view .clr').classList.toggle('hide',!tkQ);clearTimeout(q._t);q._t=setTimeout(()=>{srchSwap('tlist',tlistHTML())},120)}}
 function refreshBatch(){const y=window.scrollY;render();const t=$('tlist');if(t)t.innerHTML=tlistHTML();window.scrollTo(0,y)}
 /* ---------- جزئیات هر واریزی: شماره پیگیری، ساعت، عکس ---------- */
-async function openItem(bid,i){const b=batches.find(z=>z.id==bid);if(!b)return;const x=b.items[+i];if(!x)return;batchId=b.id;itemIdx=+i;tmpSt=x.st;tmpImg=undefined;
-  sheet(`<div class="sh-h"><b>${esc(x.name)}</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="ihead"><b>${fmt(x.amount)} <small>تومان</small></b><span class="pill g">${esc(x.src)}</span><span class="pill">${esc(x.bank||'—')}</span></div>
-  <div class="seg st3">${['ok','fail','pending'].map(k=>`<button data-act="itSt" data-st="${k}" class="${k} ${tmpSt===k?'on':''}">${ST[k][1]} ${ST[k][0]}</button>`).join('')}</div>
-  <div class="f"><label>شماره پیگیری بانک</label><input id="itn" class="ltr" inputmode="numeric" autocomplete="off" value="${esc(x.tn||'')}" placeholder="مثلاً 140507181234"></div>
-  <div class="f"><label>ساعت واریز</label><div style="display:flex;gap:8px"><input id="itt" type="time" class="ltr" value="${esc(x.time||'')}"><button class="btn sec" style="flex:0 0 auto;padding:0 16px" data-act="itNow">الان</button></div></div>
-  <div class="f"><label>عکس رسید <i>(اختیاری)</i></label><button class="btn sec" data-act="galIt" data-id="${x.id}">${ic('cam')} ${itImgs(b,x).length?'رسیدها ('+toFa(itImgs(b,x).length)+') · دیدن و افزودن':'افزودن عکس رسید'}</button></div>
-  <div class="f"><label>یادداشت <i>(اختیاری)</i></label><input id="itno" value="${esc(x.note||'')}"></div>
-  <div class="row"><button class="btn gold" data-act="itSave">ذخیره</button></div>`);
-  $('itn').oninput=()=>{$('itn').value=toEn($('itn').value).replace(/[^\dA-Za-z\-]/g,'');if($('itn').value&&tmpSt==='pending')ACT.itSt({st:'ok'})};
+/* v60.3: پنل جزئیات واریز بانکی (از رسید) — بازطراحی: بدون دکمه‌های سه‌گانه وضعیت؛ با شماره پیگیری «انجام شد» می‌شود،
+   «انجام نشد» یک گزینه آرام پایین پنل است. شماره پیگیری دکمه پاک کردن دارد، ساعت با «الان»، عکس‌ها همین‌جا (چند عکس، دوربین) بدون بستن پنل. */
+const itStLab=(st,tn)=>st==='fail'?['f','انجام نشد']:st==='ok'||tn?['k','انجام شد']:['w','در انتظار پیگیری'];
+function itStPaint(){const t=$('itn'),p=$('itstp');if(!t||!p)return;const s=itStLab(tmpSt,t.value.trim());p.className='itst '+s[0];p.querySelector('b').textContent=s[1];const c=$('itnx');if(c)c.classList.toggle('hide',!t.value)}
+function itGalHTML(){const c=galCtx();if(!c)return '';const K=c.keys;
+  return K.map((k,i)=>`<button class="galt" data-act="galView" data-i="${i}" aria-label="دیدن عکس ${toFa(i+1)}"><span class="galim" id="gal${i}"></span><i>${toFa(i+1)}</i></button>`).join('')+(c.ed?`<label class="galt add">${ic('plus')}<span>${K.length?'عکس دیگر':'گالری'}</span><input type="file" accept="image/*"${picMulti()?' multiple':''} data-galadd="1" hidden></label>${picCam()?`<label class="galt add">${ic('cam')}<span>دوربین</span><input type="file" accept="image/*" capture="environment" data-galadd="1" hidden></label>`:''}`:'')}
+async function openItem(bid,i){const b=batches.find(z=>z.id==bid);if(!b)return;const x=b.items[+i];if(!x)return;batchId=b.id;itemIdx=+i;tmpSt=x.st==='fail'?'fail':x.st;tmpImg=undefined;GAL={k:'it',eid:x.id};
+  const s0=itStLab(x.st,x.tn);
+  sheet(`<div class="sh-h"><div><b>${esc(x.name)}</b><small class="shsub">واریز بانکی${x.src?' · '+esc(x.src):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="itf">
+  <div class="ithero"><b>${fmt(x.amount)}<i>تومان</i></b><span class="ithc">${x.bank?bankBadge(x.bank)+'<span>'+esc(x.bank)+'</span>':''}</span><span class="itst ${s0[0]}" id="itstp"><i></i><b>${s0[1]}</b></span></div>
+  <div class="itg"><label class="itr" for="itn"><span>شماره پیگیری</span><span class="itv"><input id="itn" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" value="${esc(x.tn||'')}" placeholder="مثلاً 140507181234"><button type="button" class="itx${x.tn?'':' hide'}" id="itnx" data-act="itTnClr" aria-label="پاک کردن شماره پیگیری">×</button></span></label>
+  <label class="itr" for="itt"><span>ساعت واریز</span><span class="itv"><input id="itt" type="time" class="ltr" value="${esc(x.time||'')}"><button type="button" class="itnow" data-act="itNow">الان</button></span></label></div>
+  <div class="ith">رسید <i>${itImgs(b,x).length?toFa(itImgs(b,x).length)+' عکس · برای بزرگ‌نمایی بزنید':'یک یا چند عکس'}</i></div>
+  <div class="galg itgal" id="itgal">${itGalHTML()}</div>
+  <div class="ith">یادداشت <i>اختیاری</i></div>
+  <div class="itg"><input id="itno" class="itno" value="${esc(x.note||'')}" placeholder="مثلاً واریز دو مرحله‌ای"></div>
+  <button class="xgo" data-act="itSave">${ic('check')} ذخیره</button>
+  <button class="itfail" data-act="itFail">${tmpSt==='fail'?'برگرداندن به «در انتظار»':'این واریز انجام نشد'}</button></div>`);
+  galThumbs();
+  $('itn').oninput=()=>{$('itn').value=toEn($('itn').value).replace(/[^\dA-Za-z\-]/g,'');if($('itn').value&&tmpSt!=='ok')tmpSt='ok';itStPaint()};
 }
 async function saveItem(){const b=curB();if(!b)return;const x=b.items[itemIdx];x.tn=toEn($('itn').value).trim();x.time=$('itt').value;x.note=clean($('itno').value);
-  x.st=tmpSt==='pending'&&x.tn?'ok':tmpSt;x.at=new Date().toISOString();
+  x.st=tmpSt==='fail'?'fail':x.tn||tmpSt==='ok'?'ok':'pending';x.at=new Date().toISOString();
   if(tmpImg===null){await imgDel(ikey(b,x));x.img=false}else if(typeof tmpImg==='string'){const ok=await imgPut(ikey(b,x),tmpImg);if(ok)x.img=true;else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
-  saveB();closeSheet();if(cur==='day')render();else refreshBatch();toast('ذخیره شد')}
+  saveB();GAL=null;closeSheet();if(cur==='day')render();else refreshBatch();toast(x.st==='ok'?'ذخیره شد · انجام شد ✓':x.st==='fail'?'ذخیره شد · انجام نشد':'ذخیره شد')}
 function viewImg(bid,id){const b=batches.find(z=>z.id==bid),x=b&&b.items.find(z=>z.id==id);if(!x)return;openGal({k:'it',eid:x.id})}
 /* ---------- بایگانی روزانه ---------- */
 const fullSettled=iso=>validated().filter(r=>r.entryDate===iso&&r.full);

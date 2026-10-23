@@ -83,8 +83,10 @@ const ACT={
   gClear:()=>{gQ='';const q=$('gq');if(q){q.value='';q.focus()}srchSwap('gres','');$('tcont').classList.remove('hide');document.querySelector('#view .sbox .clr').classList.add('hide')},
   openDay:d=>{dayOpen=new Set();dayIso=d.iso;go('day')},
   itOpen:d=>openItem(d.b,d.i),itSave:saveItem,
-  itSt:d=>{tmpSt=d.st;document.querySelectorAll('#sheet .st3 button').forEach(x=>x.classList.toggle('on',x.dataset.st===d.st))},
-  itNow:()=>{const n=new Date();$('itt').value=p2(n.getHours())+':'+p2(n.getMinutes())},
+  itSt:d=>{tmpSt=d.st;itStPaint()},
+  itTnClr:()=>{const t=$('itn');if(!t)return;t.value='';if(tmpSt==='ok')tmpSt='pending';itStPaint();t.focus()},
+  itFail:()=>{if(tmpSt==='fail'){tmpSt='pending'}else{tmpSt='fail';const t=$('itn');if(t)t.value=''}saveItem()},
+  itNow:()=>{const n=new Date(),t=$('itt');if(!t)return;t.value=p2(n.getHours())+':'+p2(n.getMinutes());t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')},
   itImgDel:()=>{tmpImg=null;$('itimg').innerHTML='';$('itfl').textContent='افزودن عکس رسید'},
   viewImg:d=>viewImg(d.b,d.id),
   closeBatch:()=>{const b=curB();if(!b)return;const p=b.items.filter(x=>x.st==='pending').length;

@@ -3,28 +3,30 @@ let entId=null,entEdit=false,eD=null;
 const entRow=()=>entId==null?null:validated().find(y=>String(y.id)===String(entId))||null;
 function vEnt(){const x=entRow();if(!x){setTimeout(()=>{if(cur==='ent')go('home',true)},0);return ''}if(entEdit)return vEntEdit(x);
   const st=rowSt(x),t=entSt(x),si=x.sentBid?srcInfo(x.id):null,D=dates(x.entryDate),al0=allocMap().get(x.id);
-  const kv=(l,shown,cp,act)=>`<div class="kv${cp?' kc':''}${act?' ka':''}${/ibv/.test(shown)?' col':''}"${cp?` data-cp="${esc(String(cp))}"`:''}${act?` data-act="${act}" data-id="${x.id}"`:''}><small>${l}</small><b>${shown}</b>${cp?ic('copy'):act?ic('edit'):'<span class="kvx"></span>'}</div>`;
+  const kv=(l,shown,cp,act)=>`<div class="kv${cp?' kc':''}${act?' ka':''}${/ibv/.test(shown)?' col':''}"${cp?` data-cp="${esc(String(cp))}"`:''}${act?` data-act="${act}" data-id="${x.id}"`:''}><small>${l}</small><b>${shown}</b>${act?ic('edit'):'<span class="kvx"></span>'}</div>`;
   const ibd=x.iban?x.iban.slice(2):'';
+  /* v60.3: ردیف‌ها در سه بخش جدا (حساب بانکی، مبلغ، سایر)؛ آیکن کپی برداشته شد: زدن روی هر ردیف کپی می‌کند و اعلان می‌دهد */
   const rows=[x.iban?kv('شماره شبا',`<span class="ltr ibv">IR ${ibanGroups(ibd)}</span>`,ibd):kv('شماره شبا','—'),
     x.card?kv('شماره کارت',`<span class="ltr">${grp4(x.card)}</span>`,x.card):'',
     x.acct?kv('شماره حساب',`<span class="ltr">${esc(x.acct)}</span>`,x.acct):'',
     x.holder?kv('صاحب حساب',esc(x.holder)):'',
-    kv('بانک',bankBadge(x.bankShow)+esc(x.bankShow||'نامشخص')),
-    x.settled?kv('مبلغ کل',fmt(x.total)+' <i>تومان</i>',x.total):kv('مبلغ',fmt(x.amount)+' <i>تومان</i>',x.amount),
-    x.settled?kv('مانده',`<span class="rmd">${fmt(x.amount)}</span> <i>تومان</i>`,x.amount):'',
+    kv('بانک',bankBadge(x.bankShow)+esc(x.bankShow||'نامشخص'))].join(''),
+    rows2=[x.settled?kv('کل خرید',`<s class="was">${fmt(x.total)}</s> <i>تومان</i>`,x.total):kv('مبلغ',fmt(x.amount)+' <i>تومان</i>',x.amount),
+    x.settled?kv('از مشتری',`<span class="kg">− ${fmt(x.settled)}</span> <i>تومان</i>`):'',
+    x.settled?kv('مانده بانکی',`<span class="rmd">${fmt(x.amount)}</span> <i>تومان</i>`,x.amount):'',
     x.code?kv('فاکتور',`<span class="ltr">${esc(toEn(x.code))}</span>`,toEn(x.code)):'',
     x.weight?kv('وزن',esc(toFa(x.weight))+' <i>گرم</i>'):'',
     x.weight&&ppgOf(x.total||x.amount,x.weight)?kv('هر گرم تمام‌شده',fmt(x.ppg||ppgOf(x.total||x.amount,x.weight))+' <i>تومان</i>'):'',
-    x.phone?kv('شماره تماس',`<span class="ltr">${esc(x.phone)}</span>`,x.phone):'',
+    ].join(''),rows3=[x.phone?kv('شماره تماس',`<span class="ltr">${esc(x.phone)}</span>`,x.phone):'',
     x.nid?kv('کد ملی',`<span class="ltr">${esc(x.nid)}</span>`,x.nid):'',
     kv('تاریخ واریز',x.payDate?esc(payLab(x.payDate))+(['امروز','دیروز','فردا','پس‌فردا'].includes(payLab(x.payDate))?'، '+esc(dates(x.payDate).fa):''):'تعیین نشده',null,can('edit')?'entPay':null),
     kv('لیست',esc(D.fa)),
     si?kv('منبع',esc(si.src)+(si.tn?'، پیگیری '+esc(si.tn):'')):(al0&&al0.src?kv('منبع',esc(al0.src)+' <i>(آماده ارسال)</i>'):''),
     x.createdBy?kv('ثبت‌کننده',esc(x.createdBy)):''].join('');
-  return `<div class="ehead"><div class="eav ${st}">${esc(userInit(fullName(x)||'؟'))}</div>${honTag(x.name)}<b class="enm">${esc(fullName(x)||'—')}</b>${x.iban?`<span class="eib kc" data-cp="${ibd}">IR ${ibanGroups(ibd)}</span>`:''}${x.settled?`<div class="eam">${fmt(x.total)}<small>تومان</small></div><div class="eamr"><span>مانده</span><b>${fmt(x.amount)}</b><small>تومان</small><em>${fmt(x.settled)} از مشتری</em></div>`:`<div class="eam">${fmt(x.amount)}<small>تومان</small></div>`}<span class="est ${st}">${st==='bad'?'خطادار':t?t[0]:'ثبت شده'}</span></div>
+  return `<div class="ehead"><div class="eav ${st}">${esc(userInit(fullName(x)||'؟'))}</div>${honTag(x.name)}<b class="enm">${esc(fullName(x)||'—')}</b>${x.iban?`<span class="eib kc" data-cp="${ibd}">IR ${ibanGroups(ibd)}</span>`:''}${x.settled?`<div class="eamw"><span>کل خرید</span><s>${fmt(x.total)}</s><small>تومان</small></div><div class="erem${x.full?' ok':''}"><small>${x.full?'تسویه کامل با مشتری':'مانده برای واریز بانکی'}</small><b><span class="ermv" data-v="${x.total}" data-to="${x.amount}">${fmt(x.amount)}</span><i>تومان</i></b><em>${fmt(x.settled)} تومان از مشتری${(e=>{const w=(e.settles||[]).filter(z=>z.st==='wait').length;return w?'، '+toFa(w)+' مورد در انتظار تأیید':''})(entries.find(z=>z.id===x.id)||x)}</em></div>`:`<div class="eam">${fmt(x.amount)}<small>تومان</small></div>`}<span class="est ${st}">${st==='bad'?'خطادار':t?t[0]:'ثبت شده'}</span></div>
   ${st==='bad'&&x.issues&&x.issues.length?`<div class="msg bad">${esc(x.issues.join('، '))}</div>`:''}
-  <div class="kvs">${rows}</div>${entItems(x)}${entSettle(x)}${entPieces(x)}${entTrack(x)}
-  <div class="esec"><b>یادداشت</b><textarea id="enote" rows="2" placeholder="یادداشت برای این واریزی…"${can('edit')?'':' disabled'}>${esc(eD&&eD.note!=null?eD.note:(x.note||''))}</textarea></div>${can('del')?`<button class="edel" data-act="entDel" data-id="${x.id}">${ic('trash')} حذف این واریزی</button>`:''}`}
+  <div class="kvh">حساب بانکی <i>برای کپی روی هر مورد بزنید</i></div><div class="kvs">${rows}</div><div class="kvh">مبلغ</div><div class="kvs">${rows2}</div><div class="kvh">سایر</div><div class="kvs">${rows3}</div>${entItems(x)}${entSettle(x)}${entPieces(x)}${entTrack(x)}
+  <div class="esec enote"><b>یادداشت</b><textarea id="enote" rows="2" placeholder="یادداشت برای این واریزی…"${can('edit')?'':' disabled'}>${esc(eD&&eD.note!=null?eD.note:(x.note||''))}</textarea></div>${can('del')?`<button class="edel" data-act="entDel" data-id="${x.id}">${ic('trash')} حذف این واریزی</button>`:''}`}
 /* ---- اقلام خرید در جزئیات ---- */
 function entItems(x){const I=(x.items||[]).filter(z=>z.amt);if(!I.length||(I.length===1&&I[0].k==='طلا'&&!I[0].t&&!I[0].r))return '';const tot=I.reduce((s,z)=>s+(+z.amt||0),0),gw=I.filter(z=>z.k==='طلا').reduce((s,z)=>s+(parseFloat(z.q)||0),0),ga=I.filter(z=>z.k==='طلا').reduce((s,z)=>s+(+z.amt||0),0),pg=ppgOf(ga,gw);
   const icn={'طلا':'◆','سکه':'●','دلار':'$','یورو':'€'};
@@ -76,7 +78,9 @@ function entTrack(x){const q=entBI(x);if(!q)return `<div class="esec"><b>پیگ�
 function rcOfEnt(x){const e=entries.find(z=>z.id===x.id)||x,q=entBI(x),L=[];if(q)itImgs(q.b,q.it).forEach(k=>L.push({key:k,name:fullName(x),holder:x.holder||fullName(x),amount:q.it.amount,tn:q.it.tn||'',src:q.it.src||'',date:PD(x),kind:'bank',bid:q.b.id,iid:q.it.id}));(e.settles||[]).forEach(z=>{stImgs(z).forEach(k=>L.push({key:k,name:fullName(x)+' (از '+z.name+')',holder:x.holder||fullName(x),payer:z.name,amount:z.amount,tn:z.tn||'',date:z.date,kind:'cust',sid:z.id}))});return L}
 const eDirty=()=>{if(!eD)return false;const x=entRow();if(!x)return false;const q=entBI(x);return (eD.note!=null&&eD.note.trim()!==(x.note||''))||(q&&((eD.st!=null&&eD.st!==q.it.st)||(eD.tn!=null&&eD.tn!==(q.it.tn||''))||!!eD.imgD))};
 const eUpd=()=>{const a=$('act');if(a)a.innerHTML=aEnt()};
-function bindEnt(){{const V=$('view');if(V&&!V._satt){V._satt=1;V.addEventListener('change',async ev=>{const i=ev.target&&ev.target.dataset&&ev.target.dataset.satt;if(i==null||cur!=='ent')return;const f=ev.target.files&&ev.target.files[0],e=stlE(),z=e&&(e.settles||[])[+i];if(!f||!z)return;try{const d=await shrink(f),k='stl:'+z.id;if(await imgPut(k,d)){z.img=k;stlDone(e,'رسید «'+z.name+'» ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(q){toast('این عکس خوانده نشد',true)}})}}const x=entRow();if(!x)return;if(entEdit){bindEntEdit();return}const n=$('enote');if(n)n.oninput=()=>{eD=eD||{};eD.note=n.value;eUpd()};
+function bindEnt(){/* v60.3: باز شدن صفحه: مانده از «کل خرید» تا مانده واقعی می‌شمارد (یک بار، نه با هر تازه‌سازی) */
+  {const m=document.querySelector('.ermv');if(m){if(!render._same){m.textContent=fmt(+m.dataset.v);setTimeout(()=>{if(m.isConnected)tween(m,+m.dataset.to)},260)}else m.dataset.v=m.dataset.to}}
+{const V=$('view');if(V&&!V._satt){V._satt=1;V.addEventListener('change',async ev=>{const i=ev.target&&ev.target.dataset&&ev.target.dataset.satt;if(i==null||cur!=='ent')return;const f=ev.target.files&&ev.target.files[0],e=stlE(),z=e&&(e.settles||[])[+i];if(!f||!z)return;try{const d=await shrink(f),k='stl:'+z.id;if(await imgPut(k,d)){z.img=k;stlDone(e,'رسید «'+z.name+'» ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(q){toast('این عکس خوانده نشد',true)}})}}const x=entRow();if(!x)return;if(entEdit){bindEntEdit();return}const n=$('enote');if(n)n.oninput=()=>{eD=eD||{};eD.note=n.value;eUpd()};
   const q=entBI(x);if(!q)return;const t=$('etn');if(t)t.oninput=()=>{eD=eD||{};eD.tn=toEn(t.value).replace(/\D/g,'');eUpd()};
   const f=$('eimg');if(f)f.onchange=async()=>{const fl=f.files&&f.files[0];if(!fl)return;try{const d=await shrink(fl);eD=eD||{};eD.imgD=d;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}catch(z){toast('این عکس خوانده نشد',true)}}}
 async function entCommit(){const x=entRow();if(!x||!eD)return;const e=entries.find(y=>y.id===x.id),q=entBI(x),now=new Date().toISOString();
