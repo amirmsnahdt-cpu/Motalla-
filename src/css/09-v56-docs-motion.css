@@ -591,3 +591,49 @@ button.d6tot>span{display:flex;flex-direction:column}button.d6tot>span small{fon
 .d6e.d b,.d6e.d small{color:var(--red)}.d6e.c b,.d6e.c small{color:var(--blu)}
 .d6bl>span.d b,.d6bl>span.d small{color:var(--red)!important}.d6bl>span.c b,.d6bl>span.c small{color:var(--blu)!important}
 @media (prefers-reduced-motion:reduce){.bub,.bub.out{animation:none}}
+/* v60.9: ردیف‌های سند برجسته، با حرکت */
+.d6rows{background:var(--card);border-radius:20px;box-shadow:inset 0 1px 0 #ffffff80,0 0 0 1px var(--line),0 12px 26px -18px color-mix(in srgb,var(--blu) 55%,transparent);overflow:hidden}
+.d6rows .d6r+.d6r{border-top:1px solid var(--hair)}
+.d6rb .tx b{font-size:15px;font-weight:900}.d6e b{font-size:15.5px}
+.d6n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--blu);color:#fff;font-size:11.5px;font-weight:900;box-shadow:0 4px 10px -4px var(--blu)}
+#svRows.first .d6r{animation:d6rIn .5s cubic-bezier(.2,.9,.25,1.1) both}
+#svRows.first .d6r:nth-child(2){animation-delay:.05s}#svRows.first .d6r:nth-child(3){animation-delay:.1s}#svRows.first .d6r:nth-child(4){animation-delay:.15s}#svRows.first .d6r:nth-child(n+5){animation-delay:.2s}
+@keyframes d6rIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.d6r.new{animation:d6rNew .7s cubic-bezier(.2,.9,.25,1.15)}@keyframes d6rNew{0%{opacity:0;transform:translateY(-14px) scale(.97);background:var(--gtint)}45%{opacity:1;transform:none;background:var(--gtint)}100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){#svRows.first .d6r,.d6r.new{animation:none}}
+/* کلید مالیات کنار مانده‌ها */
+.d6tax{display:flex;align-items:center;gap:10px;padding:6px 12px;margin:0 0 6px;border-radius:14px;background:var(--card);box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.d6tax>span:last-child{display:flex;align-items:baseline;gap:8px}.d6tax b{font-size:13px;font-weight:800}.d6tax small{font-size:11.5px;color:var(--mut)}.d6tax.on small{color:var(--blu);font-weight:800}
+.d6tax .tgx{flex:none}
+/* پنجره تسویه سند */
+.ckh{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 12px 12px;margin:2px 0 12px;border-radius:20px;background:var(--card);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--red) 30%,transparent),0 14px 28px -16px color-mix(in srgb,var(--red) 50%,transparent)}
+.ckh.c{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 30%,transparent),0 14px 28px -16px color-mix(in srgb,var(--blu) 55%,transparent)}
+.ckh.z{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ok) 35%,transparent),0 14px 28px -16px color-mix(in srgb,var(--ok) 55%,transparent)}
+.ckh small{font-size:12px;font-weight:800;color:var(--red)}.ckh.c small{color:var(--blu)}.ckh.z small{color:var(--ok)}
+.ckh b{font-size:30px;font-weight:900;font-feature-settings:"tnum";color:var(--red)}.ckh.c b{color:var(--blu)}.ckh.z b{color:var(--ok)}.ckh b i{font-style:normal;font-size:12px;color:var(--mut);font-weight:700;margin-inline-start:6px}
+.ckh em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--mut)}
+.ckh.pop{animation:ckpop .45s cubic-bezier(.3,1.4,.5,1)}@keyframes ckpop{0%{transform:scale(.96)}100%{transform:none}}
+.ckt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.ckti{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border:0;border-radius:18px;background:var(--card);box-shadow:0 0 0 1px var(--line),0 8px 18px -14px #16213a55;font:inherit;font-size:12.5px;font-weight:800;color:var(--ink);cursor:pointer;animation:d6rIn .4s both}
+.ckti i{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}.ckti i svg{width:20px;height:20px}
+.ckti.q-dep{grid-column:span 3;flex-direction:row;justify-content:center;gap:10px;background:color-mix(in srgb,var(--blu2) 60%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 25%,transparent)}
+.ckti.q-gx i{background:var(--goldbg);color:var(--gold)}.ckti.q-cash i{background:var(--ok2);color:var(--ok)}
+.ckti:nth-child(2){animation-delay:.04s}.ckti:nth-child(3){animation-delay:.08s}.ckti:nth-child(4){animation-delay:.12s}.ckti:nth-child(5){animation-delay:.16s}
+.ckrs{background:var(--card);border-radius:16px;box-shadow:0 0 0 1px var(--line);margin-bottom:12px;overflow:hidden}
+.ckr{display:flex;align-items:center;gap:10px;padding:8px 6px 8px 12px;animation:d6rIn .35s both}.ckr+.ckr{border-top:1px solid var(--hair)}
+.ckr .tx{flex:1;min-width:0;display:flex;flex-direction:column}.ckr .tx b{font-size:13.5px;font-weight:800}.ckr .tx small{font-size:11px;color:var(--mut)}
+.ckam{font-size:14.5px;font-weight:900;font-feature-settings:"tnum";color:var(--ok)}
+.ckfm{background:var(--card);border-radius:18px;padding:12px;box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 25%,transparent);margin-bottom:12px;display:flex;flex-direction:column;gap:10px;animation:d6rIn .3s both}
+.ckfh{display:flex;align-items:center;justify-content:space-between}.ckfh b{display:flex;align-items:center;gap:6px;font-size:14.5px;font-weight:900}.ckfh b svg{width:18px;height:18px;color:var(--blu)}
+.ckg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ckf{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:14px;background:var(--bg);cursor:text}.ckf small{font-size:11px;font-weight:700;color:var(--mut)}.ckf small i{font-style:normal;opacity:.8}
+#sheet .ckf input{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;min-height:0;font-size:18px;font-weight:900;color:var(--ink);outline:none;font-feature-settings:"tnum"}
+.ckx{font-size:12.5px;color:var(--mut);font-weight:700}.ckx b{color:var(--ink);font-weight:900}
+.ckv{flex:none;display:flex;flex-direction:column;align-items:flex-end}.ckv b{font-size:13.5px;font-weight:900;color:var(--blu);font-feature-settings:"tnum"}.ckv small{font-size:10.5px;color:var(--blu);font-weight:700}
+.stsh.ckb{color:var(--blu);background:color-mix(in srgb,var(--blu2) 70%,var(--card))}
+.ckl{border-top:1.5px solid color-mix(in srgb,var(--blu) 35%,transparent);border-radius:16px}
+.cksave{flex-direction:column;gap:0;line-height:1.3}.cksave small{display:block;font-size:11px;font-weight:700;opacity:.85}
+.ckback{display:block;margin:10px auto 0}
+.ckadd{align-self:stretch;justify-content:center}
+.ckt{grid-template-columns:repeat(4,1fr)}.ckti.q-dep{grid-column:1/-1}.ckti{font-size:11.5px;padding:10px 4px}
+.cksave{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:6px}.cksave small{flex-basis:100%;text-align:center}

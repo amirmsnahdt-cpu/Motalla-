@@ -1,0 +1,75 @@
+/* ============ v60.9: تسویه سند فروش — بعد از «ثبت سند» پنجره تسویه باز می‌شود (مثل کیمیا: تسویه هر فاکتور در همان فاکتور) ============
+   راه‌ها: حواله از مشتری (به حساب مشتری‌ای که به او بدهکاریم، یا به فروشنده یک واریزیِ ارسال‌نشده)، کارتخوان، حواله به بانک ما، نقد، تعویض طلا.
+   ساختار داده عوض نمی‌شود: همه در sv.pays (cash|pos|hav|cust) و تعویض طلا یک ردیف «خرید طلا» در sv.xr با cat:'تعویض'.
+   تنها روش تازه: m:'dep' = خریدار مستقیم به فروشنده یک واریزی پرداخت می‌کند → در همان واریزی یک «تسویه از مشتری» با byInv ثبت می‌شود
+   (بدون ثبت جداگانه در حساب خریدار؛ اثرش همین ردیف سند است). حذف سند، آن تسویه را هم برمی‌دارد. */
+let CK=null,ckGo=false;
+const CKT=[['dep','حواله از مشتری','swap'],['pos','کارتخوان','card'],['hav','حواله به بانک','bank'],['cash','دریافت نقدی','cash'],['gx','تعویض طلا','coin']];
+const ckUsedDep=id=>sv.pays.filter(p=>p.m==='dep'&&String(p.entId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
+const ckUsedCu=id=>sv.pays.filter(p=>p.m==='cust'&&String(p.cuId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
+function ckOpen(){CK={m:''};sheet(ckHTML());ckBind()}
+function ckRe(f){if(!CK||!$('sheet').querySelector('.ckw'))return;$('sheet').innerHTML=ckHTML();ckBind(f)}
+function ckRows(){const R=sv.pays.map((p,i)=>({k:'py',i,ico:(PM[p.m]||PM.cash).i,lab:pyLab(p),sub:p.tn?'پیگیری '+esc(p.tn):p.m==='dep'?'در همان واریزی، تسویه از مشتری ثبت می‌شود':'',amt:pAmt(p)}));
+  (sv.xr||[]).forEach((x,i)=>{if(x.cat==='تعویض'){const C=xrCalc(x,sv.rate);R.push({k:'xr',i,ico:'coin',lab:'تعویض طلا',sub:wFmt(C.n)+' گرم · عیار '+toFa(x.ay||750),amt:C.amount})}});return R}
+function ckList(){const q0=clean(CK.q||''),q=nzName(toEn(q0)),dOk=pDig(q0);
+  const C=CU().filter(c=>String(c.id)!==String(sv.cuId)).map(c=>[c,cuBal(c).R-ckUsedCu(c.id)]).filter(([c,r])=>r>0&&(!q||cuHit(c,q,dOk))).sort((a,b)=>b[1]-a[1]).slice(0,q?8:5);
+  const D=validated().filter(x=>!x.full&&x.amount>0&&!x.sentBid).map(x=>[x,x.amount-ckUsedDep(x.id)]).filter(([x,r])=>r>0&&(!q||nzName(fullName(x)+' '+(x.holder||'')).includes(q)||dOk([x.phone,x.iban,x.code,x.card].join(' ')))).sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0])))).slice(0,q?12:8);
+  const row=(k,id,av,cls,name,sub,v)=>`<button class="stsr" data-act="ckPick" data-k="${k}" data-id="${id}"><span class="c6a${cls}">${esc(av)}</span><span class="tx"><b>${esc(name)}</b><small>${sub}</small></span><span class="ckv"><b>${fmt(v)}</b><small>بدهکاریم</small></span></button>`;
+  if(!C.length&&!D.length)return `<div class="eh" style="padding:10px 4px">${q?'کسی پیدا نشد':'به هیچ مشتری‌ای بدهکار نیستیم و واریزیِ ارسال‌نشده‌ای نیست'}</div>`;
+  return `<div class="stsug ckl">${C.length?`<div class="stsh ckb">مشتری‌هایی که به آنها بدهکاریم</div>`+C.map(([c,r])=>row('cu',c.id,userInit(c.name),'',cuName(c),[c.grp?esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join('، ')||'حساب مشتری',r)).join(''):''}
+    ${D.length?`<div class="stsh">واریزی‌های ارسال‌نشده به بانک</div>`+D.map(([x,r])=>row('dep',x.id,userInit(fullName(x)),' m',fullName(x),['واریز '+esc(payLab(PD(x))),x.settled?'بخشی تسویه شده':'',x.bankShow?esc(x.bankShow):''].filter(Boolean).join('، '),r)).join(''):''}</div>`}
+function ckSel(){const s=CK.sel;if(!s)return '';if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return '';const r=cuBal(c).R-ckUsedCu(c.id);return `<div class="stsel"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>حساب مشتری · بدهکاریم ${fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>`}
+  const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return '';const r=x.amount-ckUsedDep(x.id);return `<div class="stsel"><span class="c6a m">${esc(userInit(fullName(x)))}</span><span class="tx"><b>${esc(fullName(x))}</b><small>واریزی ${esc(payLab(PD(x)))} · مانده ${fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>`}
+function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" autocomplete="off" enterkeyhint="done"></label>`;
+  const tn=`<label class="ckf"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
+  if(m==='cash')b=amt;
+  if(m==='pos'){const L=CH('pos');b=`<div class="chps">${L.map(c=>`<button class="chp${String(CK.chId)===String(c.id)?' on':''}" data-act="ckCh" data-id="${c.id}">${ic('card')}<span><b>${esc(c.name)}</b><small>مانده ${fmt(chBal(c))}</small></span></button>`).join('')||'<div class="eh">کارتخوانی تعریف نشده؛ از «کارتخوان» در جستجوی سند یکی بسازید.</div>'}</div><div class="ckg">${amt}${tn}</div>`}
+  if(m==='hav')b=`<div class="chps">${sources.map(s=>{const bk=acBank(s);return `<button class="chp${String(CK.srcId)===String(s.id)?' on':''}" data-act="ckSrc" data-id="${s.id}">${bk?bankBadge(bk):ic('bank')}<span><b>${esc(s.name)}</b><small>${bk?'بانک '+esc(bk):'حساب ما'}</small></span></button>`}).join('')}</div><div class="ckg">${amt}${tn}</div>`;
+  if(m==='dep')b=CK.sel?`${ckSel()}${amt}`:`<div class="fsearch sm">${ic('search')}<input id="ckQ" value="${esc(CK.q||'')}" placeholder="نام، تلفن، شبا یا فاکتور…" autocomplete="off"></div><div id="ckL">${ckList()}</div>`;
+  if(m==='gx'){const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate);
+    b=`<div class="ckg"><label class="ckf"><small>وزن طلای مشتری (گرم)</small><input id="ckW" class="ltr" inputmode="decimal" value="${esc(CK.w||'')}" placeholder="0.000" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="ckY" class="ltr" inputmode="numeric" value="${esc(String(CK.ay||x.ay))}" autocomplete="off"></label></div>
+    <div class="ckx" id="ckX">${sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'}</div>`}
+  const T=CKT.find(z=>z[0]===m);
+  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><button class="lnk" data-act="ckM" data-m="">انصراف</button></div>${b}${m==='dep'&&!CK.sel?'':`<button class="qago ckadd" data-act="ckAdd">${ic('plus')} افزودن به تسویه</button>`}</div>`}
+function ckHTML(){const T=svTot(),c=svCu(),r=T.rest,R=ckRows();
+  return `<div class="ckw"><div class="sh-h"><div><b>تسویه سند</b><small class="shsub">${esc(c?cuName(c):'')} · ${sv.dk==='buy'?'سند خرید':'سند فروش'}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="ckh ${r>0?'d':r<0?'c':'z'}"><small>${r>0?'مانده این سند · طلبکاریم':r<0?'مانده این سند · بدهکاریم':'این سند کامل تسویه شد ✓'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b><em>جمع سند ${fmt(Math.abs(T.total))}${T.paid?' · دریافت ‌شده '+fmt(T.paid):''}</em></div>
+  ${R.length?`<div class="ckrs">${R.map(z=>`<div class="ckr"><span class="d6ti pm-in">${ic(z.ico)}</span><span class="tx"><b>${esc(z.lab)}</b>${z.sub?`<small>${z.sub}</small>`:''}</span><b class="ckam">${fmt(z.amt)}</b><button class="d6x" data-act="ckDel" data-k="${z.k}" data-i="${z.i}" aria-label="حذف">${ic('x')}</button></div>`).join('')}</div>`:''}
+  ${CK.m?ckForm():`<div class="ckt">${CKT.map(([k,t,i])=>`<button class="ckti q-${k}" data-act="ckM" data-m="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div>`}
+  <button class="xgo cksave" data-act="ckSave">${ic('check')} ثبت سند${r>0?`<small>مانده ${fmt(r)} به حساب مشتری</small>`:''}</button>
+  <button class="lnk ckback" data-act="close">بازگشت به سند</button></div>`}
+function ckRead(){const g=id=>{const e=$(id);return e?e.value:undefined};if($('ckA'))CK.amount=num(g('ckA'));if($('ckT'))CK.tn=toEn(g('ckT')||'').trim();if($('ckW'))CK.w=decIn(g('ckW'));if($('ckY'))CK.ay=+toEn(g('ckY')).replace(/\D/g,'')||'';if($('ckQ'))CK.q=g('ckQ')}
+function ckBind(f){const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=$('ckY');
+  if(A){selOnFocus(A);A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''};A.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.ckAdd()}}}
+  if(Q){Q.oninput=()=>{CK.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{const L=$('ckL');if(L)L.innerHTML=ckList()},100)};const L=$('ckL');if(L)L.onpointerdown=e=>{if(e.target.closest('.stsr'))e.preventDefault()}}
+  const gx=()=>{ckRead();const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate),el=$('ckX');if(el)el.innerHTML=sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'};
+  if(W)W.oninput=gx;if(Y)Y.oninput=gx;
+  const el=f&&$(f);if(el)sheetFocus(el)}
+const ckLeft=()=>Math.max(0,svTot().rest);
+ACT.ckM=d=>{ckRead();const m=d.m||'';CK={m,amount:m==='gx'?0:ckLeft(),q:''};if(m==='pos'){const L=CH('pos'),last=ls.get('m_ch_pos','');CK.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
+  if(m==='hav'){const last=ls.get('m_src_hav','');const s=sources.find(z=>String(z.id)===String(last))||sources[0];CK.srcId=s?s.id:''}
+  ckRe(m==='dep'?'ckQ':m==='gx'?'ckW':m?'ckA':'')};
+ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
+ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;ckRe()};
+ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('ckQ');return}CK.sel={k:d.k,id:d.id};
+  const av=d.k==='cu'?(()=>{const c=CU().find(z=>String(z.id)===String(d.id));return c?cuBal(c).R-ckUsedCu(c.id):0})():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();
+  CK.amount=Math.max(0,Math.min(ckLeft()||av,av));ckRe('ckA')};
+ACT.ckAdd=()=>{ckRead();const m=CK.m,a=+CK.amount||0;
+  if(m==='gx'){const w=parseFloat(CK.w)||0;if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}if(!(w>0)){toast('وزن طلا را بزنید',true);return}const x=xrNew('buy','gold',{cat:'تعویض'});x.w=String(CK.w);x.ay=+CK.ay||x.ay;sv.xr.push(x)}
+  else{if(!(a>0)){toast('مبلغ را وارد کنید',true);const A=$('ckA');if(A)A.focus();return}
+    if(m==='cash')sv.pays.push({m:'cash',amount:a});
+    if(m==='pos'){if(!CK.chId){toast('کارتخوان را انتخاب کنید',true);return}sv.pays.push({m:'pos',amount:a,chId:CK.chId,tn:CK.tn||''});ls.set('m_ch_pos',CK.chId)}
+    if(m==='hav'){if(CK.srcId===''||CK.srcId==null){toast('حساب ما را انتخاب کنید',true);return}sv.pays.push({m:'hav',amount:a,srcId:CK.srcId,tn:CK.tn||''});ls.set('m_src_hav',CK.srcId)}
+    if(m==='dep'){const s=CK.sel;if(!s){toast('یکی از فهرست را انتخاب کنید',true);return}
+      if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return;const av=cuBal(c).R-ckUsedCu(c.id);if(a>av){toast('بیشتر از بدهی ما به «'+cuName(c)+'» است ('+fmt(av)+')',true);return}sv.pays.push({m:'cust',amount:a,cuId:c.id,cuName:cuName(c)})}
+      else{const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return;const av=x.amount-ckUsedDep(x.id);if(a>av){toast('بیشتر از مانده واریزی «'+fullName(x)+'» است ('+fmt(av)+')',true);return}sv.pays.push({m:'dep',amount:a,entId:x.id,entName:fullName(x)})}}}
+  CK={m:''};svKeep();svRe();const n0=$('ckRn'),o=n0?+n0.dataset.v:0;ckRe();const n=$('ckRn');if(n){const to=+n.dataset.v;n.dataset.v=o;n.textContent=fmt(o);tween(n,to)}const h=document.querySelector('.ckh');if(h){h.classList.remove('pop');void h.offsetWidth;h.classList.add('pop')}};
+ACT.ckDel=d=>{const L=d.k==='xr'?sv.xr:sv.pays;L.splice(+d.i,1);svKeep();svRe();ckRe()};
+ACT.ckSave=()=>{ckRead();ckGo=true;closeSheet();ACT.svSave()};
+/* ثبت تسویه‌های «حواله به فروشنده واریزی» روی همان واریزی‌ها (بعد از ساخته شدن سند) */
+function ckDepApply(c,t,now){let n=0;for(const p of t.pays||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e)continue;
+  const z={id:nid++,st:'wait',name:cuName(c),phone:c.phone||'',inv:String(t.no),amount:pAmt(p),tn:'',note:'سند فروش '+toFa(t.no),cuId:'',byInv:{cu:c.id,tx:t.id},date:t.date,at:now,by:who()};
+  e.settles=(e.settles||[]).concat([z]);e.updatedAt=now;e.updatedBy=who();p.stlId=z.id;stlSync(e);n++}if(n)saveE();return n}
+/* حذف سند → تسویه‌های ساخته‌شده روی واریزی‌ها هم برداشته می‌شوند؛ تابع برگشتی برای «بازگردانی» */
+function invDepOff(t){const R=[];if(t.type!=='inv')return ()=>{};(t.pays||[]).forEach(p=>{if(p.m!=='dep')return;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e)return;const i=(e.settles||[]).findIndex(z=>z.id===p.stlId);if(i<0)return;const z=e.settles[i];e.settles=e.settles.filter((_,k)=>k!==i);stlSync(e);R.push([e,z])});
+  if(R.length)saveE();return ()=>{R.forEach(([e,z])=>{e.settles=(e.settles||[]).concat([z]);stlSync(e)});if(R.length)saveE()}}
