@@ -459,3 +459,10 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 .x6s.un .x6sum{color:var(--red)}.x6s.fs .x6sum{color:var(--gold)}
 .x6s .x6r{padding-inline:14px}
 .x6r:not(.on) .tx b,.x6r:not(.on) .v{opacity:.55;transition:opacity .25s}
+
+/* v60.2: گزینه «پرداخت از چند منبع» بالای انتخاب منبع */
+.acrow.mvps{border-radius:16px;padding-inline:12px;background:color-mix(in srgb,var(--blu2) 70%,var(--card));box-shadow:0 0 0 1px color-mix(in srgb,var(--blu) 22%,transparent);margin-bottom:4px}
+.mvpsi{--bc:var(--blu);background:var(--blu)!important;color:#fff;display:grid;place-items:center}.mvpsi svg{width:20px;height:20px}
+.acrow.mvps b{color:var(--blu)}
+.mvor{display:flex;align-items:center;gap:10px;margin:10px 4px 8px;color:var(--mut);font-size:12px;font-weight:700}.mvor:before,.mvor:after{content:'';flex:1;height:1px;background:var(--line)}
+.psr{grid-template-columns:26px 1.35fr 1fr auto}
