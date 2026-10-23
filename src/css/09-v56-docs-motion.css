@@ -439,3 +439,23 @@ html.shopen #app{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparen
 .lkhelp{width:100%;text-align:right;font-size:12.5px;line-height:1.9;color:var(--mut);background:var(--card);border-radius:14px;padding:12px 14px;margin:4px 0 2px}
 .lkhelp b{color:var(--ink)}
 .lkhelp ol{margin:6px 0;padding-right:18px}
+
+/* v60: کادر آبی بالای لیست برجسته، مثل یک لایه جدا روی زمینه؛ فاصله کافی تا سایه‌اش روی جستجو نیفتد و جستجو زیرش به نظر نرسد */
+.ldhero{margin-bottom:16px;position:relative;z-index:1;box-shadow:inset 0 1px 0 #ffffff33,inset 0 0 0 1px #ffffff14,0 1px 2px #0b1f5c33,0 6px 12px -4px #0b1f5c40,0 18px 30px -16px #2152d98c}
+.fsearch.ldq{position:relative;z-index:2;margin:0 0 12px;box-shadow:0 1px 2px #16213a0f,0 6px 14px -10px #16213a40}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ldhero{box-shadow:inset 0 1px 0 #ffffff26,inset 0 0 0 1px #ffffff1a,0 2px 4px #0009,0 16px 30px -14px #000d}}
+:root[data-theme="dark"] .ldhero{box-shadow:inset 0 1px 0 #ffffff26,inset 0 0 0 1px #ffffff1a,0 2px 4px #0009,0 16px 30px -14px #000d}
+
+/* v60: خروجی لیست — منابع جدا از هم (inset grouped مثل iOS)، سرتیتر هر منبع چسبان با نام، تعداد و جمع انتخاب‌شده */
+.x6l{background:var(--bg);padding:8px;display:flex;flex-direction:column;gap:12px;scroll-padding-top:8px}
+.x6s{background:var(--card);border-radius:16px;box-shadow:0 0 0 1px var(--line),0 6px 16px -12px #16213a40;overflow:clip}
+.x6s>.x6g{top:-8px;padding:11px 12px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--blu2) 92%,var(--card))!important;border-radius:16px 16px 0 0;box-shadow:0 8px 14px -12px #16213a59}
+.x6s.un>.x6g{background:color-mix(in srgb,var(--red2) 92%,var(--card))!important}
+.x6s.fs>.x6g{background:color-mix(in srgb,var(--goldbg) 92%,var(--card))!important}
+.x6i{flex:none;width:30px;height:30px;border-radius:10px;background:var(--blu);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:900}
+.x6s.un .x6i{background:var(--red)}.x6s.fs .x6i{background:var(--gold)}
+.x6g b{font-size:14.5px;font-weight:900}
+.x6sum{flex:none;font-size:13px;font-weight:900;font-feature-settings:"tnum";white-space:nowrap;color:var(--blu)}.x6sum i{font-style:normal;font-size:10px;font-weight:600;color:var(--mut);margin-inline-start:3px}
+.x6s.un .x6sum{color:var(--red)}.x6s.fs .x6sum{color:var(--gold)}
+.x6s .x6r{padding-inline:14px}
+.x6r:not(.on) .tx b,.x6r:not(.on) .v{opacity:.55;transition:opacity .25s}
