@@ -11,22 +11,46 @@ function entPieces(x){const F=famOf(x),sent=F.some(r=>r.sentBid),ok=can('split')
   <div class="stll2">${F.map((r,i)=>{const s=famSrc(r,A),me=r.id===x.id,st=s&&s.sent?(s.st==='ok'?['k','تسویه شد']:s.st==='fail'?['f','ناموفق']:['w','در انتظار']):s?['d','آماده ارسال']:['n','بدون منبع'];return `<div class="stlrw ${st[0]}${me?' me':''}"><button class="stlr" data-act="openEnt" data-id="${r.id}"><span class="bri"><b>${toFa(i+1)}</b></span><span class="tx"><b>${esc(s?s.name:'بدون منبع')}</b><small>${me?'همین بخش':r.id===root?'بخش اصلی':'بخش '+toFa(i+1)}</small></span><span class="brv"><b>${fmt(r.amount)} <i>تومان</i></b><small>${st[1]}</small></span></button></div>`}).join('')}</div>
   ${ok&&!sent?`<button class="link" data-act="paySplitUndo" data-id="${x.id}">یکی کردن بخش‌ها</button>`:''}</div>`}
 let PS=null;
-function psHTML(){const R=PS.R,s=PS.L.reduce((a,l)=>a+(+l.amount||0),0),left=R-s,opts=v=>`<option value="">بدون منبع</option>`+sources.map(z=>`<option value="${z.id}"${String(z.id)===String(v)?' selected':''}>${esc(z.name)}${acBank(z)&&!z.name.includes(acBank(z))?' · '+esc(acBank(z)):''}</option>`).join('');
-  return `<div class="sh-h"><div><b>پرداخت از چند منبع</b><small class="shsub">${esc(PS.name)} · مبلغ بانکی ${fmt(R)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="psl">${PS.L.map((l,i)=>`<div class="psr"><span class="n">${toFa(i+1)}</span><select data-ps="${i}" aria-label="منبع بخش ${toFa(i+1)}">${opts(l.src)}</select><input class="ltr num" data-pa="${i}" inputmode="numeric" value="${l.amount?Number(l.amount).toLocaleString('en-US'):''}" placeholder="مبلغ" aria-label="مبلغ بخش ${toFa(i+1)}">${PS.L.length>1?`<button class="psx" data-act="psDel" data-i="${i}" aria-label="حذف بخش">×</button>`:''}</div>`).join('')}</div>
-  <button class="link" data-act="psAdd">${ic('plus')} بخش دیگر</button>
-  <div class="pss ${left?'bad':'ok'}"><span>جمع بخش‌ها <b>${fmt(s)}</b></span><span>${left>0?'مانده <b>'+fmt(left)+'</b>':left<0?'بیشتر از مبلغ: <b>'+fmt(-left)+'</b>':'برابر مبلغ ✓'}</span>${left>0?`<button class="sm sec" data-act="psFill">بقیه به بخش آخر</button>`:''}</div>
-  <div class="muted" style="font-size:12px;line-height:1.8;margin:8px 2px">هر بخش در لیست ${esc(pdHead(PS.pay))} زیر منبع خودش می‌آید و جدا کپی، ارسال و پیگیری می‌شود. نام، فاکتور و شبا برای همه بخش‌ها یکی است.</div>
-  <button class="xgo" data-act="paySplitSave"${left||PS.L.some(l=>!(+l.amount>0))?' disabled':''}>${ic('check')} ثبت ${toFa(PS.L.length)} بخش</button>`}
-function psRedraw(){const f=document.activeElement,fi=f&&f.dataset?(f.dataset.pa||null):null,pos=f&&f.selectionStart;$('sheet').innerHTML=psHTML();if(fi!=null){const n=document.querySelector(`#sheet [data-pa="${fi}"]`);if(n){n.focus();try{n.setSelectionRange(n.value.length,n.value.length)}catch(e){}}}}
-function psBind(){const sh=$('sheet');sh.oninput=e=>{const t=e.target;if(t.dataset.pa!=null){const v=num(t.value);PS.L[+t.dataset.pa].amount=v;clearTimeout(sh._t);sh._t=setTimeout(psRedraw,350)}};sh.onchange=e=>{const t=e.target;if(t.dataset.ps!=null){PS.L[+t.dataset.ps].src=t.value;psRedraw()}if(t.dataset.pa!=null)psRedraw()}}
+/* v61.5: پنجره «پرداخت از چند منبع» بازطراحی شد:
+   هر بخش یک کارت: انتخاب منبع با دکمه‌های بانک (نه فهرست کشویی) + مبلغ؛ تایپ عدد بدون ساختن دوباره پنجره (مکان نشانگر و پاک کردن درست)،
+   بخش آخر خودکار «بقیه» را می‌گیرد مگر دستی عوضش کنید؛ نوار پیشرفت و مانده زنده؛ دکمه ثبت همان لحظه فعال می‌شود. */
+const psSum=()=>PS.L.reduce((a,l)=>a+(+l.amount||0),0);
+function psSrcChips(l,i){return `<div class="pssc">${sources.map(z=>{const bk=acBank(z),on=String(z.id)===String(l.src);return `<button type="button" class="psch${on?' on':''}" data-act="psSrc" data-i="${i}" data-s="${z.id}">${bk?bankBadge(bk):`<span class="bkb" style="--bc:#64748b">${esc(userInit(z.name))}</span>`}<span>${esc(z.name)}</span></button>`}).join('')}</div>`}
+function psCard(l,i){return `<div class="psc" data-i="${i}"><div class="psch0"><span class="psn">${toFa(i+1)}</span><b>بخش ${toFa(i+1)}</b>${PS.L.length>2?`<button type="button" class="itx" data-act="psDel" data-i="${i}" aria-label="حذف بخش">×</button>`:''}</div>
+  ${psSrcChips(l,i)}
+  <label class="psa"><input class="ltr" data-pa="${i}" inputmode="numeric" value="${l.amount?Number(l.amount).toLocaleString('en-US'):''}" placeholder="مبلغ این بخش" autocomplete="off"><i>تومان</i>${PS.L.length>1?`<button type="button" class="pshalf" data-act="psHalf" data-i="${i}">نصف</button><button type="button" class="pshalf" data-act="psRest" data-i="${i}">بقیه</button>`:''}</label></div>`}
+function psHTML(){const R=PS.R;
+  return `<div class="sh-h"><div><b>پرداخت از چند منبع</b><small class="shsub">${esc(PS.name)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="psh"><small>مبلغ بانکی</small><b>${fmt(R)}<i>تومان</i></b><div class="psbar"><i id="psBar"></i></div><span id="psLeft"></span></div>
+  <div class="psl2" id="psL">${PS.L.map(psCard).join('')}</div>
+  <button type="button" class="psadd" data-act="psAdd">${ic('plus')} بخش دیگر</button>
+  <div class="muted psnote">هر بخش در لیست ${esc(pdHead(PS.pay))} زیر منبع خودش می‌آید و جدا ارسال و پیگیری می‌شود.</div>
+  <button class="xgo" id="psGo" data-act="paySplitSave">${ic('check')} ثبت تقسیم</button>`}
+/* فقط خلاصه و ورودی‌های دیگر عوض می‌شوند؛ ورودی در حال تایپ دست نمی‌خورد */
+function psPaint(skip){const R=PS.R,s=psSum(),left=R-s,bar=$('psBar'),lf=$('psLeft'),go=$('psGo');
+  if(bar){bar.style.width=Math.min(100,R?s/R*100:0)+'%';bar.className=left===0?'ok':left<0?'over':''}
+  if(lf){lf.className='psleft '+(left===0?'ok':left<0?'over':'');lf.innerHTML=left===0?`${ic('check')} برابر مبلغ بانکی`:left>0?`مانده <b>${fmt(left)}</b>`:`بیشتر از مبلغ: <b>${fmt(-left)}</b>`}
+  const ok=left===0&&PS.L.every(l=>+l.amount>0)&&PS.L.length>1;if(go){go.disabled=!ok;go.innerHTML=`${ic('check')} ثبت ${toFa(PS.L.length)} بخش`}
+  document.querySelectorAll('#sheet [data-pa]').forEach(el=>{const i=+el.dataset.pa;if(i===skip)return;const v=+PS.L[i].amount||0,t=v?v.toLocaleString('en-US'):'';if(el.value!==t){el.value=t;const c=el.closest('.psc');if(c&&!RM()&&c.animate)c.animate([{boxShadow:'0 0 0 2px var(--blu)'},{boxShadow:'0 0 0 1px var(--line)'}],{duration:500})}})}
+/* بخش آخر (اگر دستی عوض نشده) همیشه بقیه مبلغ است */
+function psAuto(changed){const L=PS.L,last=L.length-1;if(changed===last||L[last].man)return;const s=L.slice(0,last).reduce((a,l)=>a+(+l.amount||0),0);L[last].amount=Math.max(0,PS.R-s)}
+function psRedraw(){$('sheet').innerHTML=psHTML();psBind();psPaint()}
+function psBind(){const sh=$('sheet');sh.oninput=e=>{const t=e.target;if(t.dataset.pa==null)return;const i=+t.dataset.pa;
+    /* قالب‌بندی با ویرگول بدون پریدن نشانگر: تعداد رقم‌های قبل از نشانگر حفظ می‌شود */
+    const pos=t.selectionStart||0,before=toEn(t.value.slice(0,pos)).replace(/\D/g,'').length,v=num(t.value);t.value=v?v.toLocaleString('en-US'):'';
+    let p=0,d=0;while(p<t.value.length&&d<before){if(/\d/.test(t.value[p]))d++;p++}try{t.setSelectionRange(p,p)}catch(_){}
+    PS.L[i].amount=v;if(i===PS.L.length-1)PS.L[i].man=true;psAuto(i);psPaint(i)};
+  sh.onchange=null;psPaint()}
 ACT.paySplit=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;const F=famOf(x);if(F.some(r=>r.sentBid)){toast('یکی از بخش‌ها ارسال شده؛ اول از پیگیری برگردانید',true);return}
   AM=allocMap();const sid=n=>{const s=sources.find(z=>z.name===n);return s?String(s.id):''};
   const L=F.map(r=>{const a=AM.get(r.id);return{src:a&&a.src?sid(a.src):'',amount:r.amount}});if(L.length===1){const o=sources.find(z=>String(z.id)!==L[0].src);L[0].amount=0;L.push({src:o?String(o.id):'',amount:0})}
-  PS={root:famRoot(x),name:fullName(x),pay:PD(x),R:sum(F),L};sheet(psHTML());psBind()};
-ACT.psAdd=()=>{const used=new Set(PS.L.map(l=>l.src)),o=sources.find(z=>!used.has(String(z.id)));PS.L.push({src:o?String(o.id):'',amount:0});psRedraw()};
-ACT.psDel=d=>{PS.L.splice(+d.i,1);psRedraw()};
-ACT.psFill=()=>{const s=PS.L.slice(0,-1).reduce((a,l)=>a+(+l.amount||0),0);PS.L[PS.L.length-1].amount=Math.max(0,PS.R-s);psRedraw()};
+  PS={root:famRoot(x),name:fullName(x),pay:PD(x),R:sum(F),L};if(PS.L.length>1&&!PS.L.slice(1).some(l=>+l.amount))psAuto(0);sheet(psHTML());psBind()};
+ACT.psAdd=()=>{const used=new Set(PS.L.map(l=>String(l.src))),o=sources.find(z=>!used.has(String(z.id)));PS.L.forEach(l=>l.man=true);PS.L.push({src:o?String(o.id):'',amount:0});psAuto(-1);psRedraw();const c=document.querySelector('#sheet .psc:last-child');if(c){if(!RM()&&c.animate)c.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,.9,.25,1)'});const f=c.querySelector('[data-pa]');if(f)setTimeout(()=>f.focus(),60)}};
+ACT.psDel=d=>{if(PS.L.length<=2)return;PS.L.splice(+d.i,1);PS.L[PS.L.length-1].man=false;psAuto(-1);psRedraw()};
+ACT.psSrc=d=>{const l=PS.L[+d.i];if(!l)return;l.src=String(d.s);const c=document.querySelector(`#sheet .psc[data-i="${d.i}"]`);if(c)c.querySelectorAll('.psch').forEach(b=>b.classList.toggle('on',b.dataset.s===String(d.s)))};
+ACT.psHalf=d=>{const i=+d.i;PS.L[i].amount=Math.round(PS.R/2);if(i===PS.L.length-1)PS.L[i].man=true;psAuto(i);psPaint()};
+ACT.psRest=d=>{const i=+d.i,s=PS.L.reduce((a,l,k)=>k===i?a:a+(+l.amount||0),0);PS.L[i].amount=Math.max(0,PS.R-s);if(i===PS.L.length-1)PS.L[i].man=true;psAuto(i);psPaint()};
+ACT.psFill=()=>ACT.psRest({i:PS.L.length-1});
 ACT.paySplitUndo=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;askConfirm('همه بخش‌ها دوباره یک واریزی شوند؟ تخصیص بخش‌ها برداشته می‌شود.','یکی کردن',()=>{const F=famOf(x);PS={root:famRoot(x),name:fullName(x),pay:PD(x),R:sum(F),L:[{src:'',amount:sum(F)}]};psApply()})};
 ACT.paySplitSave=()=>{if(!PS)return;const s=PS.L.reduce((a,l)=>a+(+l.amount||0),0);if(s!==PS.R||PS.L.some(l=>!(+l.amount>0))){toast('جمع بخش‌ها باید برابر مبلغ بانکی باشد',true);return}psApply()};
 function psApply(){const root=entries.find(e=>e.id===PS.root);if(!root){closeSheet();return}const fam=entries.filter(e=>e.id===root.id||e.splitOf===root.id).sort((a,b)=>a.id===root.id?-1:b.id===root.id?1:a.id-b.id);
