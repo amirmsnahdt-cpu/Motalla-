@@ -1175,3 +1175,19 @@ button.sssbtn svg{width:17px;height:17px}
 .svdet.dt .dtl.sum em{font-style:normal;font-size:10px;font-weight:900;padding:1px 7px;border-radius:7px;color:#fff;background:var(--mut)}
 .svdet.dt .dtl.sum.d b{color:var(--red)}.svdet.dt .dtl.sum.d em{background:var(--red)}.svdet.dt .dtl.sum.c b{color:var(--blu)}.svdet.dt .dtl.sum.c em{background:var(--blu)}.svdet.dt .dtl.sum.z b{color:var(--ok)}.svdet.dt .dtl.sum.z em{background:var(--ok)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .svdet.dt .dtl.sum em{color:#0a1222}}:root[data-theme="dark"] .svdet.dt .dtl.sum em{color:#0a1222}
+/* v61.46: فشرده‌تر (صاحب اپ: «خیلی بزرگ و جادار نباشد») */
+#act .ft2{gap:6px 8px;padding:8px 10px 9px;border-radius:18px}
+#act .ft2 .ftr{gap:5px}
+#act .ft2 .ftc{padding:4px 9px 5px;border-radius:11px}
+#act .ft2 .ftc small{display:flex;align-items:center;gap:5px;font-size:10px}
+#act .ft2 .ftc small i{font-style:normal;font-size:9px;font-weight:800;opacity:.8;margin-inline-start:auto}
+#act .ft2 .ftc .ftn{font-size:min(14px,10.5cqi)}
+#act .ft2 .ftl small{font-size:10.5px}#act .ft2 .ftl em{font-size:9.5px;padding:0 7px}
+#act .ft2 .ftb .ftn{font-size:min(21px,11cqi)}
+#act .ft2 .ftgo{height:34px;padding:0 8px 0 12px;border-radius:17px;font-size:14px}
+#act .ft2 .ftx{padding:3px 9px}
+.svdet.dt{gap:10px}.svdet.dt .dtc{padding:0 12px;border-radius:14px}
+.svdet.dt .dtr{padding:7px 0}.svdet.dt .dtn b{font-size:13px}.svdet.dt .dtn small{font-size:10.5px}.svdet.dt .dtv{font-size:14px}
+.svdet.dt .dts{margin-top:3px}.svdet.dt .dts .dtl{padding:0;font-size:11px}.svdet.dt .dts .dtl b{font-size:11.5px}
+.svdet.dt .dtl{padding:6px 0;font-size:12.5px}.svdet.dt .dtl.sum b{font-size:15px}
+.svdet.dt .dtt{margin:0 4px 4px;font-size:11px}
