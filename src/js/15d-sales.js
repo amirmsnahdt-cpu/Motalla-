@@ -288,11 +288,26 @@ function pyNew(m,o){const p={m,dir:'in',amount:0,q:'',tn:'',...(o||{})};if(m==='
 /* v61.29: تخفیف = یک ردیف دریافت/پرداخت (m:'off') که فقط مانده مبلغ را صفر می‌کند (هیچ حساب بانک، کارتخوان یا نقدی را جابه‌جا نمی‌کند).
    طلبکاریم (مشتری بدهکار) → «دریافت تخفیف»؛ بدهکاریم → «پرداخت تخفیف». مانده همان خانه «مبلغ» پایین سند است (حساب مشتری یا این سند). */
 const svRBal=skip=>{const L=svBalL(),r=L.find(z=>z[0]==='r');if(!r)return 0;const v=svCu()?r[3]:r[2];return v-(skip!=null&&sv.pays[skip]?pAmt(sv.pays[skip]):0)};
-const offLeft=p=>{const b=svRBal(p.i);return p.dir==='out'?Math.max(0,b):Math.max(0,-b)};
-function svOffApply(){const v=svRBal();if(!v){toast('مانده مبلغ صفر است');return}const i=sv.pays.findIndex(p=>p.m==='off'),old=i>=0?{...sv.pays[i]}:null,na=(old?pAmt(old):0)-v;
-  if(i>=0){if(na)sv.pays[i].amount=na;else sv.pays.splice(i,1)}else sv.pays.push({m:'off',amount:na});svKeep();svRe();
-  toast((v<0?'دریافت تخفیف ':'پرداخت تخفیف ')+fmt(Math.abs(v))+' تومان · مانده صفر شد','','بازگردانی',()=>{const j=sv.pays.findIndex(p=>p.m==='off');if(old){if(j>=0)sv.pays[j]=old;else sv.pays.push(old)}else if(j>=0)sv.pays.splice(j,1);svKeep();svRe()})}
-ACT.svOff=()=>{const v=svRBal();if(!v){toast('مانده مبلغ صفر است');return}askConfirm(`مانده ${fmt(Math.abs(v))} تومان با «${v<0?'دریافت تخفیف':'پرداخت تخفیف'}» صفر شود؟`,v<0?'دریافت تخفیف':'پرداخت تخفیف',svOffApply)};
+/* v61.36: پیش‌فرض تخفیف = ۶ رقم آخر مانده (اگر مانده کمتر از یک میلیون است، کل آن)؛ پنجره تخفیف کادر مبلغ قابل ویرایش دارد */
+const off6=b=>{b=Math.abs(Math.round(b||0));return b%1000000||Math.min(b,1000000)};
+const offLeft=p=>{const b=svRBal(p.i),v=p.dir==='out'?Math.max(0,b):Math.max(0,-b);return v?off6(v):0};
+/* a = مبلغ تخفیف (مثبت)؛ جهتش از علامت مانده: طلبکاریم → دریافت، بدهکاریم → پرداخت */
+function svOffApply(a){const v=svRBal();if(!v){toast('مانده مبلغ صفر است');return}a=Math.round(+a||0);if(!(a>0)){toast('مبلغ تخفیف را بزنید',true);return}if(a>Math.abs(v)){toast('تخفیف بیشتر از مانده است',true);return}
+  const sg=v<0?1:-1,i=sv.pays.findIndex(p=>p.m==='off'),old=i>=0?{...sv.pays[i]}:null,na=(old?pAmt(old):0)+sg*a;
+  if(i>=0){if(na)sv.pays[i].amount=na;else sv.pays.splice(i,1)}else sv.pays.push({m:'off',amount:na});svKeep();closeSheet();svRe();const r=Math.abs(v)-a;
+  toast((v<0?'دریافت تخفیف ':'پرداخت تخفیف ')+fmt(a)+(r?' · مانده '+fmt(r):' · مانده صفر شد'),'','بازگردانی',()=>{const j=sv.pays.findIndex(p=>p.m==='off');if(old){if(j>=0)sv.pays[j]=old;else sv.pays.push(old)}else if(j>=0)sv.pays.splice(j,1);svKeep();svRe()})}
+let OFF=null;
+function offHTML(){const v=svRBal(),A=Math.abs(v),d6=off6(A),a=+OFF.a||0,r=A-a,dir=v<0?'دریافت تخفیف':'پرداخت تخفیف',cl=v<0?'d':'c';
+  return `<div class="sh-h"><div><b>${dir}</b><small class="shsub">مانده ${fmt(A)} تومان · ${ourLab(v)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="offq"><button type="button" class="offc${a===d6?' on':''}" data-act="offPick" data-v="${d6}"><small>۶ رقم آخر</small><b>${fmt(d6)}</b></button>${A!==d6?`<button type="button" class="offc${a===A?' on':''}" data-act="offPick" data-v="${A}"><small>کل مانده</small><b>${fmt(A)}</b></button>`:''}</div>
+  <label class="offf ${cl}"><small>مبلغ تخفیف (تومان)</small><input id="offA" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" value="${a?a.toLocaleString('en-US'):''}"></label>
+  <div class="offr" id="offR">${offRes(A,a)}</div>
+  <button class="xgo ${cl==='d'?'offgo d':'offgo c'}" data-act="offOk">${ic('tag')} ثبت ${dir}</button>`}
+const offRes=(A,a)=>a>A?'<span class="er">بیشتر از مانده است</span>':`مانده بعد از تخفیف: <b>${fmt(A-a)}</b> تومان${A-a?'':' ✓'}`;
+ACT.svOff=()=>{const v=svRBal();if(!v){toast('مانده مبلغ صفر است');return}OFF={a:off6(v)};sheet(offHTML());offBind()};
+function offBind(){const I=$('offA');if(!I)return;selOnFocus(I);I.oninput=()=>{const n=num(I.value);I.value=n?n.toLocaleString('en-US'):'';OFF.a=n;const R=$('offR');if(R)R.innerHTML=offRes(Math.abs(svRBal()),n);document.querySelectorAll('.offc').forEach(b=>b.classList.toggle('on',+b.dataset.v===n))};I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.offOk()}}}
+ACT.offPick=d=>{OFF.a=+d.v;const I=$('offA');if(I){I.value=OFF.a.toLocaleString('en-US');I.oninput()}};
+ACT.offOk=()=>{const I=$('offA');if(I)OFF.a=num(I.value);svOffApply(OFF.a)};
 /* حساب پیش‌فرض: آخرین کارتخوان یا حساب استفاده‌شده */
 function pyAcc(p){if(p.m==='pos'&&!p.chId){const L=CH('pos'),last=ls.get('m_ch_pos','');p.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
   if(p.m==='hav'&&p.srcId==null&&!p.chId){const last=ls.get('m_src_hav','');const s=sources.find(z=>String(z.id)===String(last))||sources[0];if(s)p.srcId=s.id;else{const B=CH('bank');if(B[0])p.chId=B[0].id}}}
@@ -396,11 +411,18 @@ function svRe0(){const o=$('svTotN'),old=o?+o.dataset.v||0:0;const set=(id,h)=>{
    دریافت‌ها و پرداخت‌ها، مانده این سند، و برای هر جنس قبلی / این سند / نهایی. زدن کوتاه همان تسویه است. */
 function svDetHTML(){const c=svCu(),L=svBalL(),cc=v=>v<0?'d':v>0?'c':'z',vv=(k,v)=>v?balVU(k,v):'۰ <i>'+balU(k)+'</i>',tg=v=>v?ourLab(v):'',T=svTot();
   return `<div class="sh-h"><div><b>جزئیات سند${sv.edit?' '+toFa(sv.edit.no):''}</b><small class="shsub">${esc(c?cuName(c):'بدون مشتری')}${sv.rate?' · مظنه '+fmt(sv.mz||Math.round(sv.rate*MZK)):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="svdet bpo">${L.map(([k,p,d,f])=>{const d0=svBpDet(k),det=/ردیفی از این جنس/.test(d0)?'':d0;return `<div class="blk ${k==='r'?'kr':k==='g'?'kg':'kx'} on"><div class="blh"><span class="blic">${ic(k==='r'?'cash':k==='g'?'coin':XA[k]&&XA[k].k==='f'?'usd':'coin')}</span><b>${k==='r'?'مبلغ':k==='g'?'طلا':balNm(k)} <small>${k==='r'?'تومان':k==='g'?'گرم ۱۸':esc(balU(k))}</small></b></div>
+  <div class="svdet bpo">${svRowDet()}${L.map(([k,p,d,f])=>{const d0=svBpDet(k),det=/ردیفی از این جنس/.test(d0)?'':d0;return `<div class="blk ${k==='r'?'kr':k==='g'?'kg':'kx'} on"><div class="blh"><span class="blic">${ic(k==='r'?'cash':k==='g'?'coin':XA[k]&&XA[k].k==='f'?'usd':'coin')}</span><b>${k==='r'?'مبلغ':k==='g'?'طلا':balNm(k)} <small>${k==='r'?'تومان':k==='g'?'گرم ۱۸':esc(balU(k))}</small></b></div>
     ${det?`<div class="bld">${det}</div>`:''}
     ${c?lgLine('مانده قبلی',vv(k,p),tg(p),cc(p)):''}${lgLine('این سند',vv(k,d),tg(d),cc(d)+(c?'':' fin'))}${c?lgLine('مانده نهایی',vv(k,f),tg(f),'fin '+cc(f)):''}</div>`}).join('')}
   ${T.rest||svRBal()?'':'<div class="svdok">'+ic('check')+' سند تسویه است</div>'}</div>
   <button class="xgo" data-act="svDetGo">${ic('check')} تسویه</button>`}
+/* ریز هر ردیف: بهای کالا، اجرت، سود، مالیات و مبلغ کل؛ طلا/سکه/ارز: مقدار × نرخ */
+function svRowDet(){const R=[],ln=(l,v,c)=>`<div class="rdl${c?' '+c:''}"><span>${l}</span><b>${v}</b></div>`;
+  sv.items.forEach(it=>{const c=itCalc(it,sv.rate,sv.tax),J=ajPT(it);R.push(`<div class="rdc"><div class="rdh"><b>${esc(it.k)}</b><small>${wFmt(it.w)} گرم · عیار ${toFa(it.ay||750)}${+it.mz?' · مظنه '+fmt(it.mz):''}</small></div>
+    ${ln('بهای کالا (طلا)',fmt(c.gold))}${it.ab?'':ln('اجرت'+(J.P?' ('+toFa(J.P)+'٪)':'')+(J.T?' + '+fmt(J.T):''),fmt(c.aj))}${ln('سود ('+toFa(String(+it.pp||0))+'٪)',fmt(c.pr))}${c.tax?ln('مالیات',fmt(c.tax)):''}${ln('مبلغ کل'+(c.fx?' · مبلغ دستی':''),fmt(c.tot),'t')}</div>`)});
+  (sv.xr||[]).forEach(x=>{const C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy',u=g?'گرم':(XA[x.a]||{}).u||'';if(!m&&!C.n)return;
+    R.push(`<div class="rdc"><div class="rdh"><b>${esc(xrLab(x))}</b><small>${g?wFmt(C.n)+' گرم · عیار '+toFa(x.ay||750):qFmt(C.n)+' '+esc(u)}</small></div>${m?ln(g?'هر گرم':'نرخ هر '+esc(u||'واحد'),fmt(C.pg))+ln((x.t==='buy'?'مبلغ خرید':'مبلغ کل')+(C.fx?' · مبلغ دستی':''),fmt(C.amount),'t'):ln(x.t==='in'?'دریافت جنس':'تحویل جنس',g?wFmt(C.q)+' گرم ۷۵۰':qFmt(C.n)+' '+esc(u))}</div>`)});
+  return R.length?`<div class="rdw"><div class="rdt">ردیف‌های سند</div>${R.join('')}</div>`:''}
 ACT.svDetGo=()=>{closeSheet();setTimeout(()=>ACT.svSave(),60)};
 (()=>{let tm=0,x0=0,y0=0,btn=null;const cancel=()=>{clearTimeout(tm);tm=0};
   document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#act .svgo');if(!b||cur!=='sell'||!sv)return;b._lp=0;btn=b;x0=e.clientX;y0=e.clientY;cancel();
