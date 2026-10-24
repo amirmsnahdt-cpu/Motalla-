@@ -292,20 +292,23 @@ const svRBal=skip=>{const L=svBalL(),r=L.find(z=>z[0]==='r');if(!r)return 0;cons
 const off6=b=>{b=Math.abs(Math.round(b||0));return b%1000000||Math.min(b,1000000)};
 const offLeft=p=>{const b=svRBal(p.i),v=p.dir==='out'?Math.max(0,b):Math.max(0,-b);return v?off6(v):0};
 /* a = مبلغ تخفیف (مثبت)؛ جهتش از علامت مانده: طلبکاریم → دریافت، بدهکاریم → پرداخت */
-function svOffApply(a){const v=svRBal();if(!v){toast('مانده مبلغ صفر است');return}a=Math.round(+a||0);if(!(a>0)){toast('مبلغ تخفیف را بزنید',true);return}if(a>Math.abs(v)){toast('تخفیف بیشتر از مانده است',true);return}
+function svOffApply(a){const v=offBal();if(!v){toast('مانده مبلغ صفر است');return}a=Math.round(+a||0);if(!(a>0)){toast('مبلغ تخفیف را بزنید',true);return}if(a>Math.abs(v)){toast('تخفیف بیشتر از مانده است',true);return}
   const sg=v<0?1:-1,i=sv.pays.findIndex(p=>p.m==='off'),old=i>=0?{...sv.pays[i]}:null,na=(old?pAmt(old):0)+sg*a;
   if(i>=0){if(na)sv.pays[i].amount=na;else sv.pays.splice(i,1)}else sv.pays.push({m:'off',amount:na});svKeep();closeSheet();svRe();const r=Math.abs(v)-a;
   toast((v<0?'دریافت تخفیف ':'پرداخت تخفیف ')+fmt(a)+(r?' · مانده '+fmt(r):' · مانده صفر شد'),'','بازگردانی',()=>{const j=sv.pays.findIndex(p=>p.m==='off');if(old){if(j>=0)sv.pays[j]=old;else sv.pays.push(old)}else if(j>=0)sv.pays.splice(j,1);svKeep();svRe()})}
 let OFF=null;
-function offHTML(){const v=svRBal(),A=Math.abs(v),d6=off6(A),a=+OFF.a||0,r=A-a,dir=v<0?'دریافت تخفیف':'پرداخت تخفیف',cl=v<0?'d':'c';
-  return `<div class="sh-h"><div><b>${dir}</b><small class="shsub">مانده ${fmt(A)} تومان · ${ourLab(v)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+/* مانده هدف تخفیف: از پنجره تسویه = مانده همین سند؛ از خانه مبلغ پایین سند = مانده حساب (منفی = طلبکاریم) */
+const offBal=()=>OFF&&OFF.doc?-svTot().rest:svRBal();
+function offHTML(){const v=offBal(),A=Math.abs(v),d6=off6(A),a=+OFF.a||0,r=A-a,dir=v<0?'دریافت تخفیف':'پرداخت تخفیف',cl=v<0?'d':'c';
+  return `<div class="sh-h"><div><b>${dir}</b><small class="shsub">${OFF.doc?'مانده این سند':'مانده حساب'} ${fmt(A)} تومان · ${ourLab(v)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="offq"><button type="button" class="offc${a===d6?' on':''}" data-act="offPick" data-v="${d6}"><small>۶ رقم آخر</small><b>${fmt(d6)}</b></button>${A!==d6?`<button type="button" class="offc${a===A?' on':''}" data-act="offPick" data-v="${A}"><small>کل مانده</small><b>${fmt(A)}</b></button>`:''}</div>
   <label class="offf ${cl}"><small>مبلغ تخفیف (تومان)</small><input id="offA" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" value="${a?a.toLocaleString('en-US'):''}"></label>
   <div class="offr" id="offR">${offRes(A,a)}</div>
   <button class="xgo ${cl==='d'?'offgo d':'offgo c'}" data-act="offOk">${ic('tag')} ثبت ${dir}</button>`}
 const offRes=(A,a)=>a>A?'<span class="er">بیشتر از مانده است</span>':`مانده بعد از تخفیف: <b>${fmt(A-a)}</b> تومان${A-a?'':' ✓'}`;
-ACT.svOff=()=>{const v=svRBal();if(!v){toast('مانده مبلغ صفر است');return}OFF={a:off6(v)};sheet(offHTML());offBind()};
-function offBind(){const I=$('offA');if(!I)return;selOnFocus(I);I.oninput=()=>{const n=num(I.value);I.value=n?n.toLocaleString('en-US'):'';OFF.a=n;const R=$('offR');if(R)R.innerHTML=offRes(Math.abs(svRBal()),n);document.querySelectorAll('.offc').forEach(b=>b.classList.toggle('on',+b.dataset.v===n))};I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.offOk()}}}
+function svOffOpen(doc){OFF={doc:!!doc};const v=offBal();if(!v){toast(doc?'مانده این سند صفر است':'مانده مبلغ صفر است');OFF=null;return}OFF.a=off6(v);sheet(offHTML());offBind()}
+ACT.svOff=()=>svOffOpen(false);
+function offBind(){const I=$('offA');if(!I)return;selOnFocus(I);I.oninput=()=>{const n=num(I.value);I.value=n?n.toLocaleString('en-US'):'';OFF.a=n;const R=$('offR');if(R)R.innerHTML=offRes(Math.abs(offBal()),n);document.querySelectorAll('.offc').forEach(b=>b.classList.toggle('on',+b.dataset.v===n))};I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.offOk()}}}
 ACT.offPick=d=>{OFF.a=+d.v;const I=$('offA');if(I){I.value=OFF.a.toLocaleString('en-US');I.oninput()}};
 ACT.offOk=()=>{const I=$('offA');if(I)OFF.a=num(I.value);svOffApply(OFF.a)};
 /* حساب پیش‌فرض: آخرین کارتخوان یا حساب استفاده‌شده */

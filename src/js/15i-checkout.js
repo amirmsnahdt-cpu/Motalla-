@@ -5,8 +5,8 @@
    (بدون ثبت جداگانه در حساب خریدار؛ اثرش همین ردیف سند است). حذف سند، آن تسویه را هم برمی‌دارد. */
 let CK=null;
 const ckOut=()=>svTot().rest<0;
-const CKO=[['cust','حواله به مشتری','swap'],['hav','حواله از حساب ما','bank'],['cash','پرداخت نقدی','cash']];
-const CKT=[['dep','حواله از مشتری','swap'],['pos','کارتخوان','card'],['hav','حواله به بانک','bank'],['cash','دریافت نقدی','cash'],['gx','تعویض طلا','coin']];
+const CKO=[['cust','حواله به مشتری','swap'],['hav','حواله از حساب ما','bank'],['cash','پرداخت نقدی','cash'],['off','پرداخت تخفیف','tag']];
+const CKT=[['dep','حواله از مشتری','swap'],['pos','کارتخوان','card'],['hav','حواله به بانک','bank'],['cash','دریافت نقدی','cash'],['gx','تعویض طلا','coin'],['off','دریافت تخفیف','tag']];
 const ckUsedDep=id=>sv.pays.filter(p=>p.m==='dep'&&String(p.entId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
 const ckUsedCu=id=>sv.pays.filter(p=>p.m==='cust'&&String(p.cuId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
 function ckOpen(){CK={m:''};sheet(ckHTML());ckBind()}
@@ -56,7 +56,7 @@ function ckBind(f){const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=$('ckY');const PS=$(
   if(W)W.oninput=gx;if(Y)Y.oninput=gx;
   const el=f&&$(f);if(el)sheetFocus(el)}
 const ckLeft=()=>Math.abs(svTot().rest);
-ACT.ckM=d=>{ckRead();const m=d.m||'';CK={m,amount:m==='gx'?0:ckLeft(),q:''};if(m==='pos'){const L=CH('pos'),last=ls.get('m_ch_pos','');CK.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
+ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.39: تخفیف از پنجره تسویه — روی مانده همین سند */if(m==='off'){svOffOpen(true);return}CK={m,amount:m==='gx'?0:ckLeft(),q:''};if(m==='pos'){const L=CH('pos'),last=ls.get('m_ch_pos','');CK.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
   if(m==='hav'){const last=ls.get('m_src_hav','');const s=sources.find(z=>String(z.id)===String(last))||sources[0];CK.srcId=s?s.id:''}
   ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
