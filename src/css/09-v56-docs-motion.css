@@ -818,3 +818,27 @@ button.d6tot>span{display:flex;flex-direction:column}button.d6tot>span small{fon
 .ispin.spin .pspin{opacity:1;animation:pspin .7s linear infinite}
 /* v61.10: مظنه ردیف مثل نرخ بالای سند: دیگری (مظنه / هر گرم) کوچک زیرش */
 .stl b .stx{display:block;font-style:normal;font-size:11px;font-weight:700;color:var(--blu);margin-top:1px}
+/* v61.11: کادر مبلغ ردیف مثل پنجره تسویه — قرمز: طلبکار می‌شویم، آبی: بدهکار می‌شویم؛ مشخصات یک خط کوچک */
+.stlv{display:block}
+.stam{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 12px 11px;border-radius:18px;background:var(--card);text-align:center;box-shadow:0 0 0 1.5px var(--line)}
+.stam.d{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--red) 32%,transparent);background:color-mix(in srgb,var(--red) 5%,var(--card))}
+.stam.c{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 32%,transparent);background:color-mix(in srgb,var(--blu) 5%,var(--card))}
+.stam small{font-size:11.5px;font-weight:800;color:var(--mut)}.stam.d small,.stam.d>b{color:var(--red)}.stam.c small,.stam.c>b{color:var(--blu)}
+.stam>b{font-size:26px;font-weight:900;font-feature-settings:"tnum";line-height:1.25;white-space:nowrap}.stam>b i{font-style:normal;font-size:12px;color:var(--mut);font-weight:700;margin-inline-start:6px}
+.stam em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--mut);line-height:1.7}
+.stam em b{font-weight:800}.stam em b.own{color:var(--gold)}.stam em b.calc{color:var(--ok)}
+/* v61.11: دکمه‌های ردیف: ذخیره پررنگ و پهن، حذف کوچک کنارش */
+.stft{display:flex;align-items:stretch;gap:8px;margin-top:10px}
+.stdone{flex:1;margin:0;justify-content:center;height:46px;padding:0 16px;border-radius:14px;background:var(--blu);color:#fff;font-size:14.5px;font-weight:800;box-shadow:0 8px 18px -10px color-mix(in srgb,var(--blu) 70%,transparent)}.stdone svg{width:17px;height:17px}
+.stdel{flex:0 0 auto;justify-content:center;height:46px;padding:0 14px;border-radius:14px;background:var(--card);color:var(--red);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 28%,transparent);font-size:13.5px;font-weight:800}.stdel svg{width:17px;height:17px}
+.stft .stdel:only-child{flex:1}
+/* v61.11: «این سند» در نوار مانده پایین: در کادر، پررنگ، قرمز (طلبکاریم) / آبی (بدهکاریم)؛ زدن = جزئیات سند، با شمارنده و تپش */
+.d6b3 .bc.dv{border-radius:10px;padding:3px 8px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line)}
+.d6b3 .bc.dv.d{background:color-mix(in srgb,var(--red) 7%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 38%,transparent)}
+.d6b3 .bc.dv.c{background:color-mix(in srgb,var(--blu) 7%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 38%,transparent)}
+.d6b3 .bc.dv b{font-size:13.5px;font-weight:900;display:inline-block;transform-origin:center}.d6b3 .bc.dv.d small{color:var(--red)}.d6b3 .bc.dv.c small{color:var(--blu)}
+button.bc.dv{border:0;font:inherit;color:inherit;text-align:right;cursor:pointer;margin:3px 0}
+.bc.dv.bump b{animation:d6bump .5s var(--spring)}
+.bubr.t.d b{color:var(--red)}.bubr.t.c b{color:var(--blu)}
+.d6b3{grid-template-columns:30px minmax(0,.85fr) minmax(0,1.3fr) minmax(0,1.1fr)}
+.d6b3 .bc.dv b{font-size:13px;overflow:visible;text-overflow:clip}

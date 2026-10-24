@@ -12,13 +12,10 @@ const stMzV=(o,k)=>{const m=+o.mz;return k==='g'?(m?rOfMz(m):+sv.rate||0):(m||sv
 const stMz=o=>{const k=stMzK(o);return stS('mz',k==='g'?'هر گرم ۱۸':'مظنه','تومان','num',()=>stMzV(o,stMzK(o))||'',v=>{v=+v||0;
   const k=v?rtDetect(v,+sv.rate||+ls.get('m_rate',0)||0):stMzK(o);o.mzk=k;const m=v?(k==='mz'?v:mzOf(v)):0,h=+sv.mz||mzOf(sv.rate);
   o.mz=!m||(k==='mz'?m===h:v===+sv.rate||m===h)?'':m},{mz:1})};
-/* خانه مظنه زیر نوار: به همان شکلی که زده شده + دیگری کوچک زیرش */
-const stMzCell=(o,cell)=>{const k=stMzK(o),v=stMzV(o,k),w=stMzV(o,k==='g'?'mz':'g');
-  return cell(k==='g'?'هر گرم ۱۸':'مظنه',v?fmt(v)+(w?`<em class="stx">${k==='g'?'مظنه':'هر گرم'} ${fmt(w)}</em>`:''):'',+o.mz?'own':'')};
 function stSteps(){const a=sv.qa,K=stKind();
   if(K==='it')return [stS('w','وزن','گرم','dec',()=>a.w,v=>a.w=v),stS('ay','عیار','','int',()=>a.ay||750,v=>a.ay=v),stMz(a),stS('ajP','اجرت','٪','dec',()=>a.ajP,v=>a.ajP=v,{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,v=>a.ajT=v,{opt:1}),stS('pp','سود','٪','dec',()=>a.pp,v=>a.pp=v,{opt:1})];
-  if(K==='ab')return [stS('w','وزن آبشده','گرم','dec',()=>a.w,v=>a.w=v),stS('ay','عیار','','int',()=>a.ay||750,v=>a.ay=v),stMz(a),stS('pp','سود','٪','dec',()=>a.pp,v=>a.pp=v,{opt:1}),stS('lab','آزمایشگاه','','text',()=>a.lab,v=>a.lab=v,{opt:1}),stS('ang','شماره انگ','','text',()=>a.ang,v=>a.ang=v,{opt:1})];
-  if(K==='xr'){const x=a.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ab=x.cat==='آبشده'?[stS('lab','آزمایشگاه','','text',()=>x.lab,v=>x.lab=v,{opt:1}),stS('ang','شماره انگ','','text',()=>x.ang,v=>x.ang=v,{opt:1})]:[];
+  if(K==='ab')return [stS('w','وزن آبشده','گرم','dec',()=>a.w,v=>a.w=v),stS('ay','عیار','','int',()=>a.ay||750,v=>a.ay=v),stMz(a),stS('pp','سود','٪','dec',()=>a.pp,v=>a.pp=v,{opt:1}),stS('lab','آزمایشگاه','','text',()=>a.lab,v=>a.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>a.ang,v=>a.ang=v,{opt:1})];
+  if(K==='xr'){const x=a.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ab=x.cat==='آبشده'?[stS('lab','آزمایشگاه','','text',()=>x.lab,v=>x.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>x.ang,v=>x.ang=v,{opt:1})]:[];
     /* خرید/فروش طلا (پولی و غیرپولی): مظنه، بعد «وزن یا مبلغ» (عدد ≥ ۱۰۰۰ = مبلغ تومان؛ وزن از مظنه حساب می‌شود)، بعد عیار */
     if(g&&m)return [stMz(x),stS('w','وزن یا مبلغ','','wam',()=>+x.am?x.am:x.w,v=>{if(v&&v.am){x.am=v.am;x.w=''}else{x.am='';x.w=v}}),stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=v),...ab];
     if(g)return [stS('w','وزن','گرم','dec',()=>x.w,v=>x.w=v),stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=v),...ab];
@@ -37,16 +34,23 @@ function stHead(D,it,canBack){return `<div class="sthd k-${D[0]}"><button type="
 const stTag=()=>{const a=sv.qa,K=stKind(),d=a.d||(a.x&&a.x.fd)||(a.p&&a.p.dir)||(a.x?(a.x.cat==='تعویض'?'swap':a.x.cat==='مرجوعی'?'ret':a.x.t):'sell');
   const D=DK.find(z=>z[0]===d)||DK[0];let it='';if(K==='it')it=a.k;else if(K==='ab')it='آبشده';else if(K==='xr'){const x=a.x;it=x.cat==='تعویض'?'طلای کهنه':x.cat==='مرجوعی'?'طلای برگشتی':x.a==='gold'?(x.pul?'پولی':x.cat||'طلا'):((XA[x.a]||{}).t||x.a)}else if(K==='py')it=dkST(d==='out'?'out':'in',a.p.m)||(PM[a.p.m]||{}).t||'';
   return {D,it}};
-/* زیر نوار: وزن، مظنه و مبلغ زنده */
-function stLive(){const a=sv.qa,K=stKind(),cell=(l,v,k)=>`<span class="stl${k?' '+k:''}"><small>${l}</small><b>${v||'—'}</b></span>`;
-  if(K==='it'||K==='ab'){const it=qaIt(a),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;
-    return cell('وزن',it.w?wFmt(it.w)+' <i>گرم</i>':'')+(K==='ab'&&it.w?cell('وزن ۷۵۰',wFmt(Math.round(it.w*it.ay/750*1000)/1000)):'')+stMzCell(a,cell)+cell('مبلغ',c&&c.tot?fmt(c.tot):'','am')}
-  if(K==='xr'){const x=a.x,C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
-    if(g&&m){return cell('وزن',C.n?wFmt(C.n)+' <i>گرم</i>':'',+x.am?'calc':'')+stMzCell(x,cell)+cell('مبلغ',C.amount?fmt(C.amount):'',(+x.am?'':'calc')+' am')}
-    if(g)return cell('وزن',C.n?wFmt(C.n)+' <i>گرم</i>':'')+cell('معادل ۷۵۰',C.q?wFmt(C.q):'');
-    return cell('تعداد',C.n?qFmt(C.n):'')+(m?cell('نرخ',C.pg?fmt(C.pg):'')+cell('مبلغ',C.amount?fmt(C.amount):'','am'):'')}
-  if(K==='py')return cell('مبلغ',+a.p.amount?fmt(+a.p.amount):'','am');
-  return ''}
+/* v61.11: زیر نوار یک کادر مبلغ مثل پنجره تسویه: مبلغ بزرگ با رنگ اثرش (قرمز = طلبکار می‌شویم، آبی = بدهکار می‌شویم)
+   و مشخصات (وزن، مظنه، عیار…) فقط یک خط کوچک زیرش؛ خانه‌های جدا برای مشخصات حذف شد (در ردیف پله‌ها هست) */
+const stDir=()=>{const a=sv.qa,K=stKind();if(K==='it'||K==='ab')return -1;if(K==='xr'){const t=a.x.t;return t==='sell'||t==='out'?-1:1}if(K==='py')return a.p.dir==='out'?-1:1;return 0};
+const stMzTx=o=>{const k=stMzK(o),v=stMzV(o,k),w=stMzV(o,k==='g'?'mz':'g');return v?(k==='g'?'هر گرم ':'مظنه ')+fmt(v)+(w?' ('+(k==='g'?'مظنه ':'هر گرم ')+fmt(w)+')':'')+(+o.mz?' <b class="own">این ردیف</b>':''):''};
+function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
+  if(K==='it'||K==='ab'){const it=qaIt(a),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;am=c&&c.tot||0;
+    if(it.w)D.push(wFmt(it.w)+' گرم'+(K==='ab'&&it.ay!=750?' (۷۵۰: '+wFmt(Math.round(it.w*it.ay/750*1000)/1000)+')':''));D.push(stMzTx(a))}
+  else if(K==='xr'){const x=a.x,C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
+    if(g&&m){am=C.amount||0;if(C.n)D.push(wFmt(C.n)+' گرم'+(+x.am?' <b class="calc">حساب‌شده</b>':''));D.push(stMzTx(x))}
+    else if(g){if(C.n)D.push(wFmt(C.n)+' گرم');if(C.q)D.push('معادل ۷۵۰: '+wFmt(C.q));
+      return `<div class="stam g ${C.n?(stDir()<0?'d':'c'):'z'}"><small>${C.n?(stDir()<0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'وزن را بزنید'}</small><b>${C.q?wFmt(C.q):'—'}<i>گرم ۷۵۰</i></b>${D.length?`<em>${D.join(' · ')}</em>`:''}</div>`}
+    else{if(C.n)D.push(qFmt(C.n));if(m&&C.pg)D.push('نرخ '+fmt(C.pg));am=m?C.amount||0:0;
+      if(!m)return `<div class="stam ${C.n?(stDir()<0?'d':'c'):'z'}"><small>${C.n?(stDir()<0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'تعداد را بزنید'}</small><b>${C.n?qFmt(C.n):'—'}</b></div>`}}
+  else if(K==='py')am=+a.p.amount||0;
+  else return '';
+  const d=am?(stDir()<0?'d':'c'):'z',E=D.filter(Boolean);
+  return `<div class="stam ${d}"><small>${am?(d==='d'?'طلبکار می‌شویم':'بدهکار می‌شویم'):'مبلغ این ردیف'}</small><b>${am?fmt(am):'—'}<i>تومان</i></b>${E.length?`<em>${E.join(' · ')}</em>`:''}</div>`}
 function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.st=0;if(a.stMax==null)a.stMax=a.st;const i=a.st,cur=S[i],T=stTag(),ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null),last=i===n-1;
   const seg=S.map((s,k)=>{const v=stFmt(s,s.get()),reach=k<=Math.max(a.stMax,i)||ed;return `<button type="button" class="stp${k===i?' on':''}${v&&k!==i?' dn':''}${reach?'':' fu'}" data-act="stGo" data-i="${k}"${reach?'':' disabled'}><small>${s.lab}${s.opt?' <i>اختیاری</i>':''}</small><b>${v||(k===i?'…':'—')}</b></button>`}).join('');
   const val=cur.get(),ph=cur.type==='wam'?'وزن (گرم) یا مبلغ (تومان)':cur.mz?'مظنه یا هر گرم ۱۸ (تومان)':cur.lab+(cur.u?' ('+cur.u+')':'')+(cur.opt?' · اختیاری':''),
@@ -55,20 +59,20 @@ function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.
   return `<div class="stw">${stHead(T.D,T.it,1)}<div class="stps">${seg}</div>
     <div class="fsearch sm st3">${cur.type==='pick'&&cur.search?ic('search'):''}${inp}${cur.type==='pick'?'':`<button type="button" class="stnx${last?' go':''}" data-act="stNext">${last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':'<span>بعدی</span>'+ic('back').replace('class="i"','class="i flip"')}</button>`}</div>
     <div class="stlv" id="stPv">${stLive()}</div>
-    ${ed||(!last&&canFin)?`<div class="stft">${ed?`<button type="button" class="stdel" data-act="stDel">${ic('trash')}<span>حذف ردیف</span></button>`:''}${!last&&canFin?`<button type="button" class="stdone" data-act="stFin">${ic('check')} ${ed?'ذخیره تغییرات':'افزودن به سند'}</button>`:''}</div>`:''}
+    ${ed||(!last&&canFin)?`<div class="stft">${!last&&canFin?`<button type="button" class="stdone" data-act="stFin">${ic('check')}<span>${ed?'ذخیره تغییرات':'افزودن به سند'}</span></button>`:''}${ed?`<button type="button" class="stdel" data-act="stDel" aria-label="حذف ردیف">${ic('trash')}<span>حذف</span></button>`:''}</div>`:''}
     ${cur.type==='pick'?`<div id="stPk">${stPick(cur)}</div>`:''}</div>`}
 function stPick(s){const q=sv.qa.sq||'',L=s.opts(q),v=s.get();if(!L.length)return `<div class="eh" style="padding:8px">${s.k==='chId'?'کارتخوانی تعریف نشده؛ نامش را بنویسید و «افزودن» بزنید':'موردی نیست'}</div>${s.k==='chId'?`<div class="fsearch sm chadd">${ic('plus')}<input id="pyCn" placeholder="کارتخوان تازه، مثلاً پوز ملت" autocomplete="off"><button class="lnk" data-act="stChAdd">افزودن</button></div>`:''}`;
   return `<div class="bzsug cbl dkl">${L.map(o=>`<button type="button" class="bzsr dkrw${String(o.v)===String(v)?' on':''}" data-act="stPickV" data-v="${esc(o.v)}"><span class="av">${o.bk?bankBadge(o.bk):ic(o.ico||'check')}</span><span class="tx"><b>${esc(o.t)}</b><small class="${o.cls||''}">${esc(o.sub||'')}</small></span></button>`).join('')}</div>`}
 function stRead(){const a=sv.qa,S=stSteps(),s=S[Math.min(a.st||0,S.length-1)],I=$('stI');if(!s||!I||s.type==='pick')return;const t=I.value;
   if(s.type==='wam'){const v=toEn(t).replace(/,/g,'');s.set(+v>=1000?{am:Math.round(+v)}:decIn(v));return}
-  s.set(s.type==='num'?num(t):s.type==='dec'?decIn(t):s.type==='int'?(+toEn(t).replace(/\D/g,'')||750):clean(t))}
+  s.set(s.type==='num'?num(t):s.type==='dec'?decIn(t):s.type==='int'?(+toEn(t).replace(/\D/g,'')||750):s.type==='dig'?toEn(t).replace(/\D/g,''):clean(t))}
 /* مقدار پله فعلی در ردیف پله‌ها همان لحظه نوشته می‌شود */
 function stPaint(){const P=$('stPv');if(P)P.innerHTML=stLive();const a=sv.qa,S=stSteps(),b=document.querySelector('#qa .stp.on b');if(b){const v=stFmt(S[a.st],S[a.st].get());b.innerHTML=v||'…'}
   if(S[a.st]&&S[a.st].mz){const l=document.querySelector('#qa .stp.on small');if(l)l.textContent=S[a.st].lab}}
 function stBind(){const I=$('stI'),a=sv.qa;if(!I)return;const S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];
   if(s.type==='pick'){I.oninput=()=>{a.sq=I.value;const P=$('stPk');if(P)P.innerHTML=stPick(s)};return}
   selOnFocus(I);I.oninput=()=>{if(s.type==='num'){const pos=I.selectionStart||0,b=toEn(I.value.slice(0,pos)).replace(/\D/g,'').length,v=num(I.value);I.value=v?v.toLocaleString('en-US'):'';let p=0,d=0;while(p<I.value.length&&d<b){if(/\d/.test(I.value[p]))d++;p++}try{I.setSelectionRange(p,p)}catch(_){}}
-    else if(s.type==='wam'){const v=toEn(I.value).replace(/,/g,'');if(+v>=1000&&/^\d+$/.test(v))I.value=(+v).toLocaleString('en-US');else I.value=decIn(I.value)}else if(s.type==='dec')I.value=decIn(I.value);else if(s.type==='int')I.value=toEn(I.value).replace(/\D/g,'').slice(0,3);stRead();svKeep();stPaint()};
+    else if(s.type==='wam'){const v=toEn(I.value).replace(/,/g,'');if(+v>=1000&&/^\d+$/.test(v))I.value=(+v).toLocaleString('en-US');else I.value=decIn(I.value)}else if(s.type==='dec')I.value=decIn(I.value);else if(s.type==='int')I.value=toEn(I.value).replace(/\D/g,'').slice(0,3);else if(s.type==='dig')I.value=toEn(I.value).replace(/\D/g,'');stRead();svKeep();stPaint()};
   I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.stNext()}}}
 function stRe(){qaRe();const I=$('stI');if(I&&$('ov').classList.contains('hide'))setTimeout(()=>{try{I.focus({preventScroll:true})}catch(_){I.focus()}},30);const c=document.querySelector('#qa .st3');if(c&&!RM()&&c.animate)c.animate([{opacity:.4,transform:'translateX(-12px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});const o=document.querySelector('#qa .stp.on');if(o&&o.scrollIntoView)o.scrollIntoView({block:'nearest',inline:'center'})}
 function stFinish(){const K=stKind();if(K==='it'||K==='ab')ACT.qaAdd();else if(K==='xr')ACT.xrSave();else if(K==='py')ACT.pySave()}
