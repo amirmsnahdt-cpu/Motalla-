@@ -18,7 +18,10 @@ const stMz=(o,f)=>{f=f||1;const B=f!==1,k0=stMzK(o);return stS('mz',(k0==='g'?'�
 /* v61.25: پله «مبلغ» برای همه ردیف‌های پولی — پیش‌فرض مبلغ حساب‌شده؛ اگر عوض شود مبلغ ثابت می‌ماند و نرخ نهایی هر گرم/عدد از آن درمی‌آید */
 const stAmT=x=>stS('amT','مبلغ','تومان','num',()=>xrCalc(x,sv.rate).amount||'',v=>{v=Math.round(+v||0);if(x.a==='gold'&&+x.am){if(v)x.am=v;return}const b=xrCalc({...x,amT:''},sv.rate).amount;x.amT=!v||v===b?'':v},{opt:1});
 /* v61.27: پله «مبلغ» برای کالای فروش و آبشده — مبلغ عوض شود جمع ثابت می‌ماند (it.amT)؛ عوض کردن وزن/عیار/اجرت/سود مبلغ دستی را پاک می‌کند */
-const stItAm=a=>stS('amT','مبلغ','تومان','num',()=>{const c=itCalc(qaIt(a),sv.rate,sv.tax);return c.tot||''},v=>{v=Math.round(+v||0);const b=itCalc({...qaIt(a),amT:0},sv.rate,sv.tax).tot;a.amT=!v||v===b?'':v},{opt:1});
+/* v61.29: مبلغ دستی درصد سود را هم با مظنه و وزن همان ردیف دوباره حساب می‌کند (کمتر = سود کمتر، بیشتر = سود بیشتر)؛
+   درصد تا دو رقم اعشار در a.pp می‌نشیند و مبلغ دقیق در a.amT می‌ماند */
+const stItAm=a=>stS('amT','مبلغ','تومان','num',()=>{const c=itCalc(qaIt(a),sv.rate,sv.tax);return c.tot||''},v=>{v=Math.round(+v||0);const it={...qaIt(a),amT:0},b=itCalc(it,sv.rate,sv.tax);
+  if(!v||v===b.tot){a.amT='';return}const t=sv.tax&&!it.ab,base=b.gold+b.aj;if(base>0){const pr=(t?(v-b.gold)/1.1:v-b.gold)-b.aj;a.pp=Math.round(pr/base*10000)/100}a.amT=v},{opt:1});
 const stNv=x=>x===''||x==null||(typeof x==='string'&&!x.trim())?'':isNaN(+toEn(String(x)))?String(x):+toEn(String(x));
 const stCl=(o,k)=>v=>{if(stNv(v)!==stNv(o[k]))o.amT='';o[k]=v};
 function stSteps(){const a=sv.qa,K=stKind();
@@ -49,7 +52,7 @@ const stDir=()=>{const a=sv.qa,K=stKind();if(K==='it'||K==='ab')return -1;if(K==
 const stMzTx=(o,f)=>{f=f||1;const B=f!==1?' خرید':'',k=stMzK(o),v=Math.round(stMzV(o,k)*f),w=Math.round(stMzV(o,k==='g'?'mz':'g')*f);return v?(k==='g'?'هر گرم'+B+' ':'مظنه'+B+' ')+fmt(v)+(w?' ('+(k==='g'?'مظنه'+B+' ':'هر گرم'+B+' ')+fmt(w)+')':'')+(+o.mz?' <b class="own">این ردیف</b>':''):''};
 function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
   if(K==='it'||K==='ab'){const it=qaIt(a),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;am=c&&c.tot||0;
-    if(it.w)D.push(wFmt(it.w)+' گرم'+(K==='ab'&&it.ay!=750?' (۷۵۰: '+wFmt(Math.round(it.w*it.ay/750*1000)/1000)+')':''));D.push(c&&c.fx?'سود '+fmt(c.pr)+' <b class="own">مبلغ دستی</b>':stMzTx(a))}
+    if(it.w)D.push(wFmt(it.w)+' گرم'+(K==='ab'&&it.ay!=750?' (۷۵۰: '+wFmt(Math.round(it.w*it.ay/750*1000)/1000)+')':''));D.push(c&&c.fx?'سود '+toFa(String(+a.pp||0))+'٪ ('+fmt(c.pr)+') <b class="own">مبلغ دستی</b>':stMzTx(a))}
   else if(K==='xr'){const x=a.x,C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
     if(g&&m){am=C.amount||0;if(C.n)D.push(wFmt(C.n)+' گرم'+(+x.am?' <b class="calc">حساب‌شده</b>':''));if(C.fx){const B=stBuyF(x)!==1?' خرید':'';D.push('هر گرم'+B+' '+fmt(C.pg)+' (مظنه'+B+' '+fmt(Math.round(C.pg*MZK))+') <b class="own">مبلغ دستی</b>')}else D.push(stMzTx(x,stBuyF(x)))}
     else if(g){if(C.n)D.push(wFmt(C.n)+' گرم');if(C.q)D.push('معادل ۷۵۰: '+wFmt(C.q));

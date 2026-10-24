@@ -1036,3 +1036,8 @@ button.sssbtn svg{width:17px;height:17px}
 #act .d6foot .bzgo.svgo #svBt b,#act .d6foot .bzgo.svgo #svBt.d b,#act .d6foot .bzgo.svgo #svBt.c b{font-size:17px;font-weight:900;color:#fff;white-space:nowrap}
 #act .d6foot .bzgo.svgo #svBt b i{font-size:10px;color:rgba(255,255,255,.8)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #act .d6foot .bzgo.svgo #svBt .svbh em{background:#fff}}
+/* v61.29: تخفیف — دکمه «دریافت/پرداخت تخفیف · صفر کردن مانده» در جزئیات مانده تومانی؛ خانه مبلغ پایین سند هم با زدن همین را می‌پرسد */
+.bloff{display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 16px);margin:6px 8px 8px;min-height:40px;border:0;border-radius:12px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;background:var(--bg);color:var(--ink)}
+.bloff svg{width:15px;height:15px}
+.bloff.d{background:color-mix(in srgb,var(--red) 12%,var(--card));color:var(--red)}.bloff.c{background:color-mix(in srgb,var(--blu) 12%,var(--card));color:var(--blu)}
+.d6foot .d6bk.kr[data-act]{cursor:pointer}

@@ -6,8 +6,8 @@
 const DK=[['sell','فروش','tag'],['buy','خرید','coin'],['swap','تعویض','refresh'],['in','دریافت','down'],['out','پرداخت','share'],['ret','مرجوعی','undo']];
 const DKS={sell:[['ab','آبشده','coin'],['gold','طلای ساخته','ring'],['misc','متفرقه','ring'],['coin','سکه','coin'],['fx','دلار و ارز','usd']],
   buy:[['misc','متفرقه','coin'],['ab','آبشده','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']],
-  in:[['cust','حواله از مشتری','swap'],['hav','حواله از بانک','bank'],['pos','کارتخوان','card'],['cash','نقد','cash'],['ab','آبشده','coin'],['misc','متفرقه','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']],
-  out:[['cust','حواله به مشتری','swap'],['hav','حواله از بانک ما','bank'],['cash','نقد','cash'],['ab','آبشده','coin'],['misc','متفرقه','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']]};
+  in:[['cust','حواله از مشتری','swap'],['hav','حواله از بانک','bank'],['pos','کارتخوان','card'],['cash','نقد','cash'],['off','تخفیف','tag'],['ab','آبشده','coin'],['misc','متفرقه','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']],
+  out:[['cust','حواله به مشتری','swap'],['hav','حواله از بانک ما','bank'],['cash','نقد','cash'],['off','تخفیف','tag'],['ab','آبشده','coin'],['misc','متفرقه','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']]};
 const dkT=d=>(DK.find(z=>z[0]===d)||[])[1]||'';
 const dkST=(d,s)=>((DKS[d]||[]).find(z=>z[0]===s)||[])[1]||'';
 const COINS=()=>Object.keys(XA).filter(k=>XA[k].k==='c'),FXS=()=>Object.keys(XA).filter(k=>XA[k].k==='f');
@@ -17,7 +17,7 @@ const COINS=()=>Object.keys(XA).filter(k=>XA[k].k==='c'),FXS=()=>Object.keys(XA)
 function xaSync(){const r=cfgRec();((r&&r.xa)||[]).forEach(o=>{if(o&&o.k&&!XA[o.k])XA[o.k]={t:o.t||o.k,s:o.s||o.k,u:o.u||(o.c==='f'?'واحد':'عدد'),k:o.c==='f'?'f':'c',x:1}})}
 const gCat=k=>{const r=cfgRec();return (r&&r.gk&&r.gk[k])||'ساخته'};
 function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls)=>R.push({id,t,ico,sub,cls:cls||''});
-  if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله از مشتری':'حواله به مشتری','swap','از حساب مشتری دیگر');fx('m:hav',d==='in'?'حواله از بانک':'حواله از بانک ما','bank','حساب‌های ما');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه');fx('m:cash','نقد','cash','پول نقد')}
+  if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله از مشتری':'حواله به مشتری','swap','از حساب مشتری دیگر');fx('m:hav',d==='in'?'حواله از بانک':'حواله از بانک ما','bank','حساب‌های ما');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه');fx('m:cash','نقد','cash','پول نقد');fx('m:off','تخفیف','tag',d==='in'?'دریافت تخفیف · صفر کردن مانده طلب':'پرداخت تخفیف · صفر کردن مانده بدهی')}
   fx('g:ab','آبشده','coin',d==='sell'?'وزن، عیار، انگ، سود':'وزن و عیار','gd');fx('g:misc','متفرقه','coin',d==='sell'?'طلای دست‌دوم با اجرت و سود':'طلای دست‌دوم','gd');
   if(d==='sell'||d==='buy')fx('g:pul','پولی','swap',d==='sell'?'طلا تحویل نمی‌شود · فروش فردایی':'طلا تحویل گرفته نمی‌شود','gd');
   xaSync();COINS().forEach(k=>fx('a:'+k,XA[k].t,'coin',XA[k].x?'سکه':'سکه','gd'));FXS().forEach(k=>fx('a:'+k,XA[k].t,'usd','ارز'));return R}
