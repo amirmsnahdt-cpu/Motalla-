@@ -1004,31 +1004,35 @@ button.sssbtn svg{width:17px;height:17px}
 /* v61.24: کادر مبلغ خرید/تعویض قابل زدن (ویرایش مبلغ) */
 .stam.tap[data-act]{cursor:pointer;transition:transform .15s}.stam.tap[data-act]:active{transform:scale(.985)}
 .stam.tap[data-act] small::after{content:" · برای ویرایش مبلغ بزنید";font-weight:600;opacity:.6}
-/* v61.27: پایین سند جمع‌وجور (راهنمای اپل: یک کارت، یک رنگ برای یک معنا، عدد تنها جای پررنگ).
-   کل پایین یک کارت سفید: بالا نوار باریک مانده‌ها (زمینه خاکستری، خانه‌ها بدون قاب، جداکننده مویی، فقط عدد و برچسب رنگی:
-   قرمز طلبکاریم / آبی بدهکاریم) و زیرش دکمه آبی «ثبت سند» با جمع سند. ارتفاع کل ≈ ۱۱۰px (قبلاً ≈ ۲۳۰px). */
-#act .d6foot{gap:6px;padding:6px;border-radius:24px;background:var(--card);box-shadow:0 0 0 1px var(--hair),0 10px 28px -14px #16213a59}
-.d6foot .d6bw,.d6foot .d6bw.on{background:none;box-shadow:none;padding:0;border-radius:18px}
-.d6foot .d6bw .d6bs{gap:0;padding:0 0 0 4px;min-height:48px;align-items:center;border-radius:18px;background:var(--bg);box-shadow:none}
-.d6foot .d6bw.on .d6bs{border-top:0;border-radius:18px}
-.d6foot .d6bk,.d6foot .d6bk.d,.d6foot .d6bk.c,.d6foot .d6bk.z{flex:1 1 0;min-height:0;align-self:stretch;padding:6px 12px;gap:1px;justify-content:center;border-radius:0;background:none;box-shadow:none}
-.d6foot .d6bk+.d6bk{border-inline-start:1px solid var(--hair)}
-.d6foot .d6bkh{justify-content:flex-start;gap:6px}
-.d6foot .d6bkh small{font-size:11px;font-weight:700;color:var(--mut)}.d6foot .d6bkh small i{font-size:10px;font-weight:600}
-.d6foot .d6bkh em,.d6foot .d6bk.d .d6bkh em,.d6foot .d6bk.c .d6bkh em{display:inline-flex;align-items:center;gap:4px;padding:0;margin-inline-start:auto;border-radius:0;background:none;font-size:10.5px;font-weight:800}
-.d6foot .d6bkh em::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.d6foot .d6bk b{font-size:clamp(13px,10cqi,17px);font-weight:900;letter-spacing:-.2px;line-height:1.2;margin:0}
-.d6foot .d6bk.z b{color:var(--mut)}
-.d6foot .d6bs .d6bsi{flex:none;width:30px;height:30px;margin:0 2px 0 4px;align-self:center;border-radius:50%;background:var(--card);box-shadow:0 0 0 1px var(--hair);display:grid;place-items:center;color:var(--mut)}
+/* v61.28: پایین سند — کم‌جا، تفکیک روشن، رنگ هماهنگ (خواسته صاحب اپ):
+   یک کارت سفید باریک: ردیف خانه‌های مانده (هر خانه کادر کم‌رنگ قرمز/آبی هم‌رنگ عددش: قرمز طلبکاریم، آبی بدهکاریم)
+   + دکمه ثبت که کل پنلش هم‌رنگ جهت جمع سند است (قرمز طلبکاریم / آبی بدهکاریم / خاکستری بدون جمع). ارتفاع کل ≈ ۱۰۵px. */
+#act .d6foot{gap:6px;padding:6px;border-radius:22px;background:var(--card);box-shadow:0 0 0 1px var(--hair),0 10px 28px -14px #16213a59}
+.d6foot .d6bw,.d6foot .d6bw.on{background:none;box-shadow:none;padding:0;border-radius:16px}
+.d6foot .d6bw .d6bs{gap:6px;padding:0;min-height:0;align-items:stretch;border-radius:16px;background:none;box-shadow:none}
+.d6foot .d6bw.on .d6bs{border-top:0}
+.d6foot .d6bk{flex:1 1 0;min-height:0;padding:6px 10px 6px;gap:2px;justify-content:center;border-radius:13px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--hair)}
+.d6foot .d6bk.d{background:color-mix(in srgb,var(--red) 10%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 38%,transparent)}
+.d6foot .d6bk.c{background:color-mix(in srgb,var(--blu) 10%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 38%,transparent)}
+.d6foot .d6bkh{justify-content:space-between;gap:6px}
+.d6foot .d6bkh small{font-size:10.5px;font-weight:800;color:var(--ink)}.d6foot .d6bkh small i{font-size:9.5px;font-weight:700;color:var(--mut)}
+.d6foot .d6bkh em{display:inline-flex;align-items:center;padding:1px 6px;border-radius:6px;font-size:9.5px;font-weight:900;background:var(--card)}
+.d6foot .d6bk.d .d6bkh em{color:#fff;background:var(--red)}.d6foot .d6bk.c .d6bkh em{color:#fff;background:var(--blu)}
+.d6foot .d6bk b{font-size:clamp(13px,10.5cqi,16.5px);font-weight:900;letter-spacing:-.2px;line-height:1.2;margin:0;text-align:right}
+.d6foot .d6bk.d b{color:var(--red)}.d6foot .d6bk.c b{color:var(--blu)}.d6foot .d6bk.z b{color:var(--mut)}
+.d6foot .d6bs .d6bsi{flex:none;width:28px;height:auto;margin:0;align-self:stretch;border-radius:11px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--hair);display:grid;place-items:center;color:var(--mut)}
 .d6foot .d6bs .d6bsi svg{width:13px;height:13px}
-#act .d6foot .bzgo.svgo{margin:0;min-height:50px!important;border-radius:18px!important;padding:0 12px 0 14px!important;box-shadow:0 6px 16px -8px color-mix(in srgb,var(--blu) 70%,transparent)}
-#act .d6foot .bzgo.svgo .svgl{font-size:15px;gap:8px}
-#act .d6foot .bzgo.svgo .svgi{width:26px;height:26px}.svgo .svgi svg{width:14px;height:14px}
+/* دکمه ثبت: کل پنل هم‌رنگ جهت */
+#app.full #act .d6foot .bzgo.svgo,#act .d6foot .bzgo.svgo{margin:0;min-height:48px!important;border-radius:16px!important;padding:0 12px 0 14px!important;background:#5d6577!important;box-shadow:none;transition:background-color .3s,transform .32s var(--spring,ease)}
+#app.full #act .d6foot .bzgo.svgo.d,#act .d6foot .bzgo.svgo.d{background:var(--red)!important;box-shadow:0 6px 16px -8px color-mix(in srgb,var(--red) 75%,transparent)}
+#app.full #act .d6foot .bzgo.svgo.c,#act .d6foot .bzgo.svgo.c{background:var(--blu)!important;box-shadow:0 6px 16px -8px color-mix(in srgb,var(--blu) 75%,transparent)}
+#act .d6foot .bzgo.svgo .svgl{font-size:15px;gap:8px;color:#fff}
+#act .d6foot .bzgo.svgo .svgi{width:26px;height:26px;background:rgba(255,255,255,.22)}.svgo .svgi svg{width:14px;height:14px}
 #act .d6foot .bzgo.svgo #svBt:not(:empty){display:flex;flex-direction:column;align-items:flex-end;gap:1px;padding:0;margin:0;border:0;border-radius:0;background:none;box-shadow:none;line-height:1.15}
 #act .d6foot .bzgo.svgo #svBt .svbh{display:flex;align-items:center;gap:5px}
-#act .d6foot .bzgo.svgo #svBt .svbh small{font-size:10px;font-weight:700;color:rgba(255,255,255,.8)}
+#act .d6foot .bzgo.svgo #svBt .svbh small{font-size:10px;font-weight:700;color:rgba(255,255,255,.85)}
 #act .d6foot .bzgo.svgo #svBt .svbh em{font-style:normal;font-size:9.5px;font-weight:900;padding:1px 7px;border-radius:7px;background:#fff;color:var(--blu)}
-#act .d6foot .bzgo.svgo #svBt.d .svbh em{color:#c62f3c}
+#act .d6foot .bzgo.svgo #svBt.d .svbh em{color:var(--red)}
 #act .d6foot .bzgo.svgo #svBt b,#act .d6foot .bzgo.svgo #svBt.d b,#act .d6foot .bzgo.svgo #svBt.c b{font-size:17px;font-weight:900;color:#fff;white-space:nowrap}
-#act .d6foot .bzgo.svgo #svBt b i{font-size:10px;color:rgba(255,255,255,.78)}
+#act .d6foot .bzgo.svgo #svBt b i{font-size:10px;color:rgba(255,255,255,.8)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #act .d6foot .bzgo.svgo #svBt .svbh em{background:#fff}}
