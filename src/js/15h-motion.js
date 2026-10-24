@@ -129,3 +129,12 @@ function pageLeave(to,o){o=o||{};const ap=$('app');
 (()=>{const v=$('view'),ov=$('ov');if(v)v.addEventListener('scroll',tmSync,{passive:true});
   if(ov&&window.MutationObserver)new MutationObserver(()=>{tmSync();if(window.edgeZ)edgeZ()}).observe(ov,{attributes:true,attributeFilter:['class']});
   document.addEventListener('touchstart',tmSync,{passive:true,capture:true});tmSync()})();
+/* v61.16: شمارش زنده عددها در هر رسم دوباره: run() را اجرا می‌کند و هر عدد تومانی (بدون اعشار) که در sel عوض شده،
+   از مقدار قبلی تا جدید می‌شمارد و یک تپش کوچک می‌زند. فقط متن اول عنصر عوض می‌شود (واحدها مثل <i>تومان</i> دست نمی‌خورند).
+   برای هر بخش تازه‌ای که مبلغ دارد از همین استفاده شود. */
+function numMorph(sel,run){const tn=el=>{const n=el.firstChild;return n&&n.nodeType===3?n:null},pv=s=>{const t=toEn(s||'').trim();return /^-?[\d,]+$/.test(t)?+t.replace(/,/g,''):null};
+  /* هر گروه انتخاب جدا جفت می‌شود و فقط اگر تعداد عنصرهایش عوض نشده باشد (ردیف اضافه/حذف شد = بدون شمارش اشتباه) */
+  const G=sel.split(',').map(x=>x.trim()).filter(Boolean),old=G.map(g=>[...document.querySelectorAll(g)].map(el=>{const n=tn(el);return n?n.data:null}));run();if(RM())return;
+  G.forEach((g,gi)=>{const L=[...document.querySelectorAll(g)];if(L.length!==old[gi].length)return;L.forEach((el,i)=>{const a0=old[gi][i];const n=tn(el),a=a0;if(!n||a==null||a===n.data)return;const from=pv(a),to=pv(n.data);if(from==null||to==null||from===to)return;
+    const fmtT=n.data,t0=performance.now(),D=420;n.data=a;const st=k=>{const p=Math.min(1,(k-t0)/D),e=1-Math.pow(1-p,3);if(!n.isConnected)return;n.data=p<1?fmt(Math.round(from+(to-from)*e)):fmtT;if(p<1)requestAnimationFrame(st)};requestAnimationFrame(st);
+    if(el.animate)el.animate([{transform:'scale(1)'},{transform:'scale(1.07)'},{transform:'scale(1)'}],{duration:480,easing:'cubic-bezier(.3,1.4,.5,1)'})})})}
