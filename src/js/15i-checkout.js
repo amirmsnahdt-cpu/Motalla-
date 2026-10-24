@@ -27,8 +27,10 @@ function ckSel(){const s=CK.sel;if(!s)return '';if(s.k==='cu'){const c=CU().find
 /* v61.30: کارتخوان و حساب ما مثل بقیه فهرست‌ها: جستجو بالا، فهرست زیرش */
 function ckPick(){const m=CK.m,q=nzName(toEn(clean(CK.sq||''))),pos=m==='pos';
   const L=(pos?CH('pos').map(c=>({id:c.id,on:String(CK.chId)===String(c.id),t:c.name,sub:'مانده '+fmt(chBal(c)),av:ic('card')})):sources.map(z=>{const bk=acBank(z);return {id:z.id,on:String(CK.srcId)===String(z.id),t:z.name,sub:bk?'بانک '+bk:'حساب ما',av:bk?bankBadge(bk):ic('bank')}})).filter(o=>!q||nzName(toEn(o.t+' '+o.sub)).includes(q));
-  if(!L.length)return `<div class="eh" style="padding:8px">${q?'چیزی پیدا نشد':pos?'کارتخوانی تعریف نشده؛ از «کارتخوان» در جستجوی سند یکی بسازید.':'حسابی تعریف نشده'}</div>`;
-  return `<div class="bzsug cbl dkl">${L.map(o=>`<button type="button" class="bzsr dkrw${o.on?' on':''}" data-act="${pos?'ckCh':'ckSrc'}" data-id="${esc(o.id)}"><span class="av">${o.av}</span><span class="tx"><b>${esc(o.t)}</b><small>${esc(o.sub)}</small></span></button>`).join('')}</div>`}
+  const q0=clean(CK.sq||''),ex=q&&L.some(o=>nzName(toEn(o.t))===q);
+  return `<div class="bzsug cbl dkl">${L.map(o=>`<button type="button" class="bzsr dkrw${o.on?' on':''}" data-act="${pos?'ckCh':'ckSrc'}" data-id="${esc(o.id)}"><span class="av">${o.av}</span><span class="tx"><b>${esc(o.t)}</b><small>${esc(o.sub)}</small></span></button>`).join('')}${ex?'':pkAddRow(pos?'کارتخوان':'حساب',q0,'ckPkAdd')}</div>`}
+ACT.ckPkAdd=()=>{ckRead();const n=clean(CK.sq||''),pos=CK.m==='pos';if(!n){toast('نام '+(pos?'کارتخوان':'حساب')+' را در جستجو بنویسید',true);const I=$('ckS');if(I)I.focus();return}
+  if(pos){const r=chNew(n,'pos');if(!r)return;CK.chId=r.id;ls.set('m_ch_pos',r.id)}else{const z=srcQuick(n);if(!z)return;CK.srcId=z.id;ls.set('m_src_hav',z.id)}CK.sq='';ckRe('ckA');toast('«'+n+'» اضافه شد')};
 function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" autocomplete="off" enterkeyhint="done"></label>`;
   const tn=`<label class="ckf"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
   if(m==='cash')b=amt;
