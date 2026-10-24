@@ -3,11 +3,20 @@
    خرید: متفرقه، آبشده، سکه، دلار و ارز — مانده سند به «پرداخت» می‌رود.  تعویض / مرجوعی: طلای مشتری با نرخ روز (یک ردیف خرید).
    دریافت / پرداخت: حواله (مشتری یا بانک)، کارتخوان، نقد، آبشده، متفرقه، سکه، دلار — طلا و جنس بدون مظنه، فقط حساب جنسی مشتری.
    حساب‌ها همان قبلی است: فروش/خرید فقط ریالی (جنس تحویل می‌شود)، دریافت/پرداخت جنسی یا ریالی. هیچ ساختار داده‌ای عوض نمی‌شود. */
-const DK=[['sell','فروش','tag'],['buy','خرید','coin'],['swap','تعویض','refresh'],['in','دریافت','down'],['out','پرداخت','share'],['ret','مرجوعی','undo']];
+/* v61.47: آیکون‌های مینیمال هم‌معنی هر کار (برچسب قیمت، کیف خرید، دو فلش، فلش به داخل، فلش به بیرون، برگشت)؛
+   رنگ: هر چه از مغازه بیرون می‌رود (فروش، پرداخت) قرمز، هر چه وارد می‌شود (خرید، دریافت، تعویض، مرجوعی) آبی */
+Object.assign(IC,{dSell:'<path d="M20.2 12.6l-7.6 7.6a1.6 1.6 0 01-2.2 0L4 13.8V4h9.8l6.4 6.4a1.6 1.6 0 010 2.2z"/><circle cx="8.6" cy="8.6" r="1.4"/>',
+  dBuy:'<path d="M5.5 8h13l-1.1 11.2a1 1 0 01-1 .8H7.6a1 1 0 01-1-.8z"/><path d="M9 10V7a3 3 0 016 0v3"/>',
+  dSwap:'<path d="M4 8h14M14 4l4 4-4 4"/><path d="M20 16H6M10 12l-4 4 4 4"/>',
+  dIn:'<path d="M12 3v11M7.5 9.5L12 14l4.5-4.5"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>',
+  dOut:'<path d="M12 14V3M7.5 7.5L12 3l4.5 4.5"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>',
+  dRet:'<path d="M9 15l-5-5 5-5"/><path d="M4 10h10.5a5.5 5.5 0 010 11H11"/>'});
+const DK=[['sell','فروش','dSell'],['buy','خرید','dBuy'],['swap','تعویض','dSwap'],['in','دریافت','dIn'],['out','پرداخت','dOut'],['ret','مرجوعی','dRet']];
+const dkRed=k=>k==='sell'||k==='out';
 const DKS={sell:[['ab','آبشده','coin'],['gold','طلای ساخته','ring'],['misc','متفرقه','ring'],['coin','سکه','coin'],['fx','دلار و ارز','usd']],
   buy:[['misc','متفرقه','coin'],['ab','آبشده','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']],
-  in:[['cust','حواله از مشتری','swap'],['hav','حواله از بانک','bank'],['pos','کارتخوان','card'],['cash','نقد','cash'],['off','تخفیف','tag'],['ab','آبشده','coin'],['misc','متفرقه','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']],
-  out:[['cust','حواله به مشتری','swap'],['hav','حواله از بانک ما','bank'],['cash','نقد','cash'],['off','تخفیف','tag'],['ab','آبشده','coin'],['misc','متفرقه','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']]};
+  in:[['cust','حواله از مشتری','swap'],['hav','حواله به بانک','bank'],['pos','کارتخوان','card'],['cash','نقد','cash'],['off','تخفیف','tag'],['ab','آبشده','coin'],['misc','متفرقه','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']],
+  out:[['cust','حواله به مشتری','swap'],['hav','حواله از بانک','bank'],['cash','نقد','cash'],['off','تخفیف','tag'],['ab','آبشده','coin'],['misc','متفرقه','coin'],['coin','سکه','coin'],['fx','دلار و ارز','usd']]};
 const dkT=d=>(DK.find(z=>z[0]===d)||[])[1]||'';
 const dkST=(d,s)=>((DKS[d]||[]).find(z=>z[0]===s)||[])[1]||'';
 const COINS=()=>Object.keys(XA).filter(k=>XA[k].k==='c'),FXS=()=>Object.keys(XA).filter(k=>XA[k].k==='f');
@@ -17,7 +26,7 @@ const COINS=()=>Object.keys(XA).filter(k=>XA[k].k==='c'),FXS=()=>Object.keys(XA)
 function xaSync(){const r=cfgRec();((r&&r.xa)||[]).forEach(o=>{if(o&&o.k&&!XA[o.k])XA[o.k]={t:o.t||o.k,s:o.s||o.k,u:o.u||(o.c==='f'?'واحد':'عدد'),k:o.c==='f'?'f':'c',x:1}})}
 const gCat=k=>{const r=cfgRec();return (r&&r.gk&&r.gk[k])||'ساخته'};
 function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls)=>R.push({id,t,ico,sub,cls:cls||''});
-  if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله از مشتری':'حواله به مشتری','swap','از حساب مشتری دیگر');fx('m:hav',d==='in'?'حواله از بانک':'حواله از بانک ما','bank','حساب‌های ما');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه');fx('m:cash','نقد','cash','پول نقد');fx('m:off','تخفیف','tag',d==='in'?'دریافت تخفیف · صفر کردن مانده طلب':'پرداخت تخفیف · صفر کردن مانده بدهی')}
+  if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله از مشتری':'حواله به مشتری','swap','از حساب مشتری دیگر');fx('m:hav',d==='in'?'حواله به بانک':'حواله از بانک','bank',d==='in'?'به حساب‌های ما':'از حساب‌های ما');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه');fx('m:cash','نقد','cash','پول نقد');fx('m:off','تخفیف','tag',d==='in'?'دریافت تخفیف · صفر کردن مانده طلب':'پرداخت تخفیف · صفر کردن مانده بدهی')}
   fx('g:ab','آبشده','coin',d==='sell'?'وزن، عیار، انگ، سود':'وزن و عیار','gd');fx('g:misc','متفرقه','coin',d==='sell'?'طلای دست‌دوم با اجرت و سود':'طلای دست‌دوم','gd');
   if(d==='sell'||d==='buy')fx('g:pz','سکه پارسیان','coin',d==='sell'?'تعداد، وزن، اجرت و سود':'تعداد، وزن و مظنه خرید','gd');
   if(d==='sell'||d==='buy')fx('g:pul','پولی','swap',d==='sell'?'طلا تحویل نمی‌شود · فروش فردایی':'طلا تحویل گرفته نمی‌شود','gd');
@@ -30,7 +39,7 @@ function dkHTML(){const a=sv.qa,D=a.d&&DK.find(z=>z[0]===a.d);
   dkOpen=false;return h+`<div class="dkf dkbox open">${stHead(D,'',0)}<div class="fsearch sm">${ic('search')}<input id="qK" value="${esc(a.q||'')}" placeholder="${a.d==='sell'?'چه می‌فروشید؟ آبشده، النگو، نیم سکه، دلار…':a.d==='buy'?'چه می‌خرید؟ متفرقه، آبشده، سکه، دلار…':'حواله، نقد، آبشده، سکه…'}" autocomplete="off" enterkeyhint="next"></div><div id="qKs">${dkList()}</div></div>`}
 function dkList(){const a=sv.qa,q0=clean(a.q||''),q=nzName(toEn(q0)),hit=t=>!q||nzName(t).includes(q);
   const row=(act,data,ico,t,sub,cls)=>`<button type="button" class="bzsr dkrw${cls?' '+cls:''}" data-act="${act}"${Object.entries(data).map(([k,v])=>` data-${k}="${esc(v)}"`).join('')}><span class="av">${ic(ico)}</span><span class="tx"><b>${t}</b><small>${sub||''}</small></span>${/fix/.test(cls||'')?'<em class="dkfx">ثابت</em>':''}</button>`;
-  if(!a.d){const R=DK.filter(([k,t])=>hit(t)).map(([k,t,i])=>row('dkD',{d:k},i,t,{sell:'آبشده، طلای ساخته، سکه، ارز',buy:'متفرقه، آبشده، سکه، ارز',swap:'طلای کهنه مشتری با نرخ روز',in:'حواله، نقد، طلا، سکه، ارز',out:'حواله، نقد، طلا، سکه، ارز',ret:'برگشت کالای فروخته'}[k],'fix k-'+k));
+  if(!a.d){const R=DK.filter(([k,t])=>hit(t)).map(([k,t,i])=>row('dkD',{d:k},i,t,{sell:'آبشده، طلای ساخته، سکه، ارز',buy:'متفرقه، آبشده، سکه، ارز',swap:'طلای کهنه مشتری با نرخ روز',in:'حواله، نقد، طلا، سکه، ارز',out:'حواله، نقد، طلا، سکه، ارز',ret:'برگشت کالای فروخته'}[k],'top k-'+k+(dkRed(k)?' kr':' kb')));
     return R.length?`<div class="bzsug cbl dkl">${R.join('')}</div>`:'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}
   const F=dkFixed(a.d).filter(z=>hit(z.t+' '+z.sub)).map(z=>row('dkF',{id:z.id},z.ico,esc(z.t),esc(z.sub),'fix '+z.cls));
   let G=[];if(a.d==='sell'){const L=goodsList().filter(k=>k!=='آبشده'&&k!=='سکه'&&k!=='سکه پارسیان'&&hit(k)).sort((x,y)=>(q?(nzName(y).startsWith(q)-nzName(x).startsWith(q)):0)||(svUsed[y]||0)-(svUsed[x]||0)).slice(0,q?8:6);

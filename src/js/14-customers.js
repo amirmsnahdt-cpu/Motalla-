@@ -78,8 +78,13 @@ function vCust(){xaSync();const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust'
   ${can('debt')?`<button class="c6new c6one" data-act="svNew" data-cu="${c.id}"><span class="c6ni">${ic('inv')}</span><span><b>سند جدید</b><small>فروش، خرید، تعویض، دریافت، پرداخت، مرجوعی</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>${svDraftHTML(c)}
   `:''}
   <div class="spsec"><b>گردش حساب</b><small>${T.length?fmt(T.length)+' ردیف · برای جزئیات بزنید':'هنوز سندی ثبت نشده'}</small></div>`;
-  if(T.length){let last=null;h+=T.map(t=>{let d='';if(t.date!==last){last=t.date;const r=relDay(t.date);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(t.date).fa)}</div>`}return d+`<div class="fcard">${txRow(c,t)}</div>`}).join('')}
+  /* v61.47 (خواسته صاحب اپ): گردش حساب — هر ردیف کارت گرد با اثرش به تفکیک (تومان، طلا، سکه) و زیرش مانده حساب بعد از همان ردیف؛
+     رنگ‌ها: قرمز طلبکاریم، آبی بدهکاریم؛ کارت‌ها پله‌ای بالا می‌آیند */
+  if(T.length){const run=txRunMap(T);let last=null,n=0;h+=`<div class="tx3${cuCntId!==custId?' anim':''}">`+T.map(t=>{let d='';if(t.date!==last){last=t.date;const r=relDay(t.date);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(t.date).fa)}</div>`}return d+`<div class="fcard f3" style="--i:${Math.min(n++,8)}">${txRow(c,t)}${txRunLine(run.get(t))}</div>`}).join('')+'</div>'}
   return h}
+function txRunMap(T){const M=new Map(),A={r:0,g:0,x:{}};T.slice().reverse().forEach(t=>{const d=t.type==='inv'||t.type==='xf'||t.type==='cv'?txD(t):(()=>{const e=txEff(t);return {r:e.r||0,g:e.g||0,x:{}}})();A.r+=d.r||0;A.g=Math.round((A.g+(d.g||0))*1000)/1000;for(const k in d.x||{})A.x[k]=Math.round(((A.x[k]||0)+(+d.x[k]||0))*100)/100;M.set(t,{r:Math.round(A.r),g:A.g,x:{...A.x}})});return M}
+function txRunLine(o){if(!o)return '';const one=(k,v)=>`<span class="${v<0?'d':v>0?'c':'z'}"><b>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i>${v?`<em>${ourLab(v)}</em>`:''}</span>`;
+  return `<div class="txrun"><small>مانده بعد از این ردیف</small>${one('r',o.r)}${o.g||Object.keys(o.x).length?one('g',o.g):''}${Object.keys(o.x).filter(k=>+o.x[k]).map(k=>one(k,o.x[k])).join('')}</div>`}
 ACT.cuQ=d=>{const c=curCu();if(!c)return;if(d.k==='xf'){ACT.xfNew();return}if(d.k==='cv'){ACT.cvNew();return}ACT.svNew({cu:c.id,pre:d.k})};
 function txEff(t){const a=+t.amount||0,w=+t.weight||0;return t.type==='buy'?{r:a}:t.type==='sell'?{r:-a}:t.type==='pin'?{r:a}:t.type==='pout'?{r:-a}:t.type==='gin'?{g:w}:{g:-w}}
 function txRow(c,t){if(t.type==='inv'||t.type==='xf'||t.type==='cv')return txRow2(c,t);const T=TXT[t.type]||{t:t.type},e=txEff(t),sub=[t.kind,t.weight?wFmt(t.weight)+' گرم':'',t.ppg?'هر گرم '+fmt(t.ppg):'',t.note].filter(Boolean).join('، ');
