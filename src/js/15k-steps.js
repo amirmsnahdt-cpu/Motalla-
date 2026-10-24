@@ -25,11 +25,11 @@ const stItAm=a=>stS('amT','مبلغ','تومان','num',()=>{const c=itCalc(qaIt
 const stNv=x=>x===''||x==null||(typeof x==='string'&&!x.trim())?'':isNaN(+toEn(String(x)))?String(x):+toEn(String(x));
 const stCl=(o,k)=>v=>{if(stNv(v)!==stNv(o[k]))o.amT='';o[k]=v};
 function stSteps(){const a=sv.qa,K=stKind();
-  if(K==='it')return [stS('w','وزن','گرم','dec',()=>a.w,stCl(a,'w')),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),stS('ajP','اجرت','٪','dec',()=>a.ajP,stCl(a,'ajP'),{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,stCl(a,'ajT'),{opt:1}),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a)];
+  if(K==='it')return [...(a.pz?[stS('cnt','تعداد','عدد','dec',()=>a.cnt,v=>a.cnt=v)]:[]),stS('w',a.pz?'وزن کل':'وزن','گرم','dec',()=>a.w,stCl(a,'w')),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),stS('ajP','اجرت','٪','dec',()=>a.ajP,stCl(a,'ajP'),{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,stCl(a,'ajT'),{opt:1}),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a)];
   if(K==='ab')return [stS('w','وزن آبشده','گرم','dec',()=>a.w,stCl(a,'w')),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a),stS('lab','آزمایشگاه','','text',()=>a.lab,v=>a.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>a.ang,v=>a.ang=v,{opt:1})];
   if(K==='xr'){const x=a.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ab=x.cat==='آبشده'?[stS('lab','آزمایشگاه','','text',()=>x.lab,v=>x.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>x.ang,v=>x.ang=v,{opt:1})]:[];
     /* خرید/فروش طلا (پولی و غیرپولی): مظنه، بعد «وزن یا مبلغ» (عدد ≥ ۱۰۰۰ = مبلغ تومان؛ وزن از مظنه حساب می‌شود)، بعد عیار */
-    if(g&&m)return [stMz(x,stBuyF(x)),stS('w','وزن یا مبلغ','','wam',()=>+x.am?x.am:x.w,v=>{if(v&&v.am){x.am=v.am;x.w=''}else{x.am='';x.w=v}}),stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=v),stAmT(x),...ab];
+    if(g&&m)return [...(x.pz?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v)]:[]),stMz(x,stBuyF(x)),stS('w','وزن یا مبلغ','','wam',()=>+x.am?x.am:x.w,v=>{if(v&&v.am){x.am=v.am;x.w=''}else{x.am='';x.w=v}}),stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=v),stAmT(x),...ab];
     if(g)return [stS('w','وزن','گرم','dec',()=>x.w,v=>x.w=v),stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=v),...ab];
     return [stS('q','تعداد',(XA[x.a]||{}).u||'','dec',()=>x.q,v=>x.q=v),...(m?[stS('pg','نرخ هر '+((XA[x.a]||{}).u||'واحد'),'تومان','num',()=>x.pg||+ls.get('m_px_'+x.a,0)||'',v=>{if(+v!==+x.pg)x.amT='';x.pg=v}),stAmT(x)]:[])]}
   if(K==='py'){const p=a.p,R=[];
@@ -44,7 +44,7 @@ const stFmt=(s,v)=>s.type==='wam'?(+v>=1000?fmt(+v)+' تومان':(+v?toFa(Strin
 /* عملیات و کالا (بالای نوار، بیرون از فیلد) */
 function stHead(D,it,canBack){return `<div class="sthd k-${D[0]}"><button type="button" class="sthk" data-act="${it?'stBack0':'dkD'}" aria-label="تغییر نوع"><span class="sthi">${ic(D[2])}</span><b>${D[1]}</b></button>${it?`<i class="sthc">›</i><button type="button" class="sthit" data-act="stBack0">${esc(it)}</button>`:'<i class="sthc">›</i><span class="sthq">انتخاب کنید</span>'}<button type="button" class="lnk sthx" data-act="${it?'qaX':'dkD'}">انصراف</button></div>`}
 const stTag=()=>{const a=sv.qa,K=stKind(),d=a.d||(a.x&&a.x.fd)||(a.p&&a.p.dir)||(a.x?(a.x.cat==='تعویض'?'swap':a.x.cat==='مرجوعی'?'ret':a.x.t):'sell');
-  const D=DK.find(z=>z[0]===d)||DK[0];let it='';if(K==='it')it=a.k;else if(K==='ab')it='آبشده';else if(K==='xr'){const x=a.x;it=x.cat==='تعویض'?'طلای کهنه':x.cat==='مرجوعی'?'طلای برگشتی':x.a==='gold'?(x.pul?'پولی':x.cat||'طلا'):((XA[x.a]||{}).t||x.a)}else if(K==='py')it=dkST(d==='out'?'out':'in',a.p.m)||(PM[a.p.m]||{}).t||'';
+  const D=DK.find(z=>z[0]===d)||DK[0];let it='';if(K==='it')it=a.k;else if(K==='ab')it='آبشده';else if(K==='xr'){const x=a.x;it=x.cat==='تعویض'?'طلای کهنه':x.cat==='مرجوعی'?'طلای برگشتی':x.a==='gold'?(x.pz?'سکه پارسیان':x.pul?'پولی':x.cat||'طلا'):((XA[x.a]||{}).t||x.a)}else if(K==='py')it=dkST(d==='out'?'out':'in',a.p.m)||(PM[a.p.m]||{}).t||'';
   return {D,it}};
 /* v61.11: زیر نوار یک کادر مبلغ مثل پنجره تسویه: مبلغ بزرگ با رنگ اثرش (قرمز = طلبکار می‌شویم، آبی = بدهکار می‌شویم)
    و مشخصات (وزن، مظنه، عیار…) فقط یک خط کوچک زیرش؛ خانه‌های جدا برای مشخصات حذف شد (در ردیف پله‌ها هست) */

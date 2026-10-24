@@ -88,12 +88,12 @@ function xrCalc(x,rate){const g=x.a==='gold',money=x.t==='sell'||x.t==='buy';
   /* v61.25: مبلغ دستی (x.amT) برای همه ردیف‌های پولی (خرید، تعویض، فروش متفرقه، سکه و ارز): مبلغ همان می‌ماند و نرخ نهایی هر گرم/عدد = مبلغ ÷ وزن (وزن تبدیل نمی‌شود) */
   const fx=money&&!(g&&+x.am)&&+x.amT>0&&n>0,amount=money?(fx?Math.round(+x.amT):g&&+x.am?Math.round(+x.am):Math.round(n*(fx?0:pg))):0,pgF=fx?Math.round(amount/n):pg;
   const e=x.t==='in'?q:x.t==='out'?-q:x.pul?(x.t==='sell'?q:-q):0;return{n,pg:pgF,q,amount,e,...(fx?{fx:1}:{})}}
-function xrLab(x){const g=x.a==='gold',A=g?'طلا':(XA[x.a]||{t:x.a}).t;
+function xrLab(x){const g=x.a==='gold',A=g?'طلا':(XA[x.a]||{t:x.a}).t;if(g&&x.pz)return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' سکه پارسیان';
   if(g&&x.cat==='تعویض')return 'تعویض طلا';if(g&&x.cat==='مرجوعی')return 'مرجوعی';if(g&&(x.t==='in'||x.t==='out')&&x.cat&&x.cat!=='متفرقه')return (x.t==='in'?'دریافت ':'تحویل ')+x.cat;
   if(g){if(x.t==='buy')return x.pul?'خرید پولی طلا':'خرید '+(x.cat&&x.cat!=='متفرقه'?'طلا · '+x.cat:'متفرقه');if(x.t==='sell')return x.pul?'فروش پولی طلا':'فروش '+(x.cat&&x.cat!=='متفرقه'?'طلا · '+x.cat:'متفرقه');return (x.t==='in'?'دریافت طلا':'تحویل طلا')}
   return XT[x.t]+(x.pul?' پولی ':' ')+A}
 function xrSub(x,C){const g=x.a==='gold',m=x.t==='sell'||x.t==='buy';C=C||xrCalc(x,sv?sv.rate:0);
-  return g?[wFmt(C.n)+' گرم',x.ay!=750?'عیار '+toFa(x.ay):'',m?(x.t==='buy'&&!x.pul?'هر گرم خرید ':'هر گرم ')+fmt(C.pg)+(C.fx?' · مبلغ دستی':''):'',C.e&&Math.abs(C.e)!==C.n?'معادل '+wFmt(Math.abs(C.e))+' گرم ۱۸':''].filter(Boolean).join(' · ')
+  return g?[x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',wFmt(C.n)+' گرم',x.ay!=750?'عیار '+toFa(x.ay):'',m?(x.t==='buy'&&!x.pul?'هر گرم خرید ':'هر گرم ')+fmt(C.pg)+(C.fx?' · مبلغ دستی':''):'',C.e&&Math.abs(C.e)!==C.n?'معادل '+wFmt(Math.abs(C.e))+' گرم ۱۸':''].filter(Boolean).join(' · ')
     :[qFmt(C.n)+' '+((XA[x.a]||{}).u||''),m?'هر واحد '+fmt(C.pg)+(C.fx?' · مبلغ دستی':''):''].filter(Boolean).join(' · ')}
 function svTot(){let gold=0,aj=0,pr=0,tax=0,w=0;for(const it of sv.items){const c=itCalc(it,sv.rate,sv.tax);gold+=c.gold;aj+=c.aj;pr+=c.pr;tax+=c.tax;w+=+it.w||0}
   let xs=0,xb=0,ge=0;const xe={};for(const x of sv.xr||[]){const c=xrCalc(x,sv.rate);if(x.t==='sell')xs+=c.amount;else if(x.t==='buy')xb+=c.amount;if(c.e){if(x.a==='gold')ge+=c.e;else xe[x.a]=Math.round(((xe[x.a]||0)+c.e)*100)/100}}
@@ -183,7 +183,7 @@ function qaHTML(){const a=sv.qa;if(a.p&&a.p.m!=='disc'&&a.p.m!=='gold'||a.x||a.k
   <div class="d6br" id="qB"></div>
   <div class="d6qf">${ed?`<button class="qago red" data-act="qaDel" aria-label="حذف">${ic('trash')}</button>`:''}<button class="qago" data-act="qaAdd">${ic(ed?'check':'plus')} ${ed?'ذخیره':'افزودن'}</button></div>`}
 function qaRead(){const a=sv.qa,g=id=>{const e=$(id);return e?e.value:undefined};if($('stI')&&typeof stRead==='function')stRead();if($('qW'))a.w=decIn(g('qW'));if($('qY'))a.ay=+toEn(g('qY')).replace(/\D/g,'')||'';if($('qJ'))a.ajP=decIn(g('qJ'));if($('qJT'))a.ajT=num(g('qJT'));if($('qS'))a.pp=decIn(g('qS'));if($('qL'))a.lab=clean(g('qL'));if($('qN'))a.ang=clean(g('qN'));if($('qK'))a.q=g('qK');if(a.p)pyRead();if(a.x)xrRead()}
-const qaIt=a=>({...(+a.mz?{mz:+a.mz}:{}),k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:a.ab?0:parseFloat(a.ajP)||0,ajT:a.ab?0:+a.ajT||0,pp:parseFloat(a.pp)||0,...(+a.amT>0?{amT:Math.round(+a.amT)}:{}),...(a.ab?{ab:1,lab:a.lab||'',ang:a.ang||''}:{})});
+const qaIt=a=>({...(+a.mz?{mz:+a.mz}:{}),k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:a.ab?0:parseFloat(a.ajP)||0,ajT:a.ab?0:+a.ajT||0,pp:parseFloat(a.pp)||0,...(a.pz?{pz:1,cnt:+a.cnt||0}:{}),...(Array.isArray(a.imgs)&&a.imgs.length?{imgs:a.imgs.slice(),img:a.imgs[0]}:{}),...(+a.amT>0?{amT:Math.round(+a.amT)}:{}),...(a.ab?{ab:1,lab:a.lab||'',ang:a.ang||''}:{})});
 function qaCalc(){const B=$('qB');if(!B)return;qaRead();const a=sv.qa;if(a.p){pyHint();return}if(a.x){xrHint();return}const it=qaIt(a),c=itCalc(it,sv.rate,sv.tax),pg=$('qPg'),w7=$('qW7');if(w7)w7.textContent=it.w?wFmt(Math.round(it.w*it.ay/750*1000)/1000)+' گرم':'—';if(pg)pg.textContent=sv.rate?fmt(Math.round(sv.rate*it.ay/750)):'—';
   B.innerHTML=!sv.rate?'<small>مظنه یا نرخ گرم را بالای سند بزنید</small>':!it.w?'<small>وزن را بزنید</small>':`<button type="button" class="d6bt" data-act="qaBrk"><span>مبلغ این کالا</span><b>${fmt(c.tot)}</b><i>جزئیات ${ic('back').replace('class="i"','class="i flip"')}</i></button>`}
 /* v60.8: جزئیات طلا/اجرت/سود پنهان؛ با زدن (یا نگه داشتن) روی مبلغ، در یک حباب کوچک مثل پیام نشان داده می‌شود */
@@ -232,14 +232,14 @@ function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};
   qaCalc()}
 const qaRe=f=>{const q=$('qa');if(!q)return;q.innerHTML=qaHTML();qaBind();const e=f&&$(f);if(e)e.focus({preventScroll:false});q.classList.remove('swap');void q.offsetWidth;q.classList.add('swap')};
 const qaDone=()=>{sv.qa=qaBlank();svKeep();qaRe();svRe()};/* v61.2: بعد از افزودن، فهرست تشخیص بسته می‌ماند تا ردیف‌ها دیده شوند */
-ACT.qaK=d=>{qaRead();const a=sv.qa;a.k=d.k?clean(d.k):'';a.i=null;if(a.ab||a.k)Object.assign(a,{ab:0,lab:'',ang:'',mz:'',mzk:'',pp:PROFIT_DEF(),ay:750});if(a.k)addGoods(a.k);a.q='';svKeep();qaRe(a.k?'qW':'qK')};
+ACT.qaK=d=>{qaRead();const a=sv.qa;a.k=d.k?clean(d.k):'';a.i=null;if(a.ab||a.k)Object.assign(a,{ab:0,lab:'',ang:'',mz:'',mzk:'',pp:PROFIT_DEF(),ay:750,pz:0,cnt:'',imgs:[],img:'',amT:''});if(a.k)addGoods(a.k);a.q='';svKeep();qaRe(a.k?'qW':'qK')};
 ACT.qaS=d=>{const s=SPK.find(z=>z.id===d.s);if(!s)return;qaRead();if(s.x){if(s.x[1]==='gold'&&s.x[0]!=='in'&&s.x[0]!=='out'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);$('svM').focus();return}xrStart(xrNew(s.x[0],s.x[1],{pul:!!s.x[2]}));return}
   if(s.p[0]==='disc'){pyStart(pyNew('disc'));return}pyStart(pyNew(s.p[0],{dir:s.p[1]}))};
 ACT.qaAdd=()=>{qaRead();const a=sv.qa;if(!a.k){toast('کالا را انتخاب کنید',true);const k=$('qK');if(k)k.focus();return}const it0=qaIt(a);if(!it0.w){toast('وزن را بزنید',true);fcs('qW');return}
   const old=a.i!=null?sv.items[a.i]:null,it={...it0,cat:it0.ab?'آبشده':old&&old.cat?old.cat:GK.includes(a.k)?a.k:'نو',n:old?old.n||'':''};if(!it.ab)ls.set('m_aj',it.ajP)
   if(a.i!=null){sv.items[a.i]=it;svAdd=a.i}else{sv.items.push(it);svAdd=sv.items.length-1;svUsed[it.k]=(svUsed[it.k]||0)+1}const ay=it.ay;qaDone();sv.qa.ay=ay};
 ACT.qaDel=()=>{const a=sv.qa;if(a.i==null)return;const k=sv.items.splice(a.i,1)[0];qaDone();toast('«'+(k&&k.k)+'» از سند حذف شد','', 'بازگردانی',()=>{if(k){sv.items.push(k);svKeep();svRe()}})};
-ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;qaRead();const J=ajPT(it);sv.qa={...qaBlank(),mz:it.mz||'',k:it.k,w:String(it.w),ay:it.ay||750,ajP:J.P||'',ajT:J.T||'',pp:it.pp,amT:it.amT||'',i:+d.i,...(it.ab?{ab:1,lab:it.lab||'',ang:it.ang||''}:{})};svKeep();qaRe('qW');const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
+ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;qaRead();const J=ajPT(it);sv.qa={...qaBlank(),mz:it.mz||'',k:it.k,w:String(it.w),ay:it.ay||750,ajP:J.P||'',ajT:J.T||'',pp:it.pp,amT:it.amT||'',pz:it.pz?1:0,cnt:it.cnt||'',imgs:xrPh(it),i:+d.i,...(it.ab?{ab:1,lab:it.lab||'',ang:it.ang||''}:{})};svKeep();qaRe('qW');const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
 /* ----- ردیف طلا / سکه / ارز ----- */
 const xrStart=x=>{qaRead();sv.qa.x=x;sv.qa.p=null;sv.qa.q='';svKeep();qaRe()};
 function xrHTML(){const x=sv.qa.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ed=x.i!=null,C=xrCalc(x,sv.rate),fl=x.fl||'';
@@ -277,7 +277,7 @@ ACT.xrPgR=()=>{xrRead();const x=sv.qa.x;x.pgM=false;x.pg=0;svKeep();qaRe()};
 ACT.xrSave=()=>{xrRead();const x=sv.qa.x;if(!x)return;const C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
   if(!C.n){toast(g?'وزن را بزنید':'تعداد را بزنید',true);const f=$('xrW')||$('xrQ');if(f)f.focus();return}if(g&&!(+x.ay)){toast('عیار را بزنید',true);fcs('xrY');return}
   if(m&&!C.pg){toast(g?'مظنه یا نرخ گرم را بالای سند بزنید':'نرخ هر واحد را بزنید',true);const f=g&&!x.pgM?$('svM'):$('xrG');if(f)f.focus();return}
-  if(!g&&m)ls.set('m_px_'+x.a,x.pg);const o={t:x.t,a:x.a,pul:!!x.pul,w:g?C.n:0,q:g?0:C.n,ay:g?+x.ay:0,pg:x.pgM||!g?+x.pg:0,pgM:!!(g&&x.pgM),cat:g?x.cat||'متفرقه':''};if(x.lab)o.lab=x.lab;if(x.ang)o.ang=x.ang;if(x.img)o.img=x.img;if(Array.isArray(x.imgs)&&x.imgs.length){o.imgs=x.imgs.slice();o.img=x.imgs[0]}if(g&&m&&+x.am)o.am=Math.round(+x.am);if(m&&!(g&&+x.am)&&+x.amT)o.amT=Math.round(+x.amT);if(g&&m&&+x.mz)o.mz=+x.mz;
+  if(!g&&m)ls.set('m_px_'+x.a,x.pg);const o={t:x.t,a:x.a,pul:!!x.pul,w:g?C.n:0,q:g?0:C.n,ay:g?+x.ay:0,pg:x.pgM||!g?+x.pg:0,pgM:!!(g&&x.pgM),cat:g?x.cat||'متفرقه':''};if(x.lab)o.lab=x.lab;if(x.ang)o.ang=x.ang;if(x.pz){o.pz=1;o.cnt=+x.cnt||0}if(x.img)o.img=x.img;if(Array.isArray(x.imgs)&&x.imgs.length){o.imgs=x.imgs.slice();o.img=x.imgs[0]}if(g&&m&&+x.am)o.am=Math.round(+x.am);if(m&&!(g&&+x.am)&&+x.amT)o.amT=Math.round(+x.amT);if(g&&m&&+x.mz)o.mz=+x.mz;
   if(x.i!=null)sv.xr[x.i]=o;else sv.xr.push(o);qaDone()};
 ACT.xrDel=()=>{const x=sv.qa.x;if(!x||x.i==null)return;const o=sv.xr.splice(x.i,1)[0];qaDone();toast('ردیف حذف شد','', 'بازگردانی',()=>{if(o){sv.xr.push(o);svKeep();svRe()}})};
 ACT.svXrEdit=d=>{const o=sv.xr[+d.i];if(!o)return;qaRead();xrStart({...o,w:o.w?String(o.w):'',q:o.q?String(o.q):'',i:+d.i});const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
@@ -377,7 +377,7 @@ function svRowsHTML(){const R=[],eff=(v,k)=>v?`<span class="d6e ${v<0?'d':'c'}">
   const row0=(k,i,act,ico,cls,b,sub,v,ph)=>`<div class="d6r${k==='it'&&i===svAdd?' new':''}"><button class="d6rb" data-act="${act}" data-i="${i}"><span class="d6n">${toFa(R.length+1)}</span><span class="d6ti ${cls}${ph?' ph':''}">${ph?`<img data-ik="${esc(ph)}" alt="">`:ic(ico)}</span><span class="tx"><b>${b}</b><small>${sub}</small></span><span class="d6v">${v}</span></button></div>`;
   /* v61.6: بدون ضربدر؛ کشیدن به چپ = حذف، به راست = ویرایش */
   const row=(k,i,act,ico,cls,b,sub,v,ph)=>swW(row0(k,i,act,ico,cls,b,sub,v,ph),{r:[[act,'ویرایش','edit','#3b6fd6']],l:[['svRowDel','حذف','trash','#d23c48']],data:{k,i}});
-  sv.items.forEach((it,i)=>{const c=itCalc(it,sv.rate,sv.tax);R.push(row('it',i,'svItEdit','ring','gd',dkTag('sell')+esc(it.k)+(it.n?' <i>'+esc(it.n)+'</i>':''),(it.ab?`${wFmt(it.w)} گرم · عیار ${toFa(it.ay||750)} · وزن ۷۵۰: ${wFmt(Math.round(it.w*(it.ay||750)/750*1000)/1000)} · سود ${toFa(+it.pp||0)}٪`+(it.lab?' · آزمایشگاه '+esc(it.lab):'')+(it.ang?' · انگ '+esc(it.ang):''):`${wFmt(it.w)} گرم · عیار ${toFa(it.ay||750)} · اجرت ${ajLab(it)} · سود ${toFa(+it.pp||0)}٪`)+(c.fx?' · مبلغ دستی':''),sv.rate?eff(-c.tot):'<small class="d6nr">نرخ را بزنید</small>'))});
+  sv.items.forEach((it,i)=>{const c=itCalc(it,sv.rate,sv.tax);R.push(row('it',i,'svItEdit','ring','gd',dkTag('sell')+esc(it.k)+(it.n?' <i>'+esc(it.n)+'</i>':''),(it.ab?`${wFmt(it.w)} گرم · عیار ${toFa(it.ay||750)} · وزن ۷۵۰: ${wFmt(Math.round(it.w*(it.ay||750)/750*1000)/1000)} · سود ${toFa(+it.pp||0)}٪`+(it.lab?' · آزمایشگاه '+esc(it.lab):'')+(it.ang?' · انگ '+esc(it.ang):''):`${it.pz&&+it.cnt?qFmt(it.cnt)+' عدد · ':''}${wFmt(it.w)} گرم · عیار ${toFa(it.ay||750)} · اجرت ${ajLab(it)} · سود ${toFa(+it.pp||0)}٪`)+(c.fx?' · مبلغ دستی':''),sv.rate?eff(-c.tot):'<small class="d6nr">نرخ را بزنید</small>',xrPh(it)[0]))});
   (sv.xr||[]).forEach((x,i)=>{const C=xrCalc(x,sv.rate),R0=x.t==='sell'?-C.amount:x.t==='buy'?C.amount:0;R.push(row('xr',i,'svXrEdit',x.a==='gold'?'coin':(XA[x.a]||{}).k==='f'?'usd':'coin','x-'+x.t,dkTag(dkOfX(x))+esc(xrLab(x)),esc(xrSub(x,C)),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a),xrPh(x)[0]))});
   if(+sv.disc)R.push(row('dc',0,'svDisc','tag','pm-disc','تخفیف','از جمع سند کم می‌شود',eff(+sv.disc)));
   sv.pays.forEach((p,i)=>{const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row('py',i,'svPayEdit',M.i,out?'pm-out':'pm-in',dkTag(out?'out':'in')+esc(pyLab(p)),(p.m==='off'?'تخفیف · صفر کردن مانده':out?'پرداخت به مشتری':'دریافت از مشتری')+(p.tn?' · پیگیری '+esc(p.tn):''),eff(pAmt(p))))});
@@ -434,19 +434,21 @@ ACT.svDetGo=()=>{closeSheet();setTimeout(()=>ACT.svSave(),60)};
 /* v61.35: عکس سکه — چند عکس برای هر ردیف سکه (x.imgs، اولی هم در x.img برای داده‌های قبلی)؛ دوربین همان لحظه یا گالری،
    در اندروید و آیفون. عکس‌ها مثل رسیدها در IndexedDB و روی سرور (imgPut). */
 const xrPh=x=>Array.isArray(x.imgs)?x.imgs.slice():x.img?[x.img]:[];
-const xrPhOk=x=>!!(x&&x.a!=='gold'&&XA[x.a]&&XA[x.a].k==='c');
+const xrPhOk=x=>!!(x&&(x.pz||x.a!=='gold'&&XA[x.a]&&XA[x.a].k==='c'));
+/* ردیفی که عکس می‌گیرد: سکه (xr) یا سکه پارسیان (کالا یا خرید) */
+const phT=()=>{const a=sv&&sv.qa;if(!a)return null;if(a.x)return xrPhOk(a.x)?a.x:null;return a.pz&&a.k?a:null};
 async function phPaint(root){for(const im of (root||document).querySelectorAll('img[data-ik]:not([src])')){const v=await imgGet(im.dataset.ik);if(v&&im.isConnected)im.src=v;else if(im.isConnected)im.closest('.ph,.stpht')&&im.closest('.ph,.stpht').classList.add('miss')}}
-function stPhHTML(){const x=sv.qa&&sv.qa.x;if(!xrPhOk(x))return '';const K=xrPh(x),u=(XA[x.a]||{}).s||'سکه';
+function stPhHTML(){const x=phT();if(!x)return '';const K=xrPh(x),u=x.pz?'سکه پارسیان':(XA[x.a]||{}).s||'سکه';
   return `<div class="stph"><div class="stphh"><span class="stphi">${ic('cam')}</span><b>عکس ${esc(u)}</b><small>${K.length?toFa(K.length)+' عکس':'اختیاری · برای سند و پیگیری'}</small></div>
   <div class="stphl">${K.map(k=>`<button type="button" class="stpht" data-act="xrPhV" data-k="${esc(k)}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}
   <label class="stphb"><input type="file" accept="image/*" capture="environment" class="xrPhIn" hidden>${ic('cam')}<span>دوربین</span></label>
   <label class="stphb"><input type="file" accept="image/*" multiple class="xrPhIn" hidden>${ic('gal')}<span>گالری</span></label></div></div>`}
-document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.classList||!t.classList.contains('xrPhIn')||!sv||!sv.qa.x)return;const F=[...(t.files||[])];t.value='';if(!F.length)return;
-  const x=sv.qa.x;let n=0;toast(F.length>1?'در حال آماده کردن '+toFa(F.length)+' عکس…':'در حال آماده کردن عکس…');
+document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.classList||!t.classList.contains('xrPhIn')||!phT())return;const F=[...(t.files||[])];t.value='';if(!F.length)return;
+  const x=phT();let n=0;toast(F.length>1?'در حال آماده کردن '+toFa(F.length)+' عکس…':'در حال آماده کردن عکس…');
   for(const f of F){try{const d=await shrink(f),k=newImgKey('xr');if(await imgPut(k,d)){x.imgs=xrPh(x).concat([k]);x.img=x.imgs[0];n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}catch(e){toast('این عکس خوانده نشد',true)}}
   if(n){svKeep();qaRe();toast(n>1?toFa(n)+' عکس اضافه شد':'عکس اضافه شد')}});
 ACT.xrPhV=async d=>{const v=await imgGet(d.k);sheet(`<div class="sh-h"><b>عکس سکه</b><button class="x" data-act="close" aria-label="بستن">×</button></div><div class="phbig">${v?`<img src="${v}" alt="">`:'<div class="eh">عکس پیدا نشد</div>'}</div><button class="btn sec phdel" data-act="xrPhDel" data-k="${esc(d.k)}">${ic('trash')} برداشتن این عکس</button>`)};
-ACT.xrPhDel=d=>{const x=sv&&sv.qa.x;if(!x)return;const K=xrPh(x),i=K.indexOf(d.k);if(i<0){closeSheet();return}K.splice(i,1);x.imgs=K;x.img=K[0]||'';svKeep();closeSheet();qaRe();
+ACT.xrPhDel=d=>{const x=phT();if(!x)return;const K=xrPh(x),i=K.indexOf(d.k);if(i<0){closeSheet();return}K.splice(i,1);x.imgs=K;x.img=K[0]||'';svKeep();closeSheet();qaRe();
   toast('عکس برداشته شد','','بازگردانی',()=>{const L=xrPh(x);L.splice(i,0,d.k);x.imgs=L;x.img=L[0];svKeep();qaRe()})};
 function svBindRest(){phPaint($('svRows'));const G=$('svGc');if(G)G.onchange=()=>{sv.gconv=G.checked;svKeep();svRe()};const T=$('svT');if(T)T.onchange=()=>{sv.tax=T.checked;ls.set('m_tax',sv.tax);svKeep();svRe()}}
 function svBindCu(){const Q=$('svQ');if(!Q)return;Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{srchSwap('svCr',svCrHTML())},80)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(Q._t);sv.q=Q.value;const r=$('svCr');if(r)r.innerHTML=svCrHTML();const f=document.querySelector('#svCr [data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}};const C=$('svCr');if(C)C.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
@@ -551,9 +553,9 @@ function invDoc(c,t){const D=dates(t.date),its=t.items||[],xs=t.xr||[],hasI=its.
   const balRow=(t0,o,cl)=>`<tr${cl?' class="'+cl+'"':''}><th>${t0}</th>${col.map(([k,,f])=>{const v=val(k,o);return `<td>${v?f(v):'۰'} ${lab(v)}</td>`}).join('')}</tr>`;
   /* ردیف‌ها: کالا با مشخصات؛ طلا/سکه/ارز با مقدار و نرخ */
   let n=0;const R=[];
-  its.forEach(it=>R.push(`<tr><td class="k">${toFa(++n)}</td><td><b>${esc(it.k)}</b>${it.n?'<small>'+esc(it.n)+'</small>':''}<small>${it.ab?'آبشده':'فروش'}${+it.amT?' · مبلغ توافقی':''}</small></td><td>${wFmt(it.w)}</td><td>${toFa(it.ay||750)}</td><td>${fmt(mzOf2(it))}</td><td>${it.ab?'—':esc(ajLab(it))}</td><td>${toFa(String(+it.pp||0))}٪</td><td class="n">${fmt(it.tot)}</td></tr>`));
+  its.forEach(it=>R.push(`<tr><td class="k">${toFa(++n)}</td><td><b>${esc(it.k)}</b>${it.n?'<small>'+esc(it.n)+'</small>':''}<small>${it.pz&&+it.cnt?qFmt(it.cnt)+' عدد · ':''}${it.ab?'آبشده':'فروش'}${+it.amT?' · مبلغ توافقی':''}</small></td><td>${wFmt(it.w)}</td><td>${toFa(it.ay||750)}</td><td>${fmt(mzOf2(it))}</td><td>${it.ab?'—':esc(ajLab(it))}</td><td>${toFa(String(+it.pp||0))}٪</td><td class="n">${fmt(it.tot)}</td></tr>`));
   xs.forEach(x=>{const g=x.a==='gold',m=x.t==='sell'||x.t==='buy',amt=x.t==='sell'?x.amount:x.t==='buy'?-x.amount:0,u=g?'گرم':(XA[x.a]||{}).u||'';
-    R.push(`<tr${amt<0?' class="by"':''}><td class="k">${toFa(++n)}</td><td><b>${esc(xrLab(x))}</b>${x.lab?'<small>آزمایشگاه '+esc(x.lab)+(x.ang?' · انگ '+esc(x.ang):'')+'</small>':''}</td><td>${g?wFmt(x.n!=null?x.n:x.w):qFmt(x.n!=null?x.n:x.q)+' '+esc(u)}</td><td>${g?toFa(x.ay||750):'—'}</td><td>${g&&m?(x.t==='buy'&&!x.pul?fmt(Math.round(mzOf2(x)*(+x.ay||750)/750))+'<small>مظنه خرید</small>':fmt(mzOf2(x))):m&&x.pg?fmt(x.pg)+'<small>هر '+esc(u||'واحد')+'</small>':'—'}</td><td>—</td><td>—</td><td class="n">${amt?(amt<0?ng(amt):fmt(amt)):'<small>'+(x.t==='in'?'دریافت جنس':x.t==='out'?'تحویل جنس':'')+'</small>'}</td></tr>`)});
+    R.push(`<tr${amt<0?' class="by"':''}><td class="k">${toFa(++n)}</td><td><b>${esc(xrLab(x))}</b>${x.pz&&+x.cnt?'<small>'+qFmt(x.cnt)+' عدد</small>':''}${x.lab?'<small>آزمایشگاه '+esc(x.lab)+(x.ang?' · انگ '+esc(x.ang):'')+'</small>':''}</td><td>${g?wFmt(x.n!=null?x.n:x.w):qFmt(x.n!=null?x.n:x.q)+' '+esc(u)}</td><td>${g?toFa(x.ay||750):'—'}</td><td>${g&&m?(x.t==='buy'&&!x.pul?fmt(Math.round(mzOf2(x)*(+x.ay||750)/750))+'<small>مظنه خرید</small>':fmt(mzOf2(x))):m&&x.pg?fmt(x.pg)+'<small>هر '+esc(u||'واحد')+'</small>':'—'}</td><td>—</td><td>—</td><td class="n">${amt?(amt<0?ng(amt):fmt(amt)):'<small>'+(x.t==='in'?'دریافت جنس':x.t==='out'?'تحویل جنس':'')+'</small>'}</td></tr>`)});
   const sold=its.reduce((s,i)=>s+(+i.tot||0),0)+xs.reduce((s,x)=>s+(x.t==='sell'?+x.amount||0:0),0),bought=xs.reduce((s,x)=>s+(x.t==='buy'?+x.amount||0:0),0),W=its.reduce((s,i)=>s+(+i.w||0),0);
   const pays=t.pays||[],paid=pays.reduce((s,p)=>s+pAmt(p),0);
   const line=(l,v,cl,sub)=>`<div class="l${cl?' '+cl:''}"><span>${l}${sub?'<small>'+sub+'</small>':''}</span><b>${v}</b></div>`;
