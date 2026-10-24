@@ -1051,3 +1051,9 @@ button.sssbtn svg{width:17px;height:17px}
 .c6iv .c6a.iv{background:color-mix(in srgb,var(--gold,#c99a3a) 16%,var(--card));color:#a0731c}.c6iv .c6a.iv svg{width:19px;height:19px}
 .c6ivv{margin-inline-start:auto;text-align:left;line-height:1.2;flex:none}.c6ivv b{display:block;font-size:14px;font-weight:900;font-feature-settings:"tnum"}.c6ivv small{font-size:10px;color:var(--mut)}
 .c6ivv.d b{color:var(--red)}.c6ivv.c b{color:var(--blu)}
+/* v61.34: جزئیات سند با نگه داشتن «تسویه» */
+#act .svgo{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.svdet{display:flex;flex-direction:column;gap:10px;margin:4px 0 12px;max-height:62vh;overflow-y:auto;overscroll-behavior:contain}
+.svdet .blk .blh{cursor:default}
+.svdet .bld{margin:2px 0 6px;padding-bottom:6px;border-bottom:1px dashed var(--hair)}
+.svdok{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:12px;background:color-mix(in srgb,var(--ok) 12%,var(--card));color:var(--ok);font-weight:800;font-size:13px}.svdok svg{width:16px;height:16px}
