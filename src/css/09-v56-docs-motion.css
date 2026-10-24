@@ -1112,3 +1112,5 @@ button.sssbtn svg{width:17px;height:17px}
 /* v61.42: سند تسویه‌شده — پنل سبز */
 #app.full #act .d6foot .bzgo.svgo.ok,#act .d6foot .bzgo.svgo.ok{background:var(--ok)!important;box-shadow:0 6px 16px -8px color-mix(in srgb,var(--ok) 75%,transparent)}
 #act .d6foot .bzgo.svgo #svBt.ok .svbh em{color:var(--ok)}
+/* v61.43: جزئیات فاکتور با نگه داشتن باز می‌شود — متن انتخاب نشود */
+.sheet:has(.svdet),.svdet,.svdet *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}

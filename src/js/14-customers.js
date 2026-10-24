@@ -15,7 +15,8 @@ const qFmt=v=>{v=Math.round((+v||0)*100)/100;return toFa(v.toLocaleString('en-US
 function txD(t){const a=+t.amount||0,w=+t.weight||0;switch(t.type){case 'buy':case 'pin':return{r:a,g:0};case 'sell':case 'pout':return{r:-a,g:0};case 'gin':return{r:0,g:w};case 'gout':return{r:0,g:-w};
   case 'inv':{const paid=(t.pays||[]).reduce((s,p)=>s+(+p.amount||0),0),gc=t.gc||{};return{r:-(+t.total||0)+paid+(+gc.r||0),g:-(+gc.g||0)+(+t.ge||0),x:t.xe||null}}
   case 'xf':case 'cv':return{r:+t.r||0,g:+t.g||0};default:return{r:0,g:0}}}
-function cuBal(c){let R=0,G=0;const X={};for(const t of (c.txs||[])){if(t.del)continue;const d=txD(t);R+=d.r;G+=d.g;if(d.x)for(const k in d.x)X[k]=(X[k]||0)+(+d.x[k]||0)}
+/* v61.43: skip = شناسه‌هایی که حساب نشوند (سندی که الان در حال ویرایش است و ردیف‌های مرتبطش، تا «مانده قبلی» خودش را دوباره نشمارد) */
+function cuBal(c,skip){let R=0,G=0;const X={};for(const t of (c.txs||[])){if(t.del||(skip&&skip.has(String(t.id))))continue;const d=txD(t);R+=d.r;G+=d.g;if(d.x)for(const k in d.x)X[k]=(X[k]||0)+(+d.x[k]||0)}
   for(const k in X){X[k]=Math.round(X[k]*100)/100;if(!X[k])delete X[k]}
   return{R:Math.round(R),G:Math.round(G*1000)/1000,X}}
 const balTag=(v,gold)=>{if(!v)return `<span class="bz0">تسویه</span>`;const owe=v>0;return `<span class="${owe?'bzr':'bzb'}">${gold?wFmt(Math.abs(v))+' <i>گرم</i>':fmt(Math.abs(v))+' <i>تومان</i>'}</span>`};
