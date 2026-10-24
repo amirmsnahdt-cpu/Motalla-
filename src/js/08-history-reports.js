@@ -169,7 +169,14 @@ async function dayReport(iso,G0,FS0,T0,R0){const G=G0||dayGroups(iso),D=dates(is
   if(ri.length)h+=`<section class="pg">${pdfTop('رسیدهای واریز',D)}<h1>رسیدهای واریز</h1>${pdfSub(D)}<div class="bar"></div><div class="rc">${ri.map(({x,v})=>`<figure><img src="${v}" alt=""><figcaption><b>${esc(x.name)}</b>${fmt(x.amount)} تومان${x.tn?'<br>پیگیری <span class="tn">'+esc(x.tn)+'</span>':''}</figcaption></figure>`).join('')}</div>${pdfFoot()}</section>`;
   return pdfDoc(fileBase(iso),h)}
 /* چاپ داخل همین صفحه (بدون دانلود) */
+/* v61.33: آیفون/آیپد — چاپ داخل صفحه برنامه (پشت پنجره پیش‌نمایش) در Safari گاهی هیچ کاری نمی‌کند یا برگه سفید می‌دهد؛
+   برگه در یک صفحه جدا باز می‌شود و همان‌جا پنجره چاپ می‌آید (از آن‌جا «Save to Files» یا اشتراک PDF). دکمه چاپ هم بالای آن صفحه هست. */
+function printWin(html){let w=null;try{w=window.open('','_blank')}catch(e){}if(!w)return false;
+  const base=location.href.replace(/[^/]*$/,''),bar='<div class="pb0" style="position:sticky;top:0;z-index:9;display:flex;gap:8px;justify-content:center;padding:10px;background:#f4f5f8;border-bottom:1px solid #e3e6ec;font-family:Vazirmatn,Tahoma,sans-serif"><button onclick="window.print()" style="font:inherit;font-weight:800;font-size:15px;padding:10px 22px;border:0;border-radius:12px;background:#2152d9;color:#fff">چاپ / ذخیره PDF</button><button onclick="window.close()" style="font:inherit;font-size:15px;padding:10px 16px;border:0;border-radius:12px;background:#e6ebf5;color:#2152d9">بستن</button></div><style>@media print{.pb0{display:none!important}}</style>';
+  const h=html.replace(/<head>/i,'<head><base href="'+base+'">').replace(/<body([^>]*)>/i,'<body$1>'+bar)+'<script>window.onload=function(){setTimeout(function(){try{window.print()}catch(e){}},500)}<\/script>';
+  try{w.document.open();w.document.write(h);w.document.close();return true}catch(e){try{w.close()}catch(_){}return false}}
 function printReport(){const html=window.__pv||withCtx(reportHTML),doc=new DOMParser().parseFromString(html,'text/html');doc.querySelectorAll('.pb').forEach(b=>b.remove());
+  if(isIOS()&&printWin('<!doctype html>'+doc.documentElement.outerHTML))return;
   let css=[...doc.querySelectorAll('style')].map(s=>s.textContent).join('\n');const pg=(css.match(/@page\{[^}]*\}/)||[''])[0];css=css.replace(pg,'').replace(/(^|\})\s*body\{/g,'$1 #printArea{');
   $('printArea').innerHTML='<style>'+pg+'@media print{'+css+'}</style>'+doc.body.innerHTML;
   /* نام فایل PDF ذخیره‌شده = عنوان صفحه هنگام چاپ؛ پس عنوان گزارش (مثلاً «مطلا ( تاریخ … )») موقتاً عنوان برنامه می‌شود */

@@ -1047,3 +1047,7 @@ button.sssbtn svg{width:17px;height:17px}
 .bzsr.dkrw.on{background:color-mix(in srgb,var(--blu) 9%,var(--card))}
 .bzsr.dkrw.on .tx b{color:var(--blu)}
 .bzsr.dkrw.on::after{content:"✓";margin-inline-start:auto;flex:none;font-weight:900;font-size:15px;color:var(--blu);padding-inline-end:4px}
+/* v61.33: نتیجه شماره سند در جستجوی حساب مشتریان */
+.c6iv .c6a.iv{background:color-mix(in srgb,var(--gold,#c99a3a) 16%,var(--card));color:#a0731c}.c6iv .c6a.iv svg{width:19px;height:19px}
+.c6ivv{margin-inline-start:auto;text-align:left;line-height:1.2;flex:none}.c6ivv b{display:block;font-size:14px;font-weight:900;font-feature-settings:"tnum"}.c6ivv small{font-size:10px;color:var(--mut)}
+.c6ivv.d b{color:var(--red)}.c6ivv.c b{color:var(--blu)}
