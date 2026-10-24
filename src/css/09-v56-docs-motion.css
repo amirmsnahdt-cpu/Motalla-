@@ -812,3 +812,7 @@ button.d6tot>span{display:flex;flex-direction:column}button.d6tot>span small{fon
 .stl.am b{font-size:18px;overflow:visible}
 .stl b{overflow:visible;text-overflow:clip}
 .txv2 b small{color:inherit}
+/* v61.9: چرخنده تازه‌سازی داخل لیست کالا (کشیدن به پایین در بالای لیست) */
+.ispin{display:grid;place-items:center;height:0;overflow:hidden;transition:height .2s cubic-bezier(.2,.8,.2,1)}
+.ispin .pspin{width:24px;height:24px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--blu);opacity:var(--pp,0);transform:rotate(calc(var(--pp,0)*300deg))}
+.ispin.spin .pspin{opacity:1;animation:pspin .7s linear infinite}

@@ -102,7 +102,7 @@ function g2j0(iso){let r;try{const o={};new Intl.DateTimeFormat('en-US-u-ca-pers
 const TMV=[];let tmOn=false;
 function tmMove(e){for(const f of TMV)f(e)}
 function tmAdd(fn){TMV.push(fn);tmSync()}
-function tmSync(){const v=document.getElementById('view'),ov=document.getElementById('ov'),n=!v||v.scrollTop<=1||!!(ov&&!ov.classList.contains('hide'));
+function tmSync(){const v=document.getElementById('view'),ov=document.getElementById('ov'),n=!v||v.scrollTop<=1||!!(ov&&!ov.classList.contains('hide'))||!!(v&&v.querySelector('.dkl'));
   if(n===tmOn)return;tmOn=n;if(n)document.addEventListener('touchmove',tmMove,{passive:false});else document.removeEventListener('touchmove',tmMove,{passive:false})}
 const DATES_C=new Map();
 function dates(v){if(v){let c=DATES_C.get(v);if(!c){c=dates0(v);if(DATES_C.size>3000)DATES_C.clear();DATES_C.set(v,c)}return {...c}}return dates0(v)}

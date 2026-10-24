@@ -1,6 +1,6 @@
 /* صفحه‌های کشویی (جزئیات، تقسیم): از بالای صفحه به پایین بکشید تا بسته شود */
 (()=>{let g=null;const els=()=>[$('view'),$('bar'),$('act')];
-  document.addEventListener('touchstart',e=>{const v=$('view');if(e.touches.length!==1||!SLIDEP.has(cur)||!v||v.scrollTop>0||!$('ov').classList.contains('hide')||(cur==='ent'&&entEdit)||e.target.closest('input,textarea,select,.swr'))return;const t=e.touches[0];g={y:t.clientY,x:t.clientX,lk:null,d:0}},{passive:true});
+  document.addEventListener('touchstart',e=>{const v=$('view');if(e.touches.length!==1||!SLIDEP.has(cur)||!v||v.scrollTop>0||!$('ov').classList.contains('hide')||(cur==='ent'&&entEdit)||e.target.closest('input,textarea,select,.swr')||inScr(e.target,v))return;const t=e.touches[0];g={y:t.clientY,x:t.clientX,lk:null,d:0}},{passive:true});
   tmAdd(e=>{if(!g)return;const t=e.touches[0],dy=t.clientY-g.y,dx=t.clientX-g.x;
     if(!g.lk){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;g.lk=dy>0&&dy>Math.abs(dx)*1.2&&$('view').scrollTop<=0?'v':'x';if(g.lk==='v')els().forEach(el=>{if(el)el.style.transition='none'})}
     if(g.lk!=='v')return;e.preventDefault();g.d=Math.max(0,dy);els().forEach(el=>{if(el)el.style.transform=`translateY(${g.d}px)`})});
