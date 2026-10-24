@@ -116,3 +116,9 @@ function zvCropInit(){const im=$('zvi'),cr=$('zcr');if(!im||!cr||!ZV||!ZV.crop)r
     ZV.crop=k;place()};
   cr.onpointerup=cr.onpointercancel=()=>{dr=null}}
 addEventListener('keydown',e=>{if(!ZV)return;if(e.key==='Escape')zvClose();else if(e.key==='ArrowLeft'||e.key==='ArrowRight')ACT.zvGo({d:e.key==='ArrowLeft'?1:-1})});
+/* v61.8: اپ اندروید قدیمی (بدون AndroidBridge.camPick) فقط گالری باز می‌کند؛ بار اول در هر باز شدن برنامه که فیلد عکس زده شود،
+   پیام کوتاه با دکمه نصب نسخه تازه (نسخه تازه پنجره «دوربین / گالری» دارد) */
+document.addEventListener('click',ev=>{const t=ev.target;if(!t||t.tagName!=='INPUT'||t.type!=='file'||!/image/.test(t.accept||''))return;
+  if(!/MotallaAndroid/.test(navigator.userAgent)||(window.AndroidBridge&&AndroidBridge.camPick))return;
+  try{if(sessionStorage.getItem('m_camup'))return;sessionStorage.setItem('m_camup','1')}catch(e){return}
+  setTimeout(()=>toast('برای گرفتن عکس با دوربین، نسخه تازه اپ را نصب کنید',false,'نسخه تازه',()=>ACT.getApk()),600)},true);

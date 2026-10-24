@@ -100,21 +100,21 @@ public class MainActivity extends Activity {
                 try {
                     boolean img = false;
                     for (String t : params.getAcceptTypes()) if (t != null && (t.startsWith("image") || t.isEmpty())) img = true;
-                    Intent cam = img ? camIntent() : null;
-                    if (cam != null && params.isCaptureEnabled()) {
+                    boolean hasCam = img && getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY);
+                    if (hasCam && params.isCaptureEnabled()) {
                         // دکمه «دوربین» صفحه: مستقیم دوربین باز شود
-                        startActivityForResult(cam, FILE_REQ);
-                    } else if (cam != null) {
-                        // انتخاب عکس: گالری، با گزینه «دوربین» در همان پنجره
-                        Intent ch = Intent.createChooser(params.createIntent(), "افزودن عکس");
-                        ch.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cam});
-                        startActivityForResult(ch, FILE_REQ);
+                        openCam(params);
+                    } else if (hasCam && params.getMode() != FileChooserParams.MODE_OPEN_MULTIPLE) {
+                        // v61.8: انتخاب‌گر خود اندروید (createChooser + EXTRA_INITIAL_INTENTS) در بیشتر گوشی‌های تازه
+                        // گزینه دوربین را نشان نمی‌داد و مستقیم گالری می‌آمد؛ حالا پنجره خود برنامه: دوربین یا گالری
+                        pickSource(params);
                     } else {
-                        camUri = null;
-                        startActivityForResult(params.createIntent(), FILE_REQ);
+                        // چند عکس با هم (کنارش دکمه جدای «دوربین» هست) یا فایل غیرعکس: گالری/فایل
+                        openPicker(params);
                     }
                 } catch (Exception e) {
                     fileCb = null;
+                    camUri = null;
                     toast("انتخاب فایل در این گوشی ممکن نیست");
                     return false;
                 }
@@ -135,13 +135,50 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** پنجره کوچک «دوربین / گالری»؛ بستن پنجره = لغو (صفحه دوباره قابل انتخاب می‌ماند) */
+    private void pickSource(final WebChromeClient.FileChooserParams params) {
+        final boolean[] chosen = {false};
+        android.app.AlertDialog d = new android.app.AlertDialog.Builder(this)
+            .setTitle("افزودن عکس")
+            .setItems(new CharSequence[]{"گرفتن عکس با دوربین", "انتخاب از گالری"}, (dlg, which) -> {
+                chosen[0] = true;
+                if (which == 0) openCam(params); else openPicker(params);
+            })
+            .setNegativeButton("انصراف", null)
+            .create();
+        d.setOnDismissListener(x -> { if (!chosen[0]) cancelPick(); });
+        d.show();
+    }
+
+    /** دوربین گوشی؛ اگر برنامه دوربین پیدا نشد یا باز نشد، گالری */
+    private void openCam(WebChromeClient.FileChooserParams params) {
+        Intent cam = camIntent();
+        if (cam != null) {
+            try { startActivityForResult(cam, FILE_REQ); return; }
+            catch (Exception e) { camUri = null; }
+        }
+        toast("برنامه دوربین پیدا نشد؛ از گالری انتخاب کنید");
+        openPicker(params);
+    }
+
+    private void openPicker(WebChromeClient.FileChooserParams params) {
+        camUri = null;
+        try { startActivityForResult(params.createIntent(), FILE_REQ); }
+        catch (Exception e) { toast("انتخاب فایل در این گوشی ممکن نیست"); cancelPick(); }
+    }
+
+    private void cancelPick() {
+        camUri = null;
+        if (fileCb != null) { fileCb.onReceiveValue(null); fileCb = null; }
+    }
+
     /** عکس‌های انتخاب‌شده از گالری. وقتی صفحه اجازه چند عکس می‌دهد، گالری اندروید نتیجه را در ClipData می‌فرستد
         و getData() خالی است؛ parseResult خود اندروید فقط getData() را می‌خواند، پس عکس‌ها به صفحه نمی‌رسید. */
     /** دوربین گوشی؛ عکس در پوشه موقت برنامه (CamProvider) ذخیره می‌شود. اگر دوربینی نبود null */
     private Intent camIntent() {
         try {
             Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (i.resolveActivity(getPackageManager()) == null) return null;
+            // resolveActivity در بعضی گوشی‌ها با وجود دوربین null می‌داد؛ نبودن برنامه دوربین را startActivity خودش خبر می‌دهد
             File d = CamProvider.dir(this);
             File[] old = d.listFiles();
             if (old != null) for (File f : old) if (System.currentTimeMillis() - f.lastModified() > 86400000L) f.delete();
@@ -308,6 +345,10 @@ public class MainActivity extends Activity {
         public boolean multiPick() { return true; }
 
         /** این نسخه دکمه دوربین (عکس گرفتن همان لحظه) را پشتیبانی می‌کند */
+        /** v61.8: هر فیلد عکس (بدون دکمه جدای دوربین) پنجره «دوربین / گالری» خود برنامه را نشان می‌دهد */
+        @JavascriptInterface
+        public boolean camPick() { return true; }
+
         @JavascriptInterface
         public boolean camera() { return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY); }
 
