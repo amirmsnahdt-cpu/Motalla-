@@ -4,7 +4,11 @@
    تنها روش تازه: m:'dep' = خریدار مستقیم به فروشنده یک واریزی پرداخت می‌کند → در همان واریزی یک «تسویه از مشتری» با byInv ثبت می‌شود
    (بدون ثبت جداگانه در حساب خریدار؛ اثرش همین ردیف سند است). حذف سند، آن تسویه را هم برمی‌دارد. */
 let CK=null;
-const ckOut=()=>svTot().rest<0;
+/* v61.44: تسویه حساب بدون کالا — وقتی سند کالا/طلا/سکه ندارد، پنجره تسویه روی «مانده حساب» مشتری کار می‌کند
+   (مانده قبلی + دریافت/پرداخت‌های همین سند)؛ با کالا، روی مانده همین سند. مثبت = طلبکاریم */
+const ckAcct=()=>!!(sv&&svCu()&&!sv.items.length&&!(sv.xr||[]).length);
+const ckRest=()=>ckAcct()?-svRBal():svTot().rest;
+const ckOut=()=>ckRest()<0;
 const CKO=[['cust','حواله به مشتری','swap'],['hav','حواله از حساب ما','bank'],['cash','پرداخت نقدی','cash'],['off','پرداخت تخفیف','tag']];
 const CKT=[['dep','حواله از مشتری','swap'],['pos','کارتخوان','card'],['hav','حواله به بانک','bank'],['cash','دریافت نقدی','cash'],['gx','تعویض طلا','coin'],['off','دریافت تخفیف','tag']];
 const ckUsedDep=id=>sv.pays.filter(p=>p.m==='dep'&&String(p.entId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
@@ -41,9 +45,9 @@ function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><sm
     <div class="ckx" id="ckX">${sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'}</div>`}
   const T=(ckOut()?CKO:CKT).find(z=>z[0]===m);
   return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><button class="lnk" data-act="ckM" data-m="">انصراف</button></div>${b}${(m==='dep'||m==='cust')&&!CK.sel?'':`<button class="qago ckadd" data-act="ckAdd">${ic('plus')} افزودن به تسویه</button>`}</div>`}
-function ckHTML(){const T=svTot(),c=svCu(),r=T.rest,R=ckRows();
-  return `<div class="ckw"><div class="sh-h"><div><b>تسویه سند</b><small class="shsub">${esc(c?cuName(c):'')}${r<0?' · مانده را به مشتری می‌پردازیم':''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="ckh ${r>0?'d':r<0?'c':'z'}"><small>${r>0?'مانده این سند · طلبکاریم':r<0?'مانده این سند · بدهکاریم':'این سند کامل تسویه شد ✓'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b><em>جمع سند ${fmt(Math.abs(T.total))}${T.paid?(T.paid<0?' · پرداخت‌شده ':' · دریافت‌شده ')+fmt(Math.abs(T.paid)):''}</em></div>
+function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),R=ckRows(),A=ckAcct(),P=A?-(svCuBal(c).R||0):0;
+  return `<div class="ckw"><div class="sh-h"><div><b>${A?'تسویه حساب':'تسویه سند'}</b><small class="shsub">${esc(c?cuName(c):'')}${r<0?' · مانده را به مشتری می‌پردازیم':''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="ckh ${r>0?'d':r<0?'c':'z'}"><small>${r>0?(A?'مانده حساب':'مانده این سند')+' · طلبکاریم':r<0?(A?'مانده حساب':'مانده این سند')+' · بدهکاریم':A?'حساب تسویه شد ✓':'این سند کامل تسویه شد ✓'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b><em>${A?'مانده قبلی '+fmt(Math.abs(P))+(P?' '+(P>0?'طلبکاریم':'بدهکاریم'):''):'جمع سند '+fmt(Math.abs(T.total))}${T.paid?(T.paid<0?' · پرداخت‌شده ':' · دریافت‌شده ')+fmt(Math.abs(T.paid)):''}</em></div>
   ${R.length?`<div class="ckrs">${R.map(z=>`<div class="ckr"><span class="d6ti pm-in">${ic(z.ico)}</span><span class="tx"><b>${esc(z.lab)}</b>${z.sub?`<small>${z.sub}</small>`:''}</span><b class="ckam">${fmt(z.amt)}</b><button class="d6x" data-act="ckDel" data-k="${z.k}" data-i="${z.i}" aria-label="حذف">${ic('x')}</button></div>`).join('')}</div>`:''}
   ${CK.m?ckForm():!r?'':`<div class="ckt${r<0?' out':''}">${(r<0?CKO:CKT).map(([k,t,i])=>`<button class="ckti q-${k}" data-act="ckM" data-m="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div>`}
   <button class="xgo cksave" data-act="ckSave">${ic('check')} پایان و ثبت سند${r>0?`<small>مانده ${fmt(r)} به حساب مشتری</small>`:''}</button>
@@ -55,7 +59,7 @@ function ckBind(f){const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=$('ckY');const PS=$(
   const gx=()=>{ckRead();const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate),el=$('ckX');if(el)el.innerHTML=sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'};
   if(W)W.oninput=gx;if(Y)Y.oninput=gx;
   const el=f&&$(f);if(el)sheetFocus(el)}
-const ckLeft=()=>Math.abs(svTot().rest);
+const ckLeft=()=>Math.abs(ckRest());
 ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.39: تخفیف از پنجره تسویه — روی مانده همین سند */if(m==='off'){svOffOpen(true);return}CK={m,amount:m==='gx'?0:ckLeft(),q:''};if(m==='pos'){const L=CH('pos'),last=ls.get('m_ch_pos','');CK.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
   if(m==='hav'){const last=ls.get('m_src_hav','');const s=sources.find(z=>String(z.id)===String(last))||sources[0];CK.srcId=s?s.id:''}
   ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m?'ckA':'')};
@@ -81,7 +85,7 @@ ACT.ckAdd=()=>{ckRead();const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0;
   CK={m:''};ckBackToDoc()};
 /* v61.32: بعد از افزودن هر دریافت/پرداخت در تسویه، پنجره بسته می‌شود و سند با ردیف تازه و مانده تازه دیده می‌شود */
 function ckBackToDoc(){svKeep();closeSheet();svAdd=-1;svRe();setTimeout(()=>{const r=document.querySelector('#svRows .d6r:last-child');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'});if(r&&!RM()&&r.animate)r.animate([{background:'color-mix(in srgb,var(--blu) 14%,transparent)'},{background:'transparent'}],{duration:900,easing:'ease-out'})},120);
-  const T=svTot();toast(T.rest?('ردیف به سند اضافه شد · مانده '+fmt(Math.abs(T.rest))):'سند تسویه شد ✓')}
+  const r=ckRest();toast(r?('ردیف به سند اضافه شد · مانده '+fmt(Math.abs(r))):(ckAcct()?'حساب تسویه شد ✓':'سند تسویه شد ✓'))}
 ACT.ckDel=d=>{const L=d.k==='xr'?sv.xr:sv.pays;L.splice(+d.i,1);svKeep();svRe();ckRe()};
 /* «پایان» = ثبت و خروج از سند (همان ثبت خودکار خروج) */
 ACT.ckSave=()=>{ckRead();closeSheet();setTimeout(()=>{if(cur==='sell')back()},60)};

@@ -121,8 +121,8 @@ ACT.svTax=()=>{sv.tax=!sv.tax;ls.set('m_tax',sv.tax);svKeep();const b=$('svTx');
 const aSell=()=>`<div class="d6foot"><div id="svBal">${svBalHTML()}</div><button aria-label="تسویه · برای جزئیات سند نگه دارید" class="btn gold bzgo svgo${(()=>{const c=svBtC();return c?' '+c:''})()}" data-act="svSave"><span class="svgl"><span class="svgi">${ic('check')}</span>تسویه</span><span id="svBt" class="${svBtC()}">${svBtTxt()}</span></button></div>`;
 /* v61.42: دکمه تسویه «مانده سند» را نشان می‌دهد (جمع سند منهای دریافت‌ها، تخفیف و پرداخت‌ها)؛ بدون دریافت/پرداخت همان «جمع سند».
    رنگ کل پنل از همین مانده: قرمز طلبکاریم، آبی بدهکاریم، سبز وقتی سند تسویه شد */
-const svBtC=()=>{if(!sv)return '';const T=svTot();if(!T.total&&!sv.pays.length)return '';return T.rest>0?'d':T.rest<0?'c':'ok'};
-const svBtTxt=()=>{if(!sv)return '';const T=svTot();if(!(sv.rate||!svHasG())||(!T.total&&!sv.pays.length))return '';const pd=sv.pays.length>0,r=pd?T.rest:T.total;
+const svBtC=()=>{if(!sv)return '';if(ckAcct()){const v=svRBal();return !v?(sv.pays.length?'ok':''):v<0?'d':'c'}const T=svTot();if(!T.total&&!sv.pays.length)return '';return T.rest>0?'d':T.rest<0?'c':'ok'};
+const svBtTxt=()=>{if(!sv)return '';if(ckAcct()){const v=-svRBal();if(!v&&!sv.pays.length)return '';return !v?`<span class="svbh"><small>مانده حساب</small><em>تسویه شد</em></span><b><span id="svTotN" data-v="0">۰</span><i>تومان</i></b>`:`<span class="svbh"><small>مانده حساب</small><em>${v>0?'طلبکاریم':'بدهکاریم'}</em></span><b><span id="svTotN" data-v="${Math.abs(v)}">${fmt(Math.abs(v))}</span><i>تومان</i></b>`}const T=svTot();if(!(sv.rate||!svHasG())||(!T.total&&!sv.pays.length))return '';const pd=sv.pays.length>0,r=pd?T.rest:T.total;
   if(pd&&!r)return `<span class="svbh"><small>مانده سند</small><em>تسویه شد</em></span><b><span id="svTotN" data-v="0">۰</span><i>تومان</i></b>`;
   return `<span class="svbh"><small>${pd?'مانده سند':'جمع سند'}</small><em>${r>0?'طلبکاریم':'بدهکاریم'}</em></span><b><span id="svTotN" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b>`};
 /* ----- مشتری ----- */
@@ -303,7 +303,7 @@ function svOffApply(a){const v=offBal();if(!v){toast('مانده مبلغ صفر
   toast((v<0?'دریافت تخفیف ':'پرداخت تخفیف ')+fmt(a)+(r?' · مانده '+fmt(r):' · مانده صفر شد'),'','بازگردانی',()=>{const j=sv.pays.findIndex(p=>p.m==='off');if(old){if(j>=0)sv.pays[j]=old;else sv.pays.push(old)}else if(j>=0)sv.pays.splice(j,1);svKeep();svRe()})}
 let OFF=null;
 /* مانده هدف تخفیف: از پنجره تسویه = مانده همین سند؛ از خانه مبلغ پایین سند = مانده حساب (منفی = طلبکاریم) */
-const offBal=()=>OFF&&OFF.doc?-svTot().rest:svRBal();
+const offBal=()=>OFF&&OFF.doc?-ckRest():svRBal();
 function offHTML(){const v=offBal(),A=Math.abs(v),d6=off6(A),a=+OFF.a||0,r=A-a,dir=v<0?'دریافت تخفیف':'پرداخت تخفیف',cl=v<0?'d':'c';
   return `<div class="sh-h"><div><b>${dir}</b><small class="shsub">${OFF.doc?'مانده این سند':'مانده حساب'} ${fmt(A)} تومان · ${ourLab(v)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="offq"><button type="button" class="offc${a===d6?' on':''}" data-act="offPick" data-v="${d6}"><small>۶ رقم آخر</small><b>${fmt(d6)}</b></button>${A!==d6?`<button type="button" class="offc${a===A?' on':''}" data-act="offPick" data-v="${A}"><small>کل مانده</small><b>${fmt(A)}</b></button>`:''}</div>
@@ -514,7 +514,7 @@ function svCommit(){const c=svCu();
   return {c,t}}
 /* دکمه پایین سند: «تسویه» */
 ACT.svSave=()=>{const c=svCu();if(!c){toast('مشتری سند را انتخاب کنید',true);const q=$('svQ');if(q){q.focus();q.scrollIntoView({behavior:'smooth',block:'center'})}return}
-  if(!svFlush())return;if(!svRows()){toast('کالا، طلا، سکه یا دریافت و پرداختی اضافه کنید',true);const k=$('qK');if(k)k.focus();return}
+  if(!svFlush())return;if(!svRows()&&!svRBal()){toast('حساب این مشتری تسویه است؛ کالا، طلا یا سکه اضافه کنید',true);const k=$('qK');if(k)k.focus();return}
   if(svHasG()&&!sv.rate){toast('مظنه یا نرخ گرم را بزنید',true);$('svM').focus();return}
   ckOpen()};
 /* خروج از صفحه سند → ثبت خودکار. نتیجه: true = ثبت شد */
