@@ -128,7 +128,8 @@ function goldStock(){const m={};GK.forEach(k=>m[k]=0);for(const c of custs){if(c
 /* موجودی سکه و ارز مغازه (از سندها) */
 function assetStock(){const m={};for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv')continue;for(const x of t.xr||[]){if(x.a==='gold'||x.pul)continue;m[x.a]=(m[x.a]||0)+(x.t==='buy'||x.t==='in'?1:-1)*(+x.q||0)}}}
   Object.keys(m).forEach(k=>{m[k]=Math.round(m[k]*100)/100;if(!m[k])delete m[k]});return m}
-const PROFIT_DEF=()=>+ls.get('m_profit',7)||7;
+/* v61.12: سود پیش‌فرض ثابت: آبشده ۰٫۵٪، بقیه ۷٪ (در هر ردیف قابل تغییر؛ تغییر یک ردیف پیش‌فرض بقیه را عوض نمی‌کند) */
+const PROFIT_DEF=()=>7,PROFIT_AB=0.5;
 const decIn=v=>toEn(String(v||'')).replace(/[٫،,\/]/g,'.').replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1');
 ACT.txOpen=d=>{const c=curCu(),t=c&&(c.txs||[]).find(x=>String(x.id)===String(d.id));if(!t)return;if(t.type==='inv'){invOpen(c.id,t.id);return}if(t.type==='xf'||t.type==='cv'){xfShow(c,t);return}const T=TXT[t.type]||{t:t.type},e=txEff(t);
   const kv=(l,v)=>v?`<div class="kv"><small>${l}</small><b>${v}</b><span class="kvx"></span></div>`:'';
