@@ -266,7 +266,7 @@ function refreshMsg(r){if(r.off){toast('اتصال به اینترنت یا سر
 /* صفحه را با نوار بارگذاری از سرور تازه کن (هنگام رفتن به هر صفحه، بدون پیام) */
 let quietT=0;function quietRefresh(){if(!TOKEN||Date.now()-quietT<2500)return;quietT=Date.now();loading(true);refreshAll().finally(()=>loading(false))}
 (()=>{const V=()=>$('view'),P=$('ptr'),TH=70,MAX=120;let st=null,d=0,busy=false;
-  const okStart=()=>!SLIDEP.has(cur)&&!busy&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&$('auth').classList.contains('hide')&&!document.querySelector('.swr.on');
+  const okStart=()=>!slideDown()&&!busy&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&$('auth').classList.contains('hide')&&!document.querySelector('.swr.on');
   const place=()=>{const b=$('bar');P.style.top=((b?b.getBoundingClientRect().bottom:60)+6)+'px'};
   const hp=()=>cur==='home'&&V().querySelector('.bpanel');
   const show=(y,spin)=>{const pn=hp();if(pn){/* v59: عنوان و ردیف‌ها با هم پایین می‌آیند و هنگام تازه‌سازی همان‌جا می‌مانند (بدون اسکلت خاکستری و بدون جابه‌جایی چیدمان) */

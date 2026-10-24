@@ -9,7 +9,7 @@ function swW(inner,o){let R=o.r,L=o.l;
   return `<div class="swr"${fk} data-nr="${R.length}" data-nl="${L.length}">${R.length?`<div class="swa r">${R.map(btn).join('')}</div>`:''}${L.length?`<div class="swa l">${L.map(btn).join('')}</div>`:''}<div class="swc">${inner}</div></div>`}
 let swT=0;
 const swTip=()=>ls.get('m_swiped2',false)?'':`<div class="swtip">ردیف را بکشید: <i>به چپ ← ویرایش و کپی</i><i>به راست → حذف</i></div>`;
-const edgeOK=()=>!SLIDEP.has(cur)&&(!!PARENT[cur]||(cur==='entry'&&editId))&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide');
+const edgeOK=()=>!slideDown()&&(!!PARENT[cur]||(cur==='entry'&&editId))&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide');
 (()=>{let s=null,open=null;const BW=76;
   const setX=(w,x,anim)=>{const c=w.querySelector(':scope>.swc'),r=w.querySelector(':scope>.swa.r'),l=w.querySelector(':scope>.swa.l');
     [c,r,l].forEach(e=>{if(e)e.style.transition=anim?'':'none'});c.style.transform=x?`translateX(${x}px)`:'';if(r)r.style.width=(x<0?-x:0)+'px';if(l)l.style.width=(x>0?x:0)+'px';w.classList.toggle('on',!!x);w._x=x};
