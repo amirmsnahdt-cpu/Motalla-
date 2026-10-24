@@ -1109,3 +1109,6 @@ button.sssbtn svg{width:17px;height:17px}
 .rdps{padding:2px 0}.rdp{display:flex;align-items:center;gap:11px;padding:10px 14px}.rdp+.rdp{border-top:1px solid var(--hair);margin:0 14px;padding:10px 0}
 .rdpv{flex:none;font-size:15px;font-weight:900;font-feature-settings:"tnum"}
 .svdet .rdc>.rdb:first-child{border-top:0;padding-top:10px}
+/* v61.42: سند تسویه‌شده — پنل سبز */
+#app.full #act .d6foot .bzgo.svgo.ok,#act .d6foot .bzgo.svgo.ok{background:var(--ok)!important;box-shadow:0 6px 16px -8px color-mix(in srgb,var(--ok) 75%,transparent)}
+#act .d6foot .bzgo.svgo #svBt.ok .svbh em{color:var(--ok)}
