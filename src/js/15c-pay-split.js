@@ -4,12 +4,12 @@
 const famRoot=x=>x.splitOf!=null&&entries.some(e=>e.id===x.splitOf)?x.splitOf:x.id;
 const famOf=x=>{const k=famRoot(x);return validated().filter(r=>r.id===k||r.splitOf===k).sort((a,b)=>(a.id===k?-1:b.id===k?1:a.id-b.id))};
 function famSrc(r,A){const si=r.sentBid?srcInfo(r.id):null;if(si)return{name:si.src,st:si.st,sent:true};const a=A.get(r.id);return a&&a.src?{name:a.src,st:'none'}:null}
-function entPieces(x){const F=famOf(x),sent=F.some(r=>r.sentBid),ok=can('split')&&!x.full&&x.level<2;if(F.length<2&&!(ok&&x.amount>0))return '';
-  if(F.length<2)return `<div class="esec psplit"><div class="stlh"><div><b>پرداخت از چند منبع</b><small>اگر این مبلغ باید بخشی از یک بانک و بخشی از بانک دیگر پرداخت شود</small></div>${!sent?`<button class="stladd" data-act="paySplit" data-id="${x.id}">${ic('split')} تقسیم بین منابع</button>`:''}</div>${sent?'<div class="muted" style="font-size:12px">این واریزی ارسال شده؛ برای تقسیم اول از پیگیری برگردانید.</div>':''}</div>`;
+function entPieces(x){const F=famOf(x),sent=F.some(r=>r.sentBid),ok=can('split')&&!x.full&&x.level<2;if(F.length<2&&!(ok&&x.amount>0)&&!ssCan(x))return '';
+  if(F.length<2)return `<div class="esec psplit"><div class="stlh"><div><b>پرداخت از چند منبع</b><small>اگر این مبلغ باید بخشی از یک بانک و بخشی از بانک دیگر پرداخت شود</small></div>${!sent?`<button class="stladd" data-act="paySplit" data-id="${x.id}">${ic('split')} تقسیم بین منابع</button>`:''}</div>${sent?(ssCan(x)?`<div class="muted" style="font-size:12px;margin-bottom:8px">ارسال شده؛ اگر بخشی از مبلغ از بانک دیگری پرداخت شده، همین‌جا جدا کنید.</div>${ssBtn(x)}`:'<div class="muted" style="font-size:12px">این واریزی ارسال و تأیید شده یا لیستش بایگانی شده است.</div>'):''}</div>`;
   const tot=sum(F),root=famRoot(x),A=allocMap();
   return `<div class="esec psplit"><div class="stlh"><div><b>پرداخت از ${toFa(F.length)} منبع</b><small>جمع ${fmt(tot)} تومان · هر بخش جدا ارسال و پیگیری می‌شود</small></div>${ok&&!sent?`<button class="stladd" data-act="paySplit" data-id="${x.id}">${ic('edit')} تغییر</button>`:''}</div>
   <div class="stll2">${F.map((r,i)=>{const s=famSrc(r,A),me=r.id===x.id,st=s&&s.sent?(s.st==='ok'?['k','تسویه شد']:s.st==='fail'?['f','ناموفق']:['w','در انتظار']):s?['d','آماده ارسال']:['n','بدون منبع'];return `<div class="stlrw ${st[0]}${me?' me':''}"><button class="stlr" data-act="openEnt" data-id="${r.id}"><span class="bri"><b>${toFa(i+1)}</b></span><span class="tx"><b>${esc(s?s.name:'بدون منبع')}</b><small>${me?'همین بخش':r.id===root?'بخش اصلی':'بخش '+toFa(i+1)}</small></span><span class="brv"><b>${fmt(r.amount)} <i>تومان</i></b><small>${st[1]}</small></span></button></div>`}).join('')}</div>
-  ${ok&&!sent?`<button class="link" data-act="paySplitUndo" data-id="${x.id}">یکی کردن بخش‌ها</button>`:''}</div>`}
+  ${ok&&!sent?`<button class="link" data-act="paySplitUndo" data-id="${x.id}">یکی کردن بخش‌ها</button>`:''}${sent?ssBtn(x):''}</div>`}
 let PS=null;
 /* v61.5: پنجره «پرداخت از چند منبع» بازطراحی شد:
    هر بخش یک کارت: انتخاب منبع با دکمه‌های بانک (نه فهرست کشویی) + مبلغ؛ تایپ عدد بدون ساختن دوباره پنجره (مکان نشانگر و پاک کردن درست)،

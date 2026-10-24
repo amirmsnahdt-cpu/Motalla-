@@ -864,3 +864,8 @@ button.bc.dv{border:0;font:inherit;color:inherit;text-align:right;cursor:pointer
 .sbl{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:5px 0;font-size:12.5px}.sbl+.sbl{border-top:1px solid var(--hair)}
 .sbl span{color:var(--mut);font-weight:700}.sbl b{font-weight:800;font-feature-settings:"tnum";white-space:nowrap}.sbl b i{font-style:normal;font-size:10.5px;color:var(--mut);margin-inline-start:3px}
 .sbl.d b{color:var(--red)}.sbl.c b{color:var(--blu)}.sbl.f span{color:var(--ink);font-weight:800}.sbl.f b{font-size:15.5px;font-weight:900}.sbl.f.d span{color:var(--red)}.sbl.f.c span{color:var(--blu)}
+/* v61.14: بخشی از مبلغ واریزی ارسال‌شده از بانک دیگر */
+.sssbtn{width:100%;justify-content:center;margin-top:8px}
+.ss0 .ssrow{display:flex;align-items:center;gap:10px;padding:4px 2px 2px}.ss0 .ssrow .tx{display:flex;flex-direction:column}
+.ss0 .ssrow .tx b{font-size:19px;font-weight:900;font-feature-settings:"tnum"}.ss0 .ssrow .tx b.r{color:var(--red)}.ss0 .ssrow .tx small{font-size:11px;font-weight:700;color:var(--warn)}
+.sssbtn{min-height:42px;font-size:13.5px}
