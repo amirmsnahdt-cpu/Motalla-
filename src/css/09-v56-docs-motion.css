@@ -1122,3 +1122,56 @@ button.sssbtn svg{width:17px;height:17px}
 .c6l.anim .cbz{animation:cbIn .42s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--r,0)*45ms)}
 @media (prefers-reduced-motion:reduce){.c6l.anim .cbz{animation:none}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cbz em,:root:not([data-theme="light"]) .cbzi{color:#0b1a12}}:root[data-theme="dark"] .cbz em,:root[data-theme="dark"] .cbzi{color:#0b1a12}
+/* v61.46: کارت تسویه پایین سند — مانده قبلی · این سند · مانده نهایی؛ کل کارت دکمه تسویه است (رنگ از مانده نهایی) */
+#act .d6foot:has(.ft2){padding:0!important;background:none!important;box-shadow:none!important;border:0!important}
+#act .ft2{--fb:#5d6577;all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1fr auto;align-items:end;gap:8px 10px;padding:10px 12px 12px;border-radius:22px;background:var(--fb);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 10px 24px -12px color-mix(in srgb,var(--fb) 80%,transparent);transition:background-color .35s,box-shadow .35s;font-feature-settings:"tnum";direction:rtl;text-align:right}
+#act .ft2.d{--fb:#b8424b}#act .ft2.c{--fb:#2152d9}#act .ft2.ok{--fb:#15803d}
+#act .ft2:focus-visible{outline:3px solid color-mix(in srgb,var(--fb) 45%,#fff);outline-offset:2px}
+#act .ft2 .ftr{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#act .ft2 .ftc{display:flex;flex-direction:column;gap:1px;min-width:0;padding:6px 10px 7px;border-radius:13px;background:rgba(255,255,255,.14);line-height:1.2}
+#act .ft2 .ftc small{font-size:10.5px;font-weight:700;color:rgba(255,255,255,.82)}
+#act .ft2 .ftc .ftv{container-type:inline-size;display:block;min-width:0}
+#act .ft2 .ftc .ftn{display:block;font-size:min(15.5px,11cqi);font-weight:850;white-space:nowrap;color:#fff}
+#act .ft2 .ftc small.ftt{font-size:9.5px;font-weight:800;color:rgba(255,255,255,.75)}
+#act .ft2 .ftc.z small.ftt{color:rgba(255,255,255,.6)}
+#act .ft2 .ftm{display:flex;flex-direction:column;gap:2px;min-width:0;padding-inline-start:4px}
+#act .ft2 .ftl{display:flex;align-items:center;gap:6px}
+#act .ft2 .ftl small{font-size:11.5px;font-weight:800;color:rgba(255,255,255,.9)}
+#act .ft2 .ftl em{font-style:normal;font-size:10px;font-weight:900;padding:1px 8px;border-radius:8px;background:#fff;color:var(--fb)}
+#act .ft2 .ftb{display:flex;align-items:baseline;gap:5px;white-space:nowrap;container-type:inline-size;min-width:0}
+#act .ft2 .ftb .ftn{font-size:min(26px,12.5cqi);font-weight:900;letter-spacing:-.2px;color:#fff;line-height:1.1}
+#act .ft2 .ftb i{font-style:normal;font-size:11px;font-weight:700;color:rgba(255,255,255,.8)}
+#act .ft2 .ftw{font-size:15px;font-weight:800;color:#fff;opacity:.92}
+#act .ft2 .ftgo{display:inline-flex;align-items:center;gap:2px;height:38px;padding:0 10px 0 14px;border-radius:19px;background:#fff;color:var(--fb);font-size:15px;font-weight:900;white-space:nowrap;transition:color .35s}
+#act .ft2 .ftgo svg{width:17px;height:17px;transform:rotate(90deg);stroke-width:2.6}
+#act .ft2 .ftxs{grid-column:1/-1;grid-row:3;display:flex;flex-direction:column;gap:4px}
+#act .ft2 .ftx{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:11px;background:rgba(255,255,255,.12);font-size:11px;font-weight:700;color:rgba(255,255,255,.82);white-space:nowrap;overflow:hidden}
+#act .ft2 .ftx small{font-size:11px;font-weight:900;color:#fff}
+#act .ft2 .ftx b{margin-inline-start:auto;font-size:13px;font-weight:900;color:#fff}#act .ft2 .ftx b i{font-style:normal;font-size:10px;font-weight:700;opacity:.8}
+#act .ft2 .ftx em{font-style:normal;font-size:9.5px;font-weight:900;padding:1px 6px;border-radius:7px;background:rgba(255,255,255,.22);color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #act .ft2.d{--fb:#a83a44}:root:not([data-theme="light"]) #act .ft2.c{--fb:#2a55c8}:root:not([data-theme="light"]) #act .ft2.ok{--fb:#17733a}:root:not([data-theme="light"]) #act .ft2{box-shadow:none}}
+:root[data-theme="dark"] #act .ft2.d{--fb:#a83a44}:root[data-theme="dark"] #act .ft2.c{--fb:#2a55c8}:root[data-theme="dark"] #act .ft2.ok{--fb:#17733a}:root[data-theme="dark"] #act .ft2{box-shadow:none}
+/* v61.46: جزئیات فاکتور فشرده — یک صورت‌حساب: گروه خاکستری گرد، خط مویی، ستون عدد هم‌تراز */
+.svdet.dt{display:flex;flex-direction:column;gap:14px;padding-bottom:6px}
+.svdet.dt .dtt{display:flex;align-items:center;gap:6px;margin:0 6px 6px;font-size:12px;font-weight:800;color:var(--mut)}
+.svdet.dt .dtt i{font-style:normal;font-size:10.5px;padding:0 7px;border-radius:7px;background:var(--seg);color:var(--ink)}
+.svdet.dt .dtt span{margin-inline-start:auto;font-size:10.5px;font-weight:700}
+.svdet.dt .dtc{background:var(--bg);border-radius:16px;padding:2px 14px}
+.svdet.dt .dtr{padding:10px 0;border-bottom:1px solid var(--line)}.svdet.dt .dtr:last-child{border-bottom:0}
+.svdet.dt .dth{display:flex;align-items:flex-start;gap:10px}
+.svdet.dt .dtn{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.3}
+.svdet.dt .dtn b{font-size:14px;font-weight:850;color:var(--ink)}
+.svdet.dt .dtn small{font-size:11px;font-weight:600;color:var(--mut)}
+.svdet.dt .dtv{font-size:15px;font-weight:900;white-space:nowrap;font-feature-settings:"tnum"}.svdet.dt .dtv.d{color:var(--red)}.svdet.dt .dtv.c{color:var(--blu)}.svdet.dt .dtv.z{font-size:12px;color:var(--mut)}
+.svdet.dt .dts{margin-top:5px;padding-inline-start:10px;border-inline-start:2px solid var(--line)}
+.svdet.dt .dts .dtl{padding:1px 0;font-size:11.5px}.svdet.dt .dts .dtl span{color:var(--mut);font-weight:600}.svdet.dt .dts .dtl b{font-size:12px;font-weight:700;color:var(--ink);opacity:.85}
+.svdet.dt .dtl{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;font-size:13px;font-feature-settings:"tnum"}
+.svdet.dt .dtc>.dtl+.dtl{border-top:1px solid var(--line)}
+.svdet.dt .dtl span{font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;min-width:0}
+.svdet.dt .dtl span i{font-style:normal;font-size:10px;font-weight:700;color:var(--mut)}
+.svdet.dt .dtl b{font-weight:800;white-space:nowrap;color:var(--ink)}
+.svdet.dt .dtl.mu span,.svdet.dt .dtl.mu b{color:var(--mut);font-weight:600}
+.svdet.dt .dtl.sum span{font-weight:900}.svdet.dt .dtl.sum b{font-size:17px;font-weight:900}
+.svdet.dt .dtl.sum em{font-style:normal;font-size:10px;font-weight:900;padding:1px 7px;border-radius:7px;color:#fff;background:var(--mut)}
+.svdet.dt .dtl.sum.d b{color:var(--red)}.svdet.dt .dtl.sum.d em{background:var(--red)}.svdet.dt .dtl.sum.c b{color:var(--blu)}.svdet.dt .dtl.sum.c em{background:var(--blu)}.svdet.dt .dtl.sum.z b{color:var(--ok)}.svdet.dt .dtl.sum.z em{background:var(--ok)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .svdet.dt .dtl.sum em{color:#0a1222}}:root[data-theme="dark"] .svdet.dt .dtl.sum em{color:#0a1222}

@@ -21,7 +21,7 @@ const stAmT=x=>stS('amT','مبلغ','تومان','num',()=>xrCalc(x,sv.rate).amo
 /* v61.29: مبلغ دستی درصد سود را هم با مظنه و وزن همان ردیف دوباره حساب می‌کند (کمتر = سود کمتر، بیشتر = سود بیشتر)؛
    درصد تا دو رقم اعشار در a.pp می‌نشیند و مبلغ دقیق در a.amT می‌ماند */
 const stItAm=a=>stS('amT','مبلغ','تومان','num',()=>{const c=itCalc(qaIt(a),sv.rate,sv.tax);return c.tot||''},v=>{v=Math.round(+v||0);const it={...qaIt(a),amT:0},b=itCalc(it,sv.rate,sv.tax);
-  if(!v||v===b.tot){a.amT='';return}const t=sv.tax&&!it.ab,base=b.gold+b.aj;if(base>0){const pr=(t?(v-b.gold)/1.1:v-b.gold)-b.aj;a.pp=Math.round(pr/base*10000)/100}a.amT=v},{opt:1});
+  if(!v||v===b.tot){a.amT='';return}const t=sv.tax&&!it.ab,base=b.gold+b.aj,pr=Math.round(t?(v-b.gold)/1.1:v-b.gold)-b.aj;if(base>0)a.pp=Math.round(pr/base*10000)/100;/* v61.46: مبلغ تایپ‌شده با مالیات است؛ پیش از مالیات نگه داشته می‌شود */a.amT=b.gold+b.aj+pr},{opt:1});
 const stNv=x=>x===''||x==null||(typeof x==='string'&&!x.trim())?'':isNaN(+toEn(String(x)))?String(x):+toEn(String(x));
 const stCl=(o,k)=>v=>{if(stNv(v)!==stNv(o[k]))o.amT='';o[k]=v};
 function stSteps(){const a=sv.qa,K=stKind();
