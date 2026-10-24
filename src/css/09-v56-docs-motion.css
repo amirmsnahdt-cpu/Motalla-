@@ -1001,3 +1001,6 @@ button.sssbtn svg{width:17px;height:17px}
 .c6l.anim .cbk{animation:cbIn .42s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--r,0)*45ms + var(--i,0)*70ms)}
 .c6tl2.anim .c6t2{animation:cbIn .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*80ms + 60ms)}
 @media (prefers-reduced-motion:reduce){.c6l.anim .cbk,.c6tl2.anim .c6t2{animation:none}}
+/* v61.24: کادر مبلغ خرید/تعویض قابل زدن (ویرایش مبلغ) */
+.stam.tap[data-act]{cursor:pointer;transition:transform .15s}.stam.tap[data-act]:active{transform:scale(.985)}
+.stam.tap[data-act] small::after{content:" · برای ویرایش مبلغ بزنید";font-weight:600;opacity:.6}
