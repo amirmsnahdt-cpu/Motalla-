@@ -920,3 +920,16 @@ button.sssbtn svg{width:17px;height:17px}
 .bld .bll.sum .bln{color:var(--ink);font-weight:900}.bld .bll.sum .blv{font-size:14px;font-weight:900}
 .ble{font-size:12px;color:var(--mut);padding:4px 0}
 .blh b small{font-size:10px;font-weight:700;color:var(--mut);margin-inline-start:4px}
+/* v61.19: هر جنس یک کارت جدا با رنگ و نشان خودش (ریالی آبی، طلایی طلایی) */
+.blw{padding:8px 8px 6px}
+.blk{padding:10px 12px 8px;border-radius:16px;background:color-mix(in srgb,var(--blu) 4%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 16%,transparent)}
+.blk+.blk{border-top:0;margin-top:8px}
+.blk.kg{background:color-mix(in srgb,var(--gold) 7%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 30%,transparent)}
+.blk.kx{background:color-mix(in srgb,var(--ok) 5%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 22%,transparent)}
+.blh{gap:8px;padding:0 0 8px;margin-bottom:4px;border-bottom:1px solid color-mix(in srgb,var(--blu) 12%,transparent)}
+.blk.kg .blh{border-bottom-color:color-mix(in srgb,var(--gold) 25%,transparent)}.blk.kx .blh{border-bottom-color:color-mix(in srgb,var(--ok) 20%,transparent)}
+.blh b{flex:1;text-align:right;font-size:13.5px}
+.blic{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:color-mix(in srgb,var(--blu) 14%,var(--card));color:var(--blu);flex:none}.blic svg{width:16px;height:16px}
+.blk.kg .blic{background:color-mix(in srgb,var(--gold) 20%,var(--card));color:var(--gold)}.blk.kx .blic{background:color-mix(in srgb,var(--ok) 16%,var(--card));color:var(--ok)}
+.blk .bll.fin{border-top-color:color-mix(in srgb,var(--blu) 20%,transparent)}.blk.kg .bll.fin{border-top-color:color-mix(in srgb,var(--gold) 35%,transparent)}
+.blk .bld{background:var(--card)}
