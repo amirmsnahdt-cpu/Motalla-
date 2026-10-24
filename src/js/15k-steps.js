@@ -5,7 +5,16 @@
 const stKind=()=>{const a=sv.qa;return a.p?'py':a.x?'xr':a.k?(a.ab?'ab':'it'):''};
 const stS=(k,lab,u,type,get,set,o)=>({k,lab,u,type,get,set,...(o||{})});
 /* مظنه ردیف: پیش‌فرض مظنه بالای سند؛ اگر عوض شود فقط برای همین ردیف ذخیره می‌شود */
-const stMz=o=>stS('mz','مظنه','تومان','num',()=>+o.mz||sv.mz||mzOf(sv.rate)||'',v=>{const h=sv.mz||mzOf(sv.rate);o.mz=+v&&+v!==+h?+v:''});
+/* v61.10: مثل نرخ بالای سند، خودش تشخیص می‌دهد عدد «مظنه» (هر مثقال) است یا «هر گرم ۱۸» (با مقایسه با نرخ بالای سند)
+   و دیگری را زیرش می‌نویسد. ذخیره همیشه به صورت مظنه است (o.mz)؛ o.mzk فقط یادش می‌ماند کاربر به چه شکل زده (ذخیره نمی‌شود). */
+const stMzK=o=>o.mzk||rtK();
+const stMzV=(o,k)=>{const m=+o.mz;return k==='g'?(m?rOfMz(m):+sv.rate||0):(m||sv.mz||mzOf(sv.rate)||0)};
+const stMz=o=>{const k=stMzK(o);return stS('mz',k==='g'?'هر گرم ۱۸':'مظنه','تومان','num',()=>stMzV(o,stMzK(o))||'',v=>{v=+v||0;
+  const k=v?rtDetect(v,+sv.rate||+ls.get('m_rate',0)||0):stMzK(o);o.mzk=k;const m=v?(k==='mz'?v:mzOf(v)):0,h=+sv.mz||mzOf(sv.rate);
+  o.mz=!m||(k==='mz'?m===h:v===+sv.rate||m===h)?'':m},{mz:1})};
+/* خانه مظنه زیر نوار: به همان شکلی که زده شده + دیگری کوچک زیرش */
+const stMzCell=(o,cell)=>{const k=stMzK(o),v=stMzV(o,k),w=stMzV(o,k==='g'?'mz':'g');
+  return cell(k==='g'?'هر گرم ۱۸':'مظنه',v?fmt(v)+(w?`<em class="stx">${k==='g'?'مظنه':'هر گرم'} ${fmt(w)}</em>`:''):'',+o.mz?'own':'')};
 function stSteps(){const a=sv.qa,K=stKind();
   if(K==='it')return [stS('w','وزن','گرم','dec',()=>a.w,v=>a.w=v),stS('ay','عیار','','int',()=>a.ay||750,v=>a.ay=v),stMz(a),stS('ajP','اجرت','٪','dec',()=>a.ajP,v=>a.ajP=v,{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,v=>a.ajT=v,{opt:1}),stS('pp','سود','٪','dec',()=>a.pp,v=>a.pp=v,{opt:1})];
   if(K==='ab')return [stS('w','وزن آبشده','گرم','dec',()=>a.w,v=>a.w=v),stS('ay','عیار','','int',()=>a.ay||750,v=>a.ay=v),stMz(a),stS('pp','سود','٪','dec',()=>a.pp,v=>a.pp=v,{opt:1}),stS('lab','آزمایشگاه','','text',()=>a.lab,v=>a.lab=v,{opt:1}),stS('ang','شماره انگ','','text',()=>a.ang,v=>a.ang=v,{opt:1})];
@@ -30,17 +39,17 @@ const stTag=()=>{const a=sv.qa,K=stKind(),d=a.d||(a.x&&a.x.fd)||(a.p&&a.p.dir)||
   return {D,it}};
 /* زیر نوار: وزن، مظنه و مبلغ زنده */
 function stLive(){const a=sv.qa,K=stKind(),cell=(l,v,k)=>`<span class="stl${k?' '+k:''}"><small>${l}</small><b>${v||'—'}</b></span>`;
-  if(K==='it'||K==='ab'){const it=qaIt(a),mz=+it.mz||sv.mz||mzOf(sv.rate),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;
-    return cell('وزن',it.w?wFmt(it.w)+' <i>گرم</i>':'')+(K==='ab'&&it.w?cell('وزن ۷۵۰',wFmt(Math.round(it.w*it.ay/750*1000)/1000)):'')+cell('مظنه',mz?fmt(mz):'',+it.mz?'own':'')+cell('مبلغ',c&&c.tot?fmt(c.tot):'','am')}
+  if(K==='it'||K==='ab'){const it=qaIt(a),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;
+    return cell('وزن',it.w?wFmt(it.w)+' <i>گرم</i>':'')+(K==='ab'&&it.w?cell('وزن ۷۵۰',wFmt(Math.round(it.w*it.ay/750*1000)/1000)):'')+stMzCell(a,cell)+cell('مبلغ',c&&c.tot?fmt(c.tot):'','am')}
   if(K==='xr'){const x=a.x,C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
-    if(g&&m){const mz=+x.mz||sv.mz||mzOf(sv.rate);return cell('وزن',C.n?wFmt(C.n)+' <i>گرم</i>':'',+x.am?'calc':'')+cell('مظنه',mz?fmt(mz):'',+x.mz?'own':'')+cell('مبلغ',C.amount?fmt(C.amount):'',(+x.am?'':'calc')+' am')}
+    if(g&&m){return cell('وزن',C.n?wFmt(C.n)+' <i>گرم</i>':'',+x.am?'calc':'')+stMzCell(x,cell)+cell('مبلغ',C.amount?fmt(C.amount):'',(+x.am?'':'calc')+' am')}
     if(g)return cell('وزن',C.n?wFmt(C.n)+' <i>گرم</i>':'')+cell('معادل ۷۵۰',C.q?wFmt(C.q):'');
     return cell('تعداد',C.n?qFmt(C.n):'')+(m?cell('نرخ',C.pg?fmt(C.pg):'')+cell('مبلغ',C.amount?fmt(C.amount):'','am'):'')}
   if(K==='py')return cell('مبلغ',+a.p.amount?fmt(+a.p.amount):'','am');
   return ''}
 function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.st=0;if(a.stMax==null)a.stMax=a.st;const i=a.st,cur=S[i],T=stTag(),ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null),last=i===n-1;
   const seg=S.map((s,k)=>{const v=stFmt(s,s.get()),reach=k<=Math.max(a.stMax,i)||ed;return `<button type="button" class="stp${k===i?' on':''}${v&&k!==i?' dn':''}${reach?'':' fu'}" data-act="stGo" data-i="${k}"${reach?'':' disabled'}><small>${s.lab}${s.opt?' <i>اختیاری</i>':''}</small><b>${v||(k===i?'…':'—')}</b></button>`}).join('');
-  const val=cur.get(),ph=cur.type==='wam'?'وزن (گرم) یا مبلغ (تومان)':cur.lab+(cur.u?' ('+cur.u+')':'')+(cur.opt?' · اختیاری':''),
+  const val=cur.get(),ph=cur.type==='wam'?'وزن (گرم) یا مبلغ (تومان)':cur.mz?'مظنه یا هر گرم ۱۸ (تومان)':cur.lab+(cur.u?' ('+cur.u+')':'')+(cur.opt?' · اختیاری':''),
     inp=cur.type==='pick'?(cur.search?`<input id="stI" class="stin" placeholder="جستجوی ${cur.lab}…" autocomplete="off" value="${esc(a.sq||'')}">`:`<span class="stin pk">${cur.lab} را از فهرست زیر انتخاب کنید</span>`):`<input id="stI" class="stin${cur.type==='text'?'':' ltr'}" ${cur.type==='text'?'':`inputmode="${cur.type==='dec'||cur.type==='wam'?'decimal':'numeric'}"`} value="${cur.type==='wam'?(+val>=1000?Number(val).toLocaleString('en-US'):esc(val||'')):cur.type==='num'?(+val?Number(val).toLocaleString('en-US'):''):esc(val==null?'':String(val))}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}">`;
   const canFin=S.every(s=>s.opt||s.type==='int'||stFmt(s,s.get())||(s.type==='wam'&&(+a.x.w||+a.x.am)));
   return `<div class="stw">${stHead(T.D,T.it,1)}<div class="stps">${seg}</div>
@@ -54,7 +63,8 @@ function stRead(){const a=sv.qa,S=stSteps(),s=S[Math.min(a.st||0,S.length-1)],I=
   if(s.type==='wam'){const v=toEn(t).replace(/,/g,'');s.set(+v>=1000?{am:Math.round(+v)}:decIn(v));return}
   s.set(s.type==='num'?num(t):s.type==='dec'?decIn(t):s.type==='int'?(+toEn(t).replace(/\D/g,'')||750):clean(t))}
 /* مقدار پله فعلی در ردیف پله‌ها همان لحظه نوشته می‌شود */
-function stPaint(){const P=$('stPv');if(P)P.innerHTML=stLive();const a=sv.qa,S=stSteps(),b=document.querySelector('#qa .stp.on b');if(b){const v=stFmt(S[a.st],S[a.st].get());b.innerHTML=v||'…'}}
+function stPaint(){const P=$('stPv');if(P)P.innerHTML=stLive();const a=sv.qa,S=stSteps(),b=document.querySelector('#qa .stp.on b');if(b){const v=stFmt(S[a.st],S[a.st].get());b.innerHTML=v||'…'}
+  if(S[a.st]&&S[a.st].mz){const l=document.querySelector('#qa .stp.on small');if(l)l.textContent=S[a.st].lab}}
 function stBind(){const I=$('stI'),a=sv.qa;if(!I)return;const S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];
   if(s.type==='pick'){I.oninput=()=>{a.sq=I.value;const P=$('stPk');if(P)P.innerHTML=stPick(s)};return}
   selOnFocus(I);I.oninput=()=>{if(s.type==='num'){const pos=I.selectionStart||0,b=toEn(I.value.slice(0,pos)).replace(/\D/g,'').length,v=num(I.value);I.value=v?v.toLocaleString('en-US'):'';let p=0,d=0;while(p<I.value.length&&d<b){if(/\d/.test(I.value[p]))d++;p++}try{I.setSelectionRange(p,p)}catch(_){}}
