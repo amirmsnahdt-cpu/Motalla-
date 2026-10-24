@@ -3,7 +3,7 @@
    ساختار داده عوض نمی‌شود: همه در sv.pays (cash|pos|hav|cust) و تعویض طلا یک ردیف «خرید طلا» در sv.xr با cat:'تعویض'.
    تنها روش تازه: m:'dep' = خریدار مستقیم به فروشنده یک واریزی پرداخت می‌کند → در همان واریزی یک «تسویه از مشتری» با byInv ثبت می‌شود
    (بدون ثبت جداگانه در حساب خریدار؛ اثرش همین ردیف سند است). حذف سند، آن تسویه را هم برمی‌دارد. */
-let CK=null,ckGo=false;
+let CK=null;
 const ckOut=()=>svTot().rest<0;
 const CKO=[['cust','حواله به مشتری','swap'],['hav','حواله از حساب ما','bank'],['cash','پرداخت نقدی','cash']];
 const CKT=[['dep','حواله از مشتری','swap'],['pos','کارتخوان','card'],['hav','حواله به بانک','bank'],['cash','دریافت نقدی','cash'],['gx','تعویض طلا','coin']];
@@ -46,7 +46,7 @@ function ckHTML(){const T=svTot(),c=svCu(),r=T.rest,R=ckRows();
   <div class="ckh ${r>0?'d':r<0?'c':'z'}"><small>${r>0?'مانده این سند · طلبکاریم':r<0?'مانده این سند · بدهکاریم':'این سند کامل تسویه شد ✓'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b><em>جمع سند ${fmt(Math.abs(T.total))}${T.paid?(T.paid<0?' · پرداخت‌شده ':' · دریافت‌شده ')+fmt(Math.abs(T.paid)):''}</em></div>
   ${R.length?`<div class="ckrs">${R.map(z=>`<div class="ckr"><span class="d6ti pm-in">${ic(z.ico)}</span><span class="tx"><b>${esc(z.lab)}</b>${z.sub?`<small>${z.sub}</small>`:''}</span><b class="ckam">${fmt(z.amt)}</b><button class="d6x" data-act="ckDel" data-k="${z.k}" data-i="${z.i}" aria-label="حذف">${ic('x')}</button></div>`).join('')}</div>`:''}
   ${CK.m?ckForm():!r?'':`<div class="ckt${r<0?' out':''}">${(r<0?CKO:CKT).map(([k,t,i])=>`<button class="ckti q-${k}" data-act="ckM" data-m="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div>`}
-  <button class="xgo cksave" data-act="ckSave">${ic('check')} ثبت سند${r>0?`<small>مانده ${fmt(r)} به حساب مشتری</small>`:''}</button>
+  <button class="xgo cksave" data-act="ckSave">${ic('check')} پایان و ثبت سند${r>0?`<small>مانده ${fmt(r)} به حساب مشتری</small>`:''}</button>
   <button class="lnk ckback" data-act="close">بازگشت به سند</button></div>`}
 function ckRead(){const g=id=>{const e=$(id);return e?e.value:undefined};if($('ckA'))CK.amount=num(g('ckA'));if($('ckT'))CK.tn=toEn(g('ckT')||'').trim();if($('ckW'))CK.w=decIn(g('ckW'));if($('ckY'))CK.ay=+toEn(g('ckY')).replace(/\D/g,'')||'';if($('ckQ'))CK.q=g('ckQ');if($('ckS'))CK.sq=g('ckS')}
 function ckBind(f){const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=$('ckY');const PS=$('ckS');if(PS)PS.oninput=()=>{CK.sq=PS.value;const P=$('ckPl');if(P)P.innerHTML=ckPick()};
@@ -69,7 +69,7 @@ ACT.ckAdd=()=>{ckRead();const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0;
     if(m==='cash')sv.pays.push({m:'cash',amount:-a});
     if(m==='hav'){if(CK.srcId===''||CK.srcId==null){toast('حساب ما را انتخاب کنید',true);return}sv.pays.push({m:'hav',amount:-a,srcId:CK.srcId,tn:CK.tn||''});ls.set('m_src_hav',CK.srcId)}
     if(m==='dep'||m==='cust'){const s=CK.sel,c=s&&CU().find(z=>String(z.id)===String(s.id));if(!c){toast('مشتری را انتخاب کنید',true);return}sv.pays.push({m:'cust',amount:-a,cuId:c.id,cuName:cuName(c)})}
-    CK={m:''};svKeep();svRe();ckRe();return}
+    CK={m:''};ckBackToDoc();return}
   if(m==='gx'){const w=parseFloat(CK.w)||0;if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}if(!(w>0)){toast('وزن طلا را بزنید',true);return}const x=xrNew('buy','gold',{cat:'تعویض'});x.w=String(CK.w);x.ay=+CK.ay||x.ay;sv.xr.push(x)}
   else{if(!(a>0)){toast('مبلغ را وارد کنید',true);const A=$('ckA');if(A)A.focus();return}
     if(m==='cash')sv.pays.push({m:'cash',amount:a});
@@ -78,9 +78,13 @@ ACT.ckAdd=()=>{ckRead();const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0;
     if(m==='dep'){const s=CK.sel;if(!s){toast('یکی از فهرست را انتخاب کنید',true);return}
       if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return;const av=cuBal(c).R-ckUsedCu(c.id);if(a>av){toast('بیشتر از بدهی ما به «'+cuName(c)+'» است ('+fmt(av)+')',true);return}sv.pays.push({m:'cust',amount:a,cuId:c.id,cuName:cuName(c)})}
       else{const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return;const av=x.amount-ckUsedDep(x.id);if(a>av){toast('بیشتر از مانده واریزی «'+fullName(x)+'» است ('+fmt(av)+')',true);return}sv.pays.push({m:'dep',amount:a,entId:x.id,entName:fullName(x)})}}}
-  CK={m:''};svKeep();svRe();const n0=$('ckRn'),o=n0?+n0.dataset.v:0;ckRe();const n=$('ckRn');if(n){const to=+n.dataset.v;n.dataset.v=o;n.textContent=fmt(o);tween(n,to)}const h=document.querySelector('.ckh');if(h){h.classList.remove('pop');void h.offsetWidth;h.classList.add('pop')}};
+  CK={m:''};ckBackToDoc()};
+/* v61.32: بعد از افزودن هر دریافت/پرداخت در تسویه، پنجره بسته می‌شود و سند با ردیف تازه و مانده تازه دیده می‌شود */
+function ckBackToDoc(){svKeep();closeSheet();svAdd=-1;svRe();setTimeout(()=>{const r=document.querySelector('#svRows .d6r:last-child');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'});if(r&&!RM()&&r.animate)r.animate([{background:'color-mix(in srgb,var(--blu) 14%,transparent)'},{background:'transparent'}],{duration:900,easing:'ease-out'})},120);
+  const T=svTot();toast(T.rest?('ردیف به سند اضافه شد · مانده '+fmt(Math.abs(T.rest))):'سند تسویه شد ✓')}
 ACT.ckDel=d=>{const L=d.k==='xr'?sv.xr:sv.pays;L.splice(+d.i,1);svKeep();svRe();ckRe()};
-ACT.ckSave=()=>{ckRead();ckGo=true;closeSheet();ACT.svSave()};
+/* «پایان» = ثبت و خروج از سند (همان ثبت خودکار خروج) */
+ACT.ckSave=()=>{ckRead();closeSheet();setTimeout(()=>{if(cur==='sell')back()},60)};
 /* ثبت تسویه‌های «حواله به فروشنده واریزی» روی همان واریزی‌ها (بعد از ساخته شدن سند) */
 function ckDepApply(c,t,now){let n=0;for(const p of t.pays||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e)continue;
   const z={id:nid++,st:'wait',name:cuName(c),phone:c.phone||'',inv:String(t.no),amount:pAmt(p),tn:'',note:'سند فروش '+toFa(t.no),cuId:'',byInv:{cu:c.id,tx:t.id},date:t.date,at:now,by:who()};
