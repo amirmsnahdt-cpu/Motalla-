@@ -933,3 +933,23 @@ button.sssbtn svg{width:17px;height:17px}
 .blk.kg .blic{background:color-mix(in srgb,var(--gold) 20%,var(--card));color:var(--gold)}.blk.kx .blic{background:color-mix(in srgb,var(--ok) 16%,var(--card));color:var(--ok)}
 .blk .bll.fin{border-top-color:color-mix(in srgb,var(--blu) 20%,transparent)}.blk.kg .bll.fin{border-top-color:color-mix(in srgb,var(--gold) 35%,transparent)}
 .blk .bld{background:var(--card)}
+/* v61.20: نوار مانده نهایی — طلا راست، ریالی چپ؛ هر خانه پررنگ با پس‌زمینه طلبکار/بدهکار و واحد */
+.d6bs{gap:6px;padding:5px;min-height:0}
+.d6bs .d6bsl{display:none}
+.d6bk{flex:1 1 0;min-width:0;padding:7px 11px 6px;border-radius:13px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);transition:background-color .3s,box-shadow .3s}
+.d6bk small{font-size:10px;font-weight:800;color:var(--mut)}.d6bk small em{font-style:normal}
+.d6bk b{font-size:16.5px;font-weight:900;margin-top:1px}.d6bk b i{font-size:10.5px;font-weight:700;opacity:.75;margin-inline-start:4px}
+.d6bk.d{background:color-mix(in srgb,var(--red) 9%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 30%,transparent)}
+.d6bk.c{background:color-mix(in srgb,var(--blu) 9%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 30%,transparent)}
+.d6bk.d small em,.d6bk.d b{color:var(--red)}.d6bk.c small em,.d6bk.c b{color:var(--blu)}.d6bk.d b i,.d6bk.c b i{color:inherit}
+.d6bs .d6bsi{width:28px;height:28px;align-self:center}
+/* دکمه ثبت سند: «ثبت سند» راست، جمع سند سفید و پررنگ چپ (بدون برچسب سفید) */
+#act .d6foot .bzgo.svgo{justify-content:space-between;align-items:center;padding:0 18px 0 16px!important;min-height:54px!important;border-radius:16px!important}
+.svgl{display:inline-flex;align-items:center;gap:8px;font-size:15.5px;font-weight:900}
+.svgi{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2)}.svgi svg{width:16px;height:16px}
+#act .d6foot .bzgo.svgo #svBt:not(:empty){display:flex;flex-direction:column;align-items:flex-end;gap:0;padding:0;margin:0;border:0;background:none;color:#fff;line-height:1.15}
+#act .d6foot .bzgo.svgo #svBt small{font-size:10px;font-weight:700;color:rgba(255,255,255,.78)}
+#act .d6foot .bzgo.svgo #svBt b{font-size:18px;font-weight:900;font-feature-settings:"tnum";color:#fff}#act .d6foot .bzgo.svgo #svBt b i{font-style:normal;font-size:10.5px;font-weight:700;color:rgba(255,255,255,.75);margin-inline-start:4px}
+#act .d6foot .bzgo.svgo #svBt.d,#act .d6foot .bzgo.svgo #svBt.c{color:#fff}
+/* واحد در صورت‌حساب مانده‌ها */
+.blv i{font-size:10px;opacity:.75}
