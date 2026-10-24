@@ -1057,3 +1057,15 @@ button.sssbtn svg{width:17px;height:17px}
 .svdet .blk .blh{cursor:default}
 .svdet .bld{margin:2px 0 6px;padding-bottom:6px;border-bottom:1px dashed var(--hair)}
 .svdok{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:12px;background:color-mix(in srgb,var(--ok) 12%,var(--card));color:var(--ok);font-weight:800;font-size:13px}.svdok svg{width:16px;height:16px}
+/* v61.35: عکس سکه در ردیف (دوربین / گالری) */
+.stph{margin-top:10px;padding:10px;border-radius:16px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--hair)}
+.stphh{display:flex;align-items:center;gap:8px;margin-bottom:8px}.stphh b{font-size:13.5px;font-weight:800}.stphh small{margin-inline-start:auto;font-size:11px;color:var(--mut);font-weight:700}
+.stphi{display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:color-mix(in srgb,var(--blu) 12%,var(--card));color:var(--blu)}.stphi svg{width:15px;height:15px}
+.stphl{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:1px}.stphl::-webkit-scrollbar{display:none}
+.stpht,.stphb{flex:none;width:72px;height:72px;border-radius:14px;border:0;padding:0;overflow:hidden;cursor:pointer}
+.stpht{background:var(--card);box-shadow:0 0 0 1px var(--hair)}.stpht img{width:100%;height:100%;object-fit:cover;display:block}.stpht.miss{background:repeating-linear-gradient(45deg,var(--bg),var(--bg) 6px,var(--card) 6px,var(--card) 12px)}
+.stphb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--card);color:var(--blu);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent);font-size:11.5px;font-weight:800}
+.stphb svg{width:22px;height:22px}
+.d6ti.ph{padding:0;overflow:hidden}.d6ti.ph img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
+.phbig{display:grid;place-items:center;margin:4px 0 12px;border-radius:16px;overflow:hidden;background:#000}.phbig img{max-width:100%;max-height:60vh;display:block}
+.phdel{width:100%;color:var(--red)!important;display:flex;align-items:center;justify-content:center;gap:6px}.phdel svg{width:16px;height:16px}
