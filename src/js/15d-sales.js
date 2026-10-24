@@ -412,12 +412,13 @@ function svRe0(){const o=$('svTotN'),old=o?+o.dataset.v||0:0;const set=(id,h)=>{
   const n=$('svTotN');if(n){const to=+n.dataset.v;n.dataset.v=old;n.textContent=fmt(old);tween(n,to)}svBindRest();svAdd=-1}
 /* v61.34: نگه داشتن دکمه «تسویه» = جزئیات کامل سند (خواسته صاحب اپ): بهای طلا، اجرت، سود، مالیات، فروش و خرید، تخفیف،
    دریافت‌ها و پرداخت‌ها، مانده این سند، و برای هر جنس قبلی / این سند / نهایی. زدن کوتاه همان تسویه است. */
-function svDetHTML(){const c=svCu(),L=svBalL(),cc=v=>v<0?'d':v>0?'c':'z',vv=(k,v)=>v?balVU(k,v):'۰ <i>'+balU(k)+'</i>',tg=v=>v?ourLab(v):'',T=svTot();
-  return `<div class="sh-h"><div><b>جزئیات سند${sv.edit?' '+toFa(sv.edit.no):''}</b><small class="shsub">${esc(c?cuName(c):'بدون مشتری')}${sv.rate?' · مظنه '+fmt(sv.mz||Math.round(sv.rate*MZK)):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="svdet bpo">${svRowDet()}${L.map(([k,p,d,f])=>{const d0=svBpDet(k),det=/ردیفی از این جنس/.test(d0)?'':d0;return `<div class="blk ${k==='r'?'kr':k==='g'?'kg':'kx'} on"><div class="blh"><span class="blic">${ic(k==='r'?'cash':k==='g'?'coin':XA[k]&&XA[k].k==='f'?'usd':'coin')}</span><b>${k==='r'?'مبلغ':k==='g'?'طلا':balNm(k)} <small>${k==='r'?'تومان':k==='g'?'گرم ۱۸':esc(balU(k))}</small></b></div>
-    ${det?`<div class="bld">${det}</div>`:''}
-    ${c?lgLine('مانده قبلی',vv(k,p),tg(p),cc(p)):''}${lgLine('این سند',vv(k,d),tg(d),cc(d)+(c?'':' fin'))}${c?lgLine('مانده نهایی',vv(k,f),tg(f),'fin '+cc(f)):''}</div>`}).join('')}
-  ${T.rest||svRBal()?'':'<div class="svdok">'+ic('check')+' سند تسویه است</div>'}</div>
+/* v61.40: جزئیات فاکتور (نه مانده‌ها — مانده در نوار پایین سند است): ریز هر ردیف (بهای کالا، اجرت، سود، مالیات، مبلغ کل)،
+   جمع‌های فاکتور، و دریافت/پرداخت‌های همین سند */
+function svDetHTML(){const c=svCu(),T=svTot(),ln=(l,v,cl)=>`<div class="rdl${cl?' '+cl:''}"><span>${l}</span><b>${v}</b></div>`,ng=v=>'<bdi dir="ltr">− '+fmt(v)+'</bdi>';
+  const tot=[sv.items.length?ln('جمع بهای کالا (طلا) · '+wFmt(T.w)+' گرم',fmt(T.gold)):'',T.aj?ln('جمع اجرت',fmt(T.aj)):'',T.pr?ln('جمع سود',fmt(T.pr)):'',T.tax?ln('مالیات ۱۰٪',fmt(T.tax)):'',T.xs?ln('فروش طلا، سکه و ارز',fmt(T.xs)):'',T.xb?ln('خرید از مشتری',ng(T.xb)):'',T.disc?ln('تخفیف',ng(T.disc)):'',ln(T.total<0?'خالص خرید':'جمع فاکتور',fmt(Math.abs(T.total))+' <small>تومان</small>','t g')].join('');
+  const pays=sv.pays.map(p=>ln(esc(pyLab(p)),(pAmt(p)<0?'پرداخت ':'دریافت ')+fmt(Math.abs(pAmt(p))))).join('');
+  return `<div class="sh-h"><div><b>جزئیات فاکتور${sv.edit?' '+toFa(sv.edit.no):''}</b><small class="shsub">${esc(c?cuName(c):'بدون مشتری')}${sv.rate?' · مظنه '+fmt(sv.mz||Math.round(sv.rate*MZK)):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="svdet">${svRowDet()}<div class="rdw"><div class="rdt">جمع فاکتور</div><div class="rdc">${tot}</div></div>${pays?`<div class="rdw"><div class="rdt">دریافت و پرداخت این سند</div><div class="rdc">${pays}</div></div>`:''}</div>
   <button class="xgo" data-act="svDetGo">${ic('check')} تسویه</button>`}
 /* ریز هر ردیف: بهای کالا، اجرت، سود، مالیات و مبلغ کل؛ طلا/سکه/ارز: مقدار × نرخ */
 function svRowDet(){const R=[],ln=(l,v,c)=>`<div class="rdl${c?' '+c:''}"><span>${l}</span><b>${v}</b></div>`;
@@ -429,7 +430,7 @@ function svRowDet(){const R=[],ln=(l,v,c)=>`<div class="rdl${c?' '+c:''}"><span>
 ACT.svDetGo=()=>{closeSheet();setTimeout(()=>ACT.svSave(),60)};
 (()=>{let tm=0,x0=0,y0=0,btn=null;const cancel=()=>{clearTimeout(tm);tm=0};
   document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#act .svgo');if(!b||cur!=='sell'||!sv)return;b._lp=0;btn=b;x0=e.clientX;y0=e.clientY;cancel();
-    tm=setTimeout(()=>{tm=0;b._lp=1;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}sheet(svDetHTML());const P=document.querySelector('.svdet');if(P)bpRise(P,'.blk')},460)},true);
+    tm=setTimeout(()=>{tm=0;b._lp=1;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}sheet(svDetHTML());const P=document.querySelector('.svdet');if(P)bpRise(P,'.rdc')},460)},true);
   document.addEventListener('pointermove',e=>{if(tm&&(Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10))cancel()},true);
   ['pointerup','pointercancel','scroll'].forEach(ev=>document.addEventListener(ev,cancel,true));
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#act .svgo');if(b&&b._lp){b._lp=0;e.stopPropagation();e.preventDefault()}},true);
