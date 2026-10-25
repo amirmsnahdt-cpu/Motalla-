@@ -37,10 +37,11 @@ function txLinked(c,t){const R=[],find=(cu,tx)=>{const C=custs.find(z=>String(z.
   if(t.type==='xf'&&t.inv)find(t.inv.cu,t.inv.tx);
   return R.filter(x=>x.t!==t)}
 const invTitle=t=>(t.dk==='buy'?'سند خرید ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
-function txRow2(c,t,run){const d=txD(t);
+function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t);ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
-  return txLine(t,ico,t.type,T,sub,d,run)}
+  const vals=(d.r?v(d.r,'r'):'')+(d.g?v(d.g,'g'):'')+Object.keys(d.x||{}).filter(k=>+d.x[k]).map(k=>v(+d.x[k],k)).join('')||'<b>تسویه</b>';
+  return swW(`<button class="txr" data-act="txOpen" data-id="${t.id}"><span class="bri t-${t.type}">${ic(ico)}</span><span class="tx"><b>${esc(T)}</b><small>${esc(sub)}</small></span><span class="txv txv2">${vals}</span></button>`,{r:[['txOpen','جزئیات','eye','#3b6fd6']],l:can('del')||isAdmin()?[['txDel','حذف','trash','#d23c48']]:[],data:{id:t.id}})}
 function xfShow(c,t){const d=txD(t),kv=(l,v)=>v?`<div class="kv"><small>${l}</small><b>${v}</b><span class="kvx"></span></div>`:'';const L=txLinked(c,t);
   sheet(`<div class="sh-h"><div><b>${t.type==='cv'?'تبدیل طلایی / ریالی':'انتقال مانده'}</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="kvs" style="border:0;padding:0">${kv('اثر ریالی',d.r?fmt(Math.abs(d.r))+' تومان ('+(d.r>0?'بدهی ما':'طلب ما')+')':'')}${kv('اثر طلایی',d.g?wFmt(Math.abs(d.g))+' گرم ('+(d.g>0?'بدهی طلایی ما':'طلب طلایی ما')+')':'')}${kv('نرخ',t.rate?fmt(t.rate)+' تومان هر گرم':'')}${kv('طرف دیگر',L.map(x=>esc(cuName(x.c))).join('، '))}${kv('شرح',esc(t.note||''))}${kv('تاریخ',esc(dates(t.date).wd+' '+dates(t.date).fa))}${kv('ثبت‌کننده',esc(t.by||''))}</div>
@@ -550,7 +551,13 @@ function vInv(){const X=invGet();if(!X){setTimeout(()=>{if(cur==='inv')go('custs
   /* v61.47 (خواسته صاحب اپ): «نمایش فاکتور» و «چاپ» یکی شد (فقط دکمه پایین «فاکتور · چاپ / PDF»)؛ حساب مشتری بالای صفحه با مانده‌ها؛
      دکمه‌ها ساده‌تر: ویرایش و سند بعدی کنار هم */
   return `${fresh?`<div class="bzok ivok">${ic('check')}<span>${esc(invTitle(t))} ثبت شد و به حساب «${esc(cuName(c))}» رفت</span></div>`:''}
-  ${ivDet(c,t)}`}
+  ${ivCu9(c)}${ivDet(c,t)}`}
+/* v61.54 (خواسته صاحب اپ): بالای صفحه سند، کارت حساب مشتری مثل ردیف فهرست حساب‌ها (نام، گروه، تلفن، کاشی مبلغ و طلا با برچسب)،
+   در یک کادر با همان ورود پله‌ای و شمارش عدد (فقط بار اول هر سند)؛ زدن = حساب مشتری */
+let ivCntId=null;
+function ivCu9(c){const an=ivCntId!==String(invV&&invV.tx)?' anim':'';
+  return `<div class="c6l c6lb iv9${an}"><button class="c6r" data-act="cuOpen" data-id="${c.id}"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="c6v c6vb" style="--r:0">${balPills(cuBal(c))}</span></button></div>`}
+const bindInv=()=>{const k=String(invV&&invV.tx);if(ivCntId===k)return;ivCntId=k;requestAnimationFrame(()=>cuCount('.iv9.anim .cbn'))};
 /* v61.52 (خواسته صاحب اپ): ویرایش، سند بعدی و حذف از پایین صفحه برداشته شد و در منوی کوچک بالا سمت چپ (⋯) آمد */
 ACT.invMenu=()=>{const X=invGet();if(!X)return;const it=[can('debt')?['invEdit',ic('edit'),'ویرایش سند']:null,can('debt')?['svNew',ic('plus'),'سند بعدی برای «'+cuName(X.c)+'»',{cu:X.c.id}]:null,['invPrint',ic('print'),'فاکتور · چاپ / PDF'],['cuOpen',ic('users'),'حساب مشتری',{id:X.c.id}],can('del')||isAdmin()?['invDel',ic('trash'),'حذف این سند',null,1]:null].filter(Boolean);
   popMenu(document.querySelector('#bar .hmo'),it)};

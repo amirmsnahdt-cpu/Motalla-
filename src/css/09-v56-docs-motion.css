@@ -1555,3 +1555,17 @@ button.sssbtn svg{width:17px;height:17px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .iv8c.m.d{background:color-mix(in srgb,var(--red) 62%,#000)}:root:not([data-theme="light"]) .iv8c.m.c{background:color-mix(in srgb,var(--blu) 62%,#000)}}
 :root[data-theme="dark"] .iv8c.m.d{background:color-mix(in srgb,var(--red) 62%,#000)}:root[data-theme="dark"] .iv8c.m.c{background:color-mix(in srgb,var(--blu) 62%,#000)}
 @media (prefers-reduced-motion:reduce){.c6l.anim .c8r .q8f,.q8c.anim .q8r{animation:none!important}}
+/* v61.54: صفحه سند — کارت حساب مشتری بالا مثل ردیف فهرست حساب‌ها، در کادر */
+.c6l.iv9{margin:0 0 10px}
+/* v61.54: مانده‌های پایین سند کوتاه‌تر — هر جنس یک ردیف: نام و واحد راست، قبلی · این سند · نهایی کنارش */
+.iv8b{padding:6px 7px;gap:4px;border-radius:18px}
+.iv8h,.iv8r{grid-template-columns:44px repeat(3,minmax(0,1fr));gap:3px}
+.iv8h{padding:0 4px}.iv8h::before{content:""}.iv8h span{font-size:10.5px}
+.iv8r{padding:3px 4px;border-radius:12px}
+.iv8k{grid-column:auto;flex-direction:column;align-items:flex-start;gap:0;padding:0 3px;line-height:1.2}
+.iv8k b{font-size:12.5px}.iv8k small{font-size:10px}
+.iv8c{padding:3px 2px;border-radius:9px;line-height:1.2}
+.iv8c b{font-size:min(14px,3.9cqi)}.iv8c.m b{font-size:min(14.5px,4.05cqi)}
+.iv8c small{font-size:9px}
+.iv8h,.iv8r{grid-template-columns:40px minmax(0,1fr) minmax(0,1fr) minmax(0,1.18fr)}
+.iv8c.m{padding:3px 6px}.iv8c b{font-size:min(14px,3.7cqi)}.iv8c.m b{font-size:min(14.5px,3.9cqi)}
