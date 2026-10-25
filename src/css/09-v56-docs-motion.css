@@ -1679,3 +1679,21 @@ button.iv8c:focus-visible{outline:2px solid var(--blu);outline-offset:2px}
 .d6r.d8 .d8h .d6e{flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:5px;row-gap:0;padding:5px 10px 6px}
 .d6r.d8 .d8h .d6e small{grid-column:1/-1;justify-self:start;padding:0;background:none;font-size:10px}
 .d6r.d8 .d8h .d6e .fz{--fmax:17px;text-align:left}
+/* ===== v61.58: ردیف سند جمع‌وجور — مشخصات فهرست عمودی کوچک، مبلغ‌ها قاب کوچک کنارش ===== */
+.d6rows.d7 .d6r.d8 .d6rb{gap:7px;padding:10px 14px 10px 12px}
+.d8h{align-items:center}.d8h .d6t{padding-top:0}
+.d8h .d6t b{font-size:14.5px}
+.d8b{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,44%);gap:8px;align-items:start}
+.d8b>.d6v:only-child{grid-column:1/-1}
+.d8s{display:flex;flex-direction:column;gap:0;padding:2px 10px;border-radius:10px;background:var(--seg);grid-template-columns:none}
+.d8c{flex-direction:row;align-items:baseline;justify-content:space-between;gap:8px;padding:4px 0;border-radius:0;background:none;line-height:1.35}
+.d8c+.d8c{border-top:1px solid var(--hair)}
+.d8c small{font-size:10.5px}
+.d8c b{font-size:11.5px;font-weight:800}
+.d8c.w2,.d8c.nt{grid-column:auto}
+.d8c.own{background:none}.d8c.own b{font-size:10.5px}
+.d6r.d8 .d8b .d6v{display:flex;flex-direction:column;align-items:stretch;gap:5px;margin:0;padding:0;max-width:none}
+.d6r.d8 .d8b .d6e{flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:4px;row-gap:0;padding:4px 8px 5px;border-radius:10px}
+.d6r.d8 .d8b .d6e small{grid-column:1/-1;justify-self:start;padding:0;background:none;font-size:9.5px}
+.d6r.d8 .d8b .d6e .fz{--fmax:14px;text-align:left}
+.d6r.d8 .d8b .d6e>i{font-size:9.5px}
