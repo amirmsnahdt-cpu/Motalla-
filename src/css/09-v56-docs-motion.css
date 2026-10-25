@@ -1318,3 +1318,8 @@ button.sssbtn svg{width:17px;height:17px}
 .d6sp i{font-size:10.5px;padding:3px 5px}
 .d6rows.d7 .d6e b{font-size:14.5px}
 .stw .fsearch.st3{min-height:0}.stw .fsearch.sm:not(.st3){min-height:0;padding-block:2px}.stw .fsearch.sm:not(.st3) input{padding-block:8px!important}
+/* v61.48: ردیف «مانده» در مشخصات واریزی: در حال شمارش آبی، تسویه‌شده سبز با تیک */
+.kv b .rmd{display:inline-flex;align-items:center;gap:4px;font-feature-settings:"tnum";transition:color .3s}
+.kv b .rmd.run{color:var(--blu)}
+.kv b .rmd.z{color:var(--ok)}.kv b .rmd.z svg{width:15px;height:15px;stroke-width:2.6;transition:opacity .25s,transform .3s cubic-bezier(.2,.9,.25,1.3)}
+.kv b .rmd.z.run{color:var(--blu)}.kv b .rmd.run svg{opacity:0;transform:scale(.4)}
