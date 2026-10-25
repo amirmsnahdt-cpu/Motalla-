@@ -1,6 +1,7 @@
 package ir.motalla.app;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.content.Intent;
@@ -32,6 +33,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -533,6 +535,77 @@ public class MainActivity extends Activity {
                 if (lightIcons) f &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR; else f |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
                 d.setSystemUiVisibility(f);
             });
+        }
+
+        /** عکس رسید در گالری گوشی (Pictures/Motalla)؛ اندروید قدیمی‌تر از ۱۰ در پوشه برنامه */
+        @JavascriptInterface
+        public boolean saveImage(String name, String base64) {
+            try {
+                byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+                String safe = name.replaceAll("[\\\\/:*?\"<>|]", "_");
+                if (Build.VERSION.SDK_INT >= 29) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(MediaStore.MediaColumns.DISPLAY_NAME, safe);
+                    cv.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+                    cv.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Motalla");
+                    Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
+                    if (uri == null) throw new Exception("insert failed");
+                    try (OutputStream os = getContentResolver().openOutputStream(uri)) {
+                        if (os == null) throw new Exception("stream failed");
+                        os.write(bytes);
+                    }
+                } else {
+                    File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Motalla");
+                    if (!dir.exists() && !dir.mkdirs()) throw new Exception("mkdir failed");
+                    try (FileOutputStream os = new FileOutputStream(new File(dir, safe))) { os.write(bytes); }
+                }
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        /** اشتراک عکس‌ها با برنامه‌های دیگر (تلگرام، واتساپ، …): فایل‌ها در پوشه موقت برنامه نوشته و با CamProvider موقتاً در دسترس قرار می‌گیرند.
+            ورودی: آرایه JSON از {d: base64 جی‌پگ} */
+        @JavascriptInterface
+        public boolean shareFiles(String json, final String title) {
+            try {
+                JSONArray a = new JSONArray(json);
+                if (a.length() == 0) return false;
+                File d = CamProvider.dir(MainActivity.this);
+                File[] old = d.listFiles();
+                long now = System.currentTimeMillis();
+                if (old != null) for (File f : old) if (f.getName().startsWith("sh_") && now - f.lastModified() > 3600000L) f.delete();
+                final java.util.ArrayList<Uri> uris = new java.util.ArrayList<>();
+                for (int i = 0; i < a.length(); i++) {
+                    byte[] bytes = Base64.decode(a.getJSONObject(i).getString("d"), Base64.DEFAULT);
+                    String n = "sh_" + now + "_" + (i + 1) + ".jpg";
+                    try (FileOutputStream os = new FileOutputStream(new File(d, n))) { os.write(bytes); }
+                    uris.add(new Uri.Builder().scheme("content").authority(CamProvider.AUTH).appendPath(n).build());
+                }
+                runOnUiThread(() -> {
+                    try {
+                        Intent i;
+                        if (uris.size() == 1) {
+                            i = new Intent(Intent.ACTION_SEND);
+                            i.putExtra(Intent.EXTRA_STREAM, uris.get(0));
+                        } else {
+                            i = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                            i.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+                        }
+                        i.setType("image/jpeg");
+                        ClipData cd = ClipData.newRawUri("", uris.get(0));
+                        for (int k = 1; k < uris.size(); k++) cd.addItem(new ClipData.Item(uris.get(k)));
+                        i.setClipData(cd);
+                        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(i, title == null || title.isEmpty() ? "ارسال رسید" : title));
+                    } catch (Exception e) { toast("اشتراک ممکن نشد"); }
+                });
+                return true;
+            } catch (Exception e) {
+                toast("اشتراک ممکن نشد");
+                return false;
+            }
         }
 
         @JavascriptInterface

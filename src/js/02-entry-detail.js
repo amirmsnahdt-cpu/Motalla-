@@ -57,10 +57,18 @@ function rcStamp(d,r){return new Promise(res=>{const im=new Image();im.onload=()
   g.textAlign='left';g.direction='ltr';g.fillStyle='#b8862b';g.font=`800 ${Math.round(fs*0.8)}px Vazirmatn, Tahoma, sans-serif`;g.fillText('مطلا',24,H+band*0.62);
   c.toBlob(bl=>res(bl||d2b(d)),'image/jpeg',.92)};im.onerror=()=>res(d2b(d));im.src=d})}
 async function rcFiles(L){const out=[];for(const r of L){const d=await imgGet(r.key);if(d){const bl=await rcStamp(d,r);out.push(new File([bl],rcName(r),{type:'image/jpeg'}))}}return out}
+/* v61.50: اپ اندروید (WebView) نه اشتراک فایل وب را دارد نه دانلود blob؛ از پل بومی: shareFiles و saveImage (APK جدید)، در APK قدیمی saveFile در Download */
+const rcB64=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=no;r.readAsDataURL(f)});
+const rcAnd=()=>!!window.AndroidBridge;
 async function rcShare(files,title){if(!files.length){toast('رسیدی پیدا نشد',true);return}
+  if(rcAnd()){const B=window.AndroidBridge;if(B.shareFiles){try{const L=[];for(const f of files)L.push({d:await rcB64(f)});B.shareFiles(JSON.stringify(L),title||'رسید واریز')}catch(e){toast('اشتراک ممکن نشد',true)}return}
+    await rcDown(files);toast('برای اشتراک مستقیم، نسخه جدید اپ اندروید را نصب کنید؛ رسید در پوشه Download ذخیره شد');return}
   try{if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files,title:title||'رسید واریز'});return}}catch(e){if(e&&e.name==='AbortError')return}
   rcDown(files)}
-function rcDown(files){if(!files.length){toast('رسیدی پیدا نشد',true);return}files.forEach((f,i)=>setTimeout(()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000)}catch(e){}},i*350));toast(files.length>1?fmt(files.length)+' رسید ذخیره شد':'رسید ذخیره شد')}
+async function rcDown(files){if(!files.length){toast('رسیدی پیدا نشد',true);return}
+  if(rcAnd()){const B=window.AndroidBridge;let n=0,j=0;for(const f of files){j++;const nm=files.length>1?f.name.replace(/(\.jpe?g)?$/i,'-'+j+'$1'):f.name;try{const d=await rcB64(f);if(B.saveImage?B.saveImage(nm,d):B.saveFile(nm,d,'image/jpeg'))n++}catch(e){}}
+    if(n)toast((n>1?fmt(n)+' رسید':'رسید')+(B.saveImage?' در گالری (پوشه Motalla) ذخیره شد':' ذخیره شد'));else toast('ذخیره عکس انجام نشد',true);return}
+  files.forEach((f,i)=>setTimeout(()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000)}catch(e){}},i*350));toast(files.length>1?fmt(files.length)+' رسید ذخیره شد':'رسید ذخیره شد')}
 /* لیست رسیدهای یک مجموعه واریزی (رسید بانکی + رسید تسویه از مشتری) */
 function rcOf(items){const L=[];items.forEach(x=>{const e=entries.find(q=>q.id===x.id)||{},hd=e.holder||x.name;const b=x.bid!=null&&batches.find(z=>z.id===x.bid);if(b)itImgs(b,x).forEach(k=>L.push({key:k,name:x.name,holder:hd,amount:x.amount,tn:x.tn||'',src:x.src||'',kind:'bank',bid:x.bid,iid:x.id,date:e.payDate||e.entryDate}));(e.settles||x.settles||[]).forEach(z=>{stImgs(z).forEach(k=>L.push({key:k,name:x.name+' (از '+z.name+')',holder:hd,payer:z.name,amount:z.amount,tn:z.tn||'',kind:'cust',date:z.date}))})});return L}
 let RC=[],RCT='';

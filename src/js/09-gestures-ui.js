@@ -102,7 +102,7 @@ function badNotice(iso){const n=validated().filter(r=>r.entryDate===iso&&r.level
   return n?`<button class="lrow bad" data-act="tkFixBad" data-iso="${iso}"><span class="ic">!</span><span class="tx"><b>${fmt(n)} واریزی خطادار در تقسیم نیامده</b><small>بزنید تا اصلاح شود؛ بعد از اصلاح در تقسیم ظاهر می‌شود</small></span>${fwd()}</button>`:''}
 /* ================= v21: خروجی کامل همه تخصیص‌های روز ================= */
 const dayParts=()=>parts().filter(p=>!(p.sent&&batches.some(b=>b.id===p.bid&&b.closed)));
-function dlFile(f){try{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000);return true}catch(e){return false}}
+function dlFile(f){/* v61.50: اپ اندروید blob را دانلود نمی‌کند؛ از پل بومی در Download/Motalla */if(window.AndroidBridge&&AndroidBridge.saveFile){rcB64(f).then(d=>AndroidBridge.saveFile(f.name,d,f.type||'application/octet-stream')).catch(()=>toast('ذخیره فایل انجام نشد',true));return true}try{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000);return true}catch(e){return false}}
 async function expAllGo(){closeSheet();const nm=ctxName(),hasX=typeof XLSX!=='undefined',files=[];
   try{if(hasX)files.push(new File([withCtx(xlsx)],nm+'.xlsx',{type:MIME.xlsx}))}catch(e){}
   files.push(new File(['﻿'+withCtx(txt)],nm+'.txt',{type:'text/plain'}));
