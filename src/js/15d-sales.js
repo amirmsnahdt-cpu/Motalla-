@@ -37,11 +37,11 @@ function txLinked(c,t){const R=[],find=(cu,tx)=>{const C=custs.find(z=>String(z.
   if(t.type==='xf'&&t.inv)find(t.inv.cu,t.inv.tx);
   return R.filter(x=>x.t!==t)}
 const invTitle=t=>(t.dk==='buy'?'سند خرید ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
-function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
+function txRow2(c,t,run){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t);ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
   const vals=(d.r?v(d.r,'r'):'')+(d.g?v(d.g,'g'):'')+Object.keys(d.x||{}).filter(k=>+d.x[k]).map(k=>v(+d.x[k],k)).join('')||'<b>تسویه</b>';
-  return swW(`<button class="txr" data-act="txOpen" data-id="${t.id}"><span class="bri t-${t.type}">${ic(ico)}</span><span class="tx"><b>${esc(T)}</b><small>${esc(sub)}</small></span><span class="txv txv2">${vals}</span></button>`,{r:[['txOpen','جزئیات','eye','#3b6fd6']],l:can('del')||isAdmin()?[['txDel','حذف','trash','#d23c48']]:[],data:{id:t.id}})}
+  return swW(`<button class="txr" data-act="txOpen" data-id="${t.id}"><span class="bri t-${t.type}">${ic(ico)}</span><span class="tx"><b>${esc(T)}</b><small>${esc(sub)}</small></span><span class="txv txv2">${vals}${run?txRunMini(run):''}</span></button>`,{r:[['txOpen','جزئیات','eye','#3b6fd6']],l:can('del')||isAdmin()?[['txDel','حذف','trash','#d23c48']]:[],data:{id:t.id}})}
 function xfShow(c,t){const d=txD(t),kv=(l,v)=>v?`<div class="kv"><small>${l}</small><b>${v}</b><span class="kvx"></span></div>`:'';const L=txLinked(c,t);
   sheet(`<div class="sh-h"><div><b>${t.type==='cv'?'تبدیل طلایی / ریالی':'انتقال مانده'}</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="kvs" style="border:0;padding:0">${kv('اثر ریالی',d.r?fmt(Math.abs(d.r))+' تومان ('+(d.r>0?'بدهی ما':'طلب ما')+')':'')}${kv('اثر طلایی',d.g?wFmt(Math.abs(d.g))+' گرم ('+(d.g>0?'بدهی طلایی ما':'طلب طلایی ما')+')':'')}${kv('نرخ',t.rate?fmt(t.rate)+' تومان هر گرم':'')}${kv('طرف دیگر',L.map(x=>esc(cuName(x.c))).join('، '))}${kv('شرح',esc(t.note||''))}${kv('تاریخ',esc(dates(t.date).wd+' '+dates(t.date).fa))}${kv('ثبت‌کننده',esc(t.by||''))}</div>
@@ -551,12 +551,19 @@ function vInv(){const X=invGet();if(!X){setTimeout(()=>{if(cur==='inv')go('custs
   /* v61.47 (خواسته صاحب اپ): «نمایش فاکتور» و «چاپ» یکی شد (فقط دکمه پایین «فاکتور · چاپ / PDF»)؛ حساب مشتری بالای صفحه با مانده‌ها؛
      دکمه‌ها ساده‌تر: ویرایش و سند بعدی کنار هم */
   return `${fresh?`<div class="bzok ivok">${ic('check')}<span>${esc(invTitle(t))} ثبت شد و به حساب «${esc(cuName(c))}» رفت</span></div>`:''}
-  ${ivCuCard(c)}${ivDet(c,t)}
-  <div class="ivbtn">${can('debt')?`<button class="ivb pri" data-act="invEdit">${ic('edit')}<span>ویرایش سند</span></button>`:''}<button class="ivb" data-act="svNew" data-cu="${c.id}">${ic('plus')}<span>سند بعدی</span></button></div>
-  ${can('del')||isAdmin()?`<button class="edel" data-act="invDel">${ic('trash')} حذف این سند</button>`:''}`}
+  ${ivCuCard(c)}${ivDet(c,t)}`}
+/* v61.52 (خواسته صاحب اپ): ویرایش، سند بعدی و حذف از پایین صفحه برداشته شد و در منوی کوچک بالا سمت چپ (⋯) آمد */
+ACT.invMenu=()=>{const X=invGet();if(!X)return;const it=[can('debt')?['invEdit',ic('edit'),'ویرایش سند']:null,can('debt')?['svNew',ic('plus'),'سند بعدی برای «'+cuName(X.c)+'»',{cu:X.c.id}]:null,['invPrint',ic('print'),'فاکتور · چاپ / PDF'],['cuOpen',ic('users'),'حساب مشتری',{id:X.c.id}],can('del')||isAdmin()?['invDel',ic('trash'),'حذف این سند',null,1]:null].filter(Boolean);
+  popMenu(document.querySelector('#bar .hmo'),it)};
+/* منوی کوچک زیر یک دکمه سرتیتر (مثل منوی iOS): زدن بیرون یا Esc = بسته؛ هر گزینه همان data-act همیشگی را اجرا می‌کند */
+function popMenu(btn,items){let m=$('pmenu');if(m){m.remove();return}if(!btn)return;m=document.createElement('div');m.id='pmenu';m.className='pmenu';m.setAttribute('role','menu');
+  m.innerHTML=items.map(([a,ico,l,d,red])=>`<button role="menuitem" class="pmi${red?' red':''}" data-act="${a}"${Object.entries(d||{}).map(([k,v])=>` data-${k}="${esc(String(v))}"`).join('')}><span>${esc(l)}</span>${ico}</button>`).join('');
+  document.body.appendChild(m);const r=btn.getBoundingClientRect();m.style.top=Math.round(r.bottom+6)+'px';m.style.left=Math.max(8,Math.round(r.left))+'px';btn.setAttribute('aria-expanded','true');
+  const out=e=>{if(!m.contains(e.target)&&!btn.contains(e.target))close()},key=e=>{if(e.key==='Escape')close()},close=()=>{if(m._c)return;m._c=1;m.classList.add('out');btn.setAttribute('aria-expanded','false');document.removeEventListener('pointerdown',out,true);document.removeEventListener('keydown',key,true);setTimeout(()=>m.remove(),RM()?0:160)};
+  setTimeout(()=>{document.addEventListener('pointerdown',out,true);document.addEventListener('keydown',key,true)},0);m.addEventListener('click',e=>{if(e.target.closest('.pmi'))setTimeout(close,0)});const f=m.querySelector('.pmi');if(f)f.focus({preventScroll:true})}
 /* کارت حساب مشتری بالای صفحه سند: نام، مانده فعلی تومان و طلا؛ زدن = گردش حساب */
-function ivCuCard(c){const b=cuBal(c),one=(k,v)=>`<span class="ivcb ${ftCls(v)}"><small>${k==='r'?'مبلغ':k==='g'?'طلا':balNm(k)}<i>${v?ourLab(v):'تسویه'}</i></small><b>${v?balV(k,v):'۰'} <i>${balU(k)}</i></b></span>`;
-  return `<button class="ivcu" data-act="cuOpen" data-id="${c.id}"><span class="ivch"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>حساب مشتری · گردش و مانده‌ها</small></span>${ic('back').replace('class="i"','class="i flip"')}</span><span class="ivcbs">${one('g',b.G)}${one('r',b.R)}${Object.keys(b.X||{}).filter(k=>+b.X[k]).map(k=>one(k,b.X[k])).join('')}</span></button>`}
+function ivCuCard(c){const b=cuBal(c);/* v61.52: یک ردیف جمع‌وجور مثل فهرست حساب‌ها: نام و مانده فعلی (مبلغ و طلا) */
+  return `<button class="ivcu iv7" data-act="cuOpen" data-id="${c.id}"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>مانده فعلی حساب</small></span><span class="c7v">${balTrail(b)}</span>${ic('back').replace('class="i"','class="i flip"')}</button>`}
 /* v61.6: باز کردن سند = جزئیات سند و ردیف‌ها (مثل صفحه سند)؛ فاکتور کاغذی فقط با «نمایش فاکتور» */
 function ivDet(c,t){const D=dates(t.date),eff=(v,k)=>v?`<span class="d6e ${v<0?'d':'c'}"><b>${balV(k||'r',v)}${k&&k!=='r'?' <i>'+balU(k)+'</i>':''}</b><small>${ourLab(v)}</small></span>`:'',R=[];
   const row=(ico,tag,b,sub,v,phs)=>d6Row({ico,phs,tag:dkTag(tag),b,sub,v});
