@@ -59,10 +59,11 @@ function rcStamp(d,r){return new Promise(res=>{const im=new Image();im.onload=()
 async function rcFiles(L){const out=[];for(const r of L){const d=await imgGet(r.key);if(d){const bl=await rcStamp(d,r);out.push(new File([bl],rcName(r),{type:'image/jpeg'}))}}return out}
 /* v61.50: اپ اندروید (WebView) نه اشتراک فایل وب را دارد نه دانلود blob؛ از پل بومی: shareFiles و saveImage (APK جدید)، در APK قدیمی saveFile در Download */
 const rcB64=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=no;r.readAsDataURL(f)});
-const rcAnd=()=>!!window.AndroidBridge;
+const rcAnd=()=>!!window.AndroidBridge;let RCOLD=null;
 async function rcShare(files,title){if(!files.length){toast('رسیدی پیدا نشد',true);return}
   if(rcAnd()){const B=window.AndroidBridge;if(B.shareFiles){try{const L=[];for(const f of files)L.push({d:await rcB64(f)});B.shareFiles(JSON.stringify(L),title||'رسید واریز')}catch(e){toast('اشتراک ممکن نشد',true)}return}
-    await rcDown(files);toast('برای اشتراک مستقیم، نسخه جدید اپ اندروید را نصب کنید؛ رسید در پوشه Download ذخیره شد');return}
+    /* v61.51: اپ نصب‌شده قدیمی است (پنجره اشتراک را ندارد) → به‌جای ذخیره بی‌صدا، روشن بگو و نسخه تازه را پیشنهاد بده */
+    RCOLD=files;if(typeof ZV!=="undefined"&&ZV)zvClose();sheet(`<div class="sh-h"><div><b>اشتراک نیاز به نسخه تازه اپ دارد</b><small class="shsub">اپ اندروید نصب‌شده روی این گوشی قدیمی است و پنجره برنامه‌ها (تلگرام، واتساپ، …) را باز نمی‌کند.</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div><div class="muted" style="font-size:12.5px;margin:-2px 2px 12px">نسخه تازه را نصب کنید؛ اطلاعات روی سرور است و چیزی پاک نمی‌شود.</div><div class="row"><button class="btn sec" data-act="rcOldSave">${ic('down')} فعلاً ذخیره</button><button class="btn gold" data-act="rcOldApk">${ic('down')} دانلود نسخه تازه</button></div>`);return}
   try{if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files,title:title||'رسید واریز'});return}}catch(e){if(e&&e.name==='AbortError')return}
   rcDown(files)}
 async function rcDown(files){if(!files.length){toast('رسیدی پیدا نشد',true);return}

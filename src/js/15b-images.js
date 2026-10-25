@@ -47,7 +47,7 @@ document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.datase
   for(const f of F){try{const d=await shrink(f),k=newImgKey('stl:'+z.id);if(await imgPut(k,d)){K.push(k);n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}catch(x){toast('این عکس خوانده نشد',true)}}
   if(n){z.imgs=K;z.img=K[0]||'';e.updatedAt=new Date().toISOString();e.updatedBy=who();saveE();stlSync(e);logA('edit','افزودن رسید تسویه',fullName(e)+' ← '+z.name+' | '+fmt(n)+' عکس');if($('sheet').querySelector('.fss')){$('sheet').innerHTML=fsHTML();fsThumbs()}if(['lday','ent'].includes(cur)){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}toast(n>1?fmt(n)+' عکس اضافه شد':'عکس اضافه شد')}});
 ACT.galSt=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;openGal({k:'st',eid:e.id,sid:z.id})};
-ACT.galView=d=>zvOpen(+d.i);
+ACT.galView=d=>zvOpen(+d.i);ACT.rcOldSave=()=>{const f=RCOLD;RCOLD=null;closeSheet();if(f)rcDown(f)};ACT.rcOldApk=()=>{RCOLD=null;closeSheet();ACT.getApk()}; /* اپ اندروید قدیمی: پنجره «نسخه تازه لازم است» در rcShare */
 ACT.galShare=async()=>{const c=galCtx();if(c)rcShare(await rcFiles(galFiles(c)),'رسید '+c.meta.name)};
 ACT.galSave=async()=>{const c=galCtx();if(c)rcDown(await rcFiles(galFiles(c)))};
 /* ---------- نمایش تمام‌صفحه: دو انگشت یا دو بار زدن برای بزرگ‌نمایی، کشیدن برای جابه‌جایی ---------- */
