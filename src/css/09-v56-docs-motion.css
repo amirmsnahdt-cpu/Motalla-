@@ -1471,3 +1471,87 @@ button.sssbtn svg{width:17px;height:17px}
 /* حالت تیره: قرمز و آبیِ روشنِ تم تیره زیر متن سفید کم‌کنتراست است؛ زمینه نهایی تیره‌تر */
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #act .f3g .f3c.f3m.d,:root:not([data-theme="light"]) .f3g.st .f3c.f3m.d{background:color-mix(in srgb,var(--red) 55%,#000)!important}:root:not([data-theme="light"]) #act .f3g .f3c.f3m.c,:root:not([data-theme="light"]) .f3g.st .f3c.f3m.c{background:color-mix(in srgb,var(--blu) 55%,#000)!important}}
 :root[data-theme="dark"] #act .f3g .f3c.f3m.d,:root[data-theme="dark"] .f3g.st .f3c.f3m.d{background:color-mix(in srgb,var(--red) 55%,#000)!important}:root[data-theme="dark"] #act .f3g .f3c.f3m.c,:root[data-theme="dark"] .f3g.st .f3c.f3m.c{background:color-mix(in srgb,var(--blu) 55%,#000)!important}
+/* ===== v61.53: «قاب مانده» — هر جنس (مبلغ، طلا، سکه/ارز) در قاب جدا با واحد کامل ===== */
+.q8fs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:100%}
+.q8f{display:flex;flex-direction:column;gap:2px;min-width:0;padding:6px 9px 7px;border-radius:12px;border:1px solid var(--q8b,var(--line));background:var(--q8t,transparent);container-type:inline-size;text-align:right}
+.q8f.d{--q8b:color-mix(in srgb,var(--red) 30%,transparent);--q8t:color-mix(in srgb,var(--red) 6%,var(--card));--q8c:var(--red);--q8p:var(--red2)}
+.q8f.c{--q8b:color-mix(in srgb,var(--blu) 30%,transparent);--q8t:color-mix(in srgb,var(--blu) 6%,var(--card));--q8c:var(--blu);--q8p:var(--blu2)}
+.q8f.z{--q8b:var(--line);--q8t:color-mix(in srgb,var(--mut) 5%,var(--card));--q8c:var(--mut);--q8p:color-mix(in srgb,var(--mut) 13%,transparent)}
+.q8l{display:flex;align-items:center;justify-content:space-between;gap:4px;line-height:1.2}
+.q8l small{font-size:11px;font-weight:800;color:var(--mut);white-space:nowrap}
+.q8l em{font-style:normal;font-size:9.5px;font-weight:850;line-height:15px;padding:0 6px;border-radius:6px;background:var(--q8p);color:var(--q8c);white-space:nowrap}
+.q8f.z .q8l em{color:var(--ok);background:color-mix(in srgb,var(--ok) 11%,transparent)}
+.q8f>b{display:flex;align-items:baseline;gap:4px;min-width:0;white-space:nowrap;line-height:1.25;color:var(--q8c)}
+.q8f>b .cbn{font-size:min(16px,10.6cqi);font-weight:900;letter-spacing:-.2px;font-feature-settings:"tnum"}
+.q8f>b i{font-style:normal;font-size:min(11px,7.6cqi);font-weight:750;color:var(--mut)}
+.q8f.z>b .cbn{font-weight:800}
+.q8rn{display:flex;align-items:baseline;gap:4px;margin-top:3px;padding-top:4px;border-top:1px dashed var(--q8b);font-size:min(11px,8.6cqi);white-space:nowrap;line-height:1.3}
+.q8rn small{font-size:inherit;font-weight:700;color:var(--mut)}
+.q8rn span{font-weight:850;font-feature-settings:"tnum";color:var(--mut)}
+.q8rn em{font-style:normal;font-weight:800;font-size:.9em;margin-inline-start:auto;color:var(--mut)}
+.q8rn.d span,.q8rn.d em{color:var(--red)}.q8rn.c span,.q8rn.c em{color:var(--blu)}.q8rn.z em{color:var(--ok)}
+/* فهرست حساب‌ها: بالا نام، زیرش قاب‌ها */
+.c6l .c8r{display:flex;align-items:flex-start;gap:10px;padding:10px 12px 11px;flex-wrap:nowrap}
+.c6l .c8r .c6a{flex:none;width:38px;height:38px;font-size:15px}
+.c8b{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.c8b .tx{display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
+.c8b .tx b{display:flex;align-items:center;gap:6px;min-width:0;font-size:15px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c8b .tx b em{flex:none;font-style:normal;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:7px;background:var(--gold2,#f6ecd2);color:var(--gold,#8a6a1f)}
+.c8b .tx small{flex:none;font-size:11.5px;color:var(--mut)}
+.c6l>.swr+.swr .c8r::before{right:60px}
+.c6l.anim .c8r .q8f{animation:cbIn .42s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--r,0)*40ms + var(--i,0)*60ms)}
+/* سرتیتر حساب مشتری = پروفایل */
+#bar .cuh8{flex-direction:row;align-items:center;gap:10px;min-width:0}
+#bar .cuh8 .c6a{flex:none;width:40px;height:40px;font-size:16px}
+.cuh8t{min-width:0;display:flex;flex-direction:column;gap:2px}
+#bar .cuh8t>b{font-size:18px;font-weight:850}
+.cuh8m{display:flex;align-items:center;gap:6px;min-width:0;font-size:12px;font-weight:700;color:var(--mut);white-space:nowrap;overflow:hidden}
+.cuh8m em{flex:none;font-style:normal;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:7px;background:var(--gold2,#f6ecd2);color:var(--gold,#8a6a1f)}
+.cuh8m a,.cuh8m>span{display:inline-flex;align-items:center;gap:3px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.cuh8p{color:var(--blu);text-decoration:none;font-weight:800}.cuh8p svg{width:13px;height:13px;flex:none}
+#bar .hed{background:var(--blu2)!important;color:var(--blu)!important}
+/* کارت مانده حساب: هر جنس یک قاب، عدد بزرگ و پررنگ با واحد کامل */
+.q8c{background:var(--card);border-radius:20px;padding:10px 10px 10px;margin-bottom:14px;box-shadow:0 0 0 1px var(--line),0 12px 26px -20px color-mix(in srgb,var(--blu) 55%,transparent);display:flex;flex-direction:column;gap:8px}
+.q8ch{display:flex;align-items:baseline;justify-content:space-between;padding:2px 4px 0}
+.q8ch b{font-size:14px;font-weight:850}.q8ch small{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--mut);font-weight:700}
+.q8ch small.ok{color:var(--ok)}.q8ch small svg{width:13px;height:13px}
+.q8r{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:15px;border:1px solid var(--q8b,var(--line));background:var(--q8t);container-type:inline-size}
+.q8r.d{--q8b:color-mix(in srgb,var(--red) 32%,transparent);--q8t:color-mix(in srgb,var(--red) 7%,var(--card));--q8c:var(--red);--q8p:var(--red2)}
+.q8r.c{--q8b:color-mix(in srgb,var(--blu) 32%,transparent);--q8t:color-mix(in srgb,var(--blu) 7%,var(--card));--q8c:var(--blu);--q8p:var(--blu2)}
+.q8r.z{--q8b:var(--line);--q8t:color-mix(in srgb,var(--mut) 5%,var(--card));--q8c:var(--mut)}
+.q8rl{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.q8rl b{font-size:14.5px;font-weight:850}
+.q8rl em{font-style:normal;font-size:10.5px;font-weight:850;line-height:18px;padding:0 8px;border-radius:7px;background:var(--q8p);color:var(--q8c)}
+.q8r.z .q8rl em{color:var(--ok);background:color-mix(in srgb,var(--ok) 11%,transparent)}
+.q8rv{min-width:0;display:flex;align-items:baseline;gap:6px;white-space:nowrap;color:var(--q8c)}
+.q8rv b{font-size:min(27px,9.5cqi);font-weight:900;letter-spacing:-.4px;font-feature-settings:"tnum";line-height:1.2}
+.q8rv i{font-style:normal;font-size:13px;font-weight:750;color:var(--mut)}
+.q8c.anim .q8r{animation:cbIn .42s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+/* گردش حساب: بالا نوع و شرح، زیرش قاب‌های مبلغ و طلا با مانده بعد از ردیف */
+.tx8g .tx8{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px 12px 11px;min-height:0}
+.tx8t{display:flex;align-items:center;gap:10px;min-width:0}
+.tx8g>.swr+.swr::before{right:12px}
+/* صفحه سند ثبت‌شده: تاریخ و مظنه یک خط کوچک */
+.iv8m{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 2px 12px}
+.iv8m>span{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:10px;background:var(--card);box-shadow:0 0 0 1px var(--line);font-size:12px;white-space:nowrap}
+.iv8m svg{width:13px;height:13px;color:var(--blu);flex:none}
+.iv8m b{font-weight:800;font-feature-settings:"tnum"}.iv8m small{font-size:11px;color:var(--mut);font-weight:700}
+/* مانده‌های سند پایین صفحه: هر جنس یک قاب، سه ستون قبلی · این سند · نهایی */
+#app.full #act:has(.iv8b){display:block;padding:6px 2px 8px}
+.iv8b{background:var(--card);border-radius:20px;padding:8px 8px 8px;box-shadow:0 0 0 1px var(--line),0 -10px 28px -22px color-mix(in srgb,var(--blu) 60%,transparent);display:flex;flex-direction:column;gap:6px;container-type:inline-size}
+.iv8h,.iv8r{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:4px}
+.iv8h{padding:2px 7px 0}.iv8h span{font-size:11px;font-weight:800;color:var(--mut);text-align:center}
+.iv8r{padding:5px 6px 6px;border-radius:14px;border:1px solid var(--line);background:color-mix(in srgb,var(--mut) 4%,var(--card))}
+.iv8k{grid-column:1/-1;display:flex;align-items:baseline;gap:5px;padding:0 4px 1px;line-height:1.3}
+.iv8k b{font-size:13px;font-weight:850}.iv8k small{font-size:10.5px;font-weight:750;color:var(--mut)}
+.iv8c{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;padding:5px 2px;border-radius:10px;line-height:1.25}
+.iv8c b{font-size:min(15px,4.25cqi);font-weight:900;font-feature-settings:"tnum";white-space:nowrap;letter-spacing:-.2px}
+.iv8c small{font-size:9.5px;font-weight:800;white-space:nowrap}
+.iv8c.d b,.iv8c.d small{color:var(--red)}.iv8c.c b,.iv8c.c small{color:var(--blu)}.iv8c.z b{color:var(--mut)}.iv8c.z small{color:var(--ok)}
+.iv8c.m{background:color-mix(in srgb,var(--mut) 10%,var(--card))}
+.iv8c.m.d{background:var(--red);}.iv8c.m.c{background:var(--blu)}
+.iv8c.m.d b,.iv8c.m.d small,.iv8c.m.c b,.iv8c.m.c small{color:#fff}
+.iv8c.m b{font-size:min(15.5px,4.4cqi)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .iv8c.m.d{background:color-mix(in srgb,var(--red) 62%,#000)}:root:not([data-theme="light"]) .iv8c.m.c{background:color-mix(in srgb,var(--blu) 62%,#000)}}
+:root[data-theme="dark"] .iv8c.m.d{background:color-mix(in srgb,var(--red) 62%,#000)}:root[data-theme="dark"] .iv8c.m.c{background:color-mix(in srgb,var(--blu) 62%,#000)}
+@media (prefers-reduced-motion:reduce){.c6l.anim .c8r .q8f,.q8c.anim .q8r{animation:none!important}}

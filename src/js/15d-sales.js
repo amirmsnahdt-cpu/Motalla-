@@ -37,11 +37,10 @@ function txLinked(c,t){const R=[],find=(cu,tx)=>{const C=custs.find(z=>String(z.
   if(t.type==='xf'&&t.inv)find(t.inv.cu,t.inv.tx);
   return R.filter(x=>x.t!==t)}
 const invTitle=t=>(t.dk==='buy'?'سند خرید ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
-function txRow2(c,t,run){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
+function txRow2(c,t,run){const d=txD(t);
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t);ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
-  const vals=(d.r?v(d.r,'r'):'')+(d.g?v(d.g,'g'):'')+Object.keys(d.x||{}).filter(k=>+d.x[k]).map(k=>v(+d.x[k],k)).join('')||'<b>تسویه</b>';
-  return swW(`<button class="txr" data-act="txOpen" data-id="${t.id}"><span class="bri t-${t.type}">${ic(ico)}</span><span class="tx"><b>${esc(T)}</b><small>${esc(sub)}</small></span><span class="txv txv2">${vals}${run?txRunMini(run):''}</span></button>`,{r:[['txOpen','جزئیات','eye','#3b6fd6']],l:can('del')||isAdmin()?[['txDel','حذف','trash','#d23c48']]:[],data:{id:t.id}})}
+  return txLine(t,ico,t.type,T,sub,d,run)}
 function xfShow(c,t){const d=txD(t),kv=(l,v)=>v?`<div class="kv"><small>${l}</small><b>${v}</b><span class="kvx"></span></div>`:'';const L=txLinked(c,t);
   sheet(`<div class="sh-h"><div><b>${t.type==='cv'?'تبدیل طلایی / ریالی':'انتقال مانده'}</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="kvs" style="border:0;padding:0">${kv('اثر ریالی',d.r?fmt(Math.abs(d.r))+' تومان ('+(d.r>0?'بدهی ما':'طلب ما')+')':'')}${kv('اثر طلایی',d.g?wFmt(Math.abs(d.g))+' گرم ('+(d.g>0?'بدهی طلایی ما':'طلب طلایی ما')+')':'')}${kv('نرخ',t.rate?fmt(t.rate)+' تومان هر گرم':'')}${kv('طرف دیگر',L.map(x=>esc(cuName(x.c))).join('، '))}${kv('شرح',esc(t.note||''))}${kv('تاریخ',esc(dates(t.date).wd+' '+dates(t.date).fa))}${kv('ثبت‌کننده',esc(t.by||''))}</div>
@@ -551,7 +550,7 @@ function vInv(){const X=invGet();if(!X){setTimeout(()=>{if(cur==='inv')go('custs
   /* v61.47 (خواسته صاحب اپ): «نمایش فاکتور» و «چاپ» یکی شد (فقط دکمه پایین «فاکتور · چاپ / PDF»)؛ حساب مشتری بالای صفحه با مانده‌ها؛
      دکمه‌ها ساده‌تر: ویرایش و سند بعدی کنار هم */
   return `${fresh?`<div class="bzok ivok">${ic('check')}<span>${esc(invTitle(t))} ثبت شد و به حساب «${esc(cuName(c))}» رفت</span></div>`:''}
-  ${ivCuCard(c)}${ivDet(c,t)}`}
+  ${ivDet(c,t)}`}
 /* v61.52 (خواسته صاحب اپ): ویرایش، سند بعدی و حذف از پایین صفحه برداشته شد و در منوی کوچک بالا سمت چپ (⋯) آمد */
 ACT.invMenu=()=>{const X=invGet();if(!X)return;const it=[can('debt')?['invEdit',ic('edit'),'ویرایش سند']:null,can('debt')?['svNew',ic('plus'),'سند بعدی برای «'+cuName(X.c)+'»',{cu:X.c.id}]:null,['invPrint',ic('print'),'فاکتور · چاپ / PDF'],['cuOpen',ic('users'),'حساب مشتری',{id:X.c.id}],can('del')||isAdmin()?['invDel',ic('trash'),'حذف این سند',null,1]:null].filter(Boolean);
   popMenu(document.querySelector('#bar .hmo'),it)};
@@ -561,9 +560,6 @@ function popMenu(btn,items){let m=$('pmenu');if(m){m.remove();return}if(!btn)ret
   document.body.appendChild(m);const r=btn.getBoundingClientRect();m.style.top=Math.round(r.bottom+6)+'px';m.style.left=Math.max(8,Math.round(r.left))+'px';btn.setAttribute('aria-expanded','true');
   const out=e=>{if(!m.contains(e.target)&&!btn.contains(e.target))close()},key=e=>{if(e.key==='Escape')close()},close=()=>{if(m._c)return;m._c=1;m.classList.add('out');btn.setAttribute('aria-expanded','false');document.removeEventListener('pointerdown',out,true);document.removeEventListener('keydown',key,true);setTimeout(()=>m.remove(),RM()?0:160)};
   setTimeout(()=>{document.addEventListener('pointerdown',out,true);document.addEventListener('keydown',key,true)},0);m.addEventListener('click',e=>{if(e.target.closest('.pmi'))setTimeout(close,0)});const f=m.querySelector('.pmi');if(f)f.focus({preventScroll:true})}
-/* کارت حساب مشتری بالای صفحه سند: نام، مانده فعلی تومان و طلا؛ زدن = گردش حساب */
-function ivCuCard(c){const b=cuBal(c);/* v61.52: یک ردیف جمع‌وجور مثل فهرست حساب‌ها: نام و مانده فعلی (مبلغ و طلا) */
-  return `<button class="ivcu iv7" data-act="cuOpen" data-id="${c.id}"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>مانده فعلی حساب</small></span><span class="c7v">${balTrail(b)}</span>${ic('back').replace('class="i"','class="i flip"')}</button>`}
 /* v61.6: باز کردن سند = جزئیات سند و ردیف‌ها (مثل صفحه سند)؛ فاکتور کاغذی فقط با «نمایش فاکتور» */
 function ivDet(c,t){const D=dates(t.date),eff=(v,k)=>v?`<span class="d6e ${v<0?'d':'c'}"><b>${balV(k||'r',v)}${k&&k!=='r'?' <i>'+balU(k)+'</i>':''}</b><small>${ourLab(v)}</small></span>`:'',R=[];
   const row=(ico,tag,b,sub,v,phs)=>d6Row({ico,phs,tag:dkTag(tag),b,sub,v});
@@ -572,19 +568,20 @@ function ivDet(c,t){const D=dates(t.date),eff=(v,k)=>v?`<span class="d6e ${v<0?'
   if(+t.disc)R.push(row('tag','','تخفیف','از جمع سند کم شد',eff(+t.disc)));
   (t.pays||[]).forEach(p=>{const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row(M.i,out?'out':'in',esc(pyLab(p)),(p.m==='off'?'صفر کردن مانده':'')+(p.tn?' · پیگیری '+esc(p.tn):''),eff(pAmt(p))))});
   const E=txD(t),ef=[E.r?eff(E.r):'',E.g?eff(E.g,'g'):'',...Object.keys(E.x||{}).filter(k=>+E.x[k]).map(k=>eff(E.x[k],k))].filter(Boolean);
-  return `<div class="ivd6"><div class="ivd6h"><span class="ivd6n"><small>${esc(invTitle(t))}</small><b>${toFa(t.no)}</b></span><span class="tx"><b>${esc(D.fa)}</b><small>${esc(D.wd)}${t.rate?'، '+(t.mz?'مظنه '+fmt(t.mz):'هر گرم '+fmt(t.rate)):''}${t.tax?'، با مالیات':''}</small></span></div>
+  return `<div class="ivd6"><div class="iv8m"><span>${ic('cal')}<b>${esc(D.fa)}</b><small>${esc(D.wd)}</small></span>${t.rate?`<span>${ic('tag')}<small>${t.mz?'مظنه':'هر گرم'}</small><b>${fmt(t.mz||t.rate)}</b></span>`:''}${t.tax?`<span><small>با مالیات</small></span>`:''}</div>
   ${R.length?`<div class="d6sh"><b>ردیف‌های سند</b><small>${toFa(R.length)} ردیف</small></div><div class="d6rows d7">${R.join('')}</div>`:''}
-  ${ivBal3(c,t)}</div>`}
-/* v61.47: مانده‌های همین سند مثل پایین صفحه سند — قبلی · سند · نهایی، هر کدام مبلغ و طلا */
-function ivBal3(c,t){const P=cuBalBefore(c,t),d=txD(t),ks=[...new Set([...Object.keys(P.X||{}),...Object.keys(d.x||{})])].filter(k=>+(P.X||{})[k]||+(d.x||{})[k]);
-  const V=[{r:P.R,g:P.G,x:P.X||{}},{r:d.r,g:d.g,x:d.x||{}},{r:P.R+d.r,g:Math.round((P.G+d.g)*1000)/1000,x:Object.fromEntries(ks.map(k=>[k,(+(P.X||{})[k]||0)+(+(d.x||{})[k]||0)]))}];
-  const cell=(lab,o,m)=>{const cl=ftCls(o.r||o.g);return `<div class="f3c ${cl}${m?' f3m':''}"><small>${lab}<i>${o.r?ourLab(o.r):o.g?ourLab(o.g):'تسویه'}</i></small>${ftLn('r',o.r,m)}${ftLn('g',o.g)}${ks.map(k=>+o.x[k]?ftLn(k,+o.x[k]):'').join('')}</div>`};
-  return `<div class="d6sh"><b>مانده‌ها</b><small>قبل و بعد از این سند</small></div><div class="f3g st">${cell('قبلی',V[0])}${cell('این سند',V[1])}${cell('نهایی',V[2],1)}</div>`}
+  </div>`}
+/* v61.53 (خواسته صاحب اپ): مانده‌های سند پایین صفحه (جای دکمه چاپ)؛ هر جنس یک قاب: نام و واحد کامل کنار هم،
+   قبلی · این سند · نهایی در سه ستون، نهایی پررنگ با زمینه رنگی. مبلغ و طلا همیشه، سکه/ارز اگر هست */
+function ivBalP(c,t){const P=cuBalBefore(c,t),d=txD(t),K=q8Keys(P,d);
+  const row=k=>{const a=q8V(P,k),b=q8V(d,k),f=k==='g'?Math.round((a+b)*1000)/1000:k==='r'?a+b:Math.round((a+b)*100)/100,c0=(v,m)=>`<span class="iv8c ${q8S(v)}${m?' m':''}"><b>${v?balV(k,v):'۰'}</b><small>${ourLab(v)}</small></span>`;
+    return `<div class="iv8r k${q8C(k)}"><span class="iv8k"><b>${q8K(k)}</b><small>${esc(balU(k))}</small></span>${c0(a)}${c0(b)}${c0(f,1)}</div>`};
+  return `<div class="iv8b"><div class="iv8h"><span>قبلی</span><span>این سند</span><span>نهایی</span></div>${K.map(row).join('')}</div>`}
 ACT.invEdit=()=>{const X=invGet();if(!X)return;if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
   const items=(t.items||[]).map(it=>{const o={...it};['gold','ajv','prv','taxv','tot'].forEach(k=>delete o[k]);return o}),xr=(t.xr||[]).map(x=>{const o={...x};['n','q750','amount','e'].forEach(k=>delete o[k]);if(o.a==='gold'&&!o.pgM)o.pg=0;return o}),pays=(t.pays||[]).map(p=>{const o={...p};delete o.xfId;return o});
   sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:false,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();sv.sig0=svSig();svKeep();TITLES.sell='ویرایش سند '+toFa(t.no);PARENT.sell='inv';go('sell')};
 ACT.invPaper=()=>{if(!invV)return;invV.paper=!invV.paper;render();scrollTo({top:0,behavior:RM()?'auto':'smooth'})};
-const aInv=()=>`<button class="btn gold bzgo" data-act="invPrint">${ic('print')} فاکتور · چاپ / PDF</button>`;
+const aInv=()=>{const X=invGet();return X?ivBalP(X.c,X.t):''};
 ACT.invDel=()=>{const X=invGet();if(!X)return;askConfirm(invTitle(X.t)+' حذف شود؟ اثرش از حساب مشتری'+(txLinked(X.c,X.t).length?' و مشتری پرداخت‌کننده':'')+' برداشته می‌شود.','حذف',()=>{custId=X.c.id;cur='cust';ACT.txDel({id:X.t.id});go('cust',true)})};
 /* v61.33: برگه سند (چاپ / PDF) — خواسته صاحب اپ: هر ردیف فقط مشخصات (کالا، وزن، عیار، مظنه، اجرت ٪، سود ٪) و مبلغ نهایی؛
    بعد جمع کالاها، ردیف‌های دریافت و پرداخت که اعمال می‌شوند و جمعشان، و در آخر مانده قبلی، این سند و نهایی (تومان، طلا، سکه).

@@ -29,15 +29,19 @@ const balU=k=>k==='r'?'تومان':k==='g'?'گرم':(XA[k]||{u:''}).u;
 const bpill=(k,v)=>v?`<span class="bp ${k==='r'?'r':k==='g'?'g':'x'} ${v<0?'d':'c'}"><b>${balV(k,v)}<i>${esc(balU(k))}</i></b><small>${ourLab(v)}</small></span>`:'';/* v61.6: از دید مغازه: طلبکاریم قرمز، بدهکاریم آبی · v61.23: واحد کامل */
 /* v61.23: مانده‌ها در فهرست مشتری: ردیف جدا زیر نام، دو ستون هم‌اندازه — طلا (گرم) راست، مبلغ (تومان) چپ؛ سکه و ارز بعد از آنها */
 let cuAnim=0,cuCntId=null;/* کاشی‌های صفحه مشتری فقط بار اول ورود حرکت می‌کنند، نه در هر تازه‌سازی */
-const bindCust=()=>{if(cuCntId===custId)return;cuCntId=custId;requestAnimationFrame(()=>cuCount('.cp7b.anim .cbn'))};
+const bindCust=()=>{if(cuCntId===custId)return;cuCntId=custId;requestAnimationFrame(()=>cuCount('.q8c.anim .cbn'))};
 const cbCell=(k,v,i)=>`<span class="cbk k${k==='r'?'r':k==='g'?'g':'x'} ${v<0?'d':v>0?'c':'z'}" style="--i:${i}"><span class="cbh"><small>${k==='r'?'مبلغ':k==='g'?'طلا':esc((XA[k]||{t:k}).t)} <i>${esc(balU(k))}</i></small>${v?`<em>${ourLab(v)}</em>`:''}</span><b><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span></b></span>`;
 function balPills(b){const X=Object.keys(b.X||{}).filter(k=>b.X[k]);if(!b.R&&!b.G&&!X.length)return `<span class="cbz"><span class="cbzi">${ic('check')}</span><span class="cbzt"><b>حساب تسویه است</b><small>مبلغ و طلا صفر</small></span><em>تسویه</em></span>`;
   const L=[['g',b.G],['r',b.R],...X.map(k=>[k,b.X[k]])];let i=0;return L.map(([k,v])=>cbCell(k,v,i++)).join('')}
-/* v61.52 (خواسته صاحب اپ: ردیف‌ها خیلی جا می‌گیرند): مانده در ردیف فهرست = ستون باریک سمت چپ؛ هر جنس یک خط:
-   برچسب جهت (طلبکاریم/بدهکاریم) کوچک + عدد پررنگ + واحد؛ صفرها نمی‌آیند؛ همه صفر = «تسویه» کم‌رنگ */
-const cbLine=(k,v,i)=>`<span class="cl7 ${v<0?'d':'c'} k${k==='r'?'r':k==='g'?'g':'x'}" style="--i:${i}"><em>${ourLab(v)}</em><b><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${balV(k,v)}</span></b><i>${k==='r'?'ت':k==='g'?'گ':esc(balU(k))}</i></span>`;
-function balTrail(b){const L=[['r',b.R],['g',b.G],...Object.keys(b.X||{}).map(k=>[k,b.X[k]])].filter(z=>+z[1]);
-  if(!L.length)return `<span class="cl7z">${ic('check')}تسویه</span>`;return L.map((z,i)=>cbLine(z[0],+z[1],i)).join('')}
+/* v61.53 (خواسته صاحب اپ): «قاب مانده» — هر جنس (مبلغ، طلا، سکه/ارز) در یک قاب جدا: بالا نام جنس و برچسب طلبکاریم/بدهکاریم،
+   زیرش عدد پررنگ با واحد کامل (تومان، گرم، عدد). مبلغ و طلا همیشه کنار هم؛ سکه و ارز فقط اگر مانده دارند.
+   q8F = قاب کوچک (فهرست حساب‌ها و گردش حساب؛ run = مانده بعد از ردیف)، q8R = قاب بزرگ صفحه حساب مشتری */
+const q8K=k=>k==='r'?'مبلغ':k==='g'?'طلا':esc((XA[k]||{t:k}).t),q8S=v=>v<0?'d':v>0?'c':'z',q8C=k=>k==='r'?'r':k==='g'?'g':'x';
+const q8Keys=(...O)=>['r','g',...new Set(O.flatMap(o=>Object.keys((o&&(o.X||o.x))||{}).filter(k=>+(o.X||o.x)[k])))];
+const q8V=(o,k)=>!o?0:k==='r'?+(o.R??o.r)||0:k==='g'?+(o.G??o.g)||0:+((o.X||o.x||{})[k])||0;
+function q8F(k,v,o={}){const r=o.run;return `<span class="q8f k${q8C(k)} ${q8S(v)}"${o.i!=null?` style="--i:${o.i}"`:''}><span class="q8l"><small>${q8K(k)}</small>${o.eff&&!v?'':`<em>${ourLab(v)}</em>`}</span><b><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span><i>${esc(balU(k))}</i></b>${r!==undefined?`<span class="q8rn ${q8S(r)}"><small>مانده</small><span>${r?balV(k,r):'۰'}</span><em>${ourLab(r)}</em></span>`:''}</span>`}
+function balTrail(b){return `<span class="q8fs">${q8Keys(b).map((k,i)=>q8F(k,q8V(b,k),{i})).join('')}</span>`}
+function q8R(k,v,i){return `<div class="q8r k${q8C(k)} ${q8S(v)}" style="--i:${i}"><span class="q8rl"><b>${q8K(k)}</b><em>${ourLab(v)}</em></span><span class="q8rv"><b class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</b><i>${esc(balU(k))}</i></span></div>`}
 /* شمارش عددها از صفر هنگام باز شدن صفحه (یک بار) */
 function cuCount(sel){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const E=[...document.querySelectorAll(sel||'#cures .c6l.anim .cbn')].filter(e=>+e.dataset.v&&e.getBoundingClientRect().top<innerHeight);if(!E.length)return;
   const t0=performance.now(),D=650,f=(k,v)=>k==='r'?fmt(Math.round(v)):k==='g'?wFmt(v):qFmt(Math.round(v*100)/100);
@@ -63,7 +67,7 @@ function cuListHTML(){const q0=clean(cuQ||''),q=nzName(toEn(q0)),A=CU();let B=A.
   const IV=cuInvHits(q0),ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
   if(!B.length)return (ivh+mem+add)||`<div class="bempty">${ic('search')}<b>حسابی پیدا نشد</b></div>`;
   const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'';cuAnim=0;
-  return `${ivh}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb c7l${an}">${B.map(([c,b],ri)=>swW(`<button class="c6r c7r" data-act="cuOpen" data-id="${c.id}"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="c7v" style="--r:${Math.min(ri,8)}">${balTrail(b)}</span></button>`,{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})).join('')}</div>${mem}${add}`}
+  return `${ivh}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb c7l${an}">${B.map(([c,b],ri)=>swW(`<button class="c6r c8r" data-act="cuOpen" data-id="${c.id}" style="--r:${Math.min(ri,8)}"><span class="c6a">${esc(userInit(c.name))}</span><span class="c8b"><span class="tx"><b>${esc(cuName(c))}${c.grp?'<em>'+esc(c.grp)+'</em>':''}</b>${c.phone?'<small><bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi></small>':''}</span>${balTrail(b)}</span></button>`,{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})).join('')}</div>${mem}${add}`}
 const cuName=c=>(c.name||'');
 function cuInvHits(q0){const d=toEn(q0||'').replace(/[\s,،]/g,'');if(!/^\d{1,6}$/.test(d))return [];const R=[];
   for(const c of CU())for(const t of c.txs||[])if(t.type==='inv'&&!t.del&&t.no!=null&&String(t.no).startsWith(d))R.push([c,t]);
@@ -79,26 +83,26 @@ Object.assign(IC,{more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" 
    زیرش مانده‌ها در یک کارت (مبلغ و طلا کنار هم، سکه/ارز اگر هست)، «سند جدید» = دکمه + بالای صفحه سمت چپ،
    گردش حساب: ردیف‌های فشرده در گروه‌های هر روز (فهرست گروهی iOS) با مانده بعد از هر ردیف زیر مبلغ */
 function vCust(){xaSync();const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust')go('custs',true)},0);return ''}const b=cuBal(c),T=(c.txs||[]).filter(t=>!t.del).slice().sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
-  const an=cuCntId!==custId?' anim':'';
-  const cell=(k,v,i)=>`<div class="cp7c ${v<0?'d':v>0?'c':'z'}" style="--i:${i}"><small>${k==='r'?'مبلغ':k==='g'?'طلا':esc((XA[k]||{t:k}).t)}<i>${esc(balU(k))}</i></small><b><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span></b><em>${ourLab(v)}</em></div>`;
-  const X=Object.keys(b.X||{}).filter(k=>+b.X[k]),meta=[c.phone?`<a class="cp7t" href="tel:${esc(toEn(c.phone))}">${ic('tel')}<bdi dir="ltr">${esc(toFa(c.phone))}</bdi></a>`:'',c.nid?`<span>کد ملی <bdi dir="ltr">${esc(toFa(c.nid))}</bdi></span>`:''].filter(Boolean).join('');
-  let h=`<div class="cp7"><div class="cp7h"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}${c.grp?`<em>${esc(c.grp)}</em>`:''}</b><small>${meta||`<span>مشخصات تکمیل نشده</span>`}</small></span><button class="cp7e" data-act="cuEdit" data-id="${c.id}" aria-label="ویرایش مشخصات ${esc(cuName(c))}">${ic('edit')}</button></div>
-  <div class="cp7b${an}${X.length?' n3':''}">${cell('r',b.R,0)}${cell('g',b.G,1)}${X.map((k,n)=>cell(k,b.X[k],n+2)).join('')}</div></div>
+  /* v61.53 (خواسته صاحب اپ): پروفایل (نام، گروه، تلفن، ویرایش) در سرتیتر صفحه (cuHead در 01-core)؛ این‌جا فقط کارت مانده با قاب‌های جدا */
+  const an=cuCntId!==custId?' anim':'',K=q8Keys(b),zero=K.every(k=>!q8V(b,k));
+  let h=`<div class="q8c${an}"><div class="q8ch"><b>مانده حساب</b>${zero?`<small class="ok">${ic('check')}حساب تسویه است</small>`:'<small>تا امروز</small>'}</div>${K.map((k,i)=>q8R(k,q8V(b,k),i)).join('')}</div>
   ${can('debt')?svDraftHTML(c):''}
   <div class="tx7h"><b>گردش حساب</b><small>${T.length?fmt(T.length)+' ردیف':'هنوز سندی ثبت نشده'}</small></div>`;
   if(T.length){const run=txRunMap(T),G=[];let last=null;T.forEach(t=>{if(t.date!==last){last=t.date;G.push({d:t.date,L:[]})}G[G.length-1].L.push(t)});let n=0;
-    h+=`<div class="tx7${an}">`+G.map(g=>{const r=relDay(g.d);return `<div class="tx7d">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(g.d).fa)}</div><div class="tx7g" style="--i:${Math.min(n++,8)}">${g.L.map(t=>txRow(c,t,run.get(t))).join('')}</div>`}).join('')+'</div>'}
+    h+=`<div class="tx7 tx8l${an}">`+G.map(g=>{const r=relDay(g.d);return `<div class="tx7d">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(g.d).fa)}</div><div class="tx7g tx8g" style="--i:${Math.min(n++,8)}">${g.L.map(t=>txRow(c,t,run.get(t))).join('')}</div>`}).join('')+'</div>'}
   else if(can('debt'))h+=`<button class="tx7e" data-act="svNew" data-cu="${c.id}">${ic('plus')}<span>اولین سند این حساب</span></button>`;
   return h}
-/* مانده بعد از هر ردیف: یک خط کوچک زیر مبلغ (مبلغ، طلا و سکه اگر هست) */
-const txRunMini=o=>{if(!o)return '';const P=[['r',o.r],['g',o.g],...Object.keys(o.x||{}).map(k=>[k,+o.x[k]])].filter(z=>+z[1]);
-  return `<small class="txrn"><i>مانده</i>${P.length?P.map(([k,v])=>`<span class="${v<0?'d':'c'}">${balV(k,v)}<u>${k==='r'?'ت':k==='g'?'گ':esc(balU(k))}</u></span>`).join(''):'<span class="z">تسویه</span>'}</small>`};
+/* سرتیتر صفحه حساب مشتری: آواتار، نام و گروه، تلفن (قابل تماس) و کد ملی */
+function cuHead(c){const meta=[c.phone?`<a class="cuh8p" href="tel:${esc(toEn(c.phone))}">${ic('tel')}<bdi dir="ltr">${esc(toFa(c.phone))}</bdi></a>`:'',c.nid?`<span>کد ملی <bdi dir="ltr">${esc(toFa(c.nid))}</bdi></span>`:''].filter(Boolean).join('');
+  return `<div class="tt2 cuh8"><span class="c6a">${esc(userInit(c.name))}</span><span class="cuh8t"><b>${esc(cuName(c))}</b><span class="cuh8m">${c.grp?`<em>${esc(c.grp)}</em>`:''}${meta||(c.grp?'':'<span>مشخصات تکمیل نشده</span>')}</span></span></div>`}
+/* یک ردیف گردش حساب: بالا نوع و شرح، زیرش قاب مبلغ و قاب طلا (و سکه/ارز اگر هست): اثر همین ردیف و مانده بعد از آن */
+function txLine(t,ico,cls,T,sub,d,run){const K=q8Keys(d,run);
+  return swW(`<button class="txr tx8" data-act="txOpen" data-id="${t.id}"><span class="tx8t"><span class="bri t-${cls}">${ic(ico)}</span><span class="tx"><b>${esc(T)}</b>${sub?`<small>${esc(sub)}</small>`:''}</span></span><span class="q8fs">${K.map(k=>q8F(k,q8V(d,k),{eff:1,run:run?q8V(run,k):undefined})).join('')}</span></button>`,{r:[['txOpen','جزئیات','eye','#3b6fd6']],l:can('del')||isAdmin()?[['txDel','حذف','trash','#d23c48']]:[],data:{id:t.id}})}
 function txRunMap(T){const M=new Map(),A={r:0,g:0,x:{}};T.slice().reverse().forEach(t=>{const d=t.type==='inv'||t.type==='xf'||t.type==='cv'?txD(t):(()=>{const e=txEff(t);return {r:e.r||0,g:e.g||0,x:{}}})();A.r+=d.r||0;A.g=Math.round((A.g+(d.g||0))*1000)/1000;for(const k in d.x||{})A.x[k]=Math.round(((A.x[k]||0)+(+d.x[k]||0))*100)/100;M.set(t,{r:Math.round(A.r),g:A.g,x:{...A.x}})});return M}
 ACT.cuQ=d=>{const c=curCu();if(!c)return;if(d.k==='xf'){ACT.xfNew();return}if(d.k==='cv'){ACT.cvNew();return}ACT.svNew({cu:c.id,pre:d.k})};
 function txEff(t){const a=+t.amount||0,w=+t.weight||0;return t.type==='buy'?{r:a}:t.type==='sell'?{r:-a}:t.type==='pin'?{r:a}:t.type==='pout'?{r:-a}:t.type==='gin'?{g:w}:{g:-w}}
 function txRow(c,t,run){if(t.type==='inv'||t.type==='xf'||t.type==='cv')return txRow2(c,t,run);const T=TXT[t.type]||{t:t.type},e=txEff(t),sub=[t.kind,t.weight?wFmt(t.weight)+' گرم':'',t.ppg?'هر گرم '+fmt(t.ppg):'',t.note].filter(Boolean).join('، ');
-  const val=e.r!=null?`<b class="${e.r>0?'b':'r'}">${e.r>0?'+':'−'} ${fmt(Math.abs(e.r))} <i>تومان</i></b>`:`<b class="${e.g>0?'b':'r'}">${e.g>0?'+':'−'} ${wFmt(Math.abs(e.g))} <i>گرم</i></b>`;
-  return swW(`<button class="txr" data-act="txOpen" data-id="${t.id}"><span class="bri t-${t.type}">${ic(T.i||'plus')}</span><span class="tx"><b>${T.t}</b><small>${esc(sub||T.d||'')}</small></span><span class="txv">${val}<small>${e.r!=null?(e.r>0?'بدهی ما':'طلب ما'):(e.g>0?'بدهی طلایی ما':'طلب طلایی ما')}</small>${run?txRunMini(run):''}</span></button>`,{r:[['txOpen','جزئیات','eye','#3b6fd6']],l:can('del')||isAdmin()?[['txDel','حذف','trash','#d23c48']]:[],data:{id:t.id}})}
+  return txLine(t,T.i||'plus',t.type,T.t,sub||T.d||'',{r:e.r||0,g:e.g||0},run)}
 const aCust=()=>'';
 /* ---- افتتاح / ویرایش حساب: هر فیلد از اطلاعات قبلی مشتری‌ها پیشنهاد می‌دهد ---- */
 let cuT='',cuEd=null;
