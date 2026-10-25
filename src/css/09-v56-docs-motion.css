@@ -1644,3 +1644,38 @@ button.sssbtn svg{width:17px;height:17px}
 #act .f3g.one .f3c.f3m .f3l{flex:1 1 0;min-width:120px}
 .stam .fz{flex:1 1 150px}
 @media (max-width:379px){.cuh9g{display:none}.cuh9{gap:8px;padding-inline:8px}}
+/* ===== v61.57 ===== */
+/* کارت مشتری سرتیتر: یک ردیف تمام‌عرض زیر عنوان (نام کوتاه نمی‌شود) */
+/* کارت مشتری جای عنوان در ردیف سرتیتر؛ عنوان صفحه (سند جدید، حساب مشتری، سند ۱۰۴۱) خط کوچک بالای نام داخل کارت */
+#bar.cuhd{flex-wrap:nowrap;align-items:center}
+#bar.cuhd .ttl{align-items:center}
+#bar.cuhd .tt2{display:none}
+#bar.cuhd .cuh9{flex:1 1 auto;margin:0;padding:7px 10px 7px 8px}
+#bar .cuh9k{font-size:12px;font-weight:850;color:var(--blu);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.cuh9n{display:flex;align-items:baseline;gap:5px;min-width:0;max-width:100%}
+#bar .cuh9n .hon{flex:none}
+#bar .cuh9n b{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cuh9m{margin-top:2px}
+/* پایین صفحه سند: هر مانده (قبلی، سند، نهایی) در قاب خودش؛ عدد در قاب جا می‌شود */
+.f3l{--fmax:13px}.f3l.r{--fmax:15px}#act .f3g .f3c.f3m .f3l.r{--fmax:17.5px}
+.f3l>b{font-size:min(var(--fmax),calc(var(--fw,12)*1cqi))!important}
+#act .f3g{gap:5px}
+#act .f3g .f3c{border-radius:13px;padding:6px 9px 7px;background:color-mix(in srgb,var(--mut) 6%,var(--card));box-shadow:inset 0 0 0 1px var(--line)}
+#act .f3g .f3c+.f3c:not(.f3m){border-inline-start:0}
+#act .f3g .f3c.d:not(.f3m){background:color-mix(in srgb,var(--red) 7%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 28%,transparent)}
+#act .f3g .f3c.c:not(.f3m){background:color-mix(in srgb,var(--blu) 7%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 28%,transparent)}
+#act .f3g .f3c.f3m{border-radius:13px}
+/* جدول مشترک مانده‌ها (balGrid): پایین صفحه سند و سند ثبت‌شده */
+.iv9b.n1 .iv8h,.iv9b.n1 .iv8r{grid-template-columns:44px minmax(0,1fr)}
+.iv9b.n1 .iv8c.m .fz{--fmax:19px}
+button.iv8c{border:0;margin:0;font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center}
+button.iv8c:focus-visible{outline:2px solid var(--blu);outline-offset:2px}
+#act #svFt{display:block;width:100%}
+#act #svFt .f3c.f3w{width:100%}
+/* ردیف سند: مبلغ‌ها کنار نام (سمت چپ)، هر کدام در قاب خودش؛ مشخصات زیر */
+.d8h{align-items:flex-start}
+.d8h .d6t{padding-top:6px}
+.d6r.d8 .d8h .d6v{flex:0 0 49%;max-width:49%;display:flex;flex-direction:column;align-items:stretch;gap:5px;margin:0;padding:0;align-self:flex-start}
+.d6r.d8 .d8h .d6e{flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:5px;row-gap:0;padding:5px 10px 6px}
+.d6r.d8 .d8h .d6e small{grid-column:1/-1;justify-self:start;padding:0;background:none;font-size:10px}
+.d6r.d8 .d8h .d6e .fz{--fmax:17px;text-align:left}

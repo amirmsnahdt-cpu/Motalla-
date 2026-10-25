@@ -34,9 +34,9 @@ function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls)=>R.push({id,t,ico,sub
 function dkHTML(){const a=sv.qa,D=a.d&&DK.find(z=>z[0]===a.d);
   const sel=(t,ico,act,cls)=>`<div class="dksel${cls?' '+cls:''}"><span class="dki">${ic(ico)}</span><b>${t}</b><button class="itx" data-act="${act}" aria-label="برداشتن">×</button></div>`;
   let h='';/* v61.5: بدون سرتیتر «ردیف تازه»؛ فقط فیلدها */
-  if(!D)return h+`<div class="dkf dkbox${a.q||dkOpen?' open':''}"><div class="fsearch sm">${ic('search')}<input id="qK" value="${esc(a.q||'')}" placeholder="تشخیص: فروش، خرید، تعویض، دریافت…" autocomplete="off" enterkeyhint="next"></div><div id="qKs">${dkList()}</div></div>`;
+  if(!D)return h+`<div class="dkf dkbox${a.q||dkOpen?' open':''}"><div class="fsearch sm">${ic('search')}<input id="qK" readonly value="${esc(a.q||'')}" placeholder="تشخیص: فروش، خرید، تعویض، دریافت…" autocomplete="off" enterkeyhint="next"></div><div id="qKs">${dkList()}</div></div>`;
   /* v61.7: بالای نوار می‌نویسد چه عملیاتی است (بیرون از فیلد)، خود نوار فقط جستجوی کالا */
-  dkOpen=false;return h+`<div class="dkf dkbox open">${stHead(D,'',0)}<div class="fsearch sm">${ic('search')}<input id="qK" value="${esc(a.q||'')}" placeholder="${a.d==='sell'?'چه می‌فروشید؟ آبشده، النگو، نیم سکه، دلار…':a.d==='buy'?'چه می‌خرید؟ متفرقه، آبشده، سکه، دلار…':'حواله، نقد، آبشده، سکه…'}" autocomplete="off" enterkeyhint="next"></div><div id="qKs">${dkList()}</div></div>`}
+  dkOpen=false;return h+`<div class="dkf dkbox open">${stHead(D,'',0)}<div class="fsearch sm">${ic('search')}<input id="qK" readonly value="${esc(a.q||'')}" placeholder="${a.d==='sell'?'چه می‌فروشید؟ آبشده، النگو، نیم سکه، دلار…':a.d==='buy'?'چه می‌خرید؟ متفرقه، آبشده، سکه، دلار…':'حواله، نقد، آبشده، سکه…'}" autocomplete="off" enterkeyhint="next"></div><div id="qKs">${dkList()}</div></div>`}
 function dkList(){const a=sv.qa,q0=clean(a.q||''),q=nzName(toEn(q0)),hit=t=>!q||nzName(t).includes(q);
   const row=(act,data,ico,t,sub,cls)=>`<button type="button" class="bzsr dkrw${cls?' '+cls:''}" data-act="${act}"${Object.entries(data).map(([k,v])=>` data-${k}="${esc(v)}"`).join('')}><span class="av">${ic(ico)}</span><span class="tx"><b>${t}</b><small>${sub||''}</small></span>${/fix/.test(cls||'')?'<em class="dkfx">ثابت</em>':''}</button>`;
   if(!a.d){const R=DK.filter(([k,t])=>hit(t)).map(([k,t,i])=>row('dkD',{d:k},i,t,{sell:'آبشده، طلای ساخته، سکه، ارز',buy:'متفرقه، آبشده، سکه، ارز',swap:'طلای کهنه مشتری با نرخ روز',in:'حواله، نقد، طلا، سکه، ارز',out:'حواله، نقد، طلا، سکه، ارز',ret:'برگشت کالای فروخته'}[k],'top k-'+k+(dkRed(k)?' kr':' kb')));
@@ -77,5 +77,16 @@ async function xrImgPaint(){const x=sv&&sv.qa&&sv.qa.x,el=$('xrFi');if(!x||!x.im
 /* v61.46: فهرست تشخیص با بستن کیبورد بسته نمی‌شود (خواسته صاحب اپ: «ثابت بماند»)؛ فقط با زدن بیرون از کادر تشخیص
    (وقتی چیزی تایپ نشده) یا انتخاب یک نوع بسته می‌شود */
 let dkOpen=false;
+/* v61.57: باز کردن فهرست تشخیص بدون کیبورد */
+function dkShow(){const B=document.querySelector('.dkbox');if(!B)return;dkOpen=true;B.classList.add('open');try{B.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})}catch(_){}}
+/* v61.57 (خواسته صاحب اپ): فیلد جستجو با «دو بار زدن» کیبورد را باز می‌کند: تا readonly است لمس فوکوس نمی‌دهد؛
+   زدن اول first() را اجرا و readonly را برمی‌دارد، زدن دوم فوکوس عادی = کیبورد. با بسته شدن کیبورد دوباره readonly می‌شود */
+function kb2(el,first){if(!el||el._kb2)return;el._kb2=1;el.readOnly=true;let x0=0,y0=0;
+  el.addEventListener('touchstart',e=>{if(el.readOnly)e.preventDefault()},{passive:false});
+  el.addEventListener('mousedown',e=>{if(el.readOnly)e.preventDefault()});
+  el.addEventListener('pointerdown',e=>{x0=e.clientX;y0=e.clientY});
+  el.addEventListener('pointerup',e=>{if(!el.readOnly||Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10)return;el.readOnly=false;if(first)first()});
+  el.addEventListener('blur',()=>{el.readOnly=true});
+  el.addEventListener('keydown',e=>{if(el.readOnly&&e.key&&e.key.length===1){el.readOnly=false}})}
 document.addEventListener('pointerdown',e=>{if(!dkOpen||cur!=='sell'||!sv||!sv.qa||sv.qa.d||sv.qa.q)return;const t=e.target;if(t.closest&&(t.closest('.dkbox')||t.closest('#ov')))return;
   dkOpen=false;const B=document.querySelector('.dkbox');if(B)B.classList.remove('open');const K=$('qK');if(K&&document.activeElement===K)K.blur()},true);

@@ -89,7 +89,7 @@ function stRead(){const a=sv.qa,S=stSteps(),s=S[Math.min(a.st||0,S.length-1)],I=
   if(s.type==='wam'){const v=toEn(t).replace(/,/g,'');s.set(+v>=1000?{am:Math.round(+v)}:decIn(v));return}
   s.set(s.type==='num'?num(t):s.type==='dec'?decIn(t):s.type==='int'?(+toEn(t).replace(/\D/g,'')||750):s.type==='dig'?toEn(t).replace(/\D/g,''):clean(t))}
 /* مقدار پله فعلی در ردیف پله‌ها همان لحظه نوشته می‌شود */
-function stPaint(){const P=$('stPv');if(P)P.innerHTML=stLive();const a=sv.qa,S=stSteps(),b=document.querySelector('#qa .stp.on b');if(b){const v=stFmt(S[a.st],S[a.st].get());b.innerHTML=v||'…'}
+function stPaint(){const P=$('stPv');if(P)P.innerHTML=stLive();const a=sv.qa,S=stSteps();/* v61.57: همه پله‌ها تازه می‌شوند (مثلاً مبلغ که زده شود، پله وزن «از مبلغ: … گرم» را نشان می‌دهد) */document.querySelectorAll('#qa .stp').forEach((el,k)=>{const s=S[k],b=el.querySelector('b');if(!s||!b)return;const v=stFmt(s,s.get());b.innerHTML=v||(k===a.st?'…':'—');el.classList.toggle('dn',!!v&&k!==a.st)})
   if(S[a.st]&&S[a.st].mz){const l=document.querySelector('#qa .stp.on small');if(l)l.textContent=S[a.st].lab}}
 function stBind(){phPaint($('qa'));const I=$('stI'),a=sv.qa;if(!I)return;const S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];
   if(s.type==='pick'){I.oninput=()=>{a.sq=I.value;const P=$('stPk');if(P)P.innerHTML=stPick(s)};return}
