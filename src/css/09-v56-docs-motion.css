@@ -1323,3 +1323,20 @@ button.sssbtn svg{width:17px;height:17px}
 .kv b .rmd.run{color:var(--blu)}
 .kv b .rmd.z{color:var(--ok)}.kv b .rmd.z svg{width:15px;height:15px;stroke-width:2.6;transition:opacity .25s,transform .3s cubic-bezier(.2,.9,.25,1.3)}
 .kv b .rmd.z.run{color:var(--blu)}.kv b .rmd.run svg{opacity:0;transform:scale(.4)}
+/* v61.49: تأیید حذف عکس داخل نمایش‌گر */
+.zva{position:absolute;inset:0;z-index:30;display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(12px + env(safe-area-inset-bottom));background:#0009;animation:zvaIn .2s ease-out both}
+.zvac{width:min(420px,100%);display:flex;flex-direction:column;gap:8px;animation:zvaUp .32s cubic-bezier(.2,.9,.25,1.1) both}
+.zvam{display:flex;flex-direction:column;align-items:center;gap:3px;padding:16px 14px;border-radius:18px;background:var(--card);color:var(--ink);text-align:center}.zvam b{font-size:15px;font-weight:800}.zvam small{font-size:12px;color:var(--mut);font-weight:600}
+.zvac button{height:52px;border:0;border-radius:16px;font:inherit;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}
+.zvy{background:var(--red);color:#fff}.zvy svg{width:18px;height:18px}.zvno{background:var(--card);color:var(--blu)}
+.zva.out{animation:zvaIn .18s ease-in reverse both}.zva.out .zvac{animation:zvaUp .18s ease-in reverse both}
+@keyframes zvaIn{from{opacity:0}to{opacity:1}}@keyframes zvaUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+/* v61.49: پیش‌نمایش رسید با نگه داشتن */
+.galt,.stlc,.d6ti.ph{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.pk{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;padding:24px 18px;background:#05080f8c;-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);pointer-events:none;animation:zvaIn .18s ease-out both}
+.pkc{width:min(360px,100%);border-radius:22px;overflow:hidden;background:var(--card);box-shadow:0 24px 60px -12px #000a;animation:pkUp .3s cubic-bezier(.2,.9,.25,1.25) both;transform-origin:center}
+.pki{background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:220px;max-height:62vh}.pki img{display:block;max-width:100%;max-height:62vh;object-fit:contain}
+.pkt{display:flex;flex-direction:column;gap:2px;padding:11px 15px 13px}.pkt b{font-size:14.5px;font-weight:800;color:var(--ink)}.pkt small{font-size:12px;font-weight:700;color:var(--mut);font-feature-settings:"tnum"}
+.pk.out{animation:zvaIn .16s ease-in reverse both}.pk.out .pkc{animation:pkUp .16s ease-in reverse both}
+@keyframes pkUp{from{transform:scale(.86);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.zva,.zvac,.pk,.pkc{animation:none!important}}

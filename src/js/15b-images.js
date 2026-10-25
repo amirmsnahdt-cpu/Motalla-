@@ -98,7 +98,12 @@ function zvBind(z){const P=new Map();let st=null,lastTap=0;
 ACT.zvClose=()=>zvClose();
 ACT.zvGo=d=>{if(ZV)zvOpen(ZV.i+(+d.d),-(+d.d))};
 ACT.zvShare=async()=>{const c=galCtx();if(!c||!ZV)return;rcShare(await rcFiles([{key:ZV.k,...c.meta}]),'رسید '+c.meta.name)};
-ACT.zvDel=()=>{const c=galCtx();if(!c||!ZV)return;const k=ZV.k,i=ZV.i;askConfirm('این عکس حذف شود؟','حذف عکس',async()=>{const K=c.keys.filter(z=>z!==k);c.set(K);await imgDel(k);logA('edit','حذف رسید',c.meta.name);galRefresh();if(K.length)zvOpen(Math.min(i,K.length-1));else zvClose();toast('عکس حذف شد')})};
+/* v61.49: تأیید حذف داخل همین نمایش‌گر (قبلاً پنجره تأیید پشت عکس باز می‌شد و باید از نمایش‌گر بیرون می‌آمدی) */
+function zvAsk(msg,yes,cb){const z=$('zv');if(!z||!ZV)return;let a=z.querySelector('.zva');if(a)a.remove();a=document.createElement('div');a.className='zva';a.setAttribute('role','alertdialog');
+  a.innerHTML=`<div class="zvac"><div class="zvam"><b>${msg}</b><small>این کار برگشت ندارد</small></div><button class="zvy">${ic('trash')} ${yes}</button><button class="zvno">انصراف</button></div>`;z.appendChild(a);
+  const close=()=>{a.classList.add('out');setTimeout(()=>a.remove(),RM()?0:200)};
+  a.addEventListener('pointerdown',e=>e.stopPropagation());a.addEventListener('click',e=>{e.stopPropagation();if(e.target.closest('.zvy')){a.remove();cb()}else if(e.target.closest('.zvno')||e.target===a)close()})}
+ACT.zvDel=()=>{const c=galCtx();if(!c||!ZV)return;const k=ZV.k,i=ZV.i;zvAsk('این عکس حذف شود؟','حذف عکس',async()=>{const K=c.keys.filter(z=>z!==k);c.set(K);await imgDel(k);logA('edit','حذف رسید',c.meta.name);galRefresh();if(K.length)zvOpen(Math.min(i,K.length-1));else zvClose();toast('عکس حذف شد')})};
 /* ویرایش: نسخه جدید روی همان کلید ذخیره می‌شود؛ نسخه قبلی روی سرور ۹۰ روز نگه داشته می‌شود و تا چند ثانیه «برگرداندن» دارد */
 function zvLoad(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src})}
 async function zvSave(nd,msg){const c=galCtx();if(!c||!ZV)return;const k=ZV.k,old=ZV.src;if(!(await imgPut(k,nd))){toast('ذخیره نشد',true);return}ZVC.set(k,nd);c.set(c.keys);ZV.src=nd;ZV.s=1;ZV.x=0;ZV.y=0;ZV.crop=null;zvBar();galRefresh();
@@ -124,3 +129,24 @@ document.addEventListener('click',ev=>{const t=ev.target;if(!t||t.tagName!=='INP
   if(!/MotallaAndroid/.test(navigator.userAgent)||(window.AndroidBridge&&AndroidBridge.camPick))return;
   try{if(sessionStorage.getItem('m_camup'))return;sessionStorage.setItem('m_camup','1')}catch(e){return}
   setTimeout(()=>toast('برای گرفتن عکس با دوربین، نسخه تازه اپ را نصب کنید',false,'نسخه تازه',()=>ACT.getApk()),600)},true);
+
+/* v61.49: نگه داشتن روی رسید = پیش‌نمایش (مثل iOS)؛ رها کردن = بسته شدن. روی عکس‌های پنجره رسید، دکمه رسید در لیست‌ها و عکس ردیف سند */
+function pkInfo(el){const d=el.dataset||{},E=id=>entries.find(z=>String(z.id)===String(id));
+  if(el.matches('.d6ti.ph'))return{keys:String(d.ks||'').split(',').filter(Boolean),i:0,name:d.n||'عکس کالا'};
+  if(d.act==='galView'){const c=galCtx();return c&&{keys:c.keys,i:+d.i||0,name:c.meta.name,amount:c.meta.amount}}
+  if(d.act==='galFsP'){const e=E(d.id),z=e&&(e.settles||[]).find(q=>String(q.id)===String(d.sid));return z&&{keys:stImgs(z),i:+d.i||0,name:fullName(e)+' (از '+z.name+')',amount:z.amount}}
+  if(d.act==='galIt'){const e=E(d.id),q=e&&entBI(e);return q&&{keys:itImgs(q.b,q.it),i:0,name:fullName(e),amount:q.it.amount}}
+  if(d.act==='galFs'){const e=E(d.id);if(!e)return null;const K=[];(e.settles||[]).forEach(z=>K.push(...stImgs(z)));return{keys:K,i:0,name:fullName(e),amount:e.amount}}
+  return null}
+const PKSEL='.galt[data-act="galView"],.galt[data-act="galFsP"],.stlc.on[data-act="galIt"],.stlc.on[data-act="galFs"],.d6ti.ph';
+(()=>{let tm=0,x0=0,y0=0,el=null,open=false;const cancel=()=>{clearTimeout(tm);tm=0};
+  const close=()=>{if(!open)return;open=false;const p=$('pk');if(p){p.classList.add('out');setTimeout(()=>{if(!open)p.remove()},RM()?0:180)}};
+  async function show(t,I){const k=I.keys[I.i]||I.keys[0];if(!k)return;open=true;let p=$('pk');if(p)p.remove();p=document.createElement('div');p.id='pk';p.className='pk';p.setAttribute('aria-hidden','true');
+    p.innerHTML=`<div class="pkc"><div class="pki"><img alt=""></div><div class="pkt"><b>${esc(I.name||'رسید')}</b><small>${I.amount?fmt(I.amount)+' تومان':''}${I.keys.length>1?(I.amount?'، ':'')+'عکس '+toFa((I.keys.indexOf(k)+1))+' از '+toFa(I.keys.length):''}</small></div></div>`;document.body.appendChild(p);
+    const v=await zvGet(k);if(!open||!p.isConnected)return;const im=p.querySelector('img');if(v){im.src=v}else{close();toast('عکس پیدا نشد',true)}}
+  document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest(PKSEL);if(!t||e.button>0)return;cancel();el=t;t._pk=0;x0=e.clientX;y0=e.clientY;
+    tm=setTimeout(()=>{tm=0;const I=pkInfo(t);if(!I||!I.keys.length)return;t._pk=1;lpHold=1;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}show(t,I)},420)},true);
+  document.addEventListener('pointermove',e=>{if(tm&&(Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10))cancel()},true);
+  ['pointerup','pointercancel'].forEach(ev=>document.addEventListener(ev,()=>{cancel();close()},true));document.addEventListener('scroll',cancel,true);
+  document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest(PKSEL);if(t&&t._pk){t._pk=0;e.stopPropagation();e.preventDefault()}},true);
+  document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest(PKSEL))e.preventDefault()},true)})();
