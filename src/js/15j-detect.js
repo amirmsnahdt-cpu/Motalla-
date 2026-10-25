@@ -78,15 +78,15 @@ async function xrImgPaint(){const x=sv&&sv.qa&&sv.qa.x,el=$('xrFi');if(!x||!x.im
    (وقتی چیزی تایپ نشده) یا انتخاب یک نوع بسته می‌شود */
 let dkOpen=false;
 /* v61.57: باز کردن فهرست تشخیص بدون کیبورد */
-function dkShow(){const B=document.querySelector('.dkbox');if(!B)return;dkOpen=true;B.classList.add('open');try{B.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})}catch(_){}}
-/* v61.57 (خواسته صاحب اپ): فیلد جستجو با «دو بار زدن» کیبورد را باز می‌کند: تا readonly است لمس فوکوس نمی‌دهد؛
-   زدن اول first() را اجرا و readonly را برمی‌دارد، زدن دوم فوکوس عادی = کیبورد. با بسته شدن کیبورد دوباره readonly می‌شود */
-function kb2(el,first){if(!el||el._kb2)return;el._kb2=1;el.readOnly=true;let x0=0,y0=0;
+function dkShow(){const B=document.querySelector('.dkbox');if(!B)return;dkOpen=true;B.classList.add('open');const K=$('qK');if(K)K.readOnly=false;try{B.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})}catch(_){}}
+/* v61.59 (خواسته صاحب اپ): وقتی فهرست باز است، زدن روی جستجو = کیبورد؛ وقتی بسته است، زدن = فقط باز شدن فهرست (بدون کیبورد).
+   readonly یعنی «فهرست بسته»: لمس فوکوس نمی‌دهد و open() اجرا می‌شود؛ بعد از باز شدن، زدن بعدی فوکوس عادی = کیبورد */
+function kb2(el,isOpen,open){if(!el||el._kb2)return;el._kb2=1;const sync=()=>{el.readOnly=!isOpen()};sync();let x0=0,y0=0;
   el.addEventListener('touchstart',e=>{if(el.readOnly)e.preventDefault()},{passive:false});
   el.addEventListener('mousedown',e=>{if(el.readOnly)e.preventDefault()});
   el.addEventListener('pointerdown',e=>{x0=e.clientX;y0=e.clientY});
-  el.addEventListener('pointerup',e=>{if(!el.readOnly||Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10)return;el.readOnly=false;if(first)first()});
-  el.addEventListener('blur',()=>{el.readOnly=true});
+  el.addEventListener('pointerup',e=>{if(!el.readOnly||Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10)return;open();el.readOnly=false});
+  el.addEventListener('blur',sync);
   el.addEventListener('keydown',e=>{if(el.readOnly&&e.key&&e.key.length===1){el.readOnly=false}})}
 document.addEventListener('pointerdown',e=>{if(!dkOpen||cur!=='sell'||!sv||!sv.qa||sv.qa.d||sv.qa.q)return;const t=e.target;if(t.closest&&(t.closest('.dkbox')||t.closest('#ov')))return;
-  dkOpen=false;const B=document.querySelector('.dkbox');if(B)B.classList.remove('open');const K=$('qK');if(K&&document.activeElement===K)K.blur()},true);
+  dkOpen=false;const B=document.querySelector('.dkbox');if(B)B.classList.remove('open');const K=$('qK');if(K){if(document.activeElement===K)K.blur();K.readOnly=true}},true);

@@ -214,8 +214,8 @@ function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};
   if(a.p){pyBind();return}if(a.x){xrBind();return}
   /* v61.2: فهرست تشخیص/نوع با لمس فیلد باز و با ترک آن (اگر خالی است) بسته می‌شود */
   if(K&&!a.k){const B=K.closest('.dkbox');if(B){K.onfocus=()=>{dkOpen=true;B.classList.add('open')};K.onblur=null}}
-  /* v61.57 (خواسته صاحب اپ): زدن اول روی جستجوی تشخیص = باز شدن فهرست (بدون کیبورد)، زدن دوم = کیبورد؛ جستجوی کالا هم با زدن دوم */
-  if(K)kb2(K,()=>{if(!a.d){dkShow()}})
+  /* v61.59: فهرست باز → زدن = کیبورد؛ فهرست بسته → زدن = باز شدن فهرست (kb2 در 15j) */
+  if(K){const B=K.closest('.dkbox');kb2(K,()=>!!(B&&B.classList.contains('open')),()=>dkShow())}
   if(K){K.oninput=()=>{a.q=K.value;clearTimeout(K._t);K._t=setTimeout(()=>{const r=$('qKs');if(r)r.innerHTML=dkList()},60);svKeep()};
     K.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();a.q=K.value;const r=$('qKs');if(r)r.innerHTML=dkList();const f=document.querySelector('#qKs [data-act]');if(f)ACT[f.dataset.act]({...f.dataset})}};
     const KS=$('qKs');if(KS)KS.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
@@ -382,7 +382,7 @@ const d6Cell=x=>{if(/مبلغ دستی/.test(x))return `<span class="d8c own"><b
 const d6Spec=sub=>String(sub||'').split(' · ').map(x=>x.trim()).filter(Boolean).map(d6Cell).join('');
 /* اثر ردیف در یک قاب: برچسب طلبکاریم/بدهکاریم، عدد (در قاب جا می‌شود) و واحد */
 const d6Eff=(v,k)=>{if(!v)return '';k=k||'r';const n=balV(k,v);return `<span class="d6e ${v<0?'d':'c'}"><small>${ourLab(v)}</small><span class="fz"><b${fitS(n)}>${n}</b></span><i>${esc(k==='r'?'تومان':balU(k))}</i></span>`};
-const d6Dir=v=>/d6e d/.test(v)?'rd':/d6e c/.test(v)?'rc':'rz';
+const d6Dir=v=>{const m=String(v||'').match(/d6e (d|c)\b/);return m?'r'+m[1]:'rz'};/* v61.59: رنگ کنار ردیف از اثر اول (مبلغ) */
 const DKI={sell:'dSell',buy:'dBuy',swap:'dSwap',in:'dIn',out:'dOut',ret:'dRet'};
 const d6Ico=(k,ico)=>DKI[k]||ico;
 function d6Row(o){const P=o.phs||(o.ph?[o.ph]:[]),tile=P.length?`<span class="d6ti ph" data-act="rowPhS" data-ks="${esc(P.join(','))}" data-n="${esc(String(o.b).replace(/<[^>]*>/g,''))}" role="button" aria-label="دیدن عکس"><img data-ik="${esc(P[0])}" alt="">${P.length>1?`<em>${toFa(P.length)}</em>`:''}</span>`:`<span class="d6ti">${ic(o.ico)}</span>`,dir=d6Dir(o.v);
@@ -540,7 +540,8 @@ ACT.svSave=d=>{const c=svCu();if(!c){toast('مشتری سند را انتخاب 
   if(svHasG()&&!sv.rate){toast('مظنه یا نرخ گرم را بزنید',true);$('svM').focus();return}
   ckOpen(d&&d.w)};
 /* v61.47: زدن هر مانده (قبلی / سند / نهایی) = تسویه همان مبلغ */
-ACT.svBal=d=>ACT.svSave(d);
+/* v61.59: زدن مانده طلا = تسویه طلا (gkOpen در 15i)؛ مبلغ و سکه = تسویه تومانی */
+ACT.svBal=d=>{if(d&&d.k==='g'){if(!svCu()){toast('مشتری سند را انتخاب کنید',true);return}if(!svFlush())return;gkOpen(d.w);return}ACT.svSave(d)};
 /* خروج از صفحه سند → ثبت خودکار. نتیجه: true = ثبت شد */
 let svAutoBusy=false;
 function svAuto(why){if(!sv||svAutoBusy)return false;svAutoBusy=true;try{
@@ -598,7 +599,7 @@ function ivDet(c,t){const D=dates(t.date),eff=d6Eff,R=[];
    هر جنس یک ردیف (نام و واحد)، هر مانده (قبلی، سند، نهایی) در قاب خودش، نهایی پررنگ با زمینه رنگی؛ عدد در قاب جا می‌شود.
    rows = [[جنس, مقدار ستون ۱, ستون ۲, …]]، cols = [{lab, w (هدف تسویه با زدن), m (ستون اصلی)}]. نگه داشتن = جزئیات فاکتور */
 function balGrid(rows,cols,o){o=o||{};let n=0;const N=cols.length;
-  const cell=(k,v,c)=>{const x=v?balV(k,v):'۰',T=o.act&&c.w?'button':'span';return `<${T} class="iv8c ${q8S(v)}${c.m?' m':''}" style="--i:${n++}"${T==='button'?` type="button" data-act="${o.act}" data-w="${c.w}" aria-label="${esc(c.lab)}: ${esc(x)} ${esc(balU(k))}"`:''}><span class="fz"><b${fitS(x)}>${x}</b></span><small>${v?ourLab(v):'تسویه'}</small></${T}>`};
+  const cell=(k,v,c)=>{const x=v?balV(k,v):'۰',T=o.act&&c.w?'button':'span';return `<${T} class="iv8c ${q8S(v)}${c.m?' m':''}" style="--i:${n++}"${T==='button'?` type="button" data-act="${o.act}" data-w="${c.w}" data-k="${k}" aria-label="${esc(c.lab)}: ${esc(x)} ${esc(balU(k))}"`:''}><span class="fz"><b${fitS(x)}>${x}</b></span><small>${v?ourLab(v):'تسویه'}</small></${T}>`};
   return `<div class="iv8b iv9b n${N}${o.an?' anim':''}" role="group" aria-label="مانده‌ها"><div class="iv8h">${cols.map(c=>`<span>${esc(c.lab)}</span>`).join('')}</div>${rows.map(([k,...V])=>`<div class="iv8r k${q8C(k)}"><span class="iv8k"><b>${q8K(k)}</b><small>${esc(balU(k))}</small></span>${cols.map((c,j)=>cell(k,V[j]||0,c)).join('')}</div>`).join('')}<div class="iv9hint">${ic('hold')}${o.hint||'برای جزئیات فاکتور نگه دارید'}</div></div>`}
 function ivBalP(c,t){const P=cuBalBefore(c,t),d=txD(t),K=q8Keys(P,d);
   const rows=K.map(k=>{const a=q8V(P,k),b=q8V(d,k);return [k,a,b,k==='g'?Math.round((a+b)*1000)/1000:k==='r'?a+b:Math.round((a+b)*100)/100]});

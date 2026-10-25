@@ -1697,3 +1697,4 @@ button.iv8c:focus-visible{outline:2px solid var(--blu);outline-offset:2px}
 .d6r.d8 .d8b .d6e small{grid-column:1/-1;justify-self:start;padding:0;background:none;font-size:9.5px}
 .d6r.d8 .d8b .d6e .fz{--fmax:14px;text-align:left}
 .d6r.d8 .d8b .d6e>i{font-size:9.5px}
+.dkl{overscroll-behavior-y:auto}
