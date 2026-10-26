@@ -1738,23 +1738,6 @@ html.kbo #act{display:none!important}
 .d6q.swap.bw{animation:d6back .3s cubic-bezier(.2,.9,.25,1)}@keyframes d6back{from{opacity:.35;transform:translateX(16px)}}
 @media (prefers-reduced-motion:reduce){.d6q.swap.bw{animation:none}}
 
-/* جدول مانده‌ها: مبلغ و طلا همیشه؛ بقیه زیر دکمه گوشه */
-.iv8x{display:grid;grid-template-rows:0fr;opacity:0;margin-top:-4px;transition:grid-template-rows .34s cubic-bezier(.2,.9,.25,1),opacity .24s,margin .34s}
-.iv8x.op{grid-template-rows:1fr;opacity:1;margin-top:0}
-.iv8xi{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:5px}
-@media (prefers-reduced-motion:reduce){.iv8x{transition:none}}
-.iv8mo{display:flex;align-items:center;gap:8px;width:100%;min-height:42px;padding:6px 10px;border:0;border-radius:13px;background:color-mix(in srgb,var(--blu) 7%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 22%,transparent);color:var(--ink);font:inherit;text-align:right;cursor:pointer}
-.iv8mo>svg{flex:none;width:16px;height:16px;color:var(--blu);stroke-width:2.4;transition:transform .32s cubic-bezier(.2,.9,.25,1)}
-.iv8ml{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
-.iv8mc{display:inline-flex;align-items:baseline;gap:4px;white-space:nowrap}
-.iv8mc small{font-size:11.5px;font-weight:800;color:var(--ink)}.iv8mc b{font-size:14px;font-weight:900;font-feature-settings:"tnum"}.iv8mc em{font-style:normal;font-size:10px;font-weight:800}
-.iv8mc.d b,.iv8mc.d em{color:var(--red)}.iv8mc.c b,.iv8mc.c em{color:var(--blu)}.iv8mc.z b{color:var(--mut)}
-.iv8mt{flex:none;font-size:12px;font-weight:800;color:var(--blu)}
-.iv8mi{flex:none;display:grid;place-items:center;font-style:normal;color:var(--blu);transition:transform .32s cubic-bezier(.2,.9,.25,1)}.iv8mi svg{width:16px;height:16px;stroke-width:2.4}
-.iv9b.xo .iv8mo{background:none;box-shadow:inset 0 0 0 1px var(--line);min-height:34px}
-.iv9b.xo .iv8mo .iv8ml{display:none}.iv9b.xo .iv8mo{justify-content:center}
-.iv9b.xo .iv8mo>svg{transform:rotate(45deg)}.iv9b.xo .iv8mi{transform:rotate(180deg)}
-@media (prefers-reduced-motion:reduce){.iv8mo>svg,.iv8mi{transition:none}}
 /* آبشده شرطی */
 .shbd{flex:none;min-width:24px;height:24px;padding:0 7px;border-radius:12px;background:var(--gold,#b8862b);color:#fff;font-size:12.5px;font-weight:900;display:grid;place-items:center;margin-inline-start:auto}
 .shl{display:flex;flex-direction:column;gap:10px;padding-bottom:6px}

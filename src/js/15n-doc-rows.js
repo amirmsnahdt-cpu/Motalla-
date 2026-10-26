@@ -3,7 +3,7 @@
    ۲) مانده قبلی یک واحد در دریافت/پرداخت: تومان و طلا با هم، و هر مانده دیگر (دلار، سکه…) با «+».
       ذخیره همان ساختار قبلی است (pay m:'prev' و xr با cat 'مانده قبلی' و pul) با کلید گروه مشترک pv؛
       در فهرست ردیف‌ها یک ردیف دیده می‌شود و با هم ویرایش/حذف می‌شوند. حساب‌ها هیچ تغییری نمی‌کنند.
-   ۳) جدول مانده‌های پایین: مبلغ و طلا همیشه؛ دلار و سکه جمع‌شده زیر دکمه گوشه جدول (BGX). */
+   ۳) جدول مانده‌های پایین (v61.63): همه مانده‌ها همیشه زیر هم — مبلغ، طلا، بعد دلار و سکه. */
 const D6OP=new Set();let D6T={k:'',t:0};
 ACT.d6Tap=(d,e)=>{const b=e&&e.target&&e.target.closest('.d6rb'),r=b&&b.closest('.d6r');if(!r)return;const k=d.key||'',now=Date.now();
   /* دو بار زدن پشت هم روی همان ردیف = ویرایش (باز/بسته شدن زدن اول برمی‌گردد) */
@@ -12,12 +12,6 @@ ACT.d6Tap=(d,e)=>{const b=e&&e.target&&e.target.closest('.d6rb'),r=b&&b.closest(
 function d6Set(r,k,on){r.classList.toggle('op',on);const b=r.querySelector('.d6rb');if(b)b.setAttribute('aria-expanded',on?'true':'false');if(k){if(on)D6OP.add(k);else D6OP.delete(k)}
   if(on&&!RM()){const x=r.querySelector('.d8xi');if(x&&x.animate)x.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:300,easing:'cubic-bezier(.2,.9,.25,1)'});
     setTimeout(()=>{if(!r.isConnected)return;const R=r.getBoundingClientRect(),A=$('act'),bot=(A&&A.offsetHeight?A.getBoundingClientRect().top:innerHeight)-8;if(R.bottom>bot)scrollBy({top:Math.min(R.bottom-bot,R.top-80),behavior:'smooth'})},320)}}
-
-/* ----- جدول مانده‌ها: مانده‌های دیگر (دلار، سکه…) جمع‌شده ----- */
-let BGX=false;
-ACT.bgX=()=>{BGX=!BGX;document.querySelectorAll('.iv9b.hx').forEach(B=>{const x=B.querySelector('.iv8x'),t=B.querySelector('.iv8mo');B.classList.toggle('xo',BGX);if(x)x.classList.toggle('op',BGX);
-  if(t){t.setAttribute('aria-expanded',BGX?'true':'false');const l=t.querySelector('.iv8mt');if(l)l.textContent=BGX?'بستن':'نمایش'}
-  if(BGX&&x&&!RM()){x.querySelectorAll('.iv8c,.iv8k').forEach((c,i)=>c.animate&&c.animate([{opacity:0,transform:'translateY(8px) scale(.96)'},{opacity:1,transform:'none'}],{duration:340,delay:60+i*30,easing:'cubic-bezier(.2,.9,.25,1)',fill:'backwards'}))}})};
 
 /* ----- مانده قبلی (یک واحد) ----- */
 function pvGroups(pays,xr){const M=new Map(),sp=new Set(),sx=new Set(),G=id=>{if(!M.has(id))M.set(id,{id,p:[],x:[],dir:''});return M.get(id)};

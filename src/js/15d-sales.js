@@ -572,11 +572,10 @@ function vInv(){const X=invGet();if(!X){setTimeout(()=>{if(cur==='inv')go('custs
   /* v61.47 (خواسته صاحب اپ): «نمایش فاکتور» و «چاپ» یکی شد (فقط دکمه پایین «فاکتور · چاپ / PDF»)؛ حساب مشتری بالای صفحه با مانده‌ها؛
      دکمه‌ها ساده‌تر: ویرایش و سند بعدی کنار هم */
   return `${fresh?`<div class="bzok ivok">${ic('check')}<span>${esc(invTitle(t))} ثبت شد و به حساب «${esc(cuName(c))}» رفت</span></div>`:''}
-  ${ivMeta(t)}${ivCu9(c)}${ivDet(c,t)}`}
+  ${ivMeta(t)}${ivDet(c,t)}`}/* v61.63 (خواسته صاحب اپ): کارت «مانده حساب» بالای سند ثبت‌شده برداشته شد — مانده‌ها فقط پایین صفحه */
 /* v61.54 (خواسته صاحب اپ): بالای صفحه سند، کارت حساب مشتری مثل ردیف فهرست حساب‌ها (نام، گروه، تلفن، کاشی مبلغ و طلا با برچسب)،
    در یک کادر با همان ورود پله‌ای و شمارش عدد (فقط بار اول هر سند)؛ زدن = حساب مشتری */
 let ivCntId=null;
-function ivCu9(c){return cuBalCard(cuBal(c),ivCntId!==String(invV&&invV.tx),{a:'cuOpen',id:c.id})}
 const bindInv=()=>{const k=String(invV&&invV.tx);if(ivCntId===k)return;ivCntId=k;requestAnimationFrame(()=>cuCount('.cub9.anim .cbn'))};
 /* v61.52 (خواسته صاحب اپ): ویرایش، سند بعدی و حذف از پایین صفحه برداشته شد و در منوی کوچک بالا سمت چپ (⋯) آمد */
 ACT.invMenu=()=>{const X=invGet();if(!X)return;const it=[can('debt')?['invEdit',ic('edit'),'ویرایش سند']:null,can('debt')?['svNew',ic('plus'),'سند بعدی برای «'+cuName(X.c)+'»',{cu:X.c.id}]:null,['invPrint',ic('print'),'فاکتور · چاپ / PDF'],['cuOpen',ic('users'),'حساب مشتری',{id:X.c.id}],can('del')||isAdmin()?['invDel',ic('trash'),'حذف این سند',null,1]:null].filter(Boolean);
@@ -612,11 +611,8 @@ const balRk=k=>k==='r'?0:k==='g'?1:(XA[k]||{}).k==='f'?2:3;
 function balGrid(rows,cols,o){o=o||{};rows=rows.map((r,i)=>[r,i]).sort((a,b)=>balRk(a[0][0])-balRk(b[0][0])||a[1]-b[1]).map(z=>z[0]);let n=0;const N=cols.length;
   const cell=(k,v,c)=>{const x=v?balV(k,v):'۰',T=o.act&&c.w?'button':'span';return `<${T} class="iv8c ${q8S(v)}${c.m?' m':''}" style="--i:${n++}"${T==='button'?` type="button" data-act="${o.act}" data-w="${c.w}" data-k="${k}" aria-label="${esc(c.lab)}: ${esc(x)} ${esc(balU(k))}"`:''}><span class="fz"><b${fitS(x)}>${x}</b></span><small>${v?ourLab(v):'تسویه'}</small></${T}>`};
   const rw=([k,...V])=>`<div class="iv8r k${q8C(k)}"><span class="iv8k"><b>${q8K(k)}</b><small>${esc(balU(k))}</small></span>${cols.map((c,j)=>cell(k,V[j]||0,c)).join('')}</div>`,
-    M=rows.filter(r=>r[0]==='r'||r[0]==='g'),X=rows.filter(r=>r[0]!=='r'&&r[0]!=='g'),op=X.length&&BGX;
-  /* v61.62 (خواسته صاحب اپ): مانده‌های دیگر (دلار، سکه…) جمع‌شده؛ زیر مبلغ و طلا یک نوار روشن که نشان می‌دهد چه مانده‌های دیگری هست
-     (نام، عدد ستون اصلی با رنگش) — زدن = باز/بسته شدن همان ردیف‌ها با حرکت */
-  const mi=Math.max(0,cols.findIndex(c=>c.m)),more=X.length?`<button type="button" class="iv8mo" data-act="bgX" aria-expanded="${op?'true':'false'}">${ic('plus')}<span class="iv8ml">${X.map(([k,...V])=>{const v=V[mi]||0;return `<span class="iv8mc ${q8S(v)}"><small>${q8K(k)}</small><b>${v?balV(k,v):'۰'}</b>${v?`<em>${ourLab(v)}</em>`:''}</span>`}).join('')}</span><span class="iv8mt">${op?'بستن':'نمایش'}</span><i class="iv8mi">${ic('chev')}</i></button>`:'';
-  return `<div class="iv8b iv9b n${N}${o.an?' anim':''}${X.length?' hx':''}${op?' xo':''}" role="group" aria-label="مانده‌ها"><div class="iv8h">${cols.map(c=>`<span>${esc(c.lab)}</span>`).join('')}</div>${M.map(rw).join('')}${X.length?`<div class="iv8x${op?' op':''}"><div class="iv8xi">${X.map(rw).join('')}</div></div>`:''}${more}<div class="iv9hint">${ic('hold')}${o.hint||'برای جزئیات فاکتور نگه دارید'}</div></div>`}
+    M=rows;/* v61.63 (خواسته صاحب اپ): نوار نمایش/بستن برداشته شد؛ همه مانده‌ها (مبلغ، طلا، بعد دلار و سکه) همیشه زیر هم */
+  return `<div class="iv8b iv9b n${N}${o.an?' anim':''}" role="group" aria-label="مانده‌ها"><div class="iv8h">${cols.map(c=>`<span>${esc(c.lab)}</span>`).join('')}</div>${M.map(rw).join('')}<div class="iv9hint">${ic('hold')}${o.hint||'برای جزئیات فاکتور نگه دارید'}</div></div>`}
 function ivBalP(c,t){const P=cuBalBefore(c,t),d=txD(t),K=q8Keys(P,d);
   const rows=K.map(k=>{const a=q8V(P,k),b=q8V(d,k);return [k,a,b,k==='g'?Math.round((a+b)*1000)/1000:k==='r'?a+b:Math.round((a+b)*100)/100]});
   return balGrid(rows,[{lab:'قبلی'},{lab:'این سند'},{lab:'نهایی',m:1}],{an:ivCntId!==String(t.id)})}
