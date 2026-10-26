@@ -351,7 +351,7 @@ function doSync(user, body) {
 const STATIC = {
   '/': ['index.html', 'text/html; charset=utf-8'], '/index.html': ['index.html', 'text/html; charset=utf-8'],
   '/sw.js': ['sw.js', 'text/javascript; charset=utf-8'], '/app.js': ['app.js', 'text/javascript; charset=utf-8'], '/styles.css': ['styles.css', 'text/css; charset=utf-8'], '/icon-512-maskable.png': ['icon-512-maskable.png', 'image/png'], '/manifest.json': ['manifest.json', 'application/manifest+json'],
-  '/apple-touch-icon.png': ['apple-touch-icon.png', 'image/png'], '/icon-192.png': ['icon-192.png', 'image/png'], '/icon-512.png': ['icon-512.png', 'image/png'],
+  '/apple-touch-icon.png': ['apple-touch-icon.png', 'image/png'], '/icon-192.png': ['icon-192.png', 'image/png'], '/icon-512.png': ['icon-512.png', 'image/png'], '/logo-stamp.png': ['logo-stamp.png', 'image/png'],
 };
 function serveStatic(req, res, p) {
   const bm = /^\/banks\/([A-Za-z_]+\.svg)$/.exec(p);

@@ -27,7 +27,9 @@ function xaSync(){const r=cfgRec();((r&&r.xa)||[]).forEach(o=>{if(o&&o.k&&!XA[o.
 const gCat=k=>{const r=cfgRec();return (r&&r.gk&&r.gk[k])||'ساخته'};
 function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls)=>R.push({id,t,ico,sub,cls:cls||''});
   if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله از مشتری':'حواله به مشتری','swap','از حساب مشتری دیگر');fx('m:hav',d==='in'?'حواله به بانک':'حواله از بانک','bank',d==='in'?'به حساب‌های ما':'از حساب‌های ما');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه');fx('m:cash','نقد','cash','پول نقد');fx('m:off','تخفیف','tag',d==='in'?'دریافت تخفیف · صفر کردن مانده طلب':'پرداخت تخفیف · صفر کردن مانده بدهی')}
-  fx('g:ab','آبشده','coin',d==='sell'?'وزن، عیار، انگ، سود':'وزن و عیار','gd');fx('g:misc','متفرقه','coin',d==='sell'?'طلای دست‌دوم با اجرت و سود':'طلای دست‌دوم','gd');
+  fx('g:ab','آبشده','coin',d==='sell'?'وزن، عیار، انگ، سود':'وزن و عیار','gd');
+  /* v61.62 (خواسته صاحب اپ): آبشده شرطی — عیارش هنوز درنیامده؛ با ۷۵۰ حساب می‌شود و عیار واقعی بعداً از «تنظیمات › آبشده شرطی» در همه سندها می‌نشیند */
+  fx('g:abs','آبشده شرطی','coin','عیار درنیامده · فعلاً ۷۵۰ · انگ را بزنید','gd');fx('g:misc','متفرقه','coin',d==='sell'?'طلای دست‌دوم با اجرت و سود':'طلای دست‌دوم','gd');
   if(d==='sell'||d==='buy')fx('g:pz','سکه پارسیان','coin',d==='sell'?'تعداد، وزن، اجرت و سود':'تعداد، وزن و مظنه خرید','gd');
   if(d==='sell'||d==='buy')fx('g:pul','پولی','swap',d==='sell'?'طلا تحویل نمی‌شود · فروش فردایی':'طلا تحویل گرفته نمی‌شود','gd');
   /* v61.62 (خواسته صاحب اپ): قلک — دقیقاً مثل پولی (طلا تحویل نمی‌شود، مبلغ و مانده طلا در حساب)، فقط با عنوان قلک */
@@ -89,6 +91,8 @@ ACT.dkF=d=>{qaRead();const a=sv.qa,D=a.d,[ty,v]=String(d.id).split(':');a.q='';a
   if(ty==='m'){if(v==='cust'&&!svCu()){toast('اول مشتری سند را انتخاب کنید',true);return}pyStart(pyNew(v,{dir:D,fl:1}));return}
   if(ty==='a'){const t=D==='sell'||D==='buy'?D:D;xrStart(xrNew(t,v,{fl:'one',fd:D}));return}
   if(ty==='g'){
+    if(v==='abs'){if(D==='sell'){a.k='آبشده';a.ab=1;a.sh=1;a.ay=750;a.pp=PROFIT_AB;a.mz='';a.mzk='';a.ajP='';a.ajT='';a.lab='';a.ang='';a.i=null;svKeep();qaRe('qW');return}
+      if(D==='buy'&&!dkRateOk())return;xrStart(xrNew(D==='swap'||D==='ret'?'buy':D,'gold',{cat:'آبشده',sh:1,ay:750,fl:'gold',fd:D}));return}
     if(v==='ab'&&D==='sell'){a.k='آبشده';a.ab=1;a.ay=750;a.pp=PROFIT_AB;a.mz='';a.mzk='';a.ajP='';a.ajT='';a.lab='';a.ang='';a.i=null;svKeep();qaRe('qW');return}
     if(v==='misc'&&D==='sell'){ACT.qaK({k:'متفرقه'});return}
     if(v==='pz'){if(D==='sell'){ACT.qaK({k:'سکه پارسیان'});Object.assign(sv.qa,{pz:1,cnt:'',ajP:'',ajT:''});svKeep();qaRe();return}
