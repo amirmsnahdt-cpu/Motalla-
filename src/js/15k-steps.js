@@ -49,6 +49,7 @@ function stSteps(){const a=sv.qa,K=stKind();
     /* v61.47 (خواسته صاحب اپ): مانده هر مشتری با رنگ (قرمز طلبکاریم، آبی بدهکاریم)؛ مبلغ خودکار = مانده سند/حساب،
        اگر صفر بود مانده همان مشتری انتخاب‌شده؛ عدد دلخواه که زده شود همان کسر می‌شود */
     if(p.m==='cust')R.push(stS('cuId','مشتری','','pick',()=>p.cuId,v=>{p.cuId=v;const c=CU().find(z=>String(z.id)===String(v));p.cuName=c?cuName(c):'';if(c){p.amount=pyLeft(p);if(p.dir==='in')pyCuCap(p);else if(!+p.amount)p.amount=Math.abs(cuBal(c).R)||0}},{search:1,opts:q=>{const dOk=pDig(q),nq=nzName(toEn(q||''));return CU().filter(c=>String(c.id)!==String(sv.cuId)&&(!nq||cuHit(c,nq,dOk))).slice(0,8).map(c=>{const r=cuBal(c).R;return {v:c.id,t:cuName(c),sub:[c.grp||'',c.phone?toFa(c.phone):''].filter(Boolean).join('، ')||'حساب مشتری',amt:r?fmt(Math.abs(r)):'۰',lab:ourLab(r),ico:'user',cls:r<0?'d':r>0?'c':'z'}})},lab0:v=>((CU().find(c=>String(c.id)===String(v))||{}).name),add:{t:'مشتری',form:1}}));
+    if(p.m==='nm')R.push(stS('cuName',p.dir==='out'?'حواله از':'حواله به','','text',()=>p.cuName,v=>p.cuName=v));
     R.push(stS('amount','مبلغ','تومان','num',()=>p.amount,v=>p.amount=v));
     if(p.m==='pos'||p.m==='hav')R.push(stS('tn','پیگیری','','text',()=>p.tn,v=>p.tn=v,{opt:1}));
     return R}

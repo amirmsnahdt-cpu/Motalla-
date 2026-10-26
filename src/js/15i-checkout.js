@@ -13,25 +13,28 @@ const ckTg=()=>{const t=CK&&CK.tg;if(!svCu())return 'd';if(ckAcct())return t==='
 function ckPrev(){const r=svBalL().find(z=>z[0]==='r')||['r',0,0,0],Y=sv.pays.reduce((s,p)=>s+pAmt(p),0),G=r[2]-Y;return G&&r[2]&&Math.sign(G)===Math.sign(r[2])?-r[1]:-r[3]}
 const ckRest=()=>{const t=ckTg();return t==='p'?ckPrev():t==='f'?-svRBal():svTot().rest};
 const ckOut=()=>ckRest()<0;
-const CKO=[['cust','حواله به مشتری','swap'],['hav','حواله از حساب ما','bank'],['cash','پرداخت نقدی','cash'],['off','پرداخت تخفیف','tag']];
-const CKT=[['dep','حواله از مشتری','swap'],['pos','کارتخوان','card'],['hav','حواله به بانک','bank'],['cash','دریافت نقدی','cash'],['gx','تعویض طلا','coin'],['off','دریافت تخفیف','tag']];
+const CKO=[['hav','حواله از حساب ما','bank'],['cust','حواله از مشتری','swap'],['cash','پرداخت نقدی','cash'],['off','پرداخت تخفیف','tag']];
+const CKT=[['pos','کارتخوان','card'],['hav','حواله به بانک','bank'],['dep','حواله به مشتری','swap'],['cash','دریافت نقدی','cash'],['gx','تعویض طلا','coin'],['off','دریافت تخفیف','tag']];
 const ckUsedDep=id=>sv.pays.filter(p=>p.m==='dep'&&String(p.entId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
 const ckUsedCu=id=>sv.pays.filter(p=>p.m==='cust'&&String(p.cuId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
-function ckOpen(tg){CK={m:'',tg:tg||''};sheet(ckHTML());ckBind()}
+function ckOpen(tg){if(GAL&&GAL.ck)GAL=null;CK={m:'',tg:tg||''};sheet(ckHTML());ckBind()}
 ACT.ckTg=d=>{ckRead();CK={m:'',tg:d.w||''};ckRe()};
 function ckRe(f){if(!CK||!$('sheet').querySelector('.ckw'))return;$('sheet').innerHTML=ckHTML();ckBind(f)}
 function ckRows(){const R=sv.pays.map((p,i)=>({k:'py',i,ico:(PM[p.m]||PM.cash).i,lab:pyLab(p),sub:p.tn?'پیگیری '+esc(p.tn):p.m==='dep'?'در همان واریزی، تسویه از مشتری ثبت می‌شود':'',amt:pAmt(p)}));
   (sv.xr||[]).forEach((x,i)=>{if(x.cat==='تعویض'){const C=xrCalc(x,sv.rate);R.push({k:'xr',i,ico:'coin',lab:'تعویض طلا',sub:wFmt(C.n)+' گرم · عیار '+toFa(x.ay||750),amt:C.amount})}});return R}
+/* v61.72 (خواسته صاحب اپ): اگر طرف حواله در فهرست نیست، نامش دستی و موقت ثبت می‌شود (m:'nm' — فقط نام، به حساب کسی نمی‌رود) */
+const ckNmRow=q0=>`<button class="stsr ckn" data-act="ckNm"><span class="c6a ckna">${ic('plus')}</span><span class="tx"><b>${q0?'ثبت دستی «'+esc(q0)+'»':'ثبت دستی نام'}</b><small>${q0?'در فهرست نیست · فقط نام، بدون حساب':'نام را در جستجو بنویسید'}</small></span></button>`;
+ACT.ckNm=()=>{ckRead();const n=clean(CK.q||'');if(!n){toast('نام طرف حواله را در جستجو بنویسید',true);const I=$('ckQ');if(I)I.focus();return}CK.sel={k:'nm',n};ckRe('ckA')};
 function ckList(){const q0=clean(CK.q||''),q=nzName(toEn(q0)),dOk=pDig(q0);
   if(ckOut()){const L=CU().filter(c=>String(c.id)!==String(sv.cuId)&&(!q||cuHit(c,q,dOk))).sort((a,b)=>String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,8);
-    return L.length?`<div class="stsug ckl">${L.map(c=>`<button class="stsr" data-act="ckPick" data-k="cu" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'حساب مشتری'}</small></span></button>`).join('')}</div>`:'<div class="eh" style="padding:10px 4px">مشتری‌ای پیدا نشد</div>'}
+    return `<div class="stsug ckl">${L.map(c=>`<button class="stsr" data-act="ckPick" data-k="cu" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'حساب مشتری'}</small></span></button>`).join('')}${ckNmRow(q0)}</div>`}
   const C=CU().filter(c=>String(c.id)!==String(sv.cuId)).map(c=>[c,cuBal(c).R-ckUsedCu(c.id)]).filter(([c,r])=>r>0&&(!q||cuHit(c,q,dOk))).sort((a,b)=>b[1]-a[1]).slice(0,q?8:5);
   const D=validated().filter(x=>!x.full&&x.amount>0&&!x.sentBid).map(x=>[x,x.amount-ckUsedDep(x.id)]).filter(([x,r])=>r>0&&(!q||nzName(fullName(x)+' '+(x.holder||'')).includes(q)||dOk([x.phone,x.iban,x.code,x.card].join(' ')))).sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0])))).slice(0,q?12:8);
   const row=(k,id,av,cls,name,sub,v)=>`<button class="stsr" data-act="ckPick" data-k="${k}" data-id="${id}"><span class="c6a${cls}">${esc(av)}</span><span class="tx"><b>${esc(name)}</b><small>${sub}</small></span><span class="ckv"><b>${fmt(v)}</b><small>بدهکاریم</small></span></button>`;
-  if(!C.length&&!D.length)return `<div class="eh" style="padding:10px 4px">${q?'کسی پیدا نشد':'به هیچ مشتری‌ای بدهکار نیستیم و واریزیِ ارسال‌نشده‌ای نیست'}</div>`;
+  if(!C.length&&!D.length)return `<div class="eh" style="padding:10px 4px">${q?'کسی در فهرست پیدا نشد':'به هیچ مشتری‌ای بدهکار نیستیم و واریزیِ ارسال‌نشده‌ای نیست'}</div><div class="stsug ckl">${ckNmRow(q0)}</div>`;
   return `<div class="stsug ckl">${C.length?`<div class="stsh ckb">مشتری‌هایی که به آنها بدهکاریم</div>`+C.map(([c,r])=>row('cu',c.id,userInit(c.name),'',cuName(c),[c.grp?esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join('، ')||'حساب مشتری',r)).join(''):''}
-    ${D.length?`<div class="stsh">واریزی‌های ارسال‌نشده به بانک</div>`+D.map(([x,r])=>row('dep',x.id,userInit(fullName(x)),' m',fullName(x),['واریز '+esc(payLab(PD(x))),x.settled?'بخشی تسویه شده':'',x.bankShow?esc(x.bankShow):''].filter(Boolean).join('، '),r)).join(''):''}</div>`}
-function ckSel(){const s=CK.sel;if(!s)return '';if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return '';const r=cuBal(c).R-ckUsedCu(c.id);return `<div class="stsel">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${ckOut()?'مبلغ به حساب این مشتری می‌رود':'حساب مشتری · بدهکاریم '+fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>`}
+    ${D.length?`<div class="stsh">واریزی‌های ارسال‌نشده به بانک</div>`+D.map(([x,r])=>row('dep',x.id,userInit(fullName(x)),' m',fullName(x),['واریز '+esc(payLab(PD(x))),x.settled?'بخشی تسویه شده':'',x.bankShow?esc(x.bankShow):''].filter(Boolean).join('، '),r)).join(''):''}${ckNmRow(q0)}</div>`}
+function ckSel(){const s=CK.sel;if(!s)return '';if(s.k==='nm')return `<div class="stsel"><span class="c6a ckna">${esc(userInit(s.n))}</span><span class="tx"><b>${esc(s.n)}</b><small>ثبت دستی · ${ckOut()?'این شخص به مشتری ما پرداخت کرده':'مشتری به این شخص پرداخت کرده'} · بدون حساب</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>`;if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return '';const r=cuBal(c).R-ckUsedCu(c.id);return `<div class="stsel">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${ckOut()?'مبلغ به حساب این مشتری می‌رود':'حساب مشتری · بدهکاریم '+fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>`}
   const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return '';const r=x.amount-ckUsedDep(x.id);return `<div class="stsel"><span class="c6a m">${esc(userInit(fullName(x)))}</span><span class="tx"><b>${esc(fullName(x))}</b><small>واریزی ${esc(payLab(PD(x)))} · مانده ${fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>`}
 /* v61.30: کارتخوان و حساب ما مثل بقیه فهرست‌ها: جستجو بالا، فهرست زیرش */
 function ckPick(){const m=CK.m,q=nzName(toEn(clean(CK.sq||''))),pos=m==='pos';
@@ -40,6 +43,11 @@ function ckPick(){const m=CK.m,q=nzName(toEn(clean(CK.sq||''))),pos=m==='pos';
   return `<div class="bzsug cbl dkl">${L.map(o=>`<button type="button" class="bzsr dkrw${o.on?' on':''}" data-act="${pos?'ckCh':'ckSrc'}" data-id="${esc(o.id)}"><span class="av">${o.av}</span><span class="tx"><b>${esc(o.t)}</b><small>${esc(o.sub)}</small></span></button>`).join('')}${ex?'':pkAddRow(pos?'کارتخوان':'حساب',q0,'ckPkAdd')}</div>`}
 ACT.ckPkAdd=()=>{ckRead();const n=clean(CK.sq||''),pos=CK.m==='pos';if(!n){toast('نام '+(pos?'کارتخوان':'حساب')+' را در جستجو بنویسید',true);const I=$('ckS');if(I)I.focus();return}
   if(pos){const r=chNew(n,'pos');if(!r)return;CK.chId=r.id;ls.set('m_ch_pos',r.id)}else{const z=srcQuick(n);if(!z)return;CK.srcId=z.id;ls.set('m_src_hav',z.id)}CK.sq='';ckRe('ckA');toast('«'+n+'» اضافه شد')};
+/* v61.72: عکس رسید در فرم تسویه (همان پنجره عکس ردیف‌ها، GAL.ck)؛ بستن پنجره عکس = برگشت به همین فرم */
+ACT.ckGal=()=>{ckRead();openGal({k:'row',ck:1})};
+ACT.ckPhV=d=>{ckRead();GAL={k:'row',ck:1};zvOpen(+d.i||0)};
+ACT.ckPhBack=()=>{GAL=null;sheet(ckHTML());ckBind();phPaint($('sheet'))};
+function ckPhPut(n0){const K=xrPh(CK||{});if(K.length&&sv.pays.length>n0){const p=sv.pays[sv.pays.length-1];p.imgs=K;p.img=K[0]}}
 function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" autocomplete="off" enterkeyhint="done"></label>`;
   const tn=`<label class="ckf"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
   if(m==='cash')b=amt;
@@ -49,7 +57,7 @@ function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><sm
     b=`<div class="ckg"><label class="ckf"><small>وزن طلای مشتری (گرم)</small><input id="ckW" class="ltr" inputmode="decimal" value="${esc(CK.w||'')}" placeholder="0.000" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="ckY" class="ltr" inputmode="numeric" value="${esc(String(CK.ay||x.ay))}" autocomplete="off"></label></div>
     <div class="ckx" id="ckX">${sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'}</div>`}
   const T=(ckOut()?CKO:CKT).find(z=>z[0]===m);
-  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><button class="lnk" data-act="ckM" data-m="">انصراف</button></div>${b}${(m==='dep'||m==='cust')&&!CK.sel?'':`<button class="qago ckadd" data-act="ckAdd">${ic('plus')} افزودن به تسویه</button>`}</div>`}
+  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><button class="lnk" data-act="ckM" data-m="">انصراف</button></div>${b}${(m==='dep'||m==='cust')&&!CK.sel||m==='gx'?'':stPhHTML(CK)}${(m==='dep'||m==='cust')&&!CK.sel?'':`<button class="qago ckadd" data-act="ckAdd">${ic('plus')} افزودن به تسویه</button>`}</div>`}
 function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),R=ckRows(),A=ckAcct(),tg=ckTg(),TL={p:'مانده قبلی',d:A?'این سند':'مانده این سند',f:'مانده نهایی'}[tg];
   /* ریز مانده‌ها (قبلی · سند · نهایی، مبلغ و طلا)؛ خانه انتخاب‌شده پررنگ و با زدن هر خانه هدف تسویه عوض می‌شود */
   const L=svBalL(),gr=L.find(z=>z[0]==='g'),rr=L.find(z=>z[0]==='r')||['r',0,0,0],ln=(k,v)=>`<span class="${ftCls(v)}${k==='r'?' r':''}"><b>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i></span>`;
@@ -61,7 +69,7 @@ function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),R=ckRows(),A=ckAcct(),tg=c
   <button class="xgo cksave" data-act="ckSave">${ic('check')} پایان و ثبت سند${r>0?`<small>مانده ${fmt(r)} به حساب مشتری</small>`:''}</button>
   <button class="lnk ckback" data-act="close">بازگشت به سند</button></div>`}
 function ckRead(){const g=id=>{const e=$(id);return e?e.value:undefined};if($('ckA'))CK.amount=num(g('ckA'));if($('ckT'))CK.tn=toEn(g('ckT')||'').trim();if($('ckW'))CK.w=decIn(g('ckW'));if($('ckY'))CK.ay=+toEn(g('ckY')).replace(/\D/g,'')||'';if($('ckQ'))CK.q=g('ckQ');if($('ckS'))CK.sq=g('ckS')}
-function ckBind(f){const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=$('ckY');const PS=$('ckS');if(PS)PS.oninput=()=>{CK.sq=PS.value;const P=$('ckPl');if(P)P.innerHTML=ckPick()};
+function ckBind(f){phPaint($('sheet'));const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=$('ckY');const PS=$('ckS');if(PS)PS.oninput=()=>{CK.sq=PS.value;const P=$('ckPl');if(P)P.innerHTML=ckPick()};
   if(A){selOnFocus(A);A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''};A.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.ckAdd()}}}
   if(Q){Q.oninput=()=>{CK.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{const L=$('ckL');if(L)L.innerHTML=ckList()},100)};const L=$('ckL');if(L)L.onpointerdown=e=>{if(e.target.closest('.stsr'))e.preventDefault()}}
   const gx=()=>{ckRead();const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate),el=$('ckX');if(el)el.innerHTML=sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'};
@@ -76,21 +84,21 @@ ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;ckRe()};
 ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('ckQ');return}CK.sel={k:d.k,id:d.id};
   const av=d.k==='cu'?(()=>{const c=CU().find(z=>String(z.id)===String(d.id));return c?cuBal(c).R-ckUsedCu(c.id):0})():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();
   CK.amount=ckOut()?ckLeft():Math.max(0,Math.min(ckLeft()||av,av));ckRe('ckA')};
-ACT.ckAdd=()=>{ckRead();const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0;
+ACT.ckAdd=()=>{ckRead();const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0,n0=sv.pays.length;
   if(out&&m!=='gx'){if(!(a>0)){toast('مبلغ را وارد کنید',true);return}if(a>ckLeft()){toast('بیشتر از مانده سند است',true);return}
     if(m==='cash')sv.pays.push({m:'cash',amount:-a});
     if(m==='hav'){if(CK.srcId===''||CK.srcId==null){toast('حساب ما را انتخاب کنید',true);return}sv.pays.push({m:'hav',amount:-a,srcId:CK.srcId,tn:CK.tn||''});ls.set('m_src_hav',CK.srcId)}
-    if(m==='dep'||m==='cust'){const s=CK.sel,c=s&&CU().find(z=>String(z.id)===String(s.id));if(!c){toast('مشتری را انتخاب کنید',true);return}sv.pays.push({m:'cust',amount:-a,cuId:c.id,cuName:cuName(c)})}
-    CK={m:''};ckBackToDoc();return}
+    if(m==='dep'||m==='cust'){const s=CK.sel;if(s&&s.k==='nm'){sv.pays.push({m:'nm',amount:-a,cuName:s.n})}else{const c=s&&CU().find(z=>String(z.id)===String(s.id));if(!c){toast('مشتری را انتخاب کنید',true);return}sv.pays.push({m:'cust',amount:-a,cuId:c.id,cuName:cuName(c)})}}
+    ckPhPut(n0);CK={m:''};ckBackToDoc();return}
   if(m==='gx'){const w=parseFloat(CK.w)||0;if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}if(!(w>0)){toast('وزن طلا را بزنید',true);return}const x=xrNew('buy','gold',{cat:'تعویض'});x.w=String(CK.w);x.ay=+CK.ay||x.ay;sv.xr.push(x)}
   else{if(!(a>0)){toast('مبلغ را وارد کنید',true);const A=$('ckA');if(A)A.focus();return}
     if(m==='cash')sv.pays.push({m:'cash',amount:a});
     if(m==='pos'){if(!CK.chId){toast('کارتخوان را انتخاب کنید',true);return}sv.pays.push({m:'pos',amount:a,chId:CK.chId,tn:CK.tn||''});ls.set('m_ch_pos',CK.chId)}
     if(m==='hav'){if(CK.srcId===''||CK.srcId==null){toast('حساب ما را انتخاب کنید',true);return}sv.pays.push({m:'hav',amount:a,srcId:CK.srcId,tn:CK.tn||''});ls.set('m_src_hav',CK.srcId)}
     if(m==='dep'){const s=CK.sel;if(!s){toast('یکی از فهرست را انتخاب کنید',true);return}
-      if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return;const av=cuBal(c).R-ckUsedCu(c.id);if(a>av){toast('بیشتر از بدهی ما به «'+cuName(c)+'» است ('+fmt(av)+')',true);return}sv.pays.push({m:'cust',amount:a,cuId:c.id,cuName:cuName(c)})}
+      if(s.k==='nm')sv.pays.push({m:'nm',amount:a,cuName:s.n});else if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return;const av=cuBal(c).R-ckUsedCu(c.id);if(a>av){toast('بیشتر از بدهی ما به «'+cuName(c)+'» است ('+fmt(av)+')',true);return}sv.pays.push({m:'cust',amount:a,cuId:c.id,cuName:cuName(c)})}
       else{const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return;const av=x.amount-ckUsedDep(x.id);if(a>av){toast('بیشتر از مانده واریزی «'+fullName(x)+'» است ('+fmt(av)+')',true);return}sv.pays.push({m:'dep',amount:a,entId:x.id,entName:fullName(x)})}}}
-  CK={m:''};ckBackToDoc()};
+  ckPhPut(n0);CK={m:''};ckBackToDoc()};
 /* v61.32: بعد از افزودن هر دریافت/پرداخت در تسویه، پنجره بسته می‌شود و سند با ردیف تازه و مانده تازه دیده می‌شود */
 function ckBackToDoc(){svKeep();closeSheet();svAdd=-1;svRe();setTimeout(()=>{const r=document.querySelector('#svRows .d6r:last-child');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'});if(r&&!RM()&&r.animate)r.animate([{background:'color-mix(in srgb,var(--blu) 14%,transparent)'},{background:'transparent'}],{duration:900,easing:'ease-out'})},120);
   const r=ckRest();toast(r?('ردیف به سند اضافه شد · مانده '+fmt(Math.abs(r))):(ckAcct()?'حساب تسویه شد ✓':'سند تسویه شد ✓'))}
