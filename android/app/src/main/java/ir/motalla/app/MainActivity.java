@@ -483,6 +483,14 @@ public class MainActivity extends Activity {
             }
         }
 
+        /* اندازه کاغذ از @page خود برگه: صورتحساب A4، فاکتور A5 عمودی، گزارش‌ها A5 افقی */
+        private PrintAttributes.MediaSize pageSize(String html) {
+            String h = html == null ? "" : html;
+            if (h.contains("@page{size:A4 landscape")) return PrintAttributes.MediaSize.ISO_A4.asLandscape();
+            if (h.contains("@page{size:A4")) return PrintAttributes.MediaSize.ISO_A4;
+            if (h.contains("@page{size:A5 landscape")) return PrintAttributes.MediaSize.ISO_A5.asLandscape();
+            return PrintAttributes.MediaSize.ISO_A5;
+        }
         @JavascriptInterface
         public void printHtml(final String html, final String title) {
             runOnUiThread(() -> {
@@ -496,7 +504,7 @@ public class MainActivity extends Activity {
                     try {
                         PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
                         String jobName = (title == null || title.isEmpty()) ? "Motalla" : title;
-                        pm.print(jobName, pv.createPrintDocumentAdapter(jobName), new PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A5.asLandscape()).build());
+                        pm.print(jobName, pv.createPrintDocumentAdapter(jobName), new PrintAttributes.Builder().setMediaSize(pageSize(html)).build());
                     } catch (Exception e) { toast("چاپ ممکن نشد"); }
                 };
                 pv.setWebViewClient(new WebViewClient() {

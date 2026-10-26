@@ -10,7 +10,7 @@ const PDFK={html:'',p:null,file:null};
 const pdfDataUrl=async u=>{const r=await fetch(u);if(!r.ok)throw new Error('fetch '+u);const b=await r.blob();return await new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=rej;f.readAsDataURL(b)})};
 const pdfEsc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 async function pdfMake(html,title){
-  const land=/@page\{size:A5 landscape/.test(html)||!/@page\{size:A5/.test(html),mmW=land?210:148,mmH=land?148:210,mg=8,PX=96/25.4,
+  /* اندازه کاغذ از @page برگه: A4 (صورتحساب) یا A5، عمودی یا افقی؛ بی @page = A5 افقی */const pz=(html.match(/@page\{size:(A4|A5)( landscape)?/)||[,'A5',' landscape']),a4=pz[1]==='A4',land=!!pz[2],sw=a4?210:148,sh=a4?297:210,mmW=land?sh:sw,mmH=land?sw:sh,mg=a4?10:8,PX=96/25.4,
     W=Math.round((mmW-2*mg)*PX),H=Math.round((mmH-2*mg)*PX),S=3,base=location.href.replace(/[^/]*$/,'');
   const f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.style.cssText=`position:fixed;left:-20000px;top:0;width:${W}px;height:${H}px;border:0;opacity:0;pointer-events:none`;document.body.appendChild(f);
   try{
