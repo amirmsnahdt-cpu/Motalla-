@@ -41,7 +41,7 @@ const ACT={
   copyOut:async()=>{const ta=$('tout'),ok=await copyText(ta.value);if(ok){toast('متن کپی شد');setTimeout(autoTrack,900)}else{ta.focus();ta.select();toast('متن انتخاب شد؛ «Copy» را بزنید')}},
   shareOut:async()=>{if(window.AndroidBridge){window.AndroidBridge.share($('tout').value);return}try{await navigator.share({text:$('tout').value})}catch(e){}},
   saveTxt:()=>{autoTrack();save((txtGen?txtName:ctxName())+'.txt','﻿'+(txtGen?txtGen():withCtx(txt)),'فایل متنی آماده شد')},
-  pvClose:closePrint,pvPrint:printReport,pvShareP:async()=>{const h=window.__pv||'';try{const fl=new File([h],'motalla-report.html',{type:'text/html'});if(navigator.canShare&&navigator.canShare({files:[fl]})){await navigator.share({files:[fl],title:'گزارش مطلا'});return}}catch(e){if(e&&e.name==='AbortError')return}printReport()},
+  pvClose:closePrint,pvPrint:()=>{/* v61.72: آیفون = فایل PDF A5 در منوی اشتراک (چاپ و ذخیره داخلش) */if(isIOS()&&PDFK.html===window.__pv&&pdfShare())return;printReport()},pvShareP:async()=>{if(isIOS()&&PDFK.html===window.__pv&&pdfShare())return;const h=window.__pv||'';try{const fl=new File([h],'motalla-report.html',{type:'text/html'});if(navigator.canShare&&navigator.canShare({files:[fl]})){await navigator.share({files:[fl],title:'گزارش مطلا'});return}}catch(e){if(e&&e.name==='AbortError')return}printReport()},
   copySrc:async()=>{txtGen=null;expCtx={A:alloc,sc:String(srcIdx),track:true};const ok=await copyText(withCtx(txt));if(ok){toast('متن «'+srcRows().name+'» کپی شد');setTimeout(autoTrack,900)}else openText()},
   srcView:d=>{srcIdx=d.i;go('srcview')},
   tstyle:d=>{txtStyle=d.s;ls.set('m_txtstyle2',d.s);openText()},

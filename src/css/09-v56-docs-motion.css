@@ -1819,3 +1819,4 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .cuidp img{width:100%;height:100%;object-fit:cover;display:block}
 .cuide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--blu)}.cuide svg{width:20px;height:20px}.cuide b{font-size:13px;font-weight:850}.cuide small{font-size:10.5px;color:var(--mut);font-weight:700}
 .cuidf{display:flex;align-items:center;gap:6px}.cuidf>small{flex:1;font-size:11.5px;font-weight:800;color:var(--mut)}.cuidf .cufb{height:28px;padding:0 8px}
+#pv.ld2 .pvld{background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(2px)}

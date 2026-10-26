@@ -134,7 +134,10 @@ function openPrint(h0){const P=$('pv'),f=$('pvf'),seq=++pvSeq;P.classList.remove
   const fail=e=>{if(seq!==pvSeq)return;P.classList.remove('ld');toast('برگه آماده نشد؛ دوباره امتحان کنید',true);closePrint()};
   requestAnimationFrame(()=>setTimeout(async()=>{if(seq!==pvSeq)return;let html;try{html=await (typeof h0==='function'?h0():h0!=null?h0:withCtx(reportHTML))}catch(e){fail(e);return}
     if(seq!==pvSeq||!html)return;html=String(html).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.__pv=html;
-    const show=()=>{if(seq!==pvSeq)return;P.classList.remove('ld');f.classList.add('rdy')};
+    /* v61.72: روی آیفون بعد از دیده شدن برگه، فایل PDF A5 هم ساخته می‌شود؛ دکمه‌ها تا آماده شدنش صبر می‌کنند */
+    const show=()=>{if(seq!==pvSeq)return;f.classList.add('rdy');if(!isIOS()){P.classList.remove('ld');return}
+      const L2=P.querySelector('.pvld b');if(L2)L2.textContent='در حال ساخت PDF ‏A5…';P.classList.add('ld2');
+      pdfPrep(html).then(()=>{if(seq!==pvSeq)return;P.classList.remove('ld','ld2');const b=P.querySelector('.pvld b');if(b)b.textContent='در حال آماده‌سازی…'})};
     f.onload=()=>{let done=false;const ok=()=>{if(!done){done=true;show()}};try{const d=f.contentDocument,land=/A4 landscape/.test(html),W=land?1123:794;
       const st=d.createElement('style');st.textContent=`@media screen{html{background:transparent!important;min-height:100%}body{width:${W}px!important;max-width:none!important;margin:18px auto 28px!important;padding:${land?'30px 34px':'42px 40px'}!important;background:#fff!important;box-shadow:0 10px 34px rgba(16,33,58,.16),0 0 0 1px rgba(16,33,58,.06);border-radius:10px;box-sizing:border-box}}`;d.head.appendChild(st);
       let big=false;const fit=()=>{const z=big?Math.min(1,(f.clientWidth-8)/(W*0.62)):Math.min(1,(f.clientWidth-20)/(W+8));d.documentElement.style.zoom=String(z)};fit();f.contentWindow.addEventListener('resize',fit);d.addEventListener('click',()=>{big=!big;fit()});
