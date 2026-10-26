@@ -1698,3 +1698,14 @@ button.iv8c:focus-visible{outline:2px solid var(--blu);outline-offset:2px}
 .d6r.d8 .d8b .d6e .fz{--fmax:14px;text-align:left}
 .d6r.d8 .d8b .d6e>i{font-size:9.5px}
 .dkl{overscroll-behavior-y:auto}
+/* v61.60: کیبورد باز = نوار مانده پایین سند پنهان (اندروید) */
+html.kbo #act{display:none!important}
+/* v61.60: دکمه ⋯ کنار هر کالای اضافه‌شده (ویرایش نام، دسته، حذف) */
+.dkg{position:relative}
+.dkg>.dkrw{padding-left:52px}
+.dkg>.dkgm{position:absolute;left:8px;top:50%;translate:0 -50%;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:12px;background:var(--seg);color:var(--mut);padding:0}
+.dkg>.dkgm svg{width:20px;height:20px}
+/* v61.60: ارز (دلار) زیر مبلغ، سکه زیر طلا */
+.c6vb{grid-auto-flow:row dense}
+.c6vb>.cbk.xc{grid-column:1}
+.c6vb>.cbk.xf{grid-column:2}

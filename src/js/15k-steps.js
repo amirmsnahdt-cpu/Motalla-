@@ -11,7 +11,8 @@ const stMzK=o=>o.mzk||rtK();
 const stMzV=(o,k)=>{const m=+o.mz;return k==='g'?(m?rOfMz(m):+sv.rate||0):(m||sv.mz||mzOf(sv.rate)||0)};
 /* v61.25: در خرید طلا مظنه «مظنه خرید» است: مظنه روز × عیار/۷۵۰ (۷۳۵ / ۷۴۰) — مبلغ خرید تبدیل می‌شود، وزن نه.
    ذخیره همان مظنه ۱۸ است (o.mz)؛ فقط نمایش و ورود به شکل خرید. f = ضریب عیار */
-const stBuyF=x=>x&&x.a==='gold'&&x.t==='buy'&&!x.pul?(+x.ay||750)/750:1;
+/* v61.60 (خواسته صاحب اپ): در خرید آبشده عیار روی وزن اثر می‌گذارد (وزن ۷۵۰) نه روی قیمت — مظنه همان مظنه روز می‌ماند */
+const stBuyF=x=>x&&x.a==='gold'&&x.t==='buy'&&!x.pul&&x.cat!=='آبشده'?(+x.ay||750)/750:1;
 const stMz=(o,f)=>{f=f||1;const B=f!==1,k0=stMzK(o);return stS('mz',(k0==='g'?'هر گرم ':'مظنه ')+(B?'خرید':(k0==='g'?'۱۸':'')),'تومان','num',()=>Math.round((stMzV(o,stMzK(o))||0)*f)||'',v0=>{const v=Math.round((+v0||0)/f);
   const k=v?rtDetect(v,+sv.rate||+ls.get('m_rate',0)||0):stMzK(o);o.mzk=k;const m=v?(k==='mz'?v:mzOf(v)):0,h=+sv.mz||mzOf(sv.rate);const old=+o.mz||'';
   o.mz=!m||Math.abs(m-h)<=Math.max(2,Math.ceil(MZK/f))||(k==='g'&&Math.abs(v-(+sv.rate||0))<=1)?'':m;if((+o.mz||'')!==old)o.amT=''},{mz:1})};
@@ -23,16 +24,20 @@ const stAmT=x=>stS('amT','مبلغ','تومان','num',()=>xrCalc(x,sv.rate).amo
 const stItAm=a=>stS('amT','مبلغ','تومان','num',()=>{const c=itCalc(qaIt(a),sv.rate,sv.tax);return c.tot||''},v=>{v=Math.round(+v||0);const it={...qaIt(a),amT:0},b=itCalc(it,sv.rate,sv.tax);
   if(!v||v===b.tot){a.amT='';return}const t=sv.tax&&!it.ab,base=b.gold+b.aj,pr=Math.round(t?(v-b.gold)/1.1:v-b.gold)-b.aj;if(base>0)a.pp=Math.round(pr/base*10000)/100;/* v61.46: مبلغ تایپ‌شده با مالیات است؛ پیش از مالیات نگه داشته می‌شود */a.amT=b.gold+b.aj+pr},{opt:1});
 const stNv=x=>x===''||x==null||(typeof x==='string'&&!x.trim())?'':isNaN(+toEn(String(x)))?String(x):+toEn(String(x));
+/* v61.60: تعداد (دلار، سکه، قطعه) با جداکننده هزارگان: ۲,۰۰۰ */
+const grpIn=v=>{const r=decIn(toEn(String(v==null?'':v)).replace(/,/g,'')),i=r.split('.');return (i[0]?(+i[0]).toLocaleString('en-US'):(r.includes('.')?'0':''))+(r.includes('.')?'.'+i.slice(1).join(''):'')};
+/* v61.60: وزن ۷۵۰ آبشده = وزن × عیار ÷ ۷۵۰؛ اگر عددش زده شود عیار از آن حساب می‌شود (وزن آزمایشگاه ثابت) */
+const stW75=x=>stS('w75','وزن ۷۵۰','گرم','dec',()=>{const q=xrCalc(x,sv.rate).q;return q?String(q):''},v=>{const w=parseFloat(x.w)||0,q=parseFloat(v)||0;if(!w||!q)return;const ay=Math.round(q/w*750*10)/10;if(Math.abs(ay-(+x.ay||750))>=0.05){x.ay=ay;x.amT=''}},{opt:1});
 const stCl=(o,k)=>v=>{if(stNv(v)!==stNv(o[k]))o.amT='';o[k]=v};
 function stSteps(){const a=sv.qa,K=stKind();
-  if(K==='it')return [...(a.pz?[stS('cnt','تعداد','عدد','dec',()=>a.cnt,v=>a.cnt=v)]:[]),stS('w',a.pz?'وزن کل':'وزن','گرم','dec',()=>a.w,stCl(a,'w')),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),...(noAjK(a.k)&&!+a.ajP&&!+a.ajT?[]:[stS('ajP','اجرت','٪','dec',()=>a.ajP,stCl(a,'ajP'),{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,stCl(a,'ajT'),{opt:1})]),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a)];
+  if(K==='it')return [...(a.pz?[stS('cnt','تعداد','عدد','dec',()=>a.cnt,v=>a.cnt=v,{grp:1})]:[]),stS('w',a.pz?'وزن کل':'وزن','گرم','dec',()=>a.w,stCl(a,'w')),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),/* v61.60: اجرت درصدی و تومانی برای همه کالاها (ساخته، سایر/دست دوم، متفرقه، پارسیان) */stS('ajP','اجرت','٪','dec',()=>a.ajP,stCl(a,'ajP'),{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,stCl(a,'ajT'),{opt:1}),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a)];
   if(K==='ab')return [stS('w','وزن آبشده','گرم','dec',()=>a.w,stCl(a,'w')),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a),stS('lab','آزمایشگاه','','text',()=>a.lab,v=>a.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>a.ang,v=>a.ang=v,{opt:1})];
   if(K==='xr'){const x=a.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ab=x.cat==='آبشده'?[stS('lab','آزمایشگاه','','text',()=>x.lab,v=>x.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>x.ang,v=>x.ang=v,{opt:1})]:[];
     /* خرید/فروش طلا (پولی و غیرپولی): مظنه، وزن، عیار، مبلغ. v61.56 (خواسته صاحب اپ): وزن و مبلغ جدا — پله وزن فقط گرم است (۱۰۰۰ = یک کیلو، نه مبلغ)؛
        اگر وزن خالی بماند، مبلغ پله آخر (x.am) وزن را از مظنه می‌سازد */
-    if(g&&m)return [...(x.pz?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v)]:[]),stMz(x,stBuyF(x)),stS('w','وزن','گرم','dec',()=>x.w,v=>{if(stNv(v)!==stNv(x.w))x.amT='';x.w=v;if(+v)x.am=''},{wOr:x,ph:'وزن (گرم) · اگر فقط مبلغ دارید خالی بگذارید',fm:v=>!+v&&+x.am?'از مبلغ: '+wFmt(xrCalc(x,sv.rate).n)+' گرم':null}),stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=v),stAmT(x),...ab];
+    if(g&&m)return [...(x.pz?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v,{grp:1})]:[]),stMz(x,stBuyF(x)),stS('w','وزن','گرم','dec',()=>x.w,v=>{if(stNv(v)!==stNv(x.w))x.amT='';x.w=v;if(+v)x.am=''},{wOr:x,ph:'وزن (گرم) · اگر فقط مبلغ دارید خالی بگذارید',fm:v=>!+v&&+x.am?'از مبلغ: '+wFmt(xrCalc(x,sv.rate).n)+' گرم':null}),stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=v),...(x.cat==='آبشده'?[stW75(x)]:[]),stAmT(x),...ab];
     if(g)return [stS('w','وزن','گرم','dec',()=>x.w,v=>x.w=v),stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=v),...ab];
-    return [stS('q','تعداد',(XA[x.a]||{}).u||'','dec',()=>x.q,v=>x.q=v),...(m?[stS('pg','نرخ هر '+((XA[x.a]||{}).u||'واحد'),'تومان','num',()=>x.pg||+ls.get('m_px_'+x.a,0)||'',v=>{if(+v!==+x.pg)x.amT='';x.pg=v}),stAmT(x)]:[])]}
+    return [stS('q','تعداد',(XA[x.a]||{}).u||'','dec',()=>x.q,v=>x.q=v,{grp:1}),...(m?[stS('pg','نرخ هر '+((XA[x.a]||{}).u||'واحد'),'تومان','num',()=>x.pg||+ls.get('m_px_'+x.a,0)||'',v=>{if(+v!==+x.pg)x.amT='';x.pg=v}),stAmT(x)]:[])]}
   if(K==='py'){const p=a.p,R=[];
     if(p.m==='pos')R.push(stS('chId','کارتخوان','','pick',()=>p.chId,v=>p.chId=v,{opts:()=>CH('pos').map(c=>({v:c.id,t:c.name,sub:'مانده '+fmt(chBal(c)),ico:'card'})),lab0:v=>(CH('pos').find(c=>String(c.id)===String(v))||{}).name,add:{t:'کارتخوان',fn:n=>{const r=chNew(n,'pos');return r&&r.id}}}));
     if(p.m==='hav')R.push(stS('srcId','حساب ما','','pick',()=>p.srcId,v=>{p.srcId=+v||v;p.chId=''},{opts:()=>sources.map(z=>({v:z.id,t:z.name,sub:acBank(z)?'بانک '+acBank(z):'حساب ما',ico:'bank',bk:acBank(z)})),lab0:v=>(sources.find(z=>String(z.id)===String(v))||{}).name,add:{t:'حساب',fn:n=>{const z=srcQuick(n);return z&&z.id}}}));
@@ -43,11 +48,11 @@ function stSteps(){const a=sv.qa,K=stKind();
     if(p.m==='pos'||p.m==='hav')R.push(stS('tn','پیگیری','','text',()=>p.tn,v=>p.tn=v,{opt:1}));
     return R}
   return []}
-const stFmt=(s,v)=>s.fm&&s.fm(v)!=null?s.fm(v):s.type==='wam'?(+v>=1000?fmt(+v)+' تومان':(+v?toFa(String(v))+' گرم':'')):s.type==='pick'?(s.lab0&&s.lab0(v))||'':s.type==='num'?(+v?fmt(+v):''):s.type==='dec'?(v===''||v==null||!+v?'':toFa(String(v))+(s.u&&s.u!=='تومان'?' '+s.u:'')):s.type==='int'?(+v?toFa(String(v)):''):esc(v||'');
+const stFmt=(s,v)=>s.fm&&s.fm(v)!=null?s.fm(v):s.type==='wam'?(+v>=1000?fmt(+v)+' تومان':(+v?toFa(String(v))+' گرم':'')):s.type==='pick'?(s.lab0&&s.lab0(v))||'':s.type==='num'?(+v?fmt(+v):''):s.type==='dec'?(v===''||v==null||!+v?'':(s.grp?qFmt(v):toFa(String(v)))+(s.u&&s.u!=='تومان'?' '+s.u:'')):s.type==='int'?(+v?toFa(String(v)):''):esc(v||'');
 /* عملیات و کالا (بالای نوار، بیرون از فیلد) */
 function stHead(D,it,canBack){return `<div class="sthd k-${D[0]}"><button type="button" class="sthk" data-act="${it?'stBack0':'dkD'}" aria-label="تغییر نوع"><span class="sthi">${ic(D[2])}</span><b>${D[1]}</b></button>${it?`<i class="sthc">›</i><button type="button" class="sthit" data-act="stBack0">${esc(it)}</button>`:'<i class="sthc">›</i><span class="sthq">انتخاب کنید</span>'}<button type="button" class="lnk sthx" data-act="${it?'qaX':'dkD'}">انصراف</button></div>`}
 const stTag=()=>{const a=sv.qa,K=stKind(),d=a.d||(a.x&&a.x.fd)||(a.p&&a.p.dir)||(a.x?(a.x.cat==='تعویض'?'swap':a.x.cat==='مرجوعی'?'ret':a.x.t):'sell');
-  const D=DK.find(z=>z[0]===d)||DK[0];let it='';if(K==='it')it=a.k;else if(K==='ab')it='آبشده';else if(K==='xr'){const x=a.x;it=x.cat==='تعویض'?'طلای کهنه':x.cat==='مرجوعی'?'طلای برگشتی':x.a==='gold'?(x.pz?'سکه پارسیان':x.pul?'پولی':x.cat||'طلا'):((XA[x.a]||{}).t||x.a)}else if(K==='py')it=dkST(d==='out'?'out':'in',a.p.m)||(PM[a.p.m]||{}).t||'';
+  const D=DK.find(z=>z[0]===d)||DK[0];let it='';if(K==='it')it=a.k;else if(K==='ab')it='آبشده';else if(K==='xr'){const x=a.x;it=x.cat==='تعویض'?'طلای کهنه':x.cat==='مرجوعی'?'طلای برگشتی':x.a==='gold'?(x.pz?'سکه پارسیان':x.cat==='مانده قبلی'?'مانده قبلی طلا':x.pul?'پولی':x.cat||'طلا'):((x.pul?'پولی ':'')+((XA[x.a]||{}).t||x.a))}else if(K==='py')it=dkST(d==='out'?'out':'in',a.p.m)||(PM[a.p.m]||{}).t||'';
   return {D,it}};
 /* v61.11: زیر نوار یک کادر مبلغ مثل پنجره تسویه: مبلغ بزرگ با رنگ اثرش (قرمز = طلبکار می‌شویم، آبی = بدهکار می‌شویم)
    و مشخصات (وزن، مظنه، عیار…) فقط یک خط کوچک زیرش؛ خانه‌های جدا برای مشخصات حذف شد (در ردیف پله‌ها هست) */
@@ -57,7 +62,7 @@ function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
   if(K==='it'||K==='ab'){const it=qaIt(a),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;am=c&&c.tot||0;
     if(it.w)D.push(wFmt(it.w)+' گرم'+(K==='ab'&&it.ay!=750?' (۷۵۰: '+wFmt(Math.round(it.w*it.ay/750*1000)/1000)+')':''));D.push(c&&c.fx?'سود '+toFa(String(+a.pp||0))+'٪ ('+fmt(c.pr)+') <b class="own">مبلغ دستی</b>':stMzTx(a))}
   else if(K==='xr'){const x=a.x,C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
-    if(g&&m){am=C.amount||0;if(C.n)D.push(wFmt(C.n)+' گرم'+(+x.am?' <b class="calc">حساب‌شده</b>':''));if(C.fx){const B=stBuyF(x)!==1?' خرید':'';D.push('هر گرم'+B+' '+fmt(C.pg)+' (مظنه'+B+' '+fmt(Math.round(C.pg*MZK))+') <b class="own">مبلغ دستی</b>')}else D.push(stMzTx(x,stBuyF(x)))}
+    if(g&&m){am=C.amount||0;if(C.n)D.push(wFmt(C.n)+' گرم'+(+x.am?' <b class="calc">حساب‌شده</b>':'')+(x.cat==='آبشده'&&!x.pul&&C.q?' · وزن ۷۵۰ <b>'+wFmt(C.q)+'</b>':''));if(C.fx){const B=stBuyF(x)!==1?' خرید':'';D.push('هر گرم'+B+' '+fmt(C.pg)+' (مظنه'+B+' '+fmt(Math.round(C.pg*MZK))+') <b class="own">مبلغ دستی</b>')}else D.push(stMzTx(x,stBuyF(x)))}
     else if(g){if(C.n)D.push(wFmt(C.n)+' گرم');if(C.q)D.push('معادل ۷۵۰: '+wFmt(C.q));
       return `<div class="stam g ${C.n?(stDir()<0?'d':'c'):'z'}"><small>${C.n?(stDir()<0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'وزن را بزنید'}</small><b>${C.q?wFmt(C.q):'—'}<i>گرم ۷۵۰</i></b>${D.length?`<em>${D.join(' · ')}</em>`:''}</div>`}
     else{if(C.n)D.push(qFmt(C.n));if(m&&C.pg)D.push('نرخ '+fmt(C.pg)+(C.fx?' <b class="own">مبلغ دستی</b>':''));am=m?C.amount||0:0;
@@ -69,7 +74,7 @@ function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
 function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.st=0;if(a.stMax==null)a.stMax=a.st;const i=a.st,cur=S[i],T=stTag(),ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null),last=i===n-1;
   const seg=S.map((s,k)=>{const v=stFmt(s,s.get()),reach=k<=Math.max(a.stMax,i)||ed;return `<button type="button" class="stp${k===i?' on':''}${v&&k!==i?' dn':''}${reach?'':' fu'}" data-act="stGo" data-i="${k}"${reach?'':' disabled'}><small>${s.lab}${s.opt?' <i>اختیاری</i>':''}</small><b>${v||(k===i?'…':'—')}</b></button>`}).join('');
   const val=cur.get(),ph=cur.ph?cur.ph:cur.type==='wam'?'وزن (گرم) یا مبلغ (تومان)':cur.mz?(stBuyF(sv.qa.x)!==1?'مظنه خرید یا هر گرم خرید (تومان)':'مظنه یا هر گرم ۱۸ (تومان)'):cur.lab+(cur.u?' ('+cur.u+')':'')+(cur.opt?' · اختیاری':''),
-    inp=cur.type==='pick'?`<input id="stI" class="stin" type="search" placeholder="جستجوی ${cur.lab}…" autocomplete="off" enterkeyhint="search" value="${esc(a.sq||'')}">`:`<input id="stI" class="stin${cur.type==='text'?'':' ltr'}" ${cur.type==='text'?'':`inputmode="${cur.type==='dec'||cur.type==='wam'?'decimal':'numeric'}"`} value="${cur.type==='wam'?(+val>=1000?Number(val).toLocaleString('en-US'):esc(val||'')):cur.type==='num'?(+val?Number(val).toLocaleString('en-US'):''):esc(val==null?'':String(val))}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}">`;
+    inp=cur.type==='pick'?`<input id="stI" class="stin" type="search" placeholder="جستجوی ${cur.lab}…" autocomplete="off" enterkeyhint="search" value="${esc(a.sq||'')}">`:`<input id="stI" class="stin${cur.type==='text'?'':' ltr'}" ${cur.type==='text'?'':`inputmode="${cur.type==='dec'||cur.type==='wam'?'decimal':'numeric'}"`} value="${cur.type==='wam'?(+val>=1000?Number(val).toLocaleString('en-US'):esc(val||'')):cur.type==='num'?(+val?Number(val).toLocaleString('en-US'):''):cur.grp?esc(grpIn(val)):esc(val==null?'':String(val))}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}">`;
   const canFin=S.every(s=>s.need&&s.need()?false:s.wOr||s.opt||s.type==='int'||stFmt(s,s.get()));
   return `<div class="stw">${stHead(T.D,T.it,1)}<div class="stps">${seg}</div>
     <div class="fsearch sm st3">${cur.type==='pick'?ic('search'):''}${inp}${cur.type==='pick'?'':`<button type="button" class="stnx${last?' go':''}" data-act="stNext">${last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':'<span>بعدی</span>'+ic('back').replace('class="i"','class="i flip"')}</button>`}</div>
@@ -87,14 +92,14 @@ function stPick(s){const q=sv.qa.sq||'',qn=nzName(toEn(clean(q))),L0=s.opts(q),L
   return `<div class="bzsug cbl dkl">${L.map(o=>`<button type="button" class="bzsr dkrw${String(o.v)===String(v)?' on':''}" data-act="stPickV" data-v="${esc(o.v)}"><span class="av">${o.bk?bankBadge(o.bk):ic(o.ico||'check')}</span><span class="tx"><b>${esc(o.t)}</b><small class="${o.cls||''}">${esc(o.sub||'')}</small></span>${o.amt!=null?`<span class="stpv ${o.cls||''}"><b>${o.amt}</b><small>${o.lab||''}</small></span>`:''}</button>`).join('')}</div>`}
 function stRead(){const a=sv.qa,S=stSteps(),s=S[Math.min(a.st||0,S.length-1)],I=$('stI');if(!s||!I||s.type==='pick')return;const t=I.value;
   if(s.type==='wam'){const v=toEn(t).replace(/,/g,'');s.set(+v>=1000?{am:Math.round(+v)}:decIn(v));return}
-  s.set(s.type==='num'?num(t):s.type==='dec'?decIn(t):s.type==='int'?(+toEn(t).replace(/\D/g,'')||750):s.type==='dig'?toEn(t).replace(/\D/g,''):clean(t))}
+  s.set(s.type==='num'?num(t):s.type==='dec'?decIn(s.grp?toEn(t).replace(/,/g,''):t):s.type==='int'?(+toEn(t).replace(/\D/g,'')||750):s.type==='dig'?toEn(t).replace(/\D/g,''):clean(t))}
 /* مقدار پله فعلی در ردیف پله‌ها همان لحظه نوشته می‌شود */
 function stPaint(){const P=$('stPv');if(P)P.innerHTML=stLive();const a=sv.qa,S=stSteps();/* v61.57: همه پله‌ها تازه می‌شوند (مثلاً مبلغ که زده شود، پله وزن «از مبلغ: … گرم» را نشان می‌دهد) */document.querySelectorAll('#qa .stp').forEach((el,k)=>{const s=S[k],b=el.querySelector('b');if(!s||!b)return;const v=stFmt(s,s.get());b.innerHTML=v||(k===a.st?'…':'—');el.classList.toggle('dn',!!v&&k!==a.st)})
   if(S[a.st]&&S[a.st].mz){const l=document.querySelector('#qa .stp.on small');if(l)l.textContent=S[a.st].lab}}
 function stBind(){phPaint($('qa'));const I=$('stI'),a=sv.qa;if(!I)return;const S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];
   if(s.type==='pick'){I.oninput=()=>{a.sq=I.value;const P=$('stPk');if(P)P.innerHTML=stPick(s)};return}
   selOnFocus(I);I.oninput=()=>{if(s.type==='num'){const pos=I.selectionStart||0,b=toEn(I.value.slice(0,pos)).replace(/\D/g,'').length,v=num(I.value);I.value=v?v.toLocaleString('en-US'):'';let p=0,d=0;while(p<I.value.length&&d<b){if(/\d/.test(I.value[p]))d++;p++}try{I.setSelectionRange(p,p)}catch(_){}}
-    else if(s.type==='wam'){const v=toEn(I.value).replace(/,/g,'');if(+v>=1000&&/^\d+$/.test(v))I.value=(+v).toLocaleString('en-US');else I.value=decIn(I.value)}else if(s.type==='dec')I.value=decIn(I.value);else if(s.type==='int')I.value=toEn(I.value).replace(/\D/g,'').slice(0,3);else if(s.type==='dig')I.value=toEn(I.value).replace(/\D/g,'');stRead();svKeep();stPaint()};
+    else if(s.type==='wam'){const v=toEn(I.value).replace(/,/g,'');if(+v>=1000&&/^\d+$/.test(v))I.value=(+v).toLocaleString('en-US');else I.value=decIn(I.value)}else if(s.type==='dec')I.value=s.grp?grpIn(I.value):decIn(I.value);else if(s.type==='int')I.value=toEn(I.value).replace(/\D/g,'').slice(0,3);else if(s.type==='dig')I.value=toEn(I.value).replace(/\D/g,'');stRead();svKeep();stPaint()};
   I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.stNext()}}}
 function stRe(){qaRe();const I=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)];if(I&&$('ov').classList.contains('hide')&&!(c0&&c0.type==='pick'&&!c0.search))setTimeout(()=>{try{I.focus({preventScroll:true})}catch(_){I.focus()}},30);const c=document.querySelector('#qa .st3');if(c&&!RM()&&c.animate)c.animate([{opacity:.4,transform:'translateX(-12px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});const o=document.querySelector('#qa .stp.on');if(o&&o.scrollIntoView)o.scrollIntoView({block:'nearest',inline:'center'})}
 function stFinish(){const K=stKind();if(K==='it'||K==='ab')ACT.qaAdd();else if(K==='xr')ACT.xrSave();else if(K==='py')ACT.pySave()}
@@ -118,3 +123,12 @@ function stPeerNew(c){const p=sv.qa&&sv.qa.p;if(!p)return;p.cuId=c.id;p.cuName=c
 ACT.stChAdd=()=>{const n=$('pyCn'),name=clean((n&&n.value)||'');if(!name){toast('نام کارتخوان را بنویسید',true);return}const r=chNew(name,'pos');if(r){sv.qa.p.chId=r.id;sv.qa.st=1;svKeep();stRe();toast('«'+name+'» اضافه شد')}};
 ACT.stDel=()=>{const K=stKind();if(K==='it'||K==='ab')ACT.qaDel();else if(K==='xr')ACT.xrDel();else if(K==='py')ACT.pyDel()};
 ACT.stBack0=()=>{const a=sv.qa;sv.qa={...qaBlank(),d:a.d||(a.x&&a.x.fd)||(a.p&&a.p.dir)||''};svKeep();qaRe('qK')};
+/* v61.60 (خواسته صاحب اپ، فیلم اندروید): وقتی کیبورد باز است نوار مانده پایین سند (#act) پنهان می‌شود تا جا نگیرد —
+   در اندروید صفحه با کیبورد کوچک می‌شود و نوار بالای کیبورد می‌آمد. تشخیص: فیلد تایپی فوکوس دارد و ارتفاع دید ۱۴۰px+ کم شده */
+let kbBase=0;
+function kbChk(){const vv=window.visualViewport,h=Math.round(vv?vv.height:innerHeight),ae=document.activeElement,
+  ed=!!ae&&!ae.readOnly&&((ae.tagName==='INPUT'&&!/^(checkbox|radio|button|submit|file|range)$/i.test(ae.type||''))||ae.tagName==='TEXTAREA'||ae.isContentEditable);
+  if(!ed||!kbBase)kbBase=Math.max(h,ed?kbBase:0);const on=ed&&kbBase-h>140&&(cur==='sell'||cur==='inv');
+  document.documentElement.classList.toggle('kbo',on)}
+(()=>{const f=()=>setTimeout(kbChk,60);if(window.visualViewport)visualViewport.addEventListener('resize',kbChk);addEventListener('resize',kbChk);
+  addEventListener('orientationchange',()=>{kbBase=0;f()});document.addEventListener('focusin',f);document.addEventListener('focusout',f)})();

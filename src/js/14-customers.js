@@ -30,7 +30,8 @@ const bpill=(k,v)=>v?`<span class="bp ${k==='r'?'r':k==='g'?'g':'x'} ${v<0?'d':'
 /* v61.23: مانده‌ها در فهرست مشتری: ردیف جدا زیر نام، دو ستون هم‌اندازه — طلا (گرم) راست، مبلغ (تومان) چپ؛ سکه و ارز بعد از آنها */
 let cuAnim=0,cuCntId=null;/* کاشی‌های صفحه مشتری فقط بار اول ورود حرکت می‌کنند، نه در هر تازه‌سازی */
 const bindCust=()=>{if(cuCntId===custId)return;cuCntId=custId;requestAnimationFrame(()=>cuCount('.cub9.anim .cbn'))};
-const cbCell=(k,v,i)=>`<span class="cbk k${k==='r'?'r':k==='g'?'g':'x'} ${v<0?'d':v>0?'c':'z'}" style="--i:${i}"><span class="cbh"><small>${k==='r'?'مبلغ':k==='g'?'طلا':esc((XA[k]||{t:k}).t)} <i>${esc(balU(k))}</i></small>${v?`<em>${ourLab(v)}</em>`:''}</span><b${fitS(v?balV(k,v):'۰')}><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span></b></span>`;
+/* v61.60: ارز (xf) زیر مبلغ، سکه (xc) زیر طلا — CSS .c6vb با grid-auto-flow dense */
+const cbCell=(k,v,i)=>`<span class="cbk k${k==='r'?'r':k==='g'?'g':'x x'+((XA[k]||{}).k==='f'?'f':'c')} ${v<0?'d':v>0?'c':'z'}" style="--i:${i}"><span class="cbh"><small>${k==='r'?'مبلغ':k==='g'?'طلا':esc((XA[k]||{t:k}).t)} <i>${esc(balU(k))}</i></small>${v?`<em>${ourLab(v)}</em>`:''}</span><b${fitS(v?balV(k,v):'۰')}><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span></b></span>`;
 function balPills(b){const X=Object.keys(b.X||{}).filter(k=>b.X[k]);if(!b.R&&!b.G&&!X.length)return `<span class="cbz"><span class="cbzi">${ic('check')}</span><span class="cbzt"><b>حساب تسویه است</b><small>مبلغ و طلا صفر</small></span><em>تسویه</em></span>`;
   const L=[['g',b.G],['r',b.R],...X.map(k=>[k,b.X[k]])];let i=0;return L.map(([k,v])=>cbCell(k,v,i++)).join('')}
 /* v61.56 (خواسته صاحب اپ): کارت مشتری (آواتار، عنوان، نام، گروه، تلفن) در سرتیتر همه صفحه‌های مشتری، زیر عنوان صفحه
