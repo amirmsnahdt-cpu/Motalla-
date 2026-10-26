@@ -496,7 +496,7 @@ public class MainActivity extends Activity {
                     try {
                         PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
                         String jobName = (title == null || title.isEmpty()) ? "Motalla" : title;
-                        pm.print(jobName, pv.createPrintDocumentAdapter(jobName), new PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A5).build());
+                        pm.print(jobName, pv.createPrintDocumentAdapter(jobName), new PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A5.asLandscape()).build());
                     } catch (Exception e) { toast("چاپ ممکن نشد"); }
                 };
                 pv.setWebViewClient(new WebViewClient() {
