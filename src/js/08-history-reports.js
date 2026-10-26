@@ -79,17 +79,17 @@ function onWheel(w){const el=$('w'+w),n=+el.dataset.n,c=wcfg();let i=Math.max(0,
   if(w!=='d'){const dn=dim(),de=$('wd');if(+de.dataset.n!==dn){if(dp.d>dn)dp.d=dn;fillWheel('d',dayItems(),dp.d-1)}}updDp()}
 /* ============ PDF مدرن و مینیمال ============ */
 const PDF_FONT='<style>@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format(\'woff2\')}</style>';
-function pdfCSS(){return `@page{size:A4;margin:14mm 12mm 12mm}
+function pdfCSS(){return `@page{size:A5 landscape;margin:8mm 9mm}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{box-sizing:border-box}
 body{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;color:#16213a;font-size:9.4pt;line-height:1.6;margin:0;background:#fff;font-feature-settings:"tnum";-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.pg{page-break-after:always;max-width:186mm;margin:0 auto;padding:6mm 0}.pg:last-child{page-break-after:auto}
+.pg{page-break-after:always;max-width:192mm;margin:0 auto;padding:1mm 0}thead{display:table-header-group}tfoot{display:table-row-group}h1,h2,.top,.sub,.bar{break-after:avoid;page-break-after:avoid}.kp,.sign,.foot{break-inside:avoid;page-break-inside:avoid}.pg:last-child{page-break-after:auto}
 .pg{position:relative}.pg:before{content:"";position:absolute;left:50%;top:50%;width:70%;aspect-ratio:477/202;transform:translate(-50%,-50%) rotate(-8deg);background:url(logo-stamp.png) center/contain no-repeat;opacity:.04;pointer-events:none}.pg>*{position:relative}
 .top{display:flex;justify-content:space-between;align-items:center;gap:14px;background:linear-gradient(135deg,#0f1f3f,#13284f 60%,#1a3366);color:#fff;border-radius:16px 16px 5px 5px;padding:10px 16px 13px;position:relative;overflow:hidden}.top:after{content:"";position:absolute;inset:auto 0 0 0;height:3px;background:linear-gradient(90deg,#b8862b,#f3d892,#b8862b,#f3d892,#b8862b)}
 .brand{display:flex;align-items:center;gap:12px}.lg{flex:none;width:36mm;aspect-ratio:477/202;background:url(logo-stamp.png) center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
 .brand b{display:block;font-size:12pt;font-weight:800;line-height:1.25}.brand small{display:block;font-size:7.4pt;color:#ecd9a6;font-weight:500}.brand>span:last-child{border-inline-start:1px solid rgba(236,200,116,.35);padding-inline-start:12px}
 .doc{font-size:7.6pt;color:#ecd9a6;text-align:left;line-height:1.6;border:1px solid rgba(236,200,116,.55);border-radius:10px;padding:4px 10px}.doc b{display:block;color:#f3d892;font-size:9.5pt;font-weight:800}
-h1{font-size:20pt;font-weight:800;margin:18px 0 0;letter-spacing:-.4px;line-height:1.35}
+h1{font-size:16pt;font-weight:800;margin:10px 0 0;letter-spacing:-.4px;line-height:1.35}
 .sub{color:#6b7385;font-size:9pt;margin-top:2px}.sub{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}.sub .pdl{font-size:7.5pt!important;font-weight:700;color:#7a5a12;background:#f6ecd2;border-radius:6px;padding:1px 7px}.sub .pdv{font-size:9.5pt!important;font-weight:800;color:#13284f;direction:rtl;unicode-bidi:isolate}.sub .pde{direction:ltr;unicode-bidi:isolate}.sub .pde{font-size:8.5pt!important;color:#8a90a0}.sub .rg{font-size:8pt!important;color:#8a90a0;border-inline-start:1px solid #dfe3ea;padding-inline-start:8px}.sub span{direction:ltr;display:inline-block}
 .bar{height:3px;width:46px;background:linear-gradient(90deg,#ecc874,#b8862b);border-radius:3px;margin:10px 0 14px}
 .kp{display:flex;border:1px solid #e7e9ef;border-radius:14px;margin-bottom:18px;overflow:hidden}
@@ -109,7 +109,7 @@ tr.tot td{border-bottom:0;border-top:1.5px solid #13284f;font-weight:800;padding
 .st{display:inline-block;font-size:7.3pt;font-weight:700;padding:1px 9px;border-radius:20px;white-space:nowrap}
 .st.ok{background:#e9f6ef;color:#15803d}.st.fail{background:#fcecee;color:#c2414b}.st.pending{background:#fbf4e1;color:#946200}.st.none{background:#eef1f6;color:#5b6577}.sty{display:inline-block;margin-top:3px;font-size:9.5px;font-weight:700;color:#2a4fb8;background:#eaf0ff;border-radius:6px;padding:1px 6px}
 .tn{direction:ltr;display:inline-block;font-size:8pt;color:#2a3550;font-weight:600}
-.sign{display:flex;gap:46px;margin-top:40px}.sign div{flex:1;border-top:1px solid #d5d9e1;padding-top:7px;font-size:8pt;color:#6b7385;text-align:center}
+.sign{display:flex;gap:46px;margin-top:26px}.sign div{flex:1;border-top:1px solid #d5d9e1;padding-top:7px;font-size:8pt;color:#6b7385;text-align:center}
 .foot{margin-top:20px;padding-top:8px;border-top:1px solid #eef0f4;display:flex;justify-content:space-between;font-size:7.2pt;color:#a0a6b2}
 .rc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.rc figure{margin:0;border:1px solid #eef0f4;border-radius:12px;padding:7px;page-break-inside:avoid}
 .rc img{width:100%;height:200px;object-fit:contain;background:#f7f8fa;border-radius:8px;display:block}.rc figcaption{font-size:8pt;margin-top:5px;line-height:1.5}.rc figcaption b{display:block}
