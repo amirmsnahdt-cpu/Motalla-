@@ -1824,3 +1824,8 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .ckn .tx b{color:var(--blu)}.ckna{background:var(--blu2)!important;color:var(--blu)!important}.ckna svg{width:18px;height:18px}
 .ckti:nth-child(6){animation-delay:.2s}
 #bzStl .bzstl{margin-top:14px}
+/* v61.76: خروجی صورتحساب کنار «گردش حساب» */
+.spsec.stmh{display:flex;align-items:flex-end;gap:10px}.spsec.stmh>div{flex:1;min-width:0;display:flex;flex-direction:column}
+.stmx{flex:none;display:flex;gap:6px}
+.stmx button{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 11px;border:0;border-radius:11px;background:var(--card);box-shadow:0 0 0 1px var(--line);color:var(--blu);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
+.stmx button svg{width:16px;height:16px}

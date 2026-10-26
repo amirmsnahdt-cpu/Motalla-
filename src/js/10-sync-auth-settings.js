@@ -16,7 +16,7 @@ const PERM_OF={entCommit:'track',mvNew:'src',entMove:'split',partMoveAll:'split'
   itSave:'track',itFail:'track',tkSet:'track',tkAll:'track',tkRequeue:'track',closeBatch:'close',reopenDay:'close',undoCommit:'unsend',partUnsend:'unsend',
   credNew:'debt',credSave:'debt',credEdit:'debt',payNew:'debt',paySave:'debt',payEdit:'debt',payOk:'debt',wzSave:'debt',toDebt:'debt',
   srcMgr:'src',srcSet:'src',saveSrc:'src',addSrc:'src',delSrc:'src',delSrcGo:'src',undoEv:'undo',restoreOne:'undo',restoreAll:'undo',
-  expAll:'export',expOpen:'export',expPdf:'export',expText:'export',expXls:'export',dayExp:'export',dayPdf:'export',ldExp:'export',ldText:'export',ldPdf:'export',ldXls:'export',dayText:'export',dayXls:'export',partsExp:'export',partExp:'export',lexp:'export',tkReport:'export',credPdf:'export',credStmt:'export',
+  expAll:'export',expOpen:'export',expPdf:'export',expText:'export',expXls:'export',dayExp:'export',dayPdf:'export',ldExp:'export',ldText:'export',ldPdf:'export',ldXls:'export',dayText:'export',dayXls:'export',partsExp:'export',partExp:'export',lexp:'export',tkReport:'export',credPdf:'export',credStmt:'export',stmtPdf:'export',stmtXls:'export',
   bkShare:'admin',chgOpen:'admin',chgSeen:'admin',bkUpPick:'admin',bkUpGo:'admin',bkDl:'admin',bkFull:'admin',bkRestore:'admin',userNew:'admin',userEdit:'admin',userCreate:'admin',userSave:'admin',userDel:'admin',backup:'admin'};
 const permFor=(k,d)=>{const v=PERM_OF[k];return typeof v==='function'?v(d):v||null};
 const canAct=(k,d)=>{const p=permFor(k,d);return !p||(p==='admin'?isAdmin():can(p))};

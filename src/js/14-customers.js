@@ -95,7 +95,7 @@ function vCust(){xaSync();const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust'
   ${can('debt')?`${svDraftHTML(c)}
   `:''}
   ${shBanner(c.id)}
-  <div class="spsec"><b>گردش حساب</b><small>${T.length?fmt(T.length)+' ردیف · برای جزئیات بزنید':'هنوز سندی ثبت نشده'}</small></div>`;
+  <div class="spsec stmh"><div><b>گردش حساب</b><small>${T.length?fmt(T.length)+' ردیف · برای جزئیات بزنید':'هنوز سندی ثبت نشده'}</small></div>${T.length?`<span class="stmx"><button type="button" data-act="stmtPdf" aria-label="صورتحساب PDF">${ic('paste')}<span>PDF</span></button><button type="button" data-act="stmtXls" aria-label="صورتحساب Excel">${ic('list')}<span>Excel</span></button></span>`:''}</div>`;
   /* v61.47 (خواسته صاحب اپ): گردش حساب — هر ردیف کارت گرد با اثرش به تفکیک (تومان، طلا، سکه) و زیرش مانده حساب بعد از همان ردیف؛
      رنگ‌ها: قرمز طلبکاریم، آبی بدهکاریم؛ کارت‌ها پله‌ای بالا می‌آیند */
   /* v61.55 (خواسته صاحب اپ): گردش حساب = مدل v61.46 — هر ردیف یک کارت ساده (نوع، شرح، اثر)، بدون کادر «مانده بعد از این ردیف» */
