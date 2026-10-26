@@ -104,3 +104,19 @@ function depImgSync(z,K){if(!z||!z.byInv)return;const c=custs.find(q=>String(q.i
   if(typeof sv!=='undefined'&&sv&&sv.edit&&String(sv.edit.tx)===String(t.id))(sv.pays||[]).forEach(p=>{if(p.m==='dep'&&p.stlId===z.id){p.imgs=K.slice();p.img=K[0]||''}})}
 /* مانده قابل حواله یک واریزی: مانده بانکی + تسویه‌هایی که خود همین سند (در ویرایش) قبلاً روی آن گذاشته (وگرنه ویرایش سند رد می‌شد) */
 const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&String(z.byInv.tx)===String(sv.edit.tx)).reduce((a,z)=>a+(+z.amount||0),0):0;return (x.full&&!own?0:(+x.amount||0))+own};
+
+/* ============ v61.77 (خواسته صاحب اپ): از همان پنل حواله، اطلاعات حساب فروشنده واریزی با «مبلغ همین حواله» کپی یا فرستاده شود ============
+   (نه مانده واریزی) تا مشتری پرداخت‌کننده واریز کند؛ و دکمه رفتن به خود واریزی. در جزئیات ردیف سند، سند ثبت‌شده و فرم تسویه. */
+function depTxt(e,amt,payer){const bk=e.bankShow||e.bank||ibanBank(e.iban)||'';
+  return 'مطلا | اطلاعات واریز'+'\nواریز به: '+Bo(fullName(e))+(e.holder&&e.holder!==e.name?'\nصاحب حساب: '+e.holder:'')+(bk?'\nبانک: '+bk:'')+(e.iban?'\nشبا: '+Mo(ibanSp(e.iban)):'')+(e.card?'\nکارت: '+Mo(e.card):'')+'\nمبلغ: '+Bo(N(amt)+' تومان')+(payer?'\nپرداخت‌کننده: '+payer:'')}
+const depBar=(entId,src,i,cu)=>{const a=` data-e="${esc(entId)}" data-s="${src}"${i!=null?` data-i="${esc(i)}"`:''}${cu!=null?` data-cu="${esc(cu)}"`:''}`;
+  return `<span class="depb"><span class="depbb" role="button" data-act="depCp"${a}>${ic('copy')}<span>کپی اطلاعات واریز</span></span><span class="depbb" role="button" data-act="depSh"${a}>${ic('share')}<span>ارسال</span></span><span class="depbb g" role="button" data-act="depGo" data-e="${esc(entId)}">${ic('open')}<span>واریزی</span></span></span>`};
+const depActs=(p,k,c)=>depEnt(p)?depBar(p.entId,'p',k,c?c.id:null):'';
+/* مبلغ: فرم تسویه = مبلغ نوشته‌شده؛ ردیف سند = مبلغ همان ردیف؛ سند ثبت‌شده = مبلغ همان ردیف */
+function depAmt(d){if(d.s==='ck'){ckRead();return +CK.amount||0}const k=String(d.i||'');if(k[0]==='s'){const p=sv&&sv.pays[+k.slice(1)];return p?pAmt(p):0}
+  const m=k.match(/^v(.+)\.(\d+)$/);if(m){const c=custs.find(z=>String(z.id)===String(d.cu)),t=c&&(c.txs||[]).find(x=>String(x.id)===m[1]),p=t&&(t.pays||[])[+m[2]];return p?pAmt(p):0}return 0}
+function depMsg(d){const e=entries.find(z=>String(z.id)===String(d.e));if(!e){toast('واریزی پیدا نشد',true);return ''}const a=depAmt(d);if(!a){toast('اول مبلغ را بنویسید',true);return ''}
+  const c=d.cu!=null&&d.cu!==''?custs.find(z=>String(z.id)===String(d.cu)):(typeof svCu==='function'&&sv?svCu():null);return depTxt(e,a,c?cuName(c):'')}
+ACT.depCp=d=>{const t=depMsg(d);if(t)cpOut(t,'اطلاعات واریز با مبلغ '+fmt(depAmt(d))+' تومان کپی شد')};
+ACT.depSh=d=>{const t=depMsg(d);if(!t)return;if(window.AndroidBridge&&AndroidBridge.share){AndroidBridge.share(t);return}if(navigator.share)navigator.share({text:t}).catch(()=>{});else cpOut(t,'اطلاعات واریز کپی شد')};
+ACT.depGo=d=>{closeSheet();ACT.openEnt({id:isNaN(+d.e)?d.e:+d.e})};

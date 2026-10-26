@@ -395,7 +395,7 @@ const d6Ico=(k,ico)=>DKI[k]||ico;
 function d6Row(o){const P=o.phs||(o.ph?[o.ph]:[]),tile=P.length?`<span class="d6ti ph" data-act="rowPhS" data-ks="${esc(P.join(','))}" data-n="${esc(String(o.b).replace(/<[^>]*>/g,''))}" role="button" aria-label="دیدن عکس"><img data-ik="${esc(P[0])}" alt="">${P.length>1?`<em>${toFa(P.length)}</em>`:''}</span>`:`<span class="d6ti">${ic(o.ico)}</span>`,dir=d6Dir(o.v);
   const nm=o.tag?String(o.b).replace(/^(فروش|خرید|دریافت|پرداخت)\s+/,''):o.b,hasX=!!o.sub,key=o.key||'',op=hasX&&key&&D6OP.has(key);
   const head=`<span class="d8h">${tile}<span class="d6t">${o.tag||''}<b>${nm}</b></span>${o.v?`<span class="d6v">${o.v}</span>`:''}${hasX?`<i class="d8ch" aria-hidden="true">${ic('back')}</i>`:''}</span>`;
-  const det=hasX?`<span class="d8x"><span class="d8xi"><span class="d8s">${d6Spec(o.sub)}</span>${o.act?`<span class="d8eb" role="button" data-act="${o.act}" data-i="${o.i}">${ic('edit')}<span>ویرایش</span><small>یا دو بار بزنید</small></span>`:''}</span></span>`:'';
+  const det=hasX?`<span class="d8x"><span class="d8xi"><span class="d8s">${d6Spec(o.sub)}</span>${o.ex||''}${o.act?`<span class="d8eb" role="button" data-act="${o.act}" data-i="${o.i}">${ic('edit')}<span>ویرایش</span><small>یا دو بار بزنید</small></span>`:''}</span></span>`:'';
   const tap=hasX?` data-act="d6Tap" data-a="${o.act||''}" data-i="${o.i}" data-key="${esc(key)}" aria-expanded="${op?'true':'false'}"`:o.act?` data-act="${o.act}" data-i="${o.i}"`:'';
   return `<div class="d6r d8 ${dir}${hasX?' d8z':''}${op?' op':''}${o.nw?' new':''}"${o.n!=null?` style="--i:${o.n}"`:''}>${tap?`<button class="d6rb"${tap}>${head}${det}</button>`:`<div class="d6rb">${head}</div>`}</div>`}
 /* v61.65 (خواسته صاحب اپ): هر مقدار در جزئیات با واحدش (گرم، تومان، عدد، دلار…)؛ عیار آبشده شرطی «۷۵۰ شرطی» و بعد از ثبت عیار
@@ -406,12 +406,12 @@ const itSub=it=>it.ab?[wFmt(it.w)+' گرم',shAyL(it)||'عیار: '+toFa(it.ay||
   :[it.pz&&+it.cnt?qFmt(it.cnt)+' عدد':'',wFmt(it.w)+' گرم',(+it.ay||750)!==750?'عیار: '+toFa(it.ay):'',(()=>{const J=ajPT(it);return J.P||J.T?'اجرت: '+ajLab(it):''})(),'سود '+toFa(+it.pp||0)+'٪'].filter(Boolean).join(' · ');
 function svRowsHTML(){const R=[],eff=d6Eff;
   /* v61.6: بدون ضربدر؛ کشیدن به چپ = حذف، به راست = ویرایش */
-  const row=(k,i,act,ico,tag,b,sub,v,phs)=>swW(d6Row({act,i,ico,phs,tag,b,sub,v,key:'s'+k+i,nw:k==='it'&&i===svAdd}),{r:[[act,'ویرایش','edit','#3b6fd6']],l:[['svRowDel','حذف','trash','#d23c48']],data:{k,i}});
+  const row=(k,i,act,ico,tag,b,sub,v,phs,ex)=>swW(d6Row({act,i,ico,phs,tag,b,sub,v,ex,key:'s'+k+i,nw:k==='it'&&i===svAdd}),{r:[[act,'ویرایش','edit','#3b6fd6']],l:[['svRowDel','حذف','trash','#d23c48']],data:{k,i}});
   const PG=pvGroups(sv.pays,sv.xr||[]);
   sv.items.forEach((it,i)=>{const c=itCalc(it,sv.rate,sv.tax);R.push(row('it',i,'svItEdit',d6Ico('sell'),dkTag('sell'),esc(it.k)+(it.sh===1?' شرطی':'')+(it.n?' <i>'+esc(it.n)+'</i>':''),itSub(it)+(c.fx?' · مبلغ دستی':''),sv.rate?eff(-c.tot):'<small class="d6nr">نرخ را بزنید</small>',xrPh(it)))});
   (sv.xr||[]).forEach((x,i)=>{if(PG.sx.has(i))return;const C=xrCalc(x,sv.rate),R0=x.t==='sell'?-C.amount:x.t==='buy'?C.amount:0,k=dkOfX(x);R.push(row('xr',i,'svXrEdit',d6Ico(k,'coin'),dkTag(k),esc(xrLab(x)),esc(xrSub(x,C)),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a),xrPh(x)))});
   if(+sv.disc)R.push(row('dc',0,'svDisc','tag','','تخفیف','از جمع سند کم می‌شود',eff(+sv.disc)));
-  sv.pays.forEach((p,i)=>{if(PG.sp.has(i))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row('py',i,'svPayEdit',M.i,dkTag(out?'out':'in'),esc(pyLab(p)),p.m==='dep'?depSub(p,sv.edit&&sv.edit.tx):(p.m==='off'?'صفر کردن مانده':'')+(p.tn?' · پیگیری '+esc(p.tn):''),eff(pAmt(p)),xrPh(p)))});
+  sv.pays.forEach((p,i)=>{if(PG.sp.has(i))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row('py',i,'svPayEdit',M.i,dkTag(out?'out':'in'),esc(pyLab(p)),p.m==='dep'?depSub(p,sv.edit&&sv.edit.tx):(p.m==='off'?'صفر کردن مانده':'')+(p.tn?' · پیگیری '+esc(p.tn):''),eff(pAmt(p)),xrPh(p),p.m==='dep'?depActs(p,'s'+i):''))});
   PG.L.forEach(G=>R.push(row('pv',G.id,'svPvEdit','clock',dkTag(G.dir),'مانده قبلی',pvSub(G,sv.pays,sv.xr||[]),pvEffs(G,sv.pays,sv.xr||[],x=>xrCalc(x,sv.rate).e))));
   if(!R.length)return '';
   const nI=sv.items.length;
@@ -598,11 +598,11 @@ function popMenu(btn,items){let m=$('pmenu');if(m){m.remove();return}if(!btn)ret
 function ivMeta(t){const D=dates(t.date);return `<div class="iv8m"><span>${ic('cal')}<b>${esc(D.fa)}</b><small>${esc(D.wd)}</small></span>${t.rate?`<span>${ic('tag')}<small>${t.mz?'مظنه':'هر گرم'}</small><b>${fmt(t.mz||t.rate)}</b></span>`:''}${t.tax?`<span><small>با مالیات</small></span>`:''}</div>`}
 /* v61.6: باز کردن سند = جزئیات سند و ردیف‌ها (مثل صفحه سند)؛ فاکتور کاغذی فقط با «نمایش فاکتور» */
 function ivDet(c,t){const D=dates(t.date),eff=d6Eff,R=[];
-  let n=0;const row=(ico,tag,b,sub,v,phs)=>d6Row({ico,phs,tag:dkTag(tag),b,sub,v,key:'v'+t.id+'.'+n,n:n++}),PG=pvGroups(t.pays||[],t.xr||[]);
+  let n=0;const row=(ico,tag,b,sub,v,phs,ex)=>d6Row({ico,phs,tag:dkTag(tag),b,sub,v,ex,key:'v'+t.id+'.'+n,n:n++}),PG=pvGroups(t.pays||[],t.xr||[]);
   (t.items||[]).forEach(it=>R.push(row(d6Ico('sell'),'sell',esc(it.k)+(it.sh===1?' شرطی':'')+(it.n?' <i>'+esc(it.n)+'</i>':''),itSub(it)+(+it.amT?' · مبلغ دستی':''),eff(-(+it.tot||0)),xrPh(it))));
   (t.xr||[]).forEach((x,xi)=>{if(PG.sx.has(xi))return;const C={n:x.n!=null?x.n:(x.a==='gold'?x.w:x.q),pg:x.pg,amount:+x.amount||0,e:+x.e||0},R0=x.t==='sell'?-C.amount:x.t==='buy'?C.amount:0,k=dkOfX(x);R.push(row(d6Ico(k,'coin'),k,esc(xrLab(x)),esc(xrSub(x,C)),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a),xrPh(x)))});
   if(+t.disc)R.push(row('tag','','تخفیف','از جمع سند کم شد',eff(+t.disc)));
-  (t.pays||[]).forEach((p,pi)=>{if(PG.sp.has(pi))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row(M.i,out?'out':'in',esc(pyLab(p)),p.m==='dep'?depSub(p,t.id):(p.m==='off'?'صفر کردن مانده':'')+(p.tn?' · پیگیری '+esc(p.tn):''),eff(pAmt(p)),xrPh(p)))});
+  (t.pays||[]).forEach((p,pi)=>{if(PG.sp.has(pi))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row(M.i,out?'out':'in',esc(pyLab(p)),p.m==='dep'?depSub(p,t.id):(p.m==='off'?'صفر کردن مانده':'')+(p.tn?' · پیگیری '+esc(p.tn):''),eff(pAmt(p)),xrPh(p),p.m==='dep'?depActs(p,'v'+t.id+'.'+pi,c):''))});
   PG.L.forEach(G=>R.push(row('clock',G.dir,'مانده قبلی',pvSub(G,t.pays||[],t.xr||[]),pvEffs(G,t.pays||[],t.xr||[],x=>+x.e||0))));
   const E=txD(t),ef=[E.r?eff(E.r):'',E.g?eff(E.g,'g'):'',...Object.keys(E.x||{}).filter(k=>+E.x[k]).map(k=>eff(E.x[k],k))].filter(Boolean);
   return `<div class="ivd6${ivCntId!==String(t.id)?' anim':''}">

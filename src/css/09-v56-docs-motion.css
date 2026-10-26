@@ -1829,3 +1829,8 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .stmx{flex:none;display:flex;gap:6px}
 .stmx button{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 11px;border:0;border-radius:11px;background:var(--card);box-shadow:0 0 0 1px var(--line);color:var(--blu);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
 .stmx button svg{width:16px;height:16px}
+/* v61.77: کپی / ارسال اطلاعات واریز حواله */
+.depb{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.depbb{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 11px;border-radius:10px;background:color-mix(in srgb,var(--blu) 10%,var(--card));color:var(--blu);font-size:12.5px;font-weight:800;cursor:pointer}
+.depbb svg{width:15px;height:15px}.depbb.g{background:var(--seg);color:var(--ink)}
+.stsel+.depb{margin:8px 0 2px}
