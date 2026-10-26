@@ -1834,3 +1834,10 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .depbb{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 11px;border-radius:10px;background:color-mix(in srgb,var(--blu) 10%,var(--card));color:var(--blu);font-size:12.5px;font-weight:800;cursor:pointer}
 .depbb svg{width:15px;height:15px}.depbb.g{background:var(--seg);color:var(--ink)}
 .stsel+.depb{margin:8px 0 2px}
+.depbb{transition:background .25s,color .25s,box-shadow .25s}
+.depbb.ok{background:var(--ok);color:#fff;box-shadow:0 6px 16px -8px var(--ok);animation:depPop .42s cubic-bezier(.2,.9,.25,1.4)}
+.depbb.bad{background:color-mix(in srgb,var(--red) 14%,var(--card));color:var(--red);animation:depShk .36s ease}
+@keyframes depPop{0%{transform:scale(.9)}55%{transform:scale(1.07)}100%{transform:none}}
+@keyframes depShk{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.depbb.ok svg{animation:depChk .4s ease both}@keyframes depChk{from{opacity:0;transform:scale(.4) rotate(-20deg)}}
+@media (prefers-reduced-motion:reduce){.depbb.ok,.depbb.bad,.depbb.ok svg{animation:none}}
