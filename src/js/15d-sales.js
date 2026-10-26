@@ -612,14 +612,19 @@ function ivDet(c,t){const D=dates(t.date),eff=d6Eff,R=[];
 /* v61.60 (خواسته صاحب اپ): ارز (دلار…) درست زیر مبلغ؛ بعد طلا و سکه‌ها */
 /* v61.61 (خواسته صاحب اپ): مانده‌های اصلی مبلغ و طلا بالا؛ دلار و سکه پایین‌تر و جمع‌شده (دکمه گوشه جدول) */
 const balRk=k=>k==='r'?0:k==='g'?1:(XA[k]||{}).k==='f'?2:3;
+/* نام و واحد هر جنس در مانده‌ها: مبلغ · تومان، طلا · گرم، ارز · دلار، سکه امامی · عدد (نه «دلار دلار») */
+const balKL=(k,two)=>{const X=XA[k]||{},n=k==='r'?'مبلغ':k==='g'?'طلا':X.k==='f'?'ارز':esc(X.t||k),u=k==='r'?'تومان':k==='g'?'گرم':X.k==='f'?esc(X.t||k):esc(X.u||'عدد');return two?`<b>${n}</b><small>${u}</small>`:`${n} <i>${u}</i>`};
 function balGrid(rows,cols,o){o=o||{};rows=rows.map((r,i)=>[r,i]).sort((a,b)=>balRk(a[0][0])-balRk(b[0][0])||a[1]-b[1]).map(z=>z[0]);let n=0;const N=cols.length;
   const cell=(k,v,c)=>{const x=v?balV(k,v):'۰',T=o.act&&c.w?'button':'span';return `<${T} class="iv8c ${q8S(v)}${c.m?' m':''}" style="--i:${n++}"${T==='button'?` type="button" data-act="${o.act}" data-w="${c.w}" data-k="${k}" aria-label="${esc(c.lab)}: ${esc(x)} ${esc(balU(k))}"`:''}><span class="fz"><b${fitS(x)}>${x}</b></span><small>${v?ourLab(v):'تسویه'}</small></${T}>`};
-  const rw=([k,...V])=>`<div class="iv8r k${q8C(k)}"><span class="iv8k"><b>${q8K(k)}</b><small>${esc(balU(k))}</small></span>${cols.map((c,j)=>cell(k,V[j]||0,c)).join('')}</div>`,
+  const rw=([k,...V])=>`<div class="iv8r k${q8C(k)}"><span class="iv8k">${balKL(k,1)}</span>${cols.map((c,j)=>cell(k,V[j]||0,c)).join('')}</div>`,
     M=rows,full=`<div class="iv8h">${cols.map(c=>`<span>${esc(c.lab)}</span>`).join('')}</div>${M.map(rw).join('')}`,hint=`<div class="iv9hint">${ic('hold')}${o.hint||'برای جزئیات فاکتور نگه دارید'}</div>`;
   if(N<2)return `<div class="iv8b iv9b n${N}${o.an?' anim':''}" role="group" aria-label="مانده‌ها">${full}${hint}</div>`;
   /* v61.65 (خواسته صاحب اپ): اول فقط مانده‌های نهایی (مبلغ، طلا، دلار…) جمع‌وجور؛ دکمه فلش بالای کارت (یا زدن روی مانده‌ها) =
      جدول کامل قبلی · این سند · نهایی با حرکت بالا می‌آید؛ دوباره زدن = جمع می‌شود. حالت باز/بسته در BGO می‌ماند */
-  const mi=Math.max(0,cols.findIndex(c=>c.m)),mini=M.map(([k,...V])=>{const v=V[mi]||0,x=v?balV(k,v):'۰';return `<span class="bgmc ${q8S(v)}"><small>${q8K(k)} <i>${esc(balU(k))}</i></small><span class="fz"><b${fitS(x)}>${x}</b></span><em>${v?ourLab(v):'تسویه'}</em></span>`}).join('');
+  /* v61.66 (خواسته صاحب اپ): ترتیب از چپ: مبلغ، طلا (کنار مبلغ)، بعد ارز و سکه به سمت راست؛ همه قاب‌ها هم‌اندازه و عددها با یک اندازه
+     (اندازه بلندترین عدد)؛ برچسب «ارز · دلار»، «سکه امامی · عدد» */
+  const mi=Math.max(0,cols.findIndex(c=>c.m)),MV=M.map(([k,...V])=>[k,V[mi]||0]).reverse(),fw=Math.min(...MV.map(([k,v])=>fitW(v?balV(k,v):'۰'))),
+    mini=MV.map(([k,v])=>{const x=v?balV(k,v):'۰';return `<span class="bgmc ${q8S(v)}"><small>${balKL(k)}</small><span class="fz"><b style="--fw:${fw}">${x}</b></span><em>${v?ourLab(v):'تسویه'}</em></span>`}).join('');
   return `<div class="iv8b iv9b bgc n${N}${o.an?' anim':''}${BGO?' op':''}" role="group" aria-label="مانده‌ها"><button type="button" class="bgup" data-act="bgO" aria-expanded="${BGO?'true':'false'}" aria-label="${BGO?'بستن جزئیات مانده‌ها':'مانده‌های قبلی، این سند و نهایی'}">${ic('chev')}</button>
   <div class="bgx"><div class="bgxi">${full}</div></div><div class="bgmw"><div class="bgm" data-act="bgO" role="button" aria-label="مانده‌های نهایی؛ برای جزئیات بزنید"><span class="bgmt">مانده نهایی</span><span class="bgml">${mini}</span></div></div>${hint}</div>`}
 let BGO=false;
