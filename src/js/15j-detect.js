@@ -30,6 +30,8 @@ function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls)=>R.push({id,t,ico,sub
   fx('g:ab','آبشده','coin',d==='sell'?'وزن، عیار، انگ، سود':'وزن و عیار','gd');fx('g:misc','متفرقه','coin',d==='sell'?'طلای دست‌دوم با اجرت و سود':'طلای دست‌دوم','gd');
   if(d==='sell'||d==='buy')fx('g:pz','سکه پارسیان','coin',d==='sell'?'تعداد، وزن، اجرت و سود':'تعداد، وزن و مظنه خرید','gd');
   if(d==='sell'||d==='buy')fx('g:pul','پولی','swap',d==='sell'?'طلا تحویل نمی‌شود · فروش فردایی':'طلا تحویل گرفته نمی‌شود','gd');
+  /* v61.62 (خواسته صاحب اپ): قلک — دقیقاً مثل پولی (طلا تحویل نمی‌شود، مبلغ و مانده طلا در حساب)، فقط با عنوان قلک */
+  if(d==='sell'||d==='buy')fx('g:qlk','قلک','coin',d==='sell'?'فروش قلک · طلا تحویل نمی‌شود':'خرید قلک · طلا تحویل گرفته نمی‌شود','gd');
   /* v61.60 (خواسته صاحب اپ): پولی کردن سکه و ارز — جنس تحویل نمی‌شود؛ نرخ می‌گیرد، مبلغ و مانده همان جنس در حساب می‌ماند */
   if(d==='sell'||d==='buy'){fx('p:c','پولی سکه','swap',d==='sell'?'سکه تحویل نمی‌شود · مبلغ و مانده سکه':'سکه تحویل گرفته نمی‌شود · مبلغ و مانده سکه','gd');fx('p:f','پولی ارز','usd',d==='sell'?'ارز تحویل نمی‌شود · مبلغ و مانده ارز':'ارز تحویل گرفته نمی‌شود · مبلغ و مانده ارز')}
   /* v61.60: مانده قبلی (افتتاح حساب) — تومان یا طلا؛ فروش/پرداخت = طلبکاریم، خرید/دریافت = بدهکاریم */
@@ -92,6 +94,7 @@ ACT.dkF=d=>{qaRead();const a=sv.qa,D=a.d,[ty,v]=String(d.id).split(':');a.q='';a
     if(v==='pz'){if(D==='sell'){ACT.qaK({k:'سکه پارسیان'});Object.assign(sv.qa,{pz:1,cnt:'',ajP:'',ajT:''});svKeep();qaRe();return}
       if(!dkRateOk())return;xrStart(xrNew(D,'gold',{cat:'پارسیان',pz:1,cnt:'',ay:D==='buy'?735:750,fl:'gold',fd:D}))/* v61.60: خرید پارسیان عیار ۷۳۵، مظنه خرید */;return}
     if(v==='pul'){if(!dkRateOk())return;xrStart(xrNew(D,'gold',{pul:true,ay:750,fl:'gold',fd:D,cat:''}));return}
+    if(v==='qlk'){if(!dkRateOk())return;xrStart(xrNew(D,'gold',{pul:true,ay:750,fl:'gold',fd:D,cat:'قلک'}));return}
     if(D==='buy'&&!dkRateOk())return;xrStart(xrNew(D,'gold',{cat:v==='ab'?'آبشده':'متفرقه',ay:v==='ab'?750:(D==='buy'?735:750),fl:'gold',fd:D}));return}};
 const dkRateOk=()=>{if(sv.rate)return true;toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);const m=$('svM');if(m)m.focus();return false};
 ACT.dkD=d=>{qaRead();const a=sv.qa,k=d.d||'';a.d=k;a.s='';a.q='';a.pk='';
