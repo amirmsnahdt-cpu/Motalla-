@@ -43,7 +43,7 @@ function stmtPdfHTML(c,F){const S=stmtData(c,F),D=dates(),b=S.bal,XK=S.XK,ks=['r
   <div class="sign"><div>امضای مشتری</div><div>مهر و امضای مطلا</div></div>${pdfFoot()}</section>`;
   /* v61.79 (خواسته صاحب اپ): صورتحساب‌ها A4 عمودی */
   return pdfDoc(stmtFile(c,S.F),html).replace(/@page\{size:A5 landscape;[^}]*\}/,'@page{size:A4;margin:10mm 10mm}').replace('</head>','<style>.pg{max-width:190mm}.per{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}.per span{background:#fbf6e8;border:1px solid #ecd9a6;color:#7a5a17;border-radius:8px;padding:2px 9px;font-size:8pt;font-weight:700}.stm tr.op td{background:#f6f7fa;font-weight:700}.stm td.emp{text-align:center;color:#8a90a0;padding:14px}.stm th,.stm td{font-size:8pt;padding:5px 4px}.stm td.am b,.stm td.am span{white-space:nowrap}.stm .rd{color:#c2414b}.stm .bl{color:#1d4ed8}.stm .z{color:#a0a6b2}.stm td.am em{display:block;font-style:normal;font-size:6.4pt;color:#8a90a0}.kp .rd b{color:#c2414b}.kp .ok b{color:#1d4ed8}.kp b em{font-size:7pt}.stm tr.stlr{break-inside:auto;page-break-inside:auto}.stm .stbr{break-inside:avoid}</style></head>')}
-ACT.stmtPdf=()=>stmOpen('pdf');
+ACT.stmtPdf=()=>{const c=curCu();if(!c)return;const F=stmF(c);if(!stmtData(c,F).rows.length&&!F.f){toast('ردیفی برای این جستجو نیست',true);return}openPrint(()=>stmtPdfHTML(c,F))};
 /* ---------- Excel ---------- */
 function stmtXlsx(c,F){const S=stmtData(c,F),wb=XLSX.utils.book_new(),XK=S.XK,ks=['r','g',...XK],nm=k=>k==='r'?'تومان':k==='g'?'طلا (گرم)':((XA[k]||{t:k}).t);wb.Workbook={Views:[{RTL:true}]};
   const b=S.bal,info=[['صورتحساب مشتری — مطلا'],['نام',cuName(c)],['تلفن',toEn(c.phone||'')],['کد ملی',toEn(c.nid||'')],['گروه',c.grp||''],['تاریخ گزارش',dates().fa],stmPer(S)?['بازه',stmPer(S)]:[],
@@ -61,31 +61,47 @@ function stmtXlsx(c,F){const S=stmtData(c,F),wb=XLSX.utils.book_new(),XK=S.XK,ks
   for(let r=2;r<=L.length;r++){['I','L'].forEach(col=>{const cl=w2[col+r];if(cl&&typeof cl.v==='number')cl.z='#,##0'});const q=w2['F'+r];if(q&&typeof q.v==='number')q.z='#,##0.###'}
   XLSX.utils.book_append_sheet(wb,w2,'اقلام سندها');
   return XLSX.write(wb,{bookType:'xlsx',type:'array'})}
-ACT.stmtXls=()=>stmOpen('xls');
+ACT.stmtXls=()=>{const c=curCu();if(!c)return;if(typeof XLSX==='undefined'){toast('برای Excel اینترنت لازم است',true);return}const F=stmF(c);if(!stmtData(c,F).rows.length&&!F.f){toast('ردیفی برای این جستجو نیست',true);return}save(stmtFile(c,F)+'.xlsx',stmtXlsx(c,F),'فایل Excel صورتحساب آماده شد')};
 
-/* ---------- v61.79 (خواسته صاحب اپ): پنجره صورتحساب — بازه تاریخ و جستجو ----------
-   هر دو دکمه PDF و Excel همین پنجره را باز می‌کنند: بازه‌های آماده (همه، این ماه، ماه قبل، ۳ ماه، امسال)،
-   «از تاریخ / تا تاریخ» با تقویم شمسی، جستجو؛ شمار ردیف‌ها زنده. بازه برای هر مشتری تا بسته شدن برنامه می‌ماند. */
-let STM={cu:'',f:'',t:'',q:'',x:'pdf'};
+/* ---------- v61.80 (خواسته صاحب اپ): جستجو و بازه تاریخ بیرون، کنار PDF و Excel در صفحه مشتری ----------
+   «گردش حساب» همان لحظه با جستجو و بازه فیلتر می‌شود و PDF / Excel همان فیلتر را می‌گیرند.
+   بازه: یک دکمه کنار جستجو → پنجره بازه (خلاصه بازه بالا، بازه‌های آماده، از / تا با تقویم). حالت برای هر مشتری در STM. */
+let STM={cu:'',f:'',t:'',q:'',k:'all',d:null};
 const jIso=(y,m,d)=>{const[a,b,c]=j2g(y,m,d);return a+'-'+p2(b)+'-'+p2(c)};
-function stmQk(){const t=todayISO(),[y,m]=g2j(t),pm=m===1?[y-1,12]:[y,m-1],m3=m>2?[y,m-2]:[y-1,m+10];
-  return [['all','همه','',''],['m','این ماه',jIso(y,m,1),t],['pm','ماه قبل',jIso(pm[0],pm[1],1),jIso(pm[0],pm[1],jDays(pm[0],pm[1]))],['m3','۳ ماه اخیر',jIso(m3[0],m3[1],1),t],['y','امسال',jIso(y,1,1),t]]}
+const stmF=c=>{if(STM.cu!==String(c.id))STM={cu:String(c.id),f:'',t:'',q:'',k:'all',d:null};return {f:STM.f,t:STM.t,q:STM.q.trim()}};
+const stmOn=()=>!!(STM.f||STM.t||STM.q.trim());
+function stmQk(){const t=todayISO(),[y,m]=g2j(t),pm=m===1?[y-1,12]:[y,m-1],m3=m>2?[y,m-2]:[y-1,m+10],wd=(new Date(t+'T12:00:00').getDay()+1)%7;
+  return [['td','امروز',t,t],['yd','دیروز',isoAdd(t,-1),isoAdd(t,-1)],['wk','این هفته',isoAdd(t,-wd),t],['m','این ماه',jIso(y,m,1),t],['pm','ماه قبل',jIso(pm[0],pm[1],1),jIso(pm[0],pm[1],jDays(pm[0],pm[1]))],['m3','۳ ماه اخیر',jIso(m3[0],m3[1],1),t],['y','امسال',jIso(y,1,1),t],['py','سال قبل',jIso(y-1,1,1),jIso(y-1,12,jDays(y-1,12))],['all','همه تاریخ‌ها','','']]}
 function stmPer(S){const F=S.F||S;if(!F.f&&!F.t)return '';return F.f&&F.t?(F.f===F.t?'روز '+dates(F.f).fa:'از '+dates(F.f).fa+' تا '+dates(F.t).fa):F.f?'از '+dates(F.f).fa+' تا امروز':'تا '+dates(F.t).fa}
-function stmOpen(x){const c=curCu();if(!c)return;if(STM.cu!==String(c.id))STM={cu:String(c.id),f:'',t:'',q:'',x};STM.x=x;stmShow()}
-function stmCnt(){const c=curCu();if(!c)return '';const S=stmtData(c,STM);return S.rows.length?`<b>${fmt(S.rows.length)}</b> ردیف${S.rows.length!==S.all?` از ${fmt(S.all)}`:''}`:'<b class="z">ردیفی پیدا نشد</b>'}
-function stmShow(){const c=curCu();if(!c)return;const Q=stmQk(),on=Q.find(o=>o[2]===STM.f&&o[3]===STM.t),dB=(w,l)=>{const v=STM[w];return `<button type="button" class="stmd${v?' on':''}" data-act="stmCal" data-w="${w}"><small>${l}</small><b>${v?esc(dates(v).fa):w==='f'?'از اول حساب':'تا امروز'}</b>${v?`<i data-act="stmClr" data-w="${w}" role="button" aria-label="پاک کردن">×</i>`:''}</button>`};
-  sheet(`<div class="sh-h"><div><b>صورتحساب مشتری</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="stmw"><div class="stml">بازه تاریخ</div><div class="cqs stmq">${Q.map(([k,l])=>`<button type="button" class="cq${on&&on[0]===k?' on':''}" data-act="stmQ" data-k="${k}">${l}</button>`).join('')}</div>
-  <div class="stmds">${dB('f','از تاریخ')}${dB('t','تا تاریخ')}</div>
-  <div class="stml">جستجو</div><label class="stms">${ic('search')}<input id="stmQ" type="search" enterkeyhint="search" autocomplete="off" placeholder="شماره سند، کالا، شرح، پیگیری…" value="${esc(STM.q)}"></label>
-  <div class="stmc" id="stmC">${stmCnt()}</div>
-  <div class="stmb"><button type="button" class="btn ${STM.x==='pdf'?'gold':'sec'}" data-act="stmGo" data-x="pdf">${ic('paste')} PDF</button><button type="button" class="btn ${STM.x==='xls'?'gold':'sec'}" data-act="stmGo" data-x="xls">${ic('list')} Excel</button></div></div>`);
-  const I=$('stmQ');if(I){I.addEventListener('input',()=>{clearTimeout(I._t);I._t=setTimeout(()=>{STM.q=I.value;const e=$('stmC');if(e)e.innerHTML=stmCnt()},120)});I.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();I.blur()}})}}
-const stmRd=()=>{const I=$('stmQ');if(I)STM.q=I.value};
-ACT.stmQ=d=>{stmRd();const o=stmQk().find(x=>x[0]===d.k);if(!o)return;STM.f=o[2];STM.t=o[3];stmShow()};
-ACT.stmClr=d=>{stmRd();STM[d.w]='';stmShow()};
-ACT.stmCal=d=>{stmRd();const w=d.w;openCal(STM[w]||(w==='t'?todayISO():STM.t||todayISO()),iso=>{STM[w]=iso;if(STM.f&&STM.t&&STM.f>STM.t){if(w==='f')STM.t=iso;else STM.f=iso}stmShow()},{title:w==='f'?'از تاریخ':'تا تاریخ',sub:'صورتحساب '+esc(cuName(curCu()||{})),q:[[0,'امروز'],[-1,'دیروز'],[-7,'یک هفته پیش']]})};
-ACT.stmGo=d=>{stmRd();const c=curCu();if(!c)return;const F={f:STM.f,t:STM.t,q:STM.q.trim()};
-  if(!stmtData(c,F).rows.length&&!F.f){toast('ردیفی برای این جستجو نیست',true);return}
-  if(d.x==='xls'){if(typeof XLSX==='undefined'){toast('برای Excel اینترنت لازم است',true);return}closeSheet();save(stmtFile(c,F)+'.xlsx',stmtXlsx(c,F),'فایل Excel صورتحساب آماده شد');return}
-  closeSheet();openPrint(()=>stmtPdfHTML(c,F))};
+/* برچسب کوتاه دکمه بازه */
+function stmLab(){if(!STM.f&&!STM.t)return 'همه تاریخ‌ها';const q=stmQk().find(o=>o[2]===STM.f&&o[3]===STM.t&&o[0]!=='all');if(q)return q[1];const s=v=>{const D=dates(v);return D.fa.replace(/ ۱۴\d\d$|\s[۰-۹]{4}$/,'')};return STM.f&&STM.t?(STM.f===STM.t?s(STM.f):s(STM.f)+' تا '+s(STM.t)):STM.f?'از '+s(STM.f):'تا '+s(STM.t)}
+/* نوار جستجو و بازه زیر عنوان «گردش حساب» */
+function stmBarHTML(c){stmF(c);const Q=stmQk(),on=Q.find(o=>o[2]===STM.f&&o[3]===STM.t),cust=(STM.f||STM.t)&&!on,K=['all','td','wk','m','pm','m3','y'];
+  const chip=([k,l])=>`<button type="button" class="stc${on&&on[0]===k?' on':''}" data-act="stmQk" data-k="${k}">${k==='all'?'همه':l}</button>`;
+  return `<div class="stmbar"><label class="stms">${ic('search')}<input id="stmQ" type="search" enterkeyhint="search" autocomplete="off" placeholder="جستجو در گردش حساب…" value="${esc(STM.q)}">${STM.q?`<button type="button" class="stmx0" data-act="stmQClr" aria-label="پاک کردن جستجو">×</button>`:''}</label><button type="button" class="stme" data-act="stmtPdf" aria-label="صورتحساب PDF">${ic('paste')}<span>PDF</span></button><button type="button" class="stme" data-act="stmtXls" aria-label="صورتحساب Excel">${ic('list')}<span>Excel</span></button></div>
+  <div class="stcs" role="group" aria-label="بازه تاریخ">${K.map(k=>Q.find(o=>o[0]===k)).map(chip).join('')}<button type="button" class="stc stcc${cust?' on':''}" data-act="stmRange">${ic('cal')}<span>${cust?esc(stmLab()):'دلخواه…'}</span></button></div>`}
+/* فهرست گردش حساب (جدید → قدیم) با همان فیلتر؛ «مانده از قبل» ته فهرست وقتی بازه از روزی شروع می‌شود */
+function stmListHTML(c){const F=stmF(c),T=(c.txs||[]).filter(t=>!t.del);if(!T.length)return '';
+  const S=stmtData(c,F),ids=new Set(S.rows.map(o=>String(o.t.id))),L=T.filter(t=>ids.has(String(t.id))).sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
+  let h='';if(stmOn())h+=`<div class="stmsum"><span><b>${fmt(L.length)}</b> ردیف از ${fmt(T.length)}${stmPer(S)?' · '+esc(stmPer(S)):''}</span><button type="button" class="lnk" data-act="stmClrAll">نمایش همه</button></div>`;
+  if(!L.length)return h+`<div class="stmno">${ic('search')}<b>ردیفی پیدا نشد</b><small>${STM.q.trim()?'جستجو را عوض کنید یا ':''}بازه دیگری انتخاب کنید</small></div>`;
+  let last=null;h+=L.map(t=>{let d='';if(t.date!==last){last=t.date;const r=relDay(t.date);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(t.date).fa)}</div>`}return d+`<div class="fcard">${txRow(c,t)}</div>`}).join('');
+  if(S.open){const o=S.open,v=(k,x)=>x?`<b class="${x>0?'b':'r'}">${balV(k,x)} <i>${balU(k)}</i><small>${ourLab(x)}</small></b>`:'';h+=`<div class="fday">پیش از ${esc(dates(S.F.f).fa)}</div><div class="fcard stmop"><span class="stmopi">${ic('clock')}</span><span class="tx"><b>مانده از قبل</b><small>مانده حساب تا پیش از شروع بازه</small></span><span class="stmopv">${v('r',o.R)||''}${v('g',o.G)||''}${!o.R&&!o.G?'<b class="z">تسویه</b>':''}</span></div>`}
+  return h}
+function stmRe(){const c=curCu(),el=$('cuTx');if(!c||!el)return;const m=typeof flipSnap==='function'?flipSnap(el):null;el.innerHTML=stmListHTML(c);if(m)flipPlay(el,m);const b=$('stmBar');if(b){const I=$('stmQ'),f=document.activeElement===I,pos=I?I.selectionStart:0;b.innerHTML=stmBarHTML(c);stmBind();if(f){const J=$('stmQ');if(J){J.focus({preventScroll:true});try{J.setSelectionRange(pos,pos)}catch(e){}}}}}
+function stmBind(){const I=$('stmQ');if(!I)return;I.oninput=()=>{clearTimeout(I._t);I._t=setTimeout(()=>{STM.q=I.value;const c=curCu(),el=$('cuTx');if(c&&el)el.innerHTML=stmListHTML(c);const x=I.parentNode.querySelector('.stmx0');if(!!STM.q!==!!x){const b=$('stmBar'),pos=I.selectionStart;b.innerHTML=stmBarHTML(c);stmBind();const J=$('stmQ');J.focus({preventScroll:true});try{J.setSelectionRange(pos,pos)}catch(e){}}},140)};I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();I.blur()}}}
+ACT.stmQClr=()=>{STM.q='';stmRe()};
+ACT.stmClrAll=()=>{STM.q='';STM.f='';STM.t='';stmRe()};
+/* پنجره بازه تاریخ: خلاصه بازه بالا (از … تا … · چند روز · چند ردیف)، بازه‌های آماده (زدن = اعمال و بستن)، بازه دلخواه با تقویم */
+function stmRangeHTML(){const c=curCu();if(!c)return '';const D=STM.d||{f:STM.f,t:STM.t},Q=stmQk(),on=Q.find(o=>o[2]===D.f&&o[3]===D.t),S=stmtData(c,{f:D.f,t:D.t}),n=D.f&&D.t?Math.round((new Date(D.t+'T12:00:00')-new Date(D.f+'T12:00:00'))/864e5)+1:0;
+  const side=(w,l)=>{const v=D[w];return `<button type="button" class="srd${v?' on':''}" data-act="stmCal" data-w="${w}"><small>${l}</small><b>${v?esc(dates(v).fa):w==='f'?'اول حساب':'امروز'}</b><em>${v?esc(dates(v).wd):'بدون محدودیت'}</em>${v?`<i data-act="stmDClr" data-w="${w}" role="button" aria-label="برداشتن">×</i>`:''}</button>`};
+  return `<div class="sh-h"><div><b>بازه تاریخ</b><small class="shsub">گردش حساب و صورتحساب «${esc(cuName(c))}»</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="srw"><div class="srs">${side('f','از')}<span class="sra">${ic('back')}</span>${side('t','تا')}</div>
+  <div class="srn">${n?'<b>'+fmt(n)+'</b> روز · ':''}<b>${fmt(S.rows.length)}</b> ردیف${S.open&&(S.open.R||S.open.G)?' · با «مانده از قبل»':''}</div>
+  <div class="srl">بازه‌های آماده</div><div class="srq">${Q.map(([k,l])=>`<button type="button" class="srqb${on&&on[0]===k?' on':''}" data-act="stmQk" data-k="${k}">${l}</button>`).join('')}</div>
+  <button type="button" class="btn gold srgo" data-act="stmApply">${ic('check')} نمایش این بازه</button></div>`}
+ACT.stmRange=()=>{const c=curCu();if(!c)return;stmF(c);STM.d={f:STM.f,t:STM.t};sheet(stmRangeHTML())};
+ACT.stmQk=d=>{const o=stmQk().find(x=>x[0]===d.k);if(!o)return;STM.f=o[2];STM.t=o[3];STM.d=null;closeSheet();stmRe()};
+ACT.stmDClr=d=>{if(!STM.d)return;STM.d[d.w]='';$('sheet').innerHTML=stmRangeHTML()};
+ACT.stmCal=d=>{const w=d.w,D=STM.d||(STM.d={f:STM.f,t:STM.t});openCal(D[w]||(w==='f'&&D.t?D.t:todayISO()),iso=>{D[w]=iso;if(D.f&&D.t&&D.f>D.t){if(w==='f')D.t=iso;else D.f=iso}sheet(stmRangeHTML())},{title:w==='f'?'از تاریخ':'تا تاریخ',sub:'بازه گردش حساب',q:[[0,'امروز'],[-1,'دیروز'],[-7,'یک هفته پیش']]})};
+ACT.stmApply=()=>{const D=STM.d;if(D){STM.f=D.f||'';STM.t=D.t||''}STM.d=null;closeSheet();stmRe()};

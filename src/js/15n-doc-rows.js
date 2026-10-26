@@ -125,3 +125,35 @@ ACT.depCp=async(d,e)=>{const t=depMsg(d);if(!t)return;const el=e&&e.target&&e.ta
   if(ok){depFx(el,true,'کپی شد');toast('اطلاعات واریز با مبلغ '+fmt(depAmt(d))+' تومان کپی شد')}else{depFx(el,false,'کپی نشد');cpOut(t,'')}};
 ACT.depSh=(d,e)=>{const t=depMsg(d);if(!t)return;depFx(e&&e.target&&e.target.closest('.depbb'),true,'آماده ارسال');if(window.AndroidBridge&&AndroidBridge.share){AndroidBridge.share(t);return}if(navigator.share)navigator.share({text:t}).catch(()=>{});else cpOut(t,'اطلاعات واریز کپی شد')};
 ACT.depGo=d=>{closeSheet();ACT.openEnt({id:isNaN(+d.e)?d.e:+d.e})};
+
+/* ============ v61.80 (خواسته صاحب اپ): «در همه سندها همه جزئیات را داشته باشم وقتی روی ردیف می‌زنم» ============
+   جزئیات کامل هر ردیف (همان قالب «برچسب: مقدار» که d6Spec خانه‌خانه نشان می‌دهد) — در صفحه سند و سند ثبت‌شده.
+   کالا: تعداد، وزن، عیار، وزن ۷۵۰، مظنه، هر گرم ۱۸، بهای طلا، اجرت، سود، مالیات، مبلغ، آزمایشگاه، انگ، توضیح.
+   طلا/سکه/ارز (فروش، خرید، دریافت، تحویل آبشده…): نوع، دسته، وزن یا تعداد، عیار، وزن ۷۵۰، مظنه، هر گرم، مبلغ، اثر بر طلا/جنس، انگ، آزمایشگاه.
+   دریافت/پرداخت: روش، مبلغ، حساب یا کارتخوان، طرف حواله، پیگیری. */
+const dtT=v=>fmt(Math.round(+v||0))+' تومان';
+function itDet(it,rate,tax,saved){const c=saved&&it.tot!=null?{gold:+it.gold||0,aj:+it.ajv||0,pr:+it.prv||0,tax:+it.taxv||0,tot:+it.tot||0,fx:+it.amT>0?1:0}:itCalc(it,rate,tax),r=+it.mz?(+it.mz)/MZK:(+rate||0),ay=+it.ay||750,w=+it.w||0;
+  return [it.pz&&+it.cnt?'تعداد: '+qFmt(it.cnt)+' عدد':'','وزن: '+wFmt(w)+' گرم',shAyL(it)||'عیار: '+toFa(ay),ay!==750||it.ab?'وزن ۷۵۰: '+wFmt(Math.round(w*ay/750*1000)/1000)+' گرم':'',
+    r?'مظنه: '+fmt(Math.round(r*MZK))+' تومان':'',r?'هر گرم ۱۸: '+dtT(r):'',c.gold?'بهای طلا: '+dtT(c.gold):'',!it.ab?'اجرت: '+ajLab(it)+(c.aj&&ajPT(it).P?' = '+dtT(c.aj):''):'',
+    'سود: '+toFa(Math.round((+it.pp||0)*100)/100)+'٪'+(c.pr?' = '+dtT(c.pr):''),c.tax?'مالیات: '+dtT(c.tax):'','مبلغ: '+dtT(c.tot),c.fx?'مبلغ دستی':'',shEff(it),
+    it.lab?'آزمایشگاه '+esc(it.lab):'',it.ang?'انگ '+esc(it.ang):'',it.n?'توضیح: '+esc(it.n):''].filter(Boolean).join(' · ')}
+function xrDet(x,C,rate){const g=x.a==='gold',m=x.t==='sell'||x.t==='buy',u=g?'گرم':((XA[x.a]||{}).u||'واحد'),ay=+x.ay||750,q=C.q!=null?C.q:x.q750!=null?+x.q750:(g?Math.round((+C.n||0)*ay/750*1000)/1000:C.n),r=+x.mz?(+x.mz)/MZK:(+rate||0),ab=g&&x.cat==='آبشده'&&!x.pul;
+  const nm={sell:'فروش',buy:'خرید',in:'دریافت',out:'پرداخت (تحویل)'}[x.t]||x.t;
+  return ['نوع: '+nm+(x.pul?' پولی':''),g&&x.cat&&x.cat!=='متفرقه'?'دسته: '+esc(x.cat):'',!g?'جنس: '+esc((XA[x.a]||{t:x.a}).t):'',x.pz&&+x.cnt?'تعداد: '+qFmt(x.cnt)+' عدد':'',
+    g?(x.pz&&+x.cnt?'وزن کل: ':'وزن: ')+wFmt(C.n)+' گرم':'مقدار: '+qFmt(C.n)+' '+u,g?(shAyL(x)||'عیار: '+toFa(ay)):'',g?'وزن ۷۵۰: '+wFmt(q)+' گرم':'',
+    m&&g&&r&&!x.pgM?'مظنه: '+fmt(Math.round(r*MZK))+' تومان':'',m?(ab?'هر گرم ۱۸: '+dtT(Math.round((+C.pg||0)*750/ay)):(g?(x.t==='buy'&&!x.pul?'هر گرم خرید: ':'هر گرم: '):'هر '+u+': ')+dtT(C.pg)):'',
+    m?'مبلغ: '+dtT(C.amount):'',C.fx?'مبلغ دستی':'',C.e?'اثر بر '+(g?'طلا':esc((XA[x.a]||{t:x.a}).t))+': '+(g?wFmt(Math.abs(C.e))+' گرم ۱۸':qFmt(Math.abs(C.e))+' '+u)+' '+ourLab(C.e):'',shEff(x),
+    x.lab?'آزمایشگاه '+esc(x.lab):'',x.ang?'انگ '+esc(x.ang):'',x.note?'توضیح: '+esc(x.note):''].filter(Boolean).join(' · ')}
+function pyDet(p,txId){if(p.m==='dep')return depSub(p,txId);const a=pAmt(p),out=a<0,M=PM[p.m]||PM.cash,ch=p.chId&&custs.find(z=>String(z.id)===String(p.chId)),Y=p.cuId&&custs.find(z=>String(z.id)===String(p.cuId));
+  return ['نوع: '+(out?'پرداخت':'دریافت'),'روش: '+(p.m==='wd'?'واریز بانکی (لیست واریزی)':p.m==='cust'?'حواله دوطرفه بین حساب‌ها':p.m==='nm'?'حواله دستی':M.t),'مبلغ: '+dtT(Math.abs(a)),
+    p.srcId!=null?'حساب ما: '+esc(srcName(p.srcId)):'',ch?(p.m==='pos'?'کارتخوان: ':'حساب: ')+esc(ch.name):'',p.m==='wd'&&p.src?'از بانک: '+esc(p.src):'',p.m==='wd'&&p.nm?'تسویه از: '+esc(p.nm):'',
+    Y?(out?'به حساب: ':'از حساب: ')+esc(cuName(Y)):'',p.m==='nm'&&p.cuName?'طرف حواله: '+esc(p.cuName):'',p.m==='gold'?'وزن: '+wFmt(p.w)+' گرم':'',p.m==='gold'?'عیار: '+toFa(p.ay||750):'',
+    p.m==='off'?'صفر کردن مانده':'',p.tn?'پیگیری '+esc(p.tn):'',p.note?'توضیح: '+esc(p.note):''].filter(Boolean).join(' · ')}
+/* دکمه‌های زیر جزئیات دریافت/پرداخت: حواله دوطرفه → حساب و ردیف طرف مقابل؛ واریز بانکی → خود واریزی */
+function pyActs(p,c,txId,no){if(p.m==='cust'&&p.cuId){const Y=custs.find(z=>String(z.id)===String(p.cuId));if(!Y)return '';return `<span class="d8eb d8lk" role="button" data-act="xfGo" data-cu="${esc(p.cuId)}" data-x="${esc(p.xfId||'')}" data-fc="${c?esc(c.id):''}" data-no="${esc(no!=null?no:'')}">${ic('swap')}<span>حساب «${esc(cuName(Y))}»</span><small>حواله دوطرفه در حساب طرف مقابل</small></span>`}
+  if(p.m==='wd'&&p.entId!=null)return `<span class="d8eb d8lk" role="button" data-act="depGo" data-e="${esc(p.entId)}">${ic('open')}<span>واریزی</span><small>رسید و جزئیات واریز بانکی</small></span>`;return ''}
+/* ردیف حواله در حساب طرف مقابل (xf با inv) — با شماره سند پیدا می‌شود چون ویرایش سند شناسه‌اش را عوض می‌کند */
+function xfFind(Y,fc,no,xid){const T=(Y.txs||[]).filter(z=>!z.del&&z.type==='xf');let x=xid&&T.find(z=>String(z.id)===String(xid));if(x)return x;
+  const C=custs.find(z=>String(z.id)===String(fc));return T.find(z=>z.inv&&String(z.inv.cu)===String(fc)&&(()=>{const t=C&&(C.txs||[]).find(q=>String(q.id)===String(z.inv.tx));return t&&String(t.no)===String(no)})())||null}
+ACT.xfGo=d=>{const Y=custs.find(z=>String(z.id)===String(d.cu));if(!Y){toast('حساب طرف حواله پیدا نشد',true);return}closeSheet();custId=Y.id;go('cust');setTimeout(()=>{if(cur!=='cust'||String(custId)!==String(Y.id))return;const x=xfFind(Y,d.fc,d.no,d.x);if(x)xfShow(Y,x)},380)};
+ACT.xfInv=d=>{closeSheet();invOpen(isNaN(+d.cu)?d.cu:+d.cu,isNaN(+d.tx)?d.tx:+d.tx)};
