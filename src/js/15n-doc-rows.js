@@ -52,22 +52,27 @@ ACT.pvDel=d=>pvDel(d.i);
 function shRows(){const R=[];CU().forEach(c=>(c.txs||[]).forEach(t=>{if(t.type!=='inv'||t.del)return;
   (t.items||[]).forEach((it,i)=>{if(it.ab&&it.sh===1)R.push({c,t,k:'it',i,o:it})});
   (t.xr||[]).forEach((x,i)=>{if(x.a==='gold'&&x.cat==='آبشده'&&x.sh===1)R.push({c,t,k:'xr',i,o:x})})}));return R}
-function shGroups(){const M=new Map();shRows().forEach(r=>{const a=clean(toEn(String(r.o.ang||''))),key=a?'a:'+a:'r:'+r.t.id+':'+r.k+r.i;
+function shGroups(cu){const M=new Map();shRows().forEach(r=>{const a=clean(toEn(String(r.o.ang||''))),key=a?'a:'+a:'r:'+r.t.id+':'+r.k+r.i;
   if(!M.has(key))M.set(key,{key,ang:a,lab:'',w:0,at:'',rows:[]});const g=M.get(key);g.rows.push(r);if(!g.lab&&r.o.lab)g.lab=r.o.lab;g.w=Math.max(g.w,parseFloat(r.o.w)||0);if(String(r.t.date||'')>g.at)g.at=String(r.t.date||'')});
-  return [...M.values()].sort((a,b)=>b.at.localeCompare(a.at))}
+  return [...M.values()].filter(g=>cu==null||g.rows.some(r=>String(r.c.id)===String(cu))).sort((a,b)=>b.at.localeCompare(a.at))}
 const shN=()=>{try{return shGroups().length}catch(e){return 0}};
 const shKind=r=>r.k==='it'?'sell':r.o.t==='buy'?'buy':r.o.t==='in'?'in':r.o.t==='out'?'out':'sell';
-function shHTML(){const G=shGroups();
+function shHTML(cu){const G=shGroups(cu),C=cu!=null&&CU().find(z=>String(z.id)===String(cu));
   const card=(g,n)=>`<div class="shg" data-g="${esc(g.key)}" style="--i:${n}"><div class="shgh"><span class="shgi">${ic('coin')}</span><div class="shgt"><b>${g.ang?'انگ '+esc(g.ang):'بدون شماره انگ'}</b><small>${g.lab?'آزمایشگاه '+esc(g.lab)+' · ':''}${wFmt(g.w)} گرم · فعلاً ۷۵۰</small></div></div>
     <div class="shgr">${g.rows.map(r=>`<button type="button" class="shr" data-act="shDoc" data-cu="${esc(r.c.id)}" data-tx="${esc(r.t.id)}">${dkTag(shKind(r))}<span class="shrn"><b>${esc(cuName(r.c))}</b><small>${esc(invTitle(r.t))} · ${esc(dates(r.t.date).fa)}</small></span><i>${ic('back')}</i></button>`).join('')}</div>
     <div class="shin"><label class="shf"><small>عیار واقعی</small><input class="ltr" data-g="${esc(g.key)}" inputmode="decimal" placeholder="مثلاً ۷۴۸" autocomplete="off" enterkeyhint="done"></label><button type="button" class="shok" data-act="shSet" data-g="${esc(g.key)}">${ic('check')}<span>ثبت عیار</span></button></div>
     <div class="shpv" data-g="${esc(g.key)}"></div></div>`;
-  return `<div class="sh-h"><div><b>آبشده شرطی</b><small class="shsub">عیار درنیامده · فعلاً با ۷۵۰ حساب شده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  return `<div class="sh-h"><div><b>آبشده شرطی</b><small class="shsub">${C?esc(cuName(C))+' · ':''}عیار درنیامده · فعلاً با ۷۵۰ حساب شده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="shl">${G.length?G.map(card).join(''):`<div class="shnone">${ic('check')}<b>آبشده شرطی باز نیست</b><small>در سند: فروش، خرید، دریافت یا پرداخت › «آبشده شرطی»</small></div>`}</div>`}
 function shBind(){document.querySelectorAll('#sheet .shin input').forEach(I=>{I.oninput=()=>{I.value=decIn(I.value);const k=I.dataset.g,g=shGroups().find(z=>z.key===k),P=[...document.querySelectorAll('#sheet .shpv')].find(z=>z.dataset.g===k);if(!g||!P)return;const ay=parseFloat(I.value)||0;
     P.innerHTML=ay>0&&ay<=1000?`<span>وزن ۷۵۰: <b>${wFmt(Math.round(g.w*ay/750*1000)/1000)}</b> گرم <small>(به جای ${wFmt(g.w)})</small></span>`:'';P.classList.toggle('on',!!P.innerHTML)};
   I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.shSet({g:I.dataset.g})}}})}
-ACT.shOpen=()=>{sheet(shHTML());shBind()};
+let shCu=null;
+ACT.shOpen=d=>{shCu=d&&d.cu!=null&&d.cu!==''?d.cu:null;sheet(shHTML(shCu));shBind()};
+/* v61.65 (خواسته صاحب اپ): در حساب مشتریان و گردش حساب هر مشتری، فهرست آبشده‌های شرطی باز؛ زدن = پنجره ثبت عیار
+   (عیار در سند همان آبشده در همه حساب‌ها اثر می‌گذارد) */
+function shBanner(cu){const G=shGroups(cu);if(!G.length)return '';const R=cu==null?[]:G.flatMap(g=>g.rows.filter(r=>String(r.c.id)===String(cu)).map(r=>({g,r})));
+  return `<button type="button" class="shbn" data-act="shOpen" data-cu="${cu==null?'':esc(cu)}"><span class="shgi">${ic('coin')}</span><span class="shbt"><b>آبشده شرطی</b><small>${toFa(G.length)} آبشده منتظر عیار${cu==null?' · همه حساب‌ها':''}</small>${R.length?`<span class="shbl">${R.slice(0,4).map(({g,r})=>`<span>${dkTag(shKind(r))}<b>${wFmt(parseFloat(r.o.w)||0)} گرم</b><small>${g.ang?'انگ '+esc(g.ang):esc(invTitle(r.t))}</small></span>`).join('')}${R.length>4?`<small>و ${toFa(R.length-4)} مورد دیگر</small>`:''}</span>`:''}</span><span class="shbg">ثبت عیار</span></button>`}
 ACT.shDoc=d=>{closeSheet();invOpen(isNaN(+d.cu)?d.cu:+d.cu,isNaN(+d.tx)?d.tx:+d.tx)};
 ACT.shSet=d=>{const I=[...document.querySelectorAll('#sheet .shin input')].find(z=>z.dataset.g===d.g),ay=Math.round((parseFloat(I&&I.value)||0)*10)/10;
   if(!(ay>0&&ay<=1000)){toast('عیار واقعی را بزنید',true);if(I)I.focus();return}const g=shGroups().find(z=>z.key===d.g);if(!g)return;
@@ -75,8 +80,11 @@ ACT.shSet=d=>{const I=[...document.querySelectorAll('#sheet .shin input')].find(
   askConfirm(`عیار ${toFa(ay)} برای ${g.ang?'انگ '+toFa(g.ang):'این آبشده'} در ${toFa(T.size)} سند ثبت شود؟`,'ثبت عیار',()=>{
     T.forEach(({c,t,R})=>shFix(c,t,R,ay));saveCu();
     logA('cust','عیار آبشده شرطی',(g.ang?'انگ '+g.ang+' | ':'')+'عیار '+ay+' | '+[...T.values()].map(z=>cuName(z.c)+' '+invTitle(z.t)).join('، '));
-    toast('عیار '+toFa(ay)+' در '+toFa(T.size)+' سند نشست');setTimeout(()=>{sheet(shHTML());shBind()},60);if(cur!=='settings')render()})};
-function shFix(c,t,R,ay){const keep=sv;try{sv=invSv(c,t);R.forEach(r=>{const o=(r.k==='it'?sv.items:sv.xr)[r.i];if(!o||o.sh!==1)return;o.ay=ay;o.sh=2;delete o.amT;delete o.amN;if(r.k==='xr'&&parseFloat(o.w)>0)delete o.am});
+    toast('عیار '+toFa(ay)+' در '+toFa(T.size)+' سند نشست');render();setTimeout(()=>{sheet(shHTML(shCu));shBind()},60)})};
+function shFix(c,t,R,ay){const keep=sv;try{sv=invSv(c,t);R.forEach(r=>{const o=(r.k==='it'?sv.items:sv.xr)[r.i];if(!o||o.sh!==1)return;
+      /* اثر تبدیل عیار بر همین ردیف (برای نمایش در جزئیات سند): مبلغ و طلای ۷۵۰ پیش و پس از عیار تازه */
+      const eff=()=>{if(r.k==='it')return {r:itCalc(o,sv.rate,sv.tax).tot,g:0};const C=xrCalc(o,sv.rate);return {r:C.amount||0,g:o.t==='in'||o.t==='out'?C.q||0:0}};/* تغییر مبلغ همین ردیف و وزن ۷۵۰ آن (منفی = کمتر شد) */
+      delete o.amT;delete o.amN;if(r.k==='xr'&&parseFloat(o.w)>0)delete o.am;const b=eff();o.ay=ay;o.sh=2;const a2=eff(),dr=Math.round(a2.r-b.r),dg=Math.round((a2.g-b.g)*1000)/1000;o.shd={};if(dr)o.shd.r=dr;if(dg)o.shd.g=dg});
     const T=svTot(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}}),
       xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e}});
     t.items=items;t.xr=xr;t.sub=T.sub;t.total=T.total;t.disc=T.disc;if(T.ge)t.ge=T.ge;else delete t.ge;if(Object.keys(T.xe).length)t.xe=T.xe;else delete t.xe;

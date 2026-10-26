@@ -58,7 +58,7 @@ const curCu=()=>custs.find(c=>String(c.id)===String(custId))||null;
 /* ---- فهرست حساب‌ها: فقط جستجو و فهرست؛ مشتری تازه از همین جستجو ---- */
 function vCusts(){const L=CU();
   if(!L.length&&!cuQ)return `<div class="c6s">${cuSearchHTML(0)}</div><div class="spempty"><div class="spill">${ic('users')}</div><b>هنوز حسابی باز نشده</b><span>نام مشتری را در جستجو بنویسید؛ اگر حسابی نداشته باشد، اول مشخصاتش را می‌گیریم و بعد وارد حساب و سند او می‌شوید.</span></div>`;
-  cuAnim=1;cuCntId=null;return `<div class="c6s">${cuSearchHTML(L.length)}</div><div id="cures">${cuListHTML()}</div>`}
+  cuAnim=1;cuCntId=null;return `<div class="c6s">${cuSearchHTML(L.length)}</div>${shBanner()}<div id="cures">${cuListHTML()}</div>`}
 const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${n?'جستجو در '+fmt(n)+' حساب: نام، تلفن، کد ملی، گروه…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search">${cuQ?`<button class="x" data-act="cuQClr" aria-label="پاک کردن">×</button>`:''}</div>`;
 function cuListHTML(){const q0=clean(cuQ||''),q=nzName(toEn(q0)),A=CU();let B=A.map(c=>[c,cuBal(c)]);
   /* v60.3: جستجو در همه مشخصات حساب (نام، تلفن، کد ملی، گروه، یادداشت، کارت، شبا…)؛ عدد با و بدون فاصله/صفر اول */
@@ -94,6 +94,7 @@ function vCust(){xaSync();const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust'
   let h=`${cuBalCard(b,cuCntId!==custId)}
   ${can('debt')?`${svDraftHTML(c)}
   `:''}
+  ${shBanner(c.id)}
   <div class="spsec"><b>گردش حساب</b><small>${T.length?fmt(T.length)+' ردیف · برای جزئیات بزنید':'هنوز سندی ثبت نشده'}</small></div>`;
   /* v61.47 (خواسته صاحب اپ): گردش حساب — هر ردیف کارت گرد با اثرش به تفکیک (تومان، طلا، سکه) و زیرش مانده حساب بعد از همان ردیف؛
      رنگ‌ها: قرمز طلبکاریم، آبی بدهکاریم؛ کارت‌ها پله‌ای بالا می‌آیند */

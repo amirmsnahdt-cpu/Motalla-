@@ -1761,3 +1761,31 @@ html.kbo #act{display:none!important}
 .shnone{display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 10px;text-align:center}.shnone svg{width:28px;height:28px;color:var(--ok)}.shnone b{font-size:15px}.shnone small{font-size:12px;color:var(--mut)}
 @media (prefers-reduced-motion:reduce){.shg{animation:none}.shpv{transition:none}}
 .shpv>span{min-height:0;overflow:hidden;display:block}
+/* v61.65: مانده‌های پایین — اول فقط نهایی؛ فلش بالا = جدول کامل با حرکت */
+.iv9b.bgc{position:relative;padding-top:14px}
+.bgup{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:46px;height:28px;border:0;border-radius:14px;background:var(--card);color:var(--blu);box-shadow:0 0 0 1px var(--line),0 -4px 14px -6px color-mix(in srgb,var(--blu) 55%,transparent);display:grid;place-items:center;cursor:pointer;z-index:2}
+.bgup svg{width:20px;height:20px;stroke-width:2.6;transform:rotate(180deg);transition:transform .34s cubic-bezier(.2,.9,.25,1)}
+.iv9b.bgc.op .bgup svg{transform:none}
+.bgx{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .4s cubic-bezier(.2,.9,.25,1),opacity .25s}
+.iv9b.bgc.op .bgx{grid-template-rows:1fr;opacity:1}
+.bgxi{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:5px}
+.bgmw{display:grid;grid-template-rows:1fr;opacity:1;transition:grid-template-rows .34s cubic-bezier(.2,.9,.25,1),opacity .2s}
+.iv9b.bgc.op .bgmw{grid-template-rows:0fr;opacity:0}
+.iv9b.bgc:not(.op) .bgx,.iv9b.bgc.op .bgmw{margin-top:-4px}
+.bgm{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:4px;cursor:pointer}
+.bgmt{font-size:11px;font-weight:800;color:var(--mut);text-align:center}
+.bgml{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:6px}
+.bgmc{min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 6px 5px;border-radius:13px;background:color-mix(in srgb,var(--mut) 8%,var(--card));box-shadow:inset 0 0 0 1px var(--line);container-type:inline-size}
+.bgmc small{font-size:10.5px;font-weight:800;color:var(--ink);white-space:nowrap}.bgmc small i{font-style:normal;font-weight:700;color:var(--mut);font-size:9.5px}
+.bgmc .fz{--fmax:17px;width:100%;text-align:center}.bgmc .fz>b{font-weight:900}
+.bgmc em{font-style:normal;font-size:10px;font-weight:800}
+.bgmc.d{background:var(--red);box-shadow:none}.bgmc.c{background:var(--blu);box-shadow:none}
+.bgmc.d *,.bgmc.c *{color:#fff!important}.bgmc.z .fz>b{color:var(--mut)}.bgmc.z em{color:var(--ok)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bgmc.d{background:color-mix(in srgb,var(--red) 62%,#000)}:root:not([data-theme="light"]) .bgmc.c{background:color-mix(in srgb,var(--blu) 62%,#000)}}
+:root[data-theme="dark"] .bgmc.d{background:color-mix(in srgb,var(--red) 62%,#000)}:root[data-theme="dark"] .bgmc.c{background:color-mix(in srgb,var(--blu) 62%,#000)}
+@media (prefers-reduced-motion:reduce){.bgx,.bgmw,.bgup svg{transition:none}}
+.shbn{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 12px;padding:10px 12px;border:0;border-radius:18px;background:color-mix(in srgb,#c9a227 9%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#c9a227 40%,transparent);font:inherit;color:var(--ink);text-align:right;cursor:pointer;animation:cbIn .4s cubic-bezier(.2,.8,.2,1) both}
+.shbt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}.shbt>b{font-size:14.5px;font-weight:900}.shbt>small{font-size:11.5px;font-weight:700;color:var(--mut)}
+.shbl{display:flex;flex-direction:column;gap:3px;margin-top:6px}.shbl>span{display:flex;align-items:center;gap:6px;font-size:12px}.shbl>span b{font-weight:850}.shbl small{font-size:11px;color:var(--mut);font-weight:700}
+.shbg{flex:none;padding:7px 12px;border-radius:11px;background:var(--gold,#b8862b);color:#fff;font-size:12.5px;font-weight:800}
+@media (prefers-reduced-motion:reduce){.shbn{animation:none}}
