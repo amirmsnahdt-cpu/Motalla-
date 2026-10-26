@@ -84,27 +84,28 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{box-sizing:border-box}
 body{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;color:#16213a;font-size:9.4pt;line-height:1.6;margin:0;background:#fff;font-feature-settings:"tnum";-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .pg{page-break-after:always;max-width:186mm;margin:0 auto;padding:6mm 0}.pg:last-child{page-break-after:auto}
-.top{display:flex;justify-content:space-between;align-items:center}
-.brand{display:flex;align-items:center;gap:9px}.mk{width:30px;height:30px;border-radius:9px 9px 9px 3px;background:#13284f;color:#ecc874;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14pt;line-height:1}
-.brand b{display:block;font-size:12.5pt;font-weight:800;line-height:1.2}.brand small{display:block;font-size:7.4pt;color:#9097a5;font-weight:500}
-.doc{font-size:7.6pt;color:#9097a5;text-align:left;line-height:1.5}
-h1{font-size:20pt;font-weight:800;margin:22px 0 0;letter-spacing:-.4px;line-height:1.35}
+.pg{position:relative}.pg:before{content:"";position:absolute;left:50%;top:50%;width:70%;aspect-ratio:477/202;transform:translate(-50%,-50%) rotate(-8deg);background:url(logo-stamp.png) center/contain no-repeat;opacity:.04;pointer-events:none}.pg>*{position:relative}
+.top{display:flex;justify-content:space-between;align-items:center;gap:14px;background:linear-gradient(135deg,#0f1f3f,#13284f 60%,#1a3366);color:#fff;border-radius:16px 16px 5px 5px;padding:10px 16px 13px;position:relative;overflow:hidden}.top:after{content:"";position:absolute;inset:auto 0 0 0;height:3px;background:linear-gradient(90deg,#b8862b,#f3d892,#b8862b,#f3d892,#b8862b)}
+.brand{display:flex;align-items:center;gap:12px}.lg{flex:none;width:36mm;aspect-ratio:477/202;background:url(logo-stamp.png) center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.brand b{display:block;font-size:12pt;font-weight:800;line-height:1.25}.brand small{display:block;font-size:7.4pt;color:#ecd9a6;font-weight:500}.brand>span:last-child{border-inline-start:1px solid rgba(236,200,116,.35);padding-inline-start:12px}
+.doc{font-size:7.6pt;color:#ecd9a6;text-align:left;line-height:1.6;border:1px solid rgba(236,200,116,.55);border-radius:10px;padding:4px 10px}.doc b{display:block;color:#f3d892;font-size:9.5pt;font-weight:800}
+h1{font-size:20pt;font-weight:800;margin:18px 0 0;letter-spacing:-.4px;line-height:1.35}
 .sub{color:#6b7385;font-size:9pt;margin-top:2px}.sub{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}.sub .pdl{font-size:7.5pt!important;font-weight:700;color:#7a5a12;background:#f6ecd2;border-radius:6px;padding:1px 7px}.sub .pdv{font-size:9.5pt!important;font-weight:800;color:#13284f;direction:rtl;unicode-bidi:isolate}.sub .pde{direction:ltr;unicode-bidi:isolate}.sub .pde{font-size:8.5pt!important;color:#8a90a0}.sub .rg{font-size:8pt!important;color:#8a90a0;border-inline-start:1px solid #dfe3ea;padding-inline-start:8px}.sub span{direction:ltr;display:inline-block}
-.bar{height:3px;width:46px;background:linear-gradient(90deg,#ecc874,#b8862b);border-radius:3px;margin:12px 0 16px}
+.bar{height:3px;width:46px;background:linear-gradient(90deg,#ecc874,#b8862b);border-radius:3px;margin:10px 0 14px}
 .kp{display:flex;border:1px solid #e7e9ef;border-radius:14px;margin-bottom:18px;overflow:hidden}
 .kp div{flex:1;padding:10px 14px;border-left:1px solid #e7e9ef}.kp div:last-child{border-left:0}
 .kp small{display:block;font-size:7.4pt;color:#9097a5;font-weight:500}.kp b{font-size:13pt;font-weight:800}.kp b em{font-style:normal;font-size:7.6pt;color:#9097a5;font-weight:500;margin-right:3px}
 .kp .g b{color:#9a6a12}.kp .ok b{color:#15803d}.kp .rd b{color:#c2414b}
 h2{font-size:11.5pt;font-weight:800;margin:20px 0 8px;display:flex;justify-content:space-between;align-items:baseline}h2 small{font-size:8.4pt;color:#6b7385;font-weight:600}
 table{width:100%;border-collapse:collapse}
-th{font-size:7.4pt;color:#9097a5;font-weight:600;text-align:right;padding:0 6px 7px;border-bottom:1.2px solid #16213a;white-space:nowrap}
+th{font-size:7.4pt;color:#7a5a17;font-weight:700;text-align:right;padding:6px 6px;background:#fbf6e8;border-bottom:1.5px solid #ecd9a6;white-space:nowrap}
 td{padding:9px 6px;border-bottom:1px solid #eef0f4;vertical-align:middle}
 tr{page-break-inside:avoid}
 td.n{color:#a0a6b2;width:24px;font-size:8.2pt;font-weight:600}
 .nm{font-weight:700;font-size:9.8pt;display:block}.s{display:block;font-size:7.6pt;color:#9097a5;margin-top:1px}
 .ib{direction:ltr;text-align:left;font-size:8.4pt;letter-spacing:.4px;white-space:nowrap;font-weight:500;color:#2a3550}
 td.am,th.am{text-align:left;white-space:nowrap}td.am{font-weight:800;font-size:10pt}
-tr.tot td{border-bottom:0;border-top:1.2px solid #16213a;font-weight:800;padding-top:11px;font-size:10pt}
+tr.tot td{border-bottom:0;border-top:1.5px solid #13284f;font-weight:800;padding-top:11px;font-size:10pt}
 .st{display:inline-block;font-size:7.3pt;font-weight:700;padding:1px 9px;border-radius:20px;white-space:nowrap}
 .st.ok{background:#e9f6ef;color:#15803d}.st.fail{background:#fcecee;color:#c2414b}.st.pending{background:#fbf4e1;color:#946200}.st.none{background:#eef1f6;color:#5b6577}.sty{display:inline-block;margin-top:3px;font-size:9.5px;font-weight:700;color:#2a4fb8;background:#eaf0ff;border-radius:6px;padding:1px 6px}
 .tn{direction:ltr;display:inline-block;font-size:8pt;color:#2a3550;font-weight:600}
@@ -124,8 +125,9 @@ tr.stlr td{padding:0 6px 11px}
 .stw{display:inline-block;font-size:6.8pt;font-weight:700;color:#946200;background:#fbf4e1;border-radius:6px;padding:0 5px}
 .stbr.bk .stk{color:#2a4fb8}.stbr.bk i{background:#2a4fb8;color:#fff}.stbr.bk b{color:#2a4fb8}
 .pb{position:fixed;top:10px;left:10px;padding:9px 16px;background:#13284f;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}@media print{.pb{display:none}}`}
-function pdfTop(kind,D){const now=new Date();return `<div class="top"><div class="brand"><span class="mk">م</span><span><b>مطلا</b><small>طلا و جواهر</small></span></div><div class="doc">${esc(kind)}<br>${D.fa}</div></div>`}
-const pdfFoot=()=>`<div class="foot"><span>بده بستون · مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
+/* v61.64 (خواسته صاحب اپ): همه PDFها با تم تازه — سرتیتر سرمه‌ای با لوگوی «طلای مطلا»، نوار طلایی و نقش کم‌رنگ لوگو پشت برگه (مثل فاکتور) */
+function pdfTop(kind,D){return `<div class="top"><div class="brand"><span class="lg" role="img" aria-label="طلای مطلا"></span><span><b>${esc(kind)}</b><small>طلا و جواهر مطلا</small></span></div><div class="doc">تاریخ<b>${D.fa}</b></div></div>`}
+const pdfFoot=()=>`<div class="foot"><span style="color:#b8862b;font-weight:800">طلای مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
 const pdfDoc=(title,body)=>`<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>${PDF_FONT}<style>${pdfCSS()}</style></head><body><button class="pb" onclick="window.print()">چاپ / ذخیره PDF</button>${body}</body></html>`;
 const pdfSub=(D,reg)=>`<div class="sub"><span class="pdl">تاریخ واریز</span><span class="pdv">${D.fa}</span><span class="pde">${D.en}</span>${reg?`<span class="rg">ثبت: ${esc(reg)}</span>`:''}</div>`;
 /* v59.8: نام فایل خروجی (PDF و Excel) = تاریخ واریز، مثل «مطلا ( تاریخ ۲۹/۰۷/۱۴۰۵ )».
