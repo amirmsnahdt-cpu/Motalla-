@@ -1709,3 +1709,72 @@ html.kbo #act{display:none!important}
 .c6vb{grid-auto-flow:row dense}
 .c6vb>.cbk.xc{grid-column:1}
 .c6vb>.cbk.xf{grid-column:2}
+
+/* ===== v61.61 (خواسته صاحب اپ) ===== */
+/* ردیف سند: جمع‌وجور؛ زدن = جزئیات زیرش با حرکت، دو بار = ویرایش */
+.d6rows.d7 .d6r.d8 .d6rb{gap:0;touch-action:manipulation}
+.d6r.d8 .d8h{align-items:center;gap:10px}
+.d6r.d8 .d8h .d6t{padding-top:0}
+.d6r.d8 .d8h .d6v{flex:0 0 46%;max-width:46%;display:flex;flex-direction:column;align-items:stretch;gap:4px;margin:0;padding:0;align-self:center}
+.d6r.d8 .d8h .d6e{flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:4px;row-gap:0;padding:4px 9px 5px;border-radius:10px}
+.d6r.d8 .d8h .d6e small{grid-column:1/-1;justify-self:start;padding:0;background:none;font-size:9.5px}
+.d6r.d8 .d8h .d6e .fz{--fmax:15px;text-align:left}
+.d6r.d8 .d8h .d6e>i{font-size:9.5px}
+.d8ch{flex:none;display:grid;place-items:center;width:18px;height:18px;margin-inline-start:-4px;color:var(--mut);font-style:normal;transform:rotate(90deg);transition:transform .32s cubic-bezier(.2,.9,.25,1)}
+.d8ch svg{width:14px;height:14px;stroke-width:2.4}
+.d6r.op .d8ch{transform:rotate(-90deg);color:var(--blu)}
+.d8x{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .34s cubic-bezier(.2,.9,.25,1),opacity .24s ease}
+.d6r.op .d8x{grid-template-rows:1fr;opacity:1}
+.d8xi{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:7px}
+.d8xi>.d8s{margin-top:9px}
+.d8eb{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:10px;background:color-mix(in srgb,var(--blu) 10%,var(--card));color:var(--blu);font-size:12.5px;font-weight:800}
+.d8eb svg{width:15px;height:15px}.d8eb small{font-size:10.5px;font-weight:700;color:var(--mut)}
+.d6r.d8.d8z .d6rb{padding-bottom:10px}
+@media (prefers-reduced-motion:reduce){.d8x,.d8ch{transition:none}}
+
+/* پنجره ورود ردیف: دکمه برگشت، و حرکت برگشت (از راست) */
+.sthb{flex:none;display:inline-flex;align-items:center;gap:3px;height:30px;padding:0 10px 0 8px;margin-inline-end:2px;border:0;border-radius:10px;background:color-mix(in srgb,var(--blu) 10%,var(--card));color:var(--blu);font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.sthb svg{width:15px;height:15px;stroke-width:2.4}
+.d6q.swap.bw{animation:d6back .3s cubic-bezier(.2,.9,.25,1)}@keyframes d6back{from{opacity:.35;transform:translateX(16px)}}
+@media (prefers-reduced-motion:reduce){.d6q.swap.bw{animation:none}}
+
+/* مانده قبلی یک‌جا */
+.pvw .sthd{margin-bottom:6px;min-height:30px}
+.pvnote{display:flex;align-items:center;gap:6px;margin:0 2px 8px;font-size:12.5px;font-weight:700;color:var(--mut)}
+.pvnote svg{width:15px;height:15px}.pvnote.d b{color:var(--red)}.pvnote.c b{color:var(--blu)}
+.pvg{display:flex;flex-direction:column;gap:6px}
+.pvl{display:flex;align-items:center;gap:8px;min-height:50px;padding:0 6px 0 12px;border-radius:14px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);transition:box-shadow .2s}
+.pvl:focus-within{box-shadow:inset 0 0 0 2px var(--blu)}
+.pvk{flex:0 0 74px;display:flex;flex-direction:column;line-height:1.25}.pvk b{font-size:14px;font-weight:850}.pvk small{font-size:10.5px;font-weight:700;color:var(--mut)}
+.pvl input{flex:1;min-width:0;height:46px;border:0;background:none;font:inherit;font-size:18px;font-weight:850;color:var(--ink);text-align:left;font-feature-settings:"tnum";outline:none}
+.pvx{flex:none;width:30px;height:30px;border:0;border-radius:9px;background:var(--seg);color:var(--mut);font-size:18px;line-height:1;cursor:pointer}
+.pvadd{margin-top:8px}
+.pvab{display:flex;align-items:center;gap:6px;width:100%;height:40px;padding:0 12px;border:1.5px dashed color-mix(in srgb,var(--blu) 45%,transparent);border-radius:12px;background:none;color:var(--blu);font:inherit;font-size:13.5px;font-weight:800;cursor:pointer}
+.pvab svg{width:16px;height:16px;transition:transform .3s cubic-bezier(.2,.9,.25,1)}.pvab small{margin-inline-start:auto;font-size:11px;font-weight:700;color:var(--mut)}
+.pvadd.op .pvab svg{transform:rotate(45deg)}
+.pvch{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .32s cubic-bezier(.2,.9,.25,1),opacity .22s}
+.pvadd.op .pvch{grid-template-rows:1fr;opacity:1}
+.pvchi{min-height:0;overflow:hidden;display:flex;flex-wrap:wrap;gap:6px}
+.pvadd.op .pvchi{padding-top:8px}
+.pvc{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 12px;border:0;border-radius:10px;background:var(--goldbg,color-mix(in srgb,#c9a227 12%,var(--card)));color:var(--ink);font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.pvc svg{width:15px;height:15px;color:var(--gold,#b8862b)}
+.pvlv{margin-top:10px;padding:8px 10px;border-radius:14px;background:color-mix(in srgb,var(--mut) 6%,var(--card));box-shadow:inset 0 0 0 1px var(--line)}
+.pvlv>small{display:block;font-size:11px;font-weight:700;color:var(--mut);margin-bottom:4px}
+.pvle{display:flex;flex-wrap:wrap;gap:5px}
+.pvq{display:inline-flex;align-items:baseline;gap:5px;padding:5px 10px;border-radius:10px;background:var(--card);line-height:1.2}
+.pvq small{font-size:10px;font-weight:800}.pvq b{font-size:15px;font-weight:900;font-feature-settings:"tnum"}.pvq i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--mut)}
+.pvq.d{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 30%,transparent)}.pvq.c{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 30%,transparent)}
+.pvq.d b,.pvq.d small{color:var(--red)}.pvq.c b,.pvq.c small{color:var(--blu)}
+@media (prefers-reduced-motion:reduce){.pvch,.pvab svg{transition:none}}
+
+/* جدول مانده‌ها: مبلغ و طلا همیشه؛ بقیه زیر دکمه گوشه */
+.iv8h::before{content:none}
+.iv8tg,.iv8tg0{display:block;min-width:0}
+.iv8tg{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;height:30px;padding:0 2px;border:0;border-radius:9px;background:color-mix(in srgb,var(--blu) 12%,var(--card));color:var(--blu);font:inherit;cursor:pointer;line-height:1.05;transition:background .2s}
+.iv8tg b{font-size:12.5px;font-weight:900}.iv8tg small{font-size:8.5px;font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iv8tg.op{background:var(--blu);color:#fff}
+.iv8x{display:grid;grid-template-rows:0fr;opacity:0;margin-top:-4px;transition:grid-template-rows .34s cubic-bezier(.2,.9,.25,1),opacity .24s,margin .34s}
+.iv8x.op{grid-template-rows:1fr;opacity:1;margin-top:0}
+.iv8xi{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:5px}
+@media (prefers-reduced-motion:reduce){.iv8x{transition:none}}
+.pvl input,.pvl input:focus{border:0!important;box-shadow:none!important;background:none!important;padding:0 4px!important;border-radius:0!important}

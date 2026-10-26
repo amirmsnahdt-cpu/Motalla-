@@ -50,7 +50,9 @@ function stSteps(){const a=sv.qa,K=stKind();
   return []}
 const stFmt=(s,v)=>s.fm&&s.fm(v)!=null?s.fm(v):s.type==='wam'?(+v>=1000?fmt(+v)+' تومان':(+v?toFa(String(v))+' گرم':'')):s.type==='pick'?(s.lab0&&s.lab0(v))||'':s.type==='num'?(+v?fmt(+v):''):s.type==='dec'?(v===''||v==null||!+v?'':(s.grp?qFmt(v):toFa(String(v)))+(s.u&&s.u!=='تومان'?' '+s.u:'')):s.type==='int'?(+v?toFa(String(v)):''):esc(v||'');
 /* عملیات و کالا (بالای نوار، بیرون از فیلد) */
-function stHead(D,it,canBack){return `<div class="sthd k-${D[0]}"><button type="button" class="sthk" data-act="${it?'stBack0':'dkD'}" aria-label="تغییر نوع"><span class="sthi">${ic(D[2])}</span><b>${D[1]}</b></button>${it?`<i class="sthc">›</i><button type="button" class="sthit" data-act="stBack0">${esc(it)}</button>`:'<i class="sthc">›</i><span class="sthq">انتخاب کنید</span>'}<button type="button" class="lnk sthx" data-act="${it?'qaX':'dkD'}">انصراف</button></div>`}
+/* v61.61 (خواسته صاحب اپ): بالای پنجره ورود ردیف دکمه «برگشت» (یک مرحله عقب: پله قبلی ← فهرست جنس‌ها ← فهرست کارها)؛
+   «انصراف» کل همین ردیفِ در حال ورود را دور می‌ریزد و پنجره به حالت اول برمی‌گردد (ردیف ثبت‌شده با انصراف حذف نمی‌شود) */
+function stHead(D,it,canBack){return `<div class="sthd k-${D[0]}"><button type="button" class="sthb" data-act="stUp" aria-label="برگشت">${ic('back')}<span>برگشت</span></button><button type="button" class="sthk" data-act="${it?'stBack0':'stUp'}" aria-label="تغییر نوع"><span class="sthi">${ic(D[2])}</span><b>${D[1]}</b></button>${it?`<i class="sthc">›</i><button type="button" class="sthit" data-act="stBack0">${esc(it)}</button>`:''}<button type="button" class="lnk sthx" data-act="qaCancel">انصراف</button></div>`}
 const stTag=()=>{const a=sv.qa,K=stKind(),d=a.d||(a.x&&a.x.fd)||(a.p&&a.p.dir)||(a.x?(a.x.cat==='تعویض'?'swap':a.x.cat==='مرجوعی'?'ret':a.x.t):'sell');
   const D=DK.find(z=>z[0]===d)||DK[0];let it='';if(K==='it')it=a.k;else if(K==='ab')it='آبشده';else if(K==='xr'){const x=a.x;it=x.cat==='تعویض'?'طلای کهنه':x.cat==='مرجوعی'?'طلای برگشتی':x.a==='gold'?(x.pz?'سکه پارسیان':x.cat==='مانده قبلی'?'مانده قبلی طلا':x.pul?'پولی':x.cat||'طلا'):((x.pul?'پولی ':'')+((XA[x.a]||{}).t||x.a))}else if(K==='py')it=dkST(d==='out'?'out':'in',a.p.m)||(PM[a.p.m]||{}).t||'';
   return {D,it}};
@@ -101,7 +103,7 @@ function stBind(){phPaint($('qa'));const I=$('stI'),a=sv.qa;if(!I)return;const S
   selOnFocus(I);I.oninput=()=>{if(s.type==='num'){const pos=I.selectionStart||0,b=toEn(I.value.slice(0,pos)).replace(/\D/g,'').length,v=num(I.value);I.value=v?v.toLocaleString('en-US'):'';let p=0,d=0;while(p<I.value.length&&d<b){if(/\d/.test(I.value[p]))d++;p++}try{I.setSelectionRange(p,p)}catch(_){}}
     else if(s.type==='wam'){const v=toEn(I.value).replace(/,/g,'');if(+v>=1000&&/^\d+$/.test(v))I.value=(+v).toLocaleString('en-US');else I.value=decIn(I.value)}else if(s.type==='dec')I.value=s.grp?grpIn(I.value):decIn(I.value);else if(s.type==='int')I.value=toEn(I.value).replace(/\D/g,'').slice(0,3);else if(s.type==='dig')I.value=toEn(I.value).replace(/\D/g,'');stRead();svKeep();stPaint()};
   I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.stNext()}}}
-function stRe(){qaRe();const I=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)];if(I&&$('ov').classList.contains('hide')&&!(c0&&c0.type==='pick'&&!c0.search))setTimeout(()=>{try{I.focus({preventScroll:true})}catch(_){I.focus()}},30);const c=document.querySelector('#qa .st3');if(c&&!RM()&&c.animate)c.animate([{opacity:.4,transform:'translateX(-12px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});const o=document.querySelector('#qa .stp.on');if(o&&o.scrollIntoView)o.scrollIntoView({block:'nearest',inline:'center'})}
+function stRe(){const bw=qaDir==='bw';qaRe();const I=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)];if(I&&$('ov').classList.contains('hide')&&!(c0&&c0.type==='pick'&&!c0.search))setTimeout(()=>{try{I.focus({preventScroll:true})}catch(_){I.focus()}},30);const c=document.querySelector('#qa .st3');if(c&&!RM()&&c.animate)c.animate([{opacity:.4,transform:`translateX(${bw?14:-12}px)`},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});const o=document.querySelector('#qa .stp.on');if(o&&o.scrollIntoView)o.scrollIntoView({block:'nearest',inline:'center'})}
 function stFinish(){const K=stKind();if(K==='it'||K==='ab')ACT.qaAdd();else if(K==='xr')ACT.xrSave();else if(K==='py')ACT.pySave()}
 const stOk=s=>s.need&&s.need()?false:s.wOr?true:s.opt||s.type==='int'||(s.type==='wam'?(+sv.qa.x.w||+sv.qa.x.am):s.type==='text'?s.get():+s.get());
 ACT.stNext=()=>{stRead();const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1),s=S[i];
@@ -122,7 +124,15 @@ ACT.stPkAdd=()=>{const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1),s=S[i]
 function stPeerNew(c){const p=sv.qa&&sv.qa.p;if(!p)return;p.cuId=c.id;p.cuName=cuName(c);sv.qa.sq='';svKeep();ACT.stNext()}
 ACT.stChAdd=()=>{const n=$('pyCn'),name=clean((n&&n.value)||'');if(!name){toast('نام کارتخوان را بنویسید',true);return}const r=chNew(name,'pos');if(r){sv.qa.p.chId=r.id;sv.qa.st=1;svKeep();stRe();toast('«'+name+'» اضافه شد')}};
 ACT.stDel=()=>{const K=stKind();if(K==='it'||K==='ab')ACT.qaDel();else if(K==='xr')ACT.xrDel();else if(K==='py')ACT.pyDel()};
-ACT.stBack0=()=>{const a=sv.qa;sv.qa={...qaBlank(),d:a.d||(a.x&&a.x.fd)||(a.p&&a.p.dir)||''};svKeep();qaRe('qK')};
+ACT.stBack0=()=>{const a=sv.qa;sv.qa={...qaBlank(),d:a.d||(a.pv&&a.pv.dir)||(a.x&&a.x.fd)||(a.p&&a.p.dir)||''};svKeep();qaDir='bw';qaRe('qK')};
+/* برگشت یک مرحله: پله قبلی؛ از پله اول به فهرست جنس‌ها (ردیف ثبت‌شده‌ای که ویرایش می‌شود: بستن بدون تغییر)؛ از فهرست جنس‌ها به فهرست کارها */
+ACT.stUp=()=>{const a=sv.qa,ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null)||(a.pv&&a.pv.gid);
+  if(a.pv){if(ed){ACT.qaCancel();return}ACT.stBack0();return}
+  if(a.k||a.x||a.p){if((a.st||0)>0){stRead();a.stMax=Math.max(a.stMax||0,a.st);a.st--;a.sq='';svKeep();qaDir='bw';stRe();return}if(ed){ACT.qaCancel();return}ACT.stBack0();return}
+  if(a.pk){a.pk='';a.q='';svKeep();qaDir='bw';qaRe();return}
+  qaRead();sv.qa={...qaBlank()};dkOpen=true;svKeep();qaDir='bw';qaRe();dkShow()};
+/* انصراف = کل ردیف در حال ورود کنار می‌رود (ویرایش ردیف ثبت‌شده: بدون تغییر بسته می‌شود) */
+ACT.qaCancel=()=>{sv.qa=qaBlank();dkOpen=false;svKeep();qaDir='bw';qaRe()};
 /* v61.60 (خواسته صاحب اپ، فیلم اندروید): وقتی کیبورد باز است نوار مانده پایین سند (#act) پنهان می‌شود تا جا نگیرد —
    در اندروید صفحه با کیبورد کوچک می‌شود و نوار بالای کیبورد می‌آمد. تشخیص: فیلد تایپی فوکوس دارد و ارتفاع دید ۱۴۰px+ کم شده */
 let kbBase=0;

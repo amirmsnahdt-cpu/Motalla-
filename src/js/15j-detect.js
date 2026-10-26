@@ -33,7 +33,8 @@ function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls)=>R.push({id,t,ico,sub
   /* v61.60 (خواسته صاحب اپ): پولی کردن سکه و ارز — جنس تحویل نمی‌شود؛ نرخ می‌گیرد، مبلغ و مانده همان جنس در حساب می‌ماند */
   if(d==='sell'||d==='buy'){fx('p:c','پولی سکه','swap',d==='sell'?'سکه تحویل نمی‌شود · مبلغ و مانده سکه':'سکه تحویل گرفته نمی‌شود · مبلغ و مانده سکه','gd');fx('p:f','پولی ارز','usd',d==='sell'?'ارز تحویل نمی‌شود · مبلغ و مانده ارز':'ارز تحویل گرفته نمی‌شود · مبلغ و مانده ارز')}
   /* v61.60: مانده قبلی (افتتاح حساب) — تومان یا طلا؛ فروش/پرداخت = طلبکاریم، خرید/دریافت = بدهکاریم */
-  {const out=d==='sell'||d==='out';fx('m:prev','مانده قبلی · تومان','clock',out?'مشتری بدهکار است · طلبکاریم':'مشتری طلبکار است · بدهکاریم');fx('g:prev','مانده قبلی · طلا','clock',out?'طلای مشتری بدهکار · طلبکاریم':'طلای مشتری طلبکار · بدهکاریم','gd')}
+  /* v61.61 (خواسته صاحب اپ): مانده قبلی فقط در دریافت و پرداخت، و یک واحد: تومان و طلا با هم (دلار، سکه… هم اضافه می‌شود) */
+  if(d==='in'||d==='out')fx('v:prev','مانده قبلی','clock',d==='out'?'تومان، طلا، دلار، سکه · طلبکاریم':'تومان، طلا، دلار، سکه · بدهکاریم');
   xaSync();COINS().forEach(k=>fx('a:'+k,XA[k].t,'coin',XA[k].x?'سکه':'سکه','gd'));FXS().forEach(k=>fx('a:'+k,XA[k].t,'usd','ارز'));return R}
 function dkHTML(){const a=sv.qa,D=a.d&&DK.find(z=>z[0]===a.d);
   const sel=(t,ico,act,cls)=>`<div class="dksel${cls?' '+cls:''}"><span class="dki">${ic(ico)}</span><b>${t}</b><button class="itx" data-act="${act}" aria-label="برداشتن">×</button></div>`;
@@ -79,6 +80,7 @@ ACT.dkPk0=()=>{sv.qa.pk='';svKeep();const r=$('qKs');if(r)r.innerHTML=dkList()};
 ACT.dkPul=d=>{const a=sv.qa,D=a.d,k=d.k;if(!k||!XA[k])return;a.pk='';a.q='';xrStart(xrNew(D,k,{pul:true,fl:'one',fd:D}))};
 /* انتخاب از موارد ثابت */
 ACT.dkF=d=>{qaRead();const a=sv.qa,D=a.d,[ty,v]=String(d.id).split(':');a.q='';a.nc=0;const PO=D==='sell'||D==='out'?'out':'in';
+  if(ty==='v'&&v==='prev'){pvStart({dir:D==='out'?'out':'in'});return}
   if(ty==='m'&&v==='prev'){pyStart(pyNew('prev',{dir:PO,fl:1}));return}
   if(ty==='g'&&v==='prev'){xrStart(xrNew(PO,'gold',{cat:'مانده قبلی',pul:true,ay:750,fl:'gold',fd:D}));return}
   if(ty==='p'){a.pk=v;svKeep();const r=$('qKs');if(r)r.innerHTML=dkList();return}
