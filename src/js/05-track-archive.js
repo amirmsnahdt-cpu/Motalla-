@@ -95,12 +95,12 @@ async function openItem(bid,i){const b=batches.find(z=>z.id==bid);if(!b)return;c
   sheet(`<div class="sh-h"><div><b>${esc(x.name)}</b><small class="shsub">واریز بانکی${x.src?' · '+esc(x.src):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="itf">
   <div class="ithero"><b>${fmt(x.amount)}<i>تومان</i></b><span class="ithc">${x.bank?bankBadge(x.bank)+'<span>'+esc(x.bank)+'</span>':''}</span><span class="itst ${s0[0]}" id="itstp"><i></i><b>${s0[1]}</b></span></div>
-  <div class="itg"><label class="itr" for="itn"><span>شماره پیگیری</span><span class="itv"><input id="itn" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" value="${esc(x.tn||'')}" placeholder="مثلاً 140507181234"><button type="button" class="itx${x.tn?'':' hide'}" id="itnx" data-act="itTnClr" aria-label="پاک کردن شماره پیگیری">×</button></span></label>
+  <div class="itg"><label class="itr" for="itn"><span>شماره پیگیری</span><span class="itv"><input id="itn" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" value="${esc(x.tn||'')}" placeholder="شماره پیگیری"><button type="button" class="itx${x.tn?'':' hide'}" id="itnx" data-act="itTnClr" aria-label="پاک کردن شماره پیگیری">×</button></span></label>
   <label class="itr" for="itt"><span>ساعت واریز</span><span class="itv"><input id="itt" type="time" class="ltr" value="${esc(x.time||'')}"><button type="button" class="itnow" data-act="itNow">الان</button></span></label></div>
   <div class="ith">رسید <i>${itImgs(b,x).length?toFa(itImgs(b,x).length)+' عکس · برای بزرگ‌نمایی بزنید':'یک یا چند عکس'}</i></div>
   <div class="galg itgal" id="itgal">${itGalHTML()}</div>
   <div class="ith">یادداشت <i>اختیاری</i></div>
-  <div class="itg"><input id="itno" class="itno" value="${esc(x.note||'')}" placeholder="مثلاً واریز دو مرحله‌ای"></div>
+  <div class="itg"><input id="itno" class="itno" value="${esc(x.note||'')}" placeholder="توضیح (اختیاری)"></div>
   <button class="xgo" data-act="itSave">${ic('check')} ذخیره</button>
   <button class="itfail" data-act="itFail">${tmpSt==='fail'?'برگرداندن به «در انتظار»':'این واریز انجام نشد'}</button></div>`);
   galThumbs();

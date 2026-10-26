@@ -31,7 +31,7 @@ const bpill=(k,v)=>v?`<span class="bp ${k==='r'?'r':k==='g'?'g':'x'} ${v<0?'d':'
 let cuAnim=0,cuCntId=null;/* کاشی‌های صفحه مشتری فقط بار اول ورود حرکت می‌کنند، نه در هر تازه‌سازی */
 const bindCust=()=>{if(cuCntId===custId)return;cuCntId=custId;requestAnimationFrame(()=>cuCount('.cub9.anim .cbn'))};
 /* v61.60: ارز (xf) زیر مبلغ، سکه (xc) زیر طلا — CSS .c6vb با grid-auto-flow dense */
-const cbCell=(k,v,i)=>`<span class="cbk k${k==='r'?'r':k==='g'?'g':'x x'+((XA[k]||{}).k==='f'?'f':'c')} ${v<0?'d':v>0?'c':'z'}" style="--i:${i}"><span class="cbh"><small>${k==='r'?'مبلغ':k==='g'?'طلا':esc((XA[k]||{t:k}).t)} <i>${esc(balU(k))}</i></small>${v?`<em>${ourLab(v)}</em>`:''}</span><b${fitS(v?balV(k,v):'۰')}><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span></b></span>`;
+const cbCell=(k,v,i)=>`<span class="cbk k${k==='r'?'r':k==='g'?'g':'x x'+((XA[k]||{}).k==='f'?'f':'c')} ${v<0?'d':v>0?'c':'z'}" style="--i:${i}"><span class="cbh"><small>${balKL(k)}</small>${v?`<em>${ourLab(v)}</em>`:''}</span><b${fitS(v?balV(k,v):'۰')}><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span></b></span>`;
 function balPills(b){const X=Object.keys(b.X||{}).filter(k=>b.X[k]);if(!b.R&&!b.G&&!X.length)return `<span class="cbz"><span class="cbzi">${ic('check')}</span><span class="cbzt"><b>حساب تسویه است</b><small>مبلغ و طلا صفر</small></span><em>تسویه</em></span>`;
   const L=[['g',b.G],['r',b.R],...X.map(k=>[k,b.X[k]])];let i=0;return L.map(([k,v])=>cbCell(k,v,i++)).join('')}
 /* v61.56 (خواسته صاحب اپ): کارت مشتری (آواتار، عنوان، نام، گروه، تلفن) در سرتیتر همه صفحه‌های مشتری، زیر عنوان صفحه
@@ -114,11 +114,11 @@ function cuFormHTML(c){const isNew=!c.id;cuT=c.title||'';cuEd=c.id||null;const g
   return `<div class="sh-h"><div><b>${isNew?'حساب تازه':'مشخصات مشتری'}</b><small class="shsub">${isNew?'از مشتری‌های قبلی پیشنهاد می‌آید؛ بعد از ثبت وارد حساب او می‌شوید':'تغییرها را بدهید و ذخیره کنید'}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="f6">
   <div class="f6h">مشتری</div>
-  <div class="f6g">${fr('cuN','نام و نام خانوادگی',c.name,{ac:1,ph:'مثلاً مریم احمدی'})}
+  <div class="f6g">${fr('cuN','نام و نام خانوادگی',c.name,{ac:1,ph:'نام و نام خانوادگی'})}
   ${fr('cuP','شماره تماس',c.phone,{ac:1,ltr:1,im:'tel',ph:'09xxxxxxxxx',hint:1})}
   ${fr('cuM','کد ملی',c.nid,{ac:1,ltr:1,im:'numeric',ph:'اختیاری · ۱۰ رقم',hint:1})}</div>
   <div class="f6h">گروه</div>
-  <div class="f6g">${fr('cuG','گروه مشتری',g,{ac:1,ph:'بدون گروه · مثلاً همکار، عمده'})}</div>
+  <div class="f6g">${fr('cuG','گروه مشتری',g,{ac:1,ph:'بدون گروه'})}</div>
   <div class="f6h">بیشتر</div>
   <div class="f6g">${fr('cuA','آدرس یا توضیح',c.note,{ph:'اختیاری',last:1})}</div>
   </div>
@@ -194,7 +194,7 @@ const BZK={'طلا':{u:'گرم',q:'وزن',dec:1,t:['آبشده','نو','مست�
 function bzItems(){const d=bz.d;if(!d.items||!d.items.length)d.items=[{k:'طلا',q:d.weight||'',r:0,amt:num(d.amount||0)}]}
 function bzItemsHTML(){const L=bz.d.items;return L.map((x,i)=>{const K=BZK[x.k]||BZK['سایر'];return `<div class="bzit" data-i="${i}"><div class="bzit-h">${Object.keys(BZK).map(k=>`<button class="tch${x.k===k?' on':''}" data-act="bzItK" data-i="${i}" data-k="${k}">${k}</button>`).join('')}${L.length>1?`<button class="x" data-act="bzItDel" data-i="${i}" aria-label="حذف">×</button>`:''}</div>
   ${K.t?`<div class="bzty"><span>${K.tl}</span>${K.t.map(t=>`<button class="${x.t===t?'on':''}" data-act="bzItT" data-i="${i}" data-t="${t}">${t}</button>`).join('')}</div>`:''}
-  ${K.q?`<div class="ef2"><div class="ef"><label>${K.q} <i>(${K.u})</i></label><input data-f="q" class="ltr" inputmode="decimal" value="${esc(x.q||'')}" autocomplete="off"></div><div class="ef"><label>${K.rl||'نرخ هر '+(K.u==='گرم'?'گرم':K.u||'واحد')} <i>(اختیاری)</i></label><input data-f="r" class="ltr" inputmode="numeric" value="${x.r?Number(x.r).toLocaleString('en-US'):''}" autocomplete="off"></div></div>`:x.k==='سایر'?`<div class="ef"><label>شرح</label><input data-f="n" value="${esc(x.n||'')}" placeholder="مثلاً بدهی قبلی، ارز دیگر…" autocomplete="off"></div>`:''}
+  ${K.q?`<div class="ef2"><div class="ef"><label>${K.q} <i>(${K.u})</i></label><input data-f="q" class="ltr" inputmode="decimal" value="${esc(x.q||'')}" autocomplete="off"></div><div class="ef"><label>${K.rl||'نرخ هر '+(K.u==='گرم'?'گرم':K.u||'واحد')} <i>(اختیاری)</i></label><input data-f="r" class="ltr" inputmode="numeric" value="${x.r?Number(x.r).toLocaleString('en-US'):''}" autocomplete="off"></div></div>`:x.k==='سایر'?`<div class="ef"><label>شرح</label><input data-f="n" value="${esc(x.n||'')}" placeholder="شرح" autocomplete="off"></div>`:''}
   <div class="ef" style="margin:0"><label>مبلغ این قلم <i>(تومان)</i></label><input data-f="amt" class="ltr" inputmode="numeric" value="${x.amt?Number(x.amt).toLocaleString('en-US'):''}" autocomplete="off"></div></div>`}).join('')}
 function bzItRead(){const d=bz.d;document.querySelectorAll('#bzIt .bzit').forEach(el=>{const x=d.items[+el.dataset.i];if(!x)return;const g=f=>{const i=el.querySelector('[data-f='+f+']');return i?i.value:undefined};if(g('q')!==undefined)x.q=decIn(g('q'));if(g('r')!==undefined)x.r=num(g('r'));if(g('amt')!==undefined)x.amt=num(g('amt'));if(g('n')!==undefined)x.n=g('n')});
   d.amount=String(d.items.reduce((s,x)=>s+(+x.amt||0),0));const gw=d.items.filter(x=>x.k==='طلا').reduce((s,x)=>s+(parseFloat(x.q)||0),0);d.weight=gw?String(Math.round(gw*1000)/1000):''}
@@ -220,7 +220,7 @@ const bzF=(id,label,val,o={})=>`<div class="ef"><label for="${id}">${label}${o.o
 function vBuy(){const d=bz.d,st=bz.step,T=['اطلاعات مشتری','وزن و مبلغ','حساب و تاریخ واریز'];
   let h=`<div class="bzp">${[1,2,3].map(i=>`<i class="${i<st?'done':i===st?'on':''}"></i>`).join('')}</div><div class="bzh"><small>مرحله ${toFa(st)} از ۳</small><b>${T[st-1]}</b></div>`;
   if(bz.msg)h+=`<div class="bzok">${ic('check')}<span>${bz.msg}</span></div>`;
-  if(st===1)h+=bzF('bzN','نام و نام خانوادگی',d.name,{ph:'مثلاً علی رضایی',sug:1})+bzF('bzP','شماره تماس',d.phone,{ltr:1,im:'tel',ph:'09xxxxxxxxx',opt:1})+bzF('bzM','کد ملی',d.nid,{ltr:1,im:'numeric',ph:'۱۰ رقم',opt:1})+bzF('bzC','شماره فاکتور',d.code,{ltr:1,im:'numeric',last:1});
+  if(st===1)h+=bzF('bzN','نام و نام خانوادگی',d.name,{ph:'نام و نام خانوادگی',sug:1})+bzF('bzP','شماره تماس',d.phone,{ltr:1,im:'tel',ph:'09xxxxxxxxx',opt:1})+bzF('bzM','کد ملی',d.nid,{ltr:1,im:'numeric',ph:'۱۰ رقم',opt:1})+bzF('bzC','شماره فاکتور',d.code,{ltr:1,im:'numeric',last:1});
   if(st===2){bzItems();h+=`<div id="bzIt">${bzItemsHTML()}</div><button class="addit" data-act="bzAddIt">${ic('plus')} افزودن قلم دیگر <small>(سکه، دلار، طلای دیگر…)</small></button><div id="bzS"></div>`}
   if(st===3){h+=`<div class="ef"><label for="bzI">شماره شبا</label><div class="ibin"><input id="bzI" inputmode="numeric" value="${esc(d.iban||'')}" placeholder="شماره شبا (۲۴ رقم)" autocomplete="off" enterkeyhint="next"><span class="ibir">IR</span><span class="ibbk" id="bzIb"></span></div><small class="eh" id="bzIv"></small>${d.prevIban?`<button class="bzni" data-act="bzNewIban">${ic('edit')} شبای جدید وارد می‌کنم</button>`:''}</div>`+bzF('bzK','شماره کارت',d.card,{ltr:1,im:'numeric',ph:'۱۶ رقم',opt:1})+bzF('bzH','نام صاحب حساب',d.holder!=null?d.holder:clean(d.name||''),{last:1})+bzStlHTML()
     +`<div class="ef"><label>تاریخ واریز</label><button class="bzdate" data-act="bzCal">${ic('cal')}<span><b>${esc(payLab(d.pay))}</b><small>${esc(dates(d.pay).wd+' '+dates(d.pay).fa)}</small></span>${ic('chev')}</button></div>`

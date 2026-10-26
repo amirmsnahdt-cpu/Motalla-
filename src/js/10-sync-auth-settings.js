@@ -135,7 +135,7 @@ function authForm(mode,msg){const a=$('auth'),su=mode==='setup',bm=su?null:bioLo
   a.innerHTML=`<form class="authc" id="authf" autocomplete="on" action="#"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">${su?'راه‌اندازی اولیه — ساخت حساب مدیر':'ورود به بده بستون'}</small>
   ${msg?`<div class="msg warn">${esc(msg)}</div>`:''}
   ${bm?`<button type="button" class="btn bkgo abio" id="abio" data-act="authBio">${lkI('fp')}<span>ورود با اثر انگشت<small>${esc(bm.n||bm.u)}</small></span></button><div class="aor"><span>یا با نام کاربری و رمز</span></div>`:''}
-  ${su?`<div class="f"><label>نام شما</label><input id="an" autocomplete="name" placeholder="مثلاً علی رضایی"></div>`:''}
+  ${su?`<div class="f"><label>نام شما</label><input id="an" autocomplete="name" placeholder="نام و نام خانوادگی"></div>`:''}
   <div class="f"><label>نام کاربری</label><input id="au" class="ltr"${bm?` value="${esc(bm.u)}"`:''} autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="latin" placeholder="username"></div>
   <div class="f"><label>رمز عبور</label><div class="pw"><input id="ap" class="ltr" type="password" autocomplete="${su?'new-password':'current-password'}" placeholder="••••••"><button type="button" class="pwt" data-act="pwToggle" data-t="ap" aria-label="نمایش رمز">${ic('eye')}</button></div></div>
   ${su?`<div class="f"><label>تکرار رمز عبور</label><input id="ap2" class="ltr" type="password" autocomplete="new-password"></div>`:''}
@@ -180,7 +180,7 @@ const roleSeg=r=>`<div class="seg" id="urole">${[['staff','کارمند'],['admi
 let uTmp={};
 function userNew(){uTmp={role:'staff'};const p=genPass();
   sheet(`<div class="sh-h"><b>افزودن همکار</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="f"><label>نام کامل</label><input id="unm" placeholder="مثلاً مریم احمدی" autocomplete="off"></div>
+  <div class="f"><label>نام کامل</label><input id="unm" placeholder="نام و نام خانوادگی" autocomplete="off"></div>
   <div class="f"><label>نام کاربری <i>(انگلیسی، برای ورود)</i></label><input id="uun" class="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="maryam" autocomplete="off"></div>
   <div class="f"><label>رمز عبور</label><div class="pw"><input id="upw" class="ltr" value="${p}" autocomplete="off"><button type="button" class="pwt" data-act="uGen" aria-label="رمز تصادفی">${ic('refresh')}</button></div></div>
   <label class="albl" style="margin-top:4px">نقش</label>${roleSeg('staff')}${permList('staff',DEF_STAFF)}
