@@ -37,7 +37,7 @@ function balPills(b){const X=Object.keys(b.X||{}).filter(k=>b.X[k]);if(!b.R&&!b.
 /* v61.56 (خواسته صاحب اپ): کارت مشتری (آواتار، عنوان، نام، گروه، تلفن) در سرتیتر همه صفحه‌های مشتری، زیر عنوان صفحه
    (جای نام کوچک قبلی). حساب مشتری: زدن = ویرایش مشخصات (مداد)؛ صفحه سند ثبت‌شده: زدن = حساب مشتری؛ صفحه سند: فقط نمایش */
 function cuHead(c,ttl){const a=cur==='cust'?'cuEdit':cur==='inv'?'cuOpen':'',T=a?'button':'div',m=[c.grp?`<em>${esc(c.grp)}</em>`:'',c.phone?`<bdi dir="ltr">${esc(toFa(c.phone))}</bdi>`:''].filter(Boolean).join('');
-  return `<${T} class="cuh9"${a?` data-act="${a}" data-id="${c.id}" aria-label="${a==='cuEdit'?'ویرایش مشخصات ':'حساب '}${esc(cuName(c))}"`:''}><span class="c6a">${esc(userInit(c.name))}</span><span class="cuh9t">${ttl?`<span class="cuh9k">${esc(ttl)}</span>`:''}<span class="cuh9n">${honTag(c.name)}<b>${esc(cuName(c))}</b></span>${m?`<span class="cuh9m">${m}</span>`:''}</span>${a==='cuEdit'?`<span class="c6ed">${ic('edit')}</span>`:a?`<span class="cuh9g">${ic('back').replace('class="i"','class="i flip"')}</span>`:''}</${T}>`}
+  return `<${T} class="cuh9"${a?` data-act="${a}" data-id="${c.id}" aria-label="${a==='cuEdit'?'ویرایش مشخصات ':'حساب '}${esc(cuName(c))}"`:''}>${cuAvH(c)}<span class="cuh9t">${ttl?`<span class="cuh9k">${esc(ttl)}</span>`:''}<span class="cuh9n">${honTag(c.name)}<b>${esc(cuName(c))}</b></span>${m?`<span class="cuh9m">${m}</span>`:''}</span>${a==='cuEdit'?`<span class="c6ed">${ic('edit')}</span>`:a?`<span class="cuh9g">${ic('back').replace('class="i"','class="i flip"')}</span>`:''}</${T}>`}
 /* کارت «مانده حساب»: کاشی‌های مبلغ و طلا (و سکه/ارز) با برچسب طلبکاریم/بدهکاریم؛ عدد در قاب خودش جا می‌شود.
    همان کارت در حساب مشتری و صفحه سند ثبت‌شده؛ کاشی‌ها پله‌ای بالا می‌آیند و عدد یک بار از صفر می‌شمارد */
 function cuBalCard(b,an,act){const T=act?'button':'div';return `<${T} class="c6l c6lb cub9${an?' anim':''}"${act?` data-act="${act.a}" data-id="${act.id}" aria-label="حساب مشتری"`:''}><span class="cub9h"><b>مانده حساب</b>${act?`<small>حساب مشتری ${ic('back').replace('class="i"','class="i flip"')}</small>`:''}</span><span class="c6v c6vb">${balPills(b)}</span></${T}>`}
@@ -75,7 +75,7 @@ function cuListHTML(){const q0=clean(cuQ||''),q=nzName(toEn(q0)),A=CU();let B=A.
   const IV=cuInvHits(q0),ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
   if(!B.length)return (ivh+mem+add)||`<div class="bempty">${ic('search')}<b>حسابی پیدا نشد</b></div>`;
   const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'';cuAnim=0;
-  return `${ivh}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb${an}">${B.map(([c,b],ri)=>swW(`<button class="c6r" data-act="cuOpen" data-id="${c.id}"><span class="c6a">${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="c6v c6vb" style="--r:${Math.min(ri,8)}">${balPills(b)}</span></button>`,{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})).join('')}</div>${mem}${add}`}
+  return `${ivh}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb${an}">${B.map(([c,b],ri)=>swW(`<button class="c6r" data-act="cuOpen" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="c6v c6vb" style="--r:${Math.min(ri,8)}">${balPills(b)}</span></button>`,{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})).join('')}</div>${mem}${add}`}
 const cuName=c=>(c.name||'');
 function cuInvHits(q0){const d=toEn(q0||'').replace(/[\s,،]/g,'');if(!/^\d{1,6}$/.test(d))return [];const R=[];
   for(const c of CU())for(const t of c.txs||[])if(t.type==='inv'&&!t.del&&t.no!=null&&String(t.no).startsWith(d))R.push([c,t]);
@@ -109,16 +109,19 @@ function txRow(c,t){if(t.type==='inv'||t.type==='xf'||t.type==='cv')return txRow
 const aCust=()=>'';
 /* ---- افتتاح / ویرایش حساب: هر فیلد از اطلاعات قبلی مشتری‌ها پیشنهاد می‌دهد ---- */
 let cuT='',cuEd=null;
-function cuFormHTML(c){const isNew=!c.id;cuT=c.title||'';cuEd=c.id||null;const g=c.grp!=null?c.grp:'';
+function cuFormHTML(c){const isNew=!c.id;CUF={av:c.av||'',ids:Array.isArray(c.idImgs)?c.idImgs.slice(0,2):[]};cuT=c.title||'';cuEd=c.id||null;const g=c.grp!=null?c.grp:'';
   const fr=(id,lab,val,o={})=>`<div class="f6r${o.ac?' ac':''}"><label for="${id}">${lab}</label><div class="f6i"><input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(val||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="${o.last?'done':'next'}">${o.ac?`<span class="f6ic">${ic('search')}</span>`:''}</div>${o.ac?`<div class="f6sug hide" id="${id}s" role="listbox"></div>`:''}${o.hint?`<small class="eh" id="${id}v"></small>`:''}</div>`;
   return `<div class="sh-h"><div><b>${isNew?'حساب تازه':'مشخصات مشتری'}</b><small class="shsub">${isNew?'از مشتری‌های قبلی پیشنهاد می‌آید؛ بعد از ثبت وارد حساب او می‌شوید':'تغییرها را بدهید و ذخیره کنید'}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="f6">
+  ${cuPhHTML(c)}
   <div class="f6h">مشتری</div>
   <div class="f6g">${fr('cuN','نام و نام خانوادگی',c.name,{ac:1,ph:'نام و نام خانوادگی'})}
   ${fr('cuP','شماره تماس',c.phone,{ac:1,ltr:1,im:'tel',ph:'09xxxxxxxxx',hint:1})}
   ${fr('cuM','کد ملی',c.nid,{ac:1,ltr:1,im:'numeric',ph:'اختیاری · ۱۰ رقم',hint:1})}</div>
   <div class="f6h">گروه</div>
   <div class="f6g">${fr('cuG','گروه مشتری',g,{ac:1,ph:'بدون گروه'})}</div>
+  <div class="f6h">عکس کارت ملی</div>
+  <div class="cuid" id="cuIdBox">${cuIdHTML()}</div>
   <div class="f6h">بیشتر</div>
   <div class="f6g">${fr('cuA','آدرس یا توضیح',c.note,{ph:'اختیاری',last:1})}</div>
   </div>
@@ -133,7 +136,7 @@ const sugRow=(i,av,b,sub,cls,v)=>`<button type="button" class="bzsr${cls?' '+cls
 function cuPeople(q,by){const nq=nzName(q),qd=toEn(q).replace(/\D/g,'');const P=bzPeople();
   if(by==='n'){if(!nq)return [];return P.filter(p=>p.k.includes(nq)).sort((a,b)=>(b.k.startsWith(nq)-a.k.startsWith(nq))||(b.n-a.n)||String(b.last).localeCompare(String(a.last))).slice(0,6)}
   if(qd.length<3)return [];return P.filter(p=>(by==='p'?p.phone:p.nid).includes(qd)).slice(0,6)}
-function cuBind(){const N=$('cuN'),P=$('cuP'),M=$('cuM'),G=$('cuG'),h=(id,t,c)=>{const o=$(id);if(o){o.textContent=t;o.className='eh'+(c?' '+c:'')}};let L=[];
+function cuBind(){phPaint($('sheet'));const N=$('cuN'),P=$('cuP'),M=$('cuM'),G=$('cuG'),h=(id,t,c)=>{const o=$(id);if(o){o.textContent=t;o.className='eh'+(c?' '+c:'')}};let L=[];
   P.oninput=()=>{const v=toEn(P.value).replace(/\D/g,'').slice(0,11);P.value=v;const d=v&&custs.find(c=>!c.del&&!c.sys&&c.phone===v&&String(c.id)!==String(cuEd));h('cuPv',d?'این شماره برای «'+cuName(d)+'» ثبت شده':v.length===11?(phoneMsg(v)[0]):'',d||(v.length===11&&!phoneOk(v))?'bad':v.length===11?'ok':'')};
   M.oninput=()=>{const v=toEn(M.value).replace(/\D/g,'').slice(0,10);M.value=v;h('cuMv',v.length===10?(nidOk(v)?'کد ملی معتبر است':'کد ملی معتبر نیست'):'',v.length===10?(nidOk(v)?'ok':'bad'):'')};
   if(P.value)P.oninput();if(M.value)M.oninput();
@@ -149,8 +152,8 @@ ACT.cuEdit=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;s
 ACT.cuSave=d=>{const name=clean($('cuN').value),phone=toEn($('cuP').value).replace(/\D/g,''),nidv=toEn($('cuM').value).replace(/\D/g,''),note=clean($('cuA').value||''),grp=clean($('cuG').value||'');
   if(!name){toast('نام مشتری را وارد کنید',true);$('cuN').focus();return}if(phone&&!phoneOk(phone)){toast('شماره تماس درست نیست',true);$('cuP').focus();return}if(nidv&&!nidOk(nidv)){toast('کد ملی معتبر نیست',true);$('cuM').focus();return}
   if(grp)addGroup(grp);const now=new Date().toISOString();let c;
-  if(d.id==='new'){c={id:nid++,title:cuT,name,phone,nid:nidv,note,grp,txs:[],createdAt:now,lastAt:now,by:who()};custs.push(c);logA('cust','افتتاح حساب مشتری',cuName(c))}
-  else{c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;Object.assign(c,{title:cuT,name,phone,nid:nidv,note,grp,updatedAt:now,updatedBy:who()});logA('cust','ویرایش مشخصات مشتری',cuName(c))}
+  const ph={av:CUF.av||'',idImgs:CUF.ids.filter(Boolean)};if(d.id==='new'){c={id:nid++,title:cuT,name,phone,nid:nidv,note,grp,...ph,txs:[],createdAt:now,lastAt:now,by:who()};custs.push(c);logA('cust','افتتاح حساب مشتری',cuName(c))}
+  else{c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;Object.assign(c,{title:cuT,name,phone,nid:nidv,note,grp,...ph,updatedAt:now,updatedBy:who()});logA('cust','ویرایش مشخصات مشتری',cuName(c))}
   saveCu();closeSheet();if(d.id==='new'&&cuRet==='peer'){cuRet='';stPeerNew(c);toast('حساب «'+cuName(c)+'» باز شد');return}if(d.id==='new'&&cuRet==='sell'){cuRet='';svPick(c.id);toast('حساب «'+cuName(c)+'» باز شد و روی سند نشست');return}if(d.id==='new'){cuQ='';custId=c.id;go('cust');toast('حساب «'+cuName(c)+'» باز شد')}else{const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('مشخصات ذخیره شد')}};
 ACT.cuDel=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;const b=cuBal(c);askConfirm('حساب «'+cuName(c)+'» حذف شود؟'+(b.R||b.G||Object.keys(b.X).length?' (ته حساب صفر نیست)':''),'حذف',()=>{c.del=true;c.delAt=new Date().toISOString();saveCu();logA('cust','حذف حساب مشتری',cuName(c));if(cur==='cust')go('custs');else render();toast('حساب حذف شد','', 'بازگردانی',()=>{c.del=false;saveCu();render()})})};
 ACT.cuOpen=d=>{custId=d.id;go('cust')};
@@ -303,3 +306,20 @@ ACT.bzStlSave=()=>{stlRead();const name=clean(stl.name||stl.q||'');if(!name){toa
 async function bzStlMake(){const now=new Date().toISOString(),R=[];for(const s of (bz.d.settles||[])){const z={st:'wait',id:nid++,name:s.name,phone:s.phone,inv:s.inv,amount:s.amount,tn:s.tn,note:s.note,cuId:s.cuId,date:todayISO(),at:now,by:who()};
     if(s.imgD){const k=newImgKey('stl:'+z.id);if(await imgPut(k,s.imgD)){z.imgs=[k];z.img=k}else toast('حافظه پر است؛ عکس رسید ذخیره نشد',true)}R.push(z)}return R}
 ACT.bzNewIban=()=>{bzRead();bz.d.iban='';bz.d.card='';const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const I=$('bzI');if(I)I.focus()};
+
+/* ============ v61.69 (خواسته صاحب اپ): عکس پروفایل مشتری و عکس کارت ملی ============
+   در فرم مشخصات: دایره عکس بالای فرم (زدن = انتخاب یا گرفتن عکس، آیفون خودش «Take Photo» دارد؛ اندروید دکمه دوربین جدا)،
+   و بخش «عکس کارت ملی» با دو خانه روی/پشت کارت. عکس‌ها مثل رسیدها کوچک و در IndexedDB + سرور (/api/img) ذخیره می‌شوند؛
+   کلیدشان روی حساب مشتری (c.av، c.idImgs) با ذخیره فرم می‌نشیند. آواتار عکس‌دار همه‌جا (فهرست، سرتیتر، سند) نشان داده می‌شود. */
+let CUF={av:'',ids:[]};
+const cuAvH=c=>`<span class="c6a${c&&c.av?' cav':''}">${c&&c.av?`<img data-ik="${esc(c.av)}" alt="">`:''}${esc(userInit(c?c.name:''))}</span>`;
+function cuPhHTML(c){const n=clean(c.name||'');return `<div class="cufp"><label class="cuav${CUF.av?' on':''}" aria-label="عکس پروفایل"><span class="cuavi">${CUF.av?`<img data-ik="${esc(CUF.av)}" alt="">`:`<b>${esc(userInit(n||'؟'))}</b>`}</span><span class="cuavb">${ic('cam')}</span><input type="file" accept="image/*" data-cuph="av" hidden></label>
+  <div class="cufpt"><b>عکس پروفایل</b><small>${CUF.av?'برای عوض کردن روی عکس بزنید':'روی دایره بزنید: گالری یا دوربین'}</small><span class="cufpa">${picCam()?`<label class="cufb">${ic('cam')}<span>دوربین</span><input type="file" accept="image/*" capture="user" data-cuph="av" hidden></label>`:''}${CUF.av?`<button type="button" class="cufb rd" data-act="cuPhDel" data-k="av">${ic('trash')}<span>حذف</span></button>`:''}</span></div></div>`}
+function cuIdHTML(){return ['روی کارت','پشت کارت'].map((t,i)=>{const k=CUF.ids[i];return `<div class="cuids${k?' on':''}"><label class="cuidp" aria-label="${t}">${k?`<img data-ik="${esc(k)}" alt="">`:`<span class="cuide">${ic('plus')}<b>${t}</b><small>گالری یا عکس</small></span>`}<input type="file" accept="image/*" data-cuph="id${i}" hidden></label>
+  <span class="cuidf"><small>${k?t:""}</small>${picCam()?`<label class="cufb">${ic('cam')}<input type="file" accept="image/*" capture="environment" data-cuph="id${i}" hidden></label>`:''}${k?`<button type="button" class="cufb rd" data-act="cuPhDel" data-k="id${i}" aria-label="حذف ${t}">${ic('trash')}</button>`:''}</span></div>`}).join('')}
+function cuPhRe(which){const W=$('sheet');if(!W)return;if(which==='av'){const o=W.querySelector('.cufp');if(o){o.outerHTML=cuPhHTML({name:($('cuN')&&$('cuN').value)||''})}}else{const B=$('cuIdBox');if(B)B.innerHTML=cuIdHTML()}
+  phPaint(W);const el=which==='av'?W.querySelector('.cuav'):W.querySelector('#cuIdBox');if(el&&!RM()&&el.animate)el.animate([{transform:'scale(.92)',opacity:.4},{transform:'none',opacity:1}],{duration:320,easing:'cubic-bezier(.2,.9,.25,1)'})}
+document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.dataset||t.dataset.cuph==null)return;const w=t.dataset.cuph,f=t.files&&t.files[0];t.value='';if(!f)return;
+  try{const d=await shrink(f),k=newImgKey(w==='av'?'cuav':'cuid');if(!(await imgPut(k,d))){toast('حافظه پر است؛ عکس ذخیره نشد',true);return}
+    if(w==='av')CUF.av=k;else CUF.ids[+w.slice(2)]=k;cuPhRe(w==='av'?'av':'id');toast(w==='av'?'عکس پروفایل گذاشته شد · ذخیره را بزنید':'عکس کارت ملی اضافه شد · ذخیره را بزنید')}catch(e){toast('این عکس خوانده نشد',true)}});
+ACT.cuPhDel=d=>{if(d.k==='av'){CUF.av='';cuPhRe('av')}else{CUF.ids[+String(d.k).slice(2)]='';cuPhRe('id')}};
