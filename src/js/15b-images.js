@@ -19,7 +19,7 @@ function galCtx(){if(!GAL)return null;/* v61.47: عکس ردیف کالای سن
     meta:{name:fullName(e),holder:e.holder||fullName(e),amount:q.it.amount,tn:q.it.tn||'',src:q.it.src||'',date:PD(e),kind:'bank'}}}
   const z=(e.settles||[]).find(s=>String(s.id)===String(GAL.sid));if(!z)return null;
   return{keys:stImgs(z),ed:can('edit'),pre:'stl:'+z.id,
-    set:K=>{z.imgs=K;z.img=K[0]||'';e.updatedAt=now();e.updatedBy=who();saveE();stlSync(e)},
+    set:K=>{z.imgs=K;z.img=K[0]||'';e.updatedAt=now();e.updatedBy=who();saveE();stlSync(e);depImgSync(z,K)},
     meta:{name:fullName(e)+' (از '+z.name+')',holder:e.holder||fullName(e),payer:z.name,amount:z.amount,tn:z.tn||'',date:z.date,kind:'cust'}}}
 function galHTML(){const c=galCtx();if(!c)return `<div class="sh-h"><b>رسید</b><button class="x" data-act="close" aria-label="بستن">×</button></div><div class="spempty"><b>پیدا نشد</b></div>`;const K=c.keys;
   return `<div class="sh-h"><div><b>${GAL.k==='it'?'رسید واریز بانکی':c.meta.kind==='rc'?'عکس رسید':GAL.k==='row'||GAL.k==='view'?'عکس کالا':'رسید تسویه مشتری'}</b><small class="shsub">${esc(c.meta.name)}${c.meta.amount?' · '+fmt(c.meta.amount)+' تومان':''}${K.length?'، '+fmt(K.length)+' عکس':''}</small></div><button class="x" data-act="${GAL.ck?'ckPhBack':'close'}" aria-label="بستن">×</button></div>

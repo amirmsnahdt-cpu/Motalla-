@@ -89,3 +89,18 @@ function shFix(c,t,R,ay){const keep=sv;try{sv=invSv(c,t);R.forEach(r=>{const o=(
       xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e}});
     t.items=items;t.xr=xr;t.sub=T.sub;t.total=T.total;t.disc=T.disc;if(T.ge)t.ge=T.ge;else delete t.ge;if(Object.keys(T.xe).length)t.xe=T.xe;else delete t.xe;
     if(t.gc&&T.rest>0&&t.rate)t.gc={r:T.rest,g:Math.round(T.rest/t.rate*1000)/1000};t.shAt=ns();c.lastAt=ns()}finally{sv=keep}}
+
+/* ============ v61.75 (خواسته صاحب اپ): حواله به فروشنده واریزی (m:'dep') دوطرفه ============
+   جزئیات ردیف سند: طرف حواله (همان شخص واریزی خرید)، بانک/شبا، تاریخ واریز، کل واریزی، مانده بانکی و وضعیت تسویه روی آن واریزی.
+   عکس رسید: هر عکسی که روی تسویه واریزی (صفحه جزئیات واریزی) اضافه شود روی ردیف همان سند هم می‌نشیند و برعکس (ckDepApply). */
+const depEnt=p=>entries.find(z=>String(z.id)===String(p.entId));
+const depName=p=>{const e=depEnt(p);return clean((p.entName||'')||(e?fullName(e):''))||'واریزی'};
+function depSub(p,txId){const e=depEnt(p);if(!e)return 'واریزی پیدا نشد';const z=(e.settles||[]).find(s=>s.id===p.stlId||(s.byInv&&txId!=null&&String(s.byInv.tx)===String(txId)));
+  const st=(e.settles||[]).reduce((a,s)=>a+(+s.amount||0),0),bank=e.iban?(ibanBank(e.iban)||'')+' '+String(e.iban).slice(-4):'';
+  return ['واریز به: '+esc(fullName(e)),e.holder&&e.holder!==e.name?'صاحب حساب: '+esc(e.holder):'',bank?'بانک: '+esc(bank):'','تاریخ واریز: '+esc(dates(PD(e)).fa),'کل واریزی: '+fmt(+e.amount||0)+' تومان','مانده بانکی: '+fmt(Math.max(0,(+e.amount||0)-st))+' تومان',
+    'تسویه روی واریزی: '+(z?(z.st==='wait'?'در انتظار تأیید':'تأیید شد'):'با ثبت سند'),e.sentBid?'ارسال‌شده به بانک':''].filter(Boolean).join(' · ')}
+function depImgSync(z,K){if(!z||!z.byInv)return;const c=custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(x=>String(x.id)===String(z.byInv.tx)&&!x.del);if(!t)return;
+  let ch=false;(t.pays||[]).forEach(p=>{if(p.m==='dep'&&p.stlId===z.id){p.imgs=K.slice();p.img=K[0]||'';if(!K.length){delete p.imgs;delete p.img}ch=true}});if(ch){c.lastAt=new Date().toISOString();saveCu()}
+  if(typeof sv!=='undefined'&&sv&&sv.edit&&String(sv.edit.tx)===String(t.id))(sv.pays||[]).forEach(p=>{if(p.m==='dep'&&p.stlId===z.id){p.imgs=K.slice();p.img=K[0]||''}})}
+/* مانده قابل حواله یک واریزی: مانده بانکی + تسویه‌هایی که خود همین سند (در ویرایش) قبلاً روی آن گذاشته (وگرنه ویرایش سند رد می‌شد) */
+const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&String(z.byInv.tx)===String(sv.edit.tx)).reduce((a,z)=>a+(+z.amount||0),0):0;return (x.full&&!own?0:(+x.amount||0))+own};
