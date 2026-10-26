@@ -117,7 +117,7 @@ ACT.ldXR=d=>{const id=+d.id||d.id;[...ldX].some(x=>String(x)===String(id))?[...l
 ACT.ldXG=d=>{const D=ldData(ldKey),rows=d.k==='__full'?D.FS:((D.G.find(g=>g.name===d.k)||{}).rows||[]),on=rows.every(r=>ldX.has(r.id));rows.forEach(r=>on?ldX.delete(r.id):ldX.add(r.id));ldXRe()};
 ACT.ldXAll=()=>{const D=ldData(ldKey),all=[...D.G.flatMap(g=>g.rows),...D.FS];ldX=all.every(r=>ldX.has(r.id))?new Set():new Set(all.map(r=>r.id));ldXRe()};
 ACT.ldText=()=>{const P=ldPick();txtGen=()=>dayTxt(ldKey,P.G,P.FS,P.T);txtName=fileBase(ldKey);openText()};
-ACT.ldPdf=async()=>{const P=ldPick();closeSheet();openPrint(await dayReport(ldKey,P.G,P.FS,P.T,P.reg))};
+ACT.ldPdf=()=>{const P=ldPick();closeSheet();openPrint(()=>dayReport(ldKey,P.G,P.FS,P.T,P.reg))};
 ACT.ldXls=()=>{if(typeof XLSX==='undefined')return;const P=ldPick();closeSheet();save(fileBase(ldKey)+'.xlsx',dayXlsx(ldKey,P.G,P.FS),'فایل Excel آماده شد')};
 ACT.fTClr=()=>{fT='';fN=120;render()};
 ACT.fP=d=>{fP=fP===d.iso?'':d.iso;if(fP)fG='pay';fN=120;render()};

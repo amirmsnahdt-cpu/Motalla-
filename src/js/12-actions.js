@@ -36,7 +36,7 @@ const ACT={
     const A={res:ks.map(k=>({src:{name:ks.length>1?dates(k).fa:'لیست '+dates(k).fa,limit:0},items:by[k]})),left:[],excl:[],D:dates(ks.length===1?ks[0]:dateVal)},sc=ks.length>1?'all':'0';
     if(d.a==='cp'){expCtx={A,sc};const ok=await copyText(withCtx(txt));ok?toast('متن کپی شد'):openText();return}openExport(A,sc)},
   expOpen:d=>{openExport(alloc,d.sc);expCtx.track=true},
-  expText:()=>openText(),expPdf:()=>{closeSheet();autoTrack();openPrint()},
+  expText:()=>openText(),expPdf:()=>{closeSheet();autoTrack();openPrint(()=>withCtx(reportHTML))},
   expXls:()=>{if(typeof XLSX==='undefined')return;closeSheet();autoTrack();save(ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد')},
   copyOut:async()=>{const ta=$('tout'),ok=await copyText(ta.value);if(ok){toast('متن کپی شد');setTimeout(autoTrack,900)}else{ta.focus();ta.select();toast('متن انتخاب شد؛ «Copy» را بزنید')}},
   shareOut:async()=>{if(window.AndroidBridge){window.AndroidBridge.share($('tout').value);return}try{await navigator.share({text:$('tout').value})}catch(e){}},
@@ -95,7 +95,7 @@ const ACT={
   reopenDay:()=>{const bs=dayBatches(dayIso);bs.forEach(b=>delete b.closed);saveB();if(bs[0]){batchId=bs[0].id;go('batch')}toast('برای ویرایش باز شد')},
   dayExp:()=>openDayExport(dayIso),
   dayText:()=>{txtGen=()=>dayTxt(dayIso);txtName=fileBase(dayIso);openText()},
-  dayPdf:async()=>{closeSheet();openPrint(await dayReport(dayIso))},
+  dayPdf:()=>{closeSheet();openPrint(()=>dayReport(dayIso))},
   dayXls:()=>{if(typeof XLSX==='undefined')return;closeSheet();save(fileBase(dayIso)+'.xlsx',dayXlsx(dayIso),'فایل Excel آماده شد')},
   openBatch:d=>{batchId=+d.id;tkFilter='all';tkQ='';tkOpen=new Set();go('batch')},
   tkFilter:d=>{tkFilter=d.f;refreshBatch()},tkClear:()=>{tkQ='';refreshBatch()},
@@ -144,7 +144,7 @@ const ACT={
       if(empty)go('track');else refreshBatch();$('dock').innerHTML=dockHTML();dockInd();toast('«'+x.name+'» به تقسیم برگشت')})},
   tkFixBad:d=>{setDate(d.iso,true);ACT.showBad()},
   xAll:d=>{const P=dayParts();if(!P.length)return;txtGen=null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0',track:true,parts:P.filter(p=>!p.sent).map(p=>p.id)};
-    if(d.k==='pdf'){autoTrack();openPrint();return}
+    if(d.k==='pdf'){autoTrack();openPrint(()=>withCtx(reportHTML));return}
     if(d.k==='txt'){openText();return}
     if(d.k==='xls'){if(typeof XLSX==='undefined')return;autoTrack();save(ctxName()+'.xlsx',withCtx(xlsx),'فایل Excel آماده شد');return}
     expAllGo()},

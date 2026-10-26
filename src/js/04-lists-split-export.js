@@ -125,12 +125,22 @@ function openText(){const t=txtGen?txtGen():withCtx(txt),ln=t.split('\n').length
   <textarea id="tout" class="txout" readonly dir="rtl" rows="${Math.min(18,Math.max(6,ln+1))}">${esc(t)}</textarea>
   <div class="txbar"><button class="xgo" data-act="copyOut">${ic('copy')} کپی متن</button>
   <div class="txacts">${(navigator.share||window.AndroidBridge)?`<button data-act="shareOut">${ic('open')} اشتراک‌گذاری</button>`:''}<button data-act="saveTxt">${ic('down')} ذخیره فایل</button></div></div>`)}
-function openPrint(h0){const html=(h0||withCtx(reportHTML)).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.__pv=html;$('pv').classList.remove('hide');const f=$('pvf');
-  f.onload=()=>{try{const d=f.contentDocument,b=d.body,land=/A4 landscape/.test(html),W=land?1123:794;
-    const st=d.createElement('style');st.textContent=`@media screen{html{background:transparent!important;min-height:100%}body{width:${W}px!important;max-width:none!important;margin:18px auto 28px!important;padding:${land?'30px 34px':'42px 40px'}!important;background:#fff!important;box-shadow:0 10px 34px rgba(16,33,58,.16),0 0 0 1px rgba(16,33,58,.06);border-radius:10px;box-sizing:border-box}}`;d.head.appendChild(st);
-    let big=false;const fit=()=>{const z=big?Math.min(1,(f.clientWidth-8)/(W*0.62)):Math.min(1,(f.clientWidth-20)/(W+8));d.documentElement.style.zoom=String(z)};fit();f.contentWindow.addEventListener('resize',fit);d.addEventListener('click',()=>{big=!big;fit()})}catch(e){}};
-  f.srcdoc=html;document.body.style.overflow='hidden'}
-function closePrint(){$('pv').classList.add('hide');$('pvf').srcdoc='';document.body.style.overflow=''}
+/* v61.68 (خواسته صاحب اپ): آماده شدن PDF بدون لگ — پیش‌نمایش همان لحظه با «در حال آماده‌سازی» باز می‌شود؛
+   ساختن برگه (h0 می‌تواند متن، تابع یا Promise باشد) بعد از نمایش پنجره انجام می‌شود و برگه بعد از بار شدن فونت‌ها و عکس‌ها
+   با محو شدن نرم دیده می‌شود؛ تا آن موقع دکمه‌های چاپ و اشتراک غیرفعال‌اند */
+let pvSeq=0;
+function openPrint(h0){const P=$('pv'),f=$('pvf'),seq=++pvSeq;P.classList.remove('hide');P.classList.add('ld');f.classList.remove('rdy');document.body.style.overflow='hidden';
+  const L=P.querySelector('.pvld');if(!L)P.querySelector('.pvw').insertAdjacentHTML('beforeend','<div class="pvld" role="status" aria-live="polite"><span class="pvsp"></span><b>در حال آماده‌سازی…</b><small>چند لحظه</small></div>');
+  const fail=e=>{if(seq!==pvSeq)return;P.classList.remove('ld');toast('برگه آماده نشد؛ دوباره امتحان کنید',true);closePrint()};
+  requestAnimationFrame(()=>setTimeout(async()=>{if(seq!==pvSeq)return;let html;try{html=await (typeof h0==='function'?h0():h0!=null?h0:withCtx(reportHTML))}catch(e){fail(e);return}
+    if(seq!==pvSeq||!html)return;html=String(html).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.__pv=html;
+    const show=()=>{if(seq!==pvSeq)return;P.classList.remove('ld');f.classList.add('rdy')};
+    f.onload=()=>{let done=false;const ok=()=>{if(!done){done=true;show()}};try{const d=f.contentDocument,land=/A4 landscape/.test(html),W=land?1123:794;
+      const st=d.createElement('style');st.textContent=`@media screen{html{background:transparent!important;min-height:100%}body{width:${W}px!important;max-width:none!important;margin:18px auto 28px!important;padding:${land?'30px 34px':'42px 40px'}!important;background:#fff!important;box-shadow:0 10px 34px rgba(16,33,58,.16),0 0 0 1px rgba(16,33,58,.06);border-radius:10px;box-sizing:border-box}}`;d.head.appendChild(st);
+      let big=false;const fit=()=>{const z=big?Math.min(1,(f.clientWidth-8)/(W*0.62)):Math.min(1,(f.clientWidth-20)/(W+8));d.documentElement.style.zoom=String(z)};fit();f.contentWindow.addEventListener('resize',fit);d.addEventListener('click',()=>{big=!big;fit()});
+      const imgs=[...d.images].filter(i=>!i.complete).map(i=>new Promise(r=>{i.onload=i.onerror=r}));Promise.all([d.fonts&&d.fonts.ready,...imgs]).then(ok,ok)}catch(e){ok()}setTimeout(ok,2500)};
+    f.srcdoc=html},40))}
+function closePrint(){pvSeq++;$('pv').classList.add('hide');$('pv').classList.remove('ld');$('pvf').srcdoc='';document.body.style.overflow=''}
 /* کپی با پشتیبان برای وب‌ویوهایی که clipboard ندارند */
 async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){}
   try{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}

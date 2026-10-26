@@ -58,13 +58,13 @@ function credCopySheet(){const c=curC(),r=cRem(c);sheet(`<div class="sh-h"><b>ک
   <div class="f"><label>شماره فاکتور فروش <i>(برای ثبت «در انتظار»)</i></label><input id="ki" class="ltr" inputmode="numeric"></div>
   <div class="row"><button class="btn sec" data-act="credCopyGo" data-w="1">کپی و ثبت در انتظار</button><button class="btn gold" data-act="credCopyGo">${ic('copy')} کپی متن</button></div>`);
   $('ka').oninput=()=>{const v=num($('ka').value);$('ka').value=v?v.toLocaleString('en-US'):''}}
-async function credPdf(){const c=curC();if(!c)return;const D=dates(),P=c.pays||[];
+function credPdf(){const c=curC();if(!c)return;openPrint(async()=>{const D=dates(),P=c.pays||[];
   const body=`<section class="pg">${pdfTop('صورت‌حساب تسویه بدهی',D)}<h1>${esc(ttlName(c))}</h1><div class="sub">${c.iban?'<span>'+esc(ibanSp(c.iban))+'</span>':''}${c.iban&&ibanBank(c.iban)?' — '+esc(ibanBank(c.iban)):''}</div><div class="bar"></div>
   <div class="kp"><div><small>کل بدهی</small><b>${fmt(c.debt)}<em>تومان</em></b></div><div class="ok"><small>واریز شده</small><b>${fmt(cPaid(c))}<em>تومان</em></b></div><div class="${cDone(c)?'ok':'rd'}"><small>${cDone(c)?'وضعیت':'مانده'}</small><b>${cDone(c)?'تسویه شد':fmt(cRem(c))}</b></div></div>
   <table><thead><tr><th>#</th><th>واریزکننده و فاکتور</th><th>تاریخ و پیگیری</th><th>وضعیت</th><th class="am">مبلغ (تومان)</th></tr></thead><tbody>
   ${P.map((x,i)=>`<tr><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(ttlName(x))}</span><span class="s">فاکتور ${esc(toEn(x.inv))}${x.phone?' — '+esc(x.phone):''}</span></td><td>${dates(x.date).fa}${x.time?' — '+toFa(x.time):''}${x.tn?`<span class="s">پیگیری <span class="tn">${esc(x.tn)}</span></span>`:''}</td><td><span class="st ${x.st==='wait'?'pending':'ok'}">${x.st==='wait'?'در انتظار':'واریز شد'}</span></td><td class="am">${fmt(x.amount)}</td></tr>`).join('')}
   <tr class="tot"><td></td><td colspan="3">مانده</td><td class="am">${fmt(cRem(c))}</td></tr></tbody></table><div class="sign"><div>تهیه‌کننده</div><div>تأیید طلبکار</div></div>${pdfFoot()}</section>`;
-  openPrint(pdfDoc('صورت‌حساب '+c.name,body))}
+  return pdfDoc('صورت‌حساب '+c.name,body)})}
 
 /* ============ تسویه بدهی: ثبت گام‌به‌گام (پنجره به پنجره) ============ */
 let wz=null;

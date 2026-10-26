@@ -705,7 +705,7 @@ function invDoc(c,t){const nl=v=>String(v).replace(/ · (طلبکاریم|بده
     ${line('مانده این سند',(d.r?fmt(Math.abs(d.r))+' تومان ':'')+lab(d.r),'g')}</div>
   <div class="bl"><table><thead><tr><th></th>${col.map(([,h])=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${balRow('مانده قبلی',PB)}${balRow('این سند',DB)}${balRow('مانده نهایی',FB,'f')}</tbody></table></div>
   <div class="ed"><div class="sg"><span>امضای مشتری</span><span>مهر و امضای فروشنده</span></div><div class="ft"><span>صادرکننده: ${esc(t.by||'')}</span><b>طلای مطلا</b></div></div></div></body></html>`}
-ACT.invPrint=()=>{const X=invGet();if(!X)return;openPrint(invDoc(X.c,X.t))};
+ACT.invPrint=()=>{const X=invGet();if(!X)return;openPrint(()=>invDoc(X.c,X.t))};
 
 /* ================= انتقال مانده بین مشتری‌ها ================= */
 let xs=null;
