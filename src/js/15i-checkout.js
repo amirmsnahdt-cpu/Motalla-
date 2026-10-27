@@ -47,7 +47,7 @@ ACT.ckPkAdd=()=>{ckRead();const n=clean(CK.sq||''),pos=CK.m==='pos';if(!n){toast
 ACT.ckGal=()=>{ckRead();openGal({k:'row',ck:1})};
 ACT.ckPhV=d=>{ckRead();GAL={k:'row',ck:1};zvOpen(+d.i||0)};
 ACT.ckPhBack=()=>{GAL=null;sheet(ckHTML());ckBind();phPaint($('sheet'))};
-function ckPhPut(n0){const K=xrPh(CK||{});if(K.length&&sv.pays.length>n0){const p=sv.pays[sv.pays.length-1];p.imgs=K;p.img=K[0]}}
+function ckPhPut(n0,x){const K=xrPh(CK||{});if(!K.length)return;const p=x||(sv.pays.length>n0?sv.pays[sv.pays.length-1]:null);if(p){p.imgs=K;p.img=K[0]}}
 function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" autocomplete="off" enterkeyhint="done"></label>`;
   const tn=`<label class="ckf"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
   if(m==='cash')b=amt;
@@ -57,7 +57,7 @@ function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><sm
     b=`<div class="ckg"><label class="ckf"><small>وزن طلای مشتری (گرم)</small><input id="ckW" class="ltr" inputmode="decimal" value="${esc(CK.w||'')}" placeholder="0.000" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="ckY" class="ltr" inputmode="numeric" value="${esc(String(CK.ay||x.ay))}" autocomplete="off"></label></div>
     <div class="ckx" id="ckX">${sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'}</div>`}
   const T=(ckOut()?CKO:CKT).find(z=>z[0]===m);
-  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><button class="lnk" data-act="ckM" data-m="">انصراف</button></div>${b}${(m==='dep'||m==='cust')&&!CK.sel||m==='gx'?'':stPhHTML(CK)}${(m==='dep'||m==='cust')&&!CK.sel?'':`<button class="qago ckadd" data-act="ckAdd">${ic('plus')} افزودن به تسویه</button>`}</div>`}
+  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><button class="lnk" data-act="ckM" data-m="">انصراف</button></div>${b}${(m==='dep'||m==='cust')&&!CK.sel?'':stPhHTML(CK)}${(m==='dep'||m==='cust')&&!CK.sel?'':`<button class="qago ckadd" data-act="ckAdd">${ic('plus')} افزودن به تسویه</button>`}</div>`}
 function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),R=ckRows(),A=ckAcct(),tg=ckTg(),TL={p:'مانده قبلی',d:A?'این سند':'مانده این سند',f:'مانده نهایی'}[tg];
   /* ریز مانده‌ها (قبلی · سند · نهایی، مبلغ و طلا)؛ خانه انتخاب‌شده پررنگ و با زدن هر خانه هدف تسویه عوض می‌شود */
   const L=svBalL(),gr=L.find(z=>z[0]==='g'),rr=L.find(z=>z[0]==='r')||['r',0,0,0],ln=(k,v)=>`<span class="${ftCls(v)}${k==='r'?' r':''}"><b>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i></span>`;
@@ -91,7 +91,7 @@ ACT.ckAdd=()=>{ckRead();const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0,n0=sv.pay
     if(m==='hav'){if(CK.srcId===''||CK.srcId==null){toast('حساب ما را انتخاب کنید',true);return}sv.pays.push({m:'hav',amount:-a,srcId:CK.srcId,tn:CK.tn||''});ls.set('m_src_hav',CK.srcId)}
     if(m==='dep'||m==='cust'){const s=CK.sel;if(s&&s.k==='nm'){sv.pays.push({m:'nm',amount:-a,cuName:s.n})}else{const c=s&&CU().find(z=>String(z.id)===String(s.id));if(!c){toast('مشتری را انتخاب کنید',true);return}sv.pays.push({m:'cust',amount:-a,cuId:c.id,cuName:cuName(c)})}}
     ckPhPut(n0);CK={m:''};ckBackToDoc();return}
-  if(m==='gx'){const w=parseFloat(CK.w)||0;if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}if(!(w>0)){toast('وزن طلا را بزنید',true);return}const x=xrNew('buy','gold',{cat:'تعویض'});x.w=String(CK.w);x.ay=+CK.ay||x.ay;sv.xr.push(x)}
+  if(m==='gx'){const w=parseFloat(CK.w)||0;if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}if(!(w>0)){toast('وزن طلا را بزنید',true);return}const x=xrNew('buy','gold',{cat:'تعویض'});x.w=String(CK.w);x.ay=+CK.ay||x.ay;sv.xr.push(x);ckPhPut(n0,x);CK={m:''};ckBackToDoc();return}
   else{if(!(a>0)){toast('مبلغ را وارد کنید',true);const A=$('ckA');if(A)A.focus();return}
     if(m==='cash')sv.pays.push({m:'cash',amount:a});
     if(m==='pos'){if(!CK.chId){toast('کارتخوان را انتخاب کنید',true);return}sv.pays.push({m:'pos',amount:a,chId:CK.chId,tn:CK.tn||''});ls.set('m_ch_pos',CK.chId)}

@@ -81,7 +81,7 @@ function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
   else return '';
   const d=am?(stDir()<0?'d':'c'):'z',E=D.filter(Boolean),ai=K==='xr'||K==='it'||K==='ab'?stSteps().findIndex(z=>z.k==='amT'):-1;
   return `<div class="stam ${d}${ai>=0&&sv.qa.st!==ai?' tap':''}"${ai>=0&&sv.qa.st!==ai&&am?` data-act="stGo" data-i="${ai}" role="button" aria-label="ویرایش مبلغ"`:''}><small>${am?(d==='d'?'طلبکار می‌شویم':'بدهکار می‌شویم'):'مبلغ این ردیف'}</small><span class="fz"><b${fitS((am?fmt(am):'—')+' تومان')}>${am?fmt(am):'—'}<i>تومان</i></b></span>${E.length?`<em>${E.join(' · ')}</em>`:''}</div>`}
-function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.st=0;if(a.stMax==null)a.stMax=a.st;const i=a.st,cur=S[i],T=stTag(),ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null)||!!(a.pv&&a.pv.gid),last=i===n-1;
+function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.st=0;if(a.stMax==null)a.stMax=a.st;const i=a.st,cur=S[i],T=stTag(),ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null)||!!(a.pv&&a.pv.gid),last=i===n-1||!!(S[i+1]&&S[i+1].add0);
   const seg=S.map((s,k)=>{const v=stFmt(s,s.get()),reach=k<=Math.max(a.stMax,i)||ed;return `<button type="button" class="stp${k===i?' on':''}${v&&k!==i?' dn':''}${reach?'':' fu'}" data-act="stGo" data-i="${k}"${reach?'':' disabled'}><small>${s.lab}${s.opt&&!s.nopt?' <i>اختیاری</i>':''}</small><b>${v||(k===i?'…':'—')}</b></button>`}).join('');
   const val=cur.get(),ph=cur.ph?cur.ph:cur.type==='wam'?'وزن (گرم) یا مبلغ (تومان)':cur.mz?(stBuyF(sv.qa.x)!==1?'مظنه خرید یا هر گرم خرید (تومان)':'مظنه یا هر گرم ۱۸ (تومان)'):cur.lab+(cur.u?' ('+cur.u+')':'')+(cur.opt?' · اختیاری':''),
     inp=cur.type==='pick'?`<input id="stI" class="stin" type="search" placeholder="جستجوی ${cur.lab}…" autocomplete="off" enterkeyhint="search" value="${esc(a.sq||'')}">`:`<input id="stI" class="stin${cur.type==='text'?'':' ltr'}" ${cur.type==='text'?'':`inputmode="${cur.type==='dec'||cur.type==='wam'?'decimal':'numeric'}"`} value="${cur.type==='wam'?(+val>=1000?Number(val).toLocaleString('en-US'):esc(val||'')):cur.type==='num'?(+val?Number(val).toLocaleString('en-US'):''):cur.grp?esc(grpIn(val)):esc(val==null?'':String(val))}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}">`;
@@ -117,7 +117,8 @@ const stOk=s=>s.need&&s.need()?false:s.wOr?true:s.opt||s.type==='int'||(s.type==
 ACT.stNext=()=>{stRead();const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1),s=S[i];
   if(!stOk(s)){toast(s.msg||s.lab+' را بزنید',true);const I=$('stI');if(I)I.focus();return}
   if(s.type==='int')s.set(+s.get()||750);
-  if(i>=S.length-1){stFinish();return}
+  /* v61.82 (خواسته صاحب اپ): در مانده قبلی «بعدی» بعد از آخرین مقدار به «+ دلار، سکه» نمی‌رود؛ همان «افزودن به سند» است */
+  if(i>=S.length-1||(S[i+1]&&S[i+1].add0)){stFinish();return}
   /* برگشت برای ویرایش: بعد از «بعدی» به همان جایی می‌رود که بودید */
   let nx=i+1;if(a.stMax>i){nx=a.stMax;for(let k=i+1;k<a.stMax;k++)if(!stOk(S[k])){nx=k;break}}
   a.st=Math.min(nx,S.length-1);a.stMax=Math.max(a.stMax||0,a.st);svKeep();stRe()};

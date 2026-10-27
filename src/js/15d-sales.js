@@ -415,7 +415,7 @@ function svRowsHTML(){const R=[],eff=d6Eff;
   if(+sv.disc)R.push(row('dc',0,'svDisc','tag','','تخفیف','از جمع سند کم می‌شود',eff(+sv.disc)));
   sv.pays.forEach((p,i)=>{if(PG.sp.has(i))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row('py',i,p.m==='wd'?'svWdRow':'svPayEdit',M.i,dkTag(out?'out':'in'),esc(pyLab(p)),pyDet(p,sv.edit&&sv.edit.tx),eff(pAmt(p)),xrPh(p),p.m==='dep'?depActs(p,'s'+i):pyActs(p,svCu(),sv.edit&&sv.edit.tx,sv.edit?sv.edit.no:'')))});
   wdRowsHTML(svCu(),sv.edit?sv.edit.no:null).forEach(h=>R.push(h));
-  PG.L.forEach(G=>R.push(row('pv',G.id,'svPvEdit','clock',dkTag(G.dir),'مانده قبلی',pvSub(G,sv.pays,sv.xr||[]),pvEffs(G,sv.pays,sv.xr||[],x=>xrCalc(x,sv.rate).e))));
+  PG.L.forEach(G=>R.push(row('pv',G.id,'svPvEdit','clock',dkTag(G.dir),'مانده قبلی',pvSub(G,sv.pays,sv.xr||[]),pvEffs(G,sv.pays,sv.xr||[],x=>xrCalc(x,sv.rate).e),pvPh(G,sv.pays,sv.xr||[]))));
   if(!R.length)return '';
   const nI=sv.items.length;
   return `<div class="d6sh"><b>ردیف‌های سند</b><small>${nI?toFa(nI)+' قلم کالا، ':''}${toFa(R.length)} ردیف · بزنید = جزئیات، دو بار = ویرایش</small></div><div class="d6rows d7">${R.join('')}</div>`}
@@ -507,13 +507,14 @@ const xrPh=x=>Array.isArray(x.imgs)?x.imgs.slice():x.img?[x.img]:[];
    «+» مثل رسید واریزی‌ها پنجره عکس را باز می‌کند (گالری، دوربین، بزرگ‌نمایی، چرخش، برش، حذف — همان openGal با GAL.k='row')؛
    عکس اول روی آیکون ردیف سند می‌نشیند و زدن روی آن عکس را بزرگ نشان می‌دهد (ردیف سند و صفحه نمایش سند) */
 /* v61.72 (خواسته صاحب اپ): رسید برای ردیف‌های دریافت/پرداخت هم (ردیف در حال ویرایش a.p، یا فرم پنجره تسویه CK با GAL.ck) */
-const PHNO=['off','disc','prev'],phRc=x=>!!x&&(x===(sv&&sv.qa&&sv.qa.p)||(typeof CK!=='undefined'&&x===CK));
-const phT=()=>{if(typeof GAL!=='undefined'&&GAL&&GAL.ck&&document.querySelector('#sheet .galg,#sheet .ckw,#zv:not(.hide)'))return typeof CK!=='undefined'&&CK&&CK.m?CK:null;const a=sv&&sv.qa;if(!a)return null;if(a.p)return PHNO.includes(a.p.m)?null:a.p;if(a.x)return a.x;return a.k?a:null};
-const phName=x=>x===(typeof CK!=='undefined'&&CK)?(((ckOut()?CKO:CKT).find(z=>z[0]===x.m)||[])[1]||'رسید'):x===(sv&&sv.qa&&sv.qa.p)?pyLab({...x,amount:(x.dir==='out'&&x.m!=='pos'?-1:1)*(+x.amount||0)}):x===(sv&&sv.qa)?(x.ab?'آبشده':x.k||'کالا'):xrLab(x);
-const phAmt=x=>{try{return phRc(x)?(+x.amount||0):x===(sv&&sv.qa)?itCalc(qaIt(x),sv.rate,sv.tax).tot||0:xrCalc(x,sv.rate).amount||0}catch(_){return 0}};
+/* v61.82 (خواسته صاحب اپ: «همه سندها عکس داشته باشد»): عکس برای همه ردیف‌ها — تخفیف و مانده قبلی هم */
+const PHNO=[],phRc=x=>!!x&&(x===(sv&&sv.qa&&sv.qa.p)||(typeof CK!=='undefined'&&x===CK));
+const phT=()=>{if(typeof GAL!=='undefined'&&GAL&&GAL.ck&&document.querySelector('#sheet .galg,#sheet .ckw,#zv:not(.hide)'))return typeof CK!=='undefined'&&CK&&CK.m?CK:null;const a=sv&&sv.qa;if(!a)return null;if(a.p)return PHNO.includes(a.p.m)?null:a.p;if(a.x)return a.x;if(a.pv)return a.pv;return a.k?a:null};
+const phName=x=>x===(sv&&sv.qa&&sv.qa.pv)?'مانده قبلی':x===(typeof CK!=='undefined'&&CK)?(((ckOut()?CKO:CKT).find(z=>z[0]===x.m)||[])[1]||'رسید'):x===(sv&&sv.qa&&sv.qa.p)?pyLab({...x,amount:(x.dir==='out'&&x.m!=='pos'?-1:1)*(+x.amount||0)}):x===(sv&&sv.qa)?(x.ab?'آبشده':x.k||'کالا'):xrLab(x);
+const phAmt=x=>{try{if(x===(sv&&sv.qa&&sv.qa.pv))return +x.r||0;return phRc(x)?(+x.amount||0):x===(sv&&sv.qa)?itCalc(qaIt(x),sv.rate,sv.tax).tot||0:xrCalc(x,sv.rate).amount||0}catch(_){return 0}};
 async function phPaint(root){for(const im of (root||document).querySelectorAll('img[data-ik]:not([src])')){const v=await imgGet(im.dataset.ik);if(v&&im.isConnected)im.src=v;else if(im.isConnected)im.closest('.ph,.stpht')&&im.closest('.ph,.stpht').classList.add('miss')}}
 function stPhHTML(x0){const x=x0||phT();if(!x)return '';const K=xrPh(x),rc=phRc(x);
-  return `<div class="stph2"><span class="stphl2"><small>${ic('cam')}${K.length?toFa(K.length)+' عکس':rc?'عکس رسید':'عکس کالا'}</small>${K.map((k,i)=>`<button type="button" class="stpht" data-act="${x===(typeof CK!=='undefined'&&CK)?'ckPhV':'rowPhV'}" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</span><button type="button" class="stphadd" data-act="${x===(typeof CK!=='undefined'&&CK)?'ckGal':'rowGal'}" aria-label="افزودن عکس">${ic('plus')}</button></div>`}
+  return `<div class="stph2"><span class="stphl2"><small>${ic('cam')}${K.length?toFa(K.length)+' عکس':rc?'عکس رسید':x===(sv&&sv.qa&&sv.qa.pv)?'عکس':'عکس کالا'}</small>${K.map((k,i)=>`<button type="button" class="stpht" data-act="${x===(typeof CK!=='undefined'&&CK)?'ckPhV':'rowPhV'}" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</span><button type="button" class="stphadd" data-act="${x===(typeof CK!=='undefined'&&CK)?'ckGal':'rowGal'}" aria-label="افزودن عکس">${ic('plus')}</button></div>`}
 ACT.rowGal=()=>{if(!phT())return;qaRead();openGal({k:'row'})};
 ACT.rowPhV=d=>{if(!phT())return;GAL={k:'row'};zvOpen(+d.i||0)};
 /* عکس ردیف ثبت‌شده: فقط دیدن (data-ks = کلیدها با «,») */
@@ -607,7 +608,7 @@ function ivDet(c,t){const D=dates(t.date),eff=d6Eff,R=[];
   if(+t.disc)R.push(row('tag','','تخفیف','از جمع سند کم شد',eff(+t.disc)));
   (t.pays||[]).forEach((p,pi)=>{if(PG.sp.has(pi))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row(M.i,out?'out':'in',esc(pyLab(p)),pyDet(p,t.id),eff(pAmt(p)),xrPh(p),p.m==='dep'?depActs(p,'v'+t.id+'.'+pi,c):pyActs(p,c,t.id,t.no)))});
   wdRowsHTML(c,t.no,t.id).forEach(h=>R.push(h));
-  PG.L.forEach(G=>R.push(row('clock',G.dir,'مانده قبلی',pvSub(G,t.pays||[],t.xr||[]),pvEffs(G,t.pays||[],t.xr||[],x=>+x.e||0))));
+  PG.L.forEach(G=>R.push(row('clock',G.dir,'مانده قبلی',pvSub(G,t.pays||[],t.xr||[]),pvEffs(G,t.pays||[],t.xr||[],x=>+x.e||0),pvPh(G,t.pays||[],t.xr||[]))));
   const E=txD(t),ef=[E.r?eff(E.r):'',E.g?eff(E.g,'g'):'',...Object.keys(E.x||{}).filter(k=>+E.x[k]).map(k=>eff(E.x[k],k))].filter(Boolean);
   return `<div class="ivd6${ivCntId!==String(t.id)?' anim':''}">
   ${R.length?`<div class="d6sh"><b>ردیف‌های سند</b><small>${toFa(R.length)} ردیف</small></div><div class="d6rows d7">${R.join('')}</div>`:''}

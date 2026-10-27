@@ -23,14 +23,16 @@ const pvEffs=(G,pays,xr,eOf)=>{const E=[...G.p.map(i=>[pAmt(pays[i]),'r']),...G.
 /* جزئیات ردیف مانده قبلی (مثل بقیه ردیف‌ها): مبلغ، طلا، و هر مانده دیگر */
 function pvSub(G,pays,xr){const L=[];G.p.forEach(i=>{const v=Math.abs(pAmt(pays[i]));if(v)L.push('مبلغ: '+fmt(v)+' تومان')});
   G.x.map(i=>xr[i]).sort((a,b)=>balRk(a.a==='gold'?'g':a.a)-balRk(b.a==='gold'?'g':b.a)).forEach(x=>{if(x.a==='gold'){const w=parseFloat(x.w)||0;if(w)L.push('طلا: '+wFmt(w)+' گرم')}else{const q=parseFloat(x.q)||0;if(q)L.push(esc((XA[x.a]||{t:x.a}).t)+': '+qFmt(q)+' '+esc((XA[x.a]||{}).u||''))}});return L.join(' · ')}
+/* عکس‌های مانده قبلی روی اولین ردیف گروهش نگه داشته می‌شود */
+const pvPh=(G,pays,xr)=>[...G.p.map(i=>pays[i]),...G.x.map(i=>xr[i])].reduce((K,o)=>K.concat(o?xrPh(o):[]),[]);
 const pvHas=p=>!!(+p.r||parseFloat(p.g)||(p.xs||[]).some(z=>parseFloat(z.v)));
 /* v61.62: ورود مانده قبلی با همان پله‌ها (stHTML، stSteps کلید pv): مبلغ · طلا · مانده‌های اضافه · «+ مانده دیگر» */
-function pvStart(p){qaRead();const d=sv.qa.d||p.dir;sv.qa={...qaBlank(),d,pv:{dir:p.dir,r:p.r||'',g:p.g||'',xs:p.xs||[],gid:p.gid||''},st:0,stMax:p.gid?1+(p.xs||[]).length:0};svKeep();stRe();
+function pvStart(p){qaRead();const d=sv.qa.d||p.dir;sv.qa={...qaBlank(),d,pv:{dir:p.dir,r:p.r||'',g:p.g||'',xs:p.xs||[],gid:p.gid||'',...(p.imgs&&p.imgs.length?{imgs:p.imgs,img:p.imgs[0]}:{})},st:0,stMax:p.gid?1+(p.xs||[]).length:0};svKeep();stRe();
   const q=$('qa');if(q&&p.gid)q.scrollIntoView({behavior:'smooth',block:'center'})}
 ACT.svPvEdit=d=>{const id=String(d.i),G=pvGroups(sv.pays,sv.xr||[]).L.find(z=>z.id===id);if(!G)return;const p={dir:G.dir,gid:id,r:'',g:'',xs:[]};
   G.p.forEach(i=>{p.r=String((+p.r||0)+Math.abs(pAmt(sv.pays[i])))});
   G.x.forEach(i=>{const x=sv.xr[i];if(x.a==='gold')p.g=String(Math.round(((parseFloat(p.g)||0)+(parseFloat(x.w)||0))*1000)/1000);else p.xs.push({k:x.a,v:String(x.q||'')})});
-  pvStart(p)};
+  p.imgs=pvPh(G,sv.pays,sv.xr||[]);pvStart(p)};
 function pvRows(gid){const id=String(gid);return{P:sv.pays.filter(p=>String(p.pv||'')===id&&p.m==='prev'),X:(sv.xr||[]).filter(x=>String(x.pv||'')===id&&x.cat==='مانده قبلی')}}
 function pvDrop(gid){const id=String(gid),pi=[],xi=[];sv.pays.forEach((p,i)=>{if(String(p.pv||'')===id&&p.m==='prev')pi.push([i,p])});(sv.xr||[]).forEach((x,i)=>{if(String(x.pv||'')===id&&x.cat==='مانده قبلی')xi.push([i,x])});
   sv.pays=sv.pays.filter((p,i)=>!pi.some(z=>z[0]===i));sv.xr=(sv.xr||[]).filter((x,i)=>!xi.some(z=>z[0]===i));return{pi,xi}}
@@ -39,6 +41,7 @@ ACT.pvSave=()=>{if($('stI'))stRead();const p=sv.qa.pv;if(!p)return;if(!pvHas(p))
   if(+p.r)sv.pays.push({m:'prev',amount:sg*Math.round(+p.r),pv:gid});
   if(parseFloat(p.g))sv.xr.push(xrNew(p.dir,'gold',{cat:'مانده قبلی',pul:true,ay:750,w:String(Math.round(parseFloat(p.g)*1000)/1000),pv:gid,fd:p.dir}));
   p.xs.forEach(z=>{if(parseFloat(z.v)&&XA[z.k])sv.xr.push(xrNew(p.dir,z.k,{cat:'مانده قبلی',pul:true,q:String(parseFloat(z.v)),pv:gid,fd:p.dir}))});
+  {const K=xrPh(p),f=sv.pays.find(z=>String(z.pv||'')===gid&&z.m==='prev')||(sv.xr||[]).find(z=>String(z.pv||'')===gid&&z.cat==='مانده قبلی');if(K.length&&f){f.imgs=K;f.img=K[0]}}
   D6OP.delete('spv'+gid);qaDone();toast(p.gid?'مانده قبلی ذخیره شد':'مانده قبلی به سند اضافه شد')};
 function pvDel(gid){const R=pvDrop(gid);if(sv.qa.pv&&String(sv.qa.pv.gid)===String(gid))sv.qa=qaBlank();svKeep();qaRe();svRe();
   toast('مانده قبلی حذف شد','','بازگردانی',()=>{R.pi.forEach(([i,o])=>sv.pays.splice(Math.min(i,sv.pays.length),0,o));R.xi.forEach(([i,o])=>sv.xr.splice(Math.min(i,sv.xr.length),0,o));svKeep();svRe()})}
