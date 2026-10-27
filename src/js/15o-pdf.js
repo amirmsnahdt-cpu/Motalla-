@@ -68,7 +68,7 @@ async function pdfMake(html,title,keep){
     const pt=v=>v*72/25.4,PW=pt(mmW),PH=pt(mmH),MX=pt(Q.mh),MY=pt(Q.mv),IW=PW-2*MX,IH=PH-2*MY;
     const PP=imgs.map(o=>{let iw=IW,ih=IW*o.hp/W;if(ih>IH){const k=IH/ih;iw*=k;ih=IH}return{...o,iw,ih,x:MX+(IW-iw)/2,k:iw/IW}});
     const blob=pdfBuild(PP,PW,PH,MX,MY);
-    const fl=new File([blob],String(title||'motalla').replace(/[\\/:*?"<>|]/g,'-')+'.pdf',{type:'application/pdf'});
+    const fl=new File([blob],String(title||'motalla').replace(/[\\/:*?"<>|]/g,'-').replace(/[۰-۹]/g,d=>d.charCodeAt(0)-1776).replace(/[٠-٩]/g,d=>d.charCodeAt(0)-1632)/* v61.87: عددهای نام فایل ارسالی انگلیسی */+'.pdf',{type:'application/pdf'});
     /* keep: عکس صفحه‌ها هم برگردانده می‌شود (چاپ اندروید همان صفحه‌ها را چاپ می‌کند تا دقیقاً همان PDF باشد) */
     if(keep)fl._pages=PP.map(o=>({j:o.j,wmm:(mmW-2*Q.mh)*o.k,hmm:(mmW-2*Q.mh)*o.k*o.hp/W})),fl._spec=Q;return fl}
   finally{f.remove()}}
