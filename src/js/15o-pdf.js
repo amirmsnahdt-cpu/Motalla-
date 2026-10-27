@@ -100,6 +100,9 @@ const pdfB64=fl=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>r
 const andPdfOk=()=>{const B=window.AndroidBridge;try{return !!(B&&B.pdfShare&&B.pdfShare())}catch(e){return false}};
 async function pdfShareAnd(){const fl=PDFK.file,B=window.AndroidBridge;if(!fl||!B)return false;let d;try{d=await pdfB64(fl)}catch(e){return false}
   if(andPdfOk()){try{B.shareFiles(JSON.stringify([{d,n:fl.name,m:'application/pdf'}]),fl.name.replace(/\.pdf$/,''))}catch(e){toast('اشتراک PDF انجام نشد',true)}return true}
+  /* v61.86: اپ قدیمی فقط عکس می‌فرستد → همان صفحه‌های سند به شکل عکس مستقیم در پنجره ارسال (بدون ذخیره)؛ برای PDF نسخه تازه اپ */
+  if(B.shareFiles&&fl._pages&&fl._pages.length){let ok=false;try{ok=B.shareFiles(JSON.stringify(fl._pages.map((p,i)=>({d:p.j.split(',')[1],n:fl.name.replace(/\.pdf$/,'')+(fl._pages.length>1?' - '+(i+1):'')+'.jpg',m:'image/jpeg'}))),fl.name.replace(/\.pdf$/,''))}catch(e){}
+    if(ok!==false){setTimeout(()=>toast('سند به شکل عکس ارسال شد؛ برای ارسال فایل PDF نسخه تازه اپ را نصب کنید',false,'نسخه تازه',()=>{closePrint();ACT.getApk()}),600);return true}}
   if(B.saveFile&&B.saveFile(fl.name,d,'application/pdf'))setTimeout(()=>toast('PDF در Download/Motalla ذخیره شد؛ برای ارسال مستقیم، نسخه تازه اپ را نصب کنید',false,'نسخه تازه',()=>{closePrint();ACT.getApk()}),400);
   else toast('ذخیره PDF انجام نشد',true);return true}
 /* چاپ اندروید: خود صفحه‌های PDF (هر صفحه یک عکس با اندازه دقیق کاغذ) → دقیقاً همان شکل پیش‌نمایش و فایل */
