@@ -1919,3 +1919,36 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .cuh9m{max-width:100%;align-self:stretch}
 .cuh9m em{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cuh9m bdi{flex:none}
+/* v61.88: مانده مشتری در جستجوی پرداخت‌کننده (تسویه از مشتری): ردیف گرم + ردیف تومان، قرمز طلبکاریم / آبی بدهکاریم */
+.stbl{flex:none;display:grid;grid-template-columns:auto auto auto;align-items:baseline;column-gap:4px;row-gap:2px;max-width:48%;padding:4px 8px;border-radius:10px;background:color-mix(in srgb,var(--line) 35%,transparent)}
+.stbl.pw{box-shadow:inset 0 0 0 1.5px var(--pe);background:color-mix(in srgb,var(--warn2) 55%,var(--card))}
+.stbv{display:contents;white-space:nowrap;line-height:1.3}.stbv>*{white-space:nowrap;line-height:1.35}.stbv em{justify-self:start}.stbv b{justify-self:end}
+.stbv b{font-size:12.5px;font-weight:850;direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.stbv i{font-style:normal;font-size:10px;font-weight:700;color:var(--mut)}
+.stbv em{font-style:normal;font-size:9.5px;font-weight:850;padding:0 6px;border-radius:6px;background:color-mix(in srgb,var(--mut) 12%,transparent);color:var(--mut)}
+.stbv.d b,.stbv.d em{color:var(--red)}.stbv.d em{background:color-mix(in srgb,var(--red) 13%,transparent)}
+.stbv.c b,.stbv.c em{color:var(--blu)}.stbv.c em{background:color-mix(in srgb,var(--blu) 13%,transparent)}
+.stbv.z b{color:var(--mut)}
+.stbv.p b,.stbv.p em{color:var(--warn)}.stbv.p em{background:color-mix(in srgb,var(--pe) 20%,transparent)}
+.stsel .stbl{margin-inline-start:4px}
+/* v61.88: تخصیص از مانده مشتری که هنوز تأیید نشده: قاب مبلغ زرد + کارت «تسویه در انتظار تأیید» زیر کارت مانده */
+.cbk.pw{box-shadow:inset 0 0 0 2px var(--pe)!important;background:color-mix(in srgb,var(--warn2) 70%,var(--card))!important}
+.c6l.cub9.pend{box-shadow:0 0 0 1.5px var(--pe),0 10px 26px -20px color-mix(in srgb,var(--pe) 70%,transparent)}
+.c6l.cub9.pend:has(+.cupd){margin-bottom:8px}
+.cupd{margin:0 0 14px;padding:10px 12px;border-radius:18px;background:color-mix(in srgb,var(--warn2) 70%,var(--card));box-shadow:inset 0 0 0 1.5px var(--pe);display:flex;flex-direction:column;gap:6px}
+.cupdh{display:flex;align-items:center;gap:9px}
+.cupdi{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:color-mix(in srgb,var(--pe) 22%,var(--card));color:var(--warn)}.cupdi svg{width:17px;height:17px}
+.cupd .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.cupdh .tx b{font-size:13.5px;font-weight:850;color:var(--warn)}.cupd .tx small{font-size:11px;color:var(--mut)}
+.cupda{flex:none;font-size:16px;font-weight:900;color:var(--warn);direction:ltr;unicode-bidi:isolate;display:flex;align-items:baseline;gap:4px}.cupda i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--mut)}
+.cupr{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:0;border-radius:12px;background:var(--card);font:inherit;color:var(--ink);text-align:right;cursor:pointer}
+.cupr .tx b{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cupr>b{flex:none;font-size:14px;font-weight:850;color:var(--warn);direction:ltr;unicode-bidi:isolate}
+.cupr svg{flex:none;width:14px;height:14px;color:var(--mut)}
+.cupdf{display:flex;align-items:center;gap:6px;padding:2px 2px 0}
+.cupdf small{flex:1;font-size:11.5px;color:var(--mut);font-weight:700}
+.cupdf b{font-size:14px;font-weight:850;direction:ltr;unicode-bidi:isolate}.cupdf b i{font-style:normal;font-size:10.5px;color:var(--mut)}
+.cupdf em{font-style:normal;font-size:10.5px;font-weight:850;padding:1px 8px;border-radius:7px}
+.cupdf .d{color:var(--red)}.cupdf em.d{background:color-mix(in srgb,var(--red) 13%,transparent)}
+.cupdf .c{color:var(--blu)}.cupdf em.c{background:color-mix(in srgb,var(--blu) 13%,transparent)}
+.cupdf .z{color:var(--mut)}

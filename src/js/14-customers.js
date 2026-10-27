@@ -31,16 +31,17 @@ const bpill=(k,v)=>v?`<span class="bp ${k==='r'?'r':k==='g'?'g':'x'} ${v<0?'d':'
 let cuAnim=0,cuCntId=null;/* کاشی‌های صفحه مشتری فقط بار اول ورود حرکت می‌کنند، نه در هر تازه‌سازی */
 const bindCust=()=>{stmBind();if(cuCntId===custId)return;cuCntId=custId;requestAnimationFrame(()=>cuCount('.cub9.anim .cbn'))};
 /* v61.60: ارز (xf) زیر مبلغ، سکه (xc) زیر طلا — CSS .c6vb با grid-auto-flow dense */
-const cbCell=(k,v,i)=>`<span class="cbk k${k==='r'?'r':k==='g'?'g':'x x'+((XA[k]||{}).k==='f'?'f':'c')} ${v<0?'d':v>0?'c':'z'}" style="--i:${i}"><span class="cbh"><small>${balKL(k)}</small>${v?`<em>${ourLab(v)}</em>`:''}</span><b${fitS(v?balV(k,v):'۰')}><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span></b></span>`;
-function balPills(b){const X=Object.keys(b.X||{}).filter(k=>b.X[k]);if(!b.R&&!b.G&&!X.length)return `<span class="cbz"><span class="cbzi">${ic('check')}</span><span class="cbzt"><b>حساب تسویه است</b><small>مبلغ و طلا صفر</small></span><em>تسویه</em></span>`;
-  const L=[['g',b.G],['r',b.R],...X.map(k=>[k,b.X[k]])];let i=0;return L.map(([k,v])=>cbCell(k,v,i++)).join('')}
+const cbCell=(k,v,i,pw)=>`<span class="cbk k${k==='r'?'r':k==='g'?'g':'x x'+((XA[k]||{}).k==='f'?'f':'c')} ${v<0?'d':v>0?'c':'z'}${pw?' pw':''}" style="--i:${i}"><span class="cbh"><small>${balKL(k)}</small>${v?`<em>${ourLab(v)}</em>`:''}</span><b${fitS(v?balV(k,v):'۰')}><span class="cbn" data-k="${k}" data-v="${Math.abs(v)}">${v?balV(k,v):'۰'}</span></b></span>`;
+/* v61.88: pw = جمع تسویه‌های در انتظار تأیید این مشتری → قاب مبلغ زرد (تخصیص داده شده، هنوز کسر نشده) */
+function balPills(b,pw){const X=Object.keys(b.X||{}).filter(k=>b.X[k]);if(!b.R&&!b.G&&!X.length&&!pw)return `<span class="cbz"><span class="cbzi">${ic('check')}</span><span class="cbzt"><b>حساب تسویه است</b><small>مبلغ و طلا صفر</small></span><em>تسویه</em></span>`;
+  const L=[['g',b.G],['r',b.R],...X.map(k=>[k,b.X[k]])];let i=0;return L.map(([k,v])=>cbCell(k,v,i++,k==='r'&&pw)).join('')}
 /* v61.56 (خواسته صاحب اپ): کارت مشتری (آواتار، عنوان، نام، گروه، تلفن) در سرتیتر همه صفحه‌های مشتری، زیر عنوان صفحه
    (جای نام کوچک قبلی). حساب مشتری: زدن = ویرایش مشخصات (مداد)؛ صفحه سند ثبت‌شده: زدن = حساب مشتری؛ صفحه سند: فقط نمایش */
 function cuHead(c,ttl){const a=cur==='cust'?'cuEdit':cur==='inv'?'cuOpen':'',T=a?'button':'div',m=[c.grp?`<em>${esc(c.grp)}</em>`:'',c.phone?`<bdi dir="ltr">${esc(toFa(c.phone))}</bdi>`:''].filter(Boolean).join('');
   return `<${T} class="cuh9"${a?` data-act="${a}" data-id="${c.id}" aria-label="${a==='cuEdit'?'ویرایش مشخصات ':'حساب '}${esc(cuName(c))}"`:''}>${cuAvH(c)}<span class="cuh9t">${ttl?`<span class="cuh9k">${esc(ttl)}</span>`:''}<span class="cuh9n">${honTag(c.name)}<b>${esc(cuName(c))}</b></span>${m?`<span class="cuh9m">${m}</span>`:''}</span>${a==='cuEdit'?`<span class="c6ed">${ic('edit')}</span>`:a?`<span class="cuh9g">${ic('back').replace('class="i"','class="i flip"')}</span>`:''}</${T}>`}
 /* کارت «مانده حساب»: کاشی‌های مبلغ و طلا (و سکه/ارز) با برچسب طلبکاریم/بدهکاریم؛ عدد در قاب خودش جا می‌شود.
    همان کارت در حساب مشتری و صفحه سند ثبت‌شده؛ کاشی‌ها پله‌ای بالا می‌آیند و عدد یک بار از صفر می‌شمارد */
-function cuBalCard(b,an,act){const T=act?'button':'div';return `<${T} class="c6l c6lb cub9${an?' anim':''}"${act?` data-act="${act.a}" data-id="${act.id}" aria-label="حساب مشتری"`:''}><span class="cub9h"><b>مانده حساب</b>${act?`<small>حساب مشتری ${ic('back').replace('class="i"','class="i flip"')}</small>`:''}</span><span class="c6v c6vb">${balPills(b)}</span></${T}>`}
+function cuBalCard(b,an,act,c){const T=act?'button':'div',P=c?cuPend(c):[],pw=P.reduce((s,o)=>s+(+o.z.amount||0),0);return `<${T} class="c6l c6lb cub9${an?' anim':''}${pw?' pend':''}"${act?` data-act="${act.a}" data-id="${act.id}" aria-label="حساب مشتری"`:''}><span class="cub9h"><b>مانده حساب</b>${act?`<small>حساب مشتری ${ic('back').replace('class="i"','class="i flip"')}</small>`:''}</span><span class="c6v c6vb">${balPills(b,pw)}</span></${T}>${pw?cuPendHTML(b,P,pw):''}`}
 /* v61.53 (خواسته صاحب اپ): «قاب مانده» — هر جنس (مبلغ، طلا، سکه/ارز) در یک قاب جدا: بالا نام جنس و برچسب طلبکاریم/بدهکاریم،
    زیرش عدد پررنگ با واحد کامل (تومان، گرم، عدد). مبلغ و طلا همیشه کنار هم؛ سکه و ارز فقط اگر مانده دارند.
    q8F = قاب کوچک (فهرست حساب‌ها و گردش حساب؛ run = مانده بعد از ردیف)، q8R = قاب بزرگ صفحه حساب مشتری */
@@ -74,8 +75,8 @@ function cuListHTML(){const q0=clean(cuQ||''),q=nzName(toEn(q0)),A=CU();let B=A.
   /* v61.33: شماره سند (فاکتور فروش، خرید و…) هم جستجو می‌شود؛ زدن = باز شدن همان سند */
   const IV=cuInvHits(q0),ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
   if(!B.length)return (ivh+mem+add)||`<div class="bempty">${ic('search')}<b>حسابی پیدا نشد</b></div>`;
-  const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'';cuAnim=0;
-  return `${ivh}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb${an}">${B.map(([c,b],ri)=>swW(`<button class="c6r" data-act="cuOpen" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="c6v c6vb" style="--r:${Math.min(ri,8)}">${balPills(b)}</span></button>`,{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})).join('')}</div>${mem}${add}`}
+  const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'',PW=pendMap();cuAnim=0;
+  return `${ivh}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb${an}">${B.map(([c,b],ri)=>swW(`<button class="c6r" data-act="cuOpen" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="c6v c6vb" style="--r:${Math.min(ri,8)}">${balPills(b,PW.get(String(c.id)))}</span></button>`,{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})).join('')}</div>${mem}${add}`}
 const cuName=c=>(c.name||'');
 function cuInvHits(q0){const d=toEn(q0||'').replace(/[\s,،]/g,'');if(!/^\d{1,6}$/.test(d))return [];const R=[];
   for(const c of CU())for(const t of c.txs||[])if(t.type==='inv'&&!t.del&&t.no!=null&&String(t.no).startsWith(d))R.push([c,t]);
@@ -91,7 +92,7 @@ Object.assign(IC,{hold:'<circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12"
    «سند جدید» فقط دکمه + در سرتیتر */
 function vCust(){xaSync();const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust')go('custs',true)},0);return ''}const b=cuBal(c),T=(c.txs||[]).filter(t=>!t.del).slice().sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
   /* v60.5: کارت مشخصات مشتری برجسته؛ زدن روی کارت = ویرایش مشخصات */
-  let h=`${cuBalCard(b,cuCntId!==custId)}${wdCuHTML(c)}
+  let h=`${cuBalCard(b,cuCntId!==custId,null,c)}${wdCuHTML(c)}
   ${can('debt')?`${svDraftHTML(c)}
   `:''}
   ${shBanner(c.id)}
