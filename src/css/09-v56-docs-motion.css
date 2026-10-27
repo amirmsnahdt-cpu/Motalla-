@@ -1914,3 +1914,8 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .bzsr.on .cbv{color:var(--blu);display:grid;place-items:center}
 .bzsr.on .cbv svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 #cuG[readonly]{caret-color:transparent;cursor:pointer}
+/* v61.85 رفع باگ (اندروید): شماره تلفن کارت مشتری سرتیتر از قاب بیرون می‌زد — ردیف گروه/تلفن هم‌عرض متن کارت می‌ماند؛
+   اگر جا کم باشد نام گروه با «…» کوتاه می‌شود و شماره همیشه کامل داخل قاب دیده می‌شود */
+.cuh9m{max-width:100%;align-self:stretch}
+.cuh9m em{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cuh9m bdi{flex:none}
