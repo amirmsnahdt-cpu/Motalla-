@@ -389,6 +389,39 @@ function serveStatic(req, res, p) {
   return true;
 }
 
+/* ---------- قیمت لحظه‌ای طلای بازار (tgju) ----------
+   سرور (داخل ایران) هر ۳۰ ثانیه حداکثر یک بار از tgju می‌گیرد؛ همه گوشی‌ها همان را می‌بینند.
+   g18 = هر گرم ۱۸ عیار، mz = مثقال (مظنه)، هر دو به تومان. اگر tgju در دسترس نبود آخرین قیمت با stale برمی‌گردد. */
+const GOLD_TTL = 30e3, GOLD_URLS = ['https://call1.tgju.org/ajax.json', 'https://call2.tgju.org/ajax.json', 'https://call3.tgju.org/ajax.json', 'https://call4.tgju.org/ajax.json'];
+let goldLast = null, goldAt = 0, goldBusy = null;
+const goldNum = v => { const t = String(v == null ? '' : v).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[^\d.]/g, ''); const n = +t; return isFinite(n) && n > 0 ? n : 0; };
+const goldItem = (cur, k) => { const o = cur && cur[k]; if (!o) return null; const p = goldNum(typeof o === 'object' ? (o.p ?? o.price ?? o.value) : o); return p ? { p: Math.round(p / 10), t: typeof o === 'object' ? String(o.ts || o['t-g'] || o.t || '') : '' } : null; };
+function goldParse(j) {
+  const cur = j && (j.current || j); const g = goldItem(cur, 'geram18'), m = goldItem(cur, 'mesghal');
+  if (!g && !m) return null;
+  const MZK = 4.3318, g18 = g ? g.p : Math.round(m.p / MZK), mz = m ? m.p : Math.round(g.p * MZK);
+  /* نسبت مثقال به گرم باید حدود ۴٫۳۳ باشد؛ اگر نبود یکی از عددها خراب خوانده شده */
+  if (!(mz / g18 > 4.1 && mz / g18 < 4.6)) return null;
+  return { g18, mz, ts: (g && g.t) || (m && m.t) || '' };
+}
+async function goldFetch() {
+  for (const u of GOLD_URLS) {
+    try {
+      const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 6000);
+      const r = await fetch(u, { signal: ac.signal, headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json' } }).finally(() => clearTimeout(tm));
+      if (!r.ok) continue; const v = goldParse(await r.json()); if (v) return v;
+    } catch (e) { }
+  }
+  return null;
+}
+async function goldGet() {
+  if (goldLast && Date.now() - goldAt < GOLD_TTL) return { ...goldLast, at: new Date(goldAt).toISOString(), stale: false };
+  if (!goldBusy) goldBusy = goldFetch().then(v => { if (v) { goldLast = v; goldAt = Date.now(); } return v; }).finally(() => { goldBusy = null; });
+  const v = await goldBusy;
+  if (v) return { ...v, at: new Date(goldAt).toISOString(), stale: false };
+  return goldLast ? { ...goldLast, at: new Date(goldAt).toISOString(), stale: true } : null;
+}
+
 /* ---------- مسیرها ---------- */
 async function handle(req, res) {
   cors(req, res); secHeaders(req, res);
@@ -452,6 +485,7 @@ async function handle(req, res) {
   const me = a.user;
   if (fromPreview(req) && me.role !== 'admin') return bad(res, 403, PREVIEW_MSG);
 
+  if (p === '/api/gold' && req.method === 'GET') { const g = await goldGet(); return g ? send(res, 200, g) : bad(res, 503, 'قیمت بازار الان در دسترس نیست'); }
   if (p === '/api/me' && req.method === 'GET') return send(res, 200, { user: pubUser(me), app: APP_VER });
   if (p === '/api/logout' && req.method === 'POST') { q.delSession.run(a.tokenHash); return send(res, 200, { ok: true }); }
   /* کلید ورود با اثر انگشت برای همین گوشی (نشست فعلی لازم است)؛ کلید قبلی همین گوشی جداگانه با revoke پاک می‌شود */
@@ -669,4 +703,4 @@ const server = http.createServer((req, res) => {
 setInterval(() => { try { q.purgeSessions.run(now()); q.purgeOldImgs.run(new Date(Date.now() - 90 * 864e5).toISOString()); } catch (e) { } }, 6 * 3600e3).unref();
 try { fs.watch(path.join(ROOT, 'index.html'), () => setTimeout(appVersion, 200)).unref(); } catch (e) { }
 if (require.main === module) server.listen(PORT, process.env.HOST || '0.0.0.0', () => console.log('motalla server on :' + PORT + ' data=' + DATA_DIR + ' app=' + APP_VER));
-module.exports = { server, merge3, db };
+module.exports = { server, merge3, goldParse, db };

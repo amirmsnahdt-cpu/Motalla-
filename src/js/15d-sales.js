@@ -112,6 +112,7 @@ function vSell(){xaSync();if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();s
   return `<div class="d6">
   <div class="d6hd"><button class="d6no" data-act="svCal"><small>${sv.items.length?'فاکتور':'سند'}</small><b>${toFa(sv.edit?sv.edit.no:invNext())}</b><span>${ic('cal')}${esc(payLab(sv.date)||D.fa)}</span></button><button type="button" class="d6tx${sv.tax?' on':''}" id="svTx" data-act="svTax" aria-pressed="${!!sv.tax}"><i>${ic('check')}</i><span>مالیات</span><small>۱۰٪</small></button>
     ${rateHTML()}</div>
+  ${glSellHTML()}
   <div id="svCu">${svCuHTML()}</div>
   <div class="d6q" id="qa">${qaHTML()}</div>
   <div id="svRows"${render._same?'':' class="first"'}>${svRowsHTML()}</div>
@@ -522,7 +523,7 @@ ACT.rowPhS=d=>{const K=String(d.ks||'').split(',').filter(Boolean);if(!K.length)
 function svBindRest(){phPaint($('svRows'));const G=$('svGc');if(G)G.onchange=()=>{sv.gconv=G.checked;svKeep();svRe()};const T=$('svT');if(T)T.onchange=()=>{sv.tax=T.checked;ls.set('m_tax',sv.tax);svKeep();svRe()}}
 function svBindCu(){const Q=$('svQ');if(!Q)return;Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{srchSwap('svCr',svCrHTML())},80)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(Q._t);sv.q=Q.value;const r=$('svCr');if(r)r.innerHTML=svCrHTML();const f=document.querySelector('#svCr [data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}};const C=$('svCr');if(C)C.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
 function bindSell(){if(!sv)return;svBindCu();svBindRest();qaBind();const M=$('svM');TITLES.sell=sv.edit?'ویرایش سند '+toFa(sv.edit.no):'سند جدید';
-  const setRate=(r,m)=>{sv.rate=r;sv.mz=m;if(r)ls.set('m_rate',r);if(m)ls.set('m_mz',m);const x=$('svRx'),w=$('svRate');if(x)x.innerHTML=rateX();if(w)w.classList.toggle('need',!r);svKeep();clearTimeout(bindSell._t);bindSell._t=setTimeout(()=>{if(cur!=='sell')return;svRe();if(sv.qa.x)xrHint()},140)};
+  const setRate=(r,m)=>{sv.rate=r;sv.mz=m;if(r)ls.set('m_rate',r);if(m)ls.set('m_mz',m);const x=$('svRx'),w=$('svRate');if(x)x.innerHTML=rateX();if(w)w.classList.toggle('need',!r);svKeep();glPaint();clearTimeout(bindSell._t);bindSell._t=setTimeout(()=>{if(cur!=='sell')return;svRe();if(sv.qa.x)xrHint()},140)};
   const ref=+sv.rate||+ls.get('m_rate',0)||0;
   if(M){selOnFocus(M);M.oninput=()=>{const v=num(M.value);M.value=v?v.toLocaleString('en-US'):'';const k=rtDetect(v,ref);sv.rk=k;ls.set('m_rtk',k);const l=$('svRl');if(l)l.textContent=v?(k==='mz'?'مظنه':'هر گرم ۱۸'):'مظنه یا هر گرم';if(k==='mz')setRate(rOfMz(v),v);else setRate(v,mzOf(v))}}
   [M].forEach(el=>{if(el)el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const f=!svCu()?$('svQ'):$('qW')||$('xrW')||$('pyA');if(f)f.focus()}}});

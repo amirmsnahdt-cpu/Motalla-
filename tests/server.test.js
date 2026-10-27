@@ -6,7 +6,7 @@ const assert = require('node:assert');
 const fs = require('fs'), os = require('os'), path = require('path');
 
 process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'motalla-test-'));
-const { server, merge3 } = require('../server/server.js');
+const { server, merge3, goldParse } = require('../server/server.js');
 
 let base = '';
 test.before(() => new Promise(r => server.listen(0, '127.0.0.1', () => { base = 'http://127.0.0.1:' + server.address().port; r(); })));
@@ -217,4 +217,14 @@ test('ورود با اثر انگشت: کلید دستگاه، خروج، باط
   assert.equal((await api('/api/users/' + uid, { method: 'PATCH', token: admin, body: { password: 'secret123' } })).status, 200);
   assert.equal((await api('/api/bio/login', { method: 'POST', body: { id: k2.j.id, secret: k2.j.secret } })).status, 401, 'admin reset revokes');
   staff = (await api('/api/login', { method: 'POST', body: { username: 'clerk', password: 'secret123' } })).j.token;
+});
+
+test('قیمت لحظه‌ای طلا: خواندن پاسخ tgju (ریال → تومان) و رد عدد خراب؛ بدون ورود بسته', async () => {
+  const g = goldParse({ current: { geram18: { p: '243,425,000', ts: '2026-10-27 20:15:00' }, mesghal: { p: '1,054,500,000' } } });
+  assert.deepEqual([g.g18, g.mz], [24342500, 105450000]);
+  assert.equal(goldParse({ current: { geram18: { p: '243,425,000' } } }).mz, Math.round(24342500 * 4.3318), 'missing mesghal derived');
+  assert.equal(goldParse({ current: { geram18: { p: '243,425,000' }, mesghal: { p: '24,000' } } }), null, 'bad ratio rejected');
+  assert.equal(goldParse({}), null);
+  assert.equal((await api('/api/gold')).status, 401);
+  const r = await api('/api/gold', { token: admin }); assert.ok(r.status === 200 || r.status === 503, 'answers even when tgju is unreachable');
 });
