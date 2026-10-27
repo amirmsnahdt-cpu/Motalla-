@@ -572,7 +572,15 @@ function svAuto(why){if(!sv||svAutoBusy)return false;svAutoBusy=true;try{
   if(why==='bg'){if(fromInv&&invV)invV.tx=t.id;sv.edit={tx:t.id,no:t.no};sv.sig0=svSig();svKeep();TITLES.sell='ویرایش سند '+toFa(t.no);return true}
   if(fromInv&&invV)invV.tx=t.id;sv=null;ls.set('m_svd',null);toast(invTitle(t)+' ثبت شد','', 'دیدن سند',()=>invOpen(c.id,t.id));return true}
   finally{svAutoBusy=false}}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&cur==='sell'&&sv&&svRows()&&!svErr()&&(!sv.edit||svSig()!==sv.sig0))svAuto('bg')});
+/* v61.83: باز شدن گالری/دوربین (input file) روی آیفون و اندروید صفحه را «پنهان» می‌کند؛ قبلاً همین ثبت خودکار ردیفِ در حال ورود را می‌بست
+   (svFlush → pvSave/qaAdd → sv.qa خالی) و عکس انتخاب‌شده دیگر صاحبی نداشت و ثبت نمی‌شد. حالا تا انتخاب‌گر عکس باز است ثبت خودکار نمی‌شود. */
+let PICKING=0;
+document.addEventListener('click',e=>{const t=e.target;if(t&&t.tagName==='INPUT'&&t.type==='file')PICKING=Date.now()},true);
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.type==='file')PICKING=0},true);
+document.addEventListener('cancel',e=>{const t=e.target;if(t&&t.type==='file')PICKING=0},true);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(PICKING){const p=PICKING;setTimeout(()=>{if(PICKING===p)PICKING=0},4000)}return}
+  if(PICKING&&Date.now()-PICKING<10*60e3)return;
+  if(cur==='sell'&&sv&&svRows()&&!svErr()&&(!sv.edit||svSig()!==sv.sig0))svAuto('bg')});
 /* ================= نمایش سند ================= */
 let invV=null;
 function invOpen(cu,tx,fresh){invV={cu,tx,fresh:!!fresh};custId=cu;closeSheet();go('inv')}

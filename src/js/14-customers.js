@@ -132,11 +132,16 @@ function cuFormHTML(c){const isNew=!c.id;CUF={av:c.av||'',ids:Array.isArray(c.id
   </div>
   <button class="xgo" data-act="cuSave" data-id="${c.id||'new'}">${ic('check')} ${isNew?'ثبت و ورود به حساب':'ذخیره'}</button>`}
 /* فهرست پیشنهاد زیر یک فیلد (مثل جستجوی آیفون): با تایپ باز می‌شود و با انتخاب بسته */
-function acList(inp,box,rows,pick){if(!inp||!box)return;const hide=()=>{box.classList.add('hide');box.innerHTML=''};
-  const show=()=>{if(document.activeElement!==inp){hide();return}const h=rows(inp.value);if(!h){hide();return}box.innerHTML=h;box.classList.remove('hide')};
+/* v61.83: o.tap (خواسته صاحب اپ برای گروه مشتری): زدن اول = فقط فهرست (بدون کیبورد)، زدن دوم = کیبورد؛ زدن بیرون = بستن (kb2 در 15j) */
+function acList(inp,box,rows,pick,o){if(!inp||!box)return;const tap=o&&o.tap;const hide=()=>{box.classList.add('hide');box.innerHTML='';if(tap){inp._lo=false;if(document.activeElement!==inp)inp.readOnly=true}};
+  const show=()=>{if(document.activeElement!==inp&&!(tap&&inp._lo)){hide();return}const h=rows(inp.value);if(!h){hide();return}box.innerHTML=h;box.classList.remove('hide')};
   inp.addEventListener('input',()=>{clearTimeout(inp._at);inp._at=setTimeout(show,70)});inp.addEventListener('focus',()=>setTimeout(show,0));inp.addEventListener('blur',()=>setTimeout(hide,170));
   inp.addEventListener('keydown',e=>{if(e.key==='Escape')hide()});box.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()};
-  box.onclick=e=>{const r=e.target.closest('button[data-i]');if(!r)return;hide();pick(r.dataset.i)}}
+  box.onclick=e=>{const r=e.target.closest('button[data-i]');if(!r)return;hide();pick(r.dataset.i)};
+  if(tap){inp._lo=false;inp.addEventListener('blur',()=>setTimeout(()=>{if(document.activeElement!==inp){inp._lo=false;inp.readOnly=true}},180));
+    kb2(inp,()=>inp._lo,()=>{inp._lo=true;const h=rows('');if(!h)return;box.innerHTML=h;box.classList.remove('hide');try{box.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})}catch(_){}});
+    const out=e=>{if(!inp.isConnected){document.removeEventListener('pointerdown',out,true);return}if(!inp._lo||document.activeElement===inp)return;const t=e.target;if(t===inp||box.contains(t))return;hide()};
+    document.addEventListener('pointerdown',out,true)}}
 const sugRow=(i,av,b,sub,cls,v)=>`<button type="button" class="bzsr${cls?' '+cls:''}" data-i="${esc(i)}"><span class="av">${av}</span><span class="tx"><b>${b}</b><small>${sub}</small></span>${v?`<span class="cbv">${v}</span>`:''}</button>`;
 function cuPeople(q,by){const nq=nzName(q),qd=toEn(q).replace(/\D/g,'');const P=bzPeople();
   if(by==='n'){if(!nq)return [];return P.filter(p=>p.k.includes(nq)).sort((a,b)=>(b.k.startsWith(nq)-a.k.startsWith(nq))||(b.n-a.n)||String(b.last).localeCompare(String(a.last))).slice(0,6)}
@@ -152,8 +157,8 @@ function cuBind(){phPaint($('sheet'));const N=$('cuN'),P=$('cuP'),M=$('cuM'),G=$
   const pickP=i=>{const p=L[+i];if(!p)return;if(p.cuId&&String(p.cuId)!==String(cuEd)&&!cuEd){const c=CU().find(z=>String(z.id)===String(p.cuId));if(c){closeSheet();if(cuRet==='sell'){cuRet='';svPick(c.id)}else{custId=c.id;go('cust')}toast('حساب «'+cuName(c)+'» باز شد');return}}
     N.value=p.name;if(p.phone&&!P.value){P.value=p.phone;P.oninput()}if(p.nid&&!M.value){M.value=p.nid;M.oninput()}const nx=[P,M,G].find(el=>!el.value)||$('cuA');if(nx)nx.focus()};
   acList(N,$('cuNs'),pRows('n'),pickP);acList(P,$('cuPs'),pRows('p'),pickP);acList(M,$('cuMs'),pRows('m'),pickP);
-  let GL=[];acList(G,$('cuGs'),q=>{const nq=nzName(q),A=groupsList();GL=A.filter(g=>!nq||nzName(g).includes(nq)).slice(0,6);const ex=A.some(g=>nzName(g)===nq);const cnt=g=>CU().filter(c=>c.grp===g).length;
-    const R=GL.map((g,i)=>sugRow(i,ic('users'),esc(g),fmt(cnt(g))+' مشتری','gr'));if(nq&&!ex){GL.push(clean(q));R.push(sugRow(GL.length-1,ic('plus'),'گروه تازه «'+esc(clean(q))+'»','بعداً با جستجوی همین نام پیدا می‌شود','nw'))}if(G.value&&!nq)return R.join('');return R.join('')},i=>{G.value=GL[+i]||'';$('cuA').focus()});
+  let GL=[];G.addEventListener('focus',()=>{G._v0=G.value});acList(G,$('cuGs'),q=>{const nq=q===G._v0||q===''?'':nzName(q),A=groupsList();GL=A.filter(g=>!nq||nzName(g).includes(nq)).slice(0,nq?6:40);const ex=A.some(g=>nzName(g)===nq);const cnt=g=>CU().filter(c=>c.grp===g).length;
+    const R=GL.map((g,i)=>sugRow(i,ic('users'),esc(g),fmt(cnt(g))+' مشتری','gr'+(g===G.value?' on':''),g===G.value?ic('check'):''));if(nq&&!ex){GL.push(clean(q));R.push(sugRow(GL.length-1,ic('plus'),'گروه تازه «'+esc(clean(q))+'»','بعداً با جستجوی همین نام پیدا می‌شود','nw'))}if(G.value&&!nq)return R.join('');return R.join('')},i=>{G.value=GL[+i]||'';G.blur()},{tap:1});
   ['cuN','cuP','cuM','cuG','cuBI','cuBK','cuBH','cuA'].forEach((id,i,A)=>{const el=$(id);el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(i<A.length-1)$(A[i+1]).focus();else el.blur()}})})}
 ACT.cuNew=()=>{cuRet='';sheet(cuFormHTML({}));cuBind();sheetFocus($('cuN'))};
 ACT.cuEdit=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;sheet(cuFormHTML(c));cuBind()};

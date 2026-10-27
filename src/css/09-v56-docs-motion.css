@@ -1907,3 +1907,10 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .ckt.out{grid-template-columns:repeat(3,1fr)}
 .txwd{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:3px;padding:2px 8px;border-radius:8px;background:color-mix(in srgb,var(--warn) 14%,var(--card));color:var(--warn);font-style:normal;font-size:11px;font-weight:800}.txwd svg{width:12px;height:12px}
 .wdam label{margin:0!important}.wdam{gap:2px}
+/* v61.83: فهرست گروه مشتری با یک زدن باز می‌شود (همه گروه‌ها)؛ گروه انتخاب‌شده آبی با تیک */
+#cuGs{max-height:min(320px,46vh);overflow-y:auto;overscroll-behavior:contain}
+.bzsr.on{background:var(--blu2)}
+.bzsr.on .tx b{color:var(--blu)}
+.bzsr.on .cbv{color:var(--blu);display:grid;place-items:center}
+.bzsr.on .cbv svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#cuG[readonly]{caret-color:transparent;cursor:pointer}
