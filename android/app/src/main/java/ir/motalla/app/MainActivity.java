@@ -575,6 +575,10 @@ public class MainActivity extends Activity {
 
         /** اشتراک عکس‌ها با برنامه‌های دیگر (تلگرام، واتساپ، …): فایل‌ها در پوشه موقت برنامه نوشته و با CamProvider موقتاً در دسترس قرار می‌گیرند.
             ورودی: آرایه JSON از {d: base64 جی‌پگ} */
+        /** v61.84: shareFiles فایل PDF (m = application/pdf، n = نام فایل) را هم می‌فرستد */
+        @JavascriptInterface
+        public boolean pdfShare() { return true; }
+
         @JavascriptInterface
         public boolean shareFiles(String json, final String title) {
             try {
@@ -585,12 +589,20 @@ public class MainActivity extends Activity {
                 long now = System.currentTimeMillis();
                 if (old != null) for (File f : old) if (f.getName().startsWith("sh_") && now - f.lastModified() > 3600000L) f.delete();
                 final java.util.ArrayList<Uri> uris = new java.util.ArrayList<>();
+                String mime = "image/jpeg";
                 for (int i = 0; i < a.length(); i++) {
-                    byte[] bytes = Base64.decode(a.getJSONObject(i).getString("d"), Base64.DEFAULT);
-                    String n = "sh_" + now + "_" + (i + 1) + ".jpg";
+                    org.json.JSONObject o = a.getJSONObject(i);
+                    byte[] bytes = Base64.decode(o.getString("d"), Base64.DEFAULT);
+                    boolean pdf = "application/pdf".equals(o.optString("m"));
+                    if (pdf) mime = "application/pdf";
+                    String n = "sh_" + now + "_" + (i + 1) + (pdf ? ".pdf" : ".jpg");
                     try (FileOutputStream os = new FileOutputStream(new File(d, n))) { os.write(bytes); }
-                    uris.add(new Uri.Builder().scheme("content").authority(CamProvider.AUTH).appendPath(n).build());
+                    Uri.Builder ub = new Uri.Builder().scheme("content").authority(CamProvider.AUTH).appendPath(n);
+                    String dn = o.optString("n");
+                    if (!dn.isEmpty()) ub.appendQueryParameter("n", dn.replaceAll("[\\\\/:*?\"<>|]", "-"));
+                    uris.add(ub.build());
                 }
+                final String type = mime;
                 runOnUiThread(() -> {
                     try {
                         Intent i;
@@ -601,7 +613,7 @@ public class MainActivity extends Activity {
                             i = new Intent(Intent.ACTION_SEND_MULTIPLE);
                             i.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
                         }
-                        i.setType("image/jpeg");
+                        i.setType(type);
                         ClipData cd = ClipData.newRawUri("", uris.get(0));
                         for (int k = 1; k < uris.size(); k++) cd.addItem(new ClipData.Item(uris.get(k)));
                         i.setClipData(cd);

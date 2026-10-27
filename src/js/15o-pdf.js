@@ -9,9 +9,12 @@
 const PDFK={html:'',p:null,file:null};
 const pdfDataUrl=async u=>{const r=await fetch(u);if(!r.ok)throw new Error('fetch '+u);const b=await r.blob();return await new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=rej;f.readAsDataURL(b)})};
 const pdfEsc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-async function pdfMake(html,title){
-  /* اندازه کاغذ از @page برگه: A4 (صورتحساب) یا A5، عمودی یا افقی؛ بی @page = A5 افقی */const pz=(html.match(/@page\{size:(A4|A5)( landscape)?/)||[,'A5',' landscape']),a4=pz[1]==='A4',land=!!pz[2],sw=a4?210:148,sh=a4?297:210,mmW=land?sh:sw,mmH=land?sw:sh,mg=a4?10:8,PX=96/25.4,
-    W=Math.round((mmW-2*mg)*PX),H=Math.round((mmH-2*mg)*PX),S=3,base=location.href.replace(/[^/]*$/,'');
+/* v61.84: اندازه کاغذ و حاشیه‌ها از @page خود برگه (پیش‌نمایش، PDF و چاپ اندروید همه از همین می‌خوانند تا شکل یکی باشد) */
+function pageSpec(html){const m=String(html).match(/@page\{size:(A4|A5)( landscape)?(?:;margin:([\d.]+)mm(?: ([\d.]+)mm)?)?/)||[,'A5',' landscape'],a4=m[1]==='A4',land=!!m[2],sw=a4?210:148,sh=a4?297:210,mv=m[3]!=null?+m[3]:a4?10:8,mh=m[4]!=null?+m[4]:mv;
+  return{a4,land,mmW:land?sh:sw,mmH:land?sw:sh,mv,mh}}
+async function pdfMake(html,title,keep){
+  const Q=pageSpec(html),mmW=Q.mmW,mmH=Q.mmH,PX=96/25.4,
+    W=Math.round((mmW-2*Q.mh)*PX),H=Math.round((mmH-2*Q.mv)*PX),S=3,base=location.href.replace(/[^/]*$/,'');
   const f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.style.cssText=`position:fixed;left:-20000px;top:0;width:${W}px;height:${H}px;border:0;opacity:0;pointer-events:none`;document.body.appendChild(f);
   try{
     await new Promise(r=>{f.onload=r;f.srcdoc=html.replace(/<head>/i,'<head><base href="'+base+'">').replace(/<button class="pb"[^>]*>.*?<\/button>/,'')});
@@ -39,7 +42,10 @@ async function pdfMake(html,title){
     const C=[...cand].filter(y=>y>0&&!bad.some(([a,b])=>y>a&&y<b)).sort((a,b)=>a-b),pages=[];let y0=0;
     /* ارتفاع سرستون تکرارشده جدولی که از صفحه قبل ادامه دارد (از جای صفحه کم می‌شود) */
     const headH=y=>{let h=0;d.querySelectorAll('thead').forEach(th=>{const tb=th.closest('table').getBoundingClientRect(),r=th.getBoundingClientRect();if(tb.top-T<y-1&&tb.bottom-T>y+1&&r.bottom-T<=y+1)h=Math.max(h,r.height)});return h};
-    while(y0<total-30){const lim=y0+HU-(y0?headH(y0):0);let y1;const fz=[...force].filter(y=>y>y0+4&&y<=lim).sort((a,b)=>a-b)[0];
+    /* v61.84 (خواسته صاحب اپ: «PDF دقیقاً همان شکل پیش‌نمایش»): برگه‌ای که کمی از یک صفحه بلندتر است (تا ۱.۴ برابر)
+       نمی‌شکند؛ همان یک صفحه کمی کوچک‌تر کشیده می‌شود تا شکل و چیدمان دقیقاً همان پیش‌نمایش بماند */
+    const FIT=!force.size&&total>HU&&total<=HU*1.4;if(FIT)pages.push([0,total]);
+    while(!FIT&&y0<total-30){const lim=y0+HU-(y0?headH(y0):0);let y1;const fz=[...force].filter(y=>y>y0+4&&y<=lim).sort((a,b)=>a-b)[0];
       if(fz)y1=fz;else if(lim<total){const ok=C.filter(y=>y>y0+40&&y<=lim);y1=ok.length?ok[ok.length-1]:lim}else y1=total;
       pages.push([y0,Math.min(y1,total)]);y0=y1;
       /* فاصله سفید پیش از بخش تازه (حاشیه section) صفحه جدا نمی‌سازد */const nx=EL.map((e,i)=>RC[i]).filter(r=>r.h&&!r.abs&&r.t>=y0-1).reduce((m,r)=>Math.min(m,r.t),Infinity);if(isFinite(nx)&&nx>y0&&nx-y0<H*.5&&![...force].some(y=>y>y0&&y<nx))y0=Math.floor(nx)}
@@ -50,26 +56,29 @@ async function pdfMake(html,title){
       {const c0=document.createElement('canvas');c0.width=c0.height=4;c0.getContext('2d').drawImage(im,0,0,4,4);await new Promise(r=>setTimeout(r,imgs.length?250:700))}
       const cv=document.createElement('canvas');cv.width=W*S;cv.height=hp*S;const x=cv.getContext('2d');
       for(let k=0;k<2;k++){x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(im,0,0,W,hp,0,0,cv.width,cv.height);if(!k)await new Promise(r=>setTimeout(r,60))}
-      const j=cv.toDataURL('image/jpeg',.9);imgs.push({b:Uint8Array.from(atob(j.split(',')[1]),c=>c.charCodeAt(0)),w:cv.width,h:cv.height,hp})};
+      const j=cv.toDataURL('image/jpeg',.9);imgs.push({b:Uint8Array.from(atob(j.split(',')[1]),c=>c.charCodeAt(0)),w:cv.width,h:cv.height,hp,j:keep?j:''})};
     for(const [a,b] of pages){const P=B.cloneNode(true),E2=[...P.querySelectorAll('*')];
       /* همان ترتیب عنصرها در iframe و در نسخه (اسکریپت‌ها و دکمه‌ها قبلاً از نسخه برداشته شده‌اند؛ با ترتیب نسبی تطبیق داده می‌شود) */
       let k=0;EL.forEach((el,i)=>{if(el.matches('script,.pb,.pb0')||el.closest('.pb,.pb0'))return;const e2=E2[k++];if(!e2)return;const r=RC[i];if(!r.h||r.abs)return;
         if(r.th){const tr=r.th.getBoundingClientRect();if(tr.bottom-T>a+1&&tr.top-T<b-1)return}/* سرستون جدولی که در این صفحه هست */
         if(r.b<=a+1||r.t>=b-1)e2.style.setProperty('display','none','important')});
       const xml=new XMLSerializer().serializeToString(P).replace(/^<body/,'<div class="__pb"').replace(/<\/body>$/,'</div>');
-      const hp=Math.min(H,Math.max(1,Math.ceil(b-a+(a?headH(a):0)+8)));
+      const hp=FIT?Math.ceil(total+8):Math.min(H,Math.max(1,Math.ceil(b-a+(a?headH(a):0)+8)));
       await draw(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${hp}"><foreignObject x="0" y="0" width="${W}" height="${hp}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${W}px;margin:0;background:#fff;direction:rtl"><style>${cssE}</style>${xml}</div></foreignObject></svg>`,hp)}
-    const pt=v=>v*72/25.4,PW=pt(mmW),PH=pt(mmH),M=pt(mg),IW=PW-2*M;
-    const blob=pdfBuild(imgs.map(o=>({...o,iw:IW,ih:IW*o.hp/W})),PW,PH,M);
-    return new File([blob],String(title||'motalla').replace(/[\\/:*?"<>|]/g,'-')+'.pdf',{type:'application/pdf'})}
+    const pt=v=>v*72/25.4,PW=pt(mmW),PH=pt(mmH),MX=pt(Q.mh),MY=pt(Q.mv),IW=PW-2*MX,IH=PH-2*MY;
+    const PP=imgs.map(o=>{let iw=IW,ih=IW*o.hp/W;if(ih>IH){const k=IH/ih;iw*=k;ih=IH}return{...o,iw,ih,x:MX+(IW-iw)/2,k:iw/IW}});
+    const blob=pdfBuild(PP,PW,PH,MX,MY);
+    const fl=new File([blob],String(title||'motalla').replace(/[\\/:*?"<>|]/g,'-')+'.pdf',{type:'application/pdf'});
+    /* keep: عکس صفحه‌ها هم برگردانده می‌شود (چاپ اندروید همان صفحه‌ها را چاپ می‌کند تا دقیقاً همان PDF باشد) */
+    if(keep)fl._pages=PP.map(o=>({j:o.j,wmm:(mmW-2*Q.mh)*o.k,hmm:(mmW-2*Q.mh)*o.k*o.hp/W})),fl._spec=Q;return fl}
   finally{f.remove()}}
 /* PDF ساده: هر صفحه A5 یک عکس JPEG (DCTDecode) بالای صفحه با حاشیه */
-function pdfBuild(P,PW,PH,M){const enc=new TextEncoder(),parts=[],off=[];let len=0;const put=x=>{const u=typeof x==='string'?enc.encode(x):x;parts.push(u);len+=u.length};
+function pdfBuild(P,PW,PH,M,MY){if(MY==null)MY=M;const enc=new TextEncoder(),parts=[],off=[];let len=0;const put=x=>{const u=typeof x==='string'?enc.encode(x):x;parts.push(u);len+=u.length};
   const obj=(n,body)=>{off[n]=len;put(n+' 0 obj\n');if(Array.isArray(body))body.forEach(put);else put(body);put('\nendobj\n')};
   const n=P.length,f=v=>(Math.round(v*100)/100).toString();put('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
   obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
   obj(2,`<< /Type /Pages /Count ${n} /Kids [${P.map((_,i)=>(3+i*3)+' 0 R').join(' ')}] >>`);
-  P.forEach((p,i)=>{const pg=3+i*3,ct=pg+1,im=pg+2,s=`q ${f(p.iw)} 0 0 ${f(p.ih)} ${f(M)} ${f(PH-M-p.ih)} cm /Im0 Do Q`;
+  P.forEach((p,i)=>{const pg=3+i*3,ct=pg+1,im=pg+2,s=`q ${f(p.iw)} 0 0 ${f(p.ih)} ${f(p.x!=null?p.x:M)} ${f(PH-MY-p.ih)} cm /Im0 Do Q`;
     obj(pg,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f(PW)} ${f(PH)}] /Resources << /XObject << /Im0 ${im} 0 R >> >> /Contents ${ct} 0 R >>`);
     obj(ct,[`<< /Length ${s.length} >>\nstream\n`,s,'\nendstream']);
     obj(im,[`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.b.length} >>\nstream\n`,p.b,'\nendstream'])});
@@ -77,7 +86,23 @@ function pdfBuild(P,PW,PH,M){const enc=new TextEncoder(),parts=[],off=[];let len
   put(`trailer\n<< /Size ${N} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`);return new Blob(parts,{type:'application/pdf'})}
 const pdfTitle=h=>(String(h).match(/<title>([^<]*)<\/title>/)||[])[1]||'مطلا';
 /* از openPrint: وقتی پیش‌نمایش آماده شد، روی آیفون PDF هم ساخته می‌شود (دکمه‌ها تا آماده شدنش صبر می‌کنند) */
-function pdfPrep(html){PDFK.html=html;PDFK.file=null;PDFK.p=pdfMake(html,pdfTitle(html).replace(/&[^;]+;/g,'')).then(fl=>{if(PDFK.html===html)PDFK.file=fl;return fl}).catch(e=>{if(PDFK.html===html)PDFK.file=false;return false});return PDFK.p}
+/* v61.84: اندروید هم همان PDF را می‌سازد (اشتراک = فایل PDF برای تلگرام/واتساپ؛ چاپ = همان صفحه‌ها) */
+const pdfOn=()=>isIOS()||!!window.AndroidBridge;
+const pdfTtl=h=>pdfTitle(h).replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&[^;]+;/g,'');
+function pdfPrep(html){PDFK.html=html;PDFK.file=null;PDFK.p=pdfMake(html,pdfTtl(html),!!window.AndroidBridge).then(fl=>{if(PDFK.html===html)PDFK.file=fl;return fl}).catch(e=>{if(PDFK.html===html)PDFK.file=false;return false});return PDFK.p}
 /* «چاپ / ذخیره PDF» و «اشتراک» روی آیفون: همان لحظه منوی اشتراک با فایل PDF A5 (چاپ هم داخلش هست) */
 function pdfShare(){const fl=PDFK.file;if(!fl||!navigator.canShare||!navigator.canShare({files:[fl]}))return false;
   navigator.share({files:[fl],title:fl.name.replace(/\.pdf$/,'')}).catch(e=>{if(e&&e.name!=='AbortError')toast('اشتراک PDF انجام نشد',true)});return true}
+
+/* v61.84 اندروید: «اشتراک» = فایل PDF در پنجره برنامه‌ها (پل shareFiles با نوع application/pdf؛ اپ تازه pdfShare دارد).
+   اپ قدیمی (shareFiles فقط عکس) → PDF در Download/Motalla ذخیره می‌شود و نسخه تازه پیشنهاد می‌شود. */
+const pdfB64=fl=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(fl)});
+const andPdfOk=()=>{const B=window.AndroidBridge;try{return !!(B&&B.pdfShare&&B.pdfShare())}catch(e){return false}};
+async function pdfShareAnd(){const fl=PDFK.file,B=window.AndroidBridge;if(!fl||!B)return false;let d;try{d=await pdfB64(fl)}catch(e){return false}
+  if(andPdfOk()){try{B.shareFiles(JSON.stringify([{d,n:fl.name,m:'application/pdf'}]),fl.name.replace(/\.pdf$/,''))}catch(e){toast('اشتراک PDF انجام نشد',true)}return true}
+  if(B.saveFile&&B.saveFile(fl.name,d,'application/pdf'))setTimeout(()=>toast('PDF در Download/Motalla ذخیره شد؛ برای ارسال مستقیم، نسخه تازه اپ را نصب کنید',false,'نسخه تازه',()=>{closePrint();ACT.getApk()}),400);
+  else toast('ذخیره PDF انجام نشد',true);return true}
+/* چاپ اندروید: خود صفحه‌های PDF (هر صفحه یک عکس با اندازه دقیق کاغذ) → دقیقاً همان شکل پیش‌نمایش و فایل */
+function pdfPrintAnd(){const fl=PDFK.file,B=window.AndroidBridge;if(!fl||!fl._pages||!B||!B.printHtml||!B.version)return false;const Q=fl._spec;
+  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${pdfEsc(fl.name.replace(/\.pdf$/,''))}</title><style>@page{size:${Q.a4?'A4':'A5'}${Q.land?' landscape':''};margin:0}html,body{margin:0;padding:0;background:#fff}.p{width:${Q.mmW}mm;height:${Q.mmH}mm;box-sizing:border-box;padding:${Q.mv}mm ${Q.mh}mm;overflow:hidden;page-break-after:always;break-after:page}.p:last-child{page-break-after:auto;break-after:auto}img{display:block}</style></head><body>${fl._pages.map(p=>`<div class="p"><img src="${p.j}" style="width:${p.wmm.toFixed(2)}mm;height:${p.hmm.toFixed(2)}mm;margin:0 auto"></div>`).join('')}</body></html>`;
+  toast('در حال آماده‌سازی چاپ…');try{B.printHtml(html,fl.name.replace(/\.pdf$/,''))}catch(e){toast('چاپ در این گوشی ممکن نشد',true)}return true}

@@ -135,11 +135,11 @@ function openPrint(h0){const P=$('pv'),f=$('pvf'),seq=++pvSeq;P.classList.remove
   requestAnimationFrame(()=>setTimeout(async()=>{if(seq!==pvSeq)return;let html;try{html=await (typeof h0==='function'?h0():h0!=null?h0:withCtx(reportHTML))}catch(e){fail(e);return}
     if(seq!==pvSeq||!html)return;html=String(html).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.__pv=html;
     /* v61.72: روی آیفون بعد از دیده شدن برگه، فایل PDF A5 هم ساخته می‌شود؛ دکمه‌ها تا آماده شدنش صبر می‌کنند */
-    const show=()=>{if(seq!==pvSeq)return;f.classList.add('rdy');if(!isIOS()){P.classList.remove('ld');return}
-      const L2=P.querySelector('.pvld b');if(L2)L2.textContent='در حال ساخت PDF ‏A5…';P.classList.add('ld2');
+    const show=()=>{if(seq!==pvSeq)return;f.classList.add('rdy');if(!pdfOn()){P.classList.remove('ld');return}
+      const L2=P.querySelector('.pvld b');if(L2)L2.textContent='در حال ساخت PDF…';P.classList.add('ld2');
       pdfPrep(html).then(()=>{if(seq!==pvSeq)return;P.classList.remove('ld','ld2');const b=P.querySelector('.pvld b');if(b)b.textContent='در حال آماده‌سازی…'})};
-    f.onload=()=>{let done=false;const ok=()=>{if(!done){done=true;show()}};try{const d=f.contentDocument,land=/A4 landscape/.test(html),W=land?1123:794;
-      const st=d.createElement('style');st.textContent=`@media screen{html{background:transparent!important;min-height:100%}body{width:${W}px!important;max-width:none!important;margin:18px auto 28px!important;padding:${land?'30px 34px':'42px 40px'}!important;background:#fff!important;box-shadow:0 10px 34px rgba(16,33,58,.16),0 0 0 1px rgba(16,33,58,.06);border-radius:10px;box-sizing:border-box}}`;d.head.appendChild(st);
+    f.onload=()=>{let done=false;const ok=()=>{if(!done){done=true;show()}};try{/* v61.84: پیش‌نمایش با اندازه و حاشیه دقیق کاغذ همان برگه (@page) چیده می‌شود تا با PDF و چاپ یکی باشد */const d=f.contentDocument,Q=pageSpec(html),PXm=96/25.4,W=Math.round(Q.mmW*PXm);
+      const st=d.createElement('style');st.textContent=`@media screen{html{background:transparent!important;min-height:100%}body{width:${W}px!important;max-width:none!important;margin:18px auto 28px!important;padding:${Math.round(Q.mv*PXm)}px ${Math.round(Q.mh*PXm)}px!important;min-height:${Math.round(Q.mmH*PXm)}px;background:#fff!important;box-shadow:0 10px 34px rgba(16,33,58,.16),0 0 0 1px rgba(16,33,58,.06);border-radius:10px;box-sizing:border-box}}`;d.head.appendChild(st);
       let big=false;const fit=()=>{const z=big?Math.min(1,(f.clientWidth-8)/(W*0.62)):Math.min(1,(f.clientWidth-20)/(W+8));d.documentElement.style.zoom=String(z)};fit();f.contentWindow.addEventListener('resize',fit);d.addEventListener('click',()=>{big=!big;fit()});
       const imgs=[...d.images].filter(i=>!i.complete).map(i=>new Promise(r=>{i.onload=i.onerror=r}));Promise.all([d.fonts&&d.fonts.ready,...imgs]).then(ok,ok)}catch(e){ok()}setTimeout(ok,2500)};
     f.srcdoc=html},40))}
