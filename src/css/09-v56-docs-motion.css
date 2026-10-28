@@ -2205,3 +2205,9 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .fsearch .cufbtn{height:34px}
 
 .cufbar{position:sticky;bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:5;padding-top:8px;background:linear-gradient(to bottom,transparent,var(--card) 30%)}
+/* v61.97: نوار گردش حساب — جستجو با دکمه بازه داخلش */
+.stmbar .stms2{flex:1;min-width:0;margin:0;min-height:48px}
+.stms2 .cufbtn{max-width:46%}.stms2 .cufbtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stmbar+.cufa{margin-top:10px}
+.srw .cufg2{margin-bottom:4px}.srw .f6h{margin:12px 4px 7px}
+.srw .srn{margin-bottom:6px}
