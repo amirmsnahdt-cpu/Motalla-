@@ -130,6 +130,10 @@ ACT.fPClr=()=>{fP='';render()};
 ACT.payList=d=>ACT.arcDay(d);
 ACT.fS=d=>{fS=fS===d.s?'':d.s;fR=0;fN=120;render()};
 ACT.fR=d=>{fR=+d.r||0;fN=120;render()};
+/* v61.97: پنجره فیلتر جستجوی واریزی‌ها (findSheetHTML در 03) */
+ACT.fOpen=()=>sheet(findSheetHTML());
+ACT.fX=d=>{const a=d.a;if(a==='fP'){if(d.iso==='-'){if(!fP)return;d.iso=fP}}if(a==='fS'){if(d.s==='-'){if(!fS)return;d.s=fS}}const y=(document.querySelector('#sheet .cufs')||{}).scrollTop;ACT[a](d);const S=$('sheet');if(S&&S.querySelector('.ffs')){S.innerHTML=findSheetHTML();const c=S.querySelector('.cufs');if(c&&y)c.scrollTop=y}};
+ACT.fClrAll=()=>{fF='all';fP='';fS='';fR=0;fN=120;render();const S=$('sheet');if(S&&S.querySelector('.ffs'))S.innerHTML=findSheetHTML()};
 ACT.spLists=()=>{spTab='lists';go('split1')};
 ACT.spTab=d=>{spTab=d.t;AM=null;render();$('view').scrollTop=0};
 ACT.arcDay=d=>{ldKey=d.iso;ldX=null;ldOpen=new Set();ldQ='';go('lday')};

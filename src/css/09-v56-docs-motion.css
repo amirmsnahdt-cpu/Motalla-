@@ -2147,7 +2147,7 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .cufclr{height:32px;padding:0 10px;border:0;background:none;color:var(--mut);font:inherit;font-size:12px;font-weight:800;cursor:pointer}
 .fdot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
 .d .fdot,.cufr.d .fdot,.cufp.d .fdot{background:var(--red)}.c .fdot,.cufr.c .fdot,.cufp.c .fdot{background:var(--blu)}
-.cufs{max-height:min(62vh,560px);overflow:auto;overscroll-behavior:contain;margin:0 -2px;padding:0 2px 4px}
+.cufs{margin:0;padding:0 0 4px}/* v61.97: بدون اسکرول تودرتو (روی آیفون بالا رفتن را می‌گرفت)؛ خود پنجره اسکرول می‌خورد */
 .cufs .f6h{margin:6px 6px 7px}
 .cufg2{border-radius:16px;background:color-mix(in srgb,var(--mut) 5%,var(--card));box-shadow:0 0 0 1px var(--line);overflow:hidden;margin-bottom:6px}
 .cufr{display:flex;align-items:center;gap:11px;width:100%;min-height:54px;padding:8px 14px;border:0;background:none;color:var(--ink);font:inherit;text-align:right;cursor:pointer;position:relative;transition:background-color .2s}
@@ -2160,3 +2160,48 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .cufc{flex:none;width:22px;height:22px;display:grid;place-items:center;color:var(--blu);opacity:0;transform:scale(.5);transition:opacity .2s,transform .3s var(--spring)}.cufc .i{width:18px;height:18px}
 .cufr.on .cufc{opacity:1;transform:none}.cufr.on .tx b{color:var(--blu)}.cufr.on .cufi{background:var(--blu);color:#fff}.cufr.on.d .cufi{background:var(--red);color:#fff}.cufr.on.d .fdot,.cufr.on.c .fdot{background:#fff}
 .cufbar{display:flex;gap:8px;margin-top:10px}.cufbar .btn{flex:0 0 auto;min-height:52px;padding:0 18px;border-radius:16px}.cufbar .xgo{flex:1;margin:0}
+/* ---- v61.97 فرم مشتری از نو (cuf2): سرتیتر، ردیف‌های یک‌خطی، چیپ گروه، ذخیره چسبان ---- */
+.cuf2{padding-bottom:8px}
+.c9hero{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0 0 6px;padding:18px 14px 16px;border-radius:22px;background:linear-gradient(160deg,color-mix(in srgb,var(--blu) 13%,var(--card)),color-mix(in srgb,var(--gold) 9%,var(--card)));box-shadow:0 0 0 1px var(--line);text-align:center;animation:f6up .4s var(--spring) both}
+.c9hero .cufp{all:unset;display:flex;flex-direction:column;align-items:center;gap:8px}
+.c9hero .cufpt{display:none}
+.c9hero .cuav{width:92px;height:92px}
+.c9hero .cuavi{box-shadow:0 0 0 4px var(--card),0 10px 24px -12px color-mix(in srgb,var(--blu) 70%,transparent)}
+.c9hero .cuavi b{font-size:34px}
+.c9hero .cuavb{width:32px;height:32px;bottom:0;left:0}
+.c9ht{display:flex;flex-direction:column;gap:2px;min-width:0;max-width:100%}
+.c9ht b{font-size:19px;font-weight:900;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c9ht span{font-size:12px;color:var(--mut);font-weight:700}
+.c9h{display:flex;align-items:center;gap:8px;margin:18px 4px 8px}
+.c9hi{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}.c9hi .i{width:15px;height:15px}
+.c9h b{font-size:14px;font-weight:900;color:var(--ink)}.c9h i{font-style:normal;font-size:11px;font-weight:700;color:var(--mut)}
+.cuf2 .f6g{border-radius:18px;background:var(--card);box-shadow:0 0 0 1px var(--line),0 6px 18px -14px #16213a40}
+.cuf2 .f6r{display:grid;grid-template-columns:86px minmax(0,1fr);column-gap:10px;align-items:center;min-height:54px;padding:6px 14px}
+.cuf2 .f6r+.f6r::before{right:14px;left:0}
+.cuf2 .f6r>label{grid-column:1;grid-row:1;margin:0;font-size:13px;font-weight:800;color:var(--mut)}
+.cuf2 .f6r:focus-within>label{color:var(--blu)}
+.cuf2 .f6i{grid-column:2;grid-row:1;min-width:0}
+#sheet .cuf2 .f6i input{font-size:16px;font-weight:800;min-height:40px;padding:6px 0!important;text-align:right}
+#sheet .cuf2 .f6i input.ltr{direction:ltr;text-align:right;letter-spacing:.3px;font-variant-numeric:tabular-nums}
+.cuf2 .f6r .eh{grid-column:2;grid-row:2;margin:-4px 0 4px;font-size:11px;font-weight:800}
+.cuf2 .f6r .eh.ok::before{content:"✓ "}
+.cuf2 .f6sug{grid-column:1/-1;grid-row:3}
+.cuf2 .f6ib .f6i{direction:ltr}
+.cuf2 .f6ib .f6i input{text-align:left!important}
+.c9g{display:flex;flex-wrap:wrap;gap:8px}
+.c9c{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border:0;border-radius:999px;background:var(--card);box-shadow:0 0 0 1px var(--line);color:var(--ink);font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;transition:background-color .2s,color .2s,box-shadow .2s,transform .3s var(--spring)}
+.c9c i{font-style:normal;font-size:11px;color:var(--mut);font-weight:800}.c9c .i{width:15px;height:15px}
+.c9c:active{transform:scale(.94)}
+.c9c.on{background:var(--blu);color:#fff;box-shadow:0 8px 18px -10px var(--blu)}.c9c.on i{color:#ffffffc0}
+.c9c.nw{color:var(--blu);box-shadow:0 0 0 1.5px dashed;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 45%,transparent)}.c9c.nw.on{color:#fff}
+.c9gn{display:none;margin-top:8px}.c9gn.on{display:block;animation:f6in .28s var(--spring) both}
+.cuf2 .cuid{grid-template-columns:1fr 1fr;gap:10px}
+.cuf2 .cuidp{aspect-ratio:1.7;border-radius:16px}
+.cuf2 .cuids:not(.on) .cuidp{border:0;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 30%,transparent);background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--blu) 4%,var(--card)) 0 10px,var(--card) 10px 20px)}
+.cuf2 .cuide b{font-size:13.5px}.cuf2 .cuide small{font-size:10.5px}
+#sheet .xgo[data-act=cuSave]{position:sticky;bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:5;margin-top:14px;box-shadow:0 -14px 22px -6px var(--card),0 12px 24px -12px var(--blu)}
+/* v61.97: پنجره فیلتر واریزی‌ها */
+.ffs .fsrt{margin:0 0 6px}.ffs .frnd{margin:8px 0 6px}
+.fsearch .cufbtn{height:34px}
+
+.cufbar{position:sticky;bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:5;padding-top:8px;background:linear-gradient(to bottom,transparent,var(--card) 30%)}

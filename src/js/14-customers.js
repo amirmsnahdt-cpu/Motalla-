@@ -152,25 +152,36 @@ const aCust=()=>'';
 let cuT='',cuEd=null;
 function cuFormHTML(c){const isNew=!c.id;CUF={av:c.av||'',ids:Array.isArray(c.idImgs)?c.idImgs.slice(0,2):[]};cuT=c.title||'';cuEd=c.id||null;const g=c.grp!=null?c.grp:'';
   const fr=(id,lab,val,o={})=>`<div class="f6r${o.ac?' ac':''}${o.cls?' '+o.cls:''}"><label for="${id}">${lab}</label><div class="f6i">${o.pre?`<span class="f6pre">${o.pre}</span>`:''}<input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(val||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="${o.last?'done':'next'}">${o.bk?`<span class="f6bk" id="${id}b"></span>`:''}${o.ac?`<span class="f6ic">${ic('search')}</span>`:''}</div>${o.ac?`<div class="f6sug hide" id="${id}s" role="listbox"></div>`:''}${o.hint?`<small class="eh" id="${id}v"></small>`:''}</div>`;
-  return `<div class="sh-h"><div><b>${isNew?'حساب تازه':'مشخصات مشتری'}</b><small class="shsub">${isNew?'از مشتری‌های قبلی پیشنهاد می‌آید؛ بعد از ثبت وارد حساب او می‌شوید':'تغییرها را بدهید و ذخیره کنید'}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="f6">
-  ${cuPhHTML(c)}
-  <div class="f6h">مشتری</div>
-  <div class="f6g">${fr('cuN','نام و نام خانوادگی',c.name,{ac:1,ph:'نام و نام خانوادگی'})}
-  ${fr('cuP','شماره تماس',c.phone,{ac:1,ltr:1,im:'tel',ph:'09xxxxxxxxx',hint:1})}
-  ${fr('cuM','کد ملی',c.nid,{ac:1,ltr:1,im:'numeric',ph:'اختیاری · ۱۰ رقم',hint:1})}</div>
-  <div class="f6h">گروه</div>
-  <div class="f6g">${fr('cuG','گروه مشتری',g,{ac:1,ph:'بدون گروه'})}</div>
-  <div class="f6h">عکس کارت ملی <i>اختیاری</i></div>
+  /* v61.97 (خواسته صاحب اپ): فرم مشتری از نو — سرتیتر با عکس و نام زنده، ردیف‌های یک‌خطی (برچسب و مقدار کنار هم)،
+     گروه با چیپ (یک لمس) و «گروه تازه»، کارت ملی جمع‌وجور، دکمه ذخیره همیشه پیدا */
+  const sec=(ico,t,o)=>`<div class="c9h"><span class="c9hi">${ic(ico)}</span><b>${t}</b>${o?'<i>اختیاری</i>':''}</div>`;
+  return `<div class="sh-h"><div><b>${isNew?'حساب تازه':'مشخصات مشتری'}</b><small class="shsub">${isNew?'از مشتری‌های قبلی پیشنهاد می‌آید':'تغییرها را بدهید و ذخیره کنید'}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="f6 cuf2">
+  <div class="c9hero">${cuPhHTML(c)}<div class="c9ht"><b id="cuHn">${esc(clean(c.name||'')||'مشتری تازه')}</b><span id="cuHm">${cuHmTxt(g,c.phone)}</span></div></div>
+  ${sec('user','مشتری')}
+  <div class="f6g">${fr('cuN','نام',c.name,{ac:1,ph:'نام و نام خانوادگی'})}
+  ${fr('cuP','تلفن',c.phone,{ac:1,ltr:1,im:'tel',ph:'09xxxxxxxxx',hint:1})}
+  ${fr('cuM','کد ملی',c.nid,{ac:1,ltr:1,im:'numeric',ph:'۱۰ رقم',hint:1})}</div>
+  ${sec('users','گروه')}
+  <div class="c9g" id="cuGc">${cuGChips(g)}</div>
+  <div class="f6g c9gn${g&&!groupsList().includes(g)?' on':''}" id="cuGn">${fr('cuG','گروه تازه',g,{ph:'نام گروه تازه'})}</div>
+  ${sec('eye','عکس کارت ملی',1)}
   <div class="cuid" id="cuIdBox">${cuIdHTML()}</div>
-  <div class="f6h">مشخصات بانکی <i>اختیاری</i></div>
-  <div class="f6g">${fr('cuBI','شماره شبا',c.bk&&c.bk.iban?ibanGroups(dg(c.bk.iban)):'',{ltr:1,im:'numeric',ph:'۲۴ رقم',hint:1,pre:'IR',bk:1,cls:'f6ib'})}
-  ${fr('cuBK','شماره کارت',c.bk&&c.bk.card?grp4(c.bk.card):'',{ltr:1,im:'numeric',ph:'۱۶ رقم',hint:1,bk:1,cls:'f6ib'})}
-  ${fr('cuBH','نام صاحب حساب',c.bk?c.bk.holder:'',{ph:'اگر با نام مشتری فرق دارد'})}</div>
-  <div class="f6h">بیشتر</div>
-  <div class="f6g">${fr('cuA','آدرس یا توضیح',c.note,{ph:'اختیاری',last:1})}</div>
+  ${sec('bank','حساب بانکی',1)}
+  <div class="f6g">${fr('cuBI','شبا',c.bk&&c.bk.iban?ibanGroups(dg(c.bk.iban)):'',{ltr:1,im:'numeric',ph:'۲۴ رقم',hint:1,pre:'IR',bk:1,cls:'f6ib'})}
+  ${fr('cuBK','کارت',c.bk&&c.bk.card?grp4(c.bk.card):'',{ltr:1,im:'numeric',ph:'۱۶ رقم',hint:1,bk:1,cls:'f6ib'})}
+  ${fr('cuBH','صاحب حساب',c.bk?c.bk.holder:'',{ph:'اگر با نام مشتری فرق دارد'})}</div>
+  ${sec('edit','یادداشت',1)}
+  <div class="f6g">${fr('cuA','آدرس / توضیح',c.note,{ph:'آدرس، معرف، …',last:1})}</div>
   </div>
   <button class="xgo" data-act="cuSave" data-id="${c.id||'new'}">${ic('check')} ${isNew?'ثبت و ورود به حساب':'ذخیره'}</button>`}
+const cuHmTxt=(g,ph)=>[g?esc(g):'',ph&&/^09\d{9}$/.test(ph)?'<bdi dir="ltr">'+esc(toFa(ph))+'</bdi>':''].filter(Boolean).join(' · ')||'گروه و تلفن اینجا دیده می‌شود';
+function cuGChips(g){const G=groupsList(),cnt=x=>CU().filter(c=>c.grp===x).length;
+  return `<button type="button" class="c9c${!g?' on':''}" data-act="cuGPick" data-g="">بدون گروه</button>${G.map(x=>`<button type="button" class="c9c${g===x?' on':''}" data-act="cuGPick" data-g="${esc(x)}">${esc(x)}<i>${fmt(cnt(x))}</i></button>`).join('')}<button type="button" class="c9c nw${g&&!G.includes(g)?' on':''}" data-act="cuGNew">${ic('plus')} گروه تازه</button>`}
+ACT.cuGPick=d=>{const G=$('cuG');if(!G)return;G.value=d.g;$('cuGn').classList.remove('on');cuGRe()};
+ACT.cuGNew=()=>{const W=$('cuGn'),G=$('cuG');if(!W||!G)return;W.classList.add('on');if(groupsList().includes(G.value))G.value='';cuGRe();try{G.focus({preventScroll:false})}catch(_){G.focus()}};
+function cuGRe(){const G=$('cuG'),C=$('cuGc');if(!G||!C)return;C.innerHTML=cuGChips(clean(G.value));const o=C.querySelector('.c9c.on');if(o&&!RM()&&o.animate)o.animate([{transform:'scale(.9)'},{transform:'scale(1.06)'},{transform:'none'}],{duration:320,easing:'cubic-bezier(.3,1.4,.5,1)'});cuHero()}
+function cuHero(){const n=$('cuHn'),m=$('cuHm'),N=$('cuN'),P=$('cuP'),G=$('cuG');if(n&&N)n.textContent=clean(N.value)||'مشتری تازه';if(m)m.innerHTML=cuHmTxt(G?clean(G.value):'',P?toEn(P.value).replace(/\D/g,''):'');const b=document.querySelector('#sheet .cuavi b');if(b&&N)b.textContent=userInit(clean(N.value)||'؟')}
 /* فهرست پیشنهاد زیر یک فیلد (مثل جستجوی آیفون): با تایپ باز می‌شود و با انتخاب بسته */
 /* v61.83: o.tap (خواسته صاحب اپ برای گروه مشتری): زدن اول = فقط فهرست (بدون کیبورد)، زدن دوم = کیبورد؛ زدن بیرون = بستن (kb2 در 15j) */
 function acList(inp,box,rows,pick,o){if(!inp||!box)return;const tap=o&&o.tap;const hide=()=>{box.classList.add('hide');box.innerHTML='';if(tap){inp._lo=false;if(document.activeElement!==inp)inp.readOnly=true}};
@@ -195,13 +206,11 @@ function cuBind(){phPaint($('sheet'));const N=$('cuN'),P=$('cuP'),M=$('cuM'),G=$
   if(BK){BK.oninput=()=>{const v=dg(BK.value).slice(0,16);BK.value=grp4(v);const kb=$('cuBKb'),kn=v.length>=6?bankOfCard(v):'';if(kb&&kb.dataset.b!==kn){kb.dataset.b=kn;kb.innerHTML=kn?bankBadge(kn):''}h('cuBKv',!v?'':v.length<16?toFa(v.length)+' از ۱۶ رقم':luhn(v)?'معتبر':'رقم کنترلی نمی‌خواند',v.length===16?(luhn(v)?'ok':'bad'):'')};if(BK.value)BK.oninput()}
   const pRows=by=>q=>{L=cuPeople(q,by);if(!L.length)return '';return L.map((p,i)=>{const own=p.cuId&&String(p.cuId)===String(cuEd),acc=p.cuId&&!own;return sugRow(i,esc(userInit(p.name)),esc(p.name),[acc?'<b class="c6own">حساب دارد · باز کردن</b>':'',p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.nid&&by==='m'?'کد ملی <bdi dir="ltr">'+esc(toFa(p.nid))+'</bdi>':'',!p.cuId&&p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'مشتری',acc?'acc':'')}).join('')};
   const pickP=i=>{const p=L[+i];if(!p)return;if(p.cuId&&String(p.cuId)!==String(cuEd)&&!cuEd){const c=CU().find(z=>String(z.id)===String(p.cuId));if(c){closeSheet();if(cuRet==='sell'){cuRet='';svPick(c.id)}else{custId=c.id;go('cust')}toast('حساب «'+cuName(c)+'» باز شد');return}}
-    N.value=p.name;if(p.phone&&!P.value){P.value=p.phone;P.oninput()}if(p.nid&&!M.value){M.value=p.nid;M.oninput()}const BI=$('cuBI'),BK=$('cuBK'),BH=$('cuBH');if(BI&&p.iban&&!BI.value){BI.value=ibanGroups(dg(p.iban));BI.oninput&&BI.oninput();if(BK&&p.card&&!BK.value){BK.value=grp4(p.card);BK.oninput&&BK.oninput()}if(BH&&p.holder&&nzName(p.holder)!==nzName(p.name)&&!BH.value)BH.value=p.holder}const nx=[P,M,G].find(el=>!el.value)||$('cuA');if(nx)nx.focus()};
+    N.value=p.name;if(p.phone&&!P.value){P.value=p.phone;P.oninput()}if(p.nid&&!M.value){M.value=p.nid;M.oninput()}const BI=$('cuBI'),BK=$('cuBK'),BH=$('cuBH');if(BI&&p.iban&&!BI.value){BI.value=ibanGroups(dg(p.iban));BI.oninput&&BI.oninput();if(BK&&p.card&&!BK.value){BK.value=grp4(p.card);BK.oninput&&BK.oninput()}if(BH&&p.holder&&nzName(p.holder)!==nzName(p.name)&&!BH.value)BH.value=p.holder}const nx=[P,M].find(el=>!el.value);if(nx)nx.focus();else N.blur()};
   acList(N,$('cuNs'),pRows('n'),pickP);acList(P,$('cuPs'),pRows('p'),pickP);acList(M,$('cuMs'),pRows('m'),pickP);
-  /* v61.93 (خواسته صاحب اپ): زدن دوم روی گروه (کیبورد) کل نام گروه را انتخاب می‌کند تا با تایپ، گروه تازه ساخته شود */
-  let GL=[];G.addEventListener('focus',()=>{G._v0=G.value;if(G.value)setTimeout(()=>{if(document.activeElement===G&&!G.readOnly)try{G.setSelectionRange(0,G.value.length)}catch(_){}},40)});
-  G.addEventListener('pointerup',()=>{if(!G.readOnly&&G._lo&&document.activeElement===G&&G.value===G._v0)setTimeout(()=>{try{G.setSelectionRange(0,G.value.length)}catch(_){}},40)});acList(G,$('cuGs'),q=>{const nq=q===G._v0||q===''?'':nzName(q),A=groupsList();GL=A.filter(g=>!nq||nzName(g).includes(nq)).slice(0,nq?6:40);const ex=A.some(g=>nzName(g)===nq);const cnt=g=>CU().filter(c=>c.grp===g).length;
-    const R=GL.map((g,i)=>sugRow(i,ic('users'),esc(g),fmt(cnt(g))+' مشتری','gr'+(g===G.value?' on':''),g===G.value?ic('check'):''));if(nq&&!ex){GL.push(clean(q));R.push(sugRow(GL.length-1,ic('plus'),'گروه تازه «'+esc(clean(q))+'»','بعداً با جستجوی همین نام پیدا می‌شود','nw'))}if(G.value&&!nq)return R.join('');return R.join('')},i=>{G.value=GL[+i]||'';G.blur()},{tap:1});
-  ['cuN','cuP','cuM','cuG','cuBI','cuBK','cuBH','cuA'].forEach((id,i,A)=>{const el=$(id);el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(i<A.length-1)$(A[i+1]).focus();else el.blur()}})})}
+  /* v61.97: گروه با چیپ‌ها؛ «گروه تازه» فیلد را باز می‌کند. سرتیتر (نام، گروه، تلفن) همراه تایپ عوض می‌شود */
+  G.addEventListener('input',()=>{const C=$('cuGc');if(C)C.innerHTML=cuGChips(clean(G.value));cuHero()});[N,P].forEach(el=>el.addEventListener('input',cuHero));
+  ['cuN','cuP','cuM','cuG','cuBI','cuBK','cuBH','cuA'].forEach((id,i,A)=>{const el=$(id);el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const nx=A.slice(i+1).map(x=>$(x)).find(x=>x&&x.offsetParent);if(nx)nx.focus();else el.blur()}})})}
 ACT.cuNew=()=>{cuRet='';sheet(cuFormHTML({}));cuBind();sheetFocus($('cuN'))};
 ACT.cuEdit=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;sheet(cuFormHTML(c));cuBind()};
 ACT.cuSave=d=>{const name=clean($('cuN').value),phone=toEn($('cuP').value).replace(/\D/g,''),nidv=toEn($('cuM').value).replace(/\D/g,''),note=clean($('cuA').value||''),grp=clean($('cuG').value||'');
