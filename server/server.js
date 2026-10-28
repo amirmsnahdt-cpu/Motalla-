@@ -391,34 +391,40 @@ function serveStatic(req, res, p) {
 
 /* ---------- قیمت لحظه‌ای طلای بازار (tgju) ----------
    سرور (داخل ایران) هر ۳۰ ثانیه حداکثر یک بار از tgju می‌گیرد؛ همه گوشی‌ها همان را می‌بینند.
-   g18 = هر گرم ۱۸ عیار، mz = مثقال (مظنه)، هر دو به تومان. اگر tgju در دسترس نبود آخرین قیمت با stale برمی‌گردد. */
+   g18 = هر گرم ۱۸ عیار، mz = مثقال (مظنه)، هر دو به تومان. اگر tgju در دسترس نبود آخرین قیمت با stale برمی‌گردد.
+   v61.91: قیمت گیر می‌کرد چون ajax.json بدون ?rev از کش CDN همان نسخه کهنه را می‌داد. حالا هر بار rev تازه و no-cache
+   می‌فرستیم، هر چهار آینه را با هم می‌پرسیم و تازه‌ترین (بر اساس زمان خود بازار ts) را برمی‌داریم. mt = زمان آخرین تغییر بازار. */
 const GOLD_TTL = 30e3, GOLD_URLS = ['https://call1.tgju.org/ajax.json', 'https://call2.tgju.org/ajax.json', 'https://call3.tgju.org/ajax.json', 'https://call4.tgju.org/ajax.json'];
 let goldLast = null, goldAt = 0, goldBusy = null;
 const goldNum = v => { const t = String(v == null ? '' : v).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[^\d.]/g, ''); const n = +t; return isFinite(n) && n > 0 ? n : 0; };
 const goldItem = (cur, k) => { const o = cur && cur[k]; if (!o) return null; const p = goldNum(typeof o === 'object' ? (o.p ?? o.price ?? o.value) : o); return p ? { p: Math.round(p / 10), t: typeof o === 'object' ? String(o.ts || o['t-g'] || o.t || '') : '' } : null; };
+/* ts بازار مثل «2026-10-28 10:41:05» به وقت تهران → میلی‌ثانیه (۰ اگر خوانا نبود) */
+const goldTime = ts => { const m = /^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)(?::(\d\d))?/.exec(String(ts || '')); if (!m) return 0; const t = Date.parse(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6] || '00'}+03:30`); return isFinite(t) ? t : 0; };
 function goldParse(j) {
   const cur = j && (j.current || j); const g = goldItem(cur, 'geram18'), m = goldItem(cur, 'mesghal');
   if (!g && !m) return null;
   const MZK = 4.3318, g18 = g ? g.p : Math.round(m.p / MZK), mz = m ? m.p : Math.round(g.p * MZK);
   /* نسبت مثقال به گرم باید حدود ۴٫۳۳ باشد؛ اگر نبود یکی از عددها خراب خوانده شده */
   if (!(mz / g18 > 4.1 && mz / g18 < 4.6)) return null;
-  return { g18, mz, ts: (g && g.t) || (m && m.t) || '' };
+  const ts = (g && g.t) || (m && m.t) || '';
+  return { g18, mz, ts, mt: Math.max(goldTime(g && g.t), goldTime(m && m.t)) };
+}
+async function goldOne(u) {
+  const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 6000);
+  try {
+    const r = await fetch(u + '?rev=' + Date.now().toString(36), { signal: ac.signal, cache: 'no-store', headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json', 'Cache-Control': 'no-cache', Pragma: 'no-cache' } });
+    return r.ok ? goldParse(await r.json()) : null;
+  } catch (e) { return null; } finally { clearTimeout(tm); }
 }
 async function goldFetch() {
-  for (const u of GOLD_URLS) {
-    try {
-      const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 6000);
-      const r = await fetch(u, { signal: ac.signal, headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json' } }).finally(() => clearTimeout(tm));
-      if (!r.ok) continue; const v = goldParse(await r.json()); if (v) return v;
-    } catch (e) { }
-  }
-  return null;
+  const all = (await Promise.all(GOLD_URLS.map(goldOne))).filter(Boolean);
+  return all.sort((a, b) => b.mt - a.mt)[0] || null;
 }
 async function goldGet() {
   if (goldLast && Date.now() - goldAt < GOLD_TTL) return { ...goldLast, at: new Date(goldAt).toISOString(), stale: false };
-  if (!goldBusy) goldBusy = goldFetch().then(v => { if (v) { goldLast = v; goldAt = Date.now(); } return v; }).finally(() => { goldBusy = null; });
+  if (!goldBusy) goldBusy = goldFetch().then(v => { if (v && !(goldLast && v.mt && goldLast.mt > v.mt)) goldLast = v; if (v) goldAt = Date.now(); return v; }).finally(() => { goldBusy = null; });
   const v = await goldBusy;
-  if (v) return { ...v, at: new Date(goldAt).toISOString(), stale: false };
+  if (v) return { ...goldLast, at: new Date(goldAt).toISOString(), stale: false };
   return goldLast ? { ...goldLast, at: new Date(goldAt).toISOString(), stale: true } : null;
 }
 
