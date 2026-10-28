@@ -235,7 +235,13 @@ function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};
   qaCalc()}
 /* v61.61: جهت حرکت پنجره ورود ردیف — 'bw' برگشت (از راست می‌آید)، بقیه جلو (از چپ) */
 let qaDir='';
-const qaRe=f=>{const q=$('qa');if(!q)return;const dir=qaDir;qaDir='';q.innerHTML=qaHTML();qaBind();/* v61.57: جستجوی تشخیص/کالا خودکار فوکوس نمی‌گیرد (کیبورد فقط با زدن دوم) */const e=f&&f!=='qK'&&$(f);if(e)e.focus({preventScroll:false});q.classList.remove('swap','bw');void q.offsetWidth;q.classList.add('swap');if(dir==='bw')q.classList.add('bw')};
+/* v61.95 (خواسته صاحب اپ): در ورود سند کیبورد پایین نمی‌رود — اگر پیش از تازه‌سازی پنجره ردیف فیلدی فعال بود (کیبورد باز)،
+   همان لحظه (هم‌زمان با لمس؛ آیفون فوکوسِ دیرتر را نادیده می‌گیرد) فیلد مناسب پنجره تازه فوکوس می‌گیرد: پله ← فیلد پله، تشخیص ← جستجوی تشخیص با فهرست باز */
+const qaKbOn=()=>{const q=$('qa'),a=document.activeElement;return !!(q&&a&&q.contains(a)&&/^(INPUT|TEXTAREA)$/.test(a.tagName)&&a.type!=='file'&&!a.readOnly)};
+function qaKbKeep(){const q=$('qa');if(!q)return;const I=$('stI');if(I&&!I.readOnly){try{I.focus({preventScroll:true})}catch(_){I.focus()}return}
+  const K=$('qK');if(K){dkShow();K.readOnly=false;try{K.focus({preventScroll:true})}catch(_){K.focus()}return}
+  const F=[...q.querySelectorAll('input:not([type=file]):not(.stkb),textarea')].find(x=>!x.readOnly&&!x.disabled&&x.offsetParent);if(F)try{F.focus({preventScroll:true})}catch(_){F.focus()}}
+const qaRe=f=>{const q=$('qa');if(!q)return;const dir=qaDir,kb=qaKbOn();qaDir='';q.innerHTML=qaHTML();qaBind();/* v61.57: جستجوی تشخیص/کالا خودکار فوکوس نمی‌گیرد (کیبورد فقط با زدن دوم) — مگر کیبورد از قبل باز بوده (v61.95) */const e=f&&f!=='qK'&&$(f);if(e)e.focus({preventScroll:false});else if(kb)qaKbKeep();q.classList.remove('swap','bw');void q.offsetWidth;q.classList.add('swap');if(dir==='bw')q.classList.add('bw')};
 const qaDone=()=>{sv.qa=qaBlank();svKeep();qaRe();svRe()};/* v61.2: بعد از افزودن، فهرست تشخیص بسته می‌ماند تا ردیف‌ها دیده شوند */
 ACT.qaK=d=>{qaRead();const a=sv.qa;a.k=d.k?clean(d.k):'';a.i=null;if(a.ab||a.k)Object.assign(a,{ab:0,lab:'',ang:'',mz:'',mzk:'',pp:PROFIT_DEF(),ay:750,pz:0,cnt:'',imgs:[],img:'',amT:''});/* v61.47 (خواسته صاحب اپ): متفرقه و سکه پارسیان اجرت ندارند و سود پیش‌فرض ثابت ۷٪؛ کالای ساخته = آخرین اجرت همین کالا برای همین مشتری
   (اگر نبود، آخرین اجرت همین کالا برای هر مشتری) */if(a.k){const J=ajLast(a.k);a.ajP=J&&J.P||'';a.ajT=J&&J.T||''}if(a.k)addGoods(a.k);a.q='';svKeep();qaRe(a.k?'qW':'qK')};

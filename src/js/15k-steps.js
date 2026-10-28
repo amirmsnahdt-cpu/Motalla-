@@ -113,7 +113,7 @@ function stBind(){phPaint($('qa'));const I=$('stI'),a=sv.qa;if(!I)return;const S
   I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.stNext()}};
   /* v61.94 (خواسته صاحب اپ): «بعدی» روی خود کیبورد — فلش‌های ⌃⌄ بالای کیبورد آیفون به این دو فیلد نامرئی می‌روند و پله را عوض می‌کنند؛
      در اندروید کلید «بعدی» کیبورد همان Enter است. فوکوس همیشه روی همان فیلد می‌ماند (کیبورد بسته و باز نمی‌شود). */
-  document.querySelectorAll('#qa .stkb').forEach(k=>{k.onfocus=()=>{const n=+k.dataset.kbn;setTimeout(()=>{const J=$('stI');if(J)try{J.focus({preventScroll:true})}catch(_){J.focus()}if(n>0)ACT.stNext();else if((sv.qa.st||0)>0)ACT.stUp()},0)}});
+  document.querySelectorAll('#qa .stkb').forEach(k=>{k.onfocus=()=>{const n=+k.dataset.kbn,J=$('stI');if(J)try{J.focus({preventScroll:true})}catch(_){J.focus()}if(n>0)ACT.stNext();else if((sv.qa.st||0)>0)ACT.stUp()}});
   document.querySelectorAll('#qa .stnx,#qa .stp,#qa .stdone').forEach(b=>{b.onpointerdown=b.onmousedown=e=>{if(document.activeElement===I)e.preventDefault()}})}
 const stKbT=s=>!s?'':s.type==='pick'?'pick':s.type==='text'?'text':'num';
 /* v61.94 (خواسته صاحب اپ): با «بعدی» پنجره نمی‌پرد — اگر نوع کیبورد پله بعد همان است، فقط تکه‌ها عوض می‌شوند و همان فیلد
@@ -124,7 +124,7 @@ function stPatch(O,I0){const T=document.createElement('div');T.innerHTML=stHTML(
 function stStrip(){const o=document.querySelector('#qa .stp.on'),w=o&&o.parentNode;if(!o||!w)return;const r=o.getBoundingClientRect(),q=w.getBoundingClientRect();const d=(r.left+r.width/2)-(q.left+q.width/2);if(Math.abs(d)>4)try{w.scrollBy({left:d,behavior:RM()?'auto':'smooth'})}catch(_){w.scrollLeft+=d}}
 function stRe(){const bw=qaDir==='bw',O=document.querySelector('#qa .stw'),I0=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)],kb=stKbT(c0);
   let same=false;if(O&&I0&&I0.isConnected&&kb!=='pick'&&I0.dataset.kb===kb){qaDir='';same=stPatch(O,I0);if(same){stBind();phPaint($('qa'));if(document.activeElement!==I0&&$('ov').classList.contains('hide'))try{I0.focus({preventScroll:true})}catch(_){}try{I0.setSelectionRange(0,I0.value.length)}catch(_){}}}
-  if(!same){qaRe();const I=$('stI');if(I&&$('ov').classList.contains('hide')&&!(c0&&c0.type==='pick'&&!c0.search))setTimeout(()=>{try{I.focus({preventScroll:true})}catch(_){I.focus()}},30)}
+  if(!same){qaRe();const I=$('stI');if(I&&document.activeElement!==I&&$('ov').classList.contains('hide')&&!(c0&&c0.type==='pick'&&!c0.search)){try{I.focus({preventScroll:true})}catch(_){I.focus()}}}
   const c=document.querySelector('#qa .st3');if(c&&!RM()&&c.animate)c.animate([{opacity:.5,transform:`translateX(${bw?10:-8}px)`},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.9,.25,1)'});stStrip()}
 function stFinish(){const K=stKind();if(K==='pv'){ACT.pvSave();return}if(K==='it'||K==='ab')ACT.qaAdd();else if(K==='xr')ACT.xrSave();else if(K==='py')ACT.pySave()}
 const stOk=s=>s.need&&s.need()?false:s.wOr?true:s.opt||s.type==='int'||(s.type==='wam'?(+sv.qa.x.w||+sv.qa.x.am):s.type==='text'?s.get():+s.get());

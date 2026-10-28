@@ -125,3 +125,8 @@ function kb2(el,isOpen,open){if(!el||el._kb2)return;el._kb2=1;const sync=()=>{el
   el.addEventListener('keydown',e=>{if(el.readOnly&&e.key&&e.key.length===1){el.readOnly=false}})}
 document.addEventListener('pointerdown',e=>{if(!dkOpen||cur!=='sell'||!sv||!sv.qa||sv.qa.d||sv.qa.q)return;const t=e.target;if(t.closest&&(t.closest('.dkbox')||t.closest('#ov')))return;
   dkOpen=false;const B=document.querySelector('.dkbox');if(B)B.classList.remove('open');const K=$('qK');if(K){if(document.activeElement===K)K.blur();K.readOnly=true}},true);
+
+/* v61.95 (خواسته صاحب اپ): وقتی کیبورد در پنجره ردیف سند باز است، لمس دکمه‌های همان پنجره (بعدی، پله‌ها، برگشت، افزودن، نوع کالا…)
+   فوکوس را از فیلد نمی‌گیرد تا کیبورد پایین نرود؛ خود کلیک مثل همیشه اجرا می‌شود */
+['pointerdown','mousedown'].forEach(ev=>document.addEventListener(ev,e=>{const q=$('qa'),t=e.target;if(!q||!t||!t.closest||!q.contains(t))return;const b=t.closest('button,[role=button],.stp');if(!b||t.closest('input,textarea,label,select'))return;
+  const a=document.activeElement;if(a&&q.contains(a)&&/^(INPUT|TEXTAREA)$/.test(a.tagName)&&!a.readOnly)e.preventDefault()},true));
