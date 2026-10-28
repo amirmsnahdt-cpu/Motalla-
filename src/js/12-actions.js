@@ -1,7 +1,7 @@
 const ACT={
   back,close:()=>{aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>go(d.n),date:openDate,user:()=>ACT.acct(),resetForm,resetBulk,saveEntry,bulkAdd,
   toastAct:()=>{const f=toastAct;toastHide();f&&f()},
-  tab:d=>{if(d&&d.n==='split')spTab='split';const n={custs:'custs',banks:'banks',home:'home',entry:'entry',list:'list',split:'split1',audit:'audit',track:'track',debt:'debt',settings:'settings'}[d.n];if(n==='entry')editId=null;if(n==='audit'&&cur!=='audit')histTab='ev';if(n==='track'&&cur!=='track'){gQ='';gF='all'}if(n==='list'&&cur!=='list'){listMode='all';openGroups=new Set()}if(n===cur&&n==='list'){window.scrollTo({top:0,behavior:'smooth'});return}go(n);if(d.n==='split'){const C=splitCands().filter(c=>c.ok&&c.ok.length);if(C.length&&!C.some(c=>c.iso===dateVal)){setDate(C[0].iso,true);toast('تقسیم لیست '+dates(C[0].iso).fa)}}},
+  tab:d=>{if(d&&d.n==='split')spTab='split';const n={custs:'custs',banks:'banks',home:'home',entry:'entry',list:'list',split:'split1',audit:'audit',track:'split1',debt:'debt',settings:'settings'}[d.n];if(n==='entry')editId=null;if(n==='audit'&&cur!=='audit')histTab='ev';if(n==='track'&&cur!=='track'){gQ='';gF='all'}if(n==='list'&&cur!=='list'){listMode='all';openGroups=new Set()}if(n===cur&&n==='list'){window.scrollTo({top:0,behavior:'smooth'});return}go(n);if(d.n==='split'){const C=splitCands().filter(c=>c.ok&&c.ok.length);if(C.length&&!C.some(c=>c.iso===dateVal)){setDate(C[0].iso,true);toast('تقسیم لیست '+dates(C[0].iso).fa)}}},
   cancelEdit:()=>{editId=null;const b=editBack;editBack=null;go(b||'list')},
   pickDate:d=>{closeSheet();setDate(d.iso)},
   lsel:d=>{if(d.iso==='all'){listMode='all';openGroups=new Set();render()}else{listMode='day';setDate(d.iso,true)}window.scrollTo(0,0)},
@@ -45,12 +45,12 @@ const ACT={
   copySrc:async()=>{txtGen=null;expCtx={A:alloc,sc:String(srcIdx),track:true};const ok=await copyText(withCtx(txt));if(ok){toast('متن «'+srcRows().name+'» کپی شد');setTimeout(autoTrack,900)}else openText()},
   srcView:d=>{srcIdx=d.i;go('srcview')},
   tstyle:d=>{txtStyle=d.s;ls.set('m_txtstyle2',d.s);openText()},
-  trackNow:()=>{const b=commitAlloc(alloc,true);if(b){batchId=b.id;tkFilter='all';tkQ='';go('batch');toast(fmt(b.items.length)+' واریزی به پیگیری رفت','','برگرداندن',()=>undoCommit(b.id))}},
+  trackNow:()=>{const b=commitAlloc(alloc,true);if(b){ACT.openBatch({id:b.id});toast(fmt(b.items.length)+' واریزی به پیگیری رفت','','برگرداندن',()=>undoCommit(b.id))}},
   undoCommit:d=>askConfirm('واریزی‌های این لیست به تقسیم برگردند؟','برگردان',()=>undoCommit(+d.id)),
   toSplit:()=>{const k=fPay||todayISO();ACT.arcDay({iso:k});const n=validated().filter(r=>PD(r)===k&&r.level===2&&!r.sentBid).length;if(n)toast(fmt(n)+' واریزی خطادار است؛ بالای صفحه اصلاحشان کنید',true)},
   newList:()=>{closeSheet();startList(todayISO())},
-  flowGo:d=>{const s=d.s;if(s==='entry'){editId=null;go('entry')}else if(s==='split')go('split1');else if(s==='track'){const b=openB().find(x=>x.date===dateVal);if(b){batchId=b.id;tkFilter='all';tkQ='';go('batch')}else{trTab='open';go('track')}}else{if(dayBatches(dateVal).length){dayIso=dateVal;go('day')}else{trTab='arch';go('track')}}},
-  archive:()=>{trTab='arch';go('track')},
+  flowGo:d=>{const s=d.s;if(s==='entry'){editId=null;go('entry')}else if(s==='split')go('split1');else if(s==='track'){const b=openB().find(x=>x.date===dateVal);if(b){ACT.openBatch({id:b.id})}else{trTab='open';go('split1')}}else{if(dayBatches(dateVal).length){ldKey=dateVal;ldX=null;ldOpen=new Set();ldQ='';go('lday')}else{trTab='arch';go('split1')}}},
+  archive:()=>go('split1'),
   trTab:d=>{trTab=d.t;render()},
   dTab:d=>{dTab=d.t;render()},dClear:()=>{dQ='';render()},
   credOpen:d=>{credId=+d.id;go('cred')},credNew:()=>startCW(null),credEdit:()=>startCW(credId),credSave:()=>credSave(),
@@ -81,7 +81,7 @@ const ACT={
   credPdf:()=>credPdf(),
   gFilter:d=>{gF=d.f;$('gres').innerHTML=gHTML()},
   gClear:()=>{gQ='';const q=$('gq');if(q){q.value='';q.focus()}srchSwap('gres','');$('tcont').classList.remove('hide');document.querySelector('#view .sbox .clr').classList.add('hide')},
-  openDay:d=>{dayOpen=new Set();dayIso=d.iso;go('day')},
+  openDay:d=>{ldKey=d.iso;ldX=null;ldOpen=new Set();ldQ='';go('lday')},/* v62.3: بایگانی قدیمی → لیست واریز همان روز */
   itOpen:d=>openItem(d.b,d.i),itSave:saveItem,
   itSt:d=>{tmpSt=d.st;itStPaint()},
   itTnClr:()=>{const t=$('itn');if(!t)return;t.value='';if(tmpSt==='ok')tmpSt='pending';itStPaint();t.focus()},
@@ -90,14 +90,16 @@ const ACT={
   itImgDel:()=>{tmpImg=null;$('itimg').innerHTML='';$('itfl').textContent='افزودن عکس رسید'},
   viewImg:d=>viewImg(d.b,d.id),
   closeBatch:()=>{const b=curB();if(!b)return;const p=b.items.filter(x=>x.st==='pending').length;
-    const done=()=>{b.closed=new Date().toISOString();saveB();const c=bStat(b);logA('close','ثبت نهایی و بایگانی',dates(b.date).fa+' | موفق '+fmt(c.ok)+' از '+fmt(c.all)+' | '+fmt(c.okSum)+' تومان');dayIso=b.date;cur='track';go('day');toast('لیست در «لیست‌های روزانه» ذخیره شد ✓')};
+    const done=()=>{b.closed=new Date().toISOString();saveB();const c=bStat(b);logA('close','ثبت نهایی و بایگانی',dates(b.date).fa+' | موفق '+fmt(c.ok)+' از '+fmt(c.all)+' | '+fmt(c.okSum)+' تومان');ACT.openBatch({id:b.id});toast('لیست در «لیست‌های روزانه» ذخیره شد ✓')};
     p?askConfirm(fmt(p)+' واریزی هنوز «در انتظار» است. با همین وضعیت بایگانی شود؟','بایگانی',done):done()},
-  reopenDay:()=>{const bs=dayBatches(dayIso);bs.forEach(b=>delete b.closed);saveB();if(bs[0]){batchId=bs[0].id;go('batch')}toast('برای ویرایش باز شد')},
+  reopenDay:()=>{const bs=dayBatches(dayIso);bs.forEach(b=>delete b.closed);saveB();if(bs[0])ACT.openBatch({id:bs[0].id});toast('برای ویرایش باز شد')},
   dayExp:()=>openDayExport(dayIso),
   dayText:()=>{txtGen=()=>dayTxt(dayIso);txtName=fileBase(dayIso);openText()},
   dayPdf:()=>{closeSheet();openPrint(()=>dayReport(dayIso))},
   dayXls:()=>{if(typeof XLSX==='undefined')return;closeSheet();save(fileBase(dayIso)+'.xlsx',dayXlsx(dayIso),'فایل Excel آماده شد')},
-  openBatch:d=>{batchId=+d.id;tkFilter='all';tkQ='';tkOpen=new Set();go('batch')},
+  /* v62.3 (خواسته صاحب اپ): بخش قدیمی «پیگیری/بایگانی» دیگر استفاده نمی‌شود — همه لیست‌ها در «لیست‌های واریز» است؛
+     باز کردن یک لیست پیگیری = لیست واریز همان روز (داده‌های قدیمی دست نمی‌خورد) */
+  openBatch:d=>{const b=batches.find(x=>String(x.id)===String(d.id));if(!b){go('split1');return}const e=b.items.map(it=>entries.find(z=>z.id===it.id)).find(Boolean);ldKey=e?PD(e):b.date;ldX=null;ldOpen=new Set();ldQ='';go('lday')},
   tkFilter:d=>{tkFilter=d.f;refreshBatch()},tkClear:()=>{tkQ='';refreshBatch()},
   tkSet:d=>{const b=batches.find(x=>x.id===batchId);if(!b)return;const x=b.items[+d.i];x.st=x.st===d.st?'pending':d.st;x.at=new Date().toISOString();saveB();refreshBatch();if(!bStat(b).pending)toast('همه واریزی‌های این لیست بررسی شد ✓')},
   tkAll:d=>{const b=batches.find(x=>x.id===batchId);if(!b)return;b.items.forEach(x=>{if(x.src===d.s&&x.st==='pending')x.st='ok'});saveB();refreshBatch()},
@@ -105,7 +107,7 @@ const ACT={
   tkRequeue:()=>{const b=batches.find(x=>x.id===batchId);if(!b)return;const F=b.items.filter(x=>x.st==='fail'&&!x.requeued),t=todayISO();
     askConfirm(fmt(F.length)+' واریزی ناموفق به لیست امروز ('+dates(t).fa+') اضافه شود؟','اضافه شود',()=>{const now=new Date().toISOString(),ids=[];F.forEach(x=>{const id=nid++;ids.push(id);entries.push({id,name:x.name,code:x.code,amount:x.amount,iban:x.iban,card:'',bank:'',entryDate:t,createdBy:who(),updatedBy:who(),updatedAt:now,requeueOf:b.date});x.requeued=true});
       saveE();saveB();logA('requeue','واریز مجدد ناموفق‌ها',fmt(F.length)+' واریزی از '+dates(b.date).fa+' به '+dates(t).fa,{ids});refreshBatch();toast(fmt(F.length)+' واریزی به لیست امروز رفت','', 'مشاهده',()=>{listMode='day';setDate(t,true);go('list')})})},
-  tkDel:()=>askConfirm('این لیست پیگیری حذف شود؟ واریزی‌های اصلی دست نمی‌خورند.','حذف',()=>{batches=batches.filter(x=>x.id!==batchId);saveB();go('track')}),
+  tkDel:()=>askConfirm('این لیست پیگیری حذف شود؟ واریزی‌های اصلی دست نمی‌خورند.','حذف',()=>{batches=batches.filter(x=>x.id!==batchId);saveB();go('split1')}),
   srcSet:d=>srcSettings(d.id),
   fTitle:d=>{fTitle=d.t;$('ftl').innerHTML=titleChips()},
   sTitle:d=>{window.__sTitle=d.t;document.querySelectorAll('#stl .tch').forEach(b=>b.classList.toggle('on',b.dataset.t===d.t))},
@@ -125,7 +127,7 @@ const ACT={
   partsExp:()=>{const P=parts();if(!P.length)return;openExport(partsAlloc(P),P.length>1?'all':'0');expCtx.track=true;expCtx.parts=P.filter(p=>!p.sent).map(p=>p.id)},
   partsSend:async()=>{const P=parts().filter(p=>!p.sent&&pVis(p));if(!P.length)return;txtGen=null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0'};const t=withCtx(txt),ok=await copyText(t);const ids=P.map(p=>p.id),b=commitParts(ids,true);
     if(!ok){batchId=b?b.id:null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0'};openText();toast('به پیگیری رفت؛ متن را از اینجا کپی کنید');return}
-    if(b){batchId=b.id;tkFilter='all';tkQ='';go('batch');toast('متن کپی شد و '+fmt(P.length)+' تخصیص به پیگیری رفت','','برگرداندن',()=>uncommitParts(ids))}},
+    if(b){ACT.openBatch({id:b.id});toast('متن کپی شد و '+fmt(P.length)+' تخصیص به پیگیری رفت','','برگرداندن',()=>uncommitParts(ids))}},
   partDel:()=>askConfirm('این تخصیص لغو شود؟ واریزی‌هایش به مانده برمی‌گردند.','لغو تخصیص',()=>{const p=curPart();if(p)delPart(p);saveD();if(p)logA('undo','لغو تخصیص',p.src.name);go('lday')}),
   partUnsend:()=>uncommitParts([partId]),
   tkTime:d=>{const b=curB();if(!b)return;const x=b.items[+d.i];if(x.time){openItem(b.id,+d.i);return}const n=new Date();x.time=p2(n.getHours())+':'+p2(n.getMinutes());saveB();refreshBatch();toast('ساعت '+toFa(x.time)+' ثبت شد')},
@@ -141,7 +143,7 @@ const ACT={
     askConfirm('«'+x.name+'» از پیگیری برداشته شود و به تقسیم برگردد؟','برگشت به تقسیم',()=>{const k=b.items.indexOf(x);if(k<0)return;b.items.splice(k,1);const e=entries.find(z=>z.id===x.id);if(e)delete e.sentBid;
       const p=findPart(x.pid);if(p){p.ids=p.ids.filter(id=>id!==x.id);if(!p.ids.length)delPart(p)}
       const empty=!b.items.length;if(empty)batches=batches.filter(z=>z!==b);saveE();saveB();saveD();logA('undo','برگشت به تقسیم',x.name+' | '+fmt(x.amount)+' تومان');
-      if(empty)go('track');else refreshBatch();$('dock').innerHTML=dockHTML();dockInd();toast('«'+x.name+'» به تقسیم برگشت')})},
+      if(empty)go('split1');else refreshBatch();$('dock').innerHTML=dockHTML();dockInd();toast('«'+x.name+'» به تقسیم برگشت')})},
   tkFixBad:d=>{setDate(d.iso,true);ACT.showBad()},
   xAll:d=>{const P=dayParts();if(!P.length)return;txtGen=null;expCtx={A:partsAlloc(P),sc:P.length>1?'all':'0',track:true,parts:P.filter(p=>!p.sent).map(p=>p.id)};
     if(d.k==='pdf'){autoTrack();openPrint(()=>withCtx(reportHTML));return}
@@ -203,7 +205,7 @@ ACT.hpTog=d=>{const k='p'+d.iso;if(d.iso<dateVal){homeOpen.has(k)?homeOpen.delet
 ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.bTog=(d,e)=>{const r=e.target.closest('.brw');if(!r)return;const o=r.classList.toggle('open'),h=r.querySelector('.brh');if(h)h.setAttribute('aria-expanded',o);o?homeOpen.add(String(d.id)):homeOpen.delete(String(d.id))};
 ACT.hsearch=()=>go('find');
-ACT.arcGo=()=>{trTab='arch';go('track')};
+ACT.arcGo=()=>go('split1');
 /* انتقال به منبع دیگر — از هر جا (خانه، جستجو، لیست، منبع). واریزی تخصیص‌نیافته هم با همین کار به منبع داده می‌شود. */
 function moveTo(ids,fromP,src,toP){const P=parts(),sent=!!(fromP&&fromP.sent);let to=toP&&toP!=='new'?toP:null;
   if(!to&&toP!=='new')to=P.find(z=>z!==fromP&&!!z.sent===sent&&(!sent||z.bid===fromP.bid)&&String(z.src.id)===String(src.id));
@@ -236,5 +238,5 @@ ACT.entTkQ=d=>{const e=entries.find(y=>String(y.id)===String(d.id));if(!e)return
 ACT.trkArch=()=>{const b=batches.find(x=>x.date===dateVal&&!x.closed);if(!b)return;const c=bStat(b);
   const done=async()=>{b.closed=new Date().toISOString();b.arch={ok:c.ok,fail:c.fail,pending:c.pending,all:c.all,okSum:c.okSum||0,by:who()};saveB();logA('close','ثبت نهایی و بایگانی',dates(b.date).fa+' | موفق '+fmt(c.ok)+' از '+fmt(c.all)+' | '+fmt(c.okSum||0)+' تومان');dayIso=b.date;render();toast('بایگانی شد؛ خروجی آماده است');try{openPrint(await dayReport(b.date))}catch(e){}};
   c.pending?askConfirm(fmt(c.pending)+' واریزی هنوز «در انتظار» است. با همین وضعیت بایگانی شود؟','بایگانی',done):done()};
-ACT.trkGo=()=>{const ob=openB(),b=ob.find(x=>x.date===dateVal)||(ob.length===1?ob[0]:null);if(b){batchId=b.id;tkFilter='all';tkQ='';go('batch')}else{trTab='open';go('track')}};
+ACT.trkGo=()=>{const ob=openB(),b=ob.find(x=>x.date===dateVal)||(ob.length===1?ob[0]:null);if(b)ACT.openBatch({id:b.id});else go('split1')};
 ACT.partOkAll=()=>{const p=curPart();if(!p||!p.sent)return;const b=batches.find(x=>x.id===p.bid);if(!b||b.closed){toast('لیست این منبع بسته شده است',true);return}const L=b.items.filter(x=>x.pid===p.id&&x.st==='pending');if(!L.length)return;const now=new Date().toISOString();L.forEach(x=>{x.st='ok';x.at=now});saveB();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(fmt(L.length)+' واریز تسویه شد','', 'برگرداندن',()=>{L.forEach(x=>x.st='pending');saveB();render()})};

@@ -398,8 +398,14 @@ document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.datase
     if(w==='av')CUF.av=k;else CUF.ids[+w.slice(2)]=k;cuPhRe(w==='av'?'av':'id');toast(w==='av'?'عکس پروفایل گذاشته شد · ذخیره را بزنید':'عکس کارت ملی اضافه شد · ذخیره را بزنید')}catch(e){toast('این عکس خوانده نشد',true)}});
 /* v61.98 (خواسته صاحب اپ): عکس کارت ملی و پروفایل با «اولین» لمس باز شود — روی آیفون لمس اول گاهی فقط کیبورد را می‌بست یا گم می‌شد.
    خود لمس (touchend، که اجازه باز کردن انتخاب عکس را دارد) فیلد فایل را باز می‌کند و کلیک مصنوعی بعدی گرفته می‌شود تا دو بار باز نشود */
-(()=>{let st=null;const SEL='.cuidp,.cuav,.cufb';
-  document.addEventListener('touchstart',e=>{const l=e.target.closest&&e.target.closest(SEL);st=l&&l.querySelector('input[data-cuph]')&&e.touches.length===1?{l,x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}:null},{passive:true,capture:true});
+/* v62.3: علت واقعی «دو بار زدن» (ویدئوی صاحب اپ): وقتی کیبورد باز است، لمس اول کیبورد را می‌بندد و آیفون با جابه‌جا شدن صفحه
+   منوی «Photo Library / Take Photo» را همان لحظه می‌بندد. حالا با شروع لمس کیبورد بسته می‌شود و منو بعد از آرام شدن صفحه باز می‌شود؛
+   اگر کیبورد بسته بود، همان لحظه باز می‌شود. */
+(()=>{let st=null;const SEL='.cuidp,.cuav,.cufb',txt=a=>a&&/^(INPUT|TEXTAREA)$/.test(a.tagName)&&a.type!=='file';
+  document.addEventListener('touchstart',e=>{const l=e.target.closest&&e.target.closest(SEL);if(!(l&&l.querySelector('input[data-cuph]')&&e.touches.length===1)){st=null;return}
+    const a=document.activeElement,kb=txt(a);st={l,x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now(),kb};if(kb)a.blur()},{passive:true,capture:true});
   document.addEventListener('touchmove',e=>{if(st&&(Math.abs(e.touches[0].clientX-st.x)>10||Math.abs(e.touches[0].clientY-st.y)>10))st=null},{passive:true,capture:true});
-  document.addEventListener('touchend',e=>{const o=st;st=null;if(!o||Date.now()-o.t>900)return;const i=o.l.querySelector('input[data-cuph]');if(!i)return;e.preventDefault();const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur();try{i.click()}catch(_){}},{passive:false,capture:true})})();
+  document.addEventListener('touchend',e=>{const o=st;st=null;if(!o||Date.now()-o.t>1200)return;const i=o.l.querySelector('input[data-cuph]');if(!i)return;e.preventDefault();
+    if(!o.kb){try{i.click()}catch(_){}return}
+    const V=window.visualViewport;let h=V?V.height:innerHeight,n=0;const tick=()=>{const h2=V?V.height:innerHeight;n++;if((Math.abs(h2-h)<1&&n>3)||n>22){try{i.click()}catch(_){}return}h=h2;setTimeout(tick,30)};setTimeout(tick,60)},{passive:false,capture:true})})();
 ACT.cuPhDel=d=>{if(d.k==='av'){CUF.av='';cuPhRe('av')}else{CUF.ids[+String(d.k).slice(2)]='';cuPhRe('id')}};
