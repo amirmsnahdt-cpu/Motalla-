@@ -2211,3 +2211,22 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .stmbar+.cufa{margin-top:10px}
 .srw .cufg2{margin-bottom:4px}.srw .f6h{margin:12px 4px 7px}
 .srw .srn{margin-bottom:6px}
+/* v61.98: گروه جستجویی در طراحی تازه */
+.cuf2 .c9gf .f6i input{cursor:pointer}
+.cuf2 .c9gf .f6ic{opacity:.55;transform:none}
+.cuf2 .f6sug{margin:6px -6px 4px;border-radius:16px;box-shadow:0 0 0 1px var(--line),0 16px 34px -18px #16213a66;background:var(--card)}
+.c9gl .bzsr{min-height:52px;animation:f6in .24s var(--spring) both}
+.c9gl .bzsr:nth-child(2){animation-delay:.02s}.c9gl .bzsr:nth-child(3){animation-delay:.04s}.c9gl .bzsr:nth-child(n+4){animation-delay:.06s}
+.c9gl .bzsr .av{border-radius:10px}
+.c9gl .bzsr.on{background:color-mix(in srgb,var(--blu) 7%,transparent)}.c9gl .bzsr.on b{color:var(--blu)}.c9gl .bzsr.on .av{background:var(--blu);color:#fff}
+.c9gl .bzsr.gr0 .av{background:var(--hair);color:var(--mut)}
+.c9gl .bzsr.nw .av{background:var(--blu2);color:var(--blu)}.c9gl .bzsr.nw b{color:var(--blu)}
+#sheet input.fcov,input.fcov{pointer-events:none}
+/* v61.98: مبنای مبلغ/مظنه زیر کادر مبلغ (زدن = گذاشتن همان عدد) */
+.strs{display:flex;flex-wrap:wrap;gap:7px;margin:8px 2px 0}
+.strf,.strd{display:inline-flex;align-items:baseline;gap:6px;height:34px;padding:0 12px;border:0;border-radius:11px;background:var(--card);box-shadow:0 0 0 1px var(--line);color:var(--ink);font:inherit;cursor:pointer;transition:transform .3s var(--spring),box-shadow .2s;align-items:center}
+.strf small,.strd small{font-size:10.5px;font-weight:800;color:var(--mut)}
+.strf b,.strd b{font-size:13.5px;font-weight:900;direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.strf:active{transform:scale(.95)}.strf.on{box-shadow:0 0 0 1.5px var(--blu);background:var(--blu2)}.strf.on b{color:var(--blu)}
+.strd{cursor:default}.strd.up b{color:var(--red)}.strd.dn b{color:var(--blu)}
+.stgh{border-radius:16px;background:var(--card)}

@@ -85,7 +85,7 @@ function cuFSheetHTML(){const A=CU().map(c=>[c,cuBal(c)]),G=groupsList(),inG=A.f
   <div class="cufs"><div class="f6h">مانده</div><div class="cufg2">${BR}</div>${G.length?`<div class="f6h">گروه</div><div class="cufg2">${GR}</div>`:''}</div>
   <div class="cufbar">${cuFN()?`<button class="btn sec" data-act="cuFClr">پاک کردن</button>`:''}<button class="xgo" data-act="close">${ic('check')} نمایش ${fmt(n)} حساب</button></div>`}
 ACT.cuFOpen=()=>{sheet(cuFSheetHTML())};
-ACT.cuFS=d=>{if(d.b!=null)cuF.b=d.b;if(d.g!=null)cuF.g=d.g;const y=(document.querySelector('#sheet .cufs')||{}).scrollTop;cuFRe();const S=$('sheet');if(S&&S.querySelector('.cufs')){S.innerHTML=cuFSheetHTML();const c=S.querySelector('.cufs');if(c&&y)c.scrollTop=y;const o=S.querySelector(`.cufr.on[data-${d.b!=null?'b':'g'}]`);if(o&&!RM()&&o.animate)o.animate([{transform:'scale(.97)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.3,1.4,.5,1)'})}};
+ACT.cuFS=d=>{if(d.b!=null)cuF.b=d.b;if(d.g!=null)cuF.g=d.g;cuFRe();const S=$('sheet');if(S&&S.querySelector('.cufs')){sheetKeep(cuFSheetHTML());const o=S.querySelector(`.cufr.on[data-${d.b!=null?'b':'g'}]`);if(o&&!RM()&&o.animate)o.animate([{transform:'scale(.97)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.3,1.4,.5,1)'})}};
 /* جمع مانده‌های حساب‌های فیلترشده: تومان و طلا، جدا طلب ما (قرمز) و بدهی ما (آبی) */
 function cuSumHTML(B){if(!cuF.b&&!cuF.g)return '';let rd=0,rc=0,gd=0,gc=0;for(const [,b] of B){if(b.R<0)rd+=-b.R;else rc+=b.R;if(b.G<0)gd+=-b.G;else gc+=b.G}
   const showR=cuF.b!=='gd'&&cuF.b!=='gc',showG=cuF.b!=='rd'&&cuF.b!=='rc',cell=(l,k,v,cl)=>v?`<span class="cusc ${cl}"><small>${l}</small><b${fitS(balV(k,v)+' '+balU(k))}><span class="cbn" data-k="${k}" data-v="${v}">${balV(k,v)}</span><i>${balU(k)}</i></b></span>`:'';
@@ -115,7 +115,7 @@ function cuListHTML(){const q0=clean(cuQ||''),q=nzName(toEn(q0)),A=CU();let B=A.
 /* v61.93 (خواسته صاحب اپ): حساب تسویه‌شده در فهرست‌ها کوچک و کم‌رنگ (یک برچسب کنار نام، نه کارت سبز بزرگ) */
 const cuZero=b=>!(b.R||b.G||Object.keys(b.X||{}).length);
 const cuZTag=ri=>`<span class="c6z"${ri!=null?` style="--r:${Math.min(ri,8)}"`:''}>${ic('check')}تسویه</span>`;
-ACT.cuFClr=()=>{cuF={b:'',g:''};cuFRe();const S=$('sheet');if(S&&S.querySelector('.cufs'))S.innerHTML=cuFSheetHTML()};
+ACT.cuFClr=()=>{cuF={b:'',g:''};cuFRe();const S=$('sheet');if(S&&S.querySelector('.cufs'))sheetKeep(cuFSheetHTML())};
 const cuName=c=>(c.name||'');
 function cuInvHits(q0){const d=toEn(q0||'').replace(/[\s,،]/g,'');if(!/^\d{1,6}$/.test(d))return [];const R=[];
   for(const c of CU())for(const t of c.txs||[])if(t.type==='inv'&&!t.del&&t.no!=null&&String(t.no).startsWith(d))R.push([c,t]);
@@ -163,8 +163,7 @@ function cuFormHTML(c){const isNew=!c.id;CUF={av:c.av||'',ids:Array.isArray(c.id
   ${fr('cuP','تلفن',c.phone,{ac:1,ltr:1,im:'tel',ph:'09xxxxxxxxx',hint:1})}
   ${fr('cuM','کد ملی',c.nid,{ac:1,ltr:1,im:'numeric',ph:'۱۰ رقم',hint:1})}</div>
   ${sec('users','گروه')}
-  <div class="c9g" id="cuGc">${cuGChips(g)}</div>
-  <div class="f6g c9gn${g&&!groupsList().includes(g)?' on':''}" id="cuGn">${fr('cuG','گروه تازه',g,{ph:'نام گروه تازه'})}</div>
+  <div class="f6g c9gf">${fr('cuG','گروه',g,{ac:1,ph:'بدون گروه · بزنید'})}</div>
   ${sec('eye','عکس کارت ملی',1)}
   <div class="cuid" id="cuIdBox">${cuIdHTML()}</div>
   ${sec('bank','حساب بانکی',1)}
@@ -176,11 +175,6 @@ function cuFormHTML(c){const isNew=!c.id;CUF={av:c.av||'',ids:Array.isArray(c.id
   </div>
   <button class="xgo" data-act="cuSave" data-id="${c.id||'new'}">${ic('check')} ${isNew?'ثبت و ورود به حساب':'ذخیره'}</button>`}
 const cuHmTxt=(g,ph)=>[g?esc(g):'',ph&&/^09\d{9}$/.test(ph)?'<bdi dir="ltr">'+esc(toFa(ph))+'</bdi>':''].filter(Boolean).join(' · ')||'گروه و تلفن اینجا دیده می‌شود';
-function cuGChips(g){const G=groupsList(),cnt=x=>CU().filter(c=>c.grp===x).length;
-  return `<button type="button" class="c9c${!g?' on':''}" data-act="cuGPick" data-g="">بدون گروه</button>${G.map(x=>`<button type="button" class="c9c${g===x?' on':''}" data-act="cuGPick" data-g="${esc(x)}">${esc(x)}<i>${fmt(cnt(x))}</i></button>`).join('')}<button type="button" class="c9c nw${g&&!G.includes(g)?' on':''}" data-act="cuGNew">${ic('plus')} گروه تازه</button>`}
-ACT.cuGPick=d=>{const G=$('cuG');if(!G)return;G.value=d.g;$('cuGn').classList.remove('on');cuGRe()};
-ACT.cuGNew=()=>{const W=$('cuGn'),G=$('cuG');if(!W||!G)return;W.classList.add('on');if(groupsList().includes(G.value))G.value='';cuGRe();try{G.focus({preventScroll:false})}catch(_){G.focus()}};
-function cuGRe(){const G=$('cuG'),C=$('cuGc');if(!G||!C)return;C.innerHTML=cuGChips(clean(G.value));const o=C.querySelector('.c9c.on');if(o&&!RM()&&o.animate)o.animate([{transform:'scale(.9)'},{transform:'scale(1.06)'},{transform:'none'}],{duration:320,easing:'cubic-bezier(.3,1.4,.5,1)'});cuHero()}
 function cuHero(){const n=$('cuHn'),m=$('cuHm'),N=$('cuN'),P=$('cuP'),G=$('cuG');if(n&&N)n.textContent=clean(N.value)||'مشتری تازه';if(m)m.innerHTML=cuHmTxt(G?clean(G.value):'',P?toEn(P.value).replace(/\D/g,''):'');const b=document.querySelector('#sheet .cuavi b');if(b&&N)b.textContent=userInit(clean(N.value)||'؟')}
 /* فهرست پیشنهاد زیر یک فیلد (مثل جستجوی آیفون): با تایپ باز می‌شود و با انتخاب بسته */
 /* v61.83: o.tap (خواسته صاحب اپ برای گروه مشتری): زدن اول = فقط فهرست (بدون کیبورد)، زدن دوم = کیبورد؛ زدن بیرون = بستن (kb2 در 15j) */
@@ -208,8 +202,15 @@ function cuBind(){phPaint($('sheet'));const N=$('cuN'),P=$('cuP'),M=$('cuM'),G=$
   const pickP=i=>{const p=L[+i];if(!p)return;if(p.cuId&&String(p.cuId)!==String(cuEd)&&!cuEd){const c=CU().find(z=>String(z.id)===String(p.cuId));if(c){closeSheet();if(cuRet==='sell'){cuRet='';svPick(c.id)}else{custId=c.id;go('cust')}toast('حساب «'+cuName(c)+'» باز شد');return}}
     N.value=p.name;if(p.phone&&!P.value){P.value=p.phone;P.oninput()}if(p.nid&&!M.value){M.value=p.nid;M.oninput()}const BI=$('cuBI'),BK=$('cuBK'),BH=$('cuBH');if(BI&&p.iban&&!BI.value){BI.value=ibanGroups(dg(p.iban));BI.oninput&&BI.oninput();if(BK&&p.card&&!BK.value){BK.value=grp4(p.card);BK.oninput&&BK.oninput()}if(BH&&p.holder&&nzName(p.holder)!==nzName(p.name)&&!BH.value)BH.value=p.holder}const nx=[P,M].find(el=>!el.value);if(nx)nx.focus();else N.blur()};
   acList(N,$('cuNs'),pRows('n'),pickP);acList(P,$('cuPs'),pRows('p'),pickP);acList(M,$('cuMs'),pRows('m'),pickP);
-  /* v61.97: گروه با چیپ‌ها؛ «گروه تازه» فیلد را باز می‌کند. سرتیتر (نام، گروه، تلفن) همراه تایپ عوض می‌شود */
-  G.addEventListener('input',()=>{const C=$('cuGc');if(C)C.innerHTML=cuGChips(clean(G.value));cuHero()});[N,P].forEach(el=>el.addEventListener('input',cuHero));
+  /* v61.98 (خواسته صاحب اپ): گروه دوباره جستجویی (مثل قبل) ولی با طراحی تازه — زدن اول = فهرست گروه‌ها (بدون کیبورد)،
+     زدن دوم = کیبورد با انتخاب کل نام (تایپ = گروه تازه)؛ «بدون گروه» و «گروه تازه «…»» در همان فهرست */
+  let GL=[];G.addEventListener('focus',()=>{G._v0=G.value;if(G.value)setTimeout(()=>{if(document.activeElement===G&&!G.readOnly)try{G.setSelectionRange(0,G.value.length)}catch(_){}},40)});
+  acList(G,$('cuGs'),q=>{const nq=q===G._v0||q===''?'':nzName(q),A=groupsList();GL=A.filter(x=>!nq||nzName(x).includes(nq)).slice(0,nq?8:40);const ex=A.some(x=>nzName(x)===nq);const cnt=x=>CU().filter(c=>c.grp===x).length;
+    const R=GL.map((x,i)=>sugRow(i,ic('users'),esc(x),fmt(cnt(x))+' مشتری','gr'+(x===G.value?' on':''),x===G.value?ic('check'):''));
+    if(!nq&&G.value){GL.push('');R.unshift(sugRow(GL.length-1,ic('x'),'بدون گروه','گروه این مشتری برداشته شود','gr0'))}
+    if(nq&&!ex){GL.push(clean(q));R.push(sugRow(GL.length-1,ic('plus'),'گروه تازه «'+esc(clean(q))+'»','بعداً با جستجوی همین نام پیدا می‌شود','nw'))}
+    return (nq||!A.length)&&!R.length?'':`<div class="c9gl">${R.join('')}</div>`},i=>{G.value=GL[+i]||'';G.blur();cuHero();const r=G.closest('.f6r');if(r&&!RM()&&r.animate)r.animate([{backgroundColor:'color-mix(in srgb,#2152d9 12%,transparent)'},{backgroundColor:'transparent'}],{duration:600,easing:'ease-out'})},{tap:1});
+  G.addEventListener('input',cuHero);[N,P].forEach(el=>el.addEventListener('input',cuHero));
   ['cuN','cuP','cuM','cuG','cuBI','cuBK','cuBH','cuA'].forEach((id,i,A)=>{const el=$(id);el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const nx=A.slice(i+1).map(x=>$(x)).find(x=>x&&x.offsetParent);if(nx)nx.focus();else el.blur()}})})}
 ACT.cuNew=()=>{cuRet='';sheet(cuFormHTML({}));cuBind();sheetFocus($('cuN'))};
 ACT.cuEdit=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;sheet(cuFormHTML(c));cuBind()};
@@ -395,4 +396,10 @@ function cuPhRe(which){const W=$('sheet');if(!W)return;if(which==='av'){const o=
 document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.dataset||t.dataset.cuph==null)return;const w=t.dataset.cuph,f=t.files&&t.files[0];t.value='';if(!f)return;
   try{const d=await shrink(f),k=newImgKey(w==='av'?'cuav':'cuid');if(!(await imgPut(k,d))){toast('حافظه پر است؛ عکس ذخیره نشد',true);return}
     if(w==='av')CUF.av=k;else CUF.ids[+w.slice(2)]=k;cuPhRe(w==='av'?'av':'id');toast(w==='av'?'عکس پروفایل گذاشته شد · ذخیره را بزنید':'عکس کارت ملی اضافه شد · ذخیره را بزنید')}catch(e){toast('این عکس خوانده نشد',true)}});
+/* v61.98 (خواسته صاحب اپ): عکس کارت ملی و پروفایل با «اولین» لمس باز شود — روی آیفون لمس اول گاهی فقط کیبورد را می‌بست یا گم می‌شد.
+   خود لمس (touchend، که اجازه باز کردن انتخاب عکس را دارد) فیلد فایل را باز می‌کند و کلیک مصنوعی بعدی گرفته می‌شود تا دو بار باز نشود */
+(()=>{let st=null;const SEL='.cuidp,.cuav,.cufb';
+  document.addEventListener('touchstart',e=>{const l=e.target.closest&&e.target.closest(SEL);st=l&&l.querySelector('input[data-cuph]')&&e.touches.length===1?{l,x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}:null},{passive:true,capture:true});
+  document.addEventListener('touchmove',e=>{if(st&&(Math.abs(e.touches[0].clientX-st.x)>10||Math.abs(e.touches[0].clientY-st.y)>10))st=null},{passive:true,capture:true});
+  document.addEventListener('touchend',e=>{const o=st;st=null;if(!o||Date.now()-o.t>900)return;const i=o.l.querySelector('input[data-cuph]');if(!i)return;e.preventDefault();const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur();try{i.click()}catch(_){}},{passive:false,capture:true})})();
 ACT.cuPhDel=d=>{if(d.k==='av'){CUF.av='';cuPhRe('av')}else{CUF.ids[+String(d.k).slice(2)]='';cuPhRe('id')}};

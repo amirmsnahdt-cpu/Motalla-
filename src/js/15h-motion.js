@@ -138,3 +138,6 @@ function numMorph(sel,run){const tn=el=>{const n=el.firstChild;return n&&n.nodeT
   G.forEach((g,gi)=>{const L=[...document.querySelectorAll(g)];if(L.length!==old[gi].length)return;L.forEach((el,i)=>{const a0=old[gi][i];const n=tn(el),a=a0;if(!n||a==null||a===n.data)return;const from=pv(a),to=pv(n.data);if(from==null||to==null||from===to)return;
     const fmtT=n.data,t0=performance.now(),D=420;n.data=a;const st=k=>{const p=Math.min(1,(k-t0)/D),e=1-Math.pow(1-p,3);if(!n.isConnected)return;n.data=p<1?fmt(Math.round(from+(to-from)*e)):fmtT;if(p<1)requestAnimationFrame(st)};requestAnimationFrame(st);
     if(el.animate)el.animate([{transform:'scale(1)'},{transform:'scale(1.07)'},{transform:'scale(1)'}],{duration:480,easing:'cubic-bezier(.3,1.4,.5,1)'})})})}
+
+/* v61.98: محتوای پنجره را عوض می‌کند بی‌آنکه اسکرول پنجره به بالا بپرد (فیلترها و بازه‌ها: انتخاب پشت سر هم) */
+function sheetKeep(html){const S=$('sheet');if(!S)return;const E=[S,S.parentElement,...S.querySelectorAll('*')].filter(e=>e&&e.scrollTop>0),Y=E.map(e=>[e===S?'s':e===S.parentElement?'p':null,e.scrollTop]);S.innerHTML=html;Y.forEach(([k,y])=>{const e=k==='s'?S:k==='p'?S.parentElement:null;if(e)e.scrollTop=y})}

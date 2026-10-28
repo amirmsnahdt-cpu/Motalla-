@@ -66,6 +66,16 @@ const stTag=()=>{const a=sv.qa,K=stKind(),d=a.pv?a.pv.dir:a.d||(a.x&&a.x.fd)||(a
    و مشخصات (وزن، مظنه، عیار…) فقط یک خط کوچک زیرش؛ خانه‌های جدا برای مشخصات حذف شد (در ردیف پله‌ها هست) */
 const stDir=()=>{const a=sv.qa,K=stKind();if(K==='it'||K==='ab')return -1;if(K==='xr'){const t=a.x.t;return t==='sell'||t==='out'?-1:1}if(K==='py')return a.p.dir==='out'?-1:1;if(K==='pv')return a.pv.dir==='out'?-1:1;return 0};
 const stMzTx=(o,f)=>{f=f||1;const B=f!==1?' خرید':'',k=stMzK(o),v=Math.round(stMzV(o,k)*f),w=Math.round(stMzV(o,k==='g'?'mz':'g')*f);return v?(k==='g'?'هر گرم'+B+' ':'مظنه'+B+' ')+fmt(v)+(w?' ('+(k==='g'?'مظنه'+B+' ':'هر گرم'+B+' ')+fmt(w)+')':'')+(+o.mz?' <b class="own">این ردیف</b>':''):''};
+/* v61.98 (خواسته صاحب اپ): هنگام ویرایش مبلغ یا مظنه/نرخ، مبنا دیده شود تا خطا کم شود — مبلغ حساب‌شده (و اختلاف مبلغ دستی با آن)،
+   قیمت لحظه‌ای بازار و نرخ سند؛ زدن روی هر مبنا همان عدد را در فیلد می‌گذارد */
+function stRefHTML(){const a=sv.qa,S=stSteps(),cur=S[Math.min(a.st||0,S.length-1)];if(!cur)return '';const K=stKind(),R=[];
+  const chip=(l,v,on)=>v?`<button type="button" class="strf${on?' on':''}" data-act="stRefSet" data-v="${Math.round(v)}"><small>${l}</small><b>${fmt(Math.round(v))}</b></button>`:'';
+  if(cur.k==='amT'){let base=0,now=0;if(K==='it'||K==='ab'){const it=qaIt(a);base=itCalc({...it,amT:0},sv.rate,sv.tax).tot||0;now=itCalc(it,sv.rate,sv.tax).tot||0}else if(K==='xr'){const x=a.x;base=xrCalc({...x,amT:''},sv.rate).amount||0;now=xrCalc(x,sv.rate).amount||0}
+    if(base){R.push(chip('مبلغ حساب‌شده',base,now===base));if(now&&now!==base)R.push(`<span class="strd ${now>base?'up':'dn'}"><small>اختلاف</small><b>${now>base?'+':'−'} ${fmt(Math.abs(now-base))}</b></span>`)}}
+  if(cur.mz){const o=K==='xr'?a.x:a,f=K==='xr'?stBuyF(a.x):1,k=stMzK(o),g=k==='g';const mk=glOk()?Math.round((g?GL.g18:GL.mz)*f):0,dc=Math.round((g?(+sv.rate||0):(+sv.mz||mzOf(sv.rate)||0))*f),cv=+cur.get()||0;
+    if(mk)R.push(chip('بازار'+(glOld()?'':' · زنده'),mk,cv===mk));if(dc&&dc!==mk)R.push(chip('نرخ سند',dc,cv===dc))}
+  return R.length?`<div class="strs">${R.join('')}</div>`:''}
+ACT.stRefSet=d=>{const I=$('stI');if(!I)return;const v=+d.v||0;I.value=v?v.toLocaleString('en-US'):'';if(I.oninput)I.oninput();try{I.focus({preventScroll:true});const n=I.value.length;I.setSelectionRange(n,n)}catch(_){}};
 function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
   if(K==='it'||K==='ab'){const it=qaIt(a),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;am=c&&c.tot||0;
     if(it.w)D.push(wFmt(it.w)+' گرم'+(K==='ab'&&it.ay!=750?' (۷۵۰: '+wFmt(Math.round(it.w*it.ay/750*1000)/1000)+')':''));D.push(c&&c.fx?'سود '+toFa(String(+a.pp||0))+'٪ ('+fmt(c.pr)+') <b class="own">مبلغ دستی</b>':stMzTx(a))}
@@ -89,7 +99,7 @@ function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.
   return `<div class="stw">${stHead(T.D,T.it,1)}<div class="stps">${seg}</div>
     <div class="fsearch sm st3">${cur.type==='pick'?ic('search'):''}${inp}${cur.type==='pick'?'':`<button type="button" class="stnx${last?' go':''}" data-act="stNext">${last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':'<span>بعدی</span>'+ic('back').replace('class="i"','class="i flip"')}</button>`}</div>
     ${cur.type==='pick'?`<div id="stPk">${stPick(cur)}</div>`:''}
-    <div class="stlv" id="stPv">${stLive()}</div>
+    <div class="stlv" id="stPv">${stLive()}${stRefHTML()}</div>
     ${stPhHTML()}
     ${ed||(!last&&canFin)?`<div class="stft">${!last&&canFin?`<button type="button" class="stdone" data-act="stFin">${ic('check')}<span>${ed?'ذخیره تغییرات':'افزودن به سند'}</span></button>`:''}${ed?`<button type="button" class="stdel" data-act="stDel" aria-label="حذف ردیف">${ic('trash')}<span>حذف</span></button>`:''}</div>`:''}
 </div>`}
@@ -104,11 +114,11 @@ function stRead(){const a=sv.qa,S=stSteps(),s=S[Math.min(a.st||0,S.length-1)],I=
   if(s.type==='wam'){const v=toEn(t).replace(/,/g,'');s.set(+v>=1000?{am:Math.round(+v)}:decIn(v));return}
   s.set(s.type==='num'?num(t):s.type==='dec'?decIn(s.grp?toEn(t).replace(/,/g,''):t):s.type==='int'?(+toEn(t).replace(/\D/g,'')||750):s.type==='dig'?toEn(t).replace(/\D/g,''):clean(t))}
 /* مقدار پله فعلی در ردیف پله‌ها همان لحظه نوشته می‌شود */
-function stPaint(){const P=$('stPv');if(P)P.innerHTML=stLive();const a=sv.qa,S=stSteps();/* v61.57: همه پله‌ها تازه می‌شوند (مثلاً مبلغ که زده شود، پله وزن «از مبلغ: … گرم» را نشان می‌دهد) */document.querySelectorAll('#qa .stp').forEach((el,k)=>{const s=S[k],b=el.querySelector('b');if(!s||!b)return;const v=stFmt(s,s.get());b.innerHTML=v||(k===a.st?'…':'—');el.classList.toggle('dn',!!v&&k!==a.st)})
+function stPaint(){const P=$('stPv');if(P)numMorph('#stPv .stam .fz>b',()=>{const Q=$('stPv');if(Q)Q.innerHTML=stLive()+stRefHTML()});const a=sv.qa,S=stSteps();/* v61.57: همه پله‌ها تازه می‌شوند (مثلاً مبلغ که زده شود، پله وزن «از مبلغ: … گرم» را نشان می‌دهد) */document.querySelectorAll('#qa .stp').forEach((el,k)=>{const s=S[k],b=el.querySelector('b');if(!s||!b)return;const v=stFmt(s,s.get());b.innerHTML=v||(k===a.st?'…':'—');el.classList.toggle('dn',!!v&&k!==a.st)})
   if(S[a.st]&&S[a.st].mz){const l=document.querySelector('#qa .stp.on small');if(l)l.textContent=S[a.st].lab}}
 function stBind(){phPaint($('qa'));const I=$('stI'),a=sv.qa;if(!I)return;const S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];
   if(s.type==='pick'){I.oninput=()=>{a.sq=I.value;const P=$('stPk');if(P)P.innerHTML=stPick(s)};return}
-  selOnFocus(I);I.oninput=()=>{if(s.type==='num'){const pos=I.selectionStart||0,b=toEn(I.value.slice(0,pos)).replace(/\D/g,'').length,v=num(I.value);I.value=v?v.toLocaleString('en-US'):'';let p=0,d=0;while(p<I.value.length&&d<b){if(/\d/.test(I.value[p]))d++;p++}try{I.setSelectionRange(p,p)}catch(_){}}
+  if(s.type==='int')selOnFocus(I);else I.addEventListener('focus',()=>setTimeout(()=>{try{const n=I.value.length;I.setSelectionRange(n,n)}catch(_){}},0));I.oninput=()=>{if(s.type==='num'){const pos=I.selectionStart||0,b=toEn(I.value.slice(0,pos)).replace(/\D/g,'').length,v=num(I.value);I.value=v?v.toLocaleString('en-US'):'';let p=0,d=0;while(p<I.value.length&&d<b){if(/\d/.test(I.value[p]))d++;p++}try{I.setSelectionRange(p,p)}catch(_){}}
     else if(s.type==='wam'){const v=toEn(I.value).replace(/,/g,'');if(+v>=1000&&/^\d+$/.test(v))I.value=(+v).toLocaleString('en-US');else I.value=decIn(I.value)}else if(s.type==='dec')I.value=s.grp?grpIn(I.value):decIn(I.value);else if(s.type==='int')I.value=toEn(I.value).replace(/\D/g,'').slice(0,3);else if(s.type==='dig')I.value=toEn(I.value).replace(/\D/g,'');stRead();svKeep();stPaint()};
   I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.stNext()}};
   /* v61.94 (خواسته صاحب اپ): «بعدی» روی خود کیبورد — فلش‌های ⌃⌄ بالای کیبورد آیفون به این دو فیلد نامرئی می‌روند و پله را عوض می‌کنند؛
@@ -122,10 +132,17 @@ function stPatch(O,I0){const T=document.createElement('div');T.innerHTML=stHTML(
   [...I0.attributes].forEach(at=>{if(!nI.hasAttribute(at.name))I0.removeAttribute(at.name)});[...nI.attributes].forEach(at=>{if(I0.getAttribute(at.name)!==at.value)I0.setAttribute(at.name,at.value)});I0.value=nI.getAttribute('value')||'';
   nI.replaceWith(I0);o3.className=n3.className;o3.replaceChildren(...n3.childNodes);O.className=N.className;O.replaceChildren(...[...N.childNodes].map(n=>n===n3?o3:n));return true}
 function stStrip(){const o=document.querySelector('#qa .stp.on'),w=o&&o.parentNode;if(!o||!w)return;const r=o.getBoundingClientRect(),q=w.getBoundingClientRect();const d=(r.left+r.width/2)-(q.left+q.width/2);if(Math.abs(d)>4)try{w.scrollBy({left:d,behavior:RM()?'auto':'smooth'})}catch(_){w.scrollLeft+=d}}
-function stRe(){const bw=qaDir==='bw',O=document.querySelector('#qa .stw'),I0=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)],kb=stKbT(c0);
-  let same=false;if(O&&I0&&I0.isConnected&&kb!=='pick'&&I0.dataset.kb===kb){qaDir='';same=stPatch(O,I0);if(same){stBind();phPaint($('qa'));if(document.activeElement!==I0&&$('ov').classList.contains('hide'))try{I0.focus({preventScroll:true})}catch(_){}try{I0.setSelectionRange(0,I0.value.length)}catch(_){}}}
+function stRe(){const gh=stGhost(),bw=qaDir==='bw',O=document.querySelector('#qa .stw'),I0=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)],kb=stKbT(c0);
+  let same=false;if(O&&I0&&I0.isConnected&&kb!=='pick'&&I0.dataset.kb===kb){qaDir='';same=stPatch(O,I0);if(same){stBind();phPaint($('qa'));if(document.activeElement!==I0&&$('ov').classList.contains('hide'))try{I0.focus({preventScroll:true})}catch(_){}try{const n=I0.value.length;if(stKbT(c0)==='num'&&c0.type==='int')I0.setSelectionRange(0,n);else I0.setSelectionRange(n,n)}catch(_){}}}
   if(!same){qaRe();const I=$('stI');if(I&&document.activeElement!==I&&$('ov').classList.contains('hide')&&!(c0&&c0.type==='pick'&&!c0.search)){try{I.focus({preventScroll:true})}catch(_){I.focus()}}}
-  const c=document.querySelector('#qa .st3');if(c&&!RM()&&c.animate)c.animate([{opacity:.5,transform:`translateX(${bw?10:-8}px)`},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.9,.25,1)'});stStrip()}
+  stSlide(bw,gh);stStrip()}
+/* v61.98 (خواسته صاحب اپ): رفتن به پله بعد نرم و پیدا — تصویر فیلد قبلی به سمت راست محو می‌شود و فیلد تازه از چپ می‌آید
+   (در راست‌به‌چپ «بعدی» سمت چپ است)، کادر مبلغ کمی بعدش، و پله فعال در ردیف بالا یک بار می‌پرد */
+function stGhost(){const c=document.querySelector('#qa .st3');if(!c||RM())return null;const r=c.getBoundingClientRect(),g=c.cloneNode(true);g.removeAttribute('id');g.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));const I=$('stI'),gi=g.querySelector('.stin');if(gi&&I)gi.value=I.value;g.classList.add('stgh');g.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;pointer-events:none;z-index:40`;document.body.appendChild(g);return g}
+function stSlide(bw,gh){const E='cubic-bezier(.22,.9,.24,1)',d=bw?-1:1;if(gh&&gh.animate){gh.animate([{opacity:1,transform:'none'},{opacity:0,transform:`translateX(${d*56}px) scale(.97)`}],{duration:260,easing:E}).onfinish=()=>gh.remove();setTimeout(()=>{if(gh.isConnected)gh.remove()},400)}else if(gh)gh.remove();if(RM())return;
+  const c=document.querySelector('#qa .st3');if(c&&c.animate)c.animate([{opacity:0,transform:`translateX(${-d*56}px)`},{opacity:1,transform:'none'}],{duration:340,easing:E});
+  const v=document.querySelector('#qa #stPv');if(v&&v.animate)v.animate([{opacity:.35,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:380,delay:30,easing:E,fill:'backwards'});
+  const o=document.querySelector('#qa .stp.on');if(o&&o.animate)o.animate([{transform:'scale(.9)'},{transform:'scale(1.06)'},{transform:'none'}],{duration:380,easing:'cubic-bezier(.3,1.4,.5,1)'})}
 function stFinish(){const K=stKind();if(K==='pv'){ACT.pvSave();return}if(K==='it'||K==='ab')ACT.qaAdd();else if(K==='xr')ACT.xrSave();else if(K==='py')ACT.pySave()}
 const stOk=s=>s.need&&s.need()?false:s.wOr?true:s.opt||s.type==='int'||(s.type==='wam'?(+sv.qa.x.w||+sv.qa.x.am):s.type==='text'?s.get():+s.get());
 ACT.stNext=()=>{stRead();const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1),s=S[i];
