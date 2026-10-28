@@ -2015,14 +2015,6 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .c6s .fsearch{border:1.5px solid var(--fld);transition:border-color .2s,box-shadow .3s var(--spring),transform .3s var(--spring)}
 .c6s .fsearch:focus-within{border-color:var(--blu);box-shadow:0 0 0 4px color-mix(in srgb,var(--blu) 14%,transparent),var(--lift);transform:translateY(-1px)}
 .c6s .fsearch .x{transition:opacity .2s,transform .3s var(--spring)}.c6s .fsearch .x.hide{display:grid!important;opacity:0;transform:scale(.4);pointer-events:none}
-#cuf{margin:2px 0 4px}
-#cuf .fchips{padding-bottom:8px}#cuf .fchips.grp{padding-top:0}
-#cuf .fchip{display:inline-flex;align-items:center;gap:5px;transition:transform .32s var(--spring),background-color .2s,border-color .2s,color .2s}
-#cuf .fchip:active{transform:scale(.94)}
-.fchip .fdot{width:7px;height:7px;border-radius:50%;flex:none}
-.fchip.d .fdot{background:var(--red)}.fchip.c .fdot{background:var(--blu)}
-.fchip.d.on{border-color:var(--red);color:var(--red);background:var(--red2)}.fchip.d.on i{color:var(--red)}
-#cuf .fchips{animation:f6in .3s var(--spring) both}
 .cusum{margin:0 0 10px;padding:10px 12px;border-radius:16px;background:var(--card);box-shadow:0 0 0 1px var(--line);animation:f6in .3s var(--spring) both}
 .cush{display:flex;align-items:baseline;gap:8px}.cush b{font-size:14px;font-weight:900}.cush small{font-size:11.5px;color:var(--mut);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cusg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:8px}
@@ -2135,3 +2127,36 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .acst,.cusc{container-type:inline-size}
 .acst b{font-size:min(15px,calc(var(--fw,12)*1cqi));text-overflow:clip}
 .cusc b{font-size:min(15px,calc(var(--fw,12)*1cqi));text-overflow:clip}
+/* v61.96: پیش‌نمایش گزارش — کادر اسکرول می‌خورد و iframe دقیقاً اندازه برگه بزرگ‌شده است (زوم در آیفون و اندروید) */
+#pv .pvw{overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;direction:ltr}
+#pv iframe#pvf{position:relative;inset:auto;display:block;width:100%;height:100%;flex:none;margin:0}
+/* v61.96 (خواسته صاحب اپ): ردیف‌های سند مرتب — برچسب کار (فروش، خرید…) همیشه بالا و نام کالا همیشه زیرش، در همه ردیف‌ها یکسان */
+.d8h .d6t{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center;gap:3px!important;min-width:0;flex-wrap:nowrap!important}
+.d8h .d6t>.d6k{order:0;margin:0!important;align-self:flex-start}
+.d8h .d6t>b{order:1;display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
+
+/* ---- v61.96 فیلتر حساب‌ها: دکمه داخل جستجو، برچسب فعال، پنجره گروهی مثل iOS ---- */
+.cufbtn{flex:none;display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 11px;margin-inline-start:2px;border:0;border-radius:12px;background:var(--hair);color:var(--ink);font:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:background-color .2s,color .2s,transform .3s var(--spring)}
+.cufbtn .i{width:17px;height:17px}.cufbtn:active{transform:scale(.94)}
+.cufbtn.on{background:var(--blu);color:#fff}.cufbtn em{font-style:normal;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#fff;color:var(--blu);font-size:11px;font-weight:900;display:grid;place-items:center}
+#cuf:empty{display:none}
+.cufa{display:flex;flex-wrap:wrap;gap:7px;margin:2px 2px 12px;animation:f6in .28s var(--spring) both}
+.cufp{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 6px 0 12px;border:0;border-radius:999px;background:var(--blu2);color:var(--blu);font:inherit;font-size:12.5px;font-weight:850;cursor:pointer}
+.cufp .i{width:14px;height:14px}.cufp.d{background:var(--red2);color:var(--red)}
+.cufx{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,currentColor 16%,transparent);font-size:14px;line-height:1}
+.cufclr{height:32px;padding:0 10px;border:0;background:none;color:var(--mut);font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.fdot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
+.d .fdot,.cufr.d .fdot,.cufp.d .fdot{background:var(--red)}.c .fdot,.cufr.c .fdot,.cufp.c .fdot{background:var(--blu)}
+.cufs{max-height:min(62vh,560px);overflow:auto;overscroll-behavior:contain;margin:0 -2px;padding:0 2px 4px}
+.cufs .f6h{margin:6px 6px 7px}
+.cufg2{border-radius:16px;background:color-mix(in srgb,var(--mut) 5%,var(--card));box-shadow:0 0 0 1px var(--line);overflow:hidden;margin-bottom:6px}
+.cufr{display:flex;align-items:center;gap:11px;width:100%;min-height:54px;padding:8px 14px;border:0;background:none;color:var(--ink);font:inherit;text-align:right;cursor:pointer;position:relative;transition:background-color .2s}
+.cufr+.cufr::before{content:"";position:absolute;top:0;left:0;right:52px;border-top:1px solid var(--line)}
+.cufr:active{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.cufi{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--hair);color:var(--mut)}.cufi .i{width:16px;height:16px}
+.cufr.d .cufi{background:var(--red2)}.cufr.c .cufi{background:var(--blu2)}
+.cufr .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}.cufr .tx b{font-size:14px;font-weight:800}.cufr .tx small{font-size:11px;color:var(--mut);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cufr>em{font-style:normal;font-size:12px;font-weight:800;color:var(--mut);font-variant-numeric:tabular-nums}
+.cufc{flex:none;width:22px;height:22px;display:grid;place-items:center;color:var(--blu);opacity:0;transform:scale(.5);transition:opacity .2s,transform .3s var(--spring)}.cufc .i{width:18px;height:18px}
+.cufr.on .cufc{opacity:1;transform:none}.cufr.on .tx b{color:var(--blu)}.cufr.on .cufi{background:var(--blu);color:#fff}.cufr.on.d .cufi{background:var(--red);color:#fff}.cufr.on.d .fdot,.cufr.on.c .fdot{background:#fff}
+.cufbar{display:flex;gap:8px;margin-top:10px}.cufbar .btn{flex:0 0 auto;min-height:52px;padding:0 18px;border-radius:16px}.cufbar .xgo{flex:1;margin:0}

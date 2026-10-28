@@ -569,6 +569,14 @@ function svCommit(){const c=svCu();let depOld=null;
   (c.txs=c.txs||[]).push(t);c.lastAt=now;saveCu();if(t.pays.some(p=>p.srcId!=null))saveS();ckDepApply(c,t,now,depOld);
   logA('cust',(OLD?'ویرایش ':'')+invTitle(t),cuName(c)+(items.length?' | '+items.map(i=>i.k+' '+wFmt(i.w)+' گرم').join('، '):'')+(xr.length?' | '+xr.map(xrLab).join('، '):'')+' | جمع '+fmt(T.total)+' تومان'+(T.paid?' | دریافت/پرداخت '+fmt(T.paid):''));
   return {c,t}}
+/* v61.96 (خواسته صاحب اپ): فاکتور / PDF از داخل خود سند (پیش از ثبت) — همان برگه فاکتور با ردیف‌های فعلی، بدون ثبت و بدون تغییر حساب‌ها */
+function svDraftTx(){const c=svCu(),T=svTot(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}}),xr=(sv.xr||[]).map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e}});
+  const O=sv.edit&&c?(c.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)):null;
+  const t={id:'draft',type:'inv',dk:sv.dk||undefined,no:sv.edit?sv.edit.no:invNext(),date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>({...p})),at:ns(),by:who(),draft:1};if(O)t.at0=O.at0||O.at;
+  if(T.ge)t.ge=T.ge;if(Object.keys(T.xe).length)t.xe=T.xe;if(sv.gconv&&T.rest>0&&sv.rate)t.gc={r:T.rest,g:Math.round(T.rest/sv.rate*1000)/1000};
+  if(O){const c2={...c,txs:(c.txs||[]).filter(x=>x!==O)};return {c:c2,t}}return {c,t}}
+ACT.svPrint=()=>{if(!sv)return;const e=!svCu()?'اول مشتری سند را انتخاب کنید':!svRows()?'سند هنوز ردیفی ندارد':svHasG()&&!sv.rate?'اول مظنه یا نرخ گرم را بزنید':'';if(e){toast(e,true);return}if(sv.qa&&(sv.qa.k||sv.qa.x||sv.qa.p||sv.qa.pv)&&$('stI'))stRead();
+  const X=svDraftTx();openPrint(()=>invDoc(X.c,X.t))};
 /* دکمه پایین سند: «تسویه» */
 ACT.svSave=d=>{const c=svCu();if(!c){toast('مشتری سند را انتخاب کنید',true);const q=$('svQ');if(q){q.focus();q.scrollIntoView({behavior:'smooth',block:'center'})}return}
   if(!svFlush())return;if(!svRows()&&!svRBal()&&!(d&&d.w==='f'&&svBalL().some(z=>z[3]))){toast('حساب این مشتری تسویه است؛ کالا، طلا یا سکه اضافه کنید',true);dkShow();return}

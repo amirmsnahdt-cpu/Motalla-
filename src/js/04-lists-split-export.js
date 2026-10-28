@@ -140,10 +140,25 @@ function openPrint(h0){const P=$('pv'),f=$('pvf'),seq=++pvSeq;P.classList.remove
       pdfPrep(html).then(()=>{if(seq!==pvSeq)return;P.classList.remove('ld','ld2');const b=P.querySelector('.pvld b');if(b)b.textContent='در حال آماده‌سازی…'})};
     f.onload=()=>{let done=false;const ok=()=>{if(!done){done=true;show()}};try{/* v61.84: پیش‌نمایش با اندازه و حاشیه دقیق کاغذ همان برگه (@page) چیده می‌شود تا با PDF و چاپ یکی باشد */const d=f.contentDocument,Q=pageSpec(html),PXm=96/25.4,W=Math.round(Q.mmW*PXm);
       const st=d.createElement('style');st.textContent=`@media screen{html{background:transparent!important;min-height:100%}body{width:${W}px!important;max-width:none!important;margin:18px auto 28px!important;padding:${Math.round(Q.mv*PXm)}px ${Math.round(Q.mh*PXm)}px!important;min-height:${Math.round(Q.mmH*PXm)}px;background:#fff!important;box-shadow:0 10px 34px rgba(16,33,58,.16),0 0 0 1px rgba(16,33,58,.06);border-radius:10px;box-sizing:border-box}}`;d.head.appendChild(st);
-      let big=false;const fit=()=>{const z=big?Math.min(1,(f.clientWidth-8)/(W*0.62)):Math.min(1,(f.clientWidth-20)/(W+8));d.documentElement.style.zoom=String(z)};fit();f.contentWindow.addEventListener('resize',fit);d.addEventListener('click',()=>{big=!big;fit()});
+      pvZoomBind(f,d,W);
       const imgs=[...d.images].filter(i=>!i.complete).map(i=>new Promise(r=>{i.onload=i.onerror=r}));Promise.all([d.fonts&&d.fonts.ready,...imgs]).then(ok,ok)}catch(e){ok()}setTimeout(ok,2500)};
     f.srcdoc=html},40))}
-function closePrint(){pvSeq++;$('pv').classList.add('hide');$('pv').classList.remove('ld');$('pvf').srcdoc='';document.body.style.overflow=''}
+/* v61.96 (خواسته صاحب اپ): زوم پیش‌نمایش روی آیفون و اندروید. آیفون iframe را به اندازه محتوا بزرگ می‌کرد (برگه بیرون از صفحه و زوم بی‌اثر)؛
+   حالا اندازه iframe دقیقاً اندازه برگه بزرگ‌شده است و خود کادر پیش‌نمایش اسکرول می‌خورد. اول برگه در عرض صفحه جا می‌شود؛
+   زدن = بزرگ/کوچک (دو برابر)، دو انگشت = زوم آزاد (از اندازه جا شده تا ۴ برابر)؛ نقطه وسط صفحه هنگام زوم ثابت می‌ماند. */
+function pvZoomBind(f,d,W){const box=f.parentNode,H0=()=>{d.documentElement.style.zoom='1';return Math.max(d.documentElement.scrollHeight,d.body?d.body.scrollHeight+46:0)};
+  let NW=W+24,H=H0(),fz=1,z=1,atFit=true;const cw=()=>box.clientWidth,chh=()=>box.clientHeight;
+  const apply=(nz,keep)=>{const ow=f.offsetWidth||1,oh=f.offsetHeight||1,cx=(box.scrollLeft+cw()/2)/ow,cy=(box.scrollTop+chh()/2)/oh;z=Math.max(fz,Math.min(fz*4,nz));atFit=Math.abs(z-fz)<.01;
+    d.documentElement.style.zoom=String(z);const w=Math.max(cw(),Math.ceil(NW*z)),h=Math.ceil(H*z);f.style.width=w+'px';f.style.height=h+'px';
+    if(keep){box.scrollLeft=cx*w-cw()/2;box.scrollTop=cy*h-chh()/2}};
+  const refit=()=>{fz=Math.min(1,(cw()-12)/NW);apply(atFit?fz:z,false)};refit();
+  let tap=null,pin=null,raf=0;
+  d.addEventListener('touchstart',e=>{if(e.touches.length===2){const[a,b]=e.touches;pin={d0:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),z0:z};tap=null;e.preventDefault()}else if(e.touches.length===1)tap={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}},{passive:false});
+  d.addEventListener('touchmove',e=>{if(pin&&e.touches.length===2){e.preventDefault();const[a,b]=e.touches,dd=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),nz=pin.z0*dd/Math.max(1,pin.d0);cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>apply(nz,true))}else if(tap&&e.touches[0]&&Math.hypot(e.touches[0].clientX-tap.x,e.touches[0].clientY-tap.y)>8)tap=null},{passive:false});
+  d.addEventListener('touchend',e=>{if(pin&&e.touches.length<2){pin=null;return}},{passive:true});
+  d.addEventListener('click',()=>{if(pin)return;apply(atFit?Math.min(fz*4,Math.max(fz*2,1)):fz,true)});
+  addEventListener('resize',refit);f._pvOff=()=>removeEventListener('resize',refit)}
+function closePrint(){const f0=$('pvf');if(f0&&f0._pvOff){f0._pvOff();f0._pvOff=null}if(f0){f0.style.width='';f0.style.height=''}pvSeq++;$('pv').classList.add('hide');$('pv').classList.remove('ld');$('pvf').srcdoc='';document.body.style.overflow=''}
 /* کپی با پشتیبان برای وب‌ویوهایی که clipboard ندارند */
 async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){}
   try{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
