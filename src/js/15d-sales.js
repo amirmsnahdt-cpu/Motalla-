@@ -131,7 +131,7 @@ function svCuHTML(){const c=svCu();if(c&&sv.fixCu)return '';/* v61.5: صاحب �
   return `<div class="d6pick cbx"><div class="fsearch">${ic('search')}<input id="svQ" type="search" value="${esc(sv.q||'')}" placeholder="مشتری: نام، شماره، کد ملی یا گروه…" autocomplete="off" enterkeyhint="search"></div><div id="svCr">${svCrHTML()}</div></div>`}
 /* v61.93 (خواسته صاحب اپ): تا سند ردیفی ندارد، «مانده حساب» داخل کارت مشتری است (نه نوار پایین)؛ با اولین ردیف، نوار پایین برمی‌گردد.
    هر قاب = تسویه همان مانده (مثل نوار پایین) */
-function svCuBHTML(){const c=svCu();if(!c||svRows())return '';const b=svCuBal(c);
+function svCuBHTML(){const c=svCu();if(!c||svRows())return '';const b=svCuBal(c);if(cuZero(b))return `<div class="d6cub z"><small>مانده حساب</small>${cuZTag()}</div>`;
   return `<div class="d6cub"><small>مانده حساب</small><span class="q8fs">${q8Keys(b).map((k,i)=>`<button type="button" class="q8b" data-act="svBal" data-k="${k}">${q8F(k,q8V(b,k),{i})}</button>`).join('')}</span></div>`}
 function svCuBSync(){const B=$('svCuB'),h=svCuBHTML();if(B&&B.innerHTML!==h){B.innerHTML=h;const w=B.parentNode;if(w)w.classList.toggle('wb',!!h)}const a=$('act'),g=$('svFt');if(a&&g&&cur==='sell')a.classList.toggle('sv0',!g.innerHTML.trim())}
 function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
@@ -818,7 +818,7 @@ function pdHTML(){const c=custs.find(z=>String(z.id)===String(chId)),bal=chBal(c
   <div class="ef"><label for="pdA">مبلغ <i>(تومان)</i></label><input id="pdA" class="ltr acbig" inputmode="numeric" value="${posD.a?Number(posD.a).toLocaleString('en-US'):''}" autocomplete="off"><small class="eh">کل مانده: ${fmt(bal)} تومان</small></div></div>
   <button class="xgo" data-act="pdSave">${ic('check')} ثبت واریز</button>`}
 const pdRe=()=>{sheet(pdHTML());const A=$('pdA');if(A){selOnFocus(A);A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):'';posD.a=v}}};
-ACT.posDep=d=>{if(d&&d.id)chId=d.id;const c=custs.find(z=>String(z.id)===String(chId));if(!c)return;const last=ls.get('m_posdep_'+c.id,'');posD={a:Math.max(0,chBal(c)),to:(sources.find(s=>String(s.id)===String(last))||sources.find(s=>s.bal!=null)||sources[0]||{}).id};pdRe()};
+ACT.posDep=d=>{if(d&&d.id)chId=d.id;const c=custs.find(z=>String(z.id)===String(chId));if(!c)return;const last=ls.get('m_posdep_'+c.id,'');posD={a:Math.max(0,chBal(c)),to:(chSrc(c)||sources.find(s=>String(s.id)===String(last))||sources.find(s=>s.bal!=null)||sources[0]||{}).id};pdRe()};
 ACT.pdTo=d=>{const A=$('pdA');if(A)posD.a=num(A.value);posD.to=d.id;pdRe()};
 ACT.pdSave=()=>{const A=$('pdA');if(A)posD.a=num(A.value);const c=custs.find(z=>String(z.id)===String(chId)),s=sources.find(z=>String(z.id)===String(posD.to));if(!c)return;if(!s){toast('حساب مقصد را انتخاب کنید',true);return}if(!(posD.a>0)){toast('مبلغ را وارد کنید',true);return}
   const now=ns(),T={id:nid++,type:'tout',amount:posD.a,srcId:s.id,date:todayISO(),at:now,by:who()},L={id:nid++,type:'pos',amount:posD.a,note:'کارتخوان «'+c.name+'»',chId:c.id,chTx:T.id,date:todayISO(),at:now,by:who()};T.ledId=L.id;

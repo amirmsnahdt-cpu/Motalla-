@@ -73,7 +73,7 @@ function cuFiltHTML(){const A=CU().map(c=>[c,cuBal(c)]),G=groupsList(),inG=A.fil
   return `<div class="fchips cufb">${bc}</div>${gr}`}
 /* جمع مانده‌های حساب‌های فیلترشده: تومان و طلا، جدا طلب ما (قرمز) و بدهی ما (آبی) */
 function cuSumHTML(B){if(!cuF.b&&!cuF.g)return '';let rd=0,rc=0,gd=0,gc=0;for(const [,b] of B){if(b.R<0)rd+=-b.R;else rc+=b.R;if(b.G<0)gd+=-b.G;else gc+=b.G}
-  const showR=cuF.b!=='gd'&&cuF.b!=='gc',showG=cuF.b!=='rd'&&cuF.b!=='rc',cell=(l,k,v,cl)=>v?`<span class="cusc ${cl}"><small>${l}</small><b><span class="cbn" data-k="${k}" data-v="${v}">${balV(k,v)}</span><i>${balU(k)}</i></b></span>`:'';
+  const showR=cuF.b!=='gd'&&cuF.b!=='gc',showG=cuF.b!=='rd'&&cuF.b!=='rc',cell=(l,k,v,cl)=>v?`<span class="cusc ${cl}"><small>${l}</small><b${fitS(balV(k,v)+' '+balU(k))}><span class="cbn" data-k="${k}" data-v="${v}">${balV(k,v)}</span><i>${balU(k)}</i></b></span>`:'';
   const C=[showR?cell('طلبکاریم','r',rd,'d'):'',showR?cell('بدهکاریم','r',rc,'c'):'',showG?cell('طلبکاریم','g',Math.round(gd*1000)/1000,'d'):'',showG?cell('بدهکاریم','g',Math.round(gc*1000)/1000,'c'):''].filter(Boolean);
   return `<div class="cusum"><div class="cush"><b>${fmt(B.length)} حساب</b><small>${esc([cuF.g?(cuF.g==='-'?'بدون گروه':'گروه '+cuF.g):'',(CUFB.find(x=>x[0]===cuF.b)||[])[1]||''].filter(Boolean).join(' · '))}</small></div>${C.length?`<div class="cusg">${C.join('')}</div>`:''}</div>`}
 function cuFRe(){ls.set('m_cuf',cuF);const f=$('cuf');if(f)f.innerHTML=cuFiltHTML();const r=$('cures');cuAnim=1;if(r)srchSwap(r,cuListHTML());requestAnimationFrame(()=>cuCount('#cures .cusum .cbn'));
