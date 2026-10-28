@@ -112,7 +112,6 @@ function vSell(){xaSync();if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();g
   return `<div class="d6">
   <div class="d6hd"><button class="d6no" data-act="svCal"><small>${sv.items.length?'فاکتور':'سند'}</small><b>${toFa(sv.edit?sv.edit.no:invNext())}</b><span>${ic('cal')}${esc(payLab(sv.date)||D.fa)}</span></button><button type="button" class="d6tx${sv.tax?' on':''}" id="svTx" data-act="svTax" aria-pressed="${!!sv.tax}"><i>${ic('check')}</i><span>مالیات</span><small>۱۰٪</small></button>
     ${rateHTML()}</div>
-  ${glSellHTML()}
   <div id="svCu">${svCuHTML()}</div>
   <div class="d6q" id="qa">${qaHTML()}</div>
   <div id="svRows"${render._same?'':' class="first"'}>${svRowsHTML()}</div>
@@ -123,22 +122,30 @@ function vSell(){xaSync();if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();g
 const rtK=()=>sv&&sv.rk?sv.rk:(ls.get('m_rtk','mz')==='g'?'g':'mz');
 const rtDetect=(v,ref)=>!v?rtK():ref?(Math.abs(v-ref*MZK)<Math.abs(v-ref)?'mz':'g'):(v>=6e7?'mz':'g');
 function rateHTML(){const k=rtK(),v=k==='mz'?sv.mz:sv.rate;
-  return `<label class="d6rate2${sv.rate?'':' need'}" id="svRate"><small id="svRl">${sv.rate?(k==='mz'?'مظنه':'هر گرم ۱۸'):'مظنه یا هر گرم'}</small><input id="svM" class="ltr" inputmode="numeric" value="${v?Number(v).toLocaleString('en-US'):''}" placeholder="" autocomplete="off" enterkeyhint="next"><span class="d6rx" id="svRx">${rateX()}</span></label>`}
+  return `<label class="d6rate2${sv.rate?'':' need'}" id="svRate"><small id="svRl">${sv.rate?(k==='mz'?'مظنه':'هر گرم ۱۸'):'مظنه یا هر گرم'}</small><input id="svM" class="ltr" inputmode="numeric" value="${v?Number(v).toLocaleString('en-US'):''}" placeholder="" autocomplete="off" enterkeyhint="next"><span class="d6rx" id="svRx">${rateX()}</span>${glRateHTML()}</label>`}
 const rateX=()=>sv.rate?(rtK()==='mz'?'هر گرم <b>'+fmt(sv.rate)+'</b>':'مظنه <b>'+fmt(sv.mz)+'</b>'):'دیگری خودکار';
 ACT.svTax=()=>{sv.tax=!sv.tax;ls.set('m_tax',sv.tax);svKeep();const b=$('svTx');if(b){b.classList.toggle('on',sv.tax);b.setAttribute('aria-pressed',sv.tax);if(!RM()&&b.animate)b.animate([{transform:'scale(1)'},{transform:'scale(.9)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:420,easing:'cubic-bezier(.3,1.4,.5,1)'})}svRe();const t=svTot();toast(sv.tax?'مالیات ۱۰٪ روی اجرت و سود'+(t.tax?' · '+fmt(t.tax)+' تومان':''):'مالیات برداشته شد')};
 const aSell=()=>`<div id="svFt" class="svgo">${svFtIn()}</div>`;
 /* ----- مشتری ----- */
-function svCuHTML(){const c=svCu();if(c&&sv.fixCu)return '';/* v61.5: صاحب سند در نوار بالا */if(c){return `<div class="d6cu">${cuAvH(c)}<span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span>${sv.fixCu?"":`<button class="lnk" data-act="svCuX">تغییر</button>`}</div>`}
+function svCuHTML(){const c=svCu();if(c&&sv.fixCu)return '';/* v61.5: صاحب سند در نوار بالا */if(c){const B=svCuBHTML();return `<div class="d6cuw${B?' wb':''}"><div class="d6cu">${cuAvH(c)}<span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span>${sv.fixCu?"":`<button class="lnk" data-act="svCuX">تغییر</button>`}</div><div id="svCuB">${B}</div></div>`}
   return `<div class="d6pick cbx"><div class="fsearch">${ic('search')}<input id="svQ" type="search" value="${esc(sv.q||'')}" placeholder="مشتری: نام، شماره، کد ملی یا گروه…" autocomplete="off" enterkeyhint="search"></div><div id="svCr">${svCrHTML()}</div></div>`}
+/* v61.93 (خواسته صاحب اپ): تا سند ردیفی ندارد، «مانده حساب» داخل کارت مشتری است (نه نوار پایین)؛ با اولین ردیف، نوار پایین برمی‌گردد.
+   هر قاب = تسویه همان مانده (مثل نوار پایین) */
+function svCuBHTML(){const c=svCu();if(!c||svRows())return '';const b=svCuBal(c);
+  return `<div class="d6cub"><small>مانده حساب</small><span class="q8fs">${q8Keys(b).map((k,i)=>`<button type="button" class="q8b" data-act="svBal" data-k="${k}">${q8F(k,q8V(b,k),{i})}</button>`).join('')}</span></div>`}
+function svCuBSync(){const B=$('svCuB'),h=svCuBHTML();if(B&&B.innerHTML!==h){B.innerHTML=h;const w=B.parentNode;if(w)w.classList.toggle('wb',!!h)}const a=$('act'),g=$('svFt');if(a&&g&&cur==='sell')a.classList.toggle('sv0',!g.innerHTML.trim())}
 function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
-  if(!q)return '';
+  /* v61.93: زدن اول روی جستجو = فهرست آخرین مشتری‌ها با مانده (بدون کیبورد)؛ زدن دوم = تایپ */
+  if(!q){if(!svQO)return '';const R=A.slice().sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,8);
+    return `<div class="bzsug cbl" role="listbox"><div class="cblh">آخرین حساب‌ها<small>برای جستجو دوباره بزنید</small></div>${R.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c))).join('')}${cbRow('svCuNew',{},ic('plus'),'افتتاح حساب تازه','اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
   const L=A.filter(c=>nzName([c.name,c.phone,c.nid,c.grp].join(' ')).includes(q)).sort((a,b)=>(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,6);
   const add=!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0));
-  return `<div class="bzsug cbl" role="listbox">${L.map(c=>cbRow('svCu',{id:c.id},esc(userInit(c.name)),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',`<span class="c6v">${balPills(cuBal(c))}</span>`)).join('')}
+  return `<div class="bzsug cbl" role="listbox">${L.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c))).join('')}
     ${cbRow('svCuNew',{},ic('plus'),add?'حساب تازه: «'+esc(q0)+'»':'افتتاح حساب تازه',(L.length?'':'مشتری‌ای پیدا نشد · ')+'اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
-function svPick(id){sv.cuId=id;sv.q='';svKeep();if(cur!=='sell')go('sell');else{$('svCu').innerHTML=svCuHTML();svRe()}const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
+let svQO=0;const cuAvI=c=>c&&c.av?`<img data-ik="${esc(c.av)}" alt="">`:esc(userInit(c?c.name:''));
+function svPick(id){svQO=0;sv.cuId=id;sv.q='';svKeep();if(cur!=='sell')go('sell');else{$('svCu').innerHTML=svCuHTML();svRe()}const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
 ACT.svCu=d=>svPick(d.id);
-ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();$('svCu').innerHTML=svCuHTML();svBindCu();svRe();setTimeout(()=>{const q=$('svQ');if(q)q.focus()},60)};
+ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();$('svCu').innerHTML=svCuHTML();svBindCu();svQO=1;srchSwap('svCr',svCrHTML());phPaint($('svCr'));svRe()};
 ACT.svCuNew=()=>{cuRet='sell';sheet(cuFormHTML({name:clean(sv.q||'')}));cuBind();setTimeout(()=>{const n=$(sv.q?'cuP':'cuN');if(n)n.focus()},320)};
 ACT.svCal=()=>openCal(sv.date,iso=>{sv.date=iso;svKeep();closeSheet();render()});
 /* ----- ردیف تازه: یک جستجو برای همه چیز (مثل «شرح» در کیمیا) ----- */
@@ -445,7 +452,7 @@ const ftNum=(k,v)=>`<b class="ftn">${v?balV(k,v):'۰'}</b>`;
    هر عدد با رنگ خودش (قرمز طلبکاریم، آبی بدهکاریم)، «نهایی» پررنگ‌تر با زمینه رنگی. زدن هر خانه = پنجره تسویه برای مبلغ همان مانده
    (با ریز قبلی/سند/نهایی بالای آن)؛ نگه داشتن = جزئیات فاکتور */
 const ftLn=(k,v,big)=>`<span class="f3l ${ftCls(v)}${k==='r'?' r':''}"><b${k==='r'?' class="ftn"':''}${fitS((v?balV(k,v):'۰')+(k==='r'?'':' '+balU(k)))}>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i>${big&&v?`<em>${ourLab(v)}</em>`:''}</span>`;
-function svFtIn(){if(!sv)return '';const c=svCu(),ready=!!(sv.rate||!svHasG()),has=svRows();
+function svFtIn(){if(!sv)return '';const c=svCu(),ready=!!(sv.rate||!svHasG()),has=svRows();if(!has)return '';
   if(!ready)return `<div class="iv8b iv9b"><button type="button" class="f3c f3w" data-act="svSave"><small>مانده سند</small><span class="ftw">اول مظنه را وارد کنید</span></button></div>`;
   /* v61.57: همان جدول مانده‌های سند ثبت‌شده (balGrid)؛ زدن هر قاب = تسویه همان مانده، نگه داشتن = جزئیات فاکتور */
   const L=svBalL(),get=k=>L.find(z=>z[0]===k)||[k,0,0,0],R=[get('r')];if(c||L.some(z=>z[0]==='g'&&(z[1]||z[2]||z[3])))R.push(get('g'));L.forEach(z=>{if(z[0]!=='r'&&z[0]!=='g'&&(z[1]||z[2]||z[3]))R.push(z)});
@@ -456,7 +463,7 @@ function tween(el,to){if(!el)return;const from=+el.dataset.v||0;el.dataset.v=to;
   const st=n=>{const k=Math.min(1,(n-t0)/D),e=1-Math.pow(1-k,3);el.textContent=fmt(Math.round(from+(to-from)*e));if(k<1)el._r=requestAnimationFrame(st)};el._r=requestAnimationFrame(st)}
 function svRe(){numMorph('#svRows .d6e b,#svFt .iv8c .fz>b,#stPv .stam .fz>b',()=>svRe0())}
 function svRe0(){const set=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};set('svRows',svRowsHTML());
-  document.querySelectorAll('.d6rt').forEach(l=>l.classList.toggle('need',!sv.rate));const g=$('svFt');if(g)g.innerHTML=svFtIn();qaCalc();
+  document.querySelectorAll('.d6rt').forEach(l=>l.classList.toggle('need',!sv.rate));const g=$('svFt');if(g)g.innerHTML=svFtIn();svCuBSync();qaCalc();
   svBindRest();svAdd=-1}
 /* v61.34: نگه داشتن دکمه «تسویه» = جزئیات کامل سند (خواسته صاحب اپ): بهای طلا، اجرت، سود، مالیات، فروش و خرید، تخفیف،
    دریافت‌ها و پرداخت‌ها، مانده این سند، و برای هر جنس قبلی / این سند / نهایی. زدن کوتاه همان تسویه است. */
@@ -521,8 +528,10 @@ ACT.rowPhV=d=>{if(!phT())return;GAL={k:'row'};zvOpen(+d.i||0)};
 /* عکس ردیف ثبت‌شده: فقط دیدن (data-ks = کلیدها با «,») */
 ACT.rowPhS=d=>{const K=String(d.ks||'').split(',').filter(Boolean);if(!K.length)return;GAL={k:'view',keys:K,name:d.n||'عکس کالا'};zvOpen(0)};
 function svBindRest(){phPaint($('svRows'));const G=$('svGc');if(G)G.onchange=()=>{sv.gconv=G.checked;svKeep();svRe()};const T=$('svT');if(T)T.onchange=()=>{sv.tax=T.checked;ls.set('m_tax',sv.tax);svKeep();svRe()}}
-function svBindCu(){const Q=$('svQ');if(!Q)return;Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{srchSwap('svCr',svCrHTML())},80)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(Q._t);sv.q=Q.value;const r=$('svCr');if(r)r.innerHTML=svCrHTML();const f=document.querySelector('#svCr [data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}};const C=$('svCr');if(C)C.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
-function bindSell(){if(!sv)return;svBindCu();svBindRest();qaBind();const M=$('svM');TITLES.sell=sv.edit?'ویرایش سند '+toFa(sv.edit.no):'سند جدید';
+function svBindCu(){const Q=$('svQ');if(!Q)return;svQO=0;const cr=()=>{srchSwap('svCr',svCrHTML());phPaint($('svCr'))};
+  kb2(Q,()=>svQO||!!clean(Q.value),()=>{svQO=1;cr();const w=Q.closest('.d6pick');try{(w||Q).scrollIntoView({block:'start',behavior:RM()?'auto':'smooth'})}catch(_){}});
+  const out=e=>{if(!Q.isConnected){document.removeEventListener('pointerdown',out,true);return}if(!svQO||clean(Q.value)||document.activeElement===Q)return;const w=Q.closest('.d6pick');if(w&&w.contains(e.target))return;svQO=0;Q.readOnly=true;cr()};document.addEventListener('pointerdown',out,true);Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{srchSwap('svCr',svCrHTML())},80)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(Q._t);sv.q=Q.value;const r=$('svCr');if(r)r.innerHTML=svCrHTML();const f=document.querySelector('#svCr [data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}};const C=$('svCr');if(C)C.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
+function bindSell(){if(!sv)return;svBindCu();svCuBSync();phPaint($('svCu'));svBindRest();qaBind();const M=$('svM');TITLES.sell=sv.edit?'ویرایش سند '+toFa(sv.edit.no):'سند جدید';
   const setRate=(r,m)=>{sv.rate=r;sv.mz=m;if(r)ls.set('m_rate',r);if(m)ls.set('m_mz',m);const x=$('svRx'),w=$('svRate');if(x)x.innerHTML=rateX();if(w)w.classList.toggle('need',!r);svKeep();glPaint();clearTimeout(bindSell._t);bindSell._t=setTimeout(()=>{if(cur!=='sell')return;svRe();if(sv.qa.x)xrHint()},140)};
   const ref=+sv.rate||+ls.get('m_rate',0)||0;
   if(M){selOnFocus(M);M.oninput=()=>{const v=num(M.value);if(!GLset&&sv.live){sv.live=0;glPaint()}M.value=v?v.toLocaleString('en-US'):'';const k=rtDetect(v,ref);sv.rk=k;ls.set('m_rtk',k);const l=$('svRl');if(l)l.textContent=v?(k==='mz'?'مظنه':'هر گرم ۱۸'):'مظنه یا هر گرم';if(k==='mz')setRate(rOfMz(v),v);else setRate(v,mzOf(v))}}

@@ -225,6 +225,7 @@ test('قیمت لحظه‌ای طلا: خواندن پاسخ tgju (ریال → 
   assert.equal(goldParse({ current: { geram18: { p: '243,425,000' } } }).mz, Math.round(24342500 * 4.3318), 'missing mesghal derived');
   assert.equal(goldParse({ current: { geram18: { p: '243,425,000' }, mesghal: { p: '24,000' } } }), null, 'bad ratio rejected');
   assert.equal(g.mt, Date.parse('2026-10-27T20:15:00+03:30'), 'market time read as Tehran time');
+  assert.deepEqual(goldParse({ current: { geram18: { p: '243,425,000' }, sekee: { p: '1,100,000,000' }, price_dollar_rl: { p: '1,050,000' } } }).x, { emami: 110000000, usd: 105000 }, 'extra rates in toman');
   assert.equal(goldParse({}), null);
   assert.equal((await api('/api/gold')).status, 401);
   const r = await api('/api/gold', { token: admin }); assert.ok(r.status === 200 || r.status === 503, 'answers even when tgju is unreachable');

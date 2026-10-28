@@ -12,4 +12,7 @@ function cuPendHTML(b,P,pw){const R2=(+b.R||0)+pw;/* تسویه = «دریافت
   <div class="cupdf"><small>مانده مبلغ بعد از تأیید</small><b class="${q8S(R2)}">${R2?balV('r',R2):'۰'} <i>تومان</i></b><em class="${q8S(R2)}">${ourLab(R2)}</em></div></div>`}
 /* مانده کوچک کنار نام در جستجوی پرداخت‌کننده: یک ردیف گرم، یک ردیف تومان (+ در انتظار تأیید، زرد) */
 function cuMiniBal(c){const b=cuBal(c),pw=cuPendSum(c),row=(k,v)=>`<span class="stbv ${q8S(v)}"><b>${v?balV(k,v):'۰'}</b><i>${esc(balU(k))}</i><em>${ourLab(v)}</em></span>`;
-  return `<span class="stbl${pw?' pw':''}">${row('g',+b.G||0)}${row('r',+b.R||0)}${pw?`<span class="stbv p"><b>${fmt(pw)}</b><i>تومان</i><em>در انتظار</em></span>`:''}</span>`}
+  return `<span class="stbl${pw?' pw':''}">${+b.G||!(+b.R)?row('g',+b.G||0):''}${+b.R?row('r',+b.R):''}${pw?`<span class="stbv p"><b>${fmt(pw)}</b><i>تومان</i><em>در انتظار</em></span>`:''}</span>`}
+
+/* v61.93: مانده کوچک در همه جستجوهای مشتری (سند، تسویه): تسویه = برچسب کوچک کم‌رنگ؛ وگرنه گرم و تومان */
+const cuBalMini=c=>{const b=cuBal(c);return cuZero(b)&&!cuPendSum(c)?cuZTag():cuMiniBal(c)};

@@ -396,6 +396,7 @@ function serveStatic(req, res, p) {
    می‌فرستیم، هر چهار آینه را با هم می‌پرسیم و تازه‌ترین (بر اساس زمان خود بازار ts) را برمی‌داریم. mt = زمان آخرین تغییر بازار. */
 const GOLD_TTL = 30e3, GOLD_URLS = ['https://call1.tgju.org/ajax.json', 'https://call2.tgju.org/ajax.json', 'https://call3.tgju.org/ajax.json', 'https://call4.tgju.org/ajax.json'];
 let goldLast = null, goldAt = 0, goldBusy = null;
+const GOLD_X = [['g24', 'geram24'], ['emami', 'sekee'], ['bahar', 'sekeb'], ['nim', 'nim'], ['rob', 'rob'], ['gerami', 'gerami'], ['usd', 'price_dollar_rl'], ['eur', 'price_eur'], ['aed', 'price_aed']];
 const goldNum = v => { const t = String(v == null ? '' : v).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[^\d.]/g, ''); const n = +t; return isFinite(n) && n > 0 ? n : 0; };
 const goldItem = (cur, k) => { const o = cur && cur[k]; if (!o) return null; const p = goldNum(typeof o === 'object' ? (o.p ?? o.price ?? o.value) : o); return p ? { p: Math.round(p / 10), t: typeof o === 'object' ? String(o.ts || o['t-g'] || o.t || '') : '' } : null; };
 /* ts بازار مثل «2026-10-28 10:41:05» به وقت تهران → میلی‌ثانیه (۰ اگر خوانا نبود) */
@@ -407,7 +408,9 @@ function goldParse(j) {
   /* نسبت مثقال به گرم باید حدود ۴٫۳۳ باشد؛ اگر نبود یکی از عددها خراب خوانده شده */
   if (!(mz / g18 > 4.1 && mz / g18 < 4.6)) return null;
   const ts = (g && g.t) || (m && m.t) || '';
-  return { g18, mz, ts, mt: Math.max(goldTime(g && g.t), goldTime(m && m.t)) };
+  /* v61.93: نرخ‌های دیگر برای پنجره کوچک «نرخ‌های بازار» (سکه، ارز، طلای ۲۴) — فقط آنهایی که tgju فرستاده، به تومان */
+  const x = {}; for (const [k, src] of GOLD_X) { const o = goldItem(cur, src); if (o && o.p) x[k] = o.p; }
+  return { g18, mz, ts, mt: Math.max(goldTime(g && g.t), goldTime(m && m.t)), x };
 }
 async function goldOne(u) {
   const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 6000);
