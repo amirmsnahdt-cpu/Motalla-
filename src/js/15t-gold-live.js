@@ -27,8 +27,8 @@ async function glDirect(){const one=async n=>{try{const r=await fetch(`https://c
   const all=(await Promise.all([1,2,3,4].map(one))).filter(Boolean);return all.sort((a,b)=>b.mt-a.mt)[0]||null}
 async function glPull(){if(!TOKEN||GLbusy||document.visibilityState==='hidden')return;GLbusy=true;let v=null;
   try{const j=await api('/api/gold');if(j&&+j.g18&&+j.mz)v={g18:+j.g18,mz:+j.mz,mt:+j.mt||0,at:j.at,stale:!!j.stale}}catch(e){}
-  /* سرور جواب نداد، کهنه بود، یا بازار ۱۵ دقیقه از نظر سرور تکان نخورده: گوشی خودش هم می‌پرسد و تازه‌تر را نگه می‌دارد */
-  if(!v||v.stale||(v.mt&&Date.now()-v.mt>15*60000)){const d=await glDirect();if(d&&(!v||v.stale||(d.mt||0)>(v.mt||0)))v={...d,at:new Date().toISOString(),stale:false}}
+  /* سرور جواب نداد، کهنه بود، زمان بازار نفرستاد (سرور قدیمی تا دیپلوی شبانه)، یا بازار ۱۵ دقیقه از نظر سرور تکان نخورده: گوشی خودش هم می‌پرسد و تازه‌تر را نگه می‌دارد */
+  if(!v||v.stale||!v.mt||Date.now()-v.mt>15*60000){const d=await glDirect();if(d&&(!v||v.stale||(d.mt||0)>(v.mt||0)))v={...d,at:new Date().toISOString(),stale:false}}
   if(v){GL={...v,err:0};ls.set('m_gl',GL)}else GL=Object.assign(GL||{},{err:1});
   GLbusy=false;glApply();glPaint()}
 function glHomeHTML(){const k=glOk();
