@@ -89,7 +89,7 @@ function refreshBatch(){const y=window.scrollY;render();const t=$('tlist');if(t)
 const itStLab=(st,tn)=>st==='fail'?['f','انجام نشد']:st==='ok'||tn?['k','انجام شد']:['w','در انتظار پیگیری'];
 function itStPaint(){const t=$('itn'),p=$('itstp');if(!t||!p)return;const s=itStLab(tmpSt,t.value.trim());p.className='itst '+s[0];p.querySelector('b').textContent=s[1];const c=$('itnx');if(c)c.classList.toggle('hide',!t.value)}
 function itGalHTML(){const c=galCtx();if(!c)return '';const K=c.keys;
-  return K.map((k,i)=>`<button class="galt" data-act="galView" data-i="${i}" aria-label="دیدن عکس ${toFa(i+1)}"><span class="galim" id="gal${i}"></span><i>${toFa(i+1)}</i></button>`).join('')+(c.ed?`<label class="galt add">${ic('plus')}<span>${K.length?'عکس دیگر':'گالری'}</span><input type="file" accept="image/*"${picMulti()?' multiple':''} data-galadd="1" hidden></label>${picCam()?`<label class="galt add">${ic('cam')}<span>دوربین</span><input type="file" accept="image/*" capture="environment" data-galadd="1" hidden></label>`:''}`:'')}
+  return K.map((k,i)=>`<button class="galt" data-act="galView" data-i="${i}" aria-label="دیدن عکس ${toFa(i+1)}"><span class="galim" id="gal${i}"></span><i>${toFa(i+1)}</i></button>`).join('')+galAddHTML(c)}
 async function openItem(bid,i){const b=batches.find(z=>z.id==bid);if(!b)return;const x=b.items[+i];if(!x)return;batchId=b.id;itemIdx=+i;tmpSt=x.st==='fail'?'fail':x.st;tmpImg=undefined;GAL={k:'it',eid:x.id};
   const s0=itStLab(x.st,x.tn);
   sheet(`<div class="sh-h"><div><b>${esc(x.name)}</b><small class="shsub">واریز بانکی${x.src?' · '+esc(x.src):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
