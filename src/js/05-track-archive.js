@@ -130,9 +130,9 @@ const aDay=()=>'';
 function dayTxt(iso,G0,FS0,T0){const G=G0||dayGroups(iso),D=dates(iso),it=G.flatMap(g=>g.rows),c=bStat({items:it});
   const sentN=it.filter(x=>x.st&&x.st!=='none').length;let t=Bo('مطلا | '+(T0||'لیست روزانه واریز'))+'\nتاریخ واریز: '+D.fa+'  |  '+D.en+'\nتعداد: '+toFa(c.all)+' واریزی'+(sentN?' (موفق '+toFa(c.ok)+(c.fail?'، ناموفق '+toFa(c.fail):'')+(c.pending?'، در انتظار '+toFa(c.pending):'')+')':'')+'\n'+Bo('مجموع کل: '+N(c.sum)+' تومان')+(sentN?'\n'+Bo('واریز شده: '+N(c.okSum)+' تومان'):'')+'\n'+DLINE+'\n';
   G.forEach(g=>{const gs=k=>g.rows.filter(x=>x.st===k);t+='\n'+Bo('◆ منبع واریزی: '+g.name)+'\nتعداد: '+toFa(g.rows.length)+'  |  جمع: '+N(sum(g.rows))+' تومان\n'+[['ok','✅ تسویه شده'],['fail','❌ ناموفق'],['pending','⏳ در انتظار'],['none','⚪ ارسال نشده']].filter(([k])=>gs(k).length).map(([k,l])=>l+': '+toFa(gs(k).length)+' ('+N(sum(gs(k)))+' تومان)').join('  |  ')+'\n'+LINE+'\n';
-    g.rows.forEach((x,i)=>{t+='\n'+Bo(toFa(i+1)+'. '+fullName(x))+'\nشماره فاکتور: '+(toEn(x.code||'')||'—')+'\nمبلغ: '+Bo(N(x.amount)+' تومان')+'\nشماره شبا:\n'+Mo(ibanSp(x.iban))+(x.settled?'\nمبلغ کل: '+N(x.total)+' تومان\nنحوه تسویه:\n'+x.settles.map(z=>'• '+setLine(z)).join('\n')+'\n• باقی‌مانده از طریق بانک: '+N(x.amount)+' تومان':'')+'\nوضعیت: '+ST[x.st][1]+' '+ST[x.st][0]+'\nنوع تسویه: '+setType(x)+(x.tn?'\nشماره پیگیری: '+Mo(x.tn):'')+(x.time?'\nساعت واریز: '+x.time:'')+(x.note?'\nیادداشت: '+x.note:'')+'\n\n'+LINE+'\n'});
+    g.rows.forEach((x,i)=>{t+='\n'+Bo(toFa(i+1)+'. '+accName(x))+'\nشماره فاکتور: '+(toEn(x.code||'')||'—')+'\nمبلغ: '+Bo(N(x.amount)+' تومان')+'\nشماره شبا:\n'+Mo(ibanSp(x.iban))+(x.settled?'\nمبلغ کل: '+N(x.total)+' تومان\nنحوه تسویه:\n'+x.settles.map(z=>'• '+setLine(z)).join('\n')+'\n• باقی‌مانده از طریق بانک: '+N(x.amount)+' تومان':'')+'\nوضعیت: '+ST[x.st][1]+' '+ST[x.st][0]+'\nنوع تسویه: '+setType(x)+(x.tn?'\nشماره پیگیری: '+Mo(x.tn):'')+(x.time?'\nساعت واریز: '+x.time:'')+(x.note?'\nیادداشت: '+x.note:'')+'\n\n'+LINE+'\n'});
     t+=Bo('◆ جمع '+g.name+': '+N(sum(g.rows))+' تومان')+'\n'});
-  const F=FS0||fullSettled(iso);if(F.length){t+='\n'+Bo('◆ تسویه کامل از طریق مشتری ('+toFa(F.length)+')')+'\n'+LINE+'\n';F.forEach((r,i)=>{t+='\n'+Bo(toFa(i+1)+'. '+fullName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+'\nمبلغ کل: '+N(r.total)+' تومان\nنحوه تسویه:\n'+r.settles.map(z=>'• '+setLine(z)).join('\n')+'\n\n'+LINE+'\n'})}
+  const F=FS0||fullSettled(iso);if(F.length){t+='\n'+Bo('◆ تسویه کامل از طریق مشتری ('+toFa(F.length)+')')+'\n'+LINE+'\n';F.forEach((r,i)=>{t+='\n'+Bo(toFa(i+1)+'. '+accName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+'\nمبلغ کل: '+N(r.total)+' تومان\nنحوه تسویه:\n'+r.settles.map(z=>'• '+setLine(z)).join('\n')+'\n\n'+LINE+'\n'})}
   return t+'\n'+DLINE+'\n'+Bo('مجموع کل: '+N(c.sum)+' تومان')+'\n'+Bo('واریز شده: '+N(c.okSum)+' تومان')+(c.fail?'\nناموفق: '+toFa(c.fail)+' واریزی':'')+'\n'}
 function dayXlsx(iso,G0,FS0){const G=G0||dayGroups(iso),D=dates(iso),wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};const used={};
   const nm=n=>{let b=n.replace(/[\\\/?*\[\]:]/g,'').slice(0,28)||'sheet',k=b,i=1;while(used[k])k=b+(++i);used[k]=1;return k};
@@ -149,8 +149,8 @@ function openDayExport(iso){sheet(`<div class="sh-h"><b>خروجی لیست رو
   <button class="opt big" data-act="dayXls"${typeof XLSX==='undefined'?' disabled':''}>${ic('list')}<span><b>Excel</b><small>${typeof XLSX==='undefined'?'برای Excel اینترنت لازم است':'یک برگه برای هر منبع'}</small></span></button>`)}
 function tkReportText(b){const c=bStat(b),f=b.items.filter(x=>x.st==='fail'),p=b.items.filter(x=>x.st==='pending');
   let t=Bo('مطلا | گزارش پیگیری واریز')+'\nتاریخ لیست: '+dates(b.date).fa+'\nموفق: '+toFa(c.ok)+' از '+toFa(c.all)+'  —  '+Bo(N(c.okSum)+' تومان')+'\n';
-  if(f.length){t+='\n'+Bo('ناموفق ('+toFa(f.length)+'):')+'\n';f.forEach((x,i)=>t+=toFa(i+1)+'. '+x.name+' — '+N(x.amount)+' تومان — '+x.src+'\n'+Mo(ibanSp(x.iban))+'\n')}
-  if(p.length){t+='\n'+Bo('در انتظار تأیید ('+toFa(p.length)+'):')+'\n';p.forEach((x,i)=>t+=toFa(i+1)+'. '+x.name+' — '+N(x.amount)+' تومان\n')}
+  if(f.length){t+='\n'+Bo('ناموفق ('+toFa(f.length)+'):')+'\n';f.forEach((x,i)=>t+=toFa(i+1)+'. '+accName(x)+' — '+N(x.amount)+' تومان — '+x.src+'\n'+Mo(ibanSp(x.iban))+'\n')}
+  if(p.length){t+='\n'+Bo('در انتظار تأیید ('+toFa(p.length)+'):')+'\n';p.forEach((x,i)=>t+=toFa(i+1)+'. '+accName(x)+' — '+N(x.amount)+' تومان\n')}
   return t}
 
 /* ============ تخصیص منبع‌به‌منبع ============ */
