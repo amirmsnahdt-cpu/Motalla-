@@ -2342,10 +2342,11 @@ img[data-ik]:not([src]),.zvs>img:not([src]),.pki>img:not([src]){visibility:hidde
 .eokb:active{transform:translateY(-50%) scale(.95)}
 .eok.okd .eokb{background:var(--okc,#178049)}
 /* v63.7: سطر جدای «صاحب حساب» زیر نام مشتری در فهرست‌ها (فقط وقتی با مشتری فرق دارد) */
-.bhold{display:flex!important;align-items:center;gap:5px;margin:3px 0 1px;font-size:12px;color:var(--mut);min-width:0;white-space:nowrap;overflow:hidden}
+.bhold{display:inline-flex!important;align-items:center;gap:5px;max-width:100%;margin:4px 0 2px;padding:3px 9px 3px 10px;border-radius:9px;background:#f7efdc;font-size:12.5px;line-height:1.5;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
 .bhold svg{width:13px;height:13px;flex:none;color:#b8862b}
-.bhold span{flex:none}
-.bhold b{font-weight:800;color:#8a6417;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+.bhold b{font-weight:800;color:#8a6417;font-size:13px;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere;max-width:none!important}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bhold{background:#3a2f17}}
+:root[data-theme="dark"] .bhold{background:#3a2f17}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bhold b{color:#e0b456}}
 :root[data-theme="dark"] .bhold b{color:#e0b456}
 /* v63.7: جزئیات واریزی — مشتری و صاحب حساب جدا و خوانا بالای صفحه */
