@@ -50,6 +50,8 @@ function glRateHTML(){const k=glOk(),on=glOn(),st=!k?'none':glOld()?'old':'';
 const glDiffT=()=>{if(!glOk()||!sv||!+sv.rate)return '';const d=(sv.rate-GL.g18)/GL.g18*100,a=Math.abs(d);return a<0.05?'برابر بازار':toFa(a.toFixed(1))+'٪ '+(d>0?'بالاتر':'پایین‌تر')};
 /* پنجره کوچک نرخ‌ها: طلا (فروش ۷۵۰، خرید ۷۳۵، تعویض ۷۴۰، ۲۴ عیار، مثقال)، سکه، ارز — به تومان */
 const GLN={emami:'سکه امامی',bahar:'سکه بهار آزادی',nim:'نیم سکه',rob:'ربع سکه',gerami:'سکه گرمی',usd:'دلار',eur:'یورو',aed:'درهم'};
+/* فاصله امن پایین (نوار خانه آیفون) */
+let glSb=null;const glSab=()=>{if(glSb==null){const d=document.createElement('div');d.style.cssText='position:fixed;bottom:0;height:0;padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden';document.body.appendChild(d);glSb=parseFloat(getComputedStyle(d).paddingBottom)||0;d.remove()}return glSb};
 const glAy=a=>Math.round(GL.g18*a/750);
 function glPopHTML(){const k=glOk(),X=(GL&&GL.x)||{},row=(l,v,sub,cl)=>`<div class="glpr${cl?' '+cl:''}"><span><b>${l}</b>${sub?`<small>${sub}</small>`:''}</span><em class="glpv">${v?fmt(v):'—'}</em></div>`;
   const sec=(t,R)=>R.length?`<div class="glps"><div class="glpt">${t}</div>${R.join('')}</div>`:'';
@@ -60,14 +62,16 @@ function glPopHTML(){const k=glOk(),X=(GL&&GL.x)||{},row=(l,v,sub,cl)=>`<div cla
   return `<div class="glph${glOld()?' old':''}"><i class="gldot"></i><b>نرخ‌های بازار</b><small>${esc(glSub())}</small><button type="button" class="glpre i" data-act="glRef" aria-label="دوباره بپرس">${ic('refresh')}</button></div>${sw}
   <div class="glpb">${sec('طلا · تومان',G)}${sec('سکه',C)}${sec('ارز',F)}${C.length||F.length?'':'<div class="glpn">نرخ سکه و ارز بعد از به‌روزرسانی سرور می‌آید</div>'}</div>`}
 function glPopOpen(btn){let m=$('glpop');if(m){m._close();return}if(!btn)return;m=document.createElement('div');m.id='glpop';m.className='pmenu glp';m.setAttribute('role','dialog');m.setAttribute('aria-label','نرخ‌های بازار');m.innerHTML=glPopHTML();document.body.appendChild(m);
-  const place=()=>{if(!btn.isConnected){m._close();return}const r=btn.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight,vw=innerWidth,vh=innerHeight;let top=r.bottom+8;if(top+h>vh-10&&r.top-h-8>10)top=r.top-h-8;
-    m.style.top=Math.round(Math.max(10,top))+'px';m.style.left=Math.round(Math.min(Math.max(8,r.left+r.width/2-w/2),vw-w-8))+'px';m.style.transformOrigin=(r.left+r.width/2-parseFloat(m.style.left))+'px '+(top>r.top?'0':'100%')};place();
+  /* v63.2: ارتفاع پنجره به فضای واقعی صفحه (منهای نوار پایین آیفون) محدود می‌شود تا ته فهرست همیشه با اسکرول دیده شود */
+  const place=()=>{if(!btn.isConnected){m._close();return}const r=btn.getBoundingClientRect(),w=m.offsetWidth,vw=innerWidth,vh=(window.visualViewport&&visualViewport.height)||innerHeight,sb=glSab()+12,dn=vh-r.bottom-8-sb,up=r.top-8-10;
+    m.style.maxHeight='';const h0=m.scrollHeight,below=dn>=Math.min(h0,240)||dn>=up,room=Math.max(160,below?dn:up);m.style.maxHeight=Math.min(h0,room)+'px';const h=m.offsetHeight,top=below?r.bottom+8:r.top-8-h;
+    m.style.top=Math.round(Math.max(10,top))+'px';m.style.left=Math.round(Math.min(Math.max(8,r.left+r.width/2-w/2),vw-w-8))+'px';m.style.transformOrigin=(r.left+r.width/2-parseFloat(m.style.left))+'px '+(below?'0':'100%')};place();
   btn.setAttribute('aria-expanded','true');const out=e=>{if(!m.contains(e.target)&&!btn.contains(e.target))m._close()},key=e=>{if(e.key==='Escape')m._close()},sc=()=>m._close();
   m._close=()=>{if(m._c)return;m._c=1;m.classList.add('out');btn.setAttribute('aria-expanded','false');document.removeEventListener('pointerdown',out,true);document.removeEventListener('keydown',key,true);$('view').removeEventListener('scroll',sc);setTimeout(()=>m.remove(),RM()?0:160)};
   setTimeout(()=>{document.addEventListener('pointerdown',out,true);document.addEventListener('keydown',key,true);$('view').addEventListener('scroll',sc,{passive:true})},0)}
 /* فقط همین دو تکه دوباره ساخته می‌شوند؛ عددهای عوض‌شده می‌شمارند و می‌پرند */
 function glPaint(){if($('glH'))numMorph('#glH .glv b',()=>{const e=$('glH');if(e)e.outerHTML=glHomeHTML()});
-  const r=$('glS');if(r)r.outerHTML=glRateHTML();const p=$('glpop');if(p&&!p._c)p.innerHTML=glPopHTML()}
+  const r=$('glS');if(r)r.outerHTML=glRateHTML();const p=$('glpop');if(p&&!p._c){const y=p.scrollTop;p.innerHTML=glPopHTML();p.scrollTop=y}}
 const glVal=()=>rtK()==='g'?GL.g18:GL.mz;
 /* سند لحظه‌ای بیرون از صفحه سند (پیش‌نویس): فقط عددها؛ داخل صفحه سند: همان مسیر ورود دستی نرخ (شمارش، محاسبه دوباره ردیف‌ها) */
 function glSync(){if(!glOn()||!glOk())return;const g=rtK()==='g';sv.rate=g?GL.g18:rOfMz(GL.mz);sv.mz=g?mzOf(GL.g18):GL.mz}

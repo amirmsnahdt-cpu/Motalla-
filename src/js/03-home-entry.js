@@ -66,11 +66,10 @@ function vHome(){AM=allocMap();const lo=isoAdd(dateVal,-HOME_DAYS),L0=validated(
   const bad=L.filter(x=>x.level===2),ok=L.filter(isOkE),pend=L.filter(x=>x.level<2&&!isOkE(x)),f=flowState(),pa=pendingAll();
   if(homeF==='bad'&&!bad.length||homeF==='ok'&&!ok.length||homeF==='pend'&&!pend.length)homeF='all';
   const chip=(k,n,t,cls)=>n?`<button class="bhc-i ${cls}${homeF===k?' on':''}" data-act="homeF" data-f="${k}"><b>${fmt(n)}</b> ${t}</button>`:'';
-  let h=`<div class="bhero"><div class="bhl">جمع واریز ${homeP?esc(payLab(homeP)):lab}</div><div class="bhv">${fmt(sum(L))}<small>تومان</small></div>
+  let h=`<div class="bhero">${glHomeHTML()}<div class="bhl">جمع واریز ${homeP?esc(payLab(homeP)):lab}</div><div class="bhv">${fmt(sum(L))}<small>تومان</small></div>
     <span class="bhd">${ic('cal')}<span>${esc(D.wd)}، ${D.fa}</span></span>
     ${PKP.length>1?`<div class="bhp${PKP.length>3?' scr':''}">${PKP.map(k=>[k,payLab(k),L0.filter(x=>PD(x)===k)]).map(([k,t,A])=>`<button class="${homeP===k?'on':''}" data-act="homeP" data-iso="${k}"><span>${esc(t)}</span><b>${fmt(sum(A))}</b><small>${fmt(A.length)} واریزی</small></button>`).join('')}</div>`:''}
     <div class="bhc">${chip('bad',bad.length,'خطادار','r')}${chip('ok',ok.length,'تسویه شده','g')}${chip('pend',pend.length,'در انتظار','w')}</div>
-    ${glHomeHTML()}
     <div class="bha"><button class="ba pri" data-act="entryMenu"><i>${ic('plus')}</i><span>ورود حساب</span></button><button class="ba" data-act="tab" data-n="split"><i>${ic('split')}</i><span>لیست‌ها</span>${pa?`<em>${toFa(pa)}</em>`:''}</button></div></div>`;
   const fOk=x=>homeF==='bad'?x.level===2:homeF==='ok'?isOkE(x):homeF==='pend'?(x.level<2&&!isOkE(x)):true,rows=L0.filter(x=>fOk(x)&&(!homePick||PD(x)===homeP)).slice().reverse();
   h+=`<div class="bpanel"><div class="grab"><i class="pspin"></i></div><div class="bph"><div><b>${homePick?'لیست واریز '+esc(payLab(homeP)):'لیست‌های واریز'}</b><small>${homePick?fmt(L.length)+' واریزی · '+fmt(sum(L))+' تومان':'به تفکیک روز · امروز بالا'+(L0.length?'، '+fmt(PKH.length)+' روز':'')}${homeF!=='all'?'، فیلتر: '+({bad:'خطادار',ok:'تسویه شده',pend:'در انتظار'})[homeF]:''}</small></div>${homeF!=='all'?'<button class="link" data-act="homeF" data-f="all">همه</button>':homePick?`<button class="link" data-act="homeP" data-iso="${homeP}">همه روزها</button>`:''}</div>`;
