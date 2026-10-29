@@ -2277,14 +2277,3 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .bk9x.w>i{background:color-mix(in srgb,var(--warn) 14%,var(--card));color:var(--warn)}.bk9x.w b{color:var(--warn)}
 .bk9x.r>i{background:var(--red2);color:var(--red)}.bk9x.r b{color:var(--red)}
 .bk9z .acrow{min-height:56px}
-
-/* v62.4 پیش‌نمایش عکس‌های پیوست: عمودی ۹:۱۶ (بلندتر) تا جزئیات فیش/عکس بهتر دیده شود */
-.galt,.galg.itgal .galt{aspect-ratio:9/16}
-.stpht,.stphb{width:72px;height:128px}
-.stph2{align-items:flex-start}
-.stph2 .stpht,.stphadd{width:38px;height:68px}
-.stphl2{align-items:flex-start}.stphl2 small{align-self:center}
-.rthumb{width:84px;height:150px}
-.stimg img{width:42px;height:75px}
-.xrph.on .xrpi{width:48px;height:85px}
-img.rcpt[data-act="wzImgView"]{max-height:none;height:min(62vh,560px)}
