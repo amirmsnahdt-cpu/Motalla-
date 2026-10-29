@@ -160,7 +160,7 @@ function pvZoomBind(f,d,W){const box=f.parentNode,H0=()=>{d.documentElement.styl
   addEventListener('resize',refit);f._pvOff=()=>removeEventListener('resize',refit)}
 function closePrint(){const f0=$('pvf');if(f0&&f0._pvOff){f0._pvOff();f0._pvOff=null}if(f0){f0.style.width='';f0.style.height=''}pvSeq++;$('pv').classList.add('hide');$('pv').classList.remove('ld');$('pvf').srcdoc='';document.body.style.overflow=''}
 /* کپی با پشتیبان برای وب‌ویوهایی که clipboard ندارند */
-async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){}
+async function copyText(t){if(/^[\s+\d\u06F0-\u06F9()-]{12,20}$/.test(String(t||''))&&phFix(t))t=phFix(t);try{await navigator.clipboard.writeText(t);return true}catch(e){}
   try{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
 /* ذخیره فایل: اشتراک‌گذاری روی موبایل، دانلود روی کامپیوتر */
 const MIME={jpg:'image/jpeg',gz:'application/gzip',html:'text/html',txt:'text/plain',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
