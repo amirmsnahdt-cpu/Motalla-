@@ -174,7 +174,7 @@ function cuFormHTML(c){const isNew=!c.id;CUF={av:c.av||'',ids:Array.isArray(c.id
   <div class="f6g">${fr('cuA','آدرس / توضیح',c.note,{ph:'آدرس، معرف، …',last:1})}</div>
   </div>
   <button class="xgo" data-act="cuSave" data-id="${c.id||'new'}">${ic('check')} ${isNew?'ثبت و ورود به حساب':'ذخیره'}</button>`}
-const cuHmTxt=(g,ph)=>[g?esc(g):'',ph&&/^09\d{9}$/.test(ph)?'<bdi dir="ltr">'+esc(toFa(ph))+'</bdi>':''].filter(Boolean).join(' · ')||'گروه و تلفن اینجا دیده می‌شود';
+const cuHmTxt=(g,ph)=>[g?esc(g):'',ph&&/^09\d{9}$/.test(ph)?telA(ph,esc(toFa(ph))):''].filter(Boolean).join(' · ')||'گروه و تلفن اینجا دیده می‌شود';
 function cuHero(){const n=$('cuHn'),m=$('cuHm'),N=$('cuN'),P=$('cuP'),G=$('cuG');if(n&&N)n.textContent=clean(N.value)||'مشتری تازه';if(m)m.innerHTML=cuHmTxt(G?clean(G.value):'',P?toEn(P.value).replace(/\D/g,''):'');const b=document.querySelector('#sheet .cuavi b');if(b&&N)b.textContent=userInit(clean(N.value)||'؟')}
 /* فهرست پیشنهاد زیر یک فیلد (مثل جستجوی آیفون): با تایپ باز می‌شود و با انتخاب بسته */
 /* v61.83: o.tap (خواسته صاحب اپ برای گروه مشتری): زدن اول = فقط فهرست (بدون کیبورد)، زدن دوم = کیبورد؛ زدن بیرون = بستن (kb2 در 15j) */

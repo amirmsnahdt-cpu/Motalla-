@@ -2277,3 +2277,22 @@ button.bgmc{border:0;font:inherit;cursor:pointer}
 .bk9x.w>i{background:color-mix(in srgb,var(--warn) 14%,var(--card));color:var(--warn)}.bk9x.w b{color:var(--warn)}
 .bk9x.r>i{background:var(--red2);color:var(--red)}.bk9x.r b{color:var(--red)}
 .bk9z .acrow{min-height:56px}
+
+/* v62.6 تماس مستقیم: شماره قابل لمس + دکمه تماس کنار کپی */
+a.tel{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent;unicode-bidi:isolate}
+.kv a.tel,.ci a.tel,#cuHm a.tel{color:var(--blu)}
+.kv b:has(.kcall),.ci b:has(.kcall){display:inline-flex;align-items:center;gap:8px}
+.kcall{flex:none;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:14px;color:var(--ok);background:var(--ok2);-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.kcall:active{transform:scale(.9)}.kcall svg{width:15px;height:15px}
+
+/* v62.6 لودینگ عکس‌ها: تا عکس (از این گوشی یا از سرور، ثبت‌شده با گوشی دیگر) برسد، چرخنده نمایش داده می‌شود؛
+   اگر عکس پیدا نشد (.miss) چرخنده برداشته می‌شود */
+@keyframes imgspin{to{transform:rotate(360deg)}}
+img[data-ik]:not([src]),.zvs>img:not([src]),.pki>img:not([src]){visibility:hidden}
+.rct,.xrpi,.stpht,.d6ti.ph,.zvs,.pki{position:relative}
+:where(.galt:not(.add) .galim:not([style*="background-image"]),.rct:not([style*="background-image"]),.xrph.on .xrpi:not([style*="background-image"]),.stpht:has(>img[data-ik]:not([src])),.d6ti.ph:has(>img[data-ik]:not([src])),.cuidp:has(>img[data-ik]:not([src])),.zvs:has(>img:not([src])),.pki:has(>img:not([src]))):not(.miss)::after{
+  content:"";position:absolute;inset:0;margin:auto;width:22px;height:22px;border-radius:50%;box-sizing:border-box;
+  border:2.5px solid color-mix(in srgb,var(--blu) 22%,transparent);border-top-color:var(--blu);animation:imgspin .8s linear infinite;pointer-events:none}
+.d6ti.ph:has(>img[data-ik]:not([src]))::after,.rct:not([style*="background-image"])::after{width:16px;height:16px;border-width:2px}
+.zvs:has(>img:not([src]))::after{width:34px;height:34px;border-width:3px;border-color:#ffffff33;border-top-color:#fff}
+@media (prefers-reduced-motion:reduce){:is(.galim,.rct,.xrpi,.stpht,.d6ti,.cuidp,.zvs,.pki)::after{animation-duration:2.4s}}
