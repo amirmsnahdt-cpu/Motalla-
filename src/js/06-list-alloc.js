@@ -61,7 +61,7 @@ function ldPick(){const d=ldData(ldKey),X=ldX||ldXDef(d);return{reg:d.eds.map(e=
 /* ---------- صفحه لیست‌ها: هر تاریخ واریز یک لیست، جدیدترین بالا ---------- */
 function vSplit1(){return vArch()}
 const aSplit1=()=>'';
-function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();render()}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{const was=arcQ;arcQ=q.value;arcD='';arcN=120;if(arcQ!==was){const pos=q.selectionStart;render();const n=$('arq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}},250)}}
+function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();render()}};q.oninput=()=>{const x=q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!q.value);clearTimeout(q._t);q._t=setTimeout(()=>{const was=arcQ;arcQ=q.value;arcN=120;if(arcQ===was)return;if(arcD){arcD='';const c=q.parentNode.querySelector('.fcal');if(c)c.classList.remove('on')}srchSwap('arcRes',arcBody())},250)}}
 /* ---------- پنجره تخصیص ---------- */
 function allocNew(){const s0=sources[0]||{};aSt={srcId:s0.id,method:s0.bank?'bank':'amount',amount:0,min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
 const aPool=()=>remainList().filter(r=>r.level<2);
