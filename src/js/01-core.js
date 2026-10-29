@@ -75,7 +75,9 @@ const telHref=p=>'tel:'+toEn(String(p||'')).replace(/[^\d+]/g,'');
 const telA=(p,inner)=>`<a class="tel" href="${telHref(p)}" dir="ltr" aria-label="تماس با ${esc(String(p))}">${inner}</a>`;
 const telB=p=>`<a class="kcall" href="${telHref(p)}" aria-label="تماس">${ic('tel')}</a>`;
 /* کادر سبز تماس: شماره + آیکن تماس سمت چپ؛ با لمس، شماره‌گیر باز می‌شود */
-const telP=p=>`<a class="tel telp" href="${telHref(p)}" aria-label="تماس با ${esc(String(p))}"><span dir="ltr">${esc(String(p))}</span>${ic('tel')}</a>`;
+const telP=(p,shown)=>`<a class="tel telp" href="${telHref(p)}" aria-label="تماس با ${esc(String(p))}"><span dir="ltr">${esc(shown==null?String(p):shown)}</span>${ic('tel')}</a>`;
+/* داخل دکمه (سرتیتر مشتری) لینک مجاز نیست: همان کادر با data-act؛ تماس در همان لمس کاربر انجام می‌شود */
+const telS=(p,shown)=>`<span class="telp" role="link" data-act="telCall" data-p="${esc(telHref(p))}" aria-label="تماس با ${esc(String(p))}"><span dir="ltr">${esc(shown==null?String(p):shown)}</span>${ic('tel')}</span>`;
 const norm=s=>toEn(String(s==null?'':s)).toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک');
 /* هایلایت متن با حفظ امنیت HTML */
 function hl(text,q){const t=String(text==null?'':text);if(!q)return esc(t);const tn=norm(t),qn=norm(q);if(!qn)return esc(t);let out='',i=0,k;
@@ -87,7 +89,7 @@ function toast(m,bad,actLabel,actFn){const t=$('toast');toastAct=actFn||null;m=S
   t.style.display='';t.className='';void t.offsetWidth;t.className='show '+kind;clearTimeout(toast.t);toast.t=setTimeout(toastHide,actLabel?5200:bad?3400:2100)}
 function toastHide(){const t=$('toast');if(!t)return;t.classList.remove('show');toastAct=null}
 (()=>{const t=$('toast');if(!t)return;let y0=null;t.addEventListener('click',e=>{if(!e.target.closest('button'))toastHide()});t.addEventListener('touchstart',e=>{y0=e.touches[0].clientY},{passive:true});t.addEventListener('touchmove',e=>{if(y0!=null&&e.touches[0].clientY-y0<-14){toastHide();y0=null}},{passive:true})})();
-document.addEventListener('click',async e=>{if(e.target.closest&&e.target.closest('a.tel,a.kcall'))return;const c=e.target.closest&&e.target.closest('.cp,.kc');if(!c)return;const t=c.dataset.cp;/* v60.7: ردیف کپی‌شده: آیکن کپی همان‌جا به «✓ کپی شد» تبدیل می‌شود و بعد برمی‌گردد */c.classList.remove('cpok');void c.offsetWidth;c.classList.add('cpok');const k=c.querySelector('.kcp');if(k){if(!k._ic)k._ic=k.innerHTML;k.innerHTML=ic('check')+'<em>کپی شد</em>';clearTimeout(k._t);k._t=setTimeout(()=>{k.innerHTML=k._ic;c.classList.remove('cpok')},1500)}else setTimeout(()=>c.classList.remove('cpok'),900);try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}try{await navigator.clipboard.writeText(t);toast('کپی شد ✓ '+t)}catch(x){const r=document.createRange();r.selectNodeContents(c);const sl=window.getSelection();sl.removeAllRanges();sl.addRange(r);toast('انتخاب شد؛ دستی کپی کنید')}});
+document.addEventListener('click',async e=>{if(e.target.closest&&e.target.closest('a.tel,a.kcall,.telp'))return;const c=e.target.closest&&e.target.closest('.cp,.kc');if(!c)return;const t=c.dataset.cp;/* v60.7: ردیف کپی‌شده: آیکن کپی همان‌جا به «✓ کپی شد» تبدیل می‌شود و بعد برمی‌گردد */c.classList.remove('cpok');void c.offsetWidth;c.classList.add('cpok');const k=c.querySelector('.kcp');if(k){if(!k._ic)k._ic=k.innerHTML;k.innerHTML=ic('check')+'<em>کپی شد</em>';clearTimeout(k._t);k._t=setTimeout(()=>{k.innerHTML=k._ic;c.classList.remove('cpok')},1500)}else setTimeout(()=>c.classList.remove('cpok'),900);try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}try{await navigator.clipboard.writeText(t);toast('کپی شد ✓ '+t)}catch(x){const r=document.createRange();r.selectNodeContents(c);const sl=window.getSelection();sl.removeAllRanges();sl.addRange(r);toast('انتخاب شد؛ دستی کپی کنید')}});
 /* ============ ذخیره‌سازی ============ */
 let storeOK=true;
 let _vc=null,_vcE=null,_vcN=-1,_stm=null;const memoClear=()=>{_vc=null;_stm=null};

@@ -34,6 +34,7 @@ ACT.entDel=d=>{navBack=true;go(PARENT.ent||'home');delEntry(d.id)};
 ACT.fF=d=>{fF=d.f;fN=120;render()};
 ACT.arcCal=()=>{const M=new Set();validated().forEach(r=>{M.add(PD(r));M.add(r.entryDate)});openCal(arcD||qDate(arcQ)||todayISO(),iso=>{arcD=iso;arcQ='';render();$('view').scrollTop=0},{title:'لیست‌های کدام روز؟',sub:'روزهای نقطه‌دار لیست دارند',q:[[-1,'دیروز'],[0,'امروز'],[1,'فردا']],marks:M})};
 ACT.arcClr=()=>{arcQ='';arcD='';arcN=120;render()};
+ACT.telCall=d=>{const h=String(d.p||'');if(/^tel:\+?\d{5,15}$/.test(h))location.href=h};
 ACT.arcMore=()=>{arcN+=120;const r=$('arcRes');if(r)r.innerHTML=arcBody();else render()};
 ACT.cuStl=()=>{cuStlQ='';sheet(cuStlHTML());const q=$('csq');if(q){q.oninput=()=>{cuStlQ=q.value;$('csl').outerHTML=(()=>{const t=document.createElement('div');t.innerHTML=cuStlHTML();return t.querySelector('#csl').outerHTML})()}}};
 ACT.cuStlPick=d=>{const c=curCu(),r=validated().find(z=>String(z.id)===String(d.id));if(!c||!r)return;entId=r.id;stl={cuId:c.id,name:cuName(c),phone:c.phone||'',amount:r.amount,q:''};sheet(stlHTML());stlBind()};

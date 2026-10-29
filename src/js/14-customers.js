@@ -37,7 +37,7 @@ function balPills(b,pw){const X=Object.keys(b.X||{}).filter(k=>b.X[k]);if(!b.R&&
   const L=[['g',b.G],['r',b.R],...X.map(k=>[k,b.X[k]])];let i=0;return L.map(([k,v])=>cbCell(k,v,i++,k==='r'&&pw)).join('')}
 /* v61.56 (خواسته صاحب اپ): کارت مشتری (آواتار، عنوان، نام، گروه، تلفن) در سرتیتر همه صفحه‌های مشتری، زیر عنوان صفحه
    (جای نام کوچک قبلی). حساب مشتری: زدن = ویرایش مشخصات (مداد)؛ صفحه سند ثبت‌شده: زدن = حساب مشتری؛ صفحه سند: فقط نمایش */
-function cuHead(c,ttl){const a=cur==='cust'?'cuEdit':cur==='inv'?'cuOpen':'',T=a?'button':'div',m=[c.grp?`<em>${esc(c.grp)}</em>`:'',c.phone?`<bdi dir="ltr">${esc(toFa(c.phone))}</bdi>`:''].filter(Boolean).join('');
+function cuHead(c,ttl){const a=cur==='cust'?'cuEdit':cur==='inv'?'cuOpen':'',T=a?'button':'div',m=[c.grp?`<em>${esc(c.grp)}</em>`:'',c.phone?(T==='button'?telS(c.phone):telP(c.phone)):''].filter(Boolean).join('');
   return `<${T} class="cuh9"${a?` data-act="${a}" data-id="${c.id}" aria-label="${a==='cuEdit'?'ویرایش مشخصات ':'حساب '}${esc(cuName(c))}"`:''}>${cuAvH(c)}<span class="cuh9t">${ttl?`<span class="cuh9k">${esc(ttl)}</span>`:''}<span class="cuh9n">${honTag(c.name)}<b>${esc(cuName(c))}</b></span>${m?`<span class="cuh9m">${m}</span>`:''}</span>${a==='cuEdit'?`<span class="c6ed">${ic('edit')}</span>`:a?`<span class="cuh9g">${ic('back').replace('class="i"','class="i flip"')}</span>`:''}</${T}>`}
 /* کارت «مانده حساب»: کاشی‌های مبلغ و طلا (و سکه/ارز) با برچسب طلبکاریم/بدهکاریم؛ عدد در قاب خودش جا می‌شود.
    همان کارت در حساب مشتری و صفحه سند ثبت‌شده؛ کاشی‌ها پله‌ای بالا می‌آیند و عدد یک بار از صفر می‌شمارد */
@@ -174,7 +174,7 @@ function cuFormHTML(c){const isNew=!c.id;CUF={av:c.av||'',ids:Array.isArray(c.id
   <div class="f6g">${fr('cuA','آدرس / توضیح',c.note,{ph:'آدرس، معرف، …',last:1})}</div>
   </div>
   <button class="xgo" data-act="cuSave" data-id="${c.id||'new'}">${ic('check')} ${isNew?'ثبت و ورود به حساب':'ذخیره'}</button>`}
-const cuHmTxt=(g,ph)=>[g?esc(g):'',ph&&/^09\d{9}$/.test(ph)?telA(ph,esc(toFa(ph))):''].filter(Boolean).join(' · ')||'گروه و تلفن اینجا دیده می‌شود';
+const cuHmTxt=(g,ph)=>[g?esc(g):'',ph&&/^09\d{9}$/.test(ph)?telP(ph):''].filter(Boolean).join(' · ')||'گروه و تلفن اینجا دیده می‌شود';
 function cuHero(){const n=$('cuHn'),m=$('cuHm'),N=$('cuN'),P=$('cuP'),G=$('cuG');if(n&&N)n.textContent=clean(N.value)||'مشتری تازه';if(m)m.innerHTML=cuHmTxt(G?clean(G.value):'',P?toEn(P.value).replace(/\D/g,''):'');const b=document.querySelector('#sheet .cuavi b');if(b&&N)b.textContent=userInit(clean(N.value)||'؟')}
 /* فهرست پیشنهاد زیر یک فیلد (مثل جستجوی آیفون): با تایپ باز می‌شود و با انتخاب بسته */
 /* v61.83: o.tap (خواسته صاحب اپ برای گروه مشتری): زدن اول = فقط فهرست (بدون کیبورد)، زدن دوم = کیبورد؛ زدن بیرون = بستن (kb2 در 15j) */
