@@ -2283,7 +2283,9 @@ a.tel{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent
 .kv a.tel,.ci a.tel,#cuHm a.tel{color:var(--blu)}
 .ci b:has(.kcall){display:inline-flex;align-items:center;gap:8px}
 .kcall{flex:none;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:14px;color:var(--ok);background:var(--ok2);-webkit-tap-highlight-color:transparent;transition:transform .15s}
-.kv b .kcall{vertical-align:middle;margin-inline-end:10px;margin-block:-4px}
+.kv a.tel.telp{display:inline-flex;align-items:center;gap:7px;direction:rtl;vertical-align:middle;margin-block:-5px;padding:5px 10px 5px 9px;border-radius:14px;background:var(--ok2);color:var(--ok);font-weight:800;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 22%,transparent);transition:transform .15s}
+.kv a.telp svg{width:15px;height:15px;flex:none}
+.kv:has(a.telp) .kcp{margin-inline-start:-6px}.kv a.tel.telp{height:28px;box-sizing:border-box;padding-block:0}.kv a.telp:active{transform:scale(.96)}
 .kcall:active{transform:scale(.9)}.kcall svg{width:15px;height:15px}
 
 /* v62.6 لودینگ عکس‌ها: تا عکس (از این گوشی یا از سرور، ثبت‌شده با گوشی دیگر) برسد، چرخنده نمایش داده می‌شود؛

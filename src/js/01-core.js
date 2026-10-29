@@ -74,6 +74,8 @@ const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg
 const telHref=p=>'tel:'+toEn(String(p||'')).replace(/[^\d+]/g,'');
 const telA=(p,inner)=>`<a class="tel" href="${telHref(p)}" dir="ltr" aria-label="تماس با ${esc(String(p))}">${inner}</a>`;
 const telB=p=>`<a class="kcall" href="${telHref(p)}" aria-label="تماس">${ic('tel')}</a>`;
+/* کادر سبز تماس: شماره + آیکن تماس سمت چپ؛ با لمس، شماره‌گیر باز می‌شود */
+const telP=p=>`<a class="tel telp" href="${telHref(p)}" aria-label="تماس با ${esc(String(p))}"><span dir="ltr">${esc(String(p))}</span>${ic('tel')}</a>`;
 const norm=s=>toEn(String(s==null?'':s)).toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک');
 /* هایلایت متن با حفظ امنیت HTML */
 function hl(text,q){const t=String(text==null?'':text);if(!q)return esc(t);const tn=norm(t),qn=norm(q);if(!qn)return esc(t);let out='',i=0,k;
