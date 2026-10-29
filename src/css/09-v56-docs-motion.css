@@ -2311,3 +2311,6 @@ img[data-ik]:not([src]),.zvs>img:not([src]),.pki>img:not([src]){visibility:hidde
 .bhero>.glc .glv small{font-size:9.5px;opacity:.75;white-space:nowrap}
 .bhero>.glc .glv b{font-size:14px}
 .pmenu.glp{max-height:min(75vh,560px);touch-action:pan-y}
+
+/* v63.3: نشان بانک در حساب انتخاب‌شده حواله به بانک */
+.stsel .ckbb{width:34px;height:34px;flex:none}
