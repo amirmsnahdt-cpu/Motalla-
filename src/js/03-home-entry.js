@@ -97,14 +97,29 @@ const titleChips=()=>['خانم','آقا',''].map(t=>`<button class="tch${fTitle
 function setboxHTML(){const T=num(($('fa')||{}).value||0),S=fSet.reduce((s,x)=>s+(+x.amount||0),0);
   return `<div class="sbh"><div><b>نحوه تسویه</b><small>اگر مشتری دیگری مستقیم به این حساب واریز کرده، اینجا ثبت کنید</small></div><button class="sm gold" data-act="setAdd">${ic('plus')} واریز مشتری</button></div>${fSet.map((x,i)=>`<div class="sit"><span class="tx"><b>${esc(setLine(x).split(' — ')[0])}</b><small>${x.inv?'فاکتور فروش '+esc(x.inv)+'، ':''}مستقیم به حساب این شخص</small></span><b class="am">${fmt(x.amount)}</b>${x.cred?'<span class="pill gd" title="از بخش تسویه بدهی">بدهی</span>':`<button class="x" data-act="setDel" data-i="${i}" aria-label="حذف">×</button>`}</div>`).join('')}${fSet.length?`<div class="ssum"><span>مبلغ کل: <b>${fmt(T)}</b></span><span>از مشتری: <b>${fmt(S)}</b></span><span>مانده بانکی: <b style="color:${T-S<0?'var(--red)':T-S?'var(--warn)':'var(--ok)'}">${T-S<0?'بیشتر از مبلغ!':T-S?fmt(T-S):'هیچ ✓'}</b></span></div>`:''}`}
 const updSet=()=>{const b=$('setbox');if(b)b.innerHTML=setboxHTML()};
+/* v63.5 (خواسته صاحب اپ): «واریز مستقیم مشتری» در فرم ویرایش واریزی هم مثل ثبت، فهرست حساب‌های مشتری (و افراد واریزی/خرید بدون حساب) را زیر نام نشان دهد؛
+   انتخاب حساب، نام و تلفن را پر می‌کند و cuId روی تسویه می‌نشیند (همان فیلد فرم تسویه) */
+let SSP=[];
+function setSugHTML(){const I=$('sn2');if(!I)return '';const q0=(I.value||'').trim(),q=nzName(toEn(q0)),dOk=pDig(q0),L=CU();
+  const row=(act,data,av,m,name,sub,ex)=>`<button class="stsr" data-act="${act}" ${data}><span class="c6a${m?' m':''}">${esc(av)}</span><span class="tx"><b>${esc(name)}</b><small>${sub}</small></span>${ex||''}</button>`;
+  const sub=o=>[o.phone?'<bdi dir="ltr">'+esc(toFa(phShow(o.phone)))+'</bdi>':'',o.nid?'کد ملی <bdi dir="ltr">'+esc(toFa(o.nid))+'</bdi>':''].filter(Boolean).join('، ');
+  if(window.__sCu){const c=custs.find(x=>String(x.id)===String(window.__sCu));return c?`<div class="stsel"><span class="c6a">${esc(userInit(cuName(c)))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>حساب مشتری</small></span>${cuMiniBal(c)}<button class="itx" data-act="setCu" data-id="" aria-label="برداشتن">×</button></div>`:''}
+  if(!q){if(document.activeElement!==I)return '';const M=L.slice().sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,8);SSP=[];
+    return M.length?`<div class="stsug"><div class="stsh">آخرین حساب‌ها</div>${M.map(c=>row('setCu',`data-id="${c.id}"`,userInit(cuName(c)),0,cuName(c),[c.grp?esc(c.grp):'',sub(c)].filter(Boolean).join('، ')||'حساب مشتری',cuBalMini(c))).join('')}</div>`:''}
+  const C=L.filter(c=>cuHit(c,q,dOk)).sort((a,b)=>nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q)).slice(0,6);SSP=memPeople(q,dOk,6);
+  if(!C.length&&!SSP.length)return '';
+  return `<div class="stsug">${C.map(c=>row('setCu',`data-id="${c.id}"`,userInit(cuName(c)),0,cuName(c),[c.grp?esc(c.grp):'',sub(c)].filter(Boolean).join('، ')||'حساب مشتری',cuBalMini(c))).join('')}
+    ${SSP.length?`<div class="stsh">از واریزی‌ها و خریدها</div>`+SSP.map((p,i)=>row('setMem',`data-i="${i}"`,userInit(p.name),1,p.name,[sub(p),p.n?fmt(p.n)+' واریزی':''].filter(Boolean).join('، ')||'بدون حساب')).join(''):''}</div>`}
+const setSugRe=()=>{const b=$('ssg');if(b)b.innerHTML=setSugHTML()};
+function setSugBind(){const I=$('sn2');if(!I)return;I.oninput=()=>{window.__sCu='';setSugRe()};I.onfocus=setSugRe;I.onblur=()=>setTimeout(()=>{if(document.activeElement!==I)setSugRe()},250)}
 function openSettle(){const T=num($('fa').value||0),S=fSet.reduce((s,x)=>s+(+x.amount||0),0);
   sheet(`<div class="sh-h"><b>واریز مستقیم مشتری</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="muted" style="font-size:12.5px;margin:-6px 0 12px">مشتری دیگری (مثلاً خریدار) مبلغی را مستقیم به حساب «${esc(clean($('fn').value)||'این شخص')}» واریز کرده است.</div>
-  <div class="f"><div class="lblrow"><label>نام مشتری پرداخت‌کننده</label><div class="ttl3" id="stl">${['خانم','آقا',''].map(t=>`<button class="tch${t===''?' on':''}" data-act="sTitle" data-t="${t}">${t||'بدون عنوان'}</button>`).join('')}</div></div><input id="sn2" autocomplete="off"></div>
+  <div class="f"><div class="lblrow"><label>نام مشتری پرداخت‌کننده</label><div class="ttl3" id="stl">${['خانم','آقا',''].map(t=>`<button class="tch${t===''?' on':''}" data-act="sTitle" data-t="${t}">${t||'بدون عنوان'}</button>`).join('')}</div></div><input id="sn2" autocomplete="off" enterkeyhint="next"><div id="ssg"></div></div>
   <div class="f2"><div class="f"><label>شماره تماس <i>(اختیاری)</i></label><input id="sp2" class="ltr" type="tel" inputmode="tel" autocomplete="off"></div><div class="f"><label>شماره فاکتور فروش</label><input id="si2" class="ltr" inputmode="numeric" autocomplete="off"></div></div>
   <div class="f"><label>مبلغ واریزشده <i>(تومان)</i></label><input id="sa2" class="ltr num" inputmode="numeric" value="${T-S>0?(T-S).toLocaleString('en-US'):''}"></div>
   <div class="row"><button class="btn gold" data-act="setSave">افزودن</button></div>`);
-  window.__sTitle='';setTimeout(()=>{$('sn2')&&$('sn2').focus();$('sa2').oninput=()=>{const n=num($('sa2').value);$('sa2').value=n?n.toLocaleString('en-US'):''}},60)}
+  window.__sTitle='';window.__sCu='';setTimeout(()=>{setSugBind();$('sn2')&&$('sn2').focus();$('sa2').oninput=()=>{const n=num($('sa2').value);$('sa2').value=n?n.toLocaleString('en-US'):''}},60)}
 
 function recentHTML(){const L=dayList();if(!L.length)return '';const Rr=[...L].reverse();
   return `<div class="sec-h"><b>ثبت‌شده در این لیست: ${fmt(L.length)} مورد، ${fmt(sum(L))} تومان</b><button class="link" data-act="tab" data-n="list">لیست کامل</button></div><div class="muted" style="font-size:12px;margin:-4px 2px 8px">برای ویرایش، روی هر ردیف بزنید</div><div class="card rlist">${Rr.map(x=>`<button class="mini mb${x.level===2?' bad':''}" data-act="edit" data-id="${x.id}"><span class="idx">${fmt(x.seq)}</span><span class="nm">${esc(x.name||'—')}<small>${esc(x.bankShow||'بانک نامشخص')}${x.code?'، فاکتور '+esc(toEn(x.code)):''}</small></span><b>${fmt(x.amount)}</b>${ic('edit')}</button>`).join('')}</div>`}

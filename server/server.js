@@ -446,6 +446,8 @@ async function handle(req, res) {
     if (req.method === 'HEAD') { res.end(); return; }
     fs.createReadStream(f).pipe(res); return;
   }
+  // v63.5: اشتراک رسید پیش از فعال شدن سرویس ورکر به سرور می‌رسد؛ به‌جای صفحه خطا برنامه باز شود (سرویس ورکر دفعه بعد عکس را می‌گیرد)
+  if (p === '/share-in' && req.method === 'POST') { req.resume(); res.writeHead(303, { Location: '/index.html' }); res.end(); return; }
   if (!p.startsWith('/api/')) { if (req.method === 'GET' && serveStatic(req, res, p)) return; res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); return; }
 
   if (p === '/api/status' && req.method === 'GET') return send(res, 200, { ok: true, setup: q.userCount.get().n === 0, app: APP_VER, v: APP_V, apkKey: apkKey() });

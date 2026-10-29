@@ -2314,3 +2314,9 @@ img[data-ik]:not([src]),.zvs>img:not([src]),.pki>img:not([src]){visibility:hidde
 
 /* v63.3: نشان بانک در حساب انتخاب‌شده حواله به بانک */
 .stsel .ckbb{width:34px;height:34px;flex:none}
+/* v63.5: اشتراک رسید از برنامه‌های دیگر — عکس‌های کوچک بالای فهرست مشتری‌ها */
+.shinph{display:flex;gap:8px;overflow-x:auto;margin:-2px 0 12px;padding-bottom:2px}
+.shinph .d6ti{width:58px;height:58px;flex:none;border-radius:14px;overflow:hidden}
+.shinph .d6ti img{width:100%;height:100%;object-fit:cover}
+.shinseg{margin-bottom:12px}
+#ssg .stsug,#ssg .stsel{margin-top:8px}

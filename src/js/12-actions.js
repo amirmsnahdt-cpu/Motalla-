@@ -112,7 +112,10 @@ const ACT={
   fTitle:d=>{fTitle=d.t;$('ftl').innerHTML=titleChips()},
   sTitle:d=>{window.__sTitle=d.t;document.querySelectorAll('#stl .tch').forEach(b=>b.classList.toggle('on',b.dataset.t===d.t))},
   setAdd:()=>{if(!num($('fa').value)){toast('اول مبلغ کل را بنویسید',true);$('fa').focus();return}openSettle()},
-  setSave:()=>{const name=clean($('sn2').value),amount=num($('sa2').value);if(!name||!amount){toast('نام و مبلغ را بنویسید',true);return}fSet.push({id:nid++,title:window.__sTitle||'',name,phone:toEn($('sp2').value).replace(/[^\d+]/g,''),inv:toEn($('si2').value).trim(),amount,at:new Date().toISOString()});closeSheet();updSet();toast('واریز مشتری اضافه شد؛ برای ثبت نهایی «ثبت واریزی» را بزنید')},
+  setSave:()=>{const name=clean($('sn2').value),amount=num($('sa2').value);if(!name||!amount){toast('نام و مبلغ را بنویسید',true);return}fSet.push({id:nid++,title:window.__sTitle||'',name,phone:toEn($('sp2').value).replace(/[^\d+]/g,''),inv:toEn($('si2').value).trim(),amount,...(window.__sCu?{cuId:window.__sCu}:{}),at:new Date().toISOString()});closeSheet();updSet();toast('واریز مشتری اضافه شد؛ برای ثبت نهایی «ثبت واریزی» را بزنید')},
+  setCu:d=>{const I=$('sn2');if(!I)return;if(!d.id){window.__sCu='';I.value='';setSugRe();I.focus();return}const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;
+  window.__sCu=c.id;I.value=cuName(c);const P=$('sp2');if(P&&!P.value&&c.phone)P.value=phShow(c.phone);setSugRe();const n=$('si2');if(n)n.focus()},
+  setMem:d=>{const p=SSP[+d.i],I=$('sn2');if(!p||!I)return;window.__sCu='';I.value=p.name;const P=$('sp2');if(P&&!P.value&&p.phone)P.value=phShow(p.phone);$('ssg').innerHTML='';const n=$('si2');if(n)n.focus()},
   setDel:d=>{fSet.splice(+d.i,1);updSet()},
   delEdit:()=>{const id=editId,b=editBack;editId=null;editBack=null;cur=b||'list';delEntry(id)},
   allocNew:()=>allocNew(),allocBack:()=>{allocSheet();recalc()},

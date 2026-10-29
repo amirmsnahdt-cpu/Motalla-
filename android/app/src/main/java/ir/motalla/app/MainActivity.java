@@ -126,6 +126,72 @@ public class MainActivity extends Activity {
 
         if (state != null) web.restoreState(state);
         else web.loadUrl(serverUrl);
+        if (state == null) handleShare(getIntent());
+    }
+
+    /* رسید از برنامه‌های دیگر (تلگرام، واتساپ، گالری، بانک…): «اشتراک‌گذاری» → بده بستون.
+       عکس‌ها کوچک (حداکثر ۲۰۰۰ پیکسل) و JPEG می‌شوند و منتظر می‌مانند تا صفحه با takeShared بگیرد */
+    private final java.util.ArrayList<String> shared = new java.util.ArrayList<>();
+
+    @Override
+    protected void onNewIntent(Intent i) {
+        super.onNewIntent(i);
+        handleShare(i);
+    }
+
+    private void handleShare(Intent i) {
+        if (i == null) return;
+        String a = i.getAction();
+        if (!Intent.ACTION_SEND.equals(a) && !Intent.ACTION_SEND_MULTIPLE.equals(a)) return;
+        final java.util.ArrayList<Uri> L = new java.util.ArrayList<>();
+        try {
+            if (Intent.ACTION_SEND_MULTIPLE.equals(a)) {
+                java.util.ArrayList<Uri> m = i.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+                if (m != null) for (Uri u : m) if (u != null && !L.contains(u)) L.add(u);
+            } else {
+                Uri u = i.getParcelableExtra(Intent.EXTRA_STREAM);
+                if (u != null) L.add(u);
+            }
+            ClipData cd = i.getClipData();
+            if (cd != null) for (int k = 0; k < cd.getItemCount(); k++) { Uri u = cd.getItemAt(k).getUri(); if (u != null && !L.contains(u)) L.add(u); }
+        } catch (Exception ignored) { }
+        setIntent(new Intent(Intent.ACTION_MAIN));
+        if (L.isEmpty()) { toast("فقط عکس رسید را می‌شود فرستاد"); return; }
+        new Thread(() -> {
+            int n = 0;
+            for (Uri u : L) {
+                if (n >= 10) break;
+                String d = sharedImage(u);
+                if (d != null) { synchronized (shared) { shared.add(d); } n++; }
+            }
+            final int got = n;
+            ui.post(() -> {
+                if (got == 0) { toast("فقط عکس رسید را می‌شود فرستاد"); return; }
+                if (web != null) web.evaluateJavascript("window.__shareIn&&window.__shareIn()", null);
+            });
+        }).start();
+    }
+
+    private String sharedImage(Uri u) {
+        try {
+            String type = getContentResolver().getType(u);
+            if (type != null && !type.startsWith("image/")) return null;
+            android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            try (java.io.InputStream in = getContentResolver().openInputStream(u)) { android.graphics.BitmapFactory.decodeStream(in, null, o); }
+            if (o.outWidth <= 0 || o.outHeight <= 0) return null;
+            int ss = 1;
+            while (Math.max(o.outWidth, o.outHeight) / (ss * 2) >= 2000) ss *= 2;
+            android.graphics.BitmapFactory.Options o2 = new android.graphics.BitmapFactory.Options();
+            o2.inSampleSize = ss;
+            android.graphics.Bitmap b;
+            try (java.io.InputStream in = getContentResolver().openInputStream(u)) { b = android.graphics.BitmapFactory.decodeStream(in, null, o2); }
+            if (b == null) return null;
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            b.compress(android.graphics.Bitmap.CompressFormat.JPEG, 88, out);
+            b.recycle();
+            return "data:image/jpeg;base64," + Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP);
+        } catch (Exception | OutOfMemoryError e) { return null; }
     }
 
     @Override
@@ -338,6 +404,18 @@ public class MainActivity extends Activity {
 
     /** پل جاوااسکریپت ← اندروید */
     private class Bridge {
+        /** رسیدهای رسیده از «اشتراک‌گذاری» برنامه‌های دیگر (JSON آرایه data URL)؛ با هر بار گرفتن خالی می‌شود */
+        @JavascriptInterface
+        public String takeShared() {
+            synchronized (shared) {
+                if (shared.isEmpty()) return "";
+                JSONArray a = new JSONArray();
+                for (String d : shared) a.put(d);
+                shared.clear();
+                return a.toString();
+            }
+        }
+
         /** نسل کلید امضای این APK: ۲ = کلید جدید (۱۴۰۵). اپ‌هایی که این متد را ندارند با کلید قدیمی امضا شده‌اند */
         @JavascriptInterface
         public int keyGen() { return 2; }
