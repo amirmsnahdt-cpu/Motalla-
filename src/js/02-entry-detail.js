@@ -17,7 +17,7 @@ function vEnt(){const x=entRow();if(!x){setTimeout(()=>{if(cur==='ent')go('home'
     x.code?kv('فاکتور',`<span class="ltr">${esc(toEn(x.code))}</span>`,toEn(x.code)):'',
     x.weight?kv('وزن',esc(toFa(x.weight))+' <i>گرم</i>'):'',
     x.weight&&ppgOf(x.total||x.amount,x.weight)?kv('هر گرم تمام‌شده',fmt(x.ppg||ppgOf(x.total||x.amount,x.weight))+' <i>تومان</i>'):'',
-    ].join(''),rows3=[x.phone?kv('شماره تماس',telA(x.phone,esc(x.phone))+telB(x.phone),x.phone):'',
+    ].join(''),rows3=[x.phone?kv('شماره تماس',telB(x.phone)+telA(x.phone,esc(x.phone)),x.phone):'',
     x.nid?kv('کد ملی',`<span class="ltr">${esc(x.nid)}</span>`,x.nid):'',
     kv('تاریخ واریز',x.payDate?esc(payLab(x.payDate))+(['امروز','دیروز','فردا','پس‌فردا'].includes(payLab(x.payDate))?'، '+esc(dates(x.payDate).fa):''):'تعیین نشده',null,can('edit')?'entPay':null),
     kv('لیست',esc(D.fa)),
