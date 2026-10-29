@@ -2342,7 +2342,7 @@ img[data-ik]:not([src]),.zvs>img:not([src]),.pki>img:not([src]){visibility:hidde
 .eokb:active{transform:translateY(-50%) scale(.95)}
 .eok.okd .eokb{background:var(--okc,#178049)}
 /* v63.7: سطر جدای «صاحب حساب» زیر نام مشتری در فهرست‌ها (فقط وقتی با مشتری فرق دارد) */
-.bhold{display:inline-flex!important;align-items:center;gap:5px;max-width:100%;margin:4px 0 2px;padding:3px 9px 3px 10px;border-radius:9px;background:#f7efdc;font-size:12.5px;line-height:1.5;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+.bhold{display:inline-flex!important;align-items:center;gap:5px;max-width:100%;width:fit-content!important;align-self:flex-start!important;margin:4px 0 2px;padding:3px 9px 3px 10px;border-radius:9px;background:#f7efdc;font-size:12.5px;line-height:1.5;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
 .bhold svg{width:13px;height:13px;flex:none;color:#b8862b}
 .bhold b{font-weight:800;color:#8a6417;font-size:13px;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere;max-width:none!important}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bhold{background:#3a2f17}}
