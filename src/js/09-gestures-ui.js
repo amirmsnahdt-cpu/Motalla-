@@ -90,7 +90,7 @@ function tlistHTML(){const b=curB();if(!b)return '';const q=tkQ.trim(),qd=toEn(q
 const tkMeta=x=>[x.code?'فاکتور '+esc(toEn(x.code)):'',esc(x.bank||''),x.iban?'شبا <bdi dir="ltr">…'+esc(String(x.iban).slice(-4))+'</bdi>':''].filter(Boolean).join(' · ');
 const XI='<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 function tkRow(x,q,qd,b){const hit=qd&&qd.length>=3&&String(x.amount).includes(qd),canBack=x.st==='pending'&&!x.tn&&!x.img;
-  const inner=`<div class="tk ${x.st}"><div class="k1"><span class="dot"></span><div class="tx"><b>${q?hl(fullName(x),q):esc(fullName(x))}</b><small>${tkMeta(x)}</small></div><div class="am">${hit?'<mark>'+fmt(x.amount)+'</mark>':fmt(x.amount)}<small>تومان</small></div></div>
+  const inner=`<div class="tk ${x.st}"><div class="k1"><span class="dot"></span><div class="tx"><b>${q?hl(fullName(x),q):esc(fullName(x))}</b>${holdLine(x)}<small>${tkMeta(x)}</small></div><div class="am">${hit?'<mark>'+fmt(x.amount)+'</mark>':fmt(x.amount)}<small>تومان</small></div></div>
   <div class="tog" role="group" aria-label="وضعیت واریز"><button class="ok${x.st==='ok'?' on':''}" data-act="tkSet" data-i="${x.i}" data-st="ok">${ic('check')}${x.st==='ok'?'واریز شد':'انجام شد'}</button><button class="no${x.st==='fail'?' on':''}" data-act="tkSet" data-i="${x.i}" data-st="fail">${XI}ناموفق</button></div>
   <div class="k3"><input class="tni ltr" data-tn="${x.i}" inputmode="numeric" enterkeyhint="done" autocomplete="off" placeholder="شماره پیگیری" value="${esc(x.tn||'')}">
   <button class="mb${x.time?' on':''}" data-act="tkTime" data-i="${x.i}" aria-label="ساعت واریز">${ic('clock')}<span>${x.time?toFa(x.time):'ساعت'}</span></button>
