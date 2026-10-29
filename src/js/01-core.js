@@ -238,6 +238,8 @@ function allocMap(){const m=new Map(),VM=new Map(validated().map(r=>[r.id,r]));O
 const hnz=s=>clean(String(s||'')).replace(/^(آقای|آقا|خانم|سرکار خانم|جناب آقای)\s+/,'').replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\s]+/g,' ').trim().toLowerCase();
 function holdOf(x){if(!x)return '';let h=x.holder;if(!h&&x.id!=null){const e=entries.find(q=>q.id===x.id);h=e&&e.holder}h=clean(h||'');return h&&hnz(h)!==hnz(x.name)?h:''}
 const holdLine=x=>{const h=holdOf(x);return h?`<small class="bhold" aria-label="صاحب حساب ${esc(h)}">${ic('bank')}<b>${esc(h)}</b></small>`:''};
+/* v63.9 (خواسته صاحب اپ): در متن‌های کپی (تکی و لیست) نام صاحب حساب اول می‌آید و نام مشتری دیگر کپی نمی‌شود؛ اگر صاحب حساب ثبت نشده، همان نام مشتری */
+function accName(r){if(!r)return '';let h=r.holder;if(!h&&r.id!=null){const e=entries.find(q=>q.id===r.id);h=e&&e.holder}return clean(h||'')||fullName(r)}
 function homeRow(x){const st=rowSt(x),t=entSt(x),al=(AM||(AM=allocMap())).get(x.id);
   const ico=st==='ok'?ic('check'):st==='fail'?'<b>✕</b>':st==='bad'?'<b>!</b>':st==='pend'?ic('clock'):`<b>${esc(userInit(fullName(x)||'؟'))}</b>`;
   const lab=st==='bad'?'خطادار':t?t[0]:'ثبت شده';

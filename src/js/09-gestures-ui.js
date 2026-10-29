@@ -135,12 +135,12 @@ function srcBack(){if(srcRet==='mgr'){srcMgr();return}if(aSt){allocSheet();recal
 function srcInfo(id){for(const b of batches){const x=b.items.find(z=>z.id===id);if(x)return{src:x.src,tn:x.tn||'',st:x.st,time:x.time||''}}return null}
 /* ================= v22: متن کپی یک واریزی ================= */
 function entTxt(r){const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';
-  const pd=r.payDate||r.entryDate;return 'نام: '+Bo(fullName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+(bk?'\nبانک: '+bk:'')+'\nمبلغ: '+Bo(N(r.amount)+' تومان')+(pd?'\nتاریخ واریز: '+dates(pd).fa:'')+(r.iban?'\nشبا: '+Mo(ibanSp(r.iban)):'')+(r.card?'\nکارت: '+Mo(r.card):'')+(r.holder?'\nصاحب حساب: '+r.holder:'')}
+  const pd=r.payDate||r.entryDate;return 'صاحب حساب: '+Bo(accName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+(bk?'\nبانک: '+bk:'')+'\nمبلغ: '+Bo(N(r.amount)+' تومان')+(pd?'\nتاریخ واریز: '+dates(pd).fa:'')+(r.iban?'\nشبا: '+Mo(ibanSp(r.iban)):'')+(r.card?'\nکارت: '+Mo(r.card):'')}
 async function cpOut(t,ok){(await copyText(t))?toast(ok):(txtGen=()=>t,txtName='motalla-copy',openText())}
 /* ================= v22: منوی هر واریزی (⋯) ================= */
 function entMenu(id){const r=validated().find(x=>x.id==id);if(!r)return;const si=r.sentBid?srcInfo(r.id):null;
   sheet(`<div class="sh-h"><div><b>${esc(fullName(r))}</b><small class="shsub">${fmt(r.amount)} تومان${r.code?' · فاکتور '+esc(toEn(r.code)):''}${si?' · منبع: '+esc(si.src):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <button class="opt big" data-act="cpEnt" data-id="${r.id}">${ic('copy')}<span><b>کپی اطلاعات</b><small>نام، فاکتور، مبلغ و شبا</small></span></button>
+  <button class="opt big" data-act="cpEnt" data-id="${r.id}">${ic('copy')}<span><b>کپی اطلاعات</b><small>صاحب حساب، فاکتور، مبلغ و شبا</small></span></button>
   <button class="opt big" data-act="edit" data-id="${r.id}">${ic('edit')}<span><b>ویرایش</b><small>تغییر نام، مبلغ، شبا یا نحوه تسویه</small></span></button>
   ${r.entryDate!==dateVal?`<button class="opt big" data-act="copyDate" data-id="${r.id}">${ic('plus')}<span><b>افزودن به ${esc(dates(dateVal).fa)}</b><small>یک نسخه در لیست این تاریخ ثبت می‌شود</small></span></button>`:''}
   <button class="opt big" data-act="del" data-id="${r.id}" style="color:var(--red)">${ic('trash')}<span><b>حذف</b><small>به سطل بازیابی می‌رود و قابل برگشت است</small></span></button>`)}

@@ -111,7 +111,7 @@ const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&Stri
 /* ============ v61.77 (خواسته صاحب اپ): از همان پنل حواله، اطلاعات حساب فروشنده واریزی با «مبلغ همین حواله» کپی یا فرستاده شود ============
    (نه مانده واریزی) تا مشتری پرداخت‌کننده واریز کند؛ و دکمه رفتن به خود واریزی. در جزئیات ردیف سند، سند ثبت‌شده و فرم تسویه. */
 function depTxt(e,amt,payer){const bk=e.bankShow||e.bank||ibanBank(e.iban)||'';
-  return 'مطلا | اطلاعات واریز'+'\nواریز به: '+Bo(fullName(e))+(e.holder&&e.holder!==e.name?'\nصاحب حساب: '+e.holder:'')+(bk?'\nبانک: '+bk:'')+(e.iban?'\nشبا: '+Mo(ibanSp(e.iban)):'')+(e.card?'\nکارت: '+Mo(e.card):'')+'\nمبلغ: '+Bo(N(amt)+' تومان')+(payer?'\nپرداخت‌کننده: '+payer:'')}
+  return 'مطلا | اطلاعات واریز'+'\nواریز به: '+Bo(accName(e))+(bk?'\nبانک: '+bk:'')+(e.iban?'\nشبا: '+Mo(ibanSp(e.iban)):'')+(e.card?'\nکارت: '+Mo(e.card):'')+'\nمبلغ: '+Bo(N(amt)+' تومان')+(payer?'\nپرداخت‌کننده: '+payer:'')}
 const depBar=(entId,src,i,cu)=>{const a=` data-e="${esc(entId)}" data-s="${src}"${i!=null?` data-i="${esc(i)}"`:''}${cu!=null?` data-cu="${esc(cu)}"`:''}`;
   return `<span class="depb"><span class="depbb" role="button" data-act="depCp"${a}>${ic('copy')}<span>کپی اطلاعات واریز</span></span><span class="depbb" role="button" data-act="depSh"${a}>${ic('share')}<span>ارسال</span></span><span class="depbb g" role="button" data-act="depGo" data-e="${esc(entId)}">${ic('open')}<span>واریزی</span></span></span>`};
 const depActs=(p,k,c)=>depEnt(p)?depBar(p.entId,'p',k,c?c.id:null):'';

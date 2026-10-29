@@ -98,7 +98,7 @@ const Mo=t=>txtStyle==='plain'?t:'`'+t+'`';
 const LINE='┈┈┈┈┈┈┈┈┈┈┈┈┈',DLINE='━━━━━━━━━━━━';
 function txtBlock(g,D){const tot=sum(g.rows);
   let t=Bo('مطلا · '+g.name)+'\n'+payLine()+'\n'+toFa(g.rows.length)+' واریزی · جمع '+Bo(N(tot)+' تومان')+'\n'+LINE+'\n';
-  g.rows.forEach((r,i)=>{const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';t+='\n'+Bo(toFa(i+1)+') '+fullName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+(bk?'\nبانک: '+bk:'')+'\nمبلغ: '+N(r.amount)+' تومان'+'\nشبا: '+Mo(ibanSp(r.iban))+'\n'});
+  g.rows.forEach((r,i)=>{const bk=r.bankShow||r.bank||ibanBank(r.iban)||'';t+='\n'+Bo(toFa(i+1)+') '+accName(r))+'\nشماره فاکتور: '+(toEn(r.code||'')||'—')+(bk?'\nبانک: '+bk:'')+'\nمبلغ: '+N(r.amount)+' تومان'+'\nشبا: '+Mo(ibanSp(r.iban))+'\n'});
   return t+LINE+'\n'+Bo('جمع '+g.name+': '+N(tot)+' تومان')+'\n'+toFa(g.rows.length)+' واریزی'}
 function txt(sc){const D=alloc.D,G=groups(sc).filter(g=>g.rows.length);if(G.length===1)return txtBlock(G[0],D);
   const tc=G.reduce((s,g)=>s+g.rows.length,0),ta=G.reduce((s,g)=>s+sum(g.rows),0);
@@ -160,7 +160,16 @@ function pvZoomBind(f,d,W){const box=f.parentNode,H0=()=>{d.documentElement.styl
   addEventListener('resize',refit);f._pvOff=()=>removeEventListener('resize',refit)}
 function closePrint(){const f0=$('pvf');if(f0&&f0._pvOff){f0._pvOff();f0._pvOff=null}if(f0){f0.style.width='';f0.style.height=''}pvSeq++;$('pv').classList.add('hide');$('pv').classList.remove('ld');$('pvf').srcdoc='';document.body.style.overflow=''}
 /* کپی با پشتیبان برای وب‌ویوهایی که clipboard ندارند */
-async function copyText(t){if(/^[\s+\d\u06F0-\u06F9()-]{12,20}$/.test(String(t||''))&&phFix(t))t=phFix(t);try{await navigator.clipboard.writeText(t);return true}catch(e){}
+/* v63.9 (خواسته صاحب اپ): بازخورد کپی در همه بخش‌ها — دکمه‌ای که زده شد سبز می‌شود و «✓ کپی شد» نشان می‌دهد؛
+   کپی از کشیدن ردیف (دکمه پشت ردیف) خود ردیف را یک لحظه سبز می‌کند */
+let CPEL=null;document.addEventListener('pointerdown',e=>{CPEL=e.target&&e.target.closest?e.target.closest('button,[data-act]'):null},true);
+document.addEventListener('click',e=>{const t=e.target&&e.target.closest?e.target.closest('button,[data-act]'):null;if(t)CPEL=t},true);
+function cpFx(){const el=CPEL;CPEL=null;if(!el||!el.isConnected||el.closest('.cp,.kc'))return;const sw=el.closest('.swr'),row=sw&&sw.querySelector('.brw,.slip,.brh');
+  if(row&&row!==el&&!row.contains(el)){row.classList.remove('cpflash');void row.offsetWidth;row.classList.add('cpflash');setTimeout(()=>row.classList.remove('cpflash'),1300);return}
+  if(!el._cpH)el._cpH=el.innerHTML;clearTimeout(el._cpT);el.classList.add('cpdone');const sm=el.querySelector('small');el.innerHTML=ic('check')+(sm||el.textContent.trim().length>1?'<span>کپی شد</span>':'');
+  try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}el._cpT=setTimeout(()=>{if(el._cpH!=null){el.innerHTML=el._cpH;el._cpH=null}el.classList.remove('cpdone')},1500)}
+async function copyText(t){const ok=await copyText0(t);if(ok)try{cpFx()}catch(_){}return ok}
+async function copyText0(t){if(/^[\s+\d\u06F0-\u06F9()-]{12,20}$/.test(String(t||''))&&phFix(t))t=phFix(t);try{await navigator.clipboard.writeText(t);return true}catch(e){}
   try{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
 /* ذخیره فایل: اشتراک‌گذاری روی موبایل، دانلود روی کامپیوتر */
 const MIME={jpg:'image/jpeg',gz:'application/gzip',html:'text/html',txt:'text/plain',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
