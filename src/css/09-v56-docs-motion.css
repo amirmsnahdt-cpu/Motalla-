@@ -2574,3 +2574,30 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .txr.bxtx.way{opacity:.92}.txr.bxtx .txv b.w{color:var(--warn)}
 .bxx{flex:none;width:30px;height:30px;border:0;border-radius:9px;background:var(--seg);color:var(--mut);font-size:17px;cursor:pointer}
 .cub9 .c6vb>.cbk.kb:only-child{grid-column:1/-1}
+
+/* ===== v66.2 بانک: فهرست با جستجو، کادر آبی مانده، عکس رسید ===== */
+.bxlist{margin-top:8px}
+.bxrow{align-items:center!important;gap:10px}
+.bxrow .tx{flex:1;min-width:0}
+.bxv{display:flex;flex-direction:column;align-items:flex-end;flex:none;line-height:1.25}
+.bxv small{font-size:10.5px;color:var(--mut);font-weight:700}
+.bxv b{display:flex;align-items:baseline;gap:3px;font-size:16.5px;font-weight:900;color:var(--blu);direction:ltr;white-space:nowrap}
+.bxv b i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--mut);direction:rtl}
+.bxv b.n{color:var(--red)}.bxv b.z{font-size:12.5px;color:var(--mut);direction:rtl}
+.bxch{width:16px;height:16px;color:var(--mut);flex:none}
+.bxblue{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;margin:14px 0 10px;padding:16px 16px 14px;border-radius:22px;background:linear-gradient(150deg,#3a6ff0,var(--blu));color:#fff;text-align:center;box-shadow:0 14px 30px -18px var(--blu);animation:f6up .4s var(--spring) both}
+.bxblue>small{font-size:12.5px;font-weight:800;opacity:.85}
+.bxblue>b{display:flex;align-items:baseline;justify-content:center;gap:6px;font-size:30px;font-weight:900;line-height:1.3;direction:ltr}
+.bxblue>b i{font-style:normal;font-size:12px;font-weight:700;opacity:.8;direction:rtl}.bxblue>b.z{opacity:.8}
+.bxblue>span{font-size:11.5px;font-weight:700;opacity:.85}
+.bxfix{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:40px;padding:0 16px;border:0;border-radius:12px;background:#ffffff26;color:#fff;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:inset 0 0 0 1px #ffffff40}.bxfix svg{width:16px;height:16px}
+#view>.bxblue:first-child{margin-top:4px}
+.bxfs{gap:6px;margin:4px 0 6px}
+.bxft{gap:1px;padding:8px 6px;border-radius:14px}
+.bxft small{display:flex;align-items:center;gap:3px}.bxft small i{font-style:normal;min-width:16px;padding:0 4px;border-radius:7px;background:var(--seg);font-size:10px;line-height:16px;text-align:center}
+.bxft b{font-size:12.5px}
+/* عکس رسید در ردیف: قاب مربعی گرد ثابت، عکس بریده‌شده داخلش */
+.fcard .txr .bri.bxbi{width:44px!important;height:44px!important;min-width:44px;border-radius:12px!important;overflow:hidden;padding:0}
+.fcard .txr .bri.bxbi img{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover;border-radius:0}
+.fcard .txr .bri.bxbi em{top:auto;bottom:2px;left:2px}
+.hmo{position:relative}.bxdot{position:absolute;top:7px;left:7px;width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--card)}
