@@ -35,6 +35,15 @@ ACT.fF=d=>{fF=d.f;fN=120;render()};
 ACT.arcCal=()=>{const M=new Set();validated().forEach(r=>{M.add(PD(r));M.add(r.entryDate)});openCal(arcD||qDate(arcQ)||todayISO(),iso=>{arcD=iso;arcQ='';render();$('view').scrollTop=0},{title:'لیست‌های کدام روز؟',sub:'روزهای نقطه‌دار لیست دارند',q:[[-1,'دیروز'],[0,'امروز'],[1,'فردا']],marks:M})};
 ACT.arcClr=()=>{arcQ='';arcD='';arcN=120;render()};
 ACT.telCall=d=>{const h=String(d.p||'');if(/^tel:\+?\d{5,15}$/.test(h))location.href=h};
+/* v66.6: باز و بسته شدن کارت ماه بدون ساختن دوباره صفحه (انیمیشن ارتفاع با grid-rows؛ بستن: لیست‌ها جمع می‌شوند و کارت ماه در دید می‌ماند) */
+ACT.arcMo=d=>{const k=+d.mo,box=document.querySelector(`.armo[data-mo="${k}"]`);if(!box){arcMo.has(k)?arcMo.delete(k):arcMo.add(k);render();return}
+  const inn=box.querySelector('.armi'),h=box.querySelector('.armh');
+  if(arcMo.has(k)){arcMo.delete(k);box.classList.remove('open');h.setAttribute('aria-expanded','false');
+    const r=h.getBoundingClientRect();if(r.top<70)h.scrollIntoView({block:'start',behavior:RM()?'auto':'smooth'});
+    clearTimeout(box._t);box._t=setTimeout(()=>{if(!box.classList.contains('open'))inn.innerHTML=''},RM()?0:420)}
+  else{arcMo.add(k);clearTimeout(box._t);const L=listsData().filter(x=>arcMK(x.iso)===k);inn.innerHTML=L.map(listCard).join('');
+    void box.offsetHeight;box.classList.add('open');h.setAttribute('aria-expanded','true');
+    if(!RM())inn.querySelectorAll('.arcd').forEach((el,i)=>el.animate([{opacity:0,translate:'0 -10px'},{opacity:1,translate:'0 0'}],{duration:340,delay:Math.min(i,8)*35,easing:'cubic-bezier(.32,.72,0,1)',fill:'backwards'}))}};
 ACT.arcMore=()=>{arcN+=120;const r=$('arcRes');if(r)r.innerHTML=arcBody();else render()};
 ACT.cuStl=()=>{cuStlQ='';sheet(cuStlHTML());const q=$('csq');if(q){q.oninput=()=>{cuStlQ=q.value;$('csl').outerHTML=(()=>{const t=document.createElement('div');t.innerHTML=cuStlHTML();return t.querySelector('#csl').outerHTML})()}}};
 /* v65.0: از صفحه مشتری هم «سند دریافت» (همان پنل پرداخت، مرحله مبلغ) */

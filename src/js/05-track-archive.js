@@ -194,9 +194,17 @@ function arcRowsHTML(all){if(!all.length)return `<div class="bempty">${ic('searc
   return h+(all.length>arcN?`<button class="btn sec" style="width:100%;margin-top:10px" data-act="arcMore">نمایش بیشتر (${fmt(all.length-arcN)} مورد دیگر)</button>`:'')}
 /* v62.7: هنگام تایپ فقط نتیجه‌ها (#arcRes) عوض می‌شود؛ خانه جستجو دوباره ساخته نمی‌شود تا صفحه‌کلید عددی آیفون به حروف نپرد */
 function vArch(){return `<div class="fsearch">${ic('search')}<input id="arq" type="search" placeholder="نام، فاکتور، تلفن، مبلغ، شبا یا تاریخ…" value="${esc(arcQ)}" autocomplete="off" enterkeyhint="search"><button class="x${arcQ?'':' hide'}" data-act="arcClr" aria-label="پاک کردن">×</button><button class="fcal${arcD?' on':''}" data-act="arcCal" aria-label="انتخاب تاریخ">${ic('cal')}</button></div><div id="arcRes">${arcBody()}</div>`}
+let arcMo=new Set();
+const arcMK=iso=>{const D=dates(iso);return D.jy*100+D.jm};
+function arcMonthsHTML(LF){const cm=arcMK(todayISO()),G=[];LF.forEach(d=>{const k=arcMK(d.iso),g=G[G.length-1];if(g&&g.k===k)g.L.push(d);else G.push({k,L:[d]})});
+  return G.map(g=>{if(g.k>=cm)return g.L.map(listCard).join('');
+    const jy=Math.floor(g.k/100),jm=g.k%100,R=g.L.flatMap(d=>d.R),dn=g.L.filter(d=>d.done).length,all=dn===g.L.length,op=arcMo.has(g.k),pc=R.length?R.filter(r=>stOf(r.id)==='ok'||r.full).length/R.length*100:0;
+    return `<div class="armo${op?' open':''}${all?' ok':''}" data-mo="${g.k}"><button class="armh" data-act="arcMo" data-mo="${g.k}" aria-expanded="${op}"><span class="cal2"><b>${JM[jm-1]}</b><small>${toFa(jy)}</small></span><span class="tx"><b>واریزهای ${JM[jm-1]} ${toFa(jy)}</b><small>${fmt(g.L.length)} لیست · ${fmt(R.length)} واریزی · ${fmt(dn)} تسویه کامل</small><span class="ptbar" style="width:100%;margin-top:6px"><i class="ok" style="width:${pc}%"></i></span></span><span class="v">${fmt(sum(R))}<small>${all?'تسویه کامل ✓':fmt(g.L.length-dn)+' در جریان'}</small></span><i class="chev">${ic('back')}</i></button><div class="armb"><div class="armi">${op?g.L.map(listCard).join(''):''}</div></div></div>`}).join('')}
 function arcBody(){const L=listsData(),card=listCard;
   const aq=arcD||qDate(arcQ),tq=!aq&&arcQ.trim()?arcQ:'',LF=aq?L.filter(d=>d.iso===aq||d.eds.includes(aq)):L,open=LF.filter(d=>!d.done),done=LF.filter(d=>d.done);
   const top=`${tq?arcRowsHTML(arcRows(tq)):''}${tq?'':aq?`<div class="fdate">${ic('cal')} لیست‌های ${esc(relDay(aq))}، ${esc(dates(aq).fa)}<button data-act="arcClr" aria-label="حذف">×</button></div>`:''}${aq&&!LF.length?'<div class="spempty" style="padding:20px 8px"><b>برای این تاریخ لیستی نیست</b></div>':''}`;
   if(tq)return top;
   /* همه لیست‌ها به ترتیب تاریخ واریز، جدیدترین بالا؛ هر لیست همه واریزی‌های آن روز واریز است */
-  return top+(LF.length?`<div class="spsec"><div><b>لیست‌ها</b><small>${fmt(LF.length)} لیست · ${fmt(open.length)} در جریان · جدیدترین بالا</small></div></div>${LF.map(card).join('')}`:'')+(!L.length?'<div class="spempty"><div class="spill">'+ic('list')+'</div><b>هنوز لیستی ثبت نشده</b><span>با «ورود حساب» در صفحه اول شروع کنید.</span></div>':'')}
+  /* v66.6 (خواسته صاحب اپ): لیست‌های ماه جاری (و ماه‌های بعد) باز می‌مانند؛ ماه‌های گذشته هر کدام یک کارت ماه فشرده‌اند
+     که با لمس، لیست‌های آن ماه با انیمیشن زیرش باز می‌شوند و با لمس دوباره به کارت ماه برمی‌گردند. با فیلتر تاریخ گروه‌بندی نمی‌شود. */
+  return top+(LF.length?`<div class="spsec"><div><b>لیست‌ها</b><small>${fmt(LF.length)} لیست · ${fmt(open.length)} در جریان · جدیدترین بالا</small></div></div>${aq?LF.map(card).join(''):arcMonthsHTML(LF)}`:'')+(!L.length?'<div class="spempty"><div class="spill">'+ic('list')+'</div><b>هنوز لیستی ثبت نشده</b><span>با «ورود حساب» در صفحه اول شروع کنید.</span></div>':'')}
