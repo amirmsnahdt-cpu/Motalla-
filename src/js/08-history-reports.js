@@ -206,7 +206,9 @@ function closeSheet(){const o=$('ov'),s=$('sheet');if(o.classList.contains('hide
 /* بستن پنجره با کشیدن به پایین (از سربرگ، یا هر جا وقتی محتوا بالای خودش است) */
 (()=>{let g=null;
   document.addEventListener('touchstart',e=>{const s=$('sheet');if(e.touches.length!==1||!s||$('ov').classList.contains('hide')||!s.contains(e.target))return;
-    const head=e.target.closest('.sh-h')||e.touches[0].clientY-s.getBoundingClientRect().top<34;if(!head&&(s.scrollTop>0||e.target.closest('input,textarea,select,.chps,.d6kd,.acpick,.wheels,.x6l,.rcl,.ckl,.stsug,.swr')))return;
+    const head=e.target.closest('.sh-h')||e.touches[0].clientY-s.getBoundingClientRect().top<34;/* v66.5 (خواسته صاحب اپ: «اسکرول‌ها درست کار نمی‌کند»): هر فهرست داخل پنجره که خودش اسکرول می‌خورد و بالای خودش نیست،
+       انگشت را برای خودش نگه می‌دارد (قبلاً فقط چند فهرست نام‌برده مستثنا بودند و بقیه با کشیدن به پایین پنجره را می‌بستند) */
+    const sc=!head&&inScr(e.target,s);if(!head&&(s.scrollTop>0||(sc&&sc.scrollTop>0)||e.target.closest('input,textarea,select,.chps,.d6kd,.acpick,.wheels,.swr')))return;
     g={y:e.touches[0].clientY,x:e.touches[0].clientX,t:performance.now(),lk:null,d:0,head:!!head}},{passive:true});
   tmAdd(e=>{if(!g)return;const s=$('sheet'),t=e.touches[0],dy=t.clientY-g.y,dx=t.clientX-g.x;
     if(!g.lk){if(Math.abs(dy)<6&&Math.abs(dx)<6)return;g.lk=dy>0&&dy>Math.abs(dx)*1.1&&(g.head||s.scrollTop<=0)?'v':'x';if(g.lk==='v'){s.classList.add('drag');s.classList.remove('snap')}}

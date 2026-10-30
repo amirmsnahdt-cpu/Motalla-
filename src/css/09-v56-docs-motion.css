@@ -2609,3 +2609,19 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .pnr .pin:focus{box-shadow:inset 0 0 0 2px var(--blu)!important;outline:none}
 .hmo .bxdot{top:5px;left:5px;width:8px;height:8px}
 .bxrow .tx small{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.45}
+
+/* v66.5 ویرایش تسویه */
+.st9s{display:inline-block;vertical-align:middle;margin-inline-start:6px;padding:1px 8px;border-radius:8px;font-style:normal;font-size:11px;font-weight:800}
+.st9s.w{background:var(--warn2);color:var(--warn)}.st9s.k{background:var(--ok2);color:var(--ok)}
+.px8p .tx em b.r{color:var(--red)}.px8p .tx em b.b{color:var(--blu)}
+.px8p .py7a.m{background:var(--seg);color:var(--mut)}
+.st9q{margin-bottom:12px}
+.st9i img{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:none}
+.st9a{display:flex;gap:8px;margin-top:10px}
+.st9a button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border:0;border-radius:14px;background:var(--seg);color:var(--ink);font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.st9a button svg{width:16px;height:16px}.st9a button.d{background:none;color:var(--red);box-shadow:inset 0 0 0 1px var(--red2)}
+.st9n button{background:var(--blu2);color:var(--blu)}
+
+/* v66.5 اسکرول پنجره‌ها: یک اسکرول (خود پنجره) به‌جای فهرست تو در تو؛ ارتفاع با نوار مرورگر (dvh)؛ پایین پنجره پشت نوار نمی‌رود */
+.mvl{max-height:none;overflow:visible}
+#sheet{max-height:88vh;max-height:calc(100dvh - 56px);-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))!important;scroll-padding-bottom:24px}

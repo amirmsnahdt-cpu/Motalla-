@@ -395,7 +395,7 @@ function bzStlHTML(){const S=bz.d.settles||[],tot=num(bz.d.amount||0),rest=Math.
   ${!tot&&!S.length?'<div class="eh">بعد از نوشتن مبلغ، اگر مشتری دیگری مستقیم پرداخت کرده اینجا ثبت کنید</div>':rest>0?`<button class="addit" data-act="bzStlNew">${ic('plus')} ${S.length?'تسویه دیگر':'ثبت تسویه از مشتری'} <small>(مشتری دیگری مستقیم به این شخص پرداخت کرده)</small></button>`:`<div class="eh ok">کل مبلغ با تسویه از مشتری پرداخت می‌شود</div>`}</div>`}
 const bzStlRe=()=>{const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.bzStlNew=()=>{bzRead();pxOpen(true)};
-ACT.bzStlOpen=d=>{bzRead();const z=(bz.d.settles||[])[+d.i];if(!z)return;stl={...z,bz:1,i:+d.i,q:z.cuId?'':z.name};sheet(stlHTML());stlBind()};
+ACT.bzStlOpen=d=>{bzRead();const z=(bz.d.settles||[])[+d.i];if(!z)return;stl={...z,bz:1,i:+d.i,q:z.cuId?'':z.name,newName:!z.cuId&&!!z.name};sheet(stlHTML());stlBind()};
 ACT.bzStlDel=d=>{bzRead();(bz.d.settles||[]).splice(+d.i,1);bzStlRe()};
 ACT.bzStlSave=()=>{stlRead();const name=clean(stl.name||stl.q||'');if(!name){toast('پرداخت‌کننده را انتخاب یا نامش را بنویسید',true);return}const a=+stl.amount||0;if(!a){toast('مبلغ را وارد کنید',true);return}
   const S=bz.d.settles=(bz.d.settles||[]).slice(),others=S.filter((z,i)=>i!==stl.i).reduce((s,z)=>s+(+z.amount||0),0);if(others+a>num(bz.d.amount||0)){toast('جمع تسویه‌ها از مبلغ این واریزی بیشتر می‌شود',true);return}
