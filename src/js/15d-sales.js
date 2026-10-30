@@ -608,7 +608,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
   if(cur==='sell'&&sv&&svRows()&&!svErr()&&(!sv.edit||svSig()!==sv.sig0))svAuto('bg')});
 /* ================= نمایش سند ================= */
 let invV=null;
-function invOpen(cu,tx,fresh){invV={cu,tx,fresh:!!fresh};custId=cu;closeSheet();go('inv')}
+function invOpen(cu,tx,fresh){invV={cu,tx,fresh:!!fresh};custId=cu;if(cur!=='inv')PARENT.inv=cur==='bank'?'bank':'cust';closeSheet();go('inv')}
 /* v66.0 (خواسته صاحب اپ: «سند رو به من نشون بده نه جزئیات»): تراکنش‌های قدیمی «دریافت/پرداخت وجه» (مثل تسویه واریزی پیش از v65)
    هم در همان صفحه سند باز می‌شوند؛ فقط نمای سند است (داده دست نمی‌خورد، ویرایش ندارد، حذف همان تراکنش را حذف می‌کند) */
 const TXDOC=['pin','pout'];
