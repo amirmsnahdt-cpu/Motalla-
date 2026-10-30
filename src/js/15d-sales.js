@@ -37,7 +37,7 @@ function txLinked(c,t){const R=[],find=(cu,tx)=>{const C=custs.find(z=>String(z.
   if((t.type==='xf'||t.type==='cv')&&t.peer)find(t.peer.cu,t.peer.tx);
   if(t.type==='xf'&&t.inv)find(t.inv.cu,t.inv.tx);
   return R.filter(x=>x.t!==t)}
-const invTitle=t=>(t.dk==='buy'?'سند خرید ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
+const invTitle=t=>(t.dk==='buy'?'سند خرید ':t.dk==='in'&&t.auto==='stl'?'سند دریافت ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
 function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t);ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
@@ -95,7 +95,7 @@ function xrCalc(x,rate){const g=x.a==='gold',money=x.t==='sell'||x.t==='buy';
   /* v61.25: مبلغ دستی (x.amT) برای همه ردیف‌های پولی (خرید، تعویض، فروش متفرقه، سکه و ارز): مبلغ همان می‌ماند و نرخ نهایی هر گرم/عدد = مبلغ ÷ وزن (وزن تبدیل نمی‌شود) */
   const fx=money&&!(g&&+x.am)&&+x.amT>0&&n>0,amount=money?(fx?Math.round(+x.amT):g&&+x.am?Math.round(+x.am):Math.round(n*(fx?0:pg))):0,pgF=fx?Math.round(amount/n):pg;
   const e=x.t==='in'?q:x.t==='out'?-q:x.pul?(x.t==='sell'?q:-q):0;return{n,pg:pgF,q,amount,e,...(fx?{fx:1}:{})}}
-function xrLab(x){const g=x.a==='gold',A=g?'طلا':(XA[x.a]||{t:x.a}).t;if(g&&x.sh===1&&x.cat==='آبشده')return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' آبشده شرطی';if(g&&x.pz)return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' سکه پارسیان';
+function xrLab(x){const g=x.a==='gold',A=g?'طلا':(XA[x.a]||{t:x.a}).t;if(!g&&XA[x.a]&&XA[x.a].k==='o')return (x.t==='sell'?'فروش ':'خرید ')+(x.nt||A);if(g&&x.sh===1&&x.cat==='آبشده')return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' آبشده شرطی';if(g&&x.pz)return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' سکه پارسیان';
   if(x.cat==='مانده قبلی')return 'مانده قبلی '+(g?'طلا':A)+' · '+(x.t==='out'?'طلبکاریم':'بدهکاریم');if(g&&x.cat==='تعویض')return 'تعویض طلا';if(g&&x.cat==='مرجوعی')return 'مرجوعی';if(g&&(x.t==='in'||x.t==='out')&&x.cat&&x.cat!=='متفرقه')return (x.t==='in'?'دریافت ':'تحویل ')+x.cat;
   if(g){if(x.cat==='قلک'&&x.pul)return (x.t==='buy'?'خرید':'فروش')+' قلک';if(x.t==='buy')return x.pul?'خرید پولی طلا':'خرید '+(x.cat&&x.cat!=='متفرقه'?'طلا · '+x.cat:'متفرقه');if(x.t==='sell')return x.pul?'فروش پولی طلا':'فروش '+(x.cat&&x.cat!=='متفرقه'?'طلا · '+x.cat:'متفرقه');return (x.t==='in'?'دریافت طلا':'تحویل طلا')}
   return XT[x.t]+(x.pul?' پولی ':' ')+A}
@@ -159,7 +159,7 @@ const SPK=[
   {id:'xsp',t:'فروش پولی',d:'طلا تحویل نمی‌شود · مبلغ بدهکار، طلا طلبکار مشتری',i:'swap',al:'فروش پولی معامله پولی فردایی',x:['sell','gold',1]},
   {id:'xi',t:'دریافت طلا',d:'طلا از مشتری گرفتیم · به حساب طلایی او',i:'down',al:'دریافت طلا تحویل گرفتن طلا آبشده',x:['in','gold']},
   {id:'xo',t:'تحویل طلا',d:'طلا به مشتری دادیم · از حساب طلایی او',i:'share',al:'تحویل طلا پرداخت طلا',x:['out','gold']},
-  ...Object.keys(XA).map(k=>({id:'a'+k,t:XA[k].t,d:XA[k].k==='c'?'فروش، خرید، دریافت یا تحویل سکه':'فروش، خرید، دریافت یا تحویل ارز',i:XA[k].k==='c'?'coin':'usd',al:XA[k].t+' '+(XA[k].k==='c'?'سکه':'ارز دلار یورو درهم'),x:['sell',k]})),
+  ...Object.keys(XA).filter(k=>XA[k].k!=='o').map(k=>({id:'a'+k,t:XA[k].t,d:XA[k].k==='c'?'فروش، خرید، دریافت یا تحویل سکه':'فروش، خرید، دریافت یا تحویل ارز',i:XA[k].k==='c'?'coin':'usd',al:XA[k].t+' '+(XA[k].k==='c'?'سکه':'ارز دلار یورو درهم'),x:['sell',k]})),
   {id:'pi',t:'دریافت وجه',d:'نقد، کارتخوان، حواله یا از حساب مشتری دیگر',i:'down',al:'دریافت وجه پول نقد واریز',p:['cash','in']},
   {id:'po',t:'پرداخت وجه',d:'نقد، حواله یا به حساب مشتری دیگر',i:'share',al:'پرداخت وجه پول نقد',p:['cash','out']},
   {id:'pp',t:'کارتخوان',d:'کشیدن کارت روی کارتخوان مغازه',i:'card',al:'کارتخوان کارت پوز',p:['pos','in']},
@@ -256,7 +256,7 @@ ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;qaRead();const J=ajPT(it)
 const xrStart=x=>{qaRead();sv.qa.x=x;sv.qa.p=null;sv.qa.q='';svKeep();qaRe()};
 function xrHTML(){const x=sv.qa.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ed=x.i!=null,C=xrCalc(x,sv.rate),fl=x.fl||'';
   /* v61: پنجره از «تشخیص» باز شده → فقط همان نوع جنس، بدون انتخاب دوباره فروش/خرید/دریافت/تحویل */
-  const KL=fl==='coin'?COINS():fl==='fx'?FXS():fl==='gold'||fl==='one'?[]:['gold',...Object.keys(XA)];
+  const KL=fl==='coin'?COINS():fl==='fx'?FXS():fl==='gold'||fl==='one'?[]:['gold',...Object.keys(XA).filter(k=>XA[k].k!=='o')];
   const ttl=fl?esc((x.fd==='swap'?'تعویض':x.fd==='ret'?'مرجوعی':dkT(x.fd||({sell:'sell',buy:'buy',in:'in',out:'out'})[x.t]))+(x.fd==='swap'||x.fd==='ret'?' · طلای مشتری':' › '+(g?(x.pul?(x.cat==='قلک'?'قلک':'پولی'):x.cat||'طلا'):(XA[x.a]||{}).t||''))):esc(xrLab(x));
   const kinds=KL.map(k=>`<button class="${x.a===k?'on':''}" data-act="xrA" data-a="${k}">${k==='gold'?'طلا':esc(XA[k].s)}</button>`).join('');
   return `<div class="d6qh"><b><span class="d6ti x-${x.t}">${ic(g?'coin':(XA[x.a]||{}).k==='f'?'usd':'coin')}</span>${ttl}</b><button class="lnk" data-act="qaX">${ed?'بستن':'انصراف'}</button></div>

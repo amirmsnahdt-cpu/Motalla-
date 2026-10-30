@@ -158,8 +158,8 @@ function saveEntry(){const m=$('fm'),dgI=dg($('fi').value).slice(0,24);
   const now=new Date().toISOString(),bad=!ibanOk(e.iban);
   if(editId){const i=entries.findIndex(x=>x.id===editId);if(i>=0){const before=pick(entries[i]);entries[i]={...entries[i],...e,updatedBy:who(),updatedAt:now};
       logA('edit','ویرایش واریزی',e.name+' | '+fmt(e.amount)+' تومان',{ids:[editId],before,after:pick(entries[i])})}
-    saveE();alloc=null;editId=null;toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد',bad);go(editBack||'list');editBack=null;return}
-  const ne={...e,id:nid++,entryDate:dateVal,createdBy:who(),updatedBy:who(),updatedAt:now};entries.push(ne);saveE();alloc=null;
+    depDocFix(entries.find(x=>x.id===editId)||{});saveE();alloc=null;editId=null;toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد',bad);go(editBack||'list');editBack=null;return}
+  const ne={...e,id:nid++,entryDate:dateVal,createdBy:who(),updatedBy:who(),updatedAt:now,settles:[]};entries.push(ne);saveE();alloc=null;depLink(ne,{settles:e.settles});
   logA('add','ثبت واریزی',e.name+' | '+fmt(e.amount)+' تومان | '+dates(dateVal).fa,{ids:[ne.id],after:pick(ne)});
   FLD.forEach(i=>$(i).value='');fSet=[];fTitle='';$('ftl').innerHTML=titleChips();updSet();fPay=payDef();updPay();$('fiv').textContent='';$('fkv').textContent='';$('finfo').innerHTML='';$('rn').textContent=fmt(dayEntries().length+1);$('recent').innerHTML=recentHTML();$('dock').innerHTML=dockHTML();$('act').innerHTML=aEntry();{const fb=document.querySelector('#view .flow');if(fb)fb.outerHTML=flowBar(1)}
   m.innerHTML=bad?'<div class="msg bad"><b>شماره شبا اشتباه است.</b> واریزی ذخیره شد و در لیست قرمز علامت خورد؛ بعداً اصلاحش کنید.</div>':'<div class="msg ok">ذخیره شد ✓ — واریز '+payLab(ne.payDate)+'، '+fmt(dayEntries().length)+' واریزی در لیست امروز</div>';
@@ -178,6 +178,6 @@ function bkPrev(){const el=$('bkprev');if(!el)return;const t=($('bulk')||{}).val
 function bindBulk(){const b=$('bulk');if(!b)return;b.oninput=()=>{clearTimeout(b._t);b._t=setTimeout(bkPrev,180)};bkPrev()}
 function resetBulk(){const b=$('bulk');if(!b||!b.value.trim())return;askConfirm('متن چسبانده‌شده پاک شود؟','پاک شود',()=>{$('bulk').value='';fPay=payDef();$('bm').innerHTML='';bkPrev();toast('پاک شد')})}
 function bulkAdd(){const r=parse($('bulk').value),m=$('bm');if(!r.length){m.innerHTML='<div class="msg bad">واریزی‌ای در متن پیدا نشد.</div>';return}
-  const now=new Date().toISOString(),ids=[];r.forEach(x=>{const id=nid++;ids.push(id);entries.push({...x,card:'',id,entryDate:dateVal,payDate:fPay||payDef(),createdBy:who(),updatedBy:who(),updatedAt:now})});
+  const now=new Date().toISOString(),ids=[];r.forEach(x=>{const id=nid++;ids.push(id);const ne={...x,card:'',id,entryDate:dateVal,payDate:fPay||payDef(),createdBy:who(),updatedBy:who(),updatedAt:now};entries.push(ne);depLink(ne)});
   saveE();alloc=null;logA('bulk','ورود گروهی',fmt(r.length)+' واریزی | '+fmt(sum(r))+' تومان | '+dates(dateVal).fa,{ids});$('bulk').value='';
   m.innerHTML=`<div class="bkdone"><span class="ck">${ic('check')}</span><b>${fmt(r.length)} واریزی اضافه شد</b><small>جمع ${fmt(sum(r))} تومان · واریز ${esc(payLab(fPay||payDef()))}</small><div class="row2"><button class="s" data-act="tab" data-n="list">${ic('list')} مشاهده لیست</button><button class="p" data-act="toSplit">${ic('split')} تقسیم به منابع</button></div></div>`;$('dock').innerHTML=dockHTML();setTimeout(()=>{const d=m.querySelector('.bkdone');if(d)d.scrollIntoView({behavior:'smooth',block:'center'})},60)}

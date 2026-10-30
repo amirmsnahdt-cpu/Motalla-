@@ -343,9 +343,9 @@ ACT.bzNext=async()=>{bzRead();const d=bz.d;
   const card=dg(d.card||'').slice(0,16),now=new Date().toISOString(),iban=dI?'IR'+dI:'',name=stripName(d.name),holder=clean(d.holder||'');
   if(dateVal!==todayISO()){dateVal=todayISO();ls.set('m_date',dateVal)}
   if(bzStlSum()>num(d.amount)){toast('جمع تسویه‌ها از مبلغ این واریزی بیشتر است',true);return}
-  if(bz.saving)return;bz.saving=true;let S=[];try{S=await bzStlMake()}finally{bz.saving=false}
-  const ne={id:nid++,name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),ppg:ppgOf(bzGoldAmt(),d.weight),items:(d.items||[]).filter(x=>x.amt).map(x=>({...x})),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:S,entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
-  entries.push(ne);saveE();alloc=null;logA('add','ثبت واریزی (خرید)',name+' | '+fmt(ne.amount)+' تومان | واریز '+dates(ne.payDate).fa+(S.length?' | تسویه از مشتری '+fmt(bzStlSum(S))+' تومان':''),{ids:[ne.id],after:pick(ne)});
+  if(bz.saving)return;bz.saving=true;let S=[];try{S=await bzStlMake()}finally{bz.saving=false}/* v65.0: تسویه‌ها = سند دریافت هر پرداخت‌کننده (depLink بعد از ثبت) */
+  const ne={id:nid++,name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),ppg:ppgOf(bzGoldAmt(),d.weight),items:(d.items||[]).filter(x=>x.amt).map(x=>({...x})),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:[],entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
+  entries.push(ne);saveE();alloc=null;depLink(ne,{cuId:d.cuId,settles:S.map(z=>({...z,st:'wait'}))});logA('add','ثبت واریزی (خرید)',name+' | '+fmt(ne.amount)+' تومان | واریز '+dates(ne.payDate).fa+(S.length?' | تسویه از مشتری '+fmt(bzStlSum(S))+' تومان':''),{ids:[ne.id],after:pick(ne)});
   const rest=ne.amount-bzStlSum(S),bad=rest>0&&(!iban||!ibanOk(iban)),why=!iban?'شبا ندارد':'شبا اشتباه است';bz={step:1,d:{pay:payDef()},msg:`«${esc(name)}» ثبت شد — ${fmt(ne.amount)} تومان، واریز ${esc(payLab(ne.payDate))}${bad?' <em>('+why+'؛ در لیست خطادار علامت خورد)</em>':''}`};
   render();$('view').scrollTop=0;toast(bad?'ثبت شد، اما '+why+' (خطادار)':'ثبت شد ✓ — ثبت بعدی',bad)};
 ACT.bzCal=()=>{bzRead();openCal(bz.d.pay||todayISO(),iso=>{bz.d.pay=iso;render()})};
@@ -394,7 +394,7 @@ function bzStlHTML(){const S=bz.d.settles||[],tot=num(bz.d.amount||0),rest=Math.
   return `<div class="ef bzstl"><label>تسویه از مشتری <i>(اختیاری)</i></label>${S.length?`<div class="stll2">${S.map((z,i)=>`<div class="stlrw w"><button class="stlr" data-act="bzStlOpen" data-i="${i}"><span class="bri">${ic('user')}</span><span class="tx"><b>${esc(z.name)}</b><small>${['در انتظار تأیید',z.inv?'فاکتور '+esc(z.inv):'',z.tn?'پیگیری '+esc(z.tn):'',z.imgD?'رسید دارد':''].filter(Boolean).join(' · ')}</small></span><span class="brv"><b>${fmt(z.amount)} <i>تومان</i></b></span></button><button class="stlc" data-act="bzStlDel" data-i="${i}" aria-label="حذف این تسویه">${ic('x')}</button></div>`).join('')}</div>`:''}
   ${!tot&&!S.length?'<div class="eh">بعد از نوشتن مبلغ، اگر مشتری دیگری مستقیم پرداخت کرده اینجا ثبت کنید</div>':rest>0?`<button class="addit" data-act="bzStlNew">${ic('plus')} ${S.length?'تسویه دیگر':'ثبت تسویه از مشتری'} <small>(مشتری دیگری مستقیم به این شخص پرداخت کرده)</small></button>`:`<div class="eh ok">کل مبلغ با تسویه از مشتری پرداخت می‌شود</div>`}</div>`}
 const bzStlRe=()=>{const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
-ACT.bzStlNew=()=>{bzRead();stl={bz:1,amount:Math.max(0,num(bz.d.amount||0)-bzStlSum()),q:''};sheet(stlHTML());stlBind();setTimeout(()=>{if($('stQ')&&!stl.cuId&&!stl.newName){stl.open=1;const c=$('stCs');if(c){c.innerHTML=stlChips();phPaint(c)}}},300)};
+ACT.bzStlNew=()=>{bzRead();pxOpen(true)};
 ACT.bzStlOpen=d=>{bzRead();const z=(bz.d.settles||[])[+d.i];if(!z)return;stl={...z,bz:1,i:+d.i,q:z.cuId?'':z.name};sheet(stlHTML());stlBind()};
 ACT.bzStlDel=d=>{bzRead();(bz.d.settles||[]).splice(+d.i,1);bzStlRe()};
 ACT.bzStlSave=()=>{stlRead();const name=clean(stl.name||stl.q||'');if(!name){toast('پرداخت‌کننده را انتخاب یا نامش را بنویسید',true);return}const a=+stl.amount||0;if(!a){toast('مبلغ را وارد کنید',true);return}

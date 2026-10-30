@@ -141,8 +141,8 @@ const saveE=()=>ls.set('m_entries',entries),saveS=()=>ls.set('m_sources',sources
 const who=()=>user||'کاربر نامشخص';
 const pick=e=>({id:e.id,name:e.name,code:e.code,amount:e.amount,iban:e.iban,card:e.card||'',bank:e.bank||'',entryDate:e.entryDate,payDate:e.payDate||''});
 function logA(type,summary,detail,extra){audit.unshift({id:nid++,type,user:who(),ts:new Date().toISOString(),summary,detail:detail||'',...(extra||{})});audit=audit.slice(0,400);saveAud()}
-function trashIds(ids,reason){const S=new Set(ids.map(String)),now=new Date().toISOString(),moved=[];entries=entries.filter(e=>{if(S.has(String(e.id))){moved.push({...e,deletedAt:now,deletedBy:who(),reason});return false}return true});trash=moved.concat(trash).slice(0,500);saveE();saveT();alloc=null;return moved}
-function restoreIds(ids){const S=new Set(ids.map(String)),back=[];trash=trash.filter(t=>{if(S.has(String(t.id))&&!entries.some(e=>e.id===t.id)){const{deletedAt,deletedBy,reason,...e}=t;back.push(e);return false}return !S.has(String(t.id))});entries=entries.concat(back);saveE();saveT();alloc=null;return back}
+function trashIds(ids,reason){const S=new Set(ids.map(String)),now=new Date().toISOString(),moved=[];entries=entries.filter(e=>{if(S.has(String(e.id))){moved.push({...e,deletedAt:now,deletedBy:who(),reason});return false}return true});trash=moved.concat(trash).slice(0,500);saveE();saveT();alloc=null;if(moved.length)depDocTrash(moved);return moved}
+function restoreIds(ids){const S=new Set(ids.map(String)),back=[];trash=trash.filter(t=>{if(S.has(String(t.id))&&!entries.some(e=>e.id===t.id)){const{deletedAt,deletedBy,reason,...e}=t;back.push(e);return false}return !S.has(String(t.id))});entries=entries.concat(back);saveE();saveT();alloc=null;if(back.length)depDocBack(back);return back}
 /* ============ اعتبارسنجی و پارس ============ */
 const dayEntries=()=>entries.filter(e=>e.entryDate===dateVal);
 function validated(){if(_vc&&_vcE===entries&&_vcN===entries.length)return _vc;const L=validated0();_vc=L;_vcE=entries;_vcN=entries.length;queueMicrotask(memoClear);return L}
