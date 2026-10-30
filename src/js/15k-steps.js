@@ -135,10 +135,12 @@ function stPatch(O,I0){const T=document.createElement('div');T.innerHTML=stHTML(
   [...I0.attributes].forEach(at=>{if(!nI.hasAttribute(at.name))I0.removeAttribute(at.name)});[...nI.attributes].forEach(at=>{if(I0.getAttribute(at.name)!==at.value)I0.setAttribute(at.name,at.value)});I0.value=nI.getAttribute('value')||'';
   nI.replaceWith(I0);o3.className=n3.className;o3.replaceChildren(...n3.childNodes);O.className=N.className;O.replaceChildren(...[...N.childNodes].map(n=>n===n3?o3:n));return true}
 function stStrip(){const o=document.querySelector('#qa .stp.on'),w=o&&o.parentNode;if(!o||!w)return;const r=o.getBoundingClientRect(),q=w.getBoundingClientRect();const d=(r.left+r.width/2)-(q.left+q.width/2);if(Math.abs(d)>4)try{w.scrollBy({left:d,behavior:RM()?'auto':'smooth'})}catch(_){w.scrollLeft+=d}}
-function stRe(){const gh=stGhost(),bw=qaDir==='bw',O=document.querySelector('#qa .stw'),I0=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)],kb=stKbT(c0);
+/* v66.9 (خواسته صاحب اپ: «همش میره از اول می‌پره»): ردیف پله‌ها با هر «بعدی» از نو ساخته می‌شد و اسکرول افقی‌اش به اول برمی‌گشت،
+   بعد تا پله فعال می‌لغزید — حالا جای اسکرول قبلی نگه داشته می‌شود و فقط از همان‌جا تا پله تازه نرم می‌رود */
+function stRe(){const sp=document.querySelector('#qa .stps'),sl=sp?sp.scrollLeft:null,gh=stGhost(),bw=qaDir==='bw',O=document.querySelector('#qa .stw'),I0=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)],kb=stKbT(c0);
   let same=false;if(O&&I0&&I0.isConnected&&kb!=='pick'&&I0.dataset.kb===kb){qaDir='';same=stPatch(O,I0);if(same){stBind();phPaint($('qa'));if(document.activeElement!==I0&&$('ov').classList.contains('hide'))try{I0.focus({preventScroll:true})}catch(_){}stSel(I0,c0)}}
   if(!same){qaRe();const I=$('stI');if(I&&document.activeElement!==I&&$('ov').classList.contains('hide')&&!(c0&&c0.type==='pick'&&!c0.search)){try{I.focus({preventScroll:true})}catch(_){I.focus()}}}
-  stSlide(bw,gh);stStrip()}
+  if(sl!=null){const np=document.querySelector('#qa .stps');if(np&&np!==sp)np.scrollLeft=sl}stSlide(bw,gh);stStrip()}
 /* v61.98 (خواسته صاحب اپ): رفتن به پله بعد نرم و پیدا — تصویر فیلد قبلی به سمت راست محو می‌شود و فیلد تازه از چپ می‌آید
    (در راست‌به‌چپ «بعدی» سمت چپ است)، کادر مبلغ کمی بعدش، و پله فعال در ردیف بالا یک بار می‌پرد */
 /* v66.8 (خواسته صاحب اپ: «مثل Liquid Glass اپل، روان؛ الان می‌پرد و انگار خطا دارد»):
