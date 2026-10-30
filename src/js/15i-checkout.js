@@ -38,7 +38,7 @@ function ckSel(){const s=CK.sel;if(!s)return '';if(s.k==='nm')return `<div class
   const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return '';const r=depAvail(x)-ckUsedDep(x.id);return `<div class="stsel"><span class="c6a m">${esc(userInit(fullName(x)))}</span><span class="tx"><b>${esc(fullName(x))}</b><small>واریزی ${esc(payLab(PD(x)))} · مانده ${fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>${depBar(x.id,'ck')}`}
 /* v61.30: کارتخوان و حساب ما مثل بقیه فهرست‌ها: جستجو بالا، فهرست زیرش */
 function ckPick(){const m=CK.m,q=nzName(toEn(clean(CK.sq||''))),pos=m==='pos';
-  const L=(pos?CH('pos').map(c=>({id:c.id,on:String(CK.chId)===String(c.id),t:c.name,sub:'مانده '+fmt(chBal(c)),av:ic('card')})):sources.map(z=>{const bk=acBank(z);return {id:z.id,on:String(CK.srcId)===String(z.id),t:z.name,sub:bk?'بانک '+bk:'حساب ما',av:bk?bankBadge(bk):ic('bank')}})).filter(o=>!q||nzName(toEn(o.t+' '+o.sub)).includes(q));
+  const L=(pos?CH('pos').map(c=>({id:c.id,on:String(CK.chId)===String(c.id),t:c.name,sub:'مانده '+fmt(chBal(c)),av:ic('card')})):ownL(CK.srcId).map(z=>{const bk=acBank(z);return {id:z.id,on:String(CK.srcId)===String(z.id),t:z.name,sub:bkSub(z),av:bk?bankBadge(bk):ic('bank')}})).filter(o=>!q||nzName(toEn(o.t+' '+o.sub)).includes(q));
   const q0=clean(CK.sq||''),ex=q&&L.some(o=>nzName(toEn(o.t))===q);
   return `<div class="bzsug cbl dkl">${L.map(o=>`<button type="button" class="bzsr dkrw${o.on?' on':''}" data-act="${pos?'ckCh':'ckSrc'}" data-id="${esc(o.id)}"><span class="av">${o.av}</span><span class="tx"><b>${esc(o.t)}</b><small>${esc(o.sub)}</small></span></button>`).join('')}${ex?'':pkAddRow(pos?'کارتخوان':'حساب',q0,'ckPkAdd')}</div>`}
 ACT.ckPkAdd=()=>{ckRead();const n=clean(CK.sq||''),pos=CK.m==='pos';if(!n){toast('نام '+(pos?'کارتخوان':'حساب')+' را در جستجو بنویسید',true);const I=$('ckS');if(I)I.focus();return}
@@ -81,7 +81,7 @@ function ckBind(f){phPaint($('sheet'));const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=
   const el=f&&$(f);if(el)sheetFocus(el)}
 const ckLeft=()=>Math.abs(ckRest());
 ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حساب مشتری از لیست واریزی (15q) */if(m==='wd'){wdOpen();return}/* v61.39: تخفیف از پنجره تسویه — روی مانده همین سند */if(m==='off'){svOffOpen(true);return}const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'?0:ckLeft(),q:''};if(m==='pos'){const L=CH('pos'),last=ls.get('m_ch_pos','');CK.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
-  if(m==='hav'){const last=ls.get('m_src_hav','');const s=sources.find(z=>String(z.id)===String(last))||sources[0];CK.srcId=s?s.id:''}
+  if(m==='hav'){const last=ls.get('m_src_hav','');const O=ownL(),s=O.find(z=>String(z.id)===String(last))||O[0];CK.srcId=s?s.id:''}
   ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
 ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';ckRe('ckA')};

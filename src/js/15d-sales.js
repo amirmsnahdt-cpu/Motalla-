@@ -30,14 +30,14 @@ function chNew(name,kind){name=clean(name||'');if(!name)return null;const r={id:
 function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{if(p.srcId!=null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,t:(+p.amount<0?'حواله به ':'حواله از ')+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L}
 const srcInvSum=s=>srcMoves(s).reduce((a,m)=>a+m.a,0);
 function srcQuick(name){name=clean(name||'');if(!name)return null;const ex=sources.find(s=>s.name===name);if(ex)return ex;if(!can('src')){toast('تعریف حساب بانکی برای حساب شما فعال نیست',true);return null}
-  const s={id:nid++,name,bank:'',limit:0,count:0,iban:'',card:''};sources.push(s);saveS();logA('src','حساب بانکی جدید',name);return s}
+  const s={id:nid++,name,bank:'',limit:0,count:0,iban:'',card:''};if(ownSet())s.own=1;sources.push(s);saveS();logA('src','حساب بانکی جدید',name);return s}
 /* ---------- ردیف‌های مرتبط (برای حذف/بازگردانی هم‌زمان) ---------- */
 function txLinked(c,t){const R=[],find=(cu,tx)=>{const C=custs.find(z=>String(z.id)===String(cu)),T=C&&(C.txs||[]).find(z=>String(z.id)===String(tx));if(T)R.push({c:C,t:T})};
   if(t.type==='inv')(t.pays||[]).forEach(p=>{if(p.m==='cust'&&p.xfId)find(p.cuId,p.xfId)});
   if((t.type==='xf'||t.type==='cv')&&t.peer)find(t.peer.cu,t.peer.tx);
   if(t.type==='xf'&&t.inv)find(t.inv.cu,t.inv.tx);
   return R.filter(x=>x.t!==t)}
-const invTitle=t=>(t.dk==='buy'?'سند خرید ':t.dk==='in'&&t.auto==='stl'?'سند دریافت ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
+const invTitle=t=>t.legacy?(t.dk==='out'?'سند پرداخت وجه':'سند دریافت وجه'):(t.dk==='buy'?'سند خرید ':t.dk==='in'&&t.auto==='stl'?'سند دریافت ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
 function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t);ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
@@ -175,11 +175,11 @@ function pyLab(p,long){const ch=p.chId&&custs.find(z=>String(z.id)===String(p.ch
 function qaChips(){const a=sv.qa,q=nzName(toEn(a.q||''));if(!q)return '';
   const A=goodsList().filter(k=>nzName(k).includes(q)).sort((x,y)=>(nzName(y).startsWith(q)-nzName(x).startsWith(q))||(svUsed[y]||0)-(svUsed[x]||0)).slice(0,5);
   const bu=sv.dk==='buy',S=SPK.filter(s=>nzName(s.t+' '+s.al).includes(q)).sort((a,b)=>bu?((b.x&&b.x[0]==='buy')-(a.x&&a.x[0]==='buy')):0).slice(0,6);
-  const P=CH('pos').filter(c=>nzName(c.name).includes(q)).slice(0,3),B=sources.filter(s=>nzName(s.name+' '+(s.bank||'')).includes(q)).slice(0,3),U=CU().filter(c=>String(c.id)!==String(sv.cuId)&&nzName([c.name,c.phone,c.grp].join(' ')).includes(q)).slice(0,4);
+  const P=CH('pos').filter(c=>nzName(c.name).includes(q)).slice(0,3),B=ownL().filter(s=>nzName(s.name+' '+(s.bank||'')).includes(q)).slice(0,3),U=CU().filter(c=>String(c.id)!==String(sv.cuId)&&nzName([c.name,c.phone,c.grp].join(' ')).includes(q)).slice(0,4);
   const rA=A.map(k=>cbRow('qaK',{k},ic('ring'),esc(k),'کالا · با اجرت و سود'+(svUsed[k]?'، '+toFa(svUsed[k])+' بار فروخته شده':''),'','gd')),rS=S.map(s=>cbRow('qaS',{s:s.id},ic(s.i),s.t,s.d,'','spk'));
   const rows=(bu?rS.concat(rA):rA.concat(rS))
     .concat(P.map(c=>cbRow('qaCh',{id:c.id},ic('card'),esc(c.name),'کارتخوان ما','<b class="chv">'+fmt(chBal(c))+'</b>','ch')))
-    .concat(B.map(s=>{const e=acEst(s);return cbRow('qaSrc',{id:s.id},ic('bank'),esc(s.name),'حواله با حساب ما',e==null?'':'<b class="chv">'+fmt(e)+'</b>','ch')}))
+    .concat(B.map(s=>{const e=acFin(s);return cbRow('qaSrc',{id:s.id},ic('bank'),esc(s.name),'حواله با حساب ما',e==null?'':'<b class="chv">'+fmt(e)+'</b>','ch')}))
     .concat(U.map(c=>cbRow('qaCu',{id:c.id},esc(userInit(c.name)),esc(cuName(c)),'حواله با حساب این مشتری',`<span class="c6v">${bpill('r',cuBal(c).R)}</span>`)));
   if(!A.some(k=>nzName(k)===q)&&!/^\d+$/.test(q))rows.push(cbRow('qaK',{k:clean(a.q)},ic('plus'),'کالای تازه «'+esc(clean(a.q))+'»','به فهرست کالاها اضافه می‌شود','','nw'));
   return `<div class="bzsug cbl" role="listbox">${rows.join('')}</div>`}
@@ -325,9 +325,10 @@ ACT.offPick=d=>{OFF.a=+d.v;const I=$('offA');if(I){I.value=OFF.a.toLocaleString(
 ACT.offOk=()=>{const I=$('offA');if(I)OFF.a=num(I.value);svOffApply(OFF.a)};
 /* حساب پیش‌فرض: آخرین کارتخوان یا حساب استفاده‌شده */
 function pyAcc(p){if(p.m==='pos'&&!p.chId){const L=CH('pos'),last=ls.get('m_ch_pos','');p.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
-  if(p.m==='hav'&&p.srcId==null&&!p.chId){const last=ls.get('m_src_hav','');const s=sources.find(z=>String(z.id)===String(last))||sources[0];if(s)p.srcId=s.id;else{const B=CH('bank');if(B[0])p.chId=B[0].id}}}
+  if(p.m==='hav'&&p.srcId==null&&!p.chId){const last=ls.get('m_src_hav',''),O=ownL();const s=O.find(z=>String(z.id)===String(last))||O[0];if(s)p.srcId=s.id;else{const B=CH('bank');if(B[0])p.chId=B[0].id}}}
 function pyCuCap(p){const c=CU().find(z=>String(z.id)===String(p.cuId));if(!c)return;p.cuName=cuName(c);if(p.dir==='in'){const cr=Math.max(0,cuBal(c).R);if(cr)p.amount=Math.min(pyLeft(p),cr)}}
-const pyStart=p=>{qaRead();sv.qa.p=p;sv.qa.x=null;sv.qa.q='';svKeep();qaRe()};
+/* v66.0: حساب (یا کارتخوان) خودکار انتخاب‌شده → از همان اول پله «مبلغ»؛ حساب در نوار پله‌ها با یک لمس عوض می‌شود */
+const pyStart=p=>{qaRead();sv.qa.p=p;sv.qa.x=null;sv.qa.q='';sv.qa.sq='';const pre=(p.m==='hav'&&p.srcId!=null&&p.srcId!=='')||(p.m==='pos'&&!!p.chId);sv.qa.st=pre?1:0;sv.qa.stMax=sv.qa.st;svKeep();qaRe()};
 ACT.qaCh=d=>{const c=CH().find(z=>String(z.id)===String(d.id));if(!c)return;pyStart(pyNew(c.kind==='pos'?'pos':'hav',{chId:c.id}))};
 ACT.qaSrc=d=>pyStart(pyNew('hav',{srcId:+d.id||d.id}));
 ACT.qaCu=d=>{if(!svCu()){toast('اول مشتری سند را انتخاب کنید',true);return}pyStart(pyNew('cust',{cuId:d.id}))};
@@ -341,7 +342,7 @@ function pyHTML(){const p=sv.qa.p,ed=p.i!=null;let b='';
   <div class="d6pm">${['cash','pos','hav','cust'].map(m=>`<button class="${p.m===m?'on':''}" data-act="pyM" data-m="${m}"${m==='pos'&&out?' disabled':''}>${ic(PM[m].i)}<span>${PM[m].t}</span></button>`).join('')}</div>`;
   if(p.m==='pos'){const L=CH('pos');b+=`<div class="d6l"><small>کدام کارتخوان</small><div class="chps">${L.map(c=>`<button class="chp${String(p.chId)===String(c.id)?' on':''}" data-act="pyCh" data-id="${c.id}">${ic('card')}<span><b>${esc(c.name)}</b><small>مانده ${fmt(chBal(c))}</small></span></button>`).join('')}</div>
     <div class="fsearch sm chadd">${ic('plus')}<input id="pyCn" placeholder="نام کارتخوان تازه" autocomplete="off" enterkeyhint="done"><button class="lnk" data-act="pyChAdd">افزودن</button></div></div>`}
-  if(p.m==='hav'){const B=CH('bank');b+=`<div class="d6l"><small>${out?'از کدام حساب ما':'به کدام حساب ما'}</small><div class="chps">${sources.map(s=>{const e=acEst(s),bk=acBank(s);return `<button class="chp${p.srcId!=null&&String(p.srcId)===String(s.id)?' on':''}" data-act="pySrc" data-id="${s.id}">${bk?bankBadge(bk):ic('bank')}<span><b>${esc(s.name)}</b><small>${e==null?(bk?'بانک '+esc(bk):'حساب ما'):'موجودی '+fmt(e)}</small></span></button>`}).join('')}${B.map(c=>`<button class="chp${p.srcId==null&&String(p.chId)===String(c.id)?' on':''}" data-act="pyCh" data-id="${c.id}">${ic('bank')}<span><b>${esc(c.name)}</b><small>مانده ${fmt(chBal(c))}</small></span></button>`).join('')}</div>
+  if(p.m==='hav'){const B=CH('bank');b+=`<div class="d6l"><small>${out?'از کدام حساب ما':'به کدام حساب ما'}</small><div class="chps">${ownL(p.srcId).map(s=>{const bk=acBank(s);return `<button class="chp${p.srcId!=null&&String(p.srcId)===String(s.id)?' on':''}" data-act="pySrc" data-id="${s.id}">${bk?bankBadge(bk):ic('bank')}<span><b>${esc(s.name)}</b><small>${esc(bkSub(s))}</small></span></button>`}).join('')}${B.map(c=>`<button class="chp${p.srcId==null&&String(p.chId)===String(c.id)?' on':''}" data-act="pyCh" data-id="${c.id}">${ic('bank')}<span><b>${esc(c.name)}</b><small>مانده ${fmt(chBal(c))}</small></span></button>`).join('')}</div>
     ${can('src')?`<div class="fsearch sm chadd">${ic('plus')}<input id="pyCn" placeholder="نام حساب تازه ما" autocomplete="off" enterkeyhint="done"><button class="lnk" data-act="pyChAdd">افزودن</button></div>`:''}</div>`}
   if(p.m==='cust'){const C=CU().find(c=>String(c.id)===String(p.cuId));b+=`<div class="d6l"><small>${out?'به حساب کدام مشتری':'از طلب کدام مشتری'}</small>${C?`<div class="d6cu sm">${cuAvH(C)}<span class="tx"><b>${esc(cuName(C))}</b><small>${cuLab(cuBal(C).R)} ${cuBal(C).R?fmt(Math.abs(cuBal(C).R))+' تومان':''}</small></span><button class="lnk" data-act="pyCu" data-id="">تغییر</button></div>`
       :`<div class="cbx"><div class="fsearch sm">${ic('search')}<input id="pyQ" value="${esc(p.q||'')}" placeholder="نام مشتری…" autocomplete="off"></div><div id="pyCr">${pyCrHTML()}</div></div>`}</div>`}
@@ -608,7 +609,12 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 /* ================= نمایش سند ================= */
 let invV=null;
 function invOpen(cu,tx,fresh){invV={cu,tx,fresh:!!fresh};custId=cu;closeSheet();go('inv')}
-const invGet=()=>{if(!invV)return null;const c=custs.find(z=>String(z.id)===String(invV.cu)),t=c&&(c.txs||[]).find(z=>String(z.id)===String(invV.tx));return t&&!t.del?{c,t}:null};
+/* v66.0 (خواسته صاحب اپ: «سند رو به من نشون بده نه جزئیات»): تراکنش‌های قدیمی «دریافت/پرداخت وجه» (مثل تسویه واریزی پیش از v65)
+   هم در همان صفحه سند باز می‌شوند؛ فقط نمای سند است (داده دست نمی‌خورد، ویرایش ندارد، حذف همان تراکنش را حذف می‌کند) */
+const TXDOC=['pin','pout'];
+const txDocV=t=>{const o=t.type==='pout',a=(+t.amount||0)*(o?-1:1),n=String(t.note||''),nm=(n.match(/«(.+?)»/)||[])[1]||'',tn=(n.match(/پیگیری\s*(\S+)/)||[])[1]||'',p=t.entId?{m:'dep',amount:a,entId:t.entId,entName:nm}:{m:'cash',amount:a};if(tn)p.tn=tn;if(t.img)p.img=t.img;
+  return {id:t.id,type:'inv',legacy:t.type,no:'',dk:o?'out':'in',date:t.date,at:t.at,by:t.by,note:n,items:[],xr:[],pays:[p],total:0,ge:0}};
+const invGet=()=>{if(!invV)return null;const c=custs.find(z=>String(z.id)===String(invV.cu)),t=c&&(c.txs||[]).find(z=>String(z.id)===String(invV.tx));if(!t||t.del)return null;if(t.type==='inv')return {c,t,raw:t};return TXDOC.includes(t.type)?{c,t:txDocV(t),raw:t}:null};
 const xrRowsOf=t=>(t.xr||[]).map(x=>({lab:xrLab(x),sub:xrSub(x,{n:x.n!=null?x.n:(x.a==='gold'?x.w:x.q),pg:x.pg,amount:x.amount,e:x.e}),amt:x.t==='sell'?x.amount:x.t==='buy'?-x.amount:0}));
 function invEffTxt(t){const d=txD(t),P=[];if(d.r)P.push((d.r<0?'بدهکار ':'طلبکار ')+fmt(Math.abs(d.r))+' تومان');if(d.g)P.push((d.g<0?'بدهکار ':'طلبکار ')+wFmt(Math.abs(d.g))+' گرم طلا');for(const k in d.x||{})if(+d.x[k])P.push((d.x[k]<0?'بدهکار ':'طلبکار ')+qFmt(Math.abs(d.x[k]))+' '+(XA[k]||{u:k}).u+(XA[k]&&XA[k].k==='c'?' '+XA[k].s:''));return P}
 function vInv(){const X=invGet();if(!X){setTimeout(()=>{if(cur==='inv')go('custs',true)},0);return ''}const {c,t}=X,b=cuBal(c),D=dates(t.date),fresh=invV.fresh;invV.fresh=false;
@@ -622,7 +628,7 @@ function vInv(){const X=invGet();if(!X){setTimeout(()=>{if(cur==='inv')go('custs
 let ivCntId=null;
 const bindInv=()=>{const k=String(invV&&invV.tx);if(ivCntId===k)return;ivCntId=k;requestAnimationFrame(()=>cuCount('.cub9.anim .cbn'))};
 /* v61.52 (خواسته صاحب اپ): ویرایش، سند بعدی و حذف از پایین صفحه برداشته شد و در منوی کوچک بالا سمت چپ (⋯) آمد */
-ACT.invMenu=()=>{const X=invGet();if(!X)return;const it=[can('debt')?['invEdit',ic('edit'),'ویرایش سند']:null,can('debt')?['svNew',ic('plus'),'سند بعدی برای «'+cuName(X.c)+'»',{cu:X.c.id}]:null,['invPrint',ic('print'),'فاکتور · چاپ / PDF'],['cuOpen',ic('users'),'حساب مشتری',{id:X.c.id}],can('del')||isAdmin()?['invDel',ic('trash'),'حذف این سند',null,1]:null].filter(Boolean);
+ACT.invMenu=()=>{const X=invGet();if(!X)return;const it=[can('debt')&&!X.t.legacy?['invEdit',ic('edit'),'ویرایش سند']:null,can('debt')?['svNew',ic('plus'),'سند بعدی برای «'+cuName(X.c)+'»',{cu:X.c.id}]:null,['invPrint',ic('print'),'فاکتور · چاپ / PDF'],['cuOpen',ic('users'),'حساب مشتری',{id:X.c.id}],can('del')||isAdmin()?['invDel',ic('trash'),'حذف این سند',null,1]:null].filter(Boolean);
   popMenu(document.querySelector('#bar .hmo'),it)};
 /* منوی کوچک زیر یک دکمه سرتیتر (مثل منوی iOS): زدن بیرون یا Esc = بسته؛ هر گزینه همان data-act همیشگی را اجرا می‌کند */
 function popMenu(btn,items){let m=$('pmenu');if(m){m.remove();return}if(!btn)return;m=document.createElement('div');m.id='pmenu';m.className='pmenu';m.setAttribute('role','menu');
@@ -685,7 +691,7 @@ function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','
   const keep=sv;sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:false,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();const r=sv;sv=keep;return r}
 /* v61.56 (خواسته صاحب اپ): در صفحه سند ثبت‌شده هم نگه داشتن روی مانده‌های پایین = جزئیات فاکتور (همان پنجره صفحه سند) */
 function invDetHTML(){const X=invGet();if(!X)return '';const keep=sv;try{sv=invSv(X.c,X.t);return svDetHTML({inv:1})}finally{sv=keep}}
-ACT.invEdit=()=>{const X=invGet();if(!X)return;if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
+ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
   sv=invSv(c,t);sv.sig0=svSig();svKeep();TITLES.sell='ویرایش سند '+toFa(t.no);PARENT.sell='inv';go('sell')};
 ACT.invPaper=()=>{if(!invV)return;invV.paper=!invV.paper;render();scrollTo({top:0,behavior:RM()?'auto':'smooth'})};
 const aInv=()=>{const X=invGet();return X?ivBalP(X.c,X.t):''};
@@ -829,7 +835,7 @@ ACT.chDel=()=>{const c=custs.find(z=>String(z.id)===String(chId));if(!c)return;c
 let posD=null;
 function pdHTML(){const c=custs.find(z=>String(z.id)===String(chId)),bal=chBal(c);
   return `<div class="sh-h"><div><b>واریز «${esc(c.name)}» به حساب</b><small class="shsub">مانده واریزنشده ${fmt(bal)} تومان</small></div><button class="x" data-act="chOpen" data-id="${c.id}" aria-label="بازگشت">×</button></div><div class="bzw" style="animation:none">
-  <div class="ef"><label>به کدام حساب</label>${sources.length?`<div class="chps">${sources.map(s=>{const bk=acBank(s),e=acEst(s);return `<button class="chp${String(posD.to)===String(s.id)?' on':''}" data-act="pdTo" data-id="${s.id}">${bk?bankBadge(bk):ic('bank')}<span><b>${esc(s.name)}</b><small>${e==null?'موجودی اولیه ثبت نشده':'موجودی '+fmt(e)}</small></span></button>`}).join('')}</div>`:'<div class="eh">در بخش بانک حسابی تعریف نشده</div>'}</div>
+  <div class="ef"><label>به کدام حساب</label>${sources.length?`<div class="chps">${ownL(posD.to).map(s=>{const bk=acBank(s);return `<button class="chp${String(posD.to)===String(s.id)?' on':''}" data-act="pdTo" data-id="${s.id}">${bk?bankBadge(bk):ic('bank')}<span><b>${esc(s.name)}</b><small>${esc(bkSub(s))}</small></span></button>`}).join('')}</div>`:'<div class="eh">در بخش بانک حسابی تعریف نشده</div>'}</div>
   <div class="ef"><label for="pdA">مبلغ <i>(تومان)</i></label><input id="pdA" class="ltr acbig" inputmode="numeric" value="${posD.a?Number(posD.a).toLocaleString('en-US'):''}" autocomplete="off"><small class="eh">کل مانده: ${fmt(bal)} تومان</small></div></div>
   <button class="xgo" data-act="pdSave">${ic('check')} ثبت واریز</button>`}
 const pdRe=()=>{sheet(pdHTML());const A=$('pdA');if(A){selOnFocus(A);A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):'';posD.a=v}}};
