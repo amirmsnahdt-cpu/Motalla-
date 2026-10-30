@@ -141,11 +141,30 @@ function stRe(){const gh=stGhost(),bw=qaDir==='bw',O=document.querySelector('#qa
   stSlide(bw,gh);stStrip()}
 /* v61.98 (خواسته صاحب اپ): رفتن به پله بعد نرم و پیدا — تصویر فیلد قبلی به سمت راست محو می‌شود و فیلد تازه از چپ می‌آید
    (در راست‌به‌چپ «بعدی» سمت چپ است)، کادر مبلغ کمی بعدش، و پله فعال در ردیف بالا یک بار می‌پرد */
-function stGhost(){const c=document.querySelector('#qa .st3');if(!c||RM())return null;const r=c.getBoundingClientRect(),g=c.cloneNode(true);g.removeAttribute('id');g.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));const I=$('stI'),gi=g.querySelector('.stin');if(gi&&I)gi.value=I.value;g.classList.add('stgh');g.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;pointer-events:none;z-index:40`;document.body.appendChild(g);return g}
-function stSlide(bw,gh){const E='cubic-bezier(.22,.9,.24,1)',d=bw?-1:1;if(gh&&gh.animate){gh.animate([{opacity:1,transform:'none'},{opacity:0,transform:`translateX(${d*56}px) scale(.97)`}],{duration:260,easing:E}).onfinish=()=>gh.remove();setTimeout(()=>{if(gh.isConnected)gh.remove()},400)}else if(gh)gh.remove();if(RM())return;
-  const c=document.querySelector('#qa .st3');if(c&&c.animate)c.animate([{opacity:0,transform:`translateX(${-d*56}px)`},{opacity:1,transform:'none'}],{duration:340,easing:E});
-  const v=document.querySelector('#qa #stPv');if(v&&v.animate)v.animate([{opacity:.35,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:380,delay:30,easing:E,fill:'backwards'});
-  const o=document.querySelector('#qa .stp.on');if(o&&o.animate)o.animate([{transform:'scale(.9)'},{transform:'scale(1.06)'},{transform:'none'}],{duration:380,easing:'cubic-bezier(.3,1.4,.5,1)'})}
+/* v66.8 (خواسته صاحب اپ: «مثل Liquid Glass اپل، روان؛ الان می‌پرد و انگار خطا دارد»):
+   علت پرش: تصویر فیلد قبلی position:fixed روی body بود و در آیفون با کیبورد باز (viewport جابه‌جا) بالای پنل می‌افتاد؛
+   و وقتی پنل کامل دوباره ساخته می‌شد کل پنل هم یک بار محو و ظاهر می‌شد. حالا:
+   ۱) تصویر فیلد قبلی داخل خود پنل (#qa، absolute) و با محو + تاری کم‌کم کنار می‌رود؛ فیلد تازه از تاری روشن می‌شود (بدون پرش جا).
+   ۲) پله فعال در ردیف بالا: یک «عدسی شیشه‌ای» از پله قبلی تا پله تازه با فنر می‌لغزد و کمی کش می‌آید (حس مایع)، بعد در همان پله می‌نشیند.
+   ۳) کادر مبلغ جابه‌جا نمی‌شود؛ فقط عددش می‌شمارد (numMorph). */
+function stGhost(){const q=$('qa'),c=q&&q.querySelector('.st3');if(!c||RM())return null;const Q=q.getBoundingClientRect(),r=c.getBoundingClientRect(),g=c.cloneNode(true);
+  g.removeAttribute('id');g.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));const I=$('stI'),gi=g.querySelector('.stin');if(gi&&I)gi.value=I.value;
+  g.classList.add('stgh');g.style.cssText=`position:absolute;left:${r.left-Q.left}px;top:${r.top-Q.top}px;width:${r.width}px;height:${r.height}px;margin:0;pointer-events:none;z-index:6`;
+  const o=q.querySelector('.stp.on');g._k=o?[...o.parentNode.children].indexOf(o):-1;q.appendChild(g);return g}
+const STE='cubic-bezier(.32,.72,0,1)';
+function stSlide(bw,gh){const q=$('qa');if(q)q.classList.remove('swap','bw');if(gh&&q&&!gh.isConnected)q.appendChild(gh);const d=bw?-1:1,k0=gh?gh._k:-1;
+  if(gh&&gh.animate){gh.animate([{opacity:1,filter:'blur(0)',transform:'none'},{opacity:0,filter:'blur(6px)',transform:`translateX(${d*22}px) scale(.97)`}],{duration:240,easing:'ease-out',fill:'forwards'}).onfinish=()=>gh.remove();setTimeout(()=>{if(gh.isConnected)gh.remove()},420)}else if(gh)gh.remove();if(RM())return;
+  const c=q&&q.querySelector('.st3');if(c&&c.animate)c.animate([{opacity:0,filter:'blur(8px)',transform:`translateX(${-d*18}px) scale(.985)`},{opacity:1,filter:'blur(0)',transform:'none'}],{duration:420,delay:40,easing:STE,fill:'backwards'});
+  const v=q&&q.querySelector('#stPv');if(v&&v.animate)v.animate([{opacity:.6},{opacity:1}],{duration:300,easing:'ease-out'});
+  stLens(k0)}
+/* عدسی شیشه‌ای ردیف پله‌ها: داخل خود ردیف (absolute) تا با اسکرول افقی همراه باشد */
+function stLens(k0){const w=document.querySelector('#qa .stps'),o=w&&w.querySelector('.stp.on');if(!o||!w.animate)return;const L=[...w.children].filter(x=>x.classList.contains('stp')),k=L.indexOf(o),f=L[k0];
+  if(!f||k0===k){o.animate([{transform:'scale(.96)'},{transform:'none'}],{duration:320,easing:STE});return}
+  w.querySelectorAll('.stlens').forEach(x=>x.remove());const z=document.createElement('i');z.className='stlens';w.appendChild(z);w.classList.add('lensing');
+  const box=e=>({left:e.offsetLeft+'px',top:e.offsetTop+'px',width:e.offsetWidth+'px',height:e.offsetHeight+'px'}),A=box(f),B=box(o),
+    mid={left:Math.min(f.offsetLeft,o.offsetLeft)+'px',top:(o.offsetTop+o.offsetHeight*.06)+'px',width:(Math.max(f.offsetLeft+f.offsetWidth,o.offsetLeft+o.offsetWidth)-Math.min(f.offsetLeft,o.offsetLeft))+'px',height:(o.offsetHeight*.88)+'px'};
+  Object.assign(z.style,B);const an=z.animate([{...A,offset:0},{...mid,offset:.45},{...B,offset:1}],{duration:520,easing:STE});
+  const end=()=>{z.remove();w.classList.remove('lensing');o.animate([{transform:'scale(1.04)'},{transform:'none'}],{duration:280,easing:STE})};an.onfinish=end;an.oncancel=()=>{z.remove();w.classList.remove('lensing')}}
 function stFinish(){const K=stKind();if(K==='pv'){ACT.pvSave();return}if(K==='it'||K==='ab')ACT.qaAdd();else if(K==='xr')ACT.xrSave();else if(K==='py')ACT.pySave()}
 const stOk=s=>s.need&&s.need()?false:s.wOr?true:s.opt||s.type==='int'||(s.type==='wam'?(+sv.qa.x.w||+sv.qa.x.am):s.type==='text'?s.get():+s.get());
 ACT.stNext=()=>{stRead();const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1),s=S[i];

@@ -132,28 +132,34 @@ let acV={id:null,f:'all'},bkId=null,bkCnt=null;
 const curBk=()=>bkId==null?null:sources.find(s=>String(s.id)===String(bkId))||null;
 const bxTime=at=>{if(!at)return '';const d=new Date(at);return isNaN(d)?'':toFa(p2(d.getHours())+':'+p2(d.getMinutes()))};
 /* ردیف‌های گردش یک حساب؛ همان کارت ردیف «گردش حساب» مشتری (fcard › txr). f: hv حواله، pos کارتخوان، out برداشت */
-function acRows(s){const R=[],L=acLed(s),add=(f,o)=>R.push({f,...o});
+/* v66.8 (خواسته صاحب اپ): بعد از «اصلاح حساب» گردش‌های قبلی هم دیده می‌شوند — زیر خط «اصلاح حساب» و کم‌رنگ،
+   چون در مانده ثبت‌شده حساب شده‌اند و دیگر در مانده جمع نمی‌شوند (acSum همان قبلی است). کارت‌های کارتخوانِ روزهای قبل «نشسته ✓». */
+const AC_OLD=200;
+function acRows(s){const R=[],L=(s.led||[]).filter(x=>!x.del),ba=s.balAt||'',add=(f,o)=>{const old=!!(ba&&!o.res&&!o.way&&String(o.oat||o.at||'')<ba);if(old)o.h=o.h.replace('class="txr bxtx','class="txr bxtx old');R.push({f,old,...o})},td=todayISO();
   const ico=(K,i,cl)=>`<span class="bri bxbi ${cl}">${K.length?`<img data-ik="${esc(K[0])}" alt="">`:ic(i)}${K.length>1?`<em>${toFa(K.length)}</em>`:''}</span>`;
   const val=(a,lab,cl)=>`<span class="txv txv2"><b class="${cl||(a<0?'r':'b')}"><span><bdi dir="ltr">${a<0?'−':'+'}${fmt(Math.abs(a))}</bdi> <i>تومان</i></span><small>${lab}</small></b></span>`;
   /* هر ردیف مثل گردش حساب مشتری: کارت با کشیدن (ردیف‌های دستی: کشیدن = حذف) */
   const row=o=>`<div class="fcard">${swW(`<${o.act?'button':'div'} class="txr bxtx${o.cls?' '+o.cls:''}"${o.act||''}>${o.av}<span class="tx"><b>${o.t}</b><small>${o.sub}</small></span>${o.v}</${o.act?'button':'div'}>`,o.x||{r:[],l:[],data:{}})}</div>`;
   const del=x=>({r:[],l:can('src')?[['acLedDel','حذف','trash','#d23c48']]:[],data:{id:s.id,l:x.id}});
-  for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{if(p.srcId==null||String(p.srcId)!==String(s.id))return;const a=+p.amount||0,K=(p.imgs&&p.imgs.length?p.imgs:p.img?[p.img]:[]);
+  for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv')continue;(t.pays||[]).forEach(p=>{if(p.srcId==null||String(p.srcId)!==String(s.id))return;const a=+p.amount||0,K=(p.imgs&&p.imgs.length?p.imgs:p.img?[p.img]:[]);
     add('hv',{at:t.at,d:t.date,a,h:row({act:` data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"`,av:ico(K,a>0?'down':'share','t-inv'),t:(a>0?'حواله از ':'حواله به ')+esc(cuName(c)),sub:esc([invTitle(t),bxTime(t.at),p.tn?'پیگیری '+toFa(p.tn):''].filter(Boolean).join(' · ')),v:val(a,a>0?'دریافت':'پرداخت')})})})}}
-  L.filter(x=>x.type==='pos').forEach(x=>add('pos',{at:x.at,d:x.date,a:+x.amount||0,h:row({av:ico([],'down','t-pin'),t:x.note?esc(x.note):'کارتخوان به حساب نشست',sub:esc([bxTime(x.at),x.by||''].filter(Boolean).join(' · ')),v:val(+x.amount||0,'نشسته'),x:del(x)})}));
-  acPOS(s).forEach(ch=>chMoves(ch).forEach(m=>{if(m.own||m.a<=0||(s.balAt&&String(m.at||'')<s.balAt))return;add('pos',{at:m.at,d:m.d,a:m.a,h:row({cls:'way',act:` data-act="cuInv" data-cu="${m.cu}" data-tx="${m.tx}"`,av:ico([],'card','t-pend'),t:esc(m.t),sub:esc([ch.name,m.sub,bxTime(m.at)].filter(Boolean).join(' · ')),v:val(m.a,'در راه · فردا','w')})})}));
+  L.filter(x=>x.type==='pos'&&!x.auto).forEach(x=>add('pos',{at:x.at,d:x.date,a:+x.amount||0,h:row({av:ico([],'down','t-pin'),t:x.note?esc(x.note):'کارتخوان به حساب نشست',sub:esc([bxTime(x.at),x.by||''].filter(Boolean).join(' · ')),v:val(+x.amount||0,'نشسته'),x:del(x)})}));
+  acPOS(s).forEach(ch=>chMoves(ch).forEach(m=>{if(m.own||m.a<=0)return;const ok=String(m.d||'')<td;add('pos',{at:m.at,oat:ok?posSetAt(m.d):'',way:!ok,d:m.d,a:m.a,h:row({cls:ok?'':'way',act:` data-act="cuInv" data-cu="${m.cu}" data-tx="${m.tx}"`,av:ico([],'card',ok?'t-pin':'t-pend'),t:esc(m.t),sub:esc([ch.name,m.sub,bxTime(m.at)].filter(Boolean).join(' · ')),v:ok?val(m.a,'نشسته ✓'):val(m.a,'در راه · فردا','w')})})}));
   L.filter(x=>x.type==='in').forEach(x=>add('hv',{at:x.at,d:x.date,a:+x.amount||0,h:row({av:ico([],'plus','t-pin'),t:x.note?esc(x.note):'واریز به حساب',sub:esc(['ثبت دستی',bxTime(x.at),x.by||''].filter(Boolean).join(' · ')),v:val(+x.amount||0,'واریز'),x:del(x)})}));
-  if(s.balAt)batches.forEach(b=>b.items.forEach(x=>{if(x.src!==s.name||x.st==='fail'||String(x.sAt||b.createdAt||'')<s.balAt)return;const at=x.sAt||b.createdAt,K=itImgs(b,x);
+  if(s.balAt)batches.forEach(b=>b.items.forEach(x=>{if(x.src!==s.name||x.st==='fail')return;const at=x.sAt||b.createdAt,K=itImgs(b,x);
     add('out',{at,d:String(at||'').slice(0,10)||b.date,a:-(+x.amount||0),h:row({act:` data-act="openEnt" data-id="${x.id}"`,av:ico(K,'share','t-pout'),t:esc(x.name||'واریزی'),sub:esc(['واریزی لیست '+dates(b.pay||b.date).fa,x.iban?'شبا …'+toFa(String(x.iban).slice(-6)):'',x.tn?'پیگیری '+toFa(x.tn):''].filter(Boolean).join(' · ')),v:val(-(+x.amount||0),x.st==='ok'?'تأیید بانک':'ارسال‌شده')})})}));
   L.filter(x=>x.type==='out').forEach(x=>add('out',{at:x.at,d:x.date,a:-(+x.amount||0),h:row({av:ico([],'share','t-pout'),t:x.note?esc(x.note):'برداشت',sub:esc(['ثبت دستی',bxTime(x.at),x.by||''].filter(Boolean).join(' · ')),v:val(-(+x.amount||0),'برداشت'),x:del(x)})}));
   Object.values(drafts||{}).forEach(Lp=>(Lp||[]).forEach(p=>{if(p.sent||!p.src||String(p.src.id)!==String(s.id))return;partRows(p).forEach(r=>add('out',{at:'',res:1,d:PD(r),a:0,h:row({cls:'way',act:` data-act="openEnt" data-id="${r.id}"`,av:ico([],'clock','t-pend'),t:esc(fullName(r)),sub:esc('واریزی لیست '+dates(PD(r)).fa+' · هنوز ارسال نشده'),v:val(-(+r.amount||0),'در صف ارسال','w')})}))}));
-  return R.sort((a,b)=>(a.res||0)-(b.res||0)||String(b.at||'').localeCompare(String(a.at||'')))}
+  R.sort((a,b)=>(a.res||0)-(b.res||0)||String(b.at||'').localeCompare(String(a.at||'')));
+  if(!ba)return R;const N=R.filter(r=>!r.old),O=R.filter(r=>r.old).slice(0,AC_OLD);if(!O.length)return N;
+  const bd=new Date(ba),bi=bd.getFullYear()+'-'+p2(bd.getMonth()+1)+'-'+p2(bd.getDate()),mk={f:'mark',old:true,at:ba,d:bi,h:`<div class="bxmk"><span>${ic('edit')} اصلاح حساب · ${esc(relDay(bi))} ${esc(bxTime(ba))}</span><b>${s.bal<0?'−':''}${fmt(Math.abs(+s.bal||0))} <i>تومان</i></b><small>گردش‌های زیر در همین مانده حساب شده‌اند</small></div>`};
+  return [...N,mk,...O]}
 const ACF=[['hv','حواله‌ها'],['pos','کارتخوان'],['out','برداشت‌ها']];
-function acListHTML(s,R){const f=acV.f,L=f==='all'?R:R.filter(r=>r.f===f);
+function acListHTML(s,R){const f=acV.f,L0=f==='all'?R:R.filter(r=>r.f===f||r.f==='mark'),L=L0.some(r=>r.old&&r.f!=='mark')?L0:L0.filter(r=>r.f!=='mark');
   if(!L.length)return `<div class="stmno">${ic(f==='pos'?'card':f==='out'?'share':'swap')}<b>${f==='all'?'گردشی ثبت نشده':f==='hv'?'حواله‌ای نخورده':f==='pos'?'کارتخوانی نیست':'برداشتی نیست'}</b><small>${s.balAt?'از تطبیق '+esc(dates(s.balAt.slice(0,10)).fa):'حواله‌های سندها اینجا می‌آیند'}</small></div>`;
-  let g=null;return L.map(r=>{let d='';const k=r.res?'res':r.d||'';if(k!==g){g=k;if(r.res)d='<div class="fday">در صف ارسال · هنوز از حساب کم نشده</div>';else{const t=relDay(k);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(t)?t+'، ':''}${esc(dates(k).fa)}</div>`}}return d+r.h}).join('')}
+  let g=null;return L.map(r=>{let d='';if(r.f==='mark'){g=null;return r.h}const k=r.res?'res':r.d||'';if(k!==g){g=k;if(r.res)d='<div class="fday">در صف ارسال · هنوز از حساب کم نشده</div>';else{const t=relDay(k);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(t)?t+'، ':''}${esc(dates(k).fa)}</div>`}}return d+r.h}).join('')}
 /* صفحه حساب: کارت «مانده حساب» (مانده نهایی + مانده قبلی)، سه کاشی جمع که فیلتر فهرست هم هستند، بعد گردش حساب */
-function vBank(){const s=curBk();if(!s){setTimeout(()=>{if(cur==='bank')go('banks',true)},0);return ''}const m=acSum(s),R=acRows(s),an=bkCnt!==String(s.id),cnt=f=>R.filter(r=>r.f===f&&!r.res).length,c=can('src');
+function vBank(){const s=curBk();if(!s){setTimeout(()=>{if(cur==='bank')go('banks',true)},0);return ''}const m=acSum(s),R=acRows(s),an=bkCnt!==String(s.id),cnt=f=>R.filter(r=>r.f===f&&!r.res&&!r.old).length,c=can('src');
   /* v66.2: یک کادر آبی (مانده نهایی + مانده قبلی و الان در حساب) با دکمه «اصلاح حساب»؛ زیرش جمع‌ها به‌صورت زبانه‌های فشرده */
   const ft=(f,l,v,n)=>`<button class="bxft${acV.f===f?' on':''}" data-act="acF" data-f="${f}" aria-pressed="${acV.f===f}"><small>${l} <i>${toFa(n)}</i></small>${bxSg(v)}</button>`;
   const sub=m.known?'قبلی '+fmt(m.prev)+' · الان در حساب '+(m.now<0?'−':'')+fmt(Math.abs(m.now))+(m.posWay?'</span><span>کارتخوان '+fmt(m.posWay)+' تومان فردا می‌نشیند':''):'مانده قبلی این حساب ثبت نشده';
