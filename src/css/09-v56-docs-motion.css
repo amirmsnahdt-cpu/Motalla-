@@ -2601,3 +2601,11 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .fcard .txr .bri.bxbi img{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover;border-radius:0}
 .fcard .txr .bri.bxbi em{top:auto;bottom:2px;left:2px}
 .hmo{position:relative}.bxdot{position:absolute;top:7px;left:7px;width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--card)}
+
+/* v66.3 کارتخوان‌ها */
+.bxcard{background:var(--warn2)!important;color:var(--warn)}.bxcard svg{width:19px;height:19px}
+.acsh .c6a{flex:none}
+.pnr{cursor:text}.pnr .pin{flex:none;width:118px;height:44px;border:0!important;border-radius:12px;background:var(--bg)!important;box-shadow:inset 0 0 0 1.5px var(--line)!important;padding:0 10px!important;font:inherit;font-size:15px;font-weight:800;color:var(--ink);text-align:left}
+.pnr .pin:focus{box-shadow:inset 0 0 0 2px var(--blu)!important;outline:none}
+.hmo .bxdot{top:5px;left:5px;width:8px;height:8px}
+.bxrow .tx small{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.45}
