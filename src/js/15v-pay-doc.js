@@ -44,7 +44,7 @@ function payDocMake(e,c,a,o){o=o||{};const p={m:'dep',amount:Math.round(a),entId
 /* واریزی تازه → حساب + سند؛ تسویه‌های همراهش → سند دریافت هر پرداخت‌کننده */
 function depLink(e,o){o=o||{};try{const S=(o.settles||[]).filter(s=>+s.amount>0);
     const c=cuOf({cuId:o.cuId,name:e.name,title:e.title,phone:e.phone,nid:e.nid,iban:e.iban,card:e.card,holder:e.holder},'از واریزی');depDocMake(e,c);
-    for(const s of S){const pc=cuOf({cuId:s.cuId,name:s.name,title:s.title,phone:s.phone},'پرداخت‌کننده واریزی');payDocMake(e,pc,+s.amount,{tn:s.tn||'',note:s.note||'',imgs:stImgs(s),st:s.st||'ok'})}
+    for(const s of S){const pc=pyOf({cuId:s.cuId,name:s.name,phone:s.phone});payDocMake(e,pc,+s.amount,{tn:s.tn||'',note:s.note||'',imgs:stImgs(s),st:s.st||'ok'})}
     return c}catch(err){toast('واریزی ثبت شد، اما سند حساب مشتری ساخته نشد',true);return null}}
 /* حذف تسویه از سمت واریزی: سند خودکارش حذف، در سند دستی فقط همان ردیف */
 function stlDocOff(z){if(!z||!z.byInv)return;const c=custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);if(!t)return;const now=ns();
@@ -137,12 +137,12 @@ function pxList(){if(PX.only==='bk'){const out=[],q=nzName(toEn(clean(PX.q||''))
     if(R.length){g('آخرین حساب‌ها');R.forEach(c=>out.push(pxRow('cu',c.id,esc(userInit(cuName(c))),esc(cuName(c)),cuSub(c),cuBalMini(c))))}}
   else{const C=A.filter(c=>cuHit(c,q,dOk)).sort((a,b)=>(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||'')));
     if(C.length){g('حساب‌های مشتری',C.length);C.slice(0,60).forEach(c=>out.push(pxRow('cu',c.id,esc(userInit(cuName(c))),esc(cuName(c)),cuSub(c),cuBalMini(c))))}
-    PXM=memPeople(q,dOk,8);if(PXM.length){g('از واریزی‌ها و خریدها · حساب برایشان باز می‌شود');PXM.forEach((p,i)=>out.push(pxRow('mem',i,esc(userInit(p.name)),esc(p.name),[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'بدون حساب')))}
-    if(!/^\d+$/.test(toEn(q0))&&!C.some(c=>nzName(c.name)===q))out.push(pxRow('new','',ic('plus'),'حساب تازه: «'+esc(q0)+'»','حساب مشتری با همین نام باز می‌شود','','nw'))}
+    PXM=memPeople(q,dOk,8);if(PXM.length){g('از واریزی‌ها و خریدها · حساب مشتری باز نمی‌شود');PXM.forEach((p,i)=>out.push(pxRow('mem',i,esc(userInit(p.name)),esc(p.name),[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'بدون حساب')))}
+    if(!/^\d+$/.test(toEn(q0))&&!C.some(c=>nzName(c.name)===q))out.push(pxRow('new','',ic('plus'),'پرداخت‌کننده: «'+esc(q0)+'»','حساب مشتری باز نمی‌شود؛ فقط سند تسویه ثبت می‌شود','','nw'))}
   /* v67.3: با جستجو، بانک‌های مغازه بالای فهرست (قبلاً آخر بودند و «حساب تازه» با نام بانک ساخته می‌شد) */
   if(q){const B=[];pxBkRows(q,(t,n)=>B.push(`<div class="px7g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`),B);out.unshift(...B)}else pxBkRows(q,g,out);
   return out.length?out.join(''):`<div class="px7e"><b>«${esc(q0)}» پیدا نشد</b><small>نام را کامل‌تر بنویسید یا با شماره تلفن جستجو کنید</small></div>`}
-function pxSel(){const s=PX.sel;if(!s)return null;if(s.k==='bk'){const z=sources.find(o=>String(o.id)===String(s.id));if(!z)return null;const bk=acBank(z);return {bk:z,name:z.name,av:bk?bankBadge(bk,'lg'):ic('bank'),sub:bkSub(z),bal:'',R:0}}if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return null;const R=cuBal(c).R;return {c,name:cuName(c),sub:cuSub(c),bal:R?`<b class="${R<0?'r':'b'}">${R<0?'طلب ما':'بدهی ما'} ${fmt(Math.abs(R))} تومان</b>`:'<b>حساب تسویه است</b>',R}}return {c:null,name:s.name,sub:s.k==='mem'?'از واریزی‌ها · با ثبت، حساب باز می‌شود':'حساب تازه با ثبت باز می‌شود',bal:'',R:0}}
+function pxSel(){const s=PX.sel;if(!s)return null;if(s.k==='bk'){const z=sources.find(o=>String(o.id)===String(s.id));if(!z)return null;const bk=acBank(z);return {bk:z,name:z.name,av:bk?bankBadge(bk,'lg'):ic('bank'),sub:bkSub(z),bal:'',R:0}}if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return null;const R=cuBal(c).R;return {c,name:cuName(c),sub:cuSub(c),bal:R?`<b class="${R<0?'r':'b'}">${R<0?'طلب ما':'بدهی ما'} ${fmt(Math.abs(R))} تومان</b>`:'<b>حساب تسویه است</b>',R}}return {c:null,name:s.name,sub:'پرداخت‌کننده تسویه · حساب مشتری باز نمی‌شود',bal:'',R:0}}
 function pxHTML(){const rest=pxRest(),who0=pxWho();
   if(PX.step===1)return `<div class="px7w s1"><div class="sh-h"><div><b>پرداخت از کجا؟</b><small class="shsub">مانده بانکی «${esc(who0)}»: ${fmt(rest)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="px7q"><div class="fsearch">${ic('search')}<input id="pxQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(PX.q)}" placeholder="نام، تلفن یا گروه مشتری، یا بانک…" aria-label="جستجوی پرداخت‌کننده" aria-controls="pxL"></div></div>
@@ -186,7 +186,7 @@ ACT.pxSave=async()=>{pxRead();const a=Math.round(PX.amount||0),r=pxRest(),s=PX.s
   if(PX.bz){const S=pxSel();bz.d.settles=(bz.d.settles||[]).concat([{name:S.name,phone:s.phone||(S.c&&S.c.phone)||'',cuId:S.c?S.c.id:'',amount:a,tn:PX.tn,note:PX.note,imgD:PX.imgD||'',inv:''}]);PX=null;closeSheet();bzStlRe();toast('تسویه اضافه شد · با ثبت واریزی سندش صادر می‌شود');return}
   const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e)return;if(PX.busy)return;PX.busy=1;
   try{let K=[];if(PX.imgD){const k=newImgKey('stl:'+e.id+'.'+Date.now());if(await imgPut(k,PX.imgD))K=[k];else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
-    const c=s.k==='cu'?CU().find(z=>String(z.id)===String(s.id)):cuOf({name:s.name,phone:s.phone,nid:s.nid},'پرداخت‌کننده واریزی');if(!c){toast('حساب پیدا نشد',true);return}
+    const c=s.k==='cu'?CU().find(z=>String(z.id)===String(s.id)):pyOf({name:s.name,phone:s.phone});if(!c){toast('حساب پیدا نشد',true);return}
     const R=payDocMake(e,c,a,{tn:PX.tn,note:PX.note,imgs:K});e.updatedAt=ns();e.updatedBy=who();saveE();
     logA('edit','تسویه از مشتری (سند)',fullName(e)+' ← '+cuName(c)+' | '+fmt(a)+' تومان | '+invTitle(R.t));pyFlash=R.z?R.z.id:null;PX=null;closeSheet();pyRe();
     setTimeout(()=>{pyFlash=null},1400);const el=$('py7');if(el&&!RM())try{el.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}

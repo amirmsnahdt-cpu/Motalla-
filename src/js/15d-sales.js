@@ -27,7 +27,7 @@ function chMoves(ch){const L=[];for(const c of custs){if(c.del||c.sys)continue;f
 const chBal=ch=>chMoves(ch).reduce((s,m)=>s+m.a,0);
 function chNew(name,kind){name=clean(name||'');if(!name)return null;const r={id:nid++,sys:'ch',kind,name,txs:[],createdAt:ns(),by:who()};custs.push(r);saveCu();logA('cust','تعریف '+CHK[kind],name);return r}
 /* حواله‌های سندها به حساب‌های بخش بانک (از آخرین تطبیق موجودی آن حساب) */
-function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{if(p.srcId!=null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,t:(+p.amount<0?'حواله به ':'حواله از ')+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L}
+function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{if(p.srcId!=null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,t:(+p.amount<0?'حواله به ':'حواله از ')+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L.concat(pyMoves(s))}
 const srcInvSum=s=>srcMoves(s).reduce((a,m)=>a+m.a,0);
 function srcQuick(name){name=clean(name||'');if(!name)return null;const ex=sources.find(s=>s.name===name);if(ex)return ex;if(!can('src')){toast('تعریف حساب بانکی برای حساب شما فعال نیست',true);return null}
   const s={id:nid++,name,bank:'',limit:0,count:0,iban:'',card:''};if(ownSet())s.own=1;sources.push(s);saveS();logA('src','حساب بانکی جدید',name);return s}
@@ -106,7 +106,7 @@ function svTot(){let gold=0,aj=0,pr=0,tax=0,w=0;for(const it of sv.items){const 
   let xs=0,xb=0,ge=0;const xe={};for(const x of sv.xr||[]){const c=xrCalc(x,sv.rate);if(x.t==='sell')xs+=c.amount;else if(x.t==='buy')xb+=c.amount;if(c.e){if(x.a==='gold')ge+=c.e;else xe[x.a]=Math.round(((xe[x.a]||0)+c.e)*100)/100}}
   const sub=gold+aj+pr+tax,gross=sub+xs,disc=Math.min(+sv.disc||0,Math.max(0,gross)),total=gross-disc-xb,paid=svPaid();
   return{gold,aj,pr,tax,w:Math.round(w*1000)/1000,sub,xs,xb,disc,total,paid,rest:total-paid,ge:Math.round(ge*1000)/1000,xe}}
-const svCu=()=>sv&&sv.cuId?CU().find(c=>String(c.id)===String(sv.cuId))||null:null;
+const svCu=()=>sv&&sv.cuId?custs.find(c=>!c.del&&(!c.sys||c.sys==='py')&&String(c.id)===String(sv.cuId))||null:null;
 const svHasG=()=>sv.items.length||(sv.xr||[]).some(x=>x.a==='gold'&&(x.t==='sell'||x.t==='buy')&&!x.pgM);
 function vSell(){xaSync();if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();glSync();svUsed=goodsUsed();const D=dates(sv.date);
   return `<div class="d6">
@@ -628,7 +628,7 @@ function vInv(){const X=invGet();if(!X){setTimeout(()=>{if(cur==='inv')go('custs
 let ivCntId=null;
 const bindInv=()=>{const k=String(invV&&invV.tx);if(ivCntId===k)return;ivCntId=k;requestAnimationFrame(()=>cuCount('.cub9.anim .cbn'))};
 /* v61.52 (خواسته صاحب اپ): ویرایش، سند بعدی و حذف از پایین صفحه برداشته شد و در منوی کوچک بالا سمت چپ (⋯) آمد */
-ACT.invMenu=()=>{const X=invGet();if(!X)return;const it=[can('debt')&&!X.t.legacy?['invEdit',ic('edit'),'ویرایش سند']:null,can('debt')?['svNew',ic('plus'),'سند بعدی برای «'+cuName(X.c)+'»',{cu:X.c.id}]:null,['invPrint',ic('print'),'فاکتور · چاپ / PDF'],['cuOpen',ic('users'),'حساب مشتری',{id:X.c.id}],can('del')||isAdmin()?['invDel',ic('trash'),'حذف این سند',null,1]:null].filter(Boolean);
+ACT.invMenu=()=>{const X=invGet();if(!X)return;const it=[can('debt')&&!X.t.legacy?['invEdit',ic('edit'),'ویرایش سند']:null,can('debt')&&!isPy(X.c)?['svNew',ic('plus'),'سند بعدی برای «'+cuName(X.c)+'»',{cu:X.c.id}]:null,['invPrint',ic('print'),'فاکتور · چاپ / PDF'],isPy(X.c)?null:['cuOpen',ic('users'),'حساب مشتری',{id:X.c.id}],can('del')||isAdmin()?['invDel',ic('trash'),'حذف این سند',null,1]:null].filter(Boolean);
   popMenu(document.querySelector('#bar .hmo'),it)};
 /* منوی کوچک زیر یک دکمه سرتیتر (مثل منوی iOS): زدن بیرون یا Esc = بسته؛ هر گزینه همان data-act همیشگی را اجرا می‌کند */
 function popMenu(btn,items){let m=$('pmenu');if(m){m.remove();return}if(!btn)return;m=document.createElement('div');m.id='pmenu';m.className='pmenu';m.setAttribute('role','menu');

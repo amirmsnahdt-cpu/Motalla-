@@ -37,7 +37,7 @@ function balPills(b,pw){const X=Object.keys(b.X||{}).filter(k=>b.X[k]);if(!b.R&&
   const L=[['g',b.G],['r',b.R],...X.map(k=>[k,b.X[k]])];let i=0;return L.map(([k,v])=>cbCell(k,v,i++,k==='r'&&pw)).join('')}
 /* v61.56 (خواسته صاحب اپ): کارت مشتری (آواتار، عنوان، نام، گروه، تلفن) در سرتیتر همه صفحه‌های مشتری، زیر عنوان صفحه
    (جای نام کوچک قبلی). حساب مشتری: زدن = ویرایش مشخصات (مداد)؛ صفحه سند ثبت‌شده: زدن = حساب مشتری؛ صفحه سند: فقط نمایش */
-function cuHead(c,ttl){const a=cur==='cust'?'cuEdit':cur==='inv'?'cuOpen':'',T=a?'button':'div',m=[c.grp?`<em>${esc(c.grp)}</em>`:'',c.phone&&cur!=='cust'?(T==='button'?telS(c.phone):telP(c.phone)):''].filter(Boolean).join('');
+function cuHead(c,ttl){const a=isPy(c)?'':cur==='cust'?'cuEdit':cur==='inv'?'cuOpen':'',T=a?'button':'div',m=[c.grp?`<em>${esc(c.grp)}</em>`:'',c.phone&&cur!=='cust'?(T==='button'?telS(c.phone):telP(c.phone)):''].filter(Boolean).join('');
   return `<${T} class="cuh9"${a?` data-act="${a}" data-id="${c.id}" aria-label="${a==='cuEdit'?'ویرایش مشخصات ':'حساب '}${esc(cuName(c))}"`:''}>${cuAvH(c)}<span class="cuh9t">${ttl?`<span class="cuh9k">${esc(ttl)}</span>`:''}<span class="cuh9n">${honTag(c.name)}<b>${esc(cuName(c))}</b></span>${m?`<span class="cuh9m">${m}</span>`:''}</span>${a==='cuEdit'?`<span class="c6ed">${ic('edit')}</span>`:a?`<span class="cuh9g">${ic('back').replace('class="i"','class="i flip"')}</span>`:''}</${T}>`}
 /* کارت «مانده حساب»: کاشی‌های مبلغ و طلا (و سکه/ارز) با برچسب طلبکاریم/بدهکاریم؛ عدد در قاب خودش جا می‌شود.
    همان کارت در حساب مشتری و صفحه سند ثبت‌شده؛ کاشی‌ها پله‌ای بالا می‌آیند و عدد یک بار از صفر می‌شمارد */
@@ -224,7 +224,7 @@ ACT.cuSave=d=>{const name=clean($('cuN').value),phone=toEn($('cuP').value).repla
   else{c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;Object.assign(c,{title:cuT,name,phone,nid:nidv,note,grp,...ph,updatedAt:now,updatedBy:who()});if(bk)c.bk=bk;else delete c.bk;logA('cust','ویرایش مشخصات مشتری',cuName(c))}
   saveCu();closeSheet();if(d.id==='new'&&cuRet==='peer'){cuRet='';stPeerNew(c);toast('حساب «'+cuName(c)+'» باز شد');return}if(d.id==='new'&&cuRet==='sell'){cuRet='';svPick(c.id);toast('حساب «'+cuName(c)+'» باز شد و روی سند نشست');return}if(d.id==='new'){cuQ='';custId=c.id;go('cust');toast('حساب «'+cuName(c)+'» باز شد')}else{const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('مشخصات ذخیره شد')}};
 ACT.cuDel=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;const b=cuBal(c);askConfirm('حساب «'+cuName(c)+'» حذف شود؟'+(b.R||b.G||Object.keys(b.X).length?' (ته حساب صفر نیست)':''),'حذف',()=>{c.del=true;c.delAt=new Date().toISOString();saveCu();logA('cust','حذف حساب مشتری',cuName(c));if(cur==='cust')go('custs');else render();toast('حساب حذف شد','', 'بازگردانی',()=>{c.del=false;saveCu();render()})})};
-ACT.cuOpen=d=>{custId=d.id;go('cust')};
+ACT.cuOpen=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(isPy(c)){toast('«'+cuName(c)+'» پرداخت‌کننده تسویه است، حساب مشتری ندارد'+(c.src!=null?'؛ مانده‌اش در صفحه بانک است':''));return}custId=d.id;go('cust')};
 let CUP=[];
 ACT.cuNewP=d=>{const p=CUP[+d.i];if(!p||!can('debt'))return;cuRet='';sheet(cuFormHTML({name:p.name,phone:p.phone,nid:p.nid}));cuBind()};
 ACT.cuNewQ=()=>{cuRet='';const q=clean(cuQ||'');sheet(cuFormHTML({name:q}));cuBind();sheetFocus($('cuP'))};

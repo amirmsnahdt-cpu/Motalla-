@@ -85,11 +85,11 @@ function stlHTML(){const z=stl,who0=z.bz?clean(bz.d.name||''):fullName(entRow()|
   ${O.some(o=>!on(o[0]))?`<div class="px8m">${O.filter(o=>!on(o[0])).map(([k,t])=>`<button type="button" data-act="stlMore" data-f="${k}">${ic('plus')}<span>${t}</span></button>`).join('')}</div>`:''}
   <div class="px8fs">${O.filter(o=>on(o[0])).map(o=>F[o[0]]).join('')}</div>
   ${z.bz?`<button class="xgo" data-act="bzStlSave">${ic('check')} ${ed?'ذخیره تسویه':'افزودن تسویه'}</button>`:`<button class="xgo" data-act="stlSave">${ic('check')} ${ed?'ذخیره تغییرات':'ثبت و کسر از مانده'}</button>`}
-  ${ed&&!z.bz&&(c||stlDoc())?`<div class="st9a st9n">${c?`<button data-act="stlCuGo">${ic('users')}<span>حساب مشتری</span></button>`:''}${stlDoc()?`<button data-act="stlDocGo">${ic('inv')}<span>دیدن سند</span></button>`:''}</div>`:''}
+  ${ed&&!z.bz&&((c&&!isPy(c))||stlDoc())?`<div class="st9a st9n">${c&&!isPy(c)?`<button data-act="stlCuGo">${ic('users')}<span>حساب مشتری</span></button>`:''}${stlDoc()?`<button data-act="stlDocGo">${ic('inv')}<span>دیدن سند</span></button>`:''}</div>`:''}
   ${ed&&!z.bz?`<div class="st9a">${K.length?`<button data-act="stlImg">${ic('eye')}<span>دیدن رسید</span></button>`:''}<button class="d" data-act="stlDel">${ic('trash')}<span>حذف این تسویه</span></button></div>`:''}</div>`}
 /* v66.5 (خواسته صاحب اپ): از پنجره تسویه مستقیم به حساب مشتری و سند همان تسویه */
 function stlDoc(){const z=stl;if(!z)return null;const f=(cu,tx)=>{const c=custs.find(q=>String(q.id)===String(cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(tx)&&!q.del);return t?{cu:c.id,tx:t.id}:null};return (z.byInv&&f(z.byInv.cu,z.byInv.tx))||(z.cuId&&z.txId&&f(z.cuId,z.txId))||null}
-ACT.stlCuGo=()=>{const id=stl&&stl.cuId;if(!id)return;stl=null;closeSheet();custId=id;go('cust')};
+ACT.stlCuGo=()=>{const id=stl&&stl.cuId;if(!id||isPy(custs.find(x=>String(x.id)===String(id))))return;stl=null;closeSheet();custId=id;go('cust')};
 ACT.stlDocGo=()=>{const D=stlDoc();if(!D)return;stl=null;invOpen(D.cu,D.tx)};
 function stlAv(){const A=$('stA'),h=$('stAv');if(!A||!h)return;const a=num(A.value),r=stlRest();stl.amount=a;h.className='px8l'+(a>r?' bad':a?' ok':'');h.innerHTML=!a?'':a>r?'بیشتر از مانده بانکی ('+fmt(r)+')':`<span>مانده بانکی بعد از این <b>${fmt(r-a)}</b></span>`;document.querySelectorAll('#sheet .px8q button').forEach(b=>b.classList.toggle('on',+b.dataset.v===a))}
 function stlRe(dir){const sh=$('sheet');sh.innerHTML=stlHTML();stlBind();phPaint(sh);const W=sh.querySelector('.st9');if(dir&&W&&!RM()&&W.animate)W.animate([{opacity:0,transform:`translateX(${dir*-16}px)`},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'})}
