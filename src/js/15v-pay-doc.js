@@ -127,7 +127,7 @@ const cuSub=c=>[c.grp?esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))
 let PXM=[];
 /* بانک‌های مغازه برای «بخشی از مبلغ از بانک دیگر» (بانک اصلی همین واریزی نمی‌آید) */
 function pxBkRows(q,g,out){if(PX.bz||!can('split'))return;const x=entRow(),F=x?famOf(x):[];if(!x||F.some(r=>r.sentBid)||!(x.amount>0)||x.id!==famRoot(x))return;const L=pkL(x),main=L[0]?L[0].src:'';
-  const B=ownL().filter(s=>String(s.id)!==main&&(!q||nzName(s.name+' '+(s.bank||'')).includes(q)));if(!B.length)return;
+  const B=ownL().filter(s=>String(s.id)!==main&&(!q||bkHit(s,q)));if(!B.length)return;
   g('بانک‌های مغازه · بخشی از مبلغ از این حساب',B.length);B.forEach(s=>{const b=acBank(s),has=L.find((l,i)=>i&&l.src===String(s.id));out.push(pxRow('bk',s.id,b?bankBadge(b):ic('bank'),esc(s.name),has?'الان '+fmt(has.amount)+' تومان از این حساب':esc(bkSub(s)),bkTag(s)))})}
 function pxList(){if(PX.only==='bk'){const out=[],q=nzName(toEn(clean(PX.q||'')));pxBkRows(q,(t,n)=>out.push(`<div class="px7g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`),out);return out.length?out.join(''):'<div class="px7e"><b>بانکی برای انتخاب نیست</b><small>این واریزی ارسال شده یا بانک دیگری تعریف نشده</small></div>'}
   const q0=clean(PX.q||''),q=nzName(toEn(q0)),dOk=pDig(q0),me=PX.bz?String(bz.d.cuId||''):(e=>e&&e.wd?String(e.wd.cu):'')(entries.find(z=>String(z.id)===String(entId))),A=CU().filter(c=>String(c.id)!==me),out=[],g=(t,n)=>out.push(`<div class="px7g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`);
@@ -139,7 +139,8 @@ function pxList(){if(PX.only==='bk'){const out=[],q=nzName(toEn(clean(PX.q||''))
     if(C.length){g('حساب‌های مشتری',C.length);C.slice(0,60).forEach(c=>out.push(pxRow('cu',c.id,esc(userInit(cuName(c))),esc(cuName(c)),cuSub(c),cuBalMini(c))))}
     PXM=memPeople(q,dOk,8);if(PXM.length){g('از واریزی‌ها و خریدها · حساب برایشان باز می‌شود');PXM.forEach((p,i)=>out.push(pxRow('mem',i,esc(userInit(p.name)),esc(p.name),[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'بدون حساب')))}
     if(!/^\d+$/.test(toEn(q0))&&!C.some(c=>nzName(c.name)===q))out.push(pxRow('new','',ic('plus'),'حساب تازه: «'+esc(q0)+'»','حساب مشتری با همین نام باز می‌شود','','nw'))}
-  pxBkRows(q,g,out);
+  /* v67.3: با جستجو، بانک‌های مغازه بالای فهرست (قبلاً آخر بودند و «حساب تازه» با نام بانک ساخته می‌شد) */
+  if(q){const B=[];pxBkRows(q,(t,n)=>B.push(`<div class="px7g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`),B);out.unshift(...B)}else pxBkRows(q,g,out);
   return out.length?out.join(''):`<div class="px7e"><b>«${esc(q0)}» پیدا نشد</b><small>نام را کامل‌تر بنویسید یا با شماره تلفن جستجو کنید</small></div>`}
 function pxSel(){const s=PX.sel;if(!s)return null;if(s.k==='bk'){const z=sources.find(o=>String(o.id)===String(s.id));if(!z)return null;const bk=acBank(z);return {bk:z,name:z.name,av:bk?bankBadge(bk,'lg'):ic('bank'),sub:bkSub(z),bal:'',R:0}}if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return null;const R=cuBal(c).R;return {c,name:cuName(c),sub:cuSub(c),bal:R?`<b class="${R<0?'r':'b'}">${R<0?'طلب ما':'بدهی ما'} ${fmt(Math.abs(R))} تومان</b>`:'<b>حساب تسویه است</b>',R}}return {c:null,name:s.name,sub:s.k==='mem'?'از واریزی‌ها · با ثبت، حساب باز می‌شود':'حساب تازه با ثبت باز می‌شود',bal:'',R:0}}
 function pxHTML(){const rest=pxRest(),who0=pxWho();

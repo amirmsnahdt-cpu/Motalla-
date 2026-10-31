@@ -6,7 +6,9 @@ const CARD_BIN={'603799':'ملی','170019':'ملی','610433':'ملت','991975':'
 const bankOfCard=c=>CARD_BIN[String(c||'').slice(0,6)]||'';
 const BK_PICK=['ملی','ملت','صادرات','تجارت','سپه','کشاورزی','مسکن','رفاه','پاسارگاد','سامان','پارسیان','اقتصاد نوین','سینا','شهر','آینده','رسالت','مهر ایران','دی','پست بانک','کارآفرین','سرمایه','ایران زمین','گردشگری','خاورمیانه'];
 const acBank=s=>s.bank||ibanBank(s.iban||'')||bankOfCard(s.card)||'';
-function acSent(s){if(!s.balAt)return 0;let t=0;for(const b of batches){for(const x of b.items)if(x.src===s.name&&x.st!=='fail'&&(x.sAt||b.createdAt||'')>=s.balAt)t+=+x.amount||0}return t}
+/* v67.3: حسابی که مانده‌اش ثبت نشده هم واریزهای ارسال‌شده‌اش را نشان می‌دهد (۶۰ روز اخیر؛ در مانده حساب نمی‌شود چون مانده نامعلوم است) */
+const acFrom=s=>s.balAt||new Date(Date.now()-60*864e5).toISOString();
+function acSent(s){const f=acFrom(s);let t=0;for(const b of batches){for(const x of b.items)if(x.src===s.name&&x.st!=='fail'&&(x.sAt||b.createdAt||'')>=f)t+=+x.amount||0}return t}
 /* دفتر حساب: موجودی = آخرین موجودی ثبت‌شده + ورودی‌ها (کارتخوان، واریز) − برداشت‌ها − واریزهای ارسال‌شده از آن لحظه */
 const LT={pos:{t:'کارتخوان',sg:1,c:'g',i:'down'},in:{t:'واریز به حساب',sg:1,c:'g',i:'plus'},out:{t:'برداشت',sg:-1,c:'r',i:'share'}};
 const acLed=s=>(s.led||[]).filter(x=>!x.del&&(!s.balAt||(x.at||'')>=s.balAt));
@@ -48,7 +50,8 @@ const bxSg=(v,o)=>v?`<b class="${v<0?'r':'b'}"><bdi dir="ltr">${v<0?'−':'+'}${
    و در پایان کادر آبی «مانده کل بانک‌ها». */
 let bkQ='';
 const bxV=(m,big)=>m.known?`<b class="${m.fin<0?'n':''}"><span class="cbn" data-k="r" data-v="${Math.abs(Math.round(m.fin))}">${m.fin<0?'−':''}${fmt(Math.abs(Math.round(m.fin)))}</span><i>تومان</i></b>`:`<b class="z">ثبت نشده</b>`;
-const bkHit=(s,q)=>{if(!q)return true;const d=toEn(q).replace(/\D/g,'');return nzName(toEn([s.name,s.bank,acBank(s)].join(' '))).includes(nzName(toEn(q)))||(d.length>=3&&(String(s.iban||'').includes(d)||String(s.card||'').includes(d)))};
+/* v67.3: «بانک مهر داداشی» هم حساب «مهر داداشی» را پیدا کند (canon کلمه بانک و فاصله‌ها را برمی‌دارد) */
+const bkHit=(s,q)=>{if(!q)return true;const d=toEn(q).replace(/\D/g,''),cq=canon(toEn(q));return nzName(toEn([s.name,s.bank,acBank(s)].join(' '))).includes(nzName(toEn(q)))||(cq.length>=2&&[s.name,canon(s.name)+canon(acBank(s)),canon(acBank(s))+canon(s.name)].some(v=>canon(v).includes(cq)))||(d.length>=3&&(String(s.iban||'').includes(d)||String(s.card||'').includes(d)))};
 /* v66.4 (خواسته صاحب اپ): دکمه «حساب جدید» حذف؛ افزودن مثل جستجوی مشتری‌ها — ردیف «حساب تازه «…»» زیر نتیجه‌ها */
 const bkAddRow=q=>q&&can('src')&&!sources.some(s=>canon(s.name)===canon(q))?`<button class="c6add" data-act="bkNewQ">${ic('plus')}<span><b>حساب تازه «${esc(q)}»</b><small>${(b=>b?'بانک '+b+' · ':'')(bkGuess(q))}اول شبا و کارت، بعد ورود به حساب</small></span></button>`:'';
 const bkGuess=q=>{const n=canon(q);return BK_PICK.slice().sort((a,b)=>b.length-a.length).find(b=>n.startsWith(canon(b))||n.includes(canon(b)))||''};
@@ -146,8 +149,8 @@ function acRows(s){const R=[],L=(s.led||[]).filter(x=>!x.del),ba=s.balAt||'',add
   L.filter(x=>x.type==='pos'&&!x.auto).forEach(x=>add('pos',{at:x.at,d:x.date,a:+x.amount||0,h:row({av:ico([],'down','t-pin'),t:x.note?esc(x.note):'کارتخوان به حساب نشست',sub:esc([bxTime(x.at),x.by||''].filter(Boolean).join(' · ')),v:val(+x.amount||0,'نشسته'),x:del(x)})}));
   acPOS(s).forEach(ch=>chMoves(ch).forEach(m=>{if(m.own||m.a<=0)return;const ok=String(m.d||'')<td;add('pos',{at:m.at,oat:ok?posSetAt(m.d):'',way:!ok,d:m.d,a:m.a,h:row({cls:ok?'':'way',act:` data-act="cuInv" data-cu="${m.cu}" data-tx="${m.tx}"`,av:ico([],'card',ok?'t-pin':'t-pend'),t:esc(m.t),sub:esc([ch.name,m.sub,bxTime(m.at)].filter(Boolean).join(' · ')),v:ok?val(m.a,'نشسته ✓'):val(m.a,'در راه · فردا','w')})})}));
   L.filter(x=>x.type==='in').forEach(x=>add('hv',{at:x.at,d:x.date,a:+x.amount||0,h:row({av:ico([],'plus','t-pin'),t:x.note?esc(x.note):'واریز به حساب',sub:esc(['ثبت دستی',bxTime(x.at),x.by||''].filter(Boolean).join(' · ')),v:val(+x.amount||0,'واریز'),x:del(x)})}));
-  if(s.balAt)batches.forEach(b=>b.items.forEach(x=>{if(x.src!==s.name||x.st==='fail')return;const at=x.sAt||b.createdAt,K=itImgs(b,x);
-    add('out',{at,d:String(at||'').slice(0,10)||b.date,a:-(+x.amount||0),h:row({act:` data-act="openEnt" data-id="${x.id}"`,av:ico(K,'share','t-pout'),t:esc(x.name||'واریزی'),sub:esc(['واریزی لیست '+dates(b.pay||b.date).fa,x.iban?'شبا …'+toFa(String(x.iban).slice(-6)):'',x.tn?'پیگیری '+toFa(x.tn):''].filter(Boolean).join(' · ')),v:val(-(+x.amount||0),x.st==='ok'?'تأیید بانک':'ارسال‌شده')})})}));
+  {const f=s.balAt?'':acFrom(s);batches.forEach(b=>b.items.forEach(x=>{if(x.src!==s.name||x.st==='fail')return;const at=x.sAt||b.createdAt,K=itImgs(b,x);if(f&&String(at||'')<f)return;
+    add('out',{at,d:String(at||'').slice(0,10)||b.date,a:-(+x.amount||0),h:row({act:` data-act="openEnt" data-id="${x.id}"`,av:ico(K,'share','t-pout'),t:esc(x.name||'واریزی'),sub:esc(['واریزی لیست '+dates(b.pay||b.date).fa,x.iban?'شبا …'+toFa(String(x.iban).slice(-6)):'',x.tn?'پیگیری '+toFa(x.tn):''].filter(Boolean).join(' · ')),v:val(-(+x.amount||0),x.st==='ok'?'تأیید بانک':'ارسال‌شده')})})}));}
   L.filter(x=>x.type==='out').forEach(x=>add('out',{at:x.at,d:x.date,a:-(+x.amount||0),h:row({av:ico([],'share','t-pout'),t:x.note?esc(x.note):'برداشت',sub:esc(['ثبت دستی',bxTime(x.at),x.by||''].filter(Boolean).join(' · ')),v:val(-(+x.amount||0),'برداشت'),x:del(x)})}));
   Object.values(drafts||{}).forEach(Lp=>(Lp||[]).forEach(p=>{if(p.sent||!p.src||String(p.src.id)!==String(s.id))return;partRows(p).forEach(r=>add('out',{at:'',res:1,d:PD(r),a:0,h:row({cls:'way',act:` data-act="openEnt" data-id="${r.id}"`,av:ico([],'clock','t-pend'),t:esc(fullName(r)),sub:esc('واریزی لیست '+dates(PD(r)).fa+' · هنوز ارسال نشده'),v:val(-(+r.amount||0),'در صف ارسال','w')})}))}));
   R.sort((a,b)=>(a.res||0)-(b.res||0)||String(b.at||'').localeCompare(String(a.at||'')));
