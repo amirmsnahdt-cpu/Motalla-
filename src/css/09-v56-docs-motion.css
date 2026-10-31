@@ -2699,3 +2699,11 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .bxcvr>b{font-weight:800;white-space:nowrap}.bxcvr>b.r{color:var(--red)}.bxcvr>b.b{color:var(--pri)}.bxcvr>b i{font-style:normal;font-weight:500;font-size:11px;color:var(--mut)}
 .bxcvn{display:block;font-size:12px;color:var(--mut);line-height:1.7;margin:4px 2px 12px}
 .bxiob{padding:11px 10px;gap:8px}.bxiob>span:last-child{min-width:0}.bxiob b{font-size:13.5px;white-space:nowrap}.bxiob .bxioi{width:34px;height:34px}
+/* v67.5: مانده در انتظار واریز (واریزی تأییدنشده) در کاشی مبلغ مشتری: قاب زرد + سطر «در انتظار واریز» زیر عدد کل مانده؛ فیلتر زرد */
+.cbwp{display:flex;flex-wrap:wrap;align-items:center;gap:1px 4px;margin-top:5px;padding:4px 8px;border-radius:10px;background:color-mix(in srgb,var(--pe) 22%,var(--card));color:var(--warn);font-size:10.5px;font-weight:800;white-space:nowrap;min-width:0}
+.cbwp .i{width:12px;height:12px;flex:none}
+.cbwp>span{flex:none}
+.cbwp b{display:block!important;flex-basis:100%;text-align:start;font-size:min(14px,calc(var(--fw,12)*.85cqi))!important;font-weight:900;color:var(--warn)!important;direction:ltr;unicode-bidi:isolate;font-feature-settings:"tnum";white-space:nowrap}
+.cufr.w .fdot,.cufp.w .fdot{background:var(--pe)}.cufp.w{background:color-mix(in srgb,var(--pe) 20%,var(--card));color:var(--warn)}
+.cufr.on.w .cufi{background:var(--pe);color:#fff}.cufr.on.w .tx b{color:var(--warn)}
+.cusc.w b,.cusc.w small{color:var(--warn)}
