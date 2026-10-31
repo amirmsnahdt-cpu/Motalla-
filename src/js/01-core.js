@@ -15,7 +15,7 @@ function stashUpdate(h,nv){
 function checkUpdate(force){if(!force&&Date.now()-updT<60e3)return;updT=Date.now();
   if(location.hostname==='raw.githack.com'){
     fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;if(!sha||!/^[0-9a-f]{40}$/.test(sha))return null;
-      return fetch('https://raw.githack.com/'+REPO+'/'+sha+'/index.html',{cache:'no-store'}).then(r=>r.ok?r.text():null).then(h=>h&&h.replace(/(src|href)="(app\.js|styles\.css|apple-touch-icon\.png|icon-192\.png)/g,'$1="https://raw.githack.com/'+REPO+'/'+sha+'/$2'))}).then(h=>{if(!h||h.indexOf('</html>')<0)return;const m=h.match(/const APP_V=(\d+(?:\.\d+)?)/),nv=m?+m[1]:0;
+      return fetch('https://raw.githack.com/'+REPO+'/'+sha+'/index.html',{cache:'no-store'}).then(r=>r.ok?r.text():null).then(h=>h&&h.replace(/(src|href)="(app\.js|styles\.css|apple-touch-icon\.png|icon-192\.png|logo-stamp\.png)/g,'$1="https://raw.githack.com/'+REPO+'/'+sha+'/$2'))}).then(h=>{if(!h||h.indexOf('</html>')<0)return;const m=h.match(/const APP_V=(\d+(?:\.\d+)?)/),nv=m?+m[1]:0;
       if(nv>APP_V)return stashUpdate(h,nv).then(()=>updFound(nv))}).catch(()=>{})}
   else if(location.protocol==='https:'){fetch('/api/status',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&+j.v>APP_V)updFound(+j.v)}).catch(()=>{})}}
 function applyUpd(){try{toast('در حال به‌روزرسانی…')}catch(e){}const r=()=>location.reload();

@@ -61,3 +61,6 @@ try{if(sessionStorage.getItem('m_back_settings')){sessionStorage.removeItem('m_b
 render(true);
 if(!TOKEN)showAuth();else{setSync(navigator.onLine===false?'off':'busy');syncNow()}
 if('serviceWorker' in navigator&&(location.protocol==='https:'||/^(127\.0\.0\.1|localhost)$/.test(location.hostname))){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+/* v67.1: صفحه بارگذاری (مهر مطلا در index.html) بعد از آماده شدن قفل/ورود/خانه محو می‌شود؛ دست‌کم ۰٫۶۵ ثانیه تا چشمک نزند */
+(()=>{const s=$('splash');if(!s)return;let w=650;try{w=Math.max(0,650-performance.now())}catch(e){}
+  setTimeout(()=>{s.classList.add('out');setTimeout(()=>{try{s.remove()}catch(e){}},450)},w)})();
