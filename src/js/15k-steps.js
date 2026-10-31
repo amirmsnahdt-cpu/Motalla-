@@ -134,7 +134,14 @@ const stKbT=s=>!s?'':s.type==='pick'?'pick':s.type==='text'?'text':'num';
 function stPatch(O,I0){const T=document.createElement('div');T.innerHTML=stHTML();const N=T.firstElementChild;if(!N)return false;const nI=N.querySelector('#stI'),o3=O.querySelector('.st3'),n3=N.querySelector('.st3');if(!nI||!o3||!n3)return false;
   [...I0.attributes].forEach(at=>{if(!nI.hasAttribute(at.name))I0.removeAttribute(at.name)});[...nI.attributes].forEach(at=>{if(I0.getAttribute(at.name)!==at.value)I0.setAttribute(at.name,at.value)});I0.value=nI.getAttribute('value')||'';
   nI.replaceWith(I0);o3.className=n3.className;o3.replaceChildren(...n3.childNodes);O.className=N.className;O.replaceChildren(...[...N.childNodes].map(n=>n===n3?o3:n));return true}
-function stStrip(){const o=document.querySelector('#qa .stp.on'),w=o&&o.parentNode;if(!o||!w)return;const r=o.getBoundingClientRect(),q=w.getBoundingClientRect();const d=(r.left+r.width/2)-(q.left+q.width/2);if(Math.abs(d)>4)try{w.scrollBy({left:d,behavior:RM()?'auto':'smooth'})}catch(_){w.scrollLeft+=d}}
+/* v67.0 (خواسته صاحب اپ: «پله فعال کامل دیده نمی‌شود»): پله فعال وسط ردیف می‌آید و اگر نزدیک لبه است دست‌کم کامل و با فاصله دیده می‌شود.
+   مقصد محاسبه و در بازه اسکرول (راست‌به‌چپ: منفی) محدود می‌شود؛ اسکرول نرم آیفون گاهی وسط راه می‌ایستاد، پس بعدش یک بار بررسی و اصلاح می‌شود. */
+function stStrip(){const w=document.querySelector('#qa .stps'),o=w&&w.querySelector('.stp.on');if(!o)return;
+  const tgt=()=>{const r=o.getBoundingClientRect(),q=w.getBoundingClientRect(),max=w.scrollWidth-w.clientWidth,rtl=getComputedStyle(w).direction==='rtl',lo=rtl?-max:0,hi=rtl?0:max;
+    return Math.max(lo,Math.min(hi,w.scrollLeft+(r.left+r.width/2)-(q.left+q.width/2)))};
+  const ok=()=>{const r=o.getBoundingClientRect(),q=w.getBoundingClientRect();return r.left>=q.left+8&&r.right<=q.right-8};
+  const t=tgt();if(Math.abs(t-w.scrollLeft)<2)return;try{w.scrollTo({left:t,behavior:RM()?'auto':'smooth'})}catch(_){w.scrollLeft=t}
+  clearTimeout(w._fx);w._fx=setTimeout(()=>{if(o.isConnected&&!ok())w.scrollLeft=tgt()},520)}
 /* v66.9 (خواسته صاحب اپ: «همش میره از اول می‌پره»): ردیف پله‌ها با هر «بعدی» از نو ساخته می‌شد و اسکرول افقی‌اش به اول برمی‌گشت،
    بعد تا پله فعال می‌لغزید — حالا جای اسکرول قبلی نگه داشته می‌شود و فقط از همان‌جا تا پله تازه نرم می‌رود */
 function stRe(){const sp=document.querySelector('#qa .stps'),sl=sp?sp.scrollLeft:null,gh=stGhost(),bw=qaDir==='bw',O=document.querySelector('#qa .stw'),I0=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)],kb=stKbT(c0);

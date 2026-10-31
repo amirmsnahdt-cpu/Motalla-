@@ -2671,3 +2671,8 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 :root[data-theme="dark"] .stlens{background:linear-gradient(180deg,#ffffff1f,color-mix(in srgb,var(--blu) 16%,transparent));box-shadow:0 0 0 1.5px var(--blu),inset 0 1px 1px #ffffff40,0 6px 16px #0006}
 .stps.lensing .stp.on{box-shadow:none;border-color:var(--line);background:var(--card)}
 .stgh{will-change:opacity,filter,transform}
+
+/* v67.0 ردیف پله‌ها: لبه‌به‌لبه پنل با فاصله داخلی، تا پله اول و آخر کامل (با قاب) دیده شوند؛ لبه‌ها نرم محو می‌شوند */
+.stps{margin-inline:-10px;padding:3px 10px;scroll-padding-inline:10px;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 10px),transparent);mask:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 10px),transparent)}
+.stps{padding-inline:0}.stps::before,.stps::after{content:"";flex:0 0 6px}
