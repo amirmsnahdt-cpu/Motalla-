@@ -131,7 +131,7 @@ Object.assign(IC,{hold:'<circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12"
    «سند جدید» فقط دکمه + در سرتیتر */
 function vCust(){xaSync();const c=curCu();if(!c){setTimeout(()=>{if(cur==='cust')go('custs',true)},0);return ''}const b=cuBal(c),T=(c.txs||[]).filter(t=>!t.del).slice().sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
   /* v60.5: کارت مشخصات مشتری برجسته؛ زدن روی کارت = ویرایش مشخصات */
-  let h=`${cuBalCard(b,cuCntId!==custId,null,c)}${wdCuHTML(c)}
+  let h=`${cuBalCard(b,cuCntId!==custId,null,c)}${bxConvHTML(c)}${wdCuHTML(c)}
   ${can('debt')?`${svDraftHTML(c)}
   `:''}
   ${shBanner(c.id)}

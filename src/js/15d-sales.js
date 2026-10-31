@@ -65,8 +65,8 @@ ACT.svNew=d=>{if(!can('debt')){toast('دسترسی این بخش برای حسا
   if(old&&(old.v===1||old.v===2)&&((old.items||[]).length||(old.pays||[]).length||(old.xr||[]).length)&&(!cu||String(old.cuId||'')===String(cu)||!old.cuId)){sv=old;if(cu)sv.cuId=cu;toast('پیش‌نویس سند قبلی باز شد','', 'سند تازه',()=>{const dk=sv.dk,fc=sv.fixCu;sv=svBlank(cu);sv.dk=dk;sv.fixCu=fc;svFix();svKeep();render()})}else sv=svBlank(cu);
   /* v60.5: نوع سند: فروش یا خرید (فقط عنوان و پیشنهادهای جستجو را عوض می‌کند؛ ساختار سند همان است) */
   sv.dk=d&&d.dk==='buy'?'buy':'';sv.fixCu=!!cu;
-  svFix();const k=d&&d.pre;if(k==='in'||k==='out')sv.qa={...qaBlank(),p:pyNew('cash',{dir:k})};else if(k==='gin'||k==='gout')sv.qa={...qaBlank(),x:xrNew(k==='gin'?'in':'out','gold')};
-  PARENT.sell=cur==='cust'?'cust':'custs';svKeep();go('sell')};
+  svFix();const k=d&&d.pre;if(k==='in'||k==='out')sv.qa={...qaBlank(),p:pyNew('cash',{dir:k})};else if((k==='hin'||k==='hout')&&d.src!=null)sv.qa={...qaBlank(),p:pyNew('hav',{dir:k==='hout'?'out':'in',srcId:+d.src||d.src})};else if(k==='gin'||k==='gout')sv.qa={...qaBlank(),x:xrNew(k==='gin'?'in':'out','gold')};
+  PARENT.sell=cur==='cust'?'cust':cur==='bank'?'bank':'custs';svKeep();go('sell')};
 /* v61.6: سندی که ثبت نشده (خروج ناگهانی از صفحه سند) زیر «سند جدید» در صفحه همان مشتری دیده می‌شود */
 function svDraft(c){const o=ls.get('m_svd',null);if(!o||!(o.v===1||o.v===2)||String(o.cuId||'')!==String(c.id))return null;const n=(o.items||[]).length+(o.xr||[]).length+(o.pays||[]).length;return n?{o,n}:null}
 function svDraftHTML(c){const D=svDraft(c);if(!D)return '';const keep=sv;let T;try{sv=D.o;svFix();T=svTot()}catch(_){T=null}finally{sv=keep}
@@ -140,7 +140,7 @@ function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
     return `<div class="bzsug cbl" role="listbox"><div class="cblh">آخرین حساب‌ها<small>برای جستجو دوباره بزنید</small></div>${R.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c))).join('')}${cbRow('svCuNew',{},ic('plus'),'افتتاح حساب تازه','اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
   const L=A.filter(c=>nzName([c.name,c.phone,c.nid,c.grp].join(' ')).includes(q)).sort((a,b)=>(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,6);
   const add=!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0));
-  return `<div class="bzsug cbl" role="listbox">${L.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c))).join('')}
+  return `<div class="bzsug cbl" role="listbox">${svBkRows(q0)}${L.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c))).join('')}
     ${cbRow('svCuNew',{},ic('plus'),add?'حساب تازه: «'+esc(q0)+'»':'افتتاح حساب تازه',(L.length?'':'مشتری‌ای پیدا نشد · ')+'اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
 let svQO=0;const cuAvI=c=>c&&c.av?`<img data-ik="${esc(c.av)}" alt="">`:esc(userInit(c?c.name:''));
 function svPick(id){svQO=0;sv.cuId=id;sv.q='';svKeep();if(cur!=='sell')go('sell');else{$('svCu').innerHTML=svCuHTML();svRe()}const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}

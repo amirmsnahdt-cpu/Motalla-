@@ -2676,3 +2676,26 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .stps{margin-inline:-10px;padding:3px 10px;scroll-padding-inline:10px;
   -webkit-mask:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 10px),transparent);mask:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 10px),transparent)}
 .stps{padding-inline:0}.stps::before,.stps::after{content:"";flex:0 0 6px}
+/* v67.2 حساب بانک مثل سند: دو دکمه واریز / برداشت، پنجره انتخاب، ردیف بانک در جستجوی سند، کارت انتقال حساب اشتباهی */
+.bxio{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 6px}
+.bxiob{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);font:inherit;text-align:right;cursor:pointer;box-shadow:var(--sh)}
+.bxiob b{display:block;font-size:14.5px;font-weight:800}.bxiob small{display:block;font-size:11px;color:var(--mut);margin-top:2px;line-height:1.5}
+.bxioi{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--pri) 12%,transparent);color:var(--pri)}
+.bxioi .i{width:20px;height:20px}
+.bxiob.in .bxioi,.bxioi.in{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.bxiob.out .bxioi,.bxioi.out{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
+.bxioi.g{background:var(--seg);color:var(--mut)}
+.bxioL{display:flex;flex-direction:column;gap:8px}
+.bxioR{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);font:inherit;text-align:right;cursor:pointer}
+.bxioR .tx{flex:1;min-width:0}.bxioR .tx b{display:block;font-size:15px;font-weight:800}.bxioR .tx small{display:block;font-size:12px;color:var(--mut);margin-top:3px;line-height:1.55}
+.bxioR>.i{width:16px;height:16px;color:var(--mut);flex:none}
+.bzsr.bk .av{background:color-mix(in srgb,var(--pri) 10%,transparent)}
+.bxcv{display:flex;align-items:center;gap:12px;width:100%;margin:10px 0 2px;padding:12px 14px;border:1.5px dashed color-mix(in srgb,var(--pri) 45%,transparent);border-radius:18px;background:color-mix(in srgb,var(--pri) 6%,var(--card));color:var(--ink);font:inherit;text-align:right;cursor:pointer}
+.bxcv .tx{flex:1;min-width:0}.bxcv .tx b{display:block;font-size:14.5px;font-weight:800}.bxcv .tx small{display:block;font-size:12px;color:var(--mut);margin-top:2px;line-height:1.55}
+.bxcv em{flex:none;font-style:normal;font-weight:800;font-size:13px;color:#fff;background:var(--pri);padding:7px 12px;border-radius:12px}
+.bxcvL{display:flex;flex-direction:column;gap:6px;margin:12px 0 8px}
+.bxcvr{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.bxcvr .tx{flex:1;min-width:0}.bxcvr .tx b{display:block;font-size:14px}.bxcvr .tx small{display:block;font-size:11.5px;color:var(--mut)}
+.bxcvr>b{font-weight:800;white-space:nowrap}.bxcvr>b.r{color:var(--red)}.bxcvr>b.b{color:var(--pri)}.bxcvr>b i{font-style:normal;font-weight:500;font-size:11px;color:var(--mut)}
+.bxcvn{display:block;font-size:12px;color:var(--mut);line-height:1.7;margin:4px 2px 12px}
+.bxiob{padding:11px 10px;gap:8px}.bxiob>span:last-child{min-width:0}.bxiob b{font-size:13.5px;white-space:nowrap}.bxiob .bxioi{width:34px;height:34px}

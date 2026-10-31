@@ -164,6 +164,7 @@ function vBank(){const s=curBk();if(!s){setTimeout(()=>{if(cur==='bank')go('bank
   const ft=(f,l,v,n)=>`<button class="bxft${acV.f===f?' on':''}" data-act="acF" data-f="${f}" aria-pressed="${acV.f===f}"><small>${l} <i>${toFa(n)}</i></small>${bxSg(v)}</button>`;
   const sub=m.known?'قبلی '+fmt(m.prev)+' · الان در حساب '+(m.now<0?'−':'')+fmt(Math.abs(m.now))+(m.posWay?'</span><span>کارتخوان '+fmt(m.posWay)+' تومان فردا می‌نشیند':''):'مانده قبلی این حساب ثبت نشده';
   return `${bxBlue({t:'مانده نهایی',v:m.known?m.fin:null,an,sub,btn:c?`<button class="bxfix" data-act="acSetBal" data-id="${s.id}">${ic(m.known?'edit':'plus')} ${m.known?'اصلاح حساب':'ثبت مانده قبلی'}</button>`:''})}
+  ${bxIoHTML(s)}
   ${m.res?`<div class="bxres">${ic('clock')}<span>رزرو واریزهای ارسال‌نشده <b>${fmt(m.res)}</b> تومان · بعد از ارسال از مانده کم می‌شود</span></div>`:''}
   <div class="bxfs">${ft('hv','حواله‌ها',m.hv+m.ledIn,cnt('hv'))}${ft('pos','کارتخوان',m.pos,cnt('pos'))}${ft('out','برداشت',-m.out,cnt('out'))}</div>
   <div id="acLW">${acListHTML(s,R)}</div>`}
