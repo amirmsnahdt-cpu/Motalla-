@@ -2803,3 +2803,16 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 #cures .cuL .cbk.wp.fl .cbwp b{flex-basis:100%;text-align:right;line-height:1.35;overflow:hidden;text-overflow:ellipsis}
 /* v68.2 (خواسته صاحب اپ): کادر جستجوی حساب‌ها، بانک‌ها و حساب مشتری دقیقاً مثل جستجوی واریزی‌ها — قاب آبی، بدون سایه */
 .fsearch.c6q0,.fsearch.stms2{border-color:var(--blu)!important;box-shadow:none!important}
+/* v68.3: مانده قبلی جمع‌وجور اول سند جدید (مشتری در سرتیتر) */
+.d6pv{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:5px 6px 5px 10px;border-radius:13px;background:var(--card);box-shadow:0 0 0 1px var(--line);min-width:0;animation:f6in .3s var(--spring) both}
+.d6pv>small{flex:none;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:850;color:var(--mut)}
+.d6pv>small svg{width:13px;height:13px}
+.d6pv.z{justify-content:space-between}
+.d6pvs{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}.d6pvs::-webkit-scrollbar{display:none}
+.d6pvc{flex:none;display:inline-flex;align-items:baseline;gap:3px;height:28px;padding:0 9px;border:0;border-radius:9px;font:inherit;cursor:pointer;white-space:nowrap;background:var(--blu2);color:var(--blu);align-items:center}
+.d6pvc.d{background:color-mix(in srgb,var(--red) 10%,var(--card));color:var(--red)}
+.d6pvc b{font-size:13.5px;font-weight:900;font-feature-settings:"tnum"}
+.d6pvc i{font-style:normal;font-size:10px;font-weight:700;opacity:.75}
+.d6pvc em{font-style:normal;font-size:9.5px;font-weight:850;opacity:.8;margin-inline-start:2px}
+.d6pvc:active{transform:scale(.96)}
+@media (prefers-reduced-motion:reduce){.d6pv{animation:none}}
