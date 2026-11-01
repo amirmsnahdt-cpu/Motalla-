@@ -1,5 +1,5 @@
 const ACT={
-  back,close:()=>{aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>go(d.n),date:openDate,user:()=>ACT.acct(),resetForm,resetBulk,saveEntry,bulkAdd,
+  back,close:()=>{if(typeof cuAutoClose==='function'&&cuAutoClose())return;aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>go(d.n),date:openDate,user:()=>ACT.acct(),resetForm,resetBulk,saveEntry,bulkAdd,
   toastAct:()=>{const f=toastAct;toastHide();f&&f()},
   tab:d=>{if(d&&d.n==='split')spTab='split';const n={custs:'custs',banks:'banks',home:'home',entry:'entry',list:'list',split:'split1',audit:'audit',track:'split1',debt:'debt',settings:'settings'}[d.n];if(n==='entry')editId=null;if(n==='audit'&&cur!=='audit')histTab='ev';if(n==='track'&&cur!=='track'){gQ='';gF='all'}if(n==='list'&&cur!=='list'){listMode='all';openGroups=new Set()}if(n===cur&&n==='list'){window.scrollTo({top:0,behavior:'smooth'});return}go(n);if(d.n==='split'){const C=splitCands().filter(c=>c.ok&&c.ok.length);if(C.length&&!C.some(c=>c.iso===dateVal)){setDate(C[0].iso,true);toast('تقسیم لیست '+dates(C[0].iso).fa)}}},
   cancelEdit:()=>{editId=null;const b=editBack;editBack=null;go(b||'list')},

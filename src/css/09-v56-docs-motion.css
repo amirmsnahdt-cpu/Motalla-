@@ -2770,3 +2770,36 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .cbs .cbsm button:last-child:nth-child(odd){grid-column:1/-1}
 .cbs .px8l .ok{color:var(--ok)}.cbs .px8l .r{color:var(--red)}.cbs .px8l svg{width:13px;height:13px;vertical-align:-2px}
 .cbs .xgo{margin-top:12px}
+/* v68.2 (خواسته صاحب اپ): کارت مشتری سرتیتر کوچک‌تر در همه صفحه‌ها و کادر زیرش چسبیده به آن */
+#bar.cuhd{padding-bottom:5px}
+#app:has(#bar.cuhd) #view{padding-top:4px}
+#bar.cuhd .cuh9{padding:4px 9px 4px 6px;gap:8px;border-radius:14px}
+#bar .cuh9 .c6a{width:34px;height:34px;font-size:14px}
+#bar .cuh9t b{font-size:15px}
+#bar .cuh9k{font-size:11px;line-height:1.25}
+#bar .cuh9 .c6ed{width:26px;height:26px;border-radius:8px}#bar .cuh9 .c6ed svg{width:13px;height:13px}
+/* دکمه ذخیره بالای پنجره مشخصات مشتری (ذخیره خودکار با بستن) */
+.sh-h .shsv{flex:none;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 13px;border:0;border-radius:11px;background:var(--blu);color:#fff;font:inherit;font-size:13px;font-weight:850;cursor:pointer}
+.sh-h .shsv svg{width:15px;height:15px}
+/* v68.2 (خواسته صاحب اپ): فهرست حساب مشتریان — هر مشتری کارت گرد جدا؛ مشخصات راست و مانده چپ در یک ردیف (یک کاشی) تا ارتفاع کم شود */
+#cures .c6l.cuL{display:flex;flex-direction:column;gap:8px;background:none;box-shadow:none;border-radius:0;overflow:visible}
+#cures .cuL>.swr{border-radius:16px!important;overflow:hidden;background:var(--card);box-shadow:0 0 0 1px var(--line),0 2px 6px -3px rgba(20,40,90,.10)!important}
+#cures .cuL>.swr+.swr .c6r::before{display:none}
+#cures .cuL .c6r{padding:10px 12px;gap:6px 10px;min-height:0}
+#cures .cuL .c6r.one:not(.zr){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,46%);align-items:center}
+#cures .cuL .c6r.one .c6vb{grid-template-columns:minmax(0,1fr);margin:0;width:auto}
+#cures .cuL .c6r.one .c6vb>.cbk{grid-column:1!important;grid-row:auto}
+#cures .cuL .c6r .tx{min-width:0}
+#cures .cuL .c6r .tx small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* کاشی «در انتظار واریز»: زرد، هم‌اندازه بقیه؛ روی دیگرش (با زدن) مبلغ در انتظار */
+#cures .cuL .cbk.wp{cursor:pointer;transform-origin:50% 50%;box-shadow:inset 0 0 0 1.5px var(--pe)!important;background:color-mix(in srgb,var(--warn2) 75%,var(--card))!important}
+#cures .cuL .cbk.wp .cbwp{display:none}
+#cures .cuL .cbk.wp.fl>.cbh,#cures .cuL .cbk.wp.fl>b{display:none}
+#cures .cuL .cbk.wp.fl .cbwp{display:flex;margin:0;padding:0;background:none}
+#cures .cuL .cbk.wp.fl .cbwp b{font-size:15px!important}
+#cures .cuL .cbk.wp::after{content:"";position:absolute;left:9px;bottom:9px;width:5px;height:5px;border-left:1.6px solid var(--warn);border-bottom:1.6px solid var(--warn);transform:rotate(-45deg);opacity:.55}
+#cures .cuL .cbk.wp{position:relative}
+#cures .cuL .cbk.wp.fl .cbwp{flex-wrap:wrap;align-items:center;gap:2px 4px;font-size:10.5px;line-height:1.5}
+#cures .cuL .cbk.wp.fl .cbwp b{flex-basis:100%;text-align:right;line-height:1.35;overflow:hidden;text-overflow:ellipsis}
+/* v68.2 (خواسته صاحب اپ): کادر جستجوی حساب‌ها، بانک‌ها و حساب مشتری دقیقاً مثل جستجوی واریزی‌ها — قاب آبی، بدون سایه */
+.fsearch.c6q0,.fsearch.stms2{border-color:var(--blu)!important;box-shadow:none!important}

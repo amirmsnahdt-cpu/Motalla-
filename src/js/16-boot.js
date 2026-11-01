@@ -51,8 +51,8 @@ ACT.copyApk=()=>copyText(APK_URL).then(ok=>toast(ok?'آدرس کپی شد ✓':'
 ACT.shareInstall=d=>{const ios=d.os==='ios',t='نصب برنامه «بده بستون» — طلای مطلا\n\n'+(ios?'آیفون: این لینک را در Safari باز کنید، دکمه اشتراک‌گذاری ← Add to Home Screen\n'+WEB_URL:'اندروید: فایل نصب را دانلود و نصب کنید\n'+APK_URL)+'\n\nنام کاربری و رمز را از مدیر بگیرید.';
   if(window.AndroidBridge&&AndroidBridge.share){AndroidBridge.share(t);return}if(navigator.share)navigator.share({text:t}).catch(()=>{});else copyText(t)};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const f=ACT[t.dataset.act];if(f){e.preventDefault();f(t.dataset,e)}});
-$('ov').addEventListener('click',e=>{if(e.target.id==='ov'){aSt=null;srcRet='';closeSheet()}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('ov').classList.contains('hide')){aSt=null;srcRet='';closeSheet()}});
+$('ov').addEventListener('click',e=>{if(e.target.id==='ov')ACT.close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('ov').classList.contains('hide'))ACT.close()});
 try{history.replaceState({n:'home'},'')}catch(e){}
 /* آیفون (برنامه روی صفحه اصلی): iOS ارتفاع صفحه را به اندازه نوار ساعت کم گزارش می‌کند؛ قاب را به اندازه کامل صفحه می‌کنیم */
 
