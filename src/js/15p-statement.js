@@ -9,13 +9,15 @@ function stmtData(c,F){const T=(c.txs||[]).filter(t=>!t.del).slice().sort((a,b)=
   /* v61.79 (خواسته صاحب اپ): صورتحساب یک بازه تاریخ و جستجو. مانده‌های هر ردیف از کل حساب حساب می‌شوند (نه از اول بازه)؛
      «مانده از قبل» = مانده پیش از روز اول بازه، و کاشی‌های بالا مانده پایان بازه. */
   F=F||{};const f=F.f||'',to=F.t||'',q=stmNorm(F.q||''),dt=o=>String(o.date||'');
-  const pre=f?all.filter(o=>dt(o)<f):[],inR=all.filter(o=>(!f||dt(o)>=f)&&(!to||dt(o)<=to)),rows=q?inR.filter(o=>stmHay(o).includes(q)):inR;
+  const pre=f?all.filter(o=>dt(o)<f):[],inR=all.filter(o=>(!f||dt(o)>=f)&&(!to||dt(o)<=to)),QD=typeof qDate==='function'?qDate(F.q||''):'',rows=q?inR.filter(o=>QD?dt(o)===QD:stmHit(o,q)):inR;
   const snap=o=>o?{R:o.R,G:o.G,X:{...o.X}}:{R:0,G:0,X:{}},lastPre=pre[pre.length-1];
   const bal=f||to?snap(inR[inR.length-1]||lastPre):cuBal(c);
   return {c,rows,all:all.length,inN:inR.length,XK,bal,open:f?snap(lastPre):null,F:{f,t:to,q:F.q||''}}}
 /* جستجو: شماره سند، نوع، شرح، اقلام، پیگیری، یادداشت — با رقم فارسی/انگلیسی و ی/ک عربی */
 const stmNorm=s=>toEn(String(s||'')).replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u200f\u200e]/g,' ').replace(/,/g,'').replace(/\s+/g,' ').trim().toLowerCase();
-function stmHay(o){const t=o.t;if(!o._h)o._h=stmNorm([t.no!=null?'سند '+t.no+' '+t.no:'',o.title,o.desc,t.note,t.kind,...o.lines.map(l=>l.join(' ')),...(t.pays||[]).map(p=>[p.tn,p.cuName,p.entName].join(' ')),dates(o.date).fa].join(' '));return o._h}
+/* v68.6 (خواسته صاحب اپ): همان قانون جستجوی لیست واریزی — متن، یا عدد (۲ رقم به بالا، با جداکننده یا بی‌جداکننده) در هر عدد ردیف؛ تاریخ («۱۰ آبان»، 1405/08/10، دیروز) = همان روز */
+function stmHit(o,q){const H=stmHay(o);if(H.includes(q))return true;const qd=q.replace(/\D/g,'');if(qd.length<2||!/^[\d\s,.\-\/+]+$/.test(q))return false;if(!o._d)o._d=(H.match(/\d[\d.,\/\-]*/g)||[]).map(v=>v.replace(/\D/g,''));return o._d.some(v=>v.includes(qd))}
+function stmHay(o){const t=o.t;if(!o._h)o._h=stmNorm([t.no!=null?'سند '+t.no+' '+t.no:'',o.title,o.desc,t.note,t.kind,o.r?Math.abs(o.r):'',o.g?Math.abs(o.g):'',...Object.values(o.x||{}).map(v=>+v?Math.abs(+v):''),t.amount||'',t.total||'',t.weight||'',t.tn||'',...o.lines.map(l=>l.join(' ')),...(t.pays||[]).map(p=>[p.tn,p.cuName,p.entName].join(' ')),dates(o.date).fa].join(' '));return o._h}
 function stmtTitle(t){if(t.type==='inv')return invTitle(t);if(t.type==='xf')return t.inv?'پرداخت سند مشتری دیگر':'انتقال مانده';if(t.type==='cv')return 'تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');return (TXT[t.type]||{t:t.type}).t}
 function stmtDesc(t){if(t.type==='inv'){const W=(t.items||[]).reduce((s,i)=>s+(+i.w||0),0);return [(t.items||[]).map(i=>i.k).join('، '),W?wFmt(W)+' گرم':'',t.rate?'مظنه '+fmt(t.mz||Math.round(t.rate*MZK)):''].filter(Boolean).join(' · ')}
   return [t.kind,t.weight?wFmt(t.weight)+' گرم':'',t.ppg?'هر گرم '+fmt(t.ppg):'',t.note].filter(Boolean).join(' · ')}
@@ -129,7 +131,7 @@ function stmListHTML(c){const F=stmF(c),T=(c.txs||[]).filter(t=>!t.del);if(!T.le
   if(S.open){const o=S.open,v=(k,x)=>x?`<b class="${x>0?'b':'r'}">${balV(k,x)} <i>${balU(k)}</i><small>${ourLab(x)}</small></b>`:'';h+=`<div class="fday">پیش از ${esc(dates(S.F.f).fa)}</div><div class="fcard stmop"><span class="stmopi">${ic('clock')}</span><span class="tx"><b>مانده از قبل</b><small>مانده حساب تا پیش از شروع بازه</small></span><span class="stmopv">${v('r',o.R)||''}${v('g',o.G)||''}${!o.R&&!o.G?'<b class="z">تسویه</b>':''}</span></div>`}
   return h}
 function stmRe(){const c=curCu(),el=$('cuTx');if(!c||!el)return;const m=typeof flipSnap==='function'?flipSnap(el):null;el.innerHTML=stmListHTML(c);if(m)flipPlay(el,m);const b=$('stmBar');if(b){const I=$('stmQ'),f=document.activeElement===I,pos=I?I.selectionStart:0;b.innerHTML=stmBarHTML(c);stmBind();if(f){const J=$('stmQ');if(J){J.focus({preventScroll:true});try{J.setSelectionRange(pos,pos)}catch(e){}}}}}
-function stmBind(){const I=$('stmQ');if(!I)return;I.oninput=()=>{clearTimeout(I._t);I._t=setTimeout(()=>{STM.q=I.value;const c=curCu(),el=$('cuTx');if(c&&el)el.innerHTML=stmListHTML(c);const x=I.parentNode.querySelector('.stmx0');if(!!STM.q!==!!x){const b=$('stmBar'),pos=I.selectionStart;b.innerHTML=stmBarHTML(c);stmBind();const J=$('stmQ');J.focus({preventScroll:true});try{J.setSelectionRange(pos,pos)}catch(e){}}},140)};I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();I.blur()}}}
+function stmBind(){const I=$('stmQ');if(!I)return;I.oninput=()=>{clearTimeout(I._t);I._t=setTimeout(()=>{STM.q=I.value;const c=curCu(),el=$('cuTx');if(c&&el)el.innerHTML=stmListHTML(c);/* v68.6: دکمه × بدون ساختن دوباره کادر (قبلاً هر حرف کادر از نو ساخته می‌شد و کیبورد عددی آیفون به حروف برمی‌گشت) */const x=I.parentNode.querySelector('.x');if(STM.q&&!x)I.insertAdjacentHTML('afterend','<button type="button" class="x" data-act="stmQClr" aria-label="پاک کردن جستجو">×</button>');else if(!STM.q&&x)x.remove()},140)};I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();I.blur()}}}
 ACT.stmQClr=()=>{STM.q='';stmRe()};
 ACT.stmClrAll=()=>{STM.q='';STM.f='';STM.t='';stmRe()};
 /* پنجره بازه تاریخ: خلاصه بازه بالا (از … تا … · چند روز · چند ردیف)، بازه‌های آماده (زدن = اعمال و بستن)، بازه دلخواه با تقویم */

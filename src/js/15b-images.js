@@ -91,14 +91,14 @@ function zvBind(z){const P=new Map();let st=null,lastTap=0;
     if(Math.abs(dx)+Math.abs(dy)>6)st.moved=true;
     if(ZV.s>1){ZV.x=st.x+dx;ZV.y=st.y+dy;zvClamp();zvApply();return}
     if(!st.lk&&st.moved)st.lk=Math.abs(dx)>Math.abs(dy)?'h':'v';
-    if(st.lk==='h'){const c=galCtx(),n=c?c.keys.length:1,edge=(dx>0&&ZV.i===0)||(dx<0&&ZV.i>=n-1);tr(edge?dx*.3:dx,0)}
+    if(st.lk==='h'){const c=galCtx(),n=c?c.keys.length:1,edge=(dx<0&&ZV.i===0)||(dx>0&&ZV.i>=n-1);tr(edge?dx*.3:dx,0)}
     else if(st.lk==='v'&&dy>0){tr(0,dy);z.style.background=`rgba(5,8,15,${Math.max(.35,1-dy/500)})`}});
   const up=e=>{if(!ZV||!P.has(e.pointerId))return;P.delete(e.pointerId);if(!P.size)z.classList.remove('drag');
     if(!P.size&&st&&st.px!=null){const dx=e.clientX-st.px,dy=e.clientY-st.py,W=innerWidth;
       if(!st.moved){const t=Date.now();if(t-lastTap<300){const s=$('zvs'),r=s.getBoundingClientRect();if(ZV.s>1){ZV.s=1;ZV.x=0;ZV.y=0}else{ZV.s=2.5;ZV.x=(r.left+r.width/2-e.clientX)*1.5;ZV.y=(r.top+r.height/2-e.clientY)*1.5;zvClamp()}zvApply();lastTap=0}else lastTap=t}
       else if(ZV.s<=1&&st.lk==='v'){if(dy>110||st.vy>.6){const im=img();z.style.transition='background .2s';z.style.background='rgba(5,8,15,0)';if(im&&!RM()&&im.animate){im.animate([{transform:`translate(0,${dy}px)`},{transform:`translate(0,${innerHeight}px)`}],{duration:200,easing:'ease-in',fill:'forwards'}).onfinish=()=>{z.style.transition='';z.style.background='';zvClose()}}else{z.style.transition='';z.style.background='';zvClose()}}else back()}
       else if(ZV.s<=1&&st.lk==='h'){/* لبه راست به چپ = برگشت (مثل آیفون) */if(st.px>W-32&&dx<-70){zvClose();return}
-        const c=galCtx(),ni=ZV.i+(dx<0?1:-1);
+        /* v68.6 (خواسته صاحب اپ): راست‌به‌چپ مثل ردیف عکس‌ها — عکس بعدی سمت چپ است؛ کشیدن به راست = بعدی */const c=galCtx(),ni=ZV.i+(dx>0?1:-1);
         if(c&&ni>=0&&ni<c.keys.length&&(Math.abs(dx)>W*.18||Math.abs(st.vx)>.45)){const im=img(),dir=dx<0?-1:1;if(im&&!RM()&&im.animate){im.style.transition='';im.animate([{transform:`translate(${dx}px,0)`},{transform:`translate(${dir*W}px,0)`,opacity:.3}],{duration:170,easing:'cubic-bezier(.4,0,.8,.6)',fill:'forwards'}).onfinish=()=>zvOpen(ni,-dir)}else zvOpen(ni)}
         else back()}}
     if(P.size<2)st=P.size===1?(()=>{const p=[...P.values()][0];return{px:p.x,py:p.y,x:ZV.x,y:ZV.y,moved:true,lk:null,lx:p.x,ly:p.y,lt:performance.now(),vx:0,vy:0}})():null};

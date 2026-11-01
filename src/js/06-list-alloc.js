@@ -29,7 +29,7 @@ function vLday(){const d=hubData(ldKey);ldX=null;
   <div class="ldhero${done?' ok':''}"><small>${done?'لیست کامل تسویه شد ✓':'تسویه شده تا الان'}</small><b>${fmt(d.okS)}<i>تومان</i></b><em>از کل ${fmt(d.tot)} تومان</em><span class="ldbar"><i style="width:${pc}%"></i></span>
   <div class="ldst"><div><small>تخصیص‌نیافته</small><b>${fmt(d.un.length+d.bad.length)}</b></div><div><small>آماده ارسال</small><b>${fmt(d.none)}</b></div><div><small>در انتظار</small><b>${fmt(d.pend)}</b></div><div><small>تسویه شده</small><b>${fmt(d.ok)}</b></div></div></div>
   <div class="fsearch ldq">${ic('search')}<input id="ldq" type="search" value="${esc(ldQ)}" placeholder="جستجو: نام، فاکتور، مبلغ، پیگیری" autocomplete="off" enterkeyhint="search">${ldQ?'<button class="x" data-act="ldQClr" aria-label="پاک کردن">×</button>':''}</div>`;
-  const lq=toEn(ldQ.trim()).toLowerCase(),lqd=lq.replace(/\D/g,''),hit=(r,z)=>!lq||[fullName(r),toEn(r.code||''),z&&z.bi?z.bi.x.src:''].join(' ').toLowerCase().includes(lq)||(lqd.length>=3&&[String(r.amount),z&&z.bi?z.bi.x.tn:'',r.iban].some(v=>v&&String(v).includes(lqd)));let hits=0;
+  const lq=toEn(ldQ.trim()).toLowerCase(),lqd=lq.replace(/\D/g,''),hit=(r,z)=>!lq||[fullName(r),toEn(r.code||''),z&&z.bi?z.bi.x.src:''].join(' ').toLowerCase().includes(lq)||(lqd.length>=2&&/^[\d\s,.\-\/+]+$/.test(lq)&&[String(r.amount),z&&z.bi?z.bi.x.tn:'',r.iban].some(v=>v&&String(v).includes(lqd)));let hits=0;
   const rowsHTML=L=>{ROWDATE=false;ROWSRC=false;ROWTRK=true;ROWMOVE=can('split');try{return L.map(homeRow).join('')}finally{ROWSRC=true;ROWTRK=false;ROWMOVE=false}};
   const B=d.bad.filter(r=>hit(r));hits+=B.length;
   if(B.length)h+=`<div class="spsec bad"><div><b>${fmt(B.length)} واریزی خطادار</b><small>تا اصلاح نشوند تخصیص داده نمی‌شوند؛ برای اصلاح بزنید</small></div></div><div class="blist fcard">${rowsHTML(B)}</div>`;
@@ -48,7 +48,11 @@ function vLday(){const d=hubData(ldKey);ldX=null;
   if(lq&&!hits)h+='<div class="spempty" style="padding:20px 8px"><b>در این لیست پیدا نشد</b></div>';
   if(d.closed&&can('close'))h+=`<div class="row"><button class="link" data-act="hubReopen">بازگشایی لیست برای تغییر وضعیت‌ها</button></div>`;
   return h}
-function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;const pos=q.selectionStart,v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const n=$('ldq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},220)}}
+function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);ldQ=q.value;q.blur();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}};q.oninput=()=>{clearTimeout(q._t);q._t=setTimeout(()=>{ldQ=q.value;if(!ldSwapKeep(q))return;const x=q.parentNode.querySelector('.x');if(ldQ&&!x)q.insertAdjacentHTML('afterend','<button class="x" data-act="ldQClr" aria-label="پاک کردن">×</button>');else if(!ldQ&&x)x.remove()},220)}}
+/* v68.6: هنگام تایپ فقط بقیه صفحه عوض می‌شود و کادر جستجو دست نمی‌خورد (ساختن دوباره کادر، کیبورد عددی آیفون را به حروف برمی‌گرداند) */
+function ldSwapKeep(inp){const V=$('view'),box=inp&&inp.closest('#view>*');if(!V||!box){render();return false}const y=V.scrollTop,T=document.createElement('div');T.innerHTML=vLday();
+  const nb=T.querySelector('#'+inp.id);const nbox=nb&&nb.closest('div.fsearch');if(!nbox||nbox.parentNode!==T){render();return false}
+  const K=[...T.children],i=K.indexOf(nbox),O=[...V.children],j=O.indexOf(box);O.forEach((e,k)=>{if(k!==j)e.remove()});K.slice(0,i).forEach(e=>V.insertBefore(e,box));K.slice(i+1).forEach(e=>V.appendChild(e));V.scrollTop=y;return true}
 const aLday=()=>{const d=hubData(ldKey);if(!d.rows.length)return '';const B=[];
   if(d.un.length&&can('split'))B.push(`<button class="btn ${d.dr.length?'sec':'gold'}" data-act="allocNew">${ic('plus')} تخصیص به منبع</button>`);
   if(d.dr.length&&can('split'))B.push(`<button class="btn gold" data-act="hubSendAll">${ic('copy')} کپی و ارسال${d.dr.length>1?' '+fmt(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''}</button>`);
