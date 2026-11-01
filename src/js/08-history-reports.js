@@ -1,11 +1,12 @@
 /* ---------- تاریخچه: ردیف ساده، با زدن جزئیات باز می‌شود، کشیدن برای برگرداندن/نمایش ---------- */
-const EVI={add:'plus',bulk:'paste',edit:'edit',del:'trash',clear:'trash',purge:'trash',split:'split',restore:'restore',undo:'undo',batch:'track',requeue:'refresh',uncommit:'undo',close:'check',alloc:'split',debt:'debt'};
+const EVI={add:'plus',bulk:'paste',edit:'edit',del:'trash',clear:'trash',purge:'trash',split:'split',restore:'restore',undo:'undo',batch:'track',requeue:'refresh',uncommit:'undo',close:'check',alloc:'split',debt:'debt',merge:'split'};
 let histOpen=new Set();
 function evActs(x){const inTrash=(x.ids||[]).filter(id=>trash.some(z=>z.id===id)).length,live=(x.ids||[]).filter(id=>entries.some(z=>z.id===id)).length,R=[],L=[];
   if(!x.undone){
     if(x.type==='add'&&live){R.push(['undoEv','لغو ثبت','undo','#b8862b']);L.push(['showEnt','نمایش','eye','#3b6fd6'])}
     if(x.type==='bulk'&&live)R.push(['undoEv','لغو گروهی'+(live>1?' ('+fmt(live)+')':''),'undo','#b8862b']);
     if(x.type==='edit'&&live)R.push(['undoEv','برگرداندن','undo','#b8862b']);
+    if(x.type==='merge'&&live)R.push(['undoEv',x.mg&&x.mg.abs!=null?'جدا کردن دوباره':'لغو این خرید','undo','#b8862b']);
     if((x.type==='del'||x.type==='clear')&&inTrash)R.push(['undoEv','بازگردانی'+(inTrash>1?' ('+fmt(inTrash)+')':''),'restore','#178049'])}
   if(x.type==='split'&&x.snap)L.push(['reopen','مشاهده','eye','#3b6fd6']);
   return {R,L}}
@@ -42,6 +43,7 @@ function trashHTML(){if(!trash.length)return `<div class="card empty">${ic('tras
 function undoEv(id){const x=audit.find(a=>a.id==id);if(!x||x.undone)return;
   if(x.type==='add'||x.type==='bulk'){const m=trashIds(x.ids||[],x.type==='add'?'لغو ثبت':'لغو ورود گروهی');if(!m.length){toast('این واریزی‌ها دیگر در لیست نیستند',true);return}x.undone=true;logA('undo','لغو '+(x.type==='add'?'ثبت':'ورود گروهی'),x.detail);toast(fmt(m.length)+' واریزی به سطل بازیابی رفت')}
   else if(x.type==='edit'){const e=entries.find(z=>z.id===(x.ids||[])[0]);if(!e){toast('این واریزی دیگر در لیست نیست',true);return}Object.keys(FN).forEach(k=>{if(x.before&&k in x.before)e[k]=x.before[k]});e.updatedBy=who();e.updatedAt=new Date().toISOString();saveE();alloc=null;x.undone=true;logA('undo','برگرداندن ویرایش',x.before?x.before.name:'');toast('به مقدار قبل برگشت')}
+  else if(x.type==='merge'){if(!mgUndo(x))return;x.undone=true;logA('undo',x.mg&&x.mg.abs!=null?'جدا کردن واریزی‌های یکی‌شده':'لغو خرید اضافه‌شده به واریزی',x.detail);toast('برگشت به قبل از یکی کردن')}
   else if(x.type==='del'||x.type==='clear'){const b=restoreIds(x.ids||[]);if(!b.length){toast('در سطل بازیابی پیدا نشد',true);return}x.undone=true;logA('restore','بازگردانی',fmt(b.length)+' واریزی | '+b.map(z=>z.name).slice(0,3).join('، '),{ids:b.map(z=>z.id)});toast(fmt(b.length)+' واریزی بازگردانده شد')}
   saveAud();render()}
 function reopen(id){const x=audit.find(a=>a.id==id);if(!x||!x.snap)return;const s=x.snap;dateVal=s.date;ls.set('m_date',s.date);

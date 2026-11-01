@@ -2856,3 +2856,16 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .stphin.has{border-style:solid;background:color-mix(in srgb,var(--blu) 9%,var(--card))}
 .stph2.only{margin-top:8px;padding:5px 6px}
 @media (prefers-reduced-motion:reduce){.sthok,.sthok.go svg,.sthok.go .ck,.stw.bye{animation:none;transition:none}}
+/* v69.3: یک واریزی برای چند خرید یک مشتری — کارت «یکی کردن» و بخش «خریدهای این واریزی» در جزئیات */
+.mgj{display:flex;align-items:center;gap:10px;width:100%;margin:10px 0 0;padding:10px 12px;border:0;border-radius:16px;background:color-mix(in srgb,var(--blu) 8%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 45%,transparent);font:inherit;color:var(--ink);text-align:start;cursor:pointer}
+.mgj .mgi{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--blu);color:#fff}.mgj .mgi svg{width:17px;height:17px}
+.mgj .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.mgj .tx b{font-size:13px;font-weight:850}.mgj .tx small{font-size:11.5px;color:var(--mut);font-weight:600}
+.mgj .mgg{flex:none;padding:6px 10px;border-radius:10px;background:var(--blu);color:#fff;font-size:12.5px;font-weight:850}
+.mgb .mgl{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.mgr{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:13px;background:var(--seg)}
+.mgr .mgn{flex:none;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--blu) 14%,var(--card));color:var(--blu);font-size:13px;font-weight:900}
+.mgr .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.mgr .tx b{font-size:13.5px;font-weight:850}.mgr .tx small{font-size:11px;color:var(--mut);font-weight:600}
+.mgr .am{flex:none;font-size:14.5px;font-weight:900;white-space:nowrap}.mgr .am i{font-style:normal;font-size:10.5px;color:var(--mut);font-weight:700}
+@keyframes mgRise{from{opacity:0;transform:translateY(6px)}}
+.mgb .mgr{animation:mgRise .35s cubic-bezier(.2,.9,.3,1) both}.mgb .mgr:nth-child(2){animation-delay:.05s}.mgb .mgr:nth-child(3){animation-delay:.1s}
+@media (prefers-reduced-motion:reduce){.mgb .mgr{animation:none}}

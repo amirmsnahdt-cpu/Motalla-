@@ -362,6 +362,10 @@ ACT.bzNext=async()=>{bzRead();const d=bz.d;
   if(bzStlSum()>num(d.amount)){toast('جمع تسویه‌ها از مبلغ این واریزی بیشتر است',true);return}
   if(bz.saving)return;bz.saving=true;let S=[];try{S=await bzStlMake()}finally{bz.saving=false}/* v65.0: تسویه‌ها = سند دریافت هر پرداخت‌کننده (depLink بعد از ثبت) */
   const ne={id:nid++,name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),ppg:ppgOf(bzGoldAmt(),d.weight),items:(d.items||[]).filter(x=>x.amt).map(x=>({...x})),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:[],entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
+  /* v69.3: همان مشتری در همین لیست واریزی دارد (هنوز به بانک نرفته) → خرید به همان واریزی اضافه می‌شود، نه واریزی دوم */
+  const mt=mgBuy(ne,d.cuId,S.map(z=>({...z,st:'wait'})));if(mt){const r=mt.amount-mgStl(mt).reduce((a,z)=>a+(+z.amount||0),0),bd=r>0&&(!mt.iban||!ibanOk(mt.iban));
+    bz={step:1,d:{pay:payDef()},msg:`خرید «${esc(name)}» به واریزی قبلی‌اش اضافه شد — ${fmt(ne.amount)} تومان؛ جمع واریزی ${fmt(mt.amount)} تومان، واریز ${esc(payLab(mt.payDate))}${bd?' <em>(شبا ندارد یا اشتباه است؛ خطادار)</em>':''}`};
+    render();$('view').scrollTop=0;toast('به واریزی قبلی «'+name+'» اضافه شد ✓',bd,'دیدن واریزی',()=>ACT.depGo({e:mt.id}));return}
   entries.push(ne);saveE();alloc=null;depLink(ne,{cuId:d.cuId,settles:S.map(z=>({...z,st:'wait'}))});logA('add','ثبت واریزی (خرید)',name+' | '+fmt(ne.amount)+' تومان | واریز '+dates(ne.payDate).fa+(S.length?' | تسویه از مشتری '+fmt(bzStlSum(S))+' تومان':''),{ids:[ne.id],after:pick(ne)});
   const rest=ne.amount-bzStlSum(S),bad=rest>0&&(!iban||!ibanOk(iban)),why=!iban?'شبا ندارد':'شبا اشتباه است';bz={step:1,d:{pay:payDef()},msg:`«${esc(name)}» ثبت شد — ${fmt(ne.amount)} تومان، واریز ${esc(payLab(ne.payDate))}${bad?' <em>('+why+'؛ در لیست خطادار علامت خورد)</em>':''}`};
   render();$('view').scrollTop=0;toast(bad?'ثبت شد، اما '+why+' (خطادار)':'ثبت شد ✓ — ثبت بعدی',bad)};
