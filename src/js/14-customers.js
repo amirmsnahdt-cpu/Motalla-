@@ -255,7 +255,8 @@ function assetStock(){const m={};for(const c of custs){if(c.del||c.sys)continue;
   Object.keys(m).forEach(k=>{m[k]=Math.round(m[k]*100)/100;if(!m[k])delete m[k]});return m}
 /* v61.12: سود پیش‌فرض ثابت: آبشده ۰٫۵٪، بقیه ۷٪ (در هر ردیف قابل تغییر؛ تغییر یک ردیف پیش‌فرض بقیه را عوض نمی‌کند) */
 const PROFIT_DEF=()=>7,PROFIT_AB=0.5;
-const decIn=v=>toEn(String(v||'')).replace(/[٫،,\/]/g,'.').replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1');
+/* v69.2 (خواسته صاحب اپ): «.۷» یعنی ۰٫۷ — صفر پیش از ممیز خودکار */
+const decIn=v=>toEn(String(v||'')).replace(/[٫،,\/]/g,'.').replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1').replace(/^\./,'0.');
 ACT.txOpen=d=>{const c=curCu(),t=c&&(c.txs||[]).find(x=>String(x.id)===String(d.id));if(!t)return;if(t.type==='inv'||TXDOC.includes(t.type)){invOpen(c.id,t.id);return}if(t.type==='xf'||t.type==='cv'){xfShow(c,t);return}const T=TXT[t.type]||{t:t.type},e=txEff(t);
   const kv=(l,v)=>v?`<div class="kv"><small>${l}</small><b>${v}</b><span class="kvx"></span></div>`:'';
   sheet(`<div class="sh-h"><div><b>${T.t}</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>

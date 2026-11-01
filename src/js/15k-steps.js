@@ -58,7 +58,8 @@ const stFmt=(s,v)=>s.fm&&s.fm(v)!=null?s.fm(v):s.type==='wam'?(+v>=1000?fmt(+v)+
 /* عملیات و کالا (بالای نوار، بیرون از فیلد) */
 /* v61.61 (خواسته صاحب اپ): بالای پنجره ورود ردیف دکمه «برگشت» (یک مرحله عقب: پله قبلی ← فهرست جنس‌ها ← فهرست کارها)؛
    «انصراف» کل همین ردیفِ در حال ورود را دور می‌ریزد و پنجره به حالت اول برمی‌گردد (ردیف ثبت‌شده با انصراف حذف نمی‌شود) */
-function stHead(D,it,canBack){return `<div class="sthd k-${D[0]}"><button type="button" class="sthb" data-act="stUp" aria-label="برگشت">${ic('back')}<span>برگشت</span></button><button type="button" class="sthk" data-act="${it?'stBack0':'stUp'}" aria-label="تغییر نوع"><span class="sthi">${ic(D[2])}</span><b>${D[1]}</b></button>${it?`<i class="sthc">›</i><button type="button" class="sthit" data-act="stBack0">${esc(it)}</button>`:''}<button type="button" class="lnk sthx" data-act="qaCancel">انصراف</button></div>`}
+/* v69.2 (خواسته صاحب اپ): در ورود پله‌ای، دکمه بزرگ «افزودن به سند» پایین برداشته شد؛ به‌جایش تیک بالای کادر سمت چپ (کنار «انصراف») — زدن = آبی به سبز با کشیده شدن تیک، بعد ثبت */
+function stHead(D,it,canBack,ok){return `<div class="sthd k-${D[0]}"><button type="button" class="sthb" data-act="stUp" aria-label="برگشت">${ic('back')}<span>برگشت</span></button><button type="button" class="sthk" data-act="${it?'stBack0':'stUp'}" aria-label="تغییر نوع"><span class="sthi">${ic(D[2])}</span><b>${D[1]}</b></button>${it?`<i class="sthc">›</i><button type="button" class="sthit" data-act="stBack0">${esc(it)}</button>`:''}${ok?`<button type="button" class="sthx" data-act="stCancel">انصراف</button><button type="button" class="sthok" data-act="stFin" aria-label="${ok.ed?'ذخیره تغییرات':'افزودن به سند'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="ck" d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>`:'<button type="button" class="lnk sthx" data-act="qaCancel">انصراف</button>'}</div>`}
 const stTag=()=>{const a=sv.qa,K=stKind(),d=a.pv?a.pv.dir:a.d||(a.x&&a.x.fd)||(a.p&&a.p.dir)||(a.x?(a.x.cat==='تعویض'?'swap':a.x.cat==='مرجوعی'?'ret':a.x.t):'sell');
   const D=DK.find(z=>z[0]===d)||DK[0];let it='';if(K==='it')it=a.k;else if(K==='ab')it=a.sh===1?'آبشده شرطی':'آبشده';else if(K==='xr'){const x=a.x;it=x.cat==='تعویض'?'طلای کهنه':x.cat==='مرجوعی'?'طلای برگشتی':x.a==='gold'?(x.pz?'سکه پارسیان':x.cat==='مانده قبلی'?'مانده قبلی طلا':x.sh===1&&x.cat==='آبشده'?'آبشده شرطی':x.pul&&x.cat==='قلک'?'قلک':x.pul?'پولی':x.cat||'طلا'):((x.pul?'پولی ':'')+((XA[x.a]||{}).t||x.a))}else if(K==='pv')it='مانده قبلی';else if(K==='py')it=dkST(d==='out'?'out':'in',a.p.m)||(PM[a.p.m]||{}).t||'';
   return {D,it}};
@@ -96,13 +97,16 @@ function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.
   const val=cur.get(),ph=cur.ph?cur.ph:cur.type==='wam'?'وزن (گرم) یا مبلغ (تومان)':cur.mz?(stBuyF(sv.qa.x)!==1?'مظنه خرید یا هر گرم خرید (تومان)':'مظنه یا هر گرم ۱۸ (تومان)'):cur.lab+(cur.u?' ('+cur.u+')':'')+(cur.opt?' · اختیاری':''),
     inp=cur.type==='pick'?`<input id="stI" class="stin" type="search" placeholder="جستجوی ${cur.lab}…" autocomplete="off" enterkeyhint="search" value="${esc(a.sq||'')}">`:`<input class="stkb" data-kbn="-1" aria-hidden="true" tabindex="-1" ${cur.type==='text'?'':'inputmode="decimal"'} autocomplete="off"><input id="stI" data-kb="${stKbT(cur)}" class="stin${cur.type==='text'?'':' ltr'}" ${cur.type==='text'?'':'inputmode="decimal"'} value="${cur.type==='wam'?(+val>=1000?Number(val).toLocaleString('en-US'):esc(val||'')):cur.type==='num'?(+val?Number(val).toLocaleString('en-US'):''):cur.grp?esc(grpIn(val)):esc(val==null?'':String(val))}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}"><input class="stkb" data-kbn="1" aria-hidden="true" tabindex="-1" ${cur.type==='text'?'':'inputmode="decimal"'} autocomplete="off">`;
   const canFin=S.every(s=>s.need&&s.need()?false:s.wOr||s.opt||s.type==='int'||stFmt(s,s.get()));
-  return `<div class="stw">${stHead(T.D,T.it,1)}<div class="stps">${seg}</div>
-    <div class="fsearch sm st3">${cur.type==='pick'?ic('search'):''}${inp}${cur.type==='pick'?'':`<button type="button" class="stnx${last?' go':''}" data-act="stNext">${last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':'<span>بعدی</span>'+ic('back').replace('class="i"','class="i flip"')}</button>`}</div>
+  return `<div class="stw">${stHead(T.D,T.it,1,{ed})}<div class="stps">${seg}</div>
+    <div class="fsearch sm st3">${cur.type==='pick'?ic('search'):''}${inp}${cur.type==='pick'?'':`<button type="button" class="stnx${last?' go':''}" data-act="stNext">${last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':'<span>بعدی</span>'+ic('back').replace('class="i"','class="i flip"')}</button>`}${stPhIn()}</div>
     ${cur.type==='pick'?`<div id="stPk">${stPick(cur)}</div>`:''}
     <div class="stlv" id="stPv">${stLive()}${stRefHTML()}</div>
-    ${stPhHTML()}
-    ${ed||(!last&&canFin)?`<div class="stft">${!last&&canFin?`<button type="button" class="stdone" data-act="stFin">${ic('check')}<span>${ed?'ذخیره تغییرات':'افزودن به سند'}</span></button>`:''}${ed?`<button type="button" class="stdel" data-act="stDel" aria-label="حذف ردیف">${ic('trash')}<span>حذف</span></button>`:''}</div>`:''}
+    ${stPhRow()}
+    ${ed?`<div class="stft"><button type="button" class="stdel" data-act="stDel" aria-label="حذف ردیف">${ic('trash')}<span>حذف</span></button></div>`:''}
 </div>`}
+/* v69.2 (خواسته صاحب اپ): «+ عکس» داخل همان کادر فیلد، در انتهای آن (با شمار عکس‌ها)؛ عکس‌های زده‌شده ردیف کوچکی زیر کادر مبلغ */
+function stPhIn(){const x=phT();if(!x)return '';const n=xrPh(x).length;return `<button type="button" class="stphin${n?' has':''}" data-act="rowGal" aria-label="افزودن عکس">${ic('cam')}${n?`<i>${toFa(n)}</i>`:`<i class="pl">+</i>`}</button>`}
+function stPhRow(){const x=phT();if(!x)return '';const K=xrPh(x);if(!K.length)return '';return `<div class="stph2 only"><span class="stphl2">${K.map((k,i)=>`<button type="button" class="stpht" data-act="rowPhV" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</span></div>`}
 /* v61.30: همه فهرست‌های انتخابی (کارتخوان، حساب ما، مشتری…) جستجو دارند و فهرست زیرش دیده می‌شود */
 /* v61.31: هر فهرست انتخابی ردیف «افزودن» هم دارد (کارتخوان، حساب ما، مشتری): نام را در جستجو بنویسید و بزنید */
 const pkAddRow=(t,q,act)=>`<button type="button" class="bzsr dkrw nw" data-act="${act}"><span class="av">${ic('plus')}</span><span class="tx"><b>${q?'افزودن «'+esc(q)+'»':t+' تازه'}</b><small>${q?t+' تازه':'نامش را در جستجو بنویسید'}</small></span></button>`;
@@ -184,7 +188,12 @@ ACT.stNext=()=>{stRead();const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1
   /* برگشت برای ویرایش: بعد از «بعدی» به همان جایی می‌رود که بودید */
   let nx=i+1;if(a.stMax>i){nx=a.stMax;for(let k=i+1;k<a.stMax;k++)if(!stOk(S[k])){nx=k;break}}
   a.st=Math.min(nx,S.length-1);a.stMax=Math.max(a.stMax||0,a.st);svKeep();stRe()};
-ACT.stFin=()=>{stRead();const S=stSteps(),miss=S.findIndex(s=>!stOk(s));if(miss>=0){sv.qa.st=miss;stRe();toast(S[miss].msg||S[miss].lab+' را بزنید',true);return}stFinish()};
+/* v69.2: تیک بالا — اول همه پله‌ها بررسی می‌شود؛ درست بود: دکمه سبز می‌شود و تیک کشیده می‌شود، بعد ثبت. اگر ثبت به هر دلیل انجام نشد، دکمه به حال قبل برمی‌گردد */
+ACT.stFin=()=>{stRead();const S=stSteps(),miss=S.findIndex(s=>!stOk(s));if(miss>=0){sv.qa.st=miss;stRe();toast(S[miss].msg||S[miss].lab+' را بزنید',true);return}
+  const b=document.querySelector('#qa .sthok');if(!b||RM()){stFinish();return}if(b.classList.contains('go'))return;
+  b.classList.add('go');const w=b.closest('.stw');if(w)w.classList.add('okd');setTimeout(()=>{stFinish();if(b.isConnected){b.classList.remove('go');if(w)w.classList.remove('okd')}},430)};
+/* v69.2: انصراف از بالای کادر — کادر کمی کوچک و محو می‌شود، بعد بسته */
+ACT.stCancel=()=>{const w=document.querySelector('#qa .stw');if(!w||RM()||w.classList.contains('bye')){ACT.qaCancel();return}w.classList.add('bye');setTimeout(()=>{if(w.isConnected)ACT.qaCancel()},220)};
 ACT.stGo=d=>{stRead();const a=sv.qa;a.stMax=Math.max(a.stMax||0,a.st||0);a.st=+d.i;a.sq='';svKeep();stRe()};
 ACT.stPickV=d=>{const a=sv.qa,S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];s.set(d.v);a.sq='';if(a.p&&a.p.m==='cust')pyCuCap(a.p);if(a.p&&!a.p.amount)a.p.amount=pyLeft(a.p);a.st=(a.st||0)+1;a.stMax=Math.max(a.stMax||0,a.st);svKeep();stRe()};
 ACT.stPkAdd=()=>{const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1),s=S[i];if(!s||!s.add)return;const n=clean(a.sq||'');

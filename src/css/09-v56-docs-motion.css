@@ -2831,3 +2831,28 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .bgmk>small{text-align:center;font-size:10.5px;font-weight:800;color:var(--ink);white-space:nowrap}.bgmk>small i{font-style:normal;font-weight:700;color:var(--mut);font-size:9.5px}
 .bgmk>.bgmc{width:100%}
 .iv9b.bgc.n1 .bgup,.iv9b.bgc.n1 .bgx{display:none}
+/* v69.2 (خواسته صاحب اپ): هنگام ورود پله‌ای کل کادر همان قاب آبی فیلد؛ فیلد داخلش قاب خنثی (دو قاب آبی تو در تو نباشد) */
+#qa.d6q:has(>.stw){border:0!important;box-shadow:inset 0 0 0 1.5px var(--blu),0 0 0 4px color-mix(in srgb,var(--blu) 12%,transparent),var(--lift)!important;transition:box-shadow .3s ease}
+#qa.d6q:has(>.stw.okd){box-shadow:inset 0 0 0 1.5px var(--ok),0 0 0 4px color-mix(in srgb,var(--ok) 16%,transparent),var(--lift)!important}
+#qa .stw .fsearch.st3,#qa .stw .fsearch.st3:focus-within{border-color:var(--fld)!important;box-shadow:none!important}
+/* سربرگ: برگشت · نوع › جنس … انصراف · تیک (سمت چپ) */
+.stw .sthd{gap:5px}.stw .sthk{min-width:0;flex:0 1 auto}.stw .sthk b{white-space:nowrap}.stw .sthit{flex:0 1 auto}
+.stw .sthx{flex:none;margin-inline-start:auto;height:34px;padding:0 12px;border:0;border-radius:11px;background:var(--seg);color:var(--mut);font:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:background .2s,color .2s}
+.stw .sthx:hover{color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--card))}
+.sthok{flex:none;position:relative;width:38px;height:34px;border:0;border-radius:11px;padding:0;display:grid;place-items:center;cursor:pointer;background:var(--blu);color:#fff;box-shadow:0 6px 14px -8px color-mix(in srgb,var(--blu) 80%,transparent);transition:background .28s ease,box-shadow .28s ease,width .32s cubic-bezier(.3,1.4,.5,1)}
+.sthok svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.sthok .ck{stroke-dasharray:24;stroke-dashoffset:0}
+.sthok.go{background:var(--ok);box-shadow:0 0 0 5px color-mix(in srgb,var(--ok) 20%,transparent),0 8px 18px -8px color-mix(in srgb,var(--ok) 85%,transparent)}
+.sthok.go .ck{animation:ckDraw .38s cubic-bezier(.6,0,.3,1) both}
+.sthok.go svg{animation:ckPop .43s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes ckDraw{0%{stroke-dashoffset:24}100%{stroke-dashoffset:0}}
+@keyframes ckPop{0%{transform:scale(.6)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.stw.bye{animation:stBye .22s ease-in both;pointer-events:none}
+@keyframes stBye{to{opacity:0;transform:scale(.96) translateY(6px);filter:blur(2px)}}
+/* «+ عکس» داخل کادر فیلد، انتهای آن */
+.stphin{flex:none;position:relative;width:40px;height:38px;border-radius:11px;border:1.5px dashed color-mix(in srgb,var(--blu) 55%,transparent);background:var(--card);color:var(--blu);display:grid;place-items:center;cursor:pointer;padding:0}
+.stphin svg{width:19px;height:19px}
+.stphin i{position:absolute;top:-6px;inset-inline-end:-6px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--blu);color:#fff;font-style:normal;font-size:11px;font-weight:900;line-height:17px;text-align:center;box-shadow:0 0 0 2px var(--card)}
+.stphin.has{border-style:solid;background:color-mix(in srgb,var(--blu) 9%,var(--card))}
+.stph2.only{margin-top:8px;padding:5px 6px}
+@media (prefers-reduced-motion:reduce){.sthok,.sthok.go svg,.sthok.go .ck,.stw.bye{animation:none;transition:none}}
