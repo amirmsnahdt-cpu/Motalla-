@@ -2792,15 +2792,15 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 #cures .cuL .c6r .tx{min-width:0}
 #cures .cuL .c6r .tx small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* کاشی «در انتظار واریز»: زرد، هم‌اندازه بقیه؛ روی دیگرش (با زدن) مبلغ در انتظار */
-#cures .cuL .cbk.wp{cursor:pointer;transform-origin:50% 50%;box-shadow:inset 0 0 0 1.5px var(--pe)!important;background:color-mix(in srgb,var(--warn2) 75%,var(--card))!important}
-#cures .cuL .cbk.wp .cbwp{display:none}
-#cures .cuL .cbk.wp.fl>.cbh,#cures .cuL .cbk.wp.fl>b{display:none}
-#cures .cuL .cbk.wp.fl .cbwp{display:flex;margin:0;padding:0;background:none}
-#cures .cuL .cbk.wp.fl .cbwp b{font-size:15px!important}
-#cures .cuL .cbk.wp::after{content:"";position:absolute;left:9px;bottom:9px;width:5px;height:5px;border-left:1.6px solid var(--warn);border-bottom:1.6px solid var(--warn);transform:rotate(-45deg);opacity:.55}
-#cures .cuL .cbk.wp{position:relative}
-#cures .cuL .cbk.wp.fl .cbwp{flex-wrap:wrap;align-items:center;gap:2px 4px;font-size:10.5px;line-height:1.5}
-#cures .cuL .cbk.wp.fl .cbwp b{flex-basis:100%;text-align:right;line-height:1.35;overflow:hidden;text-overflow:ellipsis}
+#cures .cuL .cbk.wp,.cub9 .cbk.wp{cursor:pointer;transform-origin:50% 50%;box-shadow:inset 0 0 0 1.5px var(--pe)!important;background:color-mix(in srgb,var(--warn2) 75%,var(--card))!important}
+#cures .cuL .cbk.wp .cbwp,.cub9 .cbk.wp .cbwp{display:none}
+#cures .cuL .cbk.wp.fl>.cbh,.cub9 .cbk.wp.fl>.cbh,#cures .cuL .cbk.wp.fl>b,.cub9 .cbk.wp.fl>b{display:none}
+#cures .cuL .cbk.wp.fl .cbwp,.cub9 .cbk.wp.fl .cbwp{display:flex;margin:0;padding:0;background:none}
+#cures .cuL .cbk.wp.fl .cbwp b,.cub9 .cbk.wp.fl .cbwp b{font-size:15px!important}
+#cures .cuL .cbk.wp::after,.cub9 .cbk.wp::after{content:"";position:absolute;left:9px;bottom:9px;width:5px;height:5px;border-left:1.6px solid var(--warn);border-bottom:1.6px solid var(--warn);transform:rotate(-45deg);opacity:.55}
+#cures .cuL .cbk.wp,.cub9 .cbk.wp{position:relative}
+#cures .cuL .cbk.wp.fl .cbwp,.cub9 .cbk.wp.fl .cbwp{flex-wrap:wrap;align-items:center;gap:2px 4px;font-size:10.5px;line-height:1.5}
+#cures .cuL .cbk.wp.fl .cbwp b,.cub9 .cbk.wp.fl .cbwp b{flex-basis:100%;text-align:right;line-height:1.35;overflow:hidden;text-overflow:ellipsis}
 /* v68.2 (خواسته صاحب اپ): کادر جستجوی حساب‌ها، بانک‌ها و حساب مشتری دقیقاً مثل جستجوی واریزی‌ها — قاب آبی، بدون سایه */
 .fsearch.c6q0,.fsearch.stms2{border-color:var(--blu)!important;box-shadow:none!important}
 /* v68.3: مانده قبلی جمع‌وجور اول سند جدید (مشتری در سرتیتر) */
@@ -2808,7 +2808,9 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .d6pv>small{flex:none;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:850;color:var(--mut)}
 .d6pv>small svg{width:13px;height:13px}
 .d6pv.z{justify-content:space-between}
-.d6pvs{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}.d6pvs::-webkit-scrollbar{display:none}
+.d6pvs{flex:1;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,auto));justify-content:space-between;gap:5px}
+/* v68.4 (خواسته صاحب اپ): طلا همیشه راست و پول همیشه چپ، حتی وقتی فقط یکی هست */
+.d6pvc.kg{grid-column:1;grid-row:1;justify-self:start}.d6pvc.kr{grid-column:2;grid-row:1;justify-self:end}.d6pvc.kx{justify-self:end}.d6pvs::-webkit-scrollbar{display:none}
 .d6pvc{flex:none;display:inline-flex;align-items:baseline;gap:3px;height:28px;padding:0 9px;border:0;border-radius:9px;font:inherit;cursor:pointer;white-space:nowrap;background:var(--blu2);color:var(--blu);align-items:center}
 .d6pvc.d{background:color-mix(in srgb,var(--red) 10%,var(--card));color:var(--red)}
 .d6pvc b{font-size:13.5px;font-weight:900;font-feature-settings:"tnum"}
@@ -2816,3 +2818,14 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .d6pvc em{font-style:normal;font-size:9.5px;font-weight:850;opacity:.8;margin-inline-start:2px}
 .d6pvc:active{transform:scale(.96)}
 @media (prefers-reduced-motion:reduce){.d6pv{animation:none}}
+
+/* v68.4 (خواسته صاحب اپ): دو کاشی (طلا و مبلغ) هم در ردیف نام مشتری، نه زیر آن */
+#cures .cuL .c6r:not(.one):not(.zr){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,64%);align-items:center}
+#cures .cuL .c6r:not(.one) .c6vb{margin:0;width:auto;gap:5px}
+#cures .cuL .c6r:not(.one) .c6vb>.cbk{padding:6px 8px 7px;--fmax:14px}
+#cures .cuL .c6r:not(.one) .tx b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+#cures .cuL .c6r:not(.one):not(.zr){grid-template-columns:minmax(0,1fr) minmax(0,67%);gap:6px 8px;padding-inline:10px}
+#cures .cuL .c6r:not(.one) .c6vb>.cbk{padding:5px 6px 6px}
+#cures .cuL .c6r:not(.one) .cbk .cbh{gap:3px}
+#cures .cuL .c6r:not(.one) .cbk .cbh small{font-size:9.5px;white-space:nowrap}
+#cures .cuL .c6r:not(.one) .cbk .cbh em{font-size:8.5px;padding:0 4px;white-space:nowrap}
