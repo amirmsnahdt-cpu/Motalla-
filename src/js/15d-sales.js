@@ -131,10 +131,7 @@ function svCuHTML(){const c=svCu();if(c&&sv.fixCu)return `<div id="svCuB">${svCu
   return `<div class="d6pick cbx"><div class="fsearch">${ic('search')}<input id="svQ" type="search" value="${esc(sv.q||'')}" placeholder="مشتری: نام، شماره، کد ملی یا گروه…" autocomplete="off" enterkeyhint="search"></div><div id="svCr">${svCrHTML()}</div></div>`}
 /* v61.93 (خواسته صاحب اپ): تا سند ردیفی ندارد، «مانده حساب» داخل کارت مشتری است (نه نوار پایین)؛ با اولین ردیف، نوار پایین برمی‌گردد.
    هر قاب = تسویه همان مانده (مثل نوار پایین) */
-function svCuBHTML(){const c=svCu();if(!c||svRows())return '';const b=svCuBal(c);
-  /* v68.3 (خواسته صاحب اپ): سند جدید از صفحه مشتری — مانده قبلی همان اول، یک ردیف باریک (چیپ هر مانده؛ زدن = تسویه همان مانده) */
-  if(sv.fixCu)return `<div class="d6pv${cuZero(b)?' z':''}"><small>${ic('clock')}مانده قبلی</small>${cuZero(b)?cuZTag():`<span class="d6pvs">${q8Keys(b).filter(k=>q8V(b,k)).sort((x,y)=>(y==='g')-(x==='g')).map(k=>{const v=q8V(b,k);return `<button type="button" class="d6pvc ${ftCls(v)} k${k==='r'||k==='g'?k:'x'}" data-act="svBal" data-k="${k}"><b>${balV(k,v)}</b>${k==='r'?'':`<i>${balU(k)}</i>`}<em>${ourLab(v)}</em></button>`}).join('')}</span>`}</div>`;if(cuZero(b))return `<div class="d6cub z"><small>مانده حساب</small>${cuZTag()}</div>`;
-  return `<div class="d6cub"><small>مانده حساب</small><span class="q8fs">${q8Keys(b).map((k,i)=>`<button type="button" class="q8b" data-act="svBal" data-k="${k}">${q8F(k,q8V(b,k),{i})}</button>`).join('')}</span></div>`}
+function svCuBHTML(){return ''}/* v69.0 (خواسته صاحب اپ): مانده قبلی فقط در کارت پایین سند (قاب‌های نوع‌دار) */
 function svCuBSync(){const B=$('svCuB'),h=svCuBHTML();if(B&&B.innerHTML!==h){B.innerHTML=h;const w=B.parentNode;if(w)w.classList.toggle('wb',!!h)}const a=$('act'),g=$('svFt');if(a&&g&&cur==='sell')a.classList.toggle('sv0',!g.innerHTML.trim())}
 function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
   /* v61.93: زدن اول روی جستجو = فهرست آخرین مشتری‌ها با مانده (بدون کیبورد)؛ زدن دوم = تایپ */
@@ -448,7 +445,7 @@ function svBalL(){const c=svCu(),T=svTot(),b=c?svCuBal(c):{R:0,G:0,X:{}},gc=sv.g
   const dr=-T.rest+(gc?T.rest:0),dg=Math.round((T.ge-(gc?T.rest/sv.rate:0))*1000)/1000;
   const keys=[...new Set([...Object.keys(b.X||{}),...Object.keys(T.xe||{})])];
   const rd=(k,v)=>k==='r'?Math.round(v):k==='g'?Math.round(v*1000)/1000:Math.round(v*100)/100;
-  return [['r',b.R,dr],['g',b.G,dg],...keys.map(k=>[k,(b.X||{})[k]||0,(T.xe||{})[k]||0])].filter(([k,p,d],i)=>i===0||d||(c&&p&&k==='g')).map(([k,p,d])=>[k,rd(k,p),rd(k,d),rd(k,p+d)])}
+  return [['r',b.R,dr],['g',b.G,dg],...keys.map(k=>[k,(b.X||{})[k]||0,(T.xe||{})[k]||0])].filter(([k,p,d],i)=>i===0||d||(c&&p))/* v69.0: مانده قبلی ارز/سکه مشتری هم (نه فقط طلا) */.map(([k,p,d])=>[k,rd(k,p),rd(k,d),rd(k,p+d)])}
 const balNm=k=>k==='r'?'تومان':k==='g'?'طلا':esc((XA[k]||{s:k}).s);
 /* v61.20: واحد همه‌جا کنار عدد: تومان، گرم، عدد سکه */
 const balVU=(k,v)=>balV(k,v)+' <i>'+balU(k)+'</i>';
@@ -461,12 +458,12 @@ const ftNum=(k,v)=>`<b class="ftn">${v?balV(k,v):'۰'}</b>`;
    هر عدد با رنگ خودش (قرمز طلبکاریم، آبی بدهکاریم)، «نهایی» پررنگ‌تر با زمینه رنگی. زدن هر خانه = پنجره تسویه برای مبلغ همان مانده
    (با ریز قبلی/سند/نهایی بالای آن)؛ نگه داشتن = جزئیات فاکتور */
 const ftLn=(k,v,big)=>`<span class="f3l ${ftCls(v)}${k==='r'?' r':''}"><b${k==='r'?' class="ftn"':''}${fitS((v?balV(k,v):'۰')+(k==='r'?'':' '+balU(k)))}>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i>${big&&v?`<em>${ourLab(v)}</em>`:''}</span>`;
-function svFtIn(){if(!sv)return '';const c=svCu(),ready=!!(sv.rate||!svHasG()),has=svRows();if(!has)return '';
+function svFtIn(){if(!sv)return '';const c=svCu(),ready=!!(sv.rate||!svHasG()),has=svRows();if(!has&&!c)return '';/* v69.0 (خواسته صاحب اپ): سند تازه با مشتری = همین کارت پایین با مانده قبلی (نه ردیف بالا) */if(!has&&c&&cuZero(svCuBal(c)))return '';
   if(!ready)return `<div class="iv8b iv9b"><button type="button" class="f3c f3w" data-act="svSave"><small>مانده سند</small><span class="ftw">اول مظنه را وارد کنید</span></button></div>`;
   /* v61.57: همان جدول مانده‌های سند ثبت‌شده (balGrid)؛ زدن هر قاب = تسویه همان مانده، نگه داشتن = جزئیات فاکتور */
   const L=svBalL(),get=k=>L.find(z=>z[0]===k)||[k,0,0,0],R=[get('r')];if(c||L.some(z=>z[0]==='g'&&(z[1]||z[2]||z[3])))R.push(get('g'));L.forEach(z=>{if(z[0]!=='r'&&z[0]!=='g'&&(z[1]||z[2]||z[3]))R.push(z)});
   const cols=!c?[{lab:sv.pays.length?'مانده سند':'جمع سند',ix:2,w:'d',m:1}]:!has?[{lab:'مانده حساب',ix:1,w:'f',m:1}]:[{lab:'قبلی',ix:1,w:'p'},{lab:sv.pays.length?'مانده سند':'این سند',ix:2,w:'d'},{lab:'نهایی',ix:3,w:'f',m:1}];
-  return balGrid(R.map(z=>[z[0],...cols.map(cl=>z[cl.ix])]),cols,{act:'svBal',hint:'زدن = تسویه · نگه داشتن = جزئیات فاکتور'})}
+  return balGrid(R.map(z=>[z[0],...cols.map(cl=>z[cl.ix])]),cols,{act:'svBal',mini:c&&!has})}
 const svFtC=()=>{if(!sv)return '';const c=svCu(),has=sv.items.length||sv.pays.length||(sv.xr||[]).length;if(!(sv.rate||!svHasG()))return '';const r=svBalL().find(z=>z[0]==='r'),v=r?(c?r[3]:r[2]):0;return v<0?'d':v>0?'c':(has?'ok':'')};
 function tween(el,to){if(!el)return;const from=+el.dataset.v||0;el.dataset.v=to;if(from===to||matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=fmt(to);return}const t0=performance.now(),D=420;cancelAnimationFrame(el._r);
   const st=n=>{const k=Math.min(1,(n-t0)/D),e=1-Math.pow(1-k,3);el.textContent=fmt(Math.round(from+(to-from)*e));if(k<1)el._r=requestAnimationFrame(st)};el._r=requestAnimationFrame(st)}
@@ -667,14 +664,14 @@ function balGrid(rows,cols,o){o=o||{};rows=rows.map((r,i)=>[r,i]).sort((a,b)=>ba
   const cell=(k,v,c)=>{const x=v?balV(k,v):'۰',T=o.act&&c.w?'button':'span';return `<${T} class="iv8c ${q8S(v)}${c.m?' m':''}" style="--i:${n++}"${T==='button'?` type="button" data-act="${o.act}" data-w="${c.w}" data-k="${k}" aria-label="${esc(c.lab)}: ${esc(x)} ${esc(balU(k))}"`:''}><span class="fz"><b${fitS(x)}>${x}</b></span><small>${v?ourLab(v):'تسویه'}</small></${T}>`};
   const rw=([k,...V])=>`<div class="iv8r k${q8C(k)}"><span class="iv8k">${balKL(k,1)}</span>${cols.map((c,j)=>cell(k,V[j]||0,c)).join('')}</div>`,
     M=rows,full=`<div class="iv8h">${cols.map(c=>`<span>${esc(c.lab)}</span>`).join('')}</div>${M.map(rw).join('')}`;
-  if(N<2)return `<div class="iv8b iv9b n${N}${o.an?' anim':''}" role="group" aria-label="مانده‌ها">${full}</div>`;
+  if(N<2&&!o.mini)return `<div class="iv8b iv9b n${N}${o.an?' anim':''}" role="group" aria-label="مانده‌ها">${full}</div>`;
   /* v61.65 (خواسته صاحب اپ): اول فقط مانده‌های نهایی (مبلغ، طلا، دلار…) جمع‌وجور؛ دکمه فلش بالای کارت (یا زدن روی مانده‌ها) =
      جدول کامل قبلی · این سند · نهایی با حرکت بالا می‌آید؛ دوباره زدن = جمع می‌شود. حالت باز/بسته در BGO می‌ماند */
   /* v61.66 (خواسته صاحب اپ): ترتیب از چپ: مبلغ، طلا (کنار مبلغ)، بعد ارز و سکه به سمت راست؛ همه قاب‌ها هم‌اندازه و عددها با یک اندازه
      (اندازه بلندترین عدد)؛ برچسب «ارز · دلار»، «سکه امامی · عدد» */
   const mi=Math.max(0,cols.findIndex(c=>c.m)),MV=M.map(([k,...V])=>[k,V[mi]||0]).reverse(),fw=Math.min(...MV.map(([k,v])=>fitW(v?balV(k,v):'۰'))),
     fc=cols[mi],mini=MV.map(([k,v])=>{const x=v?balV(k,v):'۰',T=o.act&&fc.w?'button':'span';/* v61.67: زدن هر قاب نهایی = تسویه همان (مثل قبل)؛ فلش = جدول کامل */
-      return `<${T} class="bgmc ${q8S(v)}"${T==='button'?` type="button" data-act="${o.act}" data-w="${fc.w}" data-k="${k}" aria-label="تسویه ${esc(String(balKL(k)).replace(/<[^>]*>/g,''))}: ${esc(x)}"`:''}><small>${balKL(k)}</small><span class="fz"><b style="--fw:${fw}">${x}</b></span><em>${v?ourLab(v):'تسویه'}</em></${T}>`}).join('');
+      return `<span class="bgmk"><small>${balKL(k)}</small><${T} class="bgmc ${q8S(v)}"${T==='button'?` type="button" data-act="${o.act}" data-w="${fc.w}" data-k="${k}" aria-label="تسویه ${esc(String(balKL(k)).replace(/<[^>]*>/g,''))}: ${esc(x)}"`:''}><span class="fz"><b style="--fw:${fw}">${x}</b></span><em>${v?ourLab(v):'تسویه'}</em></${T}></span>`}).join('');/* v69.0: نوع (مبلغ تومان، طلا گرم، ارز دلار) بیرون قاب رنگی، بالای آن */
   return `<div class="iv8b iv9b bgc n${N}${o.an?' anim':''}${BGO?' op':''}" role="group" aria-label="مانده‌ها"><button type="button" class="bgup" data-act="bgO" aria-expanded="${BGO?'true':'false'}" aria-label="${BGO?'بستن جزئیات مانده‌ها':'مانده‌های قبلی، این سند و نهایی'}">${ic('chev')}</button>
   <div class="bgx"><div class="bgxi">${full}</div></div><div class="bgmw"><div class="bgm"><span class="bgml">${mini}</span></div></div></div>`}/* v68.9 (خواسته صاحب اپ): نوشته «مانده نهایی · زدن = تسویه» و راهنمای پایین برداشته شد؛ کارت کوتاه‌تر */
 let BGO=false;
