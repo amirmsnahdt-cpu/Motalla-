@@ -62,3 +62,26 @@ ACT.ssSave=()=>{if(!SS)return;if(ssLeft()!==0||SS.L.some(l=>!(+l.amount>0)||!l.t
   const n=SS.L.length;SS=null;closeSheet();numMorph('#view .stl .brv b',()=>{const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y});
   const nw=document.querySelectorAll('#view .stl .stlrw');if(!RM())nw.forEach((r,i)=>r.animate&&r.animate([{opacity:.3,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:340,delay:i*50,easing:'cubic-bezier(.2,.9,.25,1)',fill:'backwards'}));
   toast(n>1?'واریز بین '+toFa(n)+' بانک تقسیم شد':'منبع واریز ثبت شد')};
+
+/* ============ v69.4 (خواسته صاحب اپ): واریزی ارسال‌شده — مبلغ دلخواه از بانک دیگر، و برگرداندن به تخصیص ============
+   مشکل: بعد از ارسال، «تغییر بانک» (از لیست) فقط «همه مبلغ از یک منبع» داشت و هر بانکی زده می‌شد کل مبلغ می‌رفت؛
+   و برای پس گرفتن یک واریزی ارسال‌شده راهی جز حذف کل واریزی نبود.
+   حالا: در همان پنجره، «بخشی از مبلغ از بانک دیگر» (همان پنجره منابع، مبلغ دلخواه) و «برگرداندن به تخصیص» بالای فهرست بانک‌ها؛
+   در جزئیات واریزی هم «برگرداندن به تخصیص» زیر کارت واریز بانکی. برگرداندن فقط برای بخش‌هایی که تأیید، شماره پیگیری یا رسید ندارند؛
+   واریزی با همان بانک به تخصیص همان تاریخ واریز برمی‌گردد (ارسال‌نشده) و از پیگیری برداشته می‌شود. */
+function unsendFam(x){const F=ssFam(x);if(!F||F.some(o=>ssLock(o.q.it)))return null;return F}
+const unsendCan=x=>!!x&&!!x.sentBid&&can('split')&&!!unsendFam(x);
+function unsentRowsHTML(one){const a=ssCan(one),b=unsendCan(one);if(!a&&!b)return '';
+  return `${a?`<button class="acrow mvps" data-act="mvSentSplit" data-id="${one.id}"><span class="bkb lg mvpsi">${ic('split')}</span><span class="tx"><b>بخشی از مبلغ از بانک دیگر</b><small>مبلغ دلخواه را بزنید؛ بقیه در بانک فعلی می‌ماند</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:''}${b?`<button class="acrow mvun" data-act="entUnsend" data-id="${one.id}"><span class="bkb lg mvuni">${ic('undo')}</span><span class="tx"><b>برگرداندن به تخصیص</b><small>از پیگیری برداشته می‌شود و دوباره ارسال‌نشده است</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:''}<div class="mvor"><span>یا همه مبلغ از یک منبع</span></div>`}
+ACT.mvSentSplit=d=>{closeSheet();setTimeout(()=>ACT.sentSplit({id:d.id}),80)};
+ACT.entUnsend=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;const root=validated().find(r=>r.id===famRoot(x))||x;
+  if(!unsendCan(root)){toast('این واریزی تأیید شده، شماره پیگیری یا رسید دارد، یا لیستش بایگانی شده؛ برنمی‌گردد',true);return}
+  const F=unsendFam(root),tot=F.reduce((a,o)=>a+(+o.q.it.amount||0),0);
+  askConfirm(`«${esc(fullName(root))}» (${fmt(tot)} تومان${F.length>1?'، '+toFa(F.length)+' بخش':''}) از ارسال برگردد به تخصیص؟`,'برگردد',()=>{
+    const G=unsendFam(root);if(!G){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return}const now=new Date().toISOString(),pay=PD(root);
+    G.forEach(o=>{const id=o.r.id,b=o.q.b,src=o.q.it.src;b.items=b.items.filter(z=>z.id!==id);if(!b.items.length)batches=batches.filter(z=>z!==b);delete o.e.sentBid;o.e.updatedAt=now;o.e.updatedBy=who();
+      let sp=null;allParts().forEach(p=>{if(p.sent&&(p.ids||[]).includes(id)){sp=sp||p;p.ids=p.ids.filter(z=>z!==id);if(!p.ids.length)delPart(p)}});
+      const so=sp?sp.src:(z=>z?{id:z.id,name:z.name,bank:z.bank||'',limit:0}:null)(sources.find(z=>z.name===src));if(!so)return;
+      let to=allParts().find(p=>!p.sent&&p.pay===pay&&String(p.src.id)===String(so.id));if(!to){to={id:nid++,src:{id:so.id,name:so.name,bank:so.bank||'',limit:0},method:'manual',param:{},ids:[],at:now};addPart(to,pay)}if(!to.ids.includes(id))to.ids.push(id)});
+    memoClear();saveE();saveB();saveD();alloc=null;logA('uncommit','برگرداندن واریزی از ارسال',fullName(root)+' | '+fmt(tot)+' تومان | '+G.map(o=>o.q.it.src).join('، '));
+    closeSheet();const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('برگشت به تخصیص — دوباره ارسال‌نشده است')})};
