@@ -2748,3 +2748,8 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 /* v67.8 فهرست حساب‌ها: جای ثابت — طلا همیشه راست، مبلغ (تومان) همیشه چپ؛ سکه و ارز جای خالی را پر می‌کنند */
 #cures .c6lb .c6vb>.cbk.kg{grid-column:1!important;grid-row:1}
 #cures .c6lb .c6vb>.cbk.kr{grid-column:2!important;grid-row:1}
+/* v67.9 سرتیتر مشتری: گروه (همکار…) بالا کنار عنوان، تلفن زیر نام از سمت راست، دکمه ویرایش کوچک‌تر */
+#bar .cuh9k{display:flex;align-items:center;gap:5px}
+#bar .cuh9k .cuh9g2{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-size:10px;font-weight:850;line-height:1.5;padding:0 7px;border-radius:6px;background:var(--goldbg);color:var(--gold)}
+#bar .cuh9 .c6ed{width:28px;height:28px;border-radius:9px}#bar .cuh9 .c6ed svg{width:14px;height:14px}
+#bar .cuh9k .cuh9kt{flex:none}#bar .cuh9k .hon{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
