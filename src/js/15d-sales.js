@@ -666,8 +666,8 @@ const balKL=(k,two)=>{const X=XA[k]||{},n=k==='r'?'مبلغ':k==='g'?'طلا':X.
 function balGrid(rows,cols,o){o=o||{};rows=rows.map((r,i)=>[r,i]).sort((a,b)=>balRk(a[0][0])-balRk(b[0][0])||a[1]-b[1]).map(z=>z[0]);let n=0;const N=cols.length;
   const cell=(k,v,c)=>{const x=v?balV(k,v):'۰',T=o.act&&c.w?'button':'span';return `<${T} class="iv8c ${q8S(v)}${c.m?' m':''}" style="--i:${n++}"${T==='button'?` type="button" data-act="${o.act}" data-w="${c.w}" data-k="${k}" aria-label="${esc(c.lab)}: ${esc(x)} ${esc(balU(k))}"`:''}><span class="fz"><b${fitS(x)}>${x}</b></span><small>${v?ourLab(v):'تسویه'}</small></${T}>`};
   const rw=([k,...V])=>`<div class="iv8r k${q8C(k)}"><span class="iv8k">${balKL(k,1)}</span>${cols.map((c,j)=>cell(k,V[j]||0,c)).join('')}</div>`,
-    M=rows,full=`<div class="iv8h">${cols.map(c=>`<span>${esc(c.lab)}</span>`).join('')}</div>${M.map(rw).join('')}`,hint=`<div class="iv9hint">${ic('hold')}${o.hint||'برای جزئیات فاکتور نگه دارید'}</div>`;
-  if(N<2)return `<div class="iv8b iv9b n${N}${o.an?' anim':''}" role="group" aria-label="مانده‌ها">${full}${hint}</div>`;
+    M=rows,full=`<div class="iv8h">${cols.map(c=>`<span>${esc(c.lab)}</span>`).join('')}</div>${M.map(rw).join('')}`;
+  if(N<2)return `<div class="iv8b iv9b n${N}${o.an?' anim':''}" role="group" aria-label="مانده‌ها">${full}</div>`;
   /* v61.65 (خواسته صاحب اپ): اول فقط مانده‌های نهایی (مبلغ، طلا، دلار…) جمع‌وجور؛ دکمه فلش بالای کارت (یا زدن روی مانده‌ها) =
      جدول کامل قبلی · این سند · نهایی با حرکت بالا می‌آید؛ دوباره زدن = جمع می‌شود. حالت باز/بسته در BGO می‌ماند */
   /* v61.66 (خواسته صاحب اپ): ترتیب از چپ: مبلغ، طلا (کنار مبلغ)، بعد ارز و سکه به سمت راست؛ همه قاب‌ها هم‌اندازه و عددها با یک اندازه
@@ -676,7 +676,7 @@ function balGrid(rows,cols,o){o=o||{};rows=rows.map((r,i)=>[r,i]).sort((a,b)=>ba
     fc=cols[mi],mini=MV.map(([k,v])=>{const x=v?balV(k,v):'۰',T=o.act&&fc.w?'button':'span';/* v61.67: زدن هر قاب نهایی = تسویه همان (مثل قبل)؛ فلش = جدول کامل */
       return `<${T} class="bgmc ${q8S(v)}"${T==='button'?` type="button" data-act="${o.act}" data-w="${fc.w}" data-k="${k}" aria-label="تسویه ${esc(String(balKL(k)).replace(/<[^>]*>/g,''))}: ${esc(x)}"`:''}><small>${balKL(k)}</small><span class="fz"><b style="--fw:${fw}">${x}</b></span><em>${v?ourLab(v):'تسویه'}</em></${T}>`}).join('');
   return `<div class="iv8b iv9b bgc n${N}${o.an?' anim':''}${BGO?' op':''}" role="group" aria-label="مانده‌ها"><button type="button" class="bgup" data-act="bgO" aria-expanded="${BGO?'true':'false'}" aria-label="${BGO?'بستن جزئیات مانده‌ها':'مانده‌های قبلی، این سند و نهایی'}">${ic('chev')}</button>
-  <div class="bgx"><div class="bgxi">${full}</div></div><div class="bgmw"><div class="bgm"><button type="button" class="bgmt" data-act="bgO">مانده نهایی ${o.act?'· زدن = تسویه':'· جزئیات'}</button><span class="bgml">${mini}</span></div></div>${hint}</div>`}
+  <div class="bgx"><div class="bgxi">${full}</div></div><div class="bgmw"><div class="bgm"><span class="bgml">${mini}</span></div></div></div>`}/* v68.9 (خواسته صاحب اپ): نوشته «مانده نهایی · زدن = تسویه» و راهنمای پایین برداشته شد؛ کارت کوتاه‌تر */
 let BGO=false;
 ACT.bgO=()=>{BGO=!BGO;document.querySelectorAll('.iv9b.bgc').forEach(B=>{B.classList.toggle('op',BGO);const u=B.querySelector('.bgup');if(u){u.setAttribute('aria-expanded',BGO?'true':'false');u.setAttribute('aria-label',BGO?'بستن جزئیات مانده‌ها':'مانده‌های قبلی، این سند و نهایی')}
   if(BGO&&!RM())B.querySelectorAll('.bgx .iv8c,.bgx .iv8k,.bgx .iv8h span').forEach((c,i)=>c.animate&&c.animate([{opacity:0,transform:'translateY(10px) scale(.96)'},{opacity:1,transform:'none'}],{duration:360,delay:40+i*22,easing:'cubic-bezier(.2,.9,.25,1)',fill:'backwards'}))})};
