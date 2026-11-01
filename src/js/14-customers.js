@@ -106,7 +106,9 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
   if(dq){const S=new Set(TX.map(([c])=>String(c.id)));B=B.filter(([c])=>S.has(String(c.id)))}
   else if(q)B=B.filter(([c])=>cuHit(c,q,dOk));
   cuWPRe();B=B.filter(([c,b])=>cuGOk(cuF.g,c)&&cuFOk(cuF.b,b,c));
-  B.sort((a,b)=>(q?(nzName(b[0].name).startsWith(q)-nzName(a[0].name).startsWith(q)):0)||String(b[0].lastAt||b[0].createdAt||'').localeCompare(String(a[0].lastAt||a[0].createdAt||'')));
+  /* v68.1 (خواسته صاحب اپ): حساب‌های مانده‌دار (و در انتظار) بالا، تسویه‌شده‌ها پایین؛ داخل هر دسته ترتیب قبلی */
+  const PW=pendMap(),zOf=([c,b])=>cuZero(b)&&!PW.get(String(c.id))&&!(cuWP.get(String(c.id))||0)?1:0;
+  B.sort((a,b)=>(zOf(a)-zOf(b))||(q?(nzName(b[0].name).startsWith(q)-nzName(a[0].name).startsWith(q)):0)||String(b[0].lastAt||b[0].createdAt||'').localeCompare(String(a[0].lastAt||a[0].createdAt||'')));
   const canAdd=q0&&!dq&&can('debt')&&!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0))&&!groupsList().some(g=>nzName(g)===q);
   const add=canAdd?`<button class="c6add" data-act="cuNewQ">${ic('plus')}<span><b>حساب تازه برای «${esc(q0)}»</b><small>${B.length?'اگر هیچ‌کدام از این‌ها نیست':'این نام حسابی ندارد'} · اول مشخصات، بعد ورود به حساب</small></span></button>`:'';
   /* افراد واریزی‌ها و خریدها که هنوز حساب ندارند (از حافظه برنامه): با زدن، حساب با همان مشخصات باز می‌شود */
@@ -117,7 +119,7 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
   const IV=dq?[]:cuInvHits(q0),ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
   const IVS=new Set(IV.map(([,t])=>String(t.id))),txh=cuTxHTML(TX.filter(([,t])=>!IVS.has(String(t.id)))),dch=cuDtChip(qd);
   if(!B.length)return dch+((dq?txh:ivh+txh+mem+add)||`<div class="bempty">${ic(dq?'cal':'search')}<b>${dq?'در این روز سندی ثبت نشده':cuF.b||cuF.g?'حسابی با این فیلتر نیست':'حسابی پیدا نشد'}</b>${!dq&&(cuF.b||cuF.g)?'<button class="fchip on" data-act="cuFClr">برداشتن فیلتر</button>':''}</div>`);
-  const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'',PW=pendMap();cuAnim=0;
+  const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'';cuAnim=0;
   return `${dch}${ivh}${dq?txh:''}${cuSumHTML(B)}${dq?`<div class="c6gh">حساب‌های این روز · ${fmt(B.length)} حساب</div>`:''}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb${an}">${B.map(([c,b],ri)=>{const pw=PW.get(String(c.id)),wp=cuWP.get(String(c.id))||0,z=cuZero(b)&&!pw&&!wp;return swW(`<button class="c6r${z?' zr':''}" data-act="cuOpen" data-id="${c.id}"><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span>${z?cuZTag(ri):`<span class="c6v c6vb" style="--r:${Math.min(ri,8)}">${balPills(b,pw,wp)}</span>`}</button>`,{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})}).join('')}</div>${dq?'':txh}${mem}${add}`}
 /* v61.93 (خواسته صاحب اپ): حساب تسویه‌شده در فهرست‌ها کوچک و کم‌رنگ (یک برچسب کنار نام، نه کارت سبز بزرگ) */
 const cuZero=b=>!(b.R||b.G||Object.keys(b.X||{}).length);
