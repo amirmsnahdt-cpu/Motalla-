@@ -62,7 +62,7 @@ const svFix=()=>{if(sv.gconv)sv.gconv=false;/* v60.9: «مانده ریالی ط
   /* v61.46: مبلغ دستی قدیمی (با مالیات داخلش) یک بار به «پیش از مالیات» برگردانده می‌شود؛ جمع همان می‌ماند */
   sv.items.forEach(it=>{if(+it.amT>0&&!it.amN){const c=itCalc(it,sv.rate,sv.tax);if(c.fx){it.amT=c.gold+c.aj+c.pr;it.amN=1}}});};
 ACT.svNew=d=>{if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}closeSheet();const cu=d&&d.cu?d.cu:'',old=ls.get('m_svd',null);
-  if(old&&(old.v===1||old.v===2)&&((old.items||[]).length||(old.pays||[]).length||(old.xr||[]).length)&&(!cu||String(old.cuId||'')===String(cu)||!old.cuId)){sv=old;if(cu)sv.cuId=cu;toast('پیش‌نویس سند قبلی باز شد','', 'سند تازه',()=>{const dk=sv.dk,fc=sv.fixCu;sv=svBlank(cu);sv.dk=dk;sv.fixCu=fc;svFix();svKeep();render()})}else sv=svBlank(cu);
+  if(!(d&&d.fresh)&&old&&(old.v===1||old.v===2)&&((old.items||[]).length||(old.pays||[]).length||(old.xr||[]).length)&&(!cu||String(old.cuId||'')===String(cu)||!old.cuId)){sv=old;if(cu)sv.cuId=cu;toast('پیش‌نویس سند قبلی باز شد','', 'سند تازه',()=>{const dk=sv.dk,fc=sv.fixCu;sv=svBlank(cu);sv.dk=dk;sv.fixCu=fc;svFix();svKeep();render()})}else sv=svBlank(cu);
   /* v60.5: نوع سند: فروش یا خرید (فقط عنوان و پیشنهادهای جستجو را عوض می‌کند؛ ساختار سند همان است) */
   sv.dk=d&&d.dk==='buy'?'buy':'';sv.fixCu=!!cu;
   svFix();const k=d&&d.pre;if(k==='in'||k==='out')sv.qa={...qaBlank(),p:pyNew('cash',{dir:k})};else if((k==='hin'||k==='hout')&&d.src!=null)sv.qa={...qaBlank(),p:pyNew('hav',{dir:k==='hout'?'out':'in',srcId:+d.src||d.src})};else if(k==='gin'||k==='gout')sv.qa={...qaBlank(),x:xrNew(k==='gin'?'in':'out','gold')};

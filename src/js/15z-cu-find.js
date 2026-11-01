@@ -35,3 +35,10 @@ ACT.cuCal=()=>{const M=new Set();for(const c of CU())for(const t of c.txs||[])if
 ACT.cuDtClr=()=>{cuDt='';cuN=60;render()};
 ACT.cuTxMore=()=>{cuN+=100;cuReList()};
 ACT.cuTxGo=d=>{const c=custs.find(x=>String(x.id)===String(d.cu));if(!c)return;custId=c.id;const back=cur;ACT.txOpen({id:d.tx});if(cur==='inv'&&back==='custs')PARENT.inv='custs'};
+/* v67.7 (خواسته صاحب اپ): تسویه از روی مانده حساب — زدن کاشی مانده = سند تازه همین مشتری:
+   مبلغ → «دریافت» یا «پرداخت» باز با روش‌ها (حواله، نقد، کارتخوان…) و مبلغ پیش‌فرض = کل مانده؛
+   طلا/سکه/ارز → ردیف دریافت یا تحویل همان جنس با مقدار کل مانده */
+ACT.cuStl=d=>{const c=curCu(),v=+d.v||0,k=d.k;if(!c||!v)return;ACT.svNew({cu:c.id,fresh:1});if(cur!=='sell'||!sv)return;const dir=v<0?'in':'out',a=Math.abs(v);
+  if(k==='r'){sv.qa.d=dir;svKeep();qaRe();dkShow()}
+  else{sv.qa={...qaBlank(),x:xrNew(dir,k==='g'?'gold':k,k==='g'?{w:String(Math.round(a*1000)/1000)}:{q:String(a)})};svKeep();qaRe()}
+  toast((v<0?'دریافت ':'پرداخت ')+balV(k,v)+' '+balU(k)+' برای تسویه')};
