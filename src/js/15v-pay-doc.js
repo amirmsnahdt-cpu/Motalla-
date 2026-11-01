@@ -78,8 +78,11 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
   const bkSt=s=>s&&s.sent?(s.st==='ok'?['k','تأیید بانک']:s.st==='fail'?['f','ناموفق']:['w','ارسال‌شده · منتظر تأیید']):s?['d','آماده ارسال']:['n','منبع انتخاب نشده'];
   const bkAv=s=>(so=>so&&acBank(so)?bankBadge(acBank(so)):ic('bank'))(s&&sources.find(z=>z.name===s.name));
   const bkRow=({r,s})=>{const st=bkSt(s),root=r.id===rootId,me=r.id===x.id;
-    if(root){const act=!me?`data-act="openEnt" data-id="${r.id}"`:edB?`data-act="entMove" data-id="${r.id}"`:'';
-      return `<div class="py7r b py8m ${st[0]}"><${act?'button':'div'} class="py7b" ${act}><span class="py7a bk">${bkAv(s)}</span><span class="tx"><b>${F.length>1?'مانده بانک اصلی':'واریز بانکی'}</b><small>${s?esc(s.name)+' · '+st[1]:'منبع انتخاب نشده'}</small></span><span class="py7v"><b>${fmt(r.amount)}<i>تومان</i></b><small>${F.length>1?'مانده':'واریز بانکی'}</small></span></${act?'button':'div'}></div>`}
+    /* v68.8 (خواسته صاحب اپ): واریز بانکی از همین صفحه — زدن = رسید و شماره پیگیری و تأیید (بدون «کپی و ارسال» از لیست)؛
+       دوربین = رسید؛ کشیدن = تأیید / تغییر بانک. مثل ردیف‌های تسویه مشتری */
+    if(root){const tk=me&&s&&can('track'),q=s&&s.sent?bkItem(r):null,n=q?itImgs(q.b,q.it).length:0,act=!me?`data-act="openEnt" data-id="${r.id}"`:tk?`data-act="bkGo" data-id="${r.id}"`:edB?`data-act="entMove" data-id="${r.id}"`:'';
+      const row=`<div class="py7r b py8m ${st[0]}"><${act?'button':'div'} class="py7b" ${act}><span class="py7a bk">${bkAv(s)}</span><span class="tx"><b>${F.length>1?'مانده بانک اصلی':'واریز بانکی'}</b><small>${s?esc(s.name)+' · '+st[1]:'منبع انتخاب نشده'}${q&&q.it.tn?' · پیگیری '+esc(toFa(q.it.tn)):''}</small></span><span class="py7v"><b>${fmt(r.amount)}<i>تومان</i></b><small>${F.length>1?'مانده':'واریز بانکی'}</small></span></${act?'button':'div'}>${tk?`<button class="py7c${n?' on':''}" data-act="bkGo" data-id="${r.id}" aria-label="رسید واریز بانکی">${ic(n?'cam':'plus')}${n>1?`<em>${toFa(n)}</em>`:''}</button>`:''}</div>`;
+      return tk?swW(row,{r:q&&q.it.st!=='ok'?[['bkOk','تأیید','check','#178049']]:[],l:edB&&!(s&&s.sent)?[['entMove','تغییر بانک','swap','#3b6fd6']]:[],data:{id:r.id}}):row}
     const act=!me&&x.id!==rootId?`data-act="openEnt" data-id="${r.id}"`:edB&&!r.sentBid?`data-act="pkEdit" data-id="${r.id}"`:`data-act="openEnt" data-id="${r.id}"`;
     return swW(`<div class="py7r b ${st[0]}${pyFlash!=null&&String(pyFlash)===String(r.id)?' nw':''}"><button class="py7b" ${act}><span class="py7a bk">${bkAv(s)}</span><span class="tx"><b>از ${esc(s?s.name:'بانک')}</b><small>${st[1]}${me?' · همین بخش':''}</small></span><span class="py7v"><b>${fmt(r.amount)}<i>تومان</i></b><small>بانک دیگر</small></span></button></div>`,
       {r:[],l:edB&&!r.sentBid&&x.id===rootId?[['pkDel','برداشتن','undo','#d23c48']]:[],data:{id:r.id}})};
@@ -91,6 +94,13 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
   <div class="py7l">${S.map(cuRow).join('')}${bAll||!S.length?bkS.map(bkRow).join(''):''}</div>
   ${canAdd&&!x.sentBid?`<button class="py7add" data-act="pyAdd"><span class="py7s">${ic('search')}</span><span class="tx"><b>افزودن پرداخت</b><small>مشتری‌ای که مستقیم پرداخت کرده، یا بخشی از بانک دیگر مغازه</small></span><span class="py7p">${ic('plus')}</span></button>`:''}
   ${F.length>1&&can('split')&&!sent&&!x.full?`<button class="link" data-act="paySplitUndo" data-id="${x.id}">یکی کردن بخش‌های بانکی</button>`:''}${sent&&F.length<2&&!x.sentBid&&can('split')?'<div class="muted py7m">بخشی ارسال شده؛ برای تغییر بانک اول از پیگیری برگردانید.</div>':''}</div>`}
+/* v68.8: ردیف پیگیری یک واریزی؛ اگر هنوز ارسال نشده، فقط همین واریزی (جدا از بقیه همان منبع) به پیگیری می‌رود */
+function bkItem(e){const b=e&&e.sentBid&&batches.find(z=>z.id===e.sentBid),i=b?b.items.findIndex(x=>x.id===e.id):-1;return i<0?null:{b,i,it:b.items[i]}}
+function bkSend(e){let p=null;for(const d in drafts){p=(drafts[d]||[]).find(z=>z&&!z.sent&&(z.ids||[]).includes(e.id));if(p)break}if(!p)return null;
+  const k0=ldKey;ldKey=PD(e);try{if(p.ids.length>1)p=moveTo([e.id],p,p.src,'new');commitParts([p.id],true)}finally{ldKey=k0}
+  const q=bkItem(e);if(q){const pid=p.id;toast('واریز بانکی ثبت شد · رسید و پیگیری را وارد کنید','','برگرداندن',()=>{const k1=ldKey;ldKey=PD(e);try{uncommitParts([pid])}finally{ldKey=k1}closeSheet();pyRe()})}return q}
+ACT.bkGo=d=>{const e=entries.find(z=>String(z.id)===String(d.id));if(!e||!can('track'))return;const q=bkItem(e)||bkSend(e);if(!q){toast('اول بانک این واریزی را انتخاب کنید',true);return}openItem(q.b.id,q.i)};
+ACT.bkOk=d=>{const e=entries.find(z=>String(z.id)===String(d.id)),q=e&&bkItem(e);if(!q||!can('track'))return;q.it.st='ok';q.it.at=new Date().toISOString();saveB();logA('edit','تأیید واریز بانکی',fullName(e)+' | '+fmt(e.amount)+' تومان | '+(q.it.src||''));pyRe();toast('واریز بانکی تأیید شد ✓')};
 ACT.pyOpen=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;if(z.byInv&&custs.some(c=>String(c.id)===String(z.byInv.cu)&&(c.txs||[]).some(t=>String(t.id)===String(z.byInv.tx)&&!t.del))){invOpen(z.byInv.cu,z.byInv.tx);return}ACT.stlOpen(d)};
 function pyRe(){const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y}
 

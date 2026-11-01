@@ -101,15 +101,15 @@ async function openItem(bid,i){const b=batches.find(z=>z.id==bid);if(!b)return;c
   <div class="galg itgal" id="itgal">${itGalHTML()}</div>
   <div class="ith">یادداشت <i>اختیاری</i></div>
   <div class="itg"><input id="itno" class="itno" value="${esc(x.note||'')}" placeholder="توضیح (اختیاری)"></div>
-  <button class="xgo" data-act="itSave">${ic('check')} ذخیره</button>
+  <button class="xgo" data-act="itSave">${ic('check')} ${cur==='ent'&&tmpSt!=='fail'?'تأیید واریز':'ذخیره'}</button>
   <button class="itfail" data-act="itFail">${tmpSt==='fail'?'برگرداندن به «در انتظار»':'این واریز انجام نشد'}</button></div>`);
   galThumbs();
   $('itn').oninput=()=>{$('itn').value=toEn($('itn').value).replace(/[^\dA-Za-z\-]/g,'');if($('itn').value&&tmpSt!=='ok')tmpSt='ok';itStPaint()};
 }
 async function saveItem(){const b=curB();if(!b)return;const x=b.items[itemIdx];x.tn=toEn($('itn').value).trim();x.time=$('itt').value;x.note=clean($('itno').value);
-  x.st=tmpSt==='fail'?'fail':x.tn||tmpSt==='ok'?'ok':'pending';x.at=new Date().toISOString();
+  x.st=tmpSt==='fail'?'fail':x.tn||tmpSt==='ok'||cur==='ent'?'ok':'pending';/* v68.8: از صفحه جزئیات واریزی دکمه = «تأیید واریز» */x.at=new Date().toISOString();
   if(tmpImg===null){await imgDel(ikey(b,x));x.img=false}else if(typeof tmpImg==='string'){const ok=await imgPut(ikey(b,x),tmpImg);if(ok)x.img=true;else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
-  saveB();GAL=null;closeSheet();if(cur==='day')render();else refreshBatch();toast(x.st==='ok'?'ذخیره شد · انجام شد ✓':x.st==='fail'?'ذخیره شد · انجام نشد':'ذخیره شد')}
+  saveB();GAL=null;closeSheet();if(cur==='day')render();else if(cur==='ent'){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}else refreshBatch();toast(x.st==='ok'?'ذخیره شد · انجام شد ✓':x.st==='fail'?'ذخیره شد · انجام نشد':'ذخیره شد')}
 function viewImg(bid,id){const b=batches.find(z=>z.id==bid),x=b&&b.items.find(z=>z.id==id);if(!x)return;openGal({k:'it',eid:x.id})}
 /* ---------- بایگانی روزانه ---------- */
 const fullSettled=iso=>validated().filter(r=>r.entryDate===iso&&r.full);

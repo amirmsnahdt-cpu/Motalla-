@@ -2835,3 +2835,13 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .cub9 .cub9h{justify-content:center;margin:0;padding:0}
 .cub9 .cub9h b{font-size:12px;font-weight:850;color:var(--mut)}
 .cub9 .c6vb>.cbk{padding:5px 9px 6px;border-radius:11px;--fmax:15px}
+/* v68.8 (خواسته صاحب اپ): همه کاشی‌های فهرست هم‌اندازه (یک‌سوم عرض)، مثل ردیف سه‌کاشی؛ طلا راست، تومان چپ، ارز (اگر هست) راست‌تر از طلا */
+#cures .cuL .c6r:not(.zr) .c6vb,#cures .cuL .c6vb.nx{grid-template-columns:repeat(3,minmax(0,1fr))}
+#cures .cuL .c6r:not(.zr) .c6vb>.cbk{grid-row:1!important;padding:5px 6px 6px}
+#cures .cuL .c6vb:not(.nx)>.cbk.kg{grid-column:1!important}#cures .cuL .c6vb>.cbk.kr{grid-column:3!important}
+#cures .cuL .c6vb.nx>.cbk.kx{grid-column:1!important}#cures .cuL .c6vb.nx>.cbk.kg{grid-column:2!important}
+#cures .cuL .c6vb.nx>.cbk.kx~.cbk.kx{grid-column:auto!important;grid-row:auto!important}
+#cures .cuL .c6r:not(.zr) .cbk .cbh{gap:3px}
+#cures .cuL .c6r:not(.zr) .cbk .cbh small{font-size:9.5px;white-space:nowrap}
+#cures .cuL .c6r:not(.zr) .cbk .cbh em{font-size:8.5px;padding:0 4px;white-space:nowrap}
+#cures .cuL .c6r:not(.zr) .c6vb>.cbk.wp{padding-left:14px}#cures .cuL .cbk.wp::after{left:6px;bottom:8px}
