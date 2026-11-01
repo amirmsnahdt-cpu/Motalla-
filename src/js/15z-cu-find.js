@@ -35,10 +35,28 @@ ACT.cuCal=()=>{const M=new Set();for(const c of CU())for(const t of c.txs||[])if
 ACT.cuDtClr=()=>{cuDt='';cuN=60;render()};
 ACT.cuTxMore=()=>{cuN+=100;cuReList()};
 ACT.cuTxGo=d=>{const c=custs.find(x=>String(x.id)===String(d.cu));if(!c)return;custId=c.id;const back=cur;ACT.txOpen({id:d.tx});if(cur==='inv'&&back==='custs')PARENT.inv='custs'};
-/* v67.7 (خواسته صاحب اپ): تسویه از روی مانده حساب — زدن کاشی مانده = سند تازه همین مشتری:
-   مبلغ → «دریافت» یا «پرداخت» باز با روش‌ها (حواله، نقد، کارتخوان…) و مبلغ پیش‌فرض = کل مانده؛
-   طلا/سکه/ارز → ردیف دریافت یا تحویل همان جنس با مقدار کل مانده */
-ACT.cuStl=d=>{const c=curCu(),v=+d.v||0,k=d.k;if(!c||!v)return;ACT.svNew({cu:c.id,fresh:1});if(cur!=='sell'||!sv)return;const dir=v<0?'in':'out',a=Math.abs(v);
-  if(k==='r'){sv.qa.d=dir;svKeep();qaRe();dkShow()}
-  else{sv.qa={...qaBlank(),x:xrNew(dir,k==='g'?'gold':k,k==='g'?{w:String(Math.round(a*1000)/1000)}:{q:String(a)})};svKeep();qaRe()}
-  toast((v<0?'دریافت ':'پرداخت ')+balV(k,v)+' '+balU(k)+' برای تسویه')};
+/* v67.7/v68 (خواسته صاحب اپ): تسویه از روی مانده حساب — زدن کاشی مانده = پنجره تسویه (مثل پنجره تسویه واریزی):
+   مقدار پیش‌فرض کل مانده (قابل تغییر، «کل مانده» / «نصف»)، برای مبلغ روش (حواله، کارتخوان، نقد، تخفیف)؛
+   انتخاب روش = سند تازه همین مشتری با همان ردیف و همان مقدار، تا جزئیات (بانک، پیگیری…) و «ثبت سند» */
+let CBS=null;
+const CBS_M=['cust','hav','pos','cash','off'];
+function cbsHTML(){const z=CBS,c=curCu();if(!z||!c)return '';const r=z.k==='r',g=z.k==='g',a=z.a,tot=Math.abs(z.v),u=balU(z.k),inn=z.v<0,dir=inn?'in':'out';
+  const fv=v=>r?fmt(v):g?wFmt(v):qFmt(v),chip=(v,t)=>v>0?`<button type="button" class="${Math.abs(a-v)<1e-9?'on':''}" data-act="cbsAmt" data-v="${v}">${t} · ${fv(v)}</button>`:'';
+  const half=r?Math.round(tot/2):g?Math.round(tot/2*1000)/1000:Math.floor(tot/2);
+  const M=r?(DKS[dir]||[]).filter(x=>CBS_M.includes(x[0])):[];
+  return `<div class="px7w px8 cbs"><div class="sh-h"><div><b>تسویه ${q8K(z.k)}</b><small class="shsub">${esc(cuName(c))} · ${inn?'طلب ما':'بدهی ما'} ${fv(tot)} ${esc(u)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="px8a"><small>${inn?(r?'مبلغ دریافتی':'دریافت از مشتری'):(r?'مبلغ پرداختی':'تحویل به مشتری')}</small><label class="px8i"><input id="cbsA" class="ltr" inputmode="${r?'numeric':'decimal'}" autocomplete="off" enterkeyhint="done" aria-label="مقدار" value="${a?(r?a.toLocaleString('en-US'):String(a)):''}"><i>${esc(u)}</i></label>
+    <div class="px7qa px8q">${chip(tot,'کل مانده')}${half&&half!==tot?chip(half,'نصف'):''}</div><div class="px8l" id="cbsL"></div></div>
+  ${r?`<div class="cbsm">${M.map(([k,t,i])=>`<button type="button" data-act="cbsGo" data-m="${k}">${ic(i)}<span>${esc(t)}</span></button>`).join('')}</div>`
+    :`<button class="xgo" data-act="cbsGo">${ic('check')} ادامه در سند جدید</button>`}</div>`}
+const cbsRead=()=>{const e=$('cbsA');if(!e||!CBS)return;CBS.a=CBS.k==='r'?num(e.value):Math.abs(+toEn(e.value).replace(/[^\d.]/g,'')||0)};
+function cbsLive(){const z=CBS,el=$('cbsL');if(!z||!el)return;const tot=Math.abs(z.v),left=Math.round((tot-z.a)*1000)/1000,f=v=>z.k==='r'?fmt(v):z.k==='g'?wFmt(v):qFmt(v);
+  el.innerHTML=!z.a?'':left===0?`<b class="ok">${ic('check')} حساب تسویه می‌شود</b>`:left>0?`مانده بعد: <b>${f(left)}</b> ${esc(balU(z.k))}`:`<b class="r">${f(-left)} ${esc(balU(z.k))} بیشتر از مانده</b>`;
+  document.querySelectorAll('#sheet .cbs .px8q button').forEach(b=>b.classList.toggle('on',Math.abs(+b.dataset.v-z.a)<1e-9))}
+function cbsBind(){const e=$('cbsA');if(!e)return;e.oninput=()=>{if(CBS.k==='r'){const v=num(e.value);e.value=v?v.toLocaleString('en-US'):''}cbsRead();cbsLive()};cbsLive()}
+ACT.cuStl=d=>{const c=curCu(),v=+d.v||0;if(!c||!v||!can('debt'))return;CBS={k:d.k,v,a:Math.abs(v)};sheet(cbsHTML());cbsBind()};
+ACT.cbsAmt=d=>{if(!CBS)return;CBS.a=+d.v;const e=$('cbsA');if(e)e.value=CBS.k==='r'?CBS.a.toLocaleString('en-US'):String(CBS.a);cbsLive()};
+ACT.cbsGo=d=>{cbsRead();const z=CBS,c=curCu();if(!z||!c)return;if(!(z.a>0)){toast('مقدار را بنویسید',true);const e=$('cbsA');if(e)e.focus();return}
+  const dir=z.v<0?'in':'out',a=z.a;CBS=null;closeSheet();ACT.svNew({cu:c.id,fresh:1});if(cur!=='sell'||!sv)return;
+  if(z.k==='r'){sv.qa.d=dir;ACT.dkF({id:'m:'+d.m});const p=sv.qa.p;if(p){p.amount=a;svKeep();qaRe()}}
+  else{sv.qa={...qaBlank(),x:xrNew(dir,z.k==='g'?'gold':z.k,z.k==='g'?{w:String(Math.round(a*1000)/1000)}:{q:String(a)})};svKeep();qaRe()}};
