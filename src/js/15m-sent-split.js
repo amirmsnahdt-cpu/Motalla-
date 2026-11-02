@@ -92,13 +92,18 @@ function unsendDo(root){const G=unsendFam(root);if(!G){toast('این واریز�
     memoClear();saveE();saveB();saveD();alloc=null;logA('uncommit','برگرداندن واریزی از ارسال',fullName(root)+' | '+fmt(tot)+' تومان | '+G.map(o=>o.q.it.src).join('، '));return true}
 /* v69.10 (خواسته صاحب اپ): «حذف تخصیص» — واریزی کامل به اول برمی‌گردد: اگر ارسال شده از پیگیری بیرون می‌آید، بخش‌های بانکی یکی می‌شوند
    و بانکش برداشته می‌شود (در لیست‌ها دوباره «بدون منبع»، در جزئیات «انتخاب بانک»). بخش تأییدشده/رسیددار/پیگیری‌دار قفل است. */
+/* v69.13: دلیل دقیق قفل بودن حذف تخصیص (به‌جای پنهان شدن دکمه) */
+function unallocWhy(x){if(!can('split'))return 'دسترسی «تقسیم» برای حساب شما فعال نیست';if(x.full)return 'این واریزی کامل با مشتری تسویه شده؛ تخصیص بانکی ندارد';
+  const F=famOf(x).map(r=>entBI(r)).filter(Boolean);if(F.some(q=>q.b.closed))return 'لیست پیگیری این واریزی بایگانی شده است';
+  const q=F.find(q=>ssLock(q.it));if(q)return 'بخش «'+(q.it.src||'بانک')+'» '+(q.it.st==='ok'?'تأیید شده':q.it.tn?'شماره پیگیری دارد':'رسید دارد')+'؛ اول '+(q.it.st==='ok'?'تأیید را لغو کنید':q.it.tn?'شماره پیگیری را پاک کنید':'رسیدش را بردارید')+'، بعد حذف تخصیص';
+  return 'این واریزی تخصیصی ندارد'}
 const unallocCan=x=>{if(!x||!can('split')||x.full)return false;const F=famOf(x);if(F.some(r=>r.sentBid))return unsendCan(x);const A=allocMap();return F.length>1||F.some(r=>(A.get(r.id)||{}).src)};
 ACT.entUnalloc=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;const root=validated().find(r=>r.id===famRoot(x))||x;
-  if(!unallocCan(root)){toast('تخصیص این واریزی قفل است (تأیید، رسید یا شماره پیگیری دارد، یا لیستش بایگانی شده)',true);return}
+  if(!unallocCan(root)){toast(unallocWhy(root),true);return}
   const F=famOf(root),sent=F.some(r=>r.sentBid),tot=F.reduce((a,r)=>a+(+r.amount||0),0);
   askConfirm(`تخصیص «${esc(fullName(root))}» برداشته شود؟${sent?' از پیگیری هم بیرون می‌آید و':''} دوباره بدون بانک می‌شود.`,'حذف تخصیص',()=>{
     if(sent&&!unsendDo(root))return;const R=validated().find(r=>r.id===root.id)||root,G=famOf(R);
     if(G.length>1){PS={root:famRoot(R),name:fullName(R),pay:PD(R),R:sum(G),L:[{src:'',amount:sum(G)}]};psApply()}
     else{allParts().forEach(p=>{if(!p.sent&&(p.ids||[]).includes(R.id)){p.ids=p.ids.filter(z=>z!==R.id);if(!p.ids.length)delPart(p)}});memoClear();saveD();alloc=null}
-    logA('split','حذف تخصیص',fullName(R)+' | '+fmt(tot)+' تومان');closeSheet();const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('تخصیص برداشته شد — دوباره بانک را انتخاب کنید')})};
+    logA('split','حذف تخصیص',fullName(R)+' | '+fmt(tot)+' تومان');closeSheet();if(cur==='batch'&&typeof curB==='function'&&!curB()){go('split1');toast('تخصیص برداشته شد');return}const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('تخصیص برداشته شد — دوباره بانک را انتخاب کنید')})};
 

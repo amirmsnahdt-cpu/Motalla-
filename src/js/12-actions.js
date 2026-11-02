@@ -143,6 +143,8 @@ const ACT={
   /* ---------- v21 ---------- */
   tkGrp:(d,e)=>{const g=e.target.closest('.tg2');if(!g)return;const o=g.classList.toggle('open');const h=g.querySelector('.tgh2');if(h)h.setAttribute('aria-expanded',o);o?tkOpen.add(d.s):tkOpen.delete(d.s)},
   tkBack:d=>{const b=batches.find(x=>x.id==d.b);if(!b)return;const x=b.items[+d.i];if(!x)return;
+    /* v69.13: واریزی چندبخشی (از چند بانک) — همه بخش‌ها با هم برمی‌گردند و یکی می‌شوند، مثل «حذف تخصیص» در جزئیات */
+    {const e0=validated().find(z=>z.id===x.id);if(e0&&famOf(e0).length>1){ACT.entUnalloc({id:e0.id});return}}
     askConfirm('«'+x.name+'» از پیگیری برداشته شود و به تقسیم برگردد؟','برگشت به تقسیم',()=>{const k=b.items.indexOf(x);if(k<0)return;b.items.splice(k,1);const e=entries.find(z=>z.id===x.id);if(e)delete e.sentBid;
       const p=findPart(x.pid);if(p){p.ids=p.ids.filter(id=>id!==x.id);if(!p.ids.length)delPart(p)}
       const empty=!b.items.length;if(empty)batches=batches.filter(z=>z!==b);saveE();saveB();saveD();logA('undo','برگشت به تقسیم',x.name+' | '+fmt(x.amount)+' تومان');

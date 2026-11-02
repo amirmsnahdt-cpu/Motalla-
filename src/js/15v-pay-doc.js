@@ -91,7 +91,7 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
     const row=`<div class="py7r b py9 ${st[0]}${pyFlash!=null&&String(pyFlash)===String(r.id)?' nw':''}"><${act?'button':'div'} class="py7b" ${act}><span class="py7a bk">${bkAv(s)}</span><span class="tx"><b>${ttl}</b><small>${sub}</small></span><span class="py7v"><em class="py9t b">${tag}</em><b>${fmt(q&&q.it.amount!=null?+q.it.amount:r.amount)}<i>تومان</i></b></span></${act?'button':'div'}>${cam}</div>`;
     let R=[],L=[];
     if(q){if(tk&&!cl)R=q.it.st==='ok'?[['entTkQ','لغو تأیید','undo','#6b7385']]:[['entTkQ','تأیید','check','#178049']];
-      if(edB&&!cl){const xr=validated().find(z=>z.id===rootId);if(xr&&ssCan(xr)&&!lk)L.push(['sentSplit','ویرایش','edit','#3b6fd6']);if(tk&&q.it.st!=='fail'&&q.it.st!=='ok')L.push(['entTkF','ناموفق','x','#d23c48']);if(root&&xr&&unsendCan(xr))L.push(['entUnalloc','حذف تخصیص','x','#d23c48'])}}
+      if(edB&&!cl){const xr=validated().find(z=>z.id===rootId);if(xr&&ssCan(xr)&&!lk)L.push(['sentSplit','ویرایش','edit','#3b6fd6']);if(tk&&q.it.st!=='fail'&&q.it.st!=='ok')L.push(['entTkF','ناموفق','x','#d23c48']);if(root&&xr)L.push(['entUnalloc','حذف تخصیص','x','#d23c48'])/* v69.13: همیشه دیده می‌شود؛ اگر قفل است، دلیلش گفته می‌شود */}}
     else{if(s&&tk)R=[['bkGo','ثبت واریز','check','#178049']];
       /* بخشی ارسال شده باشد: مبلغ بخش‌های ارسال‌نشده از بانک اصلی ارسال‌شده کم/زیاد نمی‌شود؛ اول این بخش هم ثبت شود، بعد «ویرایش» همه بخش‌ها */
       if(edB&&!F.some(z=>z.sentBid))L=root?[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6'],...(s||F.length>1?[['entUnalloc','حذف تخصیص','x','#d23c48']]:[])]:[['pkEdit','ویرایش','edit','#3b6fd6'],['pkDel','برداشتن','trash','#d23c48']]}
