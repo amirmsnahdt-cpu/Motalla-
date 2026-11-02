@@ -2709,18 +2709,18 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .cusc.w b,.cusc.w small{color:var(--warn)}
 
 /* v67.6 جستجوی حساب مشتریان: ردیف‌های گردش به تفکیک روز */
-.c6s+#cures .fdate,#cures>.fdate{margin-top:10px}
-#cures .cutxd{margin-top:6px}
-#cures .c6tx{margin-top:8px}
-#cures .cutxm{width:100%;margin-top:10px}
-#cures .fday.sticky{top:58px;z-index:2}
+.c6s+:is(#cures,.cuLs) .fdate,#cures>.fdate{margin-top:10px}
+:is(#cures,.cuLs) .cutxd{margin-top:6px}
+:is(#cures,.cuLs) .c6tx{margin-top:8px}
+:is(#cures,.cuLs) .cutxm{width:100%;margin-top:10px}
+:is(#cures,.cuLs) .fday.sticky{top:58px;z-index:2}
 /* v67.7 فهرست حساب مشتریان: مانده‌ها جمع‌وجور — کاشی صفر پنهان (مگر در انتظار واریز)، کاشی کوتاه با عدد کوچک‌تر، هر کاشی نصف عرض */
-#cures .c6lb .c6vb{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:6px;padding-inline-start:0}
-#cures .c6lb .c6vb>.cbk{min-width:0;min-height:0;padding:6px 10px 7px;gap:2px;border-radius:12px;--fmax:15px;grid-column:auto!important}
-#cures .c6lb .c6vb>.cbk.z:not(.pw){display:none}
-#cures .c6lb .cbk .cbh small{font-size:10.5px}#cures .c6lb .cbk .cbh em{font-size:9.5px;padding:1px 6px}
-#cures .c6lb .cbk>b{letter-spacing:0}
-#cures .c6lb .cbk .cbwp{margin-top:3px;padding:3px 7px;border-radius:9px;gap:4px;font-size:10px}#cures .c6lb .cbk .cbwp b{font-size:12px}#cures .c6lb .cbk .cbwp svg{width:12px;height:12px}
+:is(#cures,.cuLs) .c6lb .c6vb{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:6px;padding-inline-start:0}
+:is(#cures,.cuLs) .c6lb .c6vb>.cbk{min-width:0;min-height:0;padding:6px 10px 7px;gap:2px;border-radius:12px;--fmax:15px;grid-column:auto!important}
+:is(#cures,.cuLs) .c6lb .c6vb>.cbk.z:not(.pw){display:none}
+:is(#cures,.cuLs) .c6lb .cbk .cbh small{font-size:10.5px}:is(#cures,.cuLs) .c6lb .cbk .cbh em{font-size:9.5px;padding:1px 6px}
+:is(#cures,.cuLs) .c6lb .cbk>b{letter-spacing:0}
+:is(#cures,.cuLs) .c6lb .cbk .cbwp{margin-top:3px;padding:3px 7px;border-radius:9px;gap:4px;font-size:10px}:is(#cures,.cuLs) .c6lb .cbk .cbwp b{font-size:12px}:is(#cures,.cuLs) .c6lb .cbk .cbwp svg{width:12px;height:12px}
 /* صفحه حساب مشتری: کاشی مانده = دکمه تسویه با سند جدید */
 .cbk.stlk{border:0;font:inherit;text-align:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .cbk .cbst{display:inline-flex;align-items:center;gap:3px;align-self:flex-start;margin-top:4px;padding:2px 8px 2px 7px;border-radius:999px;font-size:10.5px;font-weight:850;background:color-mix(in srgb,currentColor 10%,transparent)}
@@ -2746,8 +2746,8 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 /* سرتیتر سند جدید (با مداد ویرایش): گروه و تلفن در یک خط، تلفن کوچک‌تر */
 #bar .cuh9 .cuh9m:has(.telp){flex-wrap:nowrap;overflow:hidden;gap:5px}#bar .cuh9 .cuh9m:has(.telp)>em{flex:none;padding-inline:6px}#bar .cuh9 .cuh9m .telp{flex:0 1 auto;min-width:0;height:22px;font-size:11px;padding-inline:6px;gap:3px}#bar .cuh9 .cuh9m .telp>span{overflow:hidden;text-overflow:ellipsis}#bar .cuh9 .cuh9m .telp svg{width:11px;height:11px}
 /* v67.8 فهرست حساب‌ها: جای ثابت — طلا همیشه راست، مبلغ (تومان) همیشه چپ؛ سکه و ارز جای خالی را پر می‌کنند */
-#cures .c6lb .c6vb>.cbk.kg{grid-column:1!important;grid-row:1}
-#cures .c6lb .c6vb>.cbk.kr{grid-column:2!important;grid-row:1}
+:is(#cures,.cuLs) .c6lb .c6vb>.cbk.kg{grid-column:1!important;grid-row:1}
+:is(#cures,.cuLs) .c6lb .c6vb>.cbk.kr{grid-column:2!important;grid-row:1}
 /* v67.9 سرتیتر مشتری: گروه (همکار…) بالا کنار عنوان، تلفن زیر نام از سمت راست، دکمه ویرایش کوچک‌تر */
 #bar .cuh9k{display:flex;align-items:center;gap:5px}
 #bar .cuh9k .cuh9g2{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-size:10px;font-weight:850;line-height:1.5;padding:0 7px;border-radius:6px;background:var(--goldbg);color:var(--gold)}
@@ -2782,39 +2782,39 @@ button.py7b:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .sh-h .shsv{flex:none;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 13px;border:0;border-radius:11px;background:var(--blu);color:#fff;font:inherit;font-size:13px;font-weight:850;cursor:pointer}
 .sh-h .shsv svg{width:15px;height:15px}
 /* v68.2 (خواسته صاحب اپ): فهرست حساب مشتریان — هر مشتری کارت گرد جدا؛ مشخصات راست و مانده چپ در یک ردیف (یک کاشی) تا ارتفاع کم شود */
-#cures .c6l.cuL{display:flex;flex-direction:column;gap:8px;background:none;box-shadow:none;border-radius:0;overflow:visible}
-#cures .cuL>.swr{border-radius:16px!important;overflow:hidden;background:var(--card);box-shadow:0 0 0 1px var(--line),0 2px 6px -3px rgba(20,40,90,.10)!important}
-#cures .cuL>.swr+.swr .c6r::before{display:none}
-#cures .cuL .c6r{padding:10px 12px;gap:6px 10px;min-height:0}
-#cures .cuL .c6r .tx{min-width:0}
-#cures .cuL .c6r .tx small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:is(#cures,.cuLs) .c6l.cuL{display:flex;flex-direction:column;gap:8px;background:none;box-shadow:none;border-radius:0;overflow:visible}
+:is(#cures,.cuLs) .cuL>.swr{border-radius:16px!important;overflow:hidden;background:var(--card);box-shadow:0 0 0 1px var(--line),0 2px 6px -3px rgba(20,40,90,.10)!important}
+:is(#cures,.cuLs) .cuL>.swr+.swr .c6r::before{display:none}
+:is(#cures,.cuLs) .cuL .c6r{padding:10px 12px;gap:6px 10px;min-height:0}
+:is(#cures,.cuLs) .cuL .c6r .tx{min-width:0}
+:is(#cures,.cuLs) .cuL .c6r .tx small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* کاشی «در انتظار واریز»: زرد، هم‌اندازه بقیه؛ روی دیگرش (با زدن) مبلغ در انتظار */
-#cures .cuL .cbk.wp,.cub9 .cbk.wp{cursor:pointer;transform-origin:50% 50%;box-shadow:inset 0 0 0 1.5px var(--pe)!important;background:color-mix(in srgb,var(--warn2) 75%,var(--card))!important}
-#cures .cuL .cbk.wp .cbwp,.cub9 .cbk.wp .cbwp{display:none}
-#cures .cuL .cbk.wp.fl>.cbh,.cub9 .cbk.wp.fl>.cbh,#cures .cuL .cbk.wp.fl>b,.cub9 .cbk.wp.fl>b{display:none}
-#cures .cuL .cbk.wp.fl .cbwp,.cub9 .cbk.wp.fl .cbwp{display:flex;margin:0;padding:0;background:none}
-#cures .cuL .cbk.wp.fl .cbwp b,.cub9 .cbk.wp.fl .cbwp b{font-size:15px!important}
-#cures .cuL .cbk.wp::after,.cub9 .cbk.wp::after{content:"";position:absolute;left:9px;bottom:9px;width:5px;height:5px;border-left:1.6px solid var(--warn);border-bottom:1.6px solid var(--warn);transform:rotate(-45deg);opacity:.55}
-#cures .cuL .cbk.wp,.cub9 .cbk.wp{position:relative}
-#cures .cuL .cbk.wp.fl .cbwp,.cub9 .cbk.wp.fl .cbwp{flex-wrap:wrap;align-items:center;gap:2px 4px;font-size:10.5px;line-height:1.5}
-#cures .cuL .cbk.wp.fl .cbwp b,.cub9 .cbk.wp.fl .cbwp b{flex-basis:100%;text-align:right;line-height:1.35;overflow:hidden;text-overflow:ellipsis}
+:is(#cures,.cuLs) .cuL .cbk.wp,.cub9 .cbk.wp{cursor:pointer;transform-origin:50% 50%;box-shadow:inset 0 0 0 1.5px var(--pe)!important;background:color-mix(in srgb,var(--warn2) 75%,var(--card))!important}
+:is(#cures,.cuLs) .cuL .cbk.wp .cbwp,.cub9 .cbk.wp .cbwp{display:none}
+:is(#cures,.cuLs) .cuL .cbk.wp.fl>.cbh,.cub9 .cbk.wp.fl>.cbh,:is(#cures,.cuLs) .cuL .cbk.wp.fl>b,.cub9 .cbk.wp.fl>b{display:none}
+:is(#cures,.cuLs) .cuL .cbk.wp.fl .cbwp,.cub9 .cbk.wp.fl .cbwp{display:flex;margin:0;padding:0;background:none}
+:is(#cures,.cuLs) .cuL .cbk.wp.fl .cbwp b,.cub9 .cbk.wp.fl .cbwp b{font-size:15px!important}
+:is(#cures,.cuLs) .cuL .cbk.wp::after,.cub9 .cbk.wp::after{content:"";position:absolute;left:9px;bottom:9px;width:5px;height:5px;border-left:1.6px solid var(--warn);border-bottom:1.6px solid var(--warn);transform:rotate(-45deg);opacity:.55}
+:is(#cures,.cuLs) .cuL .cbk.wp,.cub9 .cbk.wp{position:relative}
+:is(#cures,.cuLs) .cuL .cbk.wp.fl .cbwp,.cub9 .cbk.wp.fl .cbwp{flex-wrap:wrap;align-items:center;gap:2px 4px;font-size:10.5px;line-height:1.5}
+:is(#cures,.cuLs) .cuL .cbk.wp.fl .cbwp b,.cub9 .cbk.wp.fl .cbwp b{flex-basis:100%;text-align:right;line-height:1.35;overflow:hidden;text-overflow:ellipsis}
 /* v68.2 (خواسته صاحب اپ): کادر جستجوی حساب‌ها، بانک‌ها و حساب مشتری دقیقاً مثل جستجوی واریزی‌ها — قاب آبی، بدون سایه */
 .fsearch.c6q0,.fsearch.stms2{border-color:var(--blu)!important;box-shadow:none!important}
 
 
 /* v68.5 (خواسته صاحب اپ): ردیف بالا افقی — نام · تلفن · گروه؛ زیرش کاشی‌های مانده (ارز، طلا، تومان از راست به چپ)، فقط آن‌هایی که مانده دارند */
-#cures .cuL .c6r:not(.zr){display:flex;flex-direction:column;align-items:stretch;gap:7px}
-#cures .cuL .c6r .tx{display:flex;flex-direction:row;justify-content:flex-start;align-items:baseline;gap:7px;min-width:0;width:100%;text-align:right}
-#cures .cuL .c6r .tx>b{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#cures .cuL .c6r .tx>small{flex:0 1 auto;min-width:0;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#cures .cuL .c6r:not(.zr) .c6vb{width:100%;margin:0;gap:6px}
-#cures .cuL .c6vb.nx{grid-template-columns:repeat(var(--n),minmax(0,1fr))}
-#cures .cuL .c6vb.nx>.cbk{grid-column:auto!important;grid-row:auto!important}
-#cures .cuL .c6vb.nx>.cbk.kx{order:0}#cures .cuL .c6vb.nx>.cbk.kg{order:1}#cures .cuL .c6vb.nx>.cbk.kr{order:2}
-#cures .cuL .c6vb.nx>.cbk{padding:5px 6px 6px}
-#cures .cuL .c6vb.nx .cbk .cbh{gap:3px}
-#cures .cuL .c6vb.nx .cbk .cbh small{font-size:9.5px;white-space:nowrap}
-#cures .cuL .c6vb.nx .cbk .cbh em{font-size:8.5px;padding:0 4px;white-space:nowrap}
+:is(#cures,.cuLs) .cuL .c6r:not(.zr){display:flex;flex-direction:column;align-items:stretch;gap:7px}
+:is(#cures,.cuLs) .cuL .c6r .tx{display:flex;flex-direction:row;justify-content:flex-start;align-items:baseline;gap:7px;min-width:0;width:100%;text-align:right}
+:is(#cures,.cuLs) .cuL .c6r .tx>b{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:is(#cures,.cuLs) .cuL .c6r .tx>small{flex:0 1 auto;min-width:0;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:is(#cures,.cuLs) .cuL .c6r:not(.zr) .c6vb{width:100%;margin:0;gap:6px}
+:is(#cures,.cuLs) .cuL .c6vb.nx{grid-template-columns:repeat(var(--n),minmax(0,1fr))}
+:is(#cures,.cuLs) .cuL .c6vb.nx>.cbk{grid-column:auto!important;grid-row:auto!important}
+:is(#cures,.cuLs) .cuL .c6vb.nx>.cbk.kx{order:0}:is(#cures,.cuLs) .cuL .c6vb.nx>.cbk.kg{order:1}:is(#cures,.cuLs) .cuL .c6vb.nx>.cbk.kr{order:2}
+:is(#cures,.cuLs) .cuL .c6vb.nx>.cbk{padding:5px 6px 6px}
+:is(#cures,.cuLs) .cuL .c6vb.nx .cbk .cbh{gap:3px}
+:is(#cures,.cuLs) .cuL .c6vb.nx .cbk .cbh small{font-size:9.5px;white-space:nowrap}
+:is(#cures,.cuLs) .cuL .c6vb.nx .cbk .cbh em{font-size:8.5px;padding:0 4px;white-space:nowrap}
 /* v68.6 (خواسته صاحب اپ): کارت «مانده حساب» در صفحه مشتری — قاب آبی مثل جستجو، کوچک‌تر، عنوان وسط */
 .c6l.cub9,.c6l.cub9.pend{gap:5px;padding:7px 10px 10px;border-radius:16px;box-shadow:inset 0 0 0 1px var(--blu)!important}
 .cub9 .cub9h{justify-content:center;margin:0;padding:0}
@@ -2907,3 +2907,33 @@ button.sssbtn.un svg{color:var(--mut)}
 .px9e{display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 10px;text-align:center}.px9e svg{width:26px;height:26px;color:var(--ok)}
 @keyframes px9In{from{opacity:0;transform:translateY(8px)}}
 @media (prefers-reduced-motion:reduce){.px9 .px9l>.c6r{animation:none}.px9seg button{transition:none}}
+/* v69.8: پنل مبلغ تخصیص/تسویه — مسیر فشرده، مبلغ بزرگ وسط، دکمه ثبت چسبیده پایین */
+.px10{display:flex;flex-direction:column;gap:12px}
+.px10 .sh-h{margin-bottom:0}
+.pxr{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;width:100%;padding:10px 12px;border:0;border-radius:18px;background:var(--seg);font:inherit;color:var(--ink);text-align:start;cursor:pointer;position:relative}
+.pxr1{display:flex;align-items:center;gap:8px;min-width:0}
+.pxr1 .py7a{flex:none;width:38px;height:38px}
+.pxr1 .tx{display:flex;flex-direction:column;min-width:0}
+.pxr1 .tx small{font-size:10.5px;font-weight:700;color:var(--mut)}
+.pxr1 .tx b{font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pxr1 .tx em{font-style:normal;font-size:10.5px;font-weight:700;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pxr1 .tx em b{font-size:10.5px}
+.pxr1.to{justify-content:flex-end;text-align:end}
+.pxra{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--card);color:var(--blu);box-shadow:0 2px 6px -3px rgba(0,0,0,.25)}.pxra svg{width:15px;height:15px}
+.pxrc{position:absolute;top:-8px;inset-inline-start:12px;padding:2px 8px;border-radius:8px;background:var(--card);color:var(--blu);font-size:10.5px;font-weight:850;box-shadow:0 0 0 1px var(--hair)}
+.pxam{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:14px 12px 12px;border-radius:20px;background:var(--card);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 45%,transparent),0 0 0 4px color-mix(in srgb,var(--blu) 9%,transparent)}
+.pxin{display:flex;align-items:baseline;justify-content:center;gap:8px;cursor:text}
+.pxin input{flex:1;min-width:0;border:0;background:none;outline:none;font:inherit;font-size:34px;font-weight:900;color:var(--ink);text-align:center;padding:2px 0;letter-spacing:.5px}
+.pxin input::placeholder{color:color-mix(in srgb,var(--mut) 45%,transparent)}
+.pxin i{flex:none;font-style:normal;font-size:13px;font-weight:800;color:var(--mut)}
+.px10 #pxAv{text-align:center;justify-content:center;min-height:0}
+.pxch{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.pxch button{border:0;border-radius:11px;padding:7px 11px;background:var(--seg);color:var(--ink);font:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:background .18s,color .18s}
+.pxch button.on{background:var(--blu);color:#fff}
+.pxop{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start}
+.pxop button{display:inline-flex;align-items:center;gap:4px;border:1.5px dashed var(--line);border-radius:11px;padding:6px 10px;background:none;color:var(--mut);font:inherit;font-size:12px;font-weight:800;cursor:pointer}.pxop button svg{width:14px;height:14px}
+.pxgo{position:sticky;bottom:0;margin:0 -2px;padding:8px 2px calc(4px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--card) 70%,transparent);z-index:2}
+.pxgo .xgo{margin:0}
+.px10 .pxin input,.px10 .pxin input:focus{border:0!important;background:none!important;box-shadow:none!important;outline:none!important;min-height:0!important;height:auto!important;padding:2px 0!important;font-size:34px!important;border-radius:0!important}
+.px10 .pxam:focus-within{box-shadow:inset 0 0 0 2px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 14%,transparent)}
+.px10 .pxin input::placeholder{font-size:34px!important;font-weight:900}

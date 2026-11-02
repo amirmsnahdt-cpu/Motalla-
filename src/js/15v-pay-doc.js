@@ -155,14 +155,14 @@ function pxTab(){if(PX.only==='bk')return 'bk';if(PX.tab)return PX.tab;return 'c
 ACT.pxTab=d=>{pxRead();if(PX.tab===d.t)return;PX.tab=d.t;PX.q='';const W=$('sheet').querySelector('.px9');if(W){W.querySelectorAll('.px9seg button').forEach(b=>{const on=b.dataset.t===d.t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});const Q=$('pxQ');if(Q){Q.value='';Q.placeholder=d.t==='bk'?'جستجوی بانک مغازه…':'نام، تلفن یا گروه مشتری…'}const L=$('pxL');if(L){L.innerHTML=pxList();L.scrollTop=0;if(!RM()&&L.animate)L.animate([{opacity:0,transform:`translateX(${d.t==='bk'?18:-18}px)`},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.9,.25,1)'})}}else pxRe(0)};
 const pxTok=q=>nzName(toEn(clean(q||''))).split(/\s+/).filter(Boolean);
 const pxHitC=(c,T,dOk)=>{if(!T.length)return true;const h=nzName(toEn(cuHay(c)));return T.every(t=>h.includes(t))||dOk(cuHay(c))};
-function pxCuCard(c,b,ri){cbLst=1;const bp=cuZero(b)?cuZTag():balPills(b,0,0);cbLst=0;const nT=(b.G?1:0)+(b.R?1:0)+Object.keys(b.X||{}).filter(k=>b.X[k]).length;
-  return `<button type="button" class="c6r px7o px9c${nT<=1?' one':''}" data-act="pxPick" data-k="cu" data-id="${esc(c.id)}" style="--r:${Math.min(ri,8)}"><span class="c6a">${esc(userInit(cuName(c)))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'',c.grp?'<em>'+esc(c.grp)+'</em>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span>${cuZero(b)?bp:`<span class="c6v c6vb" style="--r:${Math.min(ri,8)};--n:${nT}">${bp}</span>`}</button>`}
+/* v69.8 (خواسته صاحب اپ): فهرست مشتری‌ها دقیقاً همان فهرست صفحه «حساب مشتریان» (همان ردیف cuRowH و همان سبک، .cuLs) */
+function pxCuL(B){const PW=pendMap();return `<div class="cuLs"><div class="c6l c6lb cuL">${B.map(([c,b],ri)=>cuRowH(c,b,ri,PW,{act:'pxPick',k:'cu',sw:false,cls:'px7o'})).join('')}</div></div>`}
 const pxGh=(t,n)=>`<div class="c6gh px9g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`;
 function pxCuList(){const q0=clean(PX.q||''),T=pxTok(q0),dOk=pDig(q0),me=pxMe(),O=pxOwe().filter(o=>pxHitC(o.c,T,dOk)),out=[];
-  if(O.length)out.push(pxGh(T.length?'طلب ما · نتیجه جستجو':'طلب ما از این مشتری‌ها',O.length),`<div class="c6l px9l">${O.map((o,i)=>pxCuCard(o.c,o.b,i)).join('')}</div>`);
+  if(O.length)out.push(pxGh(T.length?'طلب ما · نتیجه جستجو':'طلب ما از این مشتری‌ها',O.length),pxCuL(O.map(o=>[o.c,o.b])));
   else if(!T.length)out.push(`<div class="px7e px9e">${ic('check')}<b>از هیچ مشتری‌ای طلب نداریم</b><small>برای مشتری دیگر یا نام تازه، نامش را جستجو کنید</small></div>`);
   if(T.length||dOk('')){const seen=new Set(O.map(o=>String(o.c.id))),C=CU().filter(c=>String(c.id)!==me&&!seen.has(String(c.id))&&pxHitC(c,T,dOk)).sort((a,b)=>(nzName(b.name).startsWith(T[0]||'#')-nzName(a.name).startsWith(T[0]||'#'))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,30);
-    if(C.length)out.push(pxGh('حساب‌های دیگر · طلبی از آن‌ها نداریم',C.length),`<div class="c6l px9l">${C.map((c,i)=>pxCuCard(c,cuBal(c),i)).join('')}</div>`);
+    if(C.length)out.push(pxGh('حساب‌های دیگر · طلبی از آن‌ها نداریم',C.length),pxCuL(C.map(c=>[c,cuBal(c)])));
     PXM=memPeople(T.join(' '),dOk,6);if(PXM.length)out.push(pxGh('از واریزی‌ها و خریدها · بدون حساب'),`<div class="c6l px9l">${PXM.map((p,i)=>`<button type="button" class="c6r px7o px9c one" data-act="pxPick" data-k="mem" data-id="${i}"><span class="c6a m">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'بدون حساب'}</small></span></button>`).join('')}</div>`);
     if(T.length&&!/^\d+$/.test(toEn(q0))&&![...O.map(o=>o.c),...C].some(c=>nzName(c.name)===T.join(' ')))out.push(`<div class="c6l px9l"><button type="button" class="c6r px7o px9c one px9n" data-act="pxPick" data-k="new" data-id=""><span class="c6a">${ic('plus')}</span><span class="tx"><b>پرداخت‌کننده تازه: «${esc(q0)}»</b><small>بدون باز کردن حساب؛ فقط سند تسویه ثبت می‌شود</small></span></button></div>`)}
   return out.join('')}
@@ -193,15 +193,21 @@ function pxHTML(){const rest=pxRest(),who0=pxWho();
   const fld={tn:`<div class="ef px8f"><label for="pxT">شماره پیگیری</label><input id="pxT" class="ltr" inputmode="numeric" autocomplete="off" value="${esc(PX.tn)}"></div>`,
     img:`<div class="ef px8f"><label>رسید</label><label class="stimg${PX.imgD?' on':''}">${PX.imgD?`<img src="${PX.imgD}" alt="">`:`<i>${ic('cam')}</i>`}<span>${PX.imgD?'تغییر رسید':'افزودن عکس'}</span><input type="file" accept="image/*" id="pxF" hidden></label></div>`,
     note:`<div class="ef px8f"><label for="pxN">یادداشت</label><input id="pxN" autocomplete="off" value="${esc(PX.note)}"></div>`};
-  return `<div class="px7w s2 px8"><div class="sh-h"><div><b>${bkm?(PX.edit!=null?'ویرایش بخش بانکی':'بخشی از مبلغ از بانک دیگر'):PX.bz?'تسویه از مشتری':'پرداخت مستقیم به فروشنده'}</b><small class="shsub">${bkm?'از مانده بانک اصلی کم می‌شود و جدا ارسال و پیگیری می‌شود':'از مانده بانکی «'+esc(who0)+'» کم می‌شود'}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="px8r"><button type="button" class="px8p" data-act="pxBack" aria-label="تغییر"><span class="py7a${bkm?' bk':''}">${bkm?S.av:esc(userInit(S.name||'؟'))}</span><span class="tx"><small>${bkm?'از حساب':'پرداخت‌کننده'}</small><b>${esc(S.name)}</b><em>${bkm?esc(S.sub):S.bal||S.sub}</em></span><span class="px8ch">تغییر</span></button>
-    <span class="px8ar" aria-hidden="true">${ic('down')}</span>
-    <div class="px8p to"><span class="py7a">${esc(userInit(who0||'؟'))}</span><span class="tx"><small>به</small><b>${esc(who0)}</b><em>${bkm?'بانک اصلی «'+esc(L0&&L0.src?srcName(L0.src):'انتخاب نشده')+'» · ':''}مانده بانکی ${fmt(rest)}</em></span></div></div>
-  <div class="px8a"><small>${bkm?'مبلغ از این حساب':'مبلغ پرداختی'}</small><label class="px8i"><input id="pxA" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" aria-label="مبلغ" value="${a?a.toLocaleString('en-US'):''}"><i>تومان</i></label>
-    <div class="px7qa px8q">${chip(rest,'کل مانده')}${half&&half!==rest?chip(half,'نصف'):''}${owe&&owe!==rest&&owe!==half?chip(owe,'به اندازه طلب ما'):''}</div><div class="px8l" id="pxAv"></div></div>
-  ${opt.length?`<div class="px8m">${opt.map(([k,t,i])=>M[k]?'':`<button type="button" data-act="pxMore" data-f="${k}">${ic('plus')}<span>${t}</span></button>`).join('')}</div><div class="px8fs">${opt.filter(([k])=>M[k]).map(([k])=>fld[k]).join('')}</div>`:''}
-  <div class="px7in">${ic(bkm?'split':'inv')}<span>${bkm?'هر بخش در لیست '+esc(x?pdHead(PD(x)):'')+' زیر بانک خودش می‌آید؛ اگر همه مبلغ را بزنید، فقط بانک اصلی عوض می‌شود.':PX.bz?'با ثبت واریزی، یک سند «دریافت» در حساب این مشتری ثبت می‌شود.':'یک سند «دریافت» در حساب این مشتری ثبت می‌شود و زدن روی ردیفش همان سند را باز می‌کند.'}</span></div>
-  <button class="xgo" data-act="pxSave">${ic('check')} ${bkm?(PX.edit!=null?'ذخیره بخش':'ثبت بخش'):PX.bz?'افزودن تسویه':'ثبت و صدور سند'}</button></div>`}
+  /* v69.8 (خواسته صاحب اپ: «طراحی تخصیص درست‌تر و راحت‌تر»): یک کارت مسیر فشرده (از → به، زدن = تغییر)، مبلغ بزرگ وسط با
+     دکمه‌های آماده زیرش، فیلدهای اختیاری کوچک، و دکمه ثبت که همیشه پایین پنجره دیده می‌شود. بدون متن راهنمای اضافه. */
+  const ttl=bkm?(PX.edit!=null?'ویرایش بخش بانکی':'تخصیص به بانک'):PX.bz?'تسویه از مشتری':'تسویه از مشتری',
+    main=bkm&&L0&&L0.src?srcName(L0.src):'',toSub=bkm?(main?'بقیه در «'+esc(main)+'»':'بقیه بدون بانک می‌ماند'):'مانده بانکی '+fmt(rest);
+  return `<div class="px7w s2 px10"><div class="sh-h"><div><b>${ttl}</b><small class="shsub">${esc(who0)} · مانده بانکی ${fmt(rest)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <button type="button" class="pxr" data-act="pxBack" aria-label="تغییر ${bkm?'بانک':'پرداخت‌کننده'}">
+    <span class="pxr1"><span class="py7a${bkm?' bk':''}">${bkm?S.av:esc(userInit(S.name||'؟'))}</span><span class="tx"><small>${bkm?'از بانک':'پرداخت‌کننده'}</small><b>${esc(S.name)}</b>${!bkm&&S.bal?`<em>${S.bal}</em>`:''}</span></span>
+    <span class="pxra" aria-hidden="true">${ic('back').replace('class="i"','class="i flip"')}</span>
+    <span class="pxr1 to"><span class="tx"><small>به</small><b>${esc(who0)}</b><em>${toSub}</em></span></span>
+    <span class="pxrc">تغییر</span></button>
+  <div class="pxam"><label class="pxin"><input id="pxA" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" placeholder="۰" aria-label="مبلغ" value="${a?a.toLocaleString('en-US'):''}"><i>تومان</i></label>
+    <div class="px8l" id="pxAv"></div>
+    <div class="px7qa px8q pxch">${chip(rest,'همه')}${half&&half!==rest?chip(half,'نصف'):''}${owe&&owe!==rest&&owe!==half?chip(owe,'به اندازه طلب ما'):''}</div></div>
+  ${opt.length?`<div class="px8m pxop">${opt.map(([k,t,i])=>M[k]?'':`<button type="button" data-act="pxMore" data-f="${k}">${ic(i)}<span>${t}</span></button>`).join('')}</div><div class="px8fs">${opt.filter(([k])=>M[k]).map(([k])=>fld[k]).join('')}</div>`:''}
+  <div class="pxgo"><button class="xgo" data-act="pxSave">${ic('check')} ${bkm?(PX.edit!=null?'ذخیره':'ثبت تخصیص'):PX.bz?'افزودن تسویه':'ثبت تسویه'}</button></div></div>`}
 function pxRead(){const g=id=>{const el=$(id);return el?el.value:undefined};if(g('pxQ')!==undefined)PX.q=g('pxQ');if(g('pxA')!==undefined)PX.amount=num(g('pxA'));if(g('pxT')!==undefined)PX.tn=toEn(g('pxT')).trim();if(g('pxN')!==undefined)PX.note=clean(g('pxN'))}
 function pxAv(){const A=$('pxA'),h=$('pxAv');if(!A||!h)return;const a=num(A.value),r=pxRest(),bk=PX.sel&&PX.sel.k==='bk'&&sources.find(z=>String(z.id)===String(PX.sel.id)),f=bk?acFin(bk):null;
   h.innerHTML=!a?'':a>r?'بیشتر از مانده بانکی ('+fmt(r)+')':`<span>مانده بانکی بعد از این <b>${fmt(r-a)}</b></span>${bk&&f!=null?`<span>مانده «${esc(bk.name)}» <b class="${f-a<0?'n':''}">${f-a<0?'−':''}${fmt(Math.abs(f-a))}</b></span>`:''}`;h.className='px8l'+(a>r?' bad':a?' ok':'');
