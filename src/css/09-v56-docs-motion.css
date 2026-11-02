@@ -2968,3 +2968,15 @@ button.sssbtn.un svg{color:var(--mut)}
 /* v69.10: «حذف تخصیص» در پنجره تغییر بانک */
 .acrow.mvdel b{color:var(--red)}.acrow.mvdel .mvuni{background:color-mix(in srgb,var(--red) 85%,var(--card))!important;color:#fff}
 .acrow.mvend{margin-top:10px}
+/* v69.11: خرید طلا مرحله ۱ — مثل «مشخصات مشتری» */
+.bzf6{display:flex;flex-direction:column}
+.bzhero{flex-direction:row;justify-content:flex-start;gap:12px;padding:14px 16px}
+.bzhero .bzav{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--card);color:var(--blu);font-size:22px;font-weight:900;box-shadow:0 0 0 3px color-mix(in srgb,var(--blu) 14%,transparent)}
+.bzhero .c9ht{align-items:flex-start;text-align:start;min-width:0}
+.bzhero .c9ht b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.f6ok{flex:none;width:34px;height:34px;border:0;border-radius:11px;display:grid;place-items:center;background:var(--blu);color:#fff;cursor:pointer}.f6ok svg{width:17px;height:17px;stroke-width:2.6}
+.bzsno .f6i{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px}
+.bzsno .f6i b{font-size:16px;font-weight:900;color:var(--ink)}
+.bzsno .f6i em{font-style:normal;font-size:11px;font-weight:800;color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--card));padding:2px 8px;border-radius:8px}
+.snoT{font-style:normal;font-size:11px;font-weight:800;color:var(--mut)}
+.bzw .f6sug.bzsug{border:0;border-radius:14px;margin:8px -6px 0}

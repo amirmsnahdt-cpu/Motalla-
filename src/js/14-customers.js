@@ -333,17 +333,28 @@ const bzF=(id,label,val,o={})=>`<div class="ef"><label for="${id}">${label}${o.o
 function vBuy(){const d=bz.d,st=bz.step,T=['اطلاعات مشتری','وزن و مبلغ','حساب و تاریخ واریز'];
   let h=`<div class="bzp">${[1,2,3].map(i=>`<i class="${i<st?'done':i===st?'on':''}"></i>`).join('')}</div><div class="bzh"><small>مرحله ${toFa(st)} از ۳</small><b>${T[st-1]}</b></div>`;
   if(bz.msg)h+=`<div class="bzok">${ic('check')}<span>${bz.msg}</span></div>`;
-  if(st===1)h+=bzF('bzN','نام و نام خانوادگی',d.name,{ph:'نام و نام خانوادگی',sug:1,go:1})+bzF('bzP','شماره تماس',d.phone,{ltr:1,im:'tel',ph:'09xxxxxxxxx',opt:1,sug:1})+bzF('bzM','کد ملی',d.nid,{ltr:1,im:'numeric',ph:'۱۰ رقم',opt:1,sug:1})+bzF('bzC','شماره فاکتور',d.code,{ltr:1,im:'numeric',last:1});
+  /* v69.11 (خواسته صاحب اپ): اطلاعات مشتری مثل پنجره «مشخصات مشتری» — سرتیتر با نام زنده، ردیف‌های یک‌خطی (برچسب کنار مقدار) در یک کارت؛
+     فاکتور اختیاری، کنارش «شماره سیستمی» که خودکار داده می‌شود */
+  if(st===1){const sec=(ico,t,o)=>`<div class="c9h"><span class="c9hi">${ic(ico)}</span><b>${t}</b>${o?'<i>اختیاری</i>':''}</div>`,n=clean(d.name||'');
+    h+=`<div class="f6 bzf6"><div class="c9hero bzhero"><span class="bzav">${esc(userInit(n||'؟'))}</span><div class="c9ht"><b id="bzHn">${esc(n||'مشتری تازه')}</b><span id="bzHm">${d.phone&&/^09\d{9}$/.test(toEn(d.phone))?telP(toEn(d.phone)):'نام را بنویسید؛ مشتری‌های قبلی پیشنهاد می‌شوند'}</span></div></div>
+    ${sec('user','مشتری')}<div class="f6g">${f6Row('bzN','نام',d.name,{ac:1,ph:'نام و نام خانوادگی',ok:1})}${f6Row('bzP','تلفن',d.phone,{ac:1,ltr:1,im:'tel',ph:'09xxxxxxxxx',hint:1})}${f6Row('bzM','کد ملی',d.nid,{ac:1,ltr:1,im:'numeric',ph:'۱۰ رقم · اختیاری',hint:1})}</div>
+    ${sec('inv','فاکتور')}<div class="f6g">${f6Row('bzC','فاکتور دستی',d.code,{ltr:1,im:'numeric',ph:'اختیاری',hint:1,last:1})}<div class="f6r bzsno"><label>شماره سیستمی</label><div class="f6i"><b class="ltr">${toFa(snoNext())}</b><em>خودکار</em></div></div></div></div>`}
   if(st===2){bzItems();h+=`<div id="bzIt">${bzItemsHTML()}</div><button class="addit" data-act="bzAddIt">${ic('plus')} افزودن قلم دیگر <small>(سکه، دلار، طلای دیگر…)</small></button><div id="bzS"></div><div id="bzStl">${bzStlHTML()}</div>`}/* v61.74 (خواسته صاحب اپ): تسویه از مشتری در صفحه «وزن و مبلغ»، آخر صفحه */
   if(st===3){h+=`<div class="ef"><label for="bzI">شماره شبا</label><div class="ibin"><input id="bzI" inputmode="numeric" value="${esc(d.iban||'')}" placeholder="شماره شبا (۲۴ رقم)" autocomplete="off" enterkeyhint="next"><span class="ibir">IR</span><span class="ibbk" id="bzIb"></span></div><small class="eh" id="bzIv"></small>${d.prevIban?`<button class="bzni" data-act="bzNewIban">${ic('edit')} شبای جدید وارد می‌کنم</button>`:''}</div>`+bzF('bzK','شماره کارت',d.card,{ltr:1,im:'numeric',ph:'۱۶ رقم',opt:1})+bzF('bzH','نام صاحب حساب',d.holder!=null?d.holder:clean(d.name||''),{last:1,ok:1})
     +`<div class="ef"><label>تاریخ واریز</label><button class="bzdate" data-act="bzCal">${ic('cal')}<span><b>${esc(payLab(d.pay))}</b><small>${esc(dates(d.pay).wd+' '+dates(d.pay).fa)}</small></span>${ic('chev')}</button></div>`
     +`<div class="bzrev"><div><small>مشتری</small><b>${esc(clean(d.name||'')||'—')}</b></div><div><small>مبلغ</small><b>${fmt(num(d.amount||0))} <i>تومان</i></b></div>${bzStlSum()?`<div><small>تسویه از مشتری</small><b>${fmt(bzStlSum())} <i>تومان</i></b></div><div><small>مانده واریز بانکی</small><b>${fmt(Math.max(0,num(d.amount||0)-bzStlSum()))} <i>تومان</i></b></div>`:''}${d.weight?`<div><small>وزن طلا</small><b>${esc(toFa(d.weight))} <i>گرم</i></b></div>`:''}${(d.items||[]).filter(x=>x.k!=='طلا'&&x.amt).map(x=>`<div><small>${esc(x.k+(x.t?' '+x.t:''))}</small><b>${x.q?esc(toFa(x.q))+' '+((BZK[x.k]||{}).u||'')+' · ':''}${fmt(x.amt)}</b></div>`).join('')}${ppgOf(bzGoldAmt(),d.weight)?`<div><small>هر گرم تمام‌شده</small><b>${fmt(ppgOf(bzGoldAmt(),d.weight))} <i>تومان</i></b></div>`:''}${d.code?`<div><small>فاکتور</small><b>${esc(toEn(d.code))}</b></div>`:''}</div>`}
   return `<div class="bzw">${h}</div>`}
+/* v69.11: ردیف یک‌خطی فرم (همان سبک «مشخصات مشتری»)؛ o.ok = دکمه کوچک «تایید» داخل ردیف نام */
+const f6Row=(id,lab,val,o={})=>`<div class="f6r${o.ac?' ac':''}"><label for="${id}">${lab}</label><div class="f6i"><input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(val||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="${o.last?'done':'next'}"${o.ac?` aria-autocomplete="list" aria-controls="${id}s"`:''}>${o.ok?`<button type="button" class="f6ok" data-act="bzNext" aria-label="تایید و مرحله بعد">${ic('check')}</button>`:o.ac?`<span class="f6ic">${ic('search')}</span>`:''}</div>${o.ac?`<div class="f6sug bzsug hide" id="${id}s" role="listbox"></div>`:''}${o.hint?`<small class="eh" id="${id}v"></small>`:''}</div>`;
+/* v69.11 (خواسته صاحب اپ): شماره سیستمی هر واریزی خرید — یکی بیشتر از بزرگ‌ترین شماره ثبت‌شده (سطل بازیافت هم حساب است تا تکرار نشود) */
+const snoNext=()=>Math.max(1000,...entries.map(e=>+e.sno||0),...trash.map(e=>+e.sno||0),...entries.flatMap(e=>(e.buys||[]).map(b=>+b.sno||0)))+1;
 const aBuy=()=>`<button class="btn gold bzgo" data-act="bzNext">${bz.step<3?'تأیید و ادامه':ic('check')+' ثبت واریزی'}</button>`;
 function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.textContent=t;o.className='eh'+(c?' '+c:'')}};
   const ids={1:['bzN','bzP','bzM','bzC'],2:[],3:['bzI','bzK','bzH']}[st];
   ids.forEach((id,i)=>{const el=$(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(i<ids.length-1)$(ids[i+1]).focus();else ACT.bzNext()}})});
-  if(st===1){const P=$('bzP'),M=$('bzM'),C=$('bzC');
+  if(st===1){const P=$('bzP'),M=$('bzM'),C=$('bzC'),N=$('bzN');
+    const hero=()=>{const n=clean(N.value),v=toEn(P.value).replace(/\D/g,''),a=document.querySelector('.bzhero .bzav'),hn=$('bzHn'),hm=$('bzHm');if(hn)hn.textContent=n||'مشتری تازه';if(a)a.textContent=userInit(n||'؟');if(hm)hm.innerHTML=/^09\d{9}$/.test(v)?telP(v):'نام را بنویسید؛ مشتری‌های قبلی پیشنهاد می‌شوند'};
+    N.addEventListener('input',hero);P.addEventListener('input',hero);bz.hero=hero;
     P.oninput=()=>{const v=toEn(P.value).replace(/\D/g,'').slice(0,11);P.value=v;hint('bzP',!v?'':v.length<11?toFa(v.length)+' از ۱۱ رقم':phoneMsg(v)[0],v.length===11?(phoneOk(v)?'ok':'bad'):'')};
     M.oninput=()=>{const v=toEn(M.value).replace(/\D/g,'').slice(0,10);M.value=v;hint('bzM',!v?'':v.length<10?toFa(v.length)+' از ۱۰ رقم':nidOk(v)?'کد ملی معتبر است':'کد ملی معتبر نیست',v.length===10?(nidOk(v)?'ok':'bad'):'')};
     C.oninput=()=>{C.value=toEn(C.value).replace(/[^0-9A-Za-z\-\/]/g,'');const c=C.value.trim(),dup=c&&entries.some(e=>e.entryDate===todayISO()&&toEn(e.code||'')===c);hint('bzC',dup?'این شماره فاکتور امروز قبلاً ثبت شده':'',dup?'bad':'')};
@@ -365,7 +376,7 @@ ACT.bzNext=async()=>{bzRead();const d=bz.d;
   if(dateVal!==todayISO()){dateVal=todayISO();ls.set('m_date',dateVal)}
   if(bzStlSum()>num(d.amount)){toast('جمع تسویه‌ها از مبلغ این واریزی بیشتر است',true);return}
   if(bz.saving)return;bz.saving=true;let S=[];try{S=await bzStlMake()}finally{bz.saving=false}/* v65.0: تسویه‌ها = سند دریافت هر پرداخت‌کننده (depLink بعد از ثبت) */
-  const ne={id:nid++,name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),ppg:ppgOf(bzGoldAmt(),d.weight),items:(d.items||[]).filter(x=>x.amt).map(x=>({...x})),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:[],entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
+  const ne={id:nid++,sno:snoNext(),name,title:'',phone:toEn(d.phone||''),nid:toEn(d.nid||''),code:toEn(d.code||'').trim(),weight:toEn(d.weight||''),amount:num(d.amount),ppg:ppgOf(bzGoldAmt(),d.weight),items:(d.items||[]).filter(x=>x.amt).map(x=>({...x})),iban,card,bank:'',holder:holder&&holder!==name?holder:'',payDate:d.pay||payDef(),kind:'buy',settles:[],entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
   /* v69.3: همان مشتری در همین لیست واریزی دارد (هنوز به بانک نرفته) → خرید به همان واریزی اضافه می‌شود، نه واریزی دوم */
   const mt=mgBuy(ne,d.cuId,S.map(z=>({...z,st:'wait'})));if(mt){const r=mt.amount-mgStl(mt).reduce((a,z)=>a+(+z.amount||0),0),bd=r>0&&(!mt.iban||!ibanOk(mt.iban));
     bz={step:1,d:{pay:payDef()},msg:`خرید «${esc(name)}» به واریزی قبلی‌اش اضافه شد — ${fmt(ne.amount)} تومان؛ جمع واریزی ${fmt(mt.amount)} تومان، واریز ${esc(payLab(mt.payDate))}${bd?' <em>(شبا ندارد یا اشتباه است؛ خطادار)</em>':''}`};
@@ -407,7 +418,7 @@ function bzSugBind(){[['bzN','n'],['bzP','p'],['bzM','m']].forEach(([id,by])=>{c
       /* اطلاعات حساب از آخرین ثبت همین مشتری؛ کالا خالی می‌ماند. شبا در مرحله ۳ قابل تغییر است */
       Object.assign(bz.d,{cuId:p.cuId||'',pk:p.k,prevIban:p.iban,iban:p.iban,card:p.card,holder:p.holder});if(!p.iban){delete bz.d.iban;delete bz.d.holder;delete bz.d.prevIban}
       [NN,P,M].forEach(el=>{if(el&&el.value&&!RM()&&el.animate)el.animate([{backgroundColor:'color-mix(in srgb,#2152d9 14%,transparent)'},{backgroundColor:'transparent'}],{duration:700,easing:'ease-out'})});
-      toast(p.iban?'اطلاعات «'+p.name+'» از ثبت قبلی پر شد':'«'+p.name+'» انتخاب شد')}
+      if(bz.hero)bz.hero();toast(p.iban?'اطلاعات «'+p.name+'» از ثبت قبلی پر شد':'«'+p.name+'» انتخاب شد')}
     else{['cuId','pk','prevIban','iban','card','holder'].forEach(k=>delete bz.d[k])}
     const nx=[$('bzP'),$('bzM'),$('bzC')].find(el=>el&&!el.value)||$('bzC');if(nx)nx.focus()}})}
 /* پیشنهاد از روی شماره تماس یا کد ملی (از ۳ رقم) */

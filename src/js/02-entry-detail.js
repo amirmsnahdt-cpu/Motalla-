@@ -15,6 +15,7 @@ function vEnt(){const x=entRow();if(!x){setTimeout(()=>{if(cur==='ent')go('home'
     x.settled?kv('از مشتری',`<span class="kg">− ${fmt(x.settled)}</span> <i>تومان</i>`):'',
     (x.settled||st==='ok')?(z=>kv(z?'مانده':'مانده بانکی',`<span class="rmd${z?' z':''}"><span class="ermv" data-k="r" data-v="${x.settled?x.total:x.amount}" data-to="${z?0:x.amount}">${fmt(z?0:x.amount)}</span>${z?ic('check'):''}</span> <i>تومان</i>`))(x.full||st==='ok'):'',
     x.code?kv('فاکتور',`<span class="ltr">${esc(toEn(x.code))}</span>`,toEn(x.code)):'',
+    (e=>e&&e.sno?kv('شماره سیستمی',`<span class="ltr">${toFa(e.sno)}</span>`,String(e.sno)):'')(entries.find(z=>z.id===x.id)),
     x.weight?kv('وزن',esc(toFa(x.weight))+' <i>گرم</i>'):'',
     x.weight&&ppgOf(x.total||x.amount,x.weight)?kv('هر گرم تمام‌شده',fmt(x.ppg||ppgOf(x.total||x.amount,x.weight))+' <i>تومان</i>'):'',
     ].join(''),rows3=[x.phone?kv('شماره تماس',telP(x.phone),x.phone):'',

@@ -168,12 +168,22 @@ const sum=a=>a.reduce((s,r)=>s+(r.amount||0),0);
 function datesWith(){const V=validated(),m={};V.forEach(r=>{const o=m[r.entryDate]=m[r.entryDate]||{iso:r.entryDate,n:0,s:0,bad:0};o.n++;o.s+=r.amount||0;if(r.level===2)o.bad++});return Object.values(m).sort((a,b)=>a.iso<b.iso?1:-1)}
 function parse(text){
   const lines=toEn(text).split(/\r?\n/).map(clean).filter(Boolean),recs=[];let cur=null;
-  for(const ln of lines){const ns=ln.replace(/\s/g,'').toUpperCase();
-    if(/^(IR)?\d{20,28}$/.test(ns)){const ib=ns.startsWith('IR')?ns:'IR'+ns;if(cur&&!cur.iban)cur.iban=ib;else{cur={name:'',code:'',amount:0,bank:'',iban:ib};recs.push(cur)}continue}
+  /* v69.11 (خواسته صاحب اپ): شماره موبایل (09…، +98…، با فاصله یا خط تیره، تنها یا کنار نام) خودکار خوانده و به همان واریزی داده می‌شود؛
+     قبلاً شماره تنها در یک خط مبلغ حساب می‌شد. شماره‌ای که پیش از نام آمده، به واریزی بعدی می‌رسد. */
+  let ph0='';const PH=/(?:^|[^\d])((?:\+?98|0)[\s-]*9(?:[\s-]*\d){9})(?!\d)/;
+  const phN=v=>{const d=v.replace(/\D/g,'');return '0'+d.slice(d.length-10)};
+  const phPut=v=>{if(cur&&!cur.phone)cur.phone=v;else ph0=v};
+  for(let ln of lines){{const m=ln.match(PH);if(m&&!/^(IR)?\d{20,28}$/i.test(ln.replace(/\s/g,''))){const v=phN(m[1]);ln=clean(ln.replace(m[1],' ').replace(/(تلفن|موبایل|همراه|شماره\s*تماس|شماره|تماس|tel|mob)\s*[:：]?/ig,' ').replace(/[()\[\]،,:-]+\s*$/,''));
+      if(!ln){phPut(v);continue}
+      const nm=ln.match(/^(.*[^\d\s])\s+(\d{3,6})$/)||(/[^\d\s]/.test(ln)&&!/^(IR)?\d/i.test(ln)?[0,ln,'']:null);
+      if(nm&&!(cur&&!cur.iban&&!cur.amount&&!cur.code&&cur.name===stripName(nm[1]))){cur={name:stripName(nm[1]),code:nm[2]||'',amount:0,bank:'',iban:'',phone:v};recs.push(cur);ph0='';continue}
+      phPut(v)}}
+    const ns=ln.replace(/\s/g,'').toUpperCase();
+    if(/^(IR)?\d{20,28}$/.test(ns)){const ib=ns.startsWith('IR')?ns:'IR'+ns;if(cur&&!cur.iban)cur.iban=ib;else{cur={name:'',code:'',amount:0,bank:'',iban:ib};if(ph0){cur.phone=ph0;ph0=''}recs.push(cur)}continue}
     if(/^\d{1,2}\s*(mehr|m|مهر)?$/i.test(ln)||/^\d{1,2}\s*(mehr|مهر)\b/i.test(ln))continue;
     if(/^\d[\d\/.,]*\s*(t|تومان|ت)?$/i.test(ln)&&ln.replace(/\D/g,'').length>=5){if(cur&&!cur.amount)cur.amount=num(ln);continue}
     const m=ln.match(/^(.*[^\d\s])\s+(\d{3,6})$/);
-    if(m){cur={name:stripName(m[1]),code:m[2],amount:0,bank:'',iban:''};recs.push(cur);continue}
+    if(m){cur={name:stripName(m[1]),code:m[2],amount:0,bank:'',iban:''};if(ph0){cur.phone=ph0;ph0=''}recs.push(cur);continue}
     if(cur&&!cur.iban)cur.bank=ln}
   return recs}
 /* ============ تاریخ سراسری (هماهنگ در همه بخش‌ها) ============ */
