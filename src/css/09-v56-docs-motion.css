@@ -3078,3 +3078,14 @@ button.bxmk{width:100%;border:0;font:inherit;text-align:right;cursor:pointer;-we
 .lgdr small{flex:none;font-size:12px;font-weight:700;color:var(--mut)}.lgdr b{font-size:14px;font-weight:800;text-align:left;overflow-wrap:anywhere}
 /* v71.1: هشدار حذف تخصیص بخش تأییدشده/رسیددار */
 .unlkw{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--warn2);color:var(--warn);font-size:12.5px;font-weight:700;line-height:1.7}.unlkw .i{width:15px;height:15px;vertical-align:-3px}
+/* v71.3 (خواسته صاحب اپ: «انصراف و تأیید پنجره‌های سند درست نیست»): سرتیتر پنجره ورود ردیف روی هم نمی‌افتد —
+   نوع کار (دریافت/فروش…) کوچک بالا و زیرنوع پررنگ زیرش در یک دکمه؛ عنوان جا را می‌گیرد و اگر جا نبود «…» می‌خورد،
+   «برگشت»، «انصراف» و تأیید همیشه کامل و هم‌قد (۳۴px) دیده می‌شوند */
+.stw .sthd{gap:6px;min-height:40px}
+.stw .sthb{height:34px;border-radius:11px}
+.sthk.two,.stw .sthk.two{flex:1 1 auto;min-width:0;gap:8px;text-align:right}
+.sthk.two .stht{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.sthk.two .stht small{font-size:11.5px;font-weight:800;color:var(--mut);white-space:nowrap}
+.sthk.two .stht b{font-size:15px;font-weight:900;color:var(--blu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stw .sthk.two~.sthx{margin-inline-start:0}
+@media (max-width:380px){.stw .sthb span{display:none}.stw .sthb{padding:0 9px}}

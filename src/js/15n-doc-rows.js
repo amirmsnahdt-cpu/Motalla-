@@ -116,16 +116,31 @@ const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&Stri
 const cuDepPend=c=>{let a=0;for(const e of entries){if(e.del||!e.wd||String(e.wd.cu)!==String(c.id))continue;if(e.splitOf!=null&&entries.some(z=>z.id===e.splitOf&&z.wd))continue;a+=wdState(e).pend}return a};
 const cuFree=(c,skip)=>Math.max(0,Math.round(cuBal(c).R-cuDepPend(c)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='cust'&&String(p.cuId)===String(c.id)).reduce((s,p)=>s+pAmt(p),0):0)));
 const depLeft=(x,skip)=>Math.max(0,Math.round(depAvail(x)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='dep'&&String(p.entId)===String(x.id)).reduce((s,p)=>s+pAmt(p),0):0)));
+/* v71.3 (خواسته صاحب اپ: «هر حسابی که مانده دارد و تخصیص داده نشده باید در فهرست بدهکاریم باشد»):
+   یک فهرست برای همه جا (پنجره تسویه سند، پنجره مانده صفحه مشتری، پله‌های ردیف): هر حساب مشتری که به او بدهکاریم یک ردیف،
+   بدون سقف تعداد؛ قابل حواله = طلب آزاد + مانده واریزی‌های ارسال‌نشده خودش (واریزی ارسال‌شده به بانک دیگر تخصیص خورده و حساب نمی‌شود).
+   واریزی‌ای که حساب مشتری ندارد جدا زیر «واریزی‌های ارسال‌نشده» می‌آید. oweSplit مبلغ را اول از طلب آزاد (حواله به حساب)،
+   بعد از واریزی‌ها (حواله به واریزی، m:'dep') برمی‌دارد تا هیچ مبلغی دو بار پرداخت نشود. */
+const cuDeps=(c,skip)=>validated().filter(x=>!x.sentBid&&x.wd&&String(x.wd.cu)===String(c.id)).map(x=>[x,depLeft(x,skip)]).filter(z=>z[1]>0);
+function oweAccts(q,skip){const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId);
+  return CU().filter(c=>String(c.id)!==me&&(!nq||cuHit(c,nq,dOk))).map(c=>{const f=cuFree(c,skip),D=cuDeps(c,skip);return {c,f,D,a:f+D.reduce((s,z)=>s+z[1],0)}}).filter(o=>o.a>0).sort((x,y)=>y.a-x.a)}
+const oweDeps=(q,skip)=>{const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId);return validated().filter(x=>!x.sentBid&&!(x.wd&&CU().some(c=>String(c.id)===String(x.wd.cu)))&&!(x.wd&&String(x.wd.cu)===me)).map(x=>[x,depLeft(x,skip)]).filter(([x,r])=>r>0&&(!nq||nzName(fullName(x)+' '+(x.holder||'')).includes(nq)||dOk([x.phone,x.iban,x.code,x.card].join(' ')))).sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0]))))};
+const oweSub=o=>[o.c.grp?esc(o.c.grp):'',o.D.length?(o.f?'آزاد '+fmt(o.f)+' · ':'')+'واریزی '+fmt(o.D.reduce((s,z)=>s+z[1],0)):'',o.c.phone?'<bdi dir="ltr">'+esc(toFa(o.c.phone))+'</bdi>':''].filter(Boolean).join('، ')||'حساب مشتری';
+/* مبلغ a از حساب c: ردیف‌های پرداخت (اول طلب آزاد، بعد هر واریزی ارسال‌نشده) */
+function oweSplit(c,a,skip){const R=[];let r=Math.round(a);const f=Math.min(r,cuFree(c,skip));if(f>0){R.push({m:'cust',amount:f,cuId:c.id,cuName:cuName(c)});r-=f}
+  for(const [x,l] of cuDeps(c,skip)){if(r<=0)break;const v=Math.min(r,l);R.push({m:'dep',amount:v,entId:x.id,entName:fullName(x)});r-=v}return {R,rest:r}}
 /* گزینه‌های پله «طرف حواله» وقتی مشتری سند پول را به شخص دیگری داده (dir:'in') */
-function peerInOpts(q,skip){const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv.cuId);
-  const D=validated().filter(x=>!x.sentBid&&!(x.wd&&String(x.wd.cu)===me)).map(x=>[x,depLeft(x,skip)]).filter(([x,r])=>r>0&&(!nq||nzName(fullName(x)+' '+(x.holder||'')).includes(nq)||dOk([x.phone,x.iban,x.code,x.card].join(' '))))
-    .sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0])))).slice(0,nq?12:8)
-    .map(([x,r])=>({v:'d'+x.id,t:fullName(x),sub:['واریزی '+payLab(PD(x)),x.bankShow||(x.iban?ibanBank(x.iban):'')||''].filter(Boolean).join('، '),amt:fmt(r),lab:'بدهکاریم',ico:'bank',bk:x.iban?ibanBank(x.iban):'',cls:'c'}));
-  const C=CU().filter(c=>String(c.id)!==me&&(!nq||cuHit(c,nq,dOk))).map(c=>[c,cuFree(c,skip),cuDepPend(c)]).filter(([c,f,dp])=>f>0||(nq&&!dp)).sort((a,b)=>b[1]-a[1]).slice(0,nq?8:6)
-    .map(([c,f])=>{const r=cuBal(c).R;return f>0?{v:c.id,t:cuName(c),sub:[c.grp||'',c.phone?toFa(c.phone):''].filter(Boolean).join('، ')||'حساب مشتری',amt:fmt(f),lab:'بدهکاریم',ico:'user',cls:'c'}:{v:c.id,t:cuName(c),sub:[c.grp||'',c.phone?toFa(c.phone):''].filter(Boolean).join('، ')||'حساب مشتری',amt:r?fmt(Math.abs(r)):'۰',lab:ourLab(r),ico:'user',cls:r<0?'d':'z'}});
-  return [...C,...D]}
+function peerInOpts(q,skip){const nq=nzName(toEn(q||''));
+  const A=oweAccts(q,skip).map(o=>({v:o.c.id,t:cuName(o.c),sub:oweSub(o).replace(/<[^>]+>/g,''),amt:fmt(o.a),lab:'بدهکاریم',ico:'user',cls:'c'}));
+  const D2=oweDeps(q,skip).map(([x,r])=>({v:'d'+x.id,t:fullName(x),sub:['واریزی '+payLab(PD(x)),x.bankShow||(x.iban?ibanBank(x.iban):'')||''].filter(Boolean).join('، '),amt:fmt(r),lab:'بدهکاریم',ico:'bank',bk:x.iban?ibanBank(x.iban):'',cls:'c'}));
+  /* با جستجو: بقیه مشتری‌ها هم (بدون طلب)، تا حواله به هر حسابی ممکن باشد */
+  const O=nq?CU().filter(c=>String(c.id)!==String(sv.cuId)&&!A.some(z=>String(z.v)===String(c.id))&&cuHit(c,nq,pDig(q||''))&&!cuDeps(c,skip).length&&!cuDepPend(c)).slice(0,8).map(c=>{const r=cuBal(c).R;return {v:c.id,t:cuName(c),sub:[c.grp||'',c.phone?toFa(c.phone):''].filter(Boolean).join('، ')||'حساب مشتری',amt:r?fmt(Math.abs(r)):'۰',lab:ourLab(r),ico:'user',cls:r<0?'d':'z'}}):[];
+  return [...A,...D2,...O]}
 function peerInSet(p,v){const s=String(v||'');if(s[0]==='d'){const x=validated().find(z=>String(z.id)===s.slice(1));if(!x)return;p.m='dep';p.entId=x.id;p.entName=fullName(x);delete p.cuId;delete p.cuName;const r=depLeft(x,p.i);p.amount=Math.min(pyLeft(p)||r,r);return}
-  const c=CU().find(z=>String(z.id)===s);if(!c)return;p.m='cust';p.cuId=c.id;p.cuName=cuName(c);delete p.entId;delete p.entName;delete p.stlId;p.amount=pyLeft(p);pyCuCap(p)}
+  const c=CU().find(z=>String(z.id)===s);if(!c)return;const f=cuFree(c,p.i),D=cuDeps(c,p.i);
+  /* طلب آزاد ندارد ولی واریزی ارسال‌نشده دارد → همان واریزی (یک ردیف = یک طرف؛ بقیه در ردیف بعدی) */
+  if(!(f>0)&&D.length){const [x,l]=D[0];p.m='dep';p.entId=x.id;p.entName=fullName(x);delete p.cuId;delete p.cuName;p.amount=Math.min(pyLeft(p)||l,l);if(D.length>1||D.reduce((a,z)=>a+z[1],0)<pyLeft(p))toast('حواله روی واریزی «'+fullName(x)+'» نشست؛ بقیه را در ردیف بعد بزنید');return}
+  p.m='cust';p.cuId=c.id;p.cuName=cuName(c);delete p.entId;delete p.entName;delete p.stlId;p.amount=pyLeft(p);pyCuCap(p)}
 
 /* ============ v61.77 (خواسته صاحب اپ): از همان پنل حواله، اطلاعات حساب فروشنده واریزی با «مبلغ همین حواله» کپی یا فرستاده شود ============
    (نه مانده واریزی) تا مشتری پرداخت‌کننده واریز کند؛ و دکمه رفتن به خود واریزی. در جزئیات ردیف سند، سند ثبت‌شده و فرم تسویه. */

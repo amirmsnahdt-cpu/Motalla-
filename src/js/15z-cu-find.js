@@ -54,7 +54,9 @@ function cbsLive(){const z=CBS,el=$('cbsL');if(!z||!el)return;const tot=Math.abs
   el.innerHTML=!z.a?'':left===0?`<b class="ok">${ic('check')} حساب تسویه می‌شود</b>`:left>0?`مانده بعد: <b>${f(left)}</b> ${esc(balU(z.k))}`:`<b class="r">${f(-left)} ${esc(balU(z.k))} بیشتر از مانده</b>`;
   document.querySelectorAll('#sheet .cbs .px8q button').forEach(b=>b.classList.toggle('on',Math.abs(+b.dataset.v-z.a)<1e-9))}
 function cbsBind(){const e=$('cbsA');if(!e)return;e.oninput=()=>{if(CBS.k==='r'){const v=num(e.value);e.value=v?v.toLocaleString('en-US'):''}cbsRead();cbsLive()};cbsLive()}
-ACT.cuStl=d=>{const c=curCu(),v=+d.v||0;if(!c||!v||!can('debt'))return;CBS={k:d.k,v,a:Math.abs(v)};sheet(cbsHTML());cbsBind()};
+/* v71.3 (خواسته صاحب اپ: «مانده‌ها از صفحه مشتری یا سند یک نوع پنجره باز کنند»): مانده تومان و طلا همان پنجره تسویه سند را
+   باز می‌کنند (سند تازه همین مشتری، روی «مانده نهایی»)؛ سکه و ارز همان پنجره ساده قبلی */
+ACT.cuStl=d=>{const c=curCu(),v=+d.v||0;if(!c||!v||!can('debt'))return;if(d.k==='r'||d.k==='g'){ACT.svNew({cu:c.id,fresh:1});if(cur!=='sell'||!sv)return;setTimeout(()=>{if(cur==='sell'&&sv)d.k==='r'?ckOpen('f'):gkOpen('f')},60);return}CBS={k:d.k,v,a:Math.abs(v)};sheet(cbsHTML());cbsBind()};
 ACT.cbsAmt=d=>{if(!CBS)return;CBS.a=+d.v;const e=$('cbsA');if(e)e.value=CBS.k==='r'?CBS.a.toLocaleString('en-US'):String(CBS.a);cbsLive()};
 ACT.cbsGo=d=>{cbsRead();const z=CBS,c=curCu();if(!z||!c)return;if(!(z.a>0)){toast('مقدار را بنویسید',true);const e=$('cbsA');if(e)e.focus();return}
   const dir=z.v<0?'in':'out',a=z.a;CBS=null;closeSheet();ACT.svNew({cu:c.id,fresh:1});if(cur!=='sell'||!sv)return;
