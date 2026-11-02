@@ -270,10 +270,13 @@ ACT.txDel=d=>{const c=curCu(),t=c&&(c.txs||[]).find(x=>String(x.id)===String(d.i
   toast('حذف شد'+(L.length?' (همراه '+toFa(L.length)+' ردیف مرتبط در حساب‌های دیگر)':''),'', 'بازگردانی',()=>{t.del=false;L.forEach(x=>x.t.del=false);DU();saveCu();const v2=$('view'),y2=v2.scrollTop;render();v2.scrollTop=y2})};
 
 ACT.entryMenu=()=>{if(!can('add')){toast('دسترسی «ثبت واریزی جدید» برای حساب شما فعال نیست',true);return}sheet(`<div class="sh-h"><div><b>ورود حساب</b><small class="shsub">نوع ثبت را انتخاب کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <button class="opt big" data-act="buyNew">${ic('plus')}<span><b>خرید</b><small>خرید طلا از مشتری و واریز مبلغ به حساب او، مرحله‌به‌مرحله</small></span></button>
+  <button class="opt big" data-act="buyDoc">${ic('inv')}<span><b>سند خرید</b><small>همان پنجره سند با همه امکانات (طلا، سکه، ارز، مانده، تسویه) · واریز به حساب مشتری</small></span></button>
+  <button class="opt big" data-act="buyNew">${ic('plus')}<span><b>خرید دستی</b><small>اطلاعات مشتری، اقلام و حساب در یک صفحه، کادر به کادر</small></span></button>
   <button class="opt big" data-act="sellSoon">${ic('debt')}<span><b>فروش</b><small>فروش طلا به مشتری</small></span></button>
   <button class="opt big" data-act="go" data-n="bulk">${ic('paste')}<span><b>چسباندن لیست</b><small>چند واریزی یکجا از متن تلگرام یا یادداشت</small></span></button>`)};
 ACT.sellSoon=()=>{closeSheet();ACT.svNew({})};
+/* v69.12 (خواسته صاحب اپ): «سند خرید» = همان پنجره سند، نوع خرید از اول انتخاب‌شده (فهرست اقلام خرید باز) */
+ACT.buyDoc=()=>{closeSheet();ACT.svNew({dk:'buy',fresh:1});setTimeout(()=>{if(cur==='sell'&&sv&&!sv.qa.d&&typeof ACT.dkD==='function')ACT.dkD({d:'buy'})},120)};
 let bz={step:1,d:{},msg:''};
 const ppgOf=(amt,w)=>{w=parseFloat(toEn(String(w||'')))||0;return w>0&&amt>0?Math.round(amt/w):0};
 const nidOk=c=>{if(!/^\d{10}$/.test(c)||/^(\d)\1{9}$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);const r=s%11;return r<2?+c[9]===r:+c[9]===11-r};
@@ -288,39 +291,73 @@ function bzItems(){const d=bz.d;if(!d.items||!d.items.length)d.items=[{k:'طلا
    در کارت قلم فقط یک دکمه با انتخاب فعلی می‌ماند */
 const BZI={'طلا':'ring','سکه':'coin','دلار':'usd','یورو':'cash','سایر':'tag'};
 const bzKLab=x=>x.k+(x.t?' · '+x.t:x.k==='سایر'&&x.n?' · '+x.n:'');
-function bzItemsHTML(){const L=bz.d.items;return L.map((x,i)=>{const K=BZK[x.k]||BZK['سایر'];return `<div class="bzit" data-i="${i}"><div class="bzit-h"><button type="button" class="bzpk" data-act="bzPick" data-i="${i}" aria-label="انتخاب نوع قلم"><span class="bzpki">${ic(BZI[x.k]||'tag')}</span><span class="bzpkt"><small>${L.length>1?'قلم '+toFa(i+1):'نوع قلم'}</small><b>${esc(bzKLab(x))}</b></span><span class="bzpkc">تغییر ${ic('chev')}</span></button>${L.length>1?`<button class="x" data-act="bzItDel" data-i="${i}" aria-label="حذف">×</button>`:''}</div>
-  ${K.q?`<div class="ef2"><div class="ef"><label>${K.q} <i>(${K.u})</i></label><input data-f="q" class="ltr" inputmode="decimal" value="${esc(x.q||'')}" autocomplete="off"></div><div class="ef"><label>${K.rl||'نرخ هر '+(K.u==='گرم'?'گرم':K.u||'واحد')} <i>(اختیاری)</i></label><input data-f="r" class="ltr" inputmode="numeric" value="${x.r?Number(x.r).toLocaleString('en-US'):''}" autocomplete="off"></div></div>`:x.k==='سایر'?`<div class="ef"><label>شرح</label><input data-f="n" value="${esc(x.n||'')}" placeholder="شرح" autocomplete="off"></div>`:''}
-  <div class="ef" style="margin:0"><label>مبلغ این قلم <i>(تومان)</i></label><input data-f="amt" class="ltr" inputmode="numeric" value="${x.amt?Number(x.amt).toLocaleString('en-US'):''}" autocomplete="off"></div></div>`}).join('')}
-function bzItRead(){const d=bz.d;document.querySelectorAll('#bzIt .bzit').forEach(el=>{const x=d.items[+el.dataset.i];if(!x)return;const g=f=>{const i=el.querySelector('[data-f='+f+']');return i?i.value:undefined};if(g('q')!==undefined)x.q=decIn(g('q'));if(g('r')!==undefined)x.r=num(g('r'));if(g('amt')!==undefined)x.amt=num(g('amt'));if(g('n')!==undefined)x.n=g('n')});
-  d.amount=String(d.items.reduce((s,x)=>s+(+x.amt||0),0));const gw=d.items.filter(x=>x.k==='طلا').reduce((s,x)=>s+(parseFloat(x.q)||0),0);d.weight=gw?String(Math.round(gw*1000)/1000):''}
 const bzGoldAmt=()=>(bz.d.items||[]).filter(x=>x.k==='طلا').reduce((s,x)=>s+(+x.amt||0),0)||(!(bz.d.items||[]).length?num(bz.d.amount||0):0);
-function bzItBind(){const S=()=>{bzItRead();const d=bz.d,tot=num(d.amount),gw=parseFloat(d.weight)||0,ga=bzGoldAmt(),pg=ppgOf(ga,gw),n=d.items.filter(x=>x.amt).length;
-    $('bzS').innerHTML=`${pg?`<div class="bzppg"><div><small>هر گرم طلای خام، تمام‌شده</small><b>${fmt(pg)}<i>تومان</i></b></div><span class="m">${fmt(ga)} تومان<br>÷ ${esc(toFa(d.weight))} گرم</span></div>`:''}${tot?`<div class="bztot"><span>جمع کل${n>1?' ('+toFa(n)+' قلم)':''}</span><b>${fmt(tot)} <i>تومان</i></b></div>`:''}`;
-    /* تسویه از مشتری با مبلغ همین صفحه هم‌زمان (دکمه «ثبت تسویه» وقتی مبلغی هست) */const T=$('bzStl');if(T){const h=bzStlHTML();if(T._h!==h){T.innerHTML=h;T._h=h}}};
-  document.querySelectorAll('#bzIt .bzit').forEach(el=>{const x=bz.d.items[+el.dataset.i],q=el.querySelector('[data-f=q]'),r=el.querySelector('[data-f=r]'),a=el.querySelector('[data-f=amt]');
-    const auto=()=>{const qq=parseFloat(decIn(q?q.value:''))||0,rr=r?num(r.value):0;if(qq&&rr&&a){a.value=Math.round(qq*rr).toLocaleString('en-US')}};
-    if(q)q.oninput=()=>{q.value=decIn(q.value);auto();S()};if(r)r.oninput=()=>{const v=num(r.value);r.value=v?v.toLocaleString('en-US'):'';auto();S()};if(a)a.oninput=()=>{const v=num(a.value);a.value=v?v.toLocaleString('en-US'):'';S()};
-    const n=el.querySelector('[data-f=n]');if(n)n.oninput=S});
-  S();const f=document.querySelector('#bzIt .bzit:last-child input');if(f&&!f.value)setTimeout(()=>f.focus(),300)}
-ACT.bzAddIt=()=>{bzItRead();bz.d.items.push({k:'سکه',t:'تمام امامی',q:'',r:0,amt:0});const y=$('view').scrollTop;render();$('view').scrollTop=y+200};
-ACT.bzItDel=d=>{bzItRead();bz.d.items.splice(+d.i,1);const y=$('view').scrollTop;render();$('view').scrollTop=y};
-ACT.bzItT=d=>{bzItRead();const x=bz.d.items[+d.i];if(!x)return;x.t=x.t===d.t?'':d.t;const y=$('view').scrollTop;render();$('view').scrollTop=y};
+/* ============ v69.12 (خواسته صاحب اپ): «خرید دستی» مرحله ۲ مثل سند — یک کادر، «بعدی» به خانه بعد می‌رود، نرخ را اعلام می‌کند ============
+   هر قلم: طلا = وزن ← نرخ (مظنه یا هر گرم ۱۸، خودکار تشخیص؛ نرخ بازار با یک لمس) ← مبلغ (خودکار وزن × نرخ، قابل تغییر)؛
+   سکه/ارز = تعداد ← نرخ هر عدد ← مبلغ؛ سایر = شرح ← مبلغ. قلم‌های تمام‌شده یک ردیف بالای کادر (زدن = ویرایش). */
+const bz1F=x=>{const K=BZK[x.k]||BZK['سایر'];if(x.k==='سایر')return [{f:'n',lab:'شرح',t:'text'},{f:'amt',lab:'مبلغ',u:'تومان',t:'num'}];
+  return [{f:'q',lab:K.q,u:K.u,t:'dec'},{f:'r',lab:x.k==='طلا'?'نرخ':(K.rl||'نرخ هر '+(K.u||'واحد')),u:'تومان',t:'rate'},{f:'amt',lab:'مبلغ',u:'تومان',t:'num'}]};
+const bz1Ref=()=>glOk()?+GL.g18:(+ls.get('m_rate',0)||0);
+const bz1Fmt=(x,F)=>{const v=x[F.f];if(F.t==='text')return esc(v||'');if(F.t==='dec')return +v?toFa(String(v))+' '+(F.u||''):'';if(F.t==='rate'&&x.k==='طلا'&&+x.r)return x.rk==='mz'?'مظنه '+fmt(x.rv||mzOf(x.r)):fmt(x.r);return +v?fmt(+v):''};
+function bz1Cur(){const d=bz.d,L=d.items;if(bz.ii==null||bz.ii>=L.length)bz.ii=Math.max(0,L.findIndex(x=>!+x.amt));if(bz.ii<0)bz.ii=0;const x=L[bz.ii],F=bz1F(x);if(bz.fs==null||bz.fs>=F.length)bz.fs=0;return {x,F,f:F[bz.fs]}}
+function bz1HTML(){const d=bz.d,{x,F,f}=bz1Cur(),last=bz.fs===F.length-1,v=x[f.f];
+  const done=d.items.map((y,i)=>i===bz.ii||!+y.amt?'':`<button type="button" class="bz1d" data-act="bz1Ed" data-i="${i}"><span class="bzpki">${ic(BZI[y.k]||'tag')}</span><span class="tx"><b>${esc(bzKLab(y))}</b><small>${[+y.q?toFa(String(y.q))+' '+((BZK[y.k]||{}).u||''):'',+y.r?'نرخ '+fmt(y.r):''].filter(Boolean).join(' · ')}</small></span><b class="am">${fmt(y.amt)}<i>تومان</i></b>${d.items.length>1?`<span class="bz1x" data-act="bzItDel" data-i="${i}" role="button" aria-label="حذف">×</span>`:''}</button>`).join('');
+  const strip=F.map((g,k)=>`<button type="button" class="stp${k===bz.fs?' on':''}${bz1Fmt(x,g)&&k!==bz.fs?' dn':''}" data-act="bz1Go" data-k="${k}"><small>${g.lab}${g.u&&g.t!=='rate'?' <i>('+g.u+')</i>':''}</small><b>${bz1Fmt(x,g)||(k===bz.fs?'…':'—')}</b></button>`).join('');
+  const val=f.t==='text'?esc(v||''):f.t==='dec'?esc(v||''):f.t==='rate'?(x.k==='طلا'&&x.rv?Number(x.rv).toLocaleString('en-US'):+v?Number(v).toLocaleString('en-US'):''):(+v?Number(v).toLocaleString('en-US'):'');
+  const ph=f.t==='rate'&&x.k==='طلا'?'مظنه یا هر گرم ۱۸ (تومان)':f.lab+(f.u?' ('+f.u+')':'');
+  return `<div class="bz1">${done}<div class="bz1c stw"><div class="bzit-h"><button type="button" class="bzpk" data-act="bzPick" data-i="${bz.ii}" aria-label="انتخاب نوع قلم"><span class="bzpki">${ic(BZI[x.k]||'tag')}</span><span class="bzpkt"><small>${d.items.length>1?'قلم '+toFa(bz.ii+1):'نوع قلم'}</small><b>${esc(bzKLab(x))}</b></span><span class="bzpkc">تغییر ${ic('chev')}</span></button></div>
+    <div class="stps">${strip}</div>
+    <div class="fsearch sm st3"><input id="bz1I" class="stin${f.t==='text'?'':' ltr'}"${f.t==='text'?'':' inputmode="decimal"'} value="${val}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}"><button type="button" class="stnx${last?' go':''}" data-act="bz1Next">${last?ic('check')+'<span>ثبت قلم</span>':'<span>بعدی</span>'+ic('back').replace('class="i"','class="i flip"')}</button></div>
+    <div class="bz1lv" id="bz1Lv">${bz1Live()}</div></div>
+    <button class="addit" data-act="bzAddIt">${ic('plus')} افزودن قلم دیگر <small>(سکه، دلار، طلای دیگر…)</small></button></div>`}
+function bz1Live(){const {x,f}=bz1Cur(),out=[];
+  if(f.t==='rate'&&x.k==='طلا'){const r=bz1Ref();if(glOk())out.push(`<div class="bz1mk"><small>نرخ بازار${glOld()?' · '+esc(glTime()):''}</small><button type="button" data-act="bz1Mk" data-v="${+GL.g18}">هر گرم ۱۸ · <b>${fmt(+GL.g18)}</b></button><button type="button" data-act="bz1Mk" data-v="${+GL.mz}">مظنه · <b>${fmt(+GL.mz)}</b></button></div>`);
+    if(+x.r)out.push(`<div class="bz1rt">${x.rk==='mz'?'مظنه '+fmt(x.rv)+' = هر گرم ۱۸ <b>'+fmt(x.r)+'</b>':'هر گرم ۱۸ '+fmt(x.r)+' = مظنه <b>'+fmt(mzOf(x.r))+'</b>'}${r&&Math.abs(x.r-r)/r>0.15?' <em>با نرخ بازار خیلی فرق دارد</em>':''}</div>`)}
+  const q=parseFloat(x.q)||0,a=+x.amt||Math.round(q*(+x.r||0));
+  if(a)out.push(`<div class="stam c bz1am"><small>مبلغ این قلم${x.amM?'':' · خودکار'}</small><div class="fz"><b>${fmt(a)}</b><i>تومان</i></div>${q&&+x.r&&x.k==='طلا'?`<em>${toFa(String(q))} گرم × ${fmt(x.r)}</em>`:''}</div>`);
+  const tot=num(bz.d.amount||0);if(tot&&bz.d.items.filter(z=>+z.amt).length>1)out.push(`<div class="bztot"><span>جمع کل</span><b>${fmt(tot)} <i>تومان</i></b></div>`);
+  return out.join('')}
+function bz1Read(){const I=$('bz1I');if(!I||!bz.d.items)return;const {x,f}=bz1Cur(),t=I.value;
+  if(f.t==='text')x.n=t;else if(f.t==='dec'){const v=decIn(t);if(v!==String(x.q||'')){x.q=v;if(!x.amM)x.amt=Math.round((parseFloat(v)||0)*(+x.r||0))}}
+  else if(f.t==='rate'){const v=num(t);if(x.k==='طلا'){const k=v?rtDetect(v,bz1Ref()):'g';x.rk=k;x.rv=v;x.r=k==='mz'?rOfMz(v):v}else x.r=v;if(!x.amM)x.amt=Math.round((parseFloat(x.q)||0)*(+x.r||0))}
+  else{const v=num(t),au=Math.round((parseFloat(x.q)||0)*(+x.r||0));x.amt=v;x.amM=!!v&&v!==au}}
+/* جمع‌ها همان فیلدهای قبلی (d.amount، d.weight) تا مرحله ۳ و ثبت دست نخورند */
+function bz1Sum(){const d=bz.d,I=d.items||[];d.amount=String(I.reduce((a,x)=>a+(+x.amt||0),0)||'');const w=I.filter(x=>x.k==='طلا').reduce((a,x)=>a+(parseFloat(x.q)||0),0);d.weight=w?String(Math.round(w*1000)/1000):''}
+function bz1Paint(){const L=$('bz1Lv');if(L)L.innerHTML=bz1Live();const {x,F}=bz1Cur();document.querySelectorAll('.bz1c .stp').forEach((el,k)=>{const b=el.querySelector('b'),v=bz1Fmt(x,F[k]);if(b)b.innerHTML=v||(k===bz.fs?'…':'—');el.classList.toggle('dn',!!v&&k!==bz.fs)});
+  const T=$('bzStl');if(T){const h=bzStlHTML();if(T._h!==h){T.innerHTML=h;T._h=h}}}
+function bz1Re(focus){const B=$('bzIt');if(!B)return;B.innerHTML=bz1HTML();bz1Bind(focus)}
+function bz1Bind(focus){const I=$('bz1I');if(!I)return;const {f}=bz1Cur();
+  I.oninput=()=>{if(f.t==='dec')I.value=decIn(I.value);else if(f.t!=='text'){const v=num(I.value);I.value=v?v.toLocaleString('en-US'):''}bz1Read();bz1Sum();bz1Paint()};
+  I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.bz1Next()}};I.onfocus=()=>setTimeout(()=>{try{I.setSelectionRange(0,I.value.length)}catch(_){}},0);
+  document.querySelectorAll('.bz1c .stnx,.bz1c .stp,.bz1mk button').forEach(b=>{b.onpointerdown=e=>{if(document.activeElement===I)e.preventDefault()}});
+  if(focus!==false&&cur==='buy')setTimeout(()=>{if(I.isConnected&&$('ov').classList.contains('hide'))try{I.focus({preventScroll:true})}catch(_){}},focus?0:380)}
+ACT.bz1Go=d=>{bz1Read();bz1Sum();bz.fs=+d.k;bz1Re(true)};
+ACT.bz1Mk=d=>{const I=$('bz1I');if(!I)return;I.value=(+d.v).toLocaleString('en-US');bz1Read();bz1Sum();bz1Paint();try{I.focus({preventScroll:true})}catch(_){}};
+ACT.bz1Ed=d=>{bz1Read();bz1Sum();bz.ii=+d.i;bz.fs=0;bz1Re(true)};
+ACT.bz1Next=()=>{bz1Read();bz1Sum();const {x,F,f}=bz1Cur();
+  if(f.t!=='text'&&f.f!=='r'&&!(+x[f.f]||parseFloat(x[f.f]))){toast(f.lab+' را بزنید',true);return}if(f.t==='text'&&!clean(x.n||'')){toast('شرح را بنویسید',true);return}
+  if(bz.fs<F.length-1){bz.fs++;bz1Re(true);return}
+  if(!(+x.amt)){toast('مبلغ را بزنید',true);return}
+  /* قلم ثبت شد: کارت بسته و ردیف خلاصه می‌شود؛ اگر قلم ناقصی هست به آن می‌رود */
+  const nx=bz.d.items.findIndex((y,i)=>i!==bz.ii&&!+y.amt);bz.ii=nx>=0?nx:bz.ii;bz.fs=0;bz1Re(nx>=0);
+  const r=document.querySelector('.bz1d:last-of-type');if(r&&!RM()&&r.animate)r.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:260});
+  if(nx<0)toast('قلم ثبت شد · برای ادامه «ادامه» بالا را بزنید')};
+ACT.bzAddIt=()=>{bz1Read();bz1Sum();bz.d.items.push({k:'سکه',t:'تمام امامی',q:'',r:0,amt:0});bz.ii=bz.d.items.length-1;bz.fs=0;bz1Re(true)};
+ACT.bzItDel=d=>{bz1Read();bz.d.items.splice(+d.i,1);if(!bz.d.items.length)bz.d.items.push({k:'طلا',q:'',r:0,amt:0});bz.ii=Math.min(bz.ii||0,bz.d.items.length-1);bz.fs=0;bz1Sum();bz1Re(false)};
 const bzPkOpts=()=>Object.keys(BZK).flatMap(k=>BZK[k].t?BZK[k].t.map(t=>({k,t})):[{k,t:''}]);
 function bzPkList(i,q0){const x=bz.d.items[i]||{},q=nzName(toEn(q0||'')),O=bzPkOpts().filter(o=>!q||nzName(o.k+' '+o.t).includes(q));let h='',g='';
   O.forEach(o=>{if(o.k!==g){g=o.k;h+=`<div class="bzpkg">${esc(o.k)}${BZK[o.k].tl?' <i>· '+esc(BZK[o.k].tl)+'</i>':''}</div>`}const on=x.k===o.k&&(x.t||'')===o.t;
     h+=`<button type="button" class="bzsr bzpko${on?' on':''}" data-act="bzPkSel" data-i="${i}" data-k="${esc(o.k)}" data-t="${esc(o.t)}"><span class="av">${ic(BZI[o.k]||'tag')}</span><span class="tx"><b>${esc(o.t||o.k)}</b><small>${o.t?esc(o.k):o.k==='سایر'?'با شرح دلخواه':'به '+esc(BZK[o.k].u)}</small></span>${on?`<span class="cbv">${ic('check')}</span>`:''}</button>`});
   if(q&&!O.some(o=>nzName(o.t||o.k)===q))h+=`<button type="button" class="bzsr bzpko nw" data-act="bzPkSel" data-i="${i}" data-k="سایر" data-t="" data-n="${esc(clean(q0))}"><span class="av">${ic('plus')}</span><span class="tx"><b>«${esc(clean(q0))}»</b><small>به‌عنوان سایر، با همین شرح</small></span></button>`;
   return h||'<div class="eh">موردی پیدا نشد</div>'}
-ACT.bzPick=d=>{bzItRead();const i=+d.i;sheet(`<div class="sh-h"><div><b>نوع قلم</b><small class="shsub">طلا، سکه، ارز یا سایر — جستجو کنید یا انتخاب کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+ACT.bzPick=d=>{bz1Read();bz1Sum();const i=+d.i;sheet(`<div class="sh-h"><div><b>نوع قلم</b><small class="shsub">طلا، سکه، ارز یا سایر — جستجو کنید یا انتخاب کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="fsearch bzpkq">${ic('search')}<input id="bzPkQ" type="search" enterkeyhint="search" autocomplete="off" placeholder="جستجو: آبشده، ربع، دلار…"></div><div class="bzpkl" id="bzPkL">${bzPkList(i,'')}</div>`);
   const Q=$('bzPkQ'),Lh=$('bzPkL');if(Q){Q.oninput=()=>{Lh.innerHTML=bzPkList(i,Q.value)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const b=Lh.querySelector('.bzpko');if(b)b.click()}}}};
-ACT.bzPkSel=d=>{const x=bz.d.items[+d.i];if(!x)return;if(x.k!==d.k&&!BZK[d.k].q){x.q='';x.r=0}x.k=d.k;x.t=d.t||'';if(d.k==='سایر'){if(d.n)x.n=d.n}else delete x.n;closeSheet();const y=$('view').scrollTop;render();$('view').scrollTop=y;
-  const el=document.querySelector(`#bzIt .bzit[data-i="${d.i}"] [data-f=${BZK[d.k].q?'q':d.k==='سایر'&&!x.n?'n':'amt'}]`);if(el)setTimeout(()=>el.focus(),260)};
-ACT.bzItK=d=>{bzItRead();const x=bz.d.items[+d.i];if(!x)return;if(x.k!==d.k)x.t=(BZK[d.k]&&BZK[d.k].t&&d.k==='سکه')?'تمام امامی':'';x.k=d.k;if(!BZK[d.k].q){x.q='';x.r=0}const y=$('view').scrollTop;render();$('view').scrollTop=y};
+ACT.bzPkSel=d=>{const x=bz.d.items[+d.i];if(!x)return;if(x.k!==d.k){x.q='';x.r=0;x.rk='';x.rv=0;if(!x.amM)x.amt=0}x.k=d.k;x.t=d.t||'';if(d.k==='سایر'){if(d.n)x.n=d.n}else delete x.n;bz.ii=+d.i;bz.fs=0;closeSheet();bz1Sum();bz1Re(true)};
 ACT.buyNew=()=>{closeSheet();bz={step:1,d:{pay:payDef()},msg:''};go('buy')};
 function bzRead(){if(cur!=='buy')return;const g=id=>{const el=$(id);return el?el.value:undefined},d=bz.d;
   if(bz.step===1){d.name=g('bzN');d.phone=g('bzP');d.nid=g('bzM');d.code=g('bzC');if(d.pk&&nzName(d.name)!==d.pk)['cuId','pk','prevIban','iban','card','holder'].forEach(k=>delete d[k])}
-  if(bz.step===2){bzItRead()}
+  if(bz.step===2){bz1Read();bz1Sum()}
   if(bz.step===3){d.iban=g('bzI');d.card=g('bzK');d.holder=g('bzH')}
   Object.keys(d).forEach(k=>{if(d[k]===undefined)delete d[k]})}
 /* v63.7 (خواسته صاحب اپ): نام صاحب حساب — با لمس کادر کل نام انتخاب می‌شود (تایپ = جایگزینی) و دکمه «تایید» داخل کادر:
@@ -331,24 +368,32 @@ document.addEventListener('focusin',e=>{const t=e.target;if(!t||!t.dataset||t.da
 document.addEventListener('input',e=>{const t=e.target,w=t&&t.closest&&t.closest('.eok');if(!w)return;w.classList.remove('okd');const h=t.id&&$(t.id+'v');if(h&&/\bok\b/.test(h.className)&&!t.dataset.go){h.textContent='';h.className='eh'}});
 const bzF=(id,label,val,o={})=>`<div class="ef"><label for="${id}">${label}${o.opt?' <i>(اختیاری)</i>':''}</label>${o.pre?`<div class="eib2"><span>${o.pre}</span>`:''}${o.ok||o.go?'<div class="eok">':''}<input id="${id}"${o.ltr?' class="ltr"':''} ${o.im?`inputmode="${o.im}"`:''} value="${esc(val||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="${o.last?'done':'next'}"${o.sug?` aria-autocomplete="list" aria-controls="${id}s"`:''}${o.ok?' data-selall="1"':''}>${o.ok?`<button type="button" class="eokb" data-act="hOk" data-f="${id}" aria-label="تایید همین نام">${ic('check')}<span>تایید</span></button></div>`:o.go?`<button type="button" class="eokb" data-act="bzNext" aria-label="تایید و رفتن به مرحله بعد">${ic('check')}<span>تایید</span></button></div>`:''}${o.pre?'</div>':''}${o.sug?`<div class="bzsug hide" id="${id}s" role="listbox"></div>`:''}<small class="eh" id="${id}v"></small></div>`;
 function vBuy(){const d=bz.d,st=bz.step,T=['اطلاعات مشتری','وزن و مبلغ','حساب و تاریخ واریز'];
-  let h=`<div class="bzp">${[1,2,3].map(i=>`<i class="${i<st?'done':i===st?'on':''}"></i>`).join('')}</div><div class="bzh"><small>مرحله ${toFa(st)} از ۳</small><b>${T[st-1]}</b></div>`;
-  if(bz.msg)h+=`<div class="bzok">${ic('check')}<span>${bz.msg}</span></div>`;
+  /* v69.12 (خواسته صاحب اپ): دکمه تأیید هر مرحله بالا سمت چپ (کنار عنوان مرحله)، نه پایین صفحه */
+  let h=`<div class="bzp">${[1,2,3].map(i=>`<i class="${i<st?'done':i===st?'on':''}"></i>`).join('')}</div><div class="bzh bzh9"><div><small>خرید دستی</small><b>مرحله ${toFa(st)} از ۳</b></div><button type="button" class="bzgo9${st===3?' fin':''}" data-act="bzNext" aria-label="${st<3?'تأیید و ادامه':'ثبت واریزی'}">${ic('check')}<span>${st<3?'ادامه':'ثبت واریزی'}</span></button></div>`;
+  if(bz.msg)h+=`<div class="bzok">${ic('check')}<span>${bz.msg}</span></div>`;const h0=h.length;
   /* v69.11 (خواسته صاحب اپ): اطلاعات مشتری مثل پنجره «مشخصات مشتری» — سرتیتر با نام زنده، ردیف‌های یک‌خطی (برچسب کنار مقدار) در یک کارت؛
      فاکتور اختیاری، کنارش «شماره سیستمی» که خودکار داده می‌شود */
   if(st===1){const sec=(ico,t,o)=>`<div class="c9h"><span class="c9hi">${ic(ico)}</span><b>${t}</b>${o?'<i>اختیاری</i>':''}</div>`,n=clean(d.name||'');
     h+=`<div class="f6 bzf6"><div class="c9hero bzhero"><span class="bzav">${esc(userInit(n||'؟'))}</span><div class="c9ht"><b id="bzHn">${esc(n||'مشتری تازه')}</b><span id="bzHm">${d.phone&&/^09\d{9}$/.test(toEn(d.phone))?telP(toEn(d.phone)):'نام را بنویسید؛ مشتری‌های قبلی پیشنهاد می‌شوند'}</span></div></div>
     ${sec('user','مشتری')}<div class="f6g">${f6Row('bzN','نام',d.name,{ac:1,ph:'نام و نام خانوادگی',ok:1})}${f6Row('bzP','تلفن',d.phone,{ac:1,ltr:1,im:'tel',ph:'09xxxxxxxxx',hint:1})}${f6Row('bzM','کد ملی',d.nid,{ac:1,ltr:1,im:'numeric',ph:'۱۰ رقم · اختیاری',hint:1})}</div>
     ${sec('inv','فاکتور')}<div class="f6g">${f6Row('bzC','فاکتور دستی',d.code,{ltr:1,im:'numeric',ph:'اختیاری',hint:1,last:1})}<div class="f6r bzsno"><label>شماره سیستمی</label><div class="f6i"><b class="ltr">${toFa(snoNext())}</b><em>خودکار</em></div></div></div></div>`}
-  if(st===2){bzItems();h+=`<div id="bzIt">${bzItemsHTML()}</div><button class="addit" data-act="bzAddIt">${ic('plus')} افزودن قلم دیگر <small>(سکه، دلار، طلای دیگر…)</small></button><div id="bzS"></div><div id="bzStl">${bzStlHTML()}</div>`}/* v61.74 (خواسته صاحب اپ): تسویه از مشتری در صفحه «وزن و مبلغ»، آخر صفحه */
+  if(st===2){bzItems();h+=`<div id="bzIt">${bz1HTML()}</div><div id="bzS"></div><div id="bzStl">${bzStlHTML()}</div>`}/* v61.74 (خواسته صاحب اپ): تسویه از مشتری در صفحه «وزن و مبلغ»، آخر صفحه */
   if(st===3){h+=`<div class="ef"><label for="bzI">شماره شبا</label><div class="ibin"><input id="bzI" inputmode="numeric" value="${esc(d.iban||'')}" placeholder="شماره شبا (۲۴ رقم)" autocomplete="off" enterkeyhint="next"><span class="ibir">IR</span><span class="ibbk" id="bzIb"></span></div><small class="eh" id="bzIv"></small>${d.prevIban?`<button class="bzni" data-act="bzNewIban">${ic('edit')} شبای جدید وارد می‌کنم</button>`:''}</div>`+bzF('bzK','شماره کارت',d.card,{ltr:1,im:'numeric',ph:'۱۶ رقم',opt:1})+bzF('bzH','نام صاحب حساب',d.holder!=null?d.holder:clean(d.name||''),{last:1,ok:1})
     +`<div class="ef"><label>تاریخ واریز</label><button class="bzdate" data-act="bzCal">${ic('cal')}<span><b>${esc(payLab(d.pay))}</b><small>${esc(dates(d.pay).wd+' '+dates(d.pay).fa)}</small></span>${ic('chev')}</button></div>`
     +`<div class="bzrev"><div><small>مشتری</small><b>${esc(clean(d.name||'')||'—')}</b></div><div><small>مبلغ</small><b>${fmt(num(d.amount||0))} <i>تومان</i></b></div>${bzStlSum()?`<div><small>تسویه از مشتری</small><b>${fmt(bzStlSum())} <i>تومان</i></b></div><div><small>مانده واریز بانکی</small><b>${fmt(Math.max(0,num(d.amount||0)-bzStlSum()))} <i>تومان</i></b></div>`:''}${d.weight?`<div><small>وزن طلا</small><b>${esc(toFa(d.weight))} <i>گرم</i></b></div>`:''}${(d.items||[]).filter(x=>x.k!=='طلا'&&x.amt).map(x=>`<div><small>${esc(x.k+(x.t?' '+x.t:''))}</small><b>${x.q?esc(toFa(x.q))+' '+((BZK[x.k]||{}).u||'')+' · ':''}${fmt(x.amt)}</b></div>`).join('')}${ppgOf(bzGoldAmt(),d.weight)?`<div><small>هر گرم تمام‌شده</small><b>${fmt(ppgOf(bzGoldAmt(),d.weight))} <i>تومان</i></b></div>`:''}${d.code?`<div><small>فاکتور</small><b>${esc(toEn(d.code))}</b></div>`:''}</div>`}
-  return `<div class="bzw">${h}</div>`}
+  /* v69.12 (خواسته صاحب اپ: «هر سه قسمت در یک صفحه، با تیک بعدی با انیمیشن باز شود»): سه بخش زیر هم؛ بخش فعلی باز،
+     بخش‌های تمام‌شده یک کارت خلاصه (زدن = برگشت به همان بخش)، بخش‌های بعدی کم‌رنگ. باز شدن بخش تازه با انیمیشن. */
+  const body=h.slice(h0),S2=bzSum2();const sm=[clean(d.name||'')?esc(clean(d.name))+(d.phone?' · <bdi dir="ltr">'+esc(toFa(toEn(d.phone)))+'</bdi>':''):'',S2,d.iban?'شبا '+esc(toFa(dg(d.iban).slice(-4)))+'… · '+esc(payLab(d.pay)):esc(payLab(d.pay))];
+  const secs=T.map((t,i)=>{const n=i+1;if(n===st)return `<section class="bzsec on${bz.anim?' ani':''}" data-s="${n}"><div class="bzsh"><span class="bzsn">${toFa(n)}</span><b>${t}</b></div>${body}</section>`;
+    return `<button type="button" class="bzsec ${n<st?'dn':'fu'}" data-s="${n}" ${n<st?'data-act="bzGo" data-s="'+n+'"':'disabled'}><span class="bzsn">${n<st?ic('check'):toFa(n)}</span><span class="tx"><b>${t}</b><small>${n<st?(sm[i]||'—'):'بعد از «ادامه»'}</small></span>${n<st?'<span class="bzse">ویرایش</span>':''}</button>`}).join('');
+  bz.anim=0;return `<div class="bzw bzw9">${h.slice(0,h0)}${secs}</div>`}
+ACT.bzGo=d=>{bzRead();const n=+d.s;if(!(n>=1&&n<bz.step))return;bz.step=n;bz.anim=1;render();$('view').scrollTop=0};
+const bzSum2=()=>{const I=(bz.d.items||[]).filter(x=>+x.amt);if(!I.length)return '';const w=I.filter(x=>x.k==='طلا').reduce((a,x)=>a+(parseFloat(x.q)||0),0);return (I.length>1?toFa(I.length)+' قلم · ':'')+(w?toFa(String(Math.round(w*1000)/1000))+' گرم · ':'')+fmt(I.reduce((a,x)=>a+(+x.amt||0),0))+' تومان'};
 /* v69.11: ردیف یک‌خطی فرم (همان سبک «مشخصات مشتری»)؛ o.ok = دکمه کوچک «تایید» داخل ردیف نام */
 const f6Row=(id,lab,val,o={})=>`<div class="f6r${o.ac?' ac':''}"><label for="${id}">${lab}</label><div class="f6i"><input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(val||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="${o.last?'done':'next'}"${o.ac?` aria-autocomplete="list" aria-controls="${id}s"`:''}>${o.ok?`<button type="button" class="f6ok" data-act="bzNext" aria-label="تایید و مرحله بعد">${ic('check')}</button>`:o.ac?`<span class="f6ic">${ic('search')}</span>`:''}</div>${o.ac?`<div class="f6sug bzsug hide" id="${id}s" role="listbox"></div>`:''}${o.hint?`<small class="eh" id="${id}v"></small>`:''}</div>`;
 /* v69.11 (خواسته صاحب اپ): شماره سیستمی هر واریزی خرید — یکی بیشتر از بزرگ‌ترین شماره ثبت‌شده (سطل بازیافت هم حساب است تا تکرار نشود) */
 const snoNext=()=>Math.max(1000,...entries.map(e=>+e.sno||0),...trash.map(e=>+e.sno||0),...entries.flatMap(e=>(e.buys||[]).map(b=>+b.sno||0)))+1;
-const aBuy=()=>`<button class="btn gold bzgo" data-act="bzNext">${bz.step<3?'تأیید و ادامه':ic('check')+' ثبت واریزی'}</button>`;
+const aBuy=()=>'';/* v69.12: دکمه پایین برداشته شد؛ تأیید بالا سمت چپ است */
 function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.textContent=t;o.className='eh'+(c?' '+c:'')}};
   const ids={1:['bzN','bzP','bzM','bzC'],2:[],3:['bzI','bzK','bzH']}[st];
   ids.forEach((id,i)=>{const el=$(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(i<ids.length-1)$(ids[i+1]).focus();else ACT.bzNext()}})});
@@ -359,7 +404,7 @@ function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.te
     M.oninput=()=>{const v=toEn(M.value).replace(/\D/g,'').slice(0,10);M.value=v;hint('bzM',!v?'':v.length<10?toFa(v.length)+' از ۱۰ رقم':nidOk(v)?'کد ملی معتبر است':'کد ملی معتبر نیست',v.length===10?(nidOk(v)?'ok':'bad'):'')};
     C.oninput=()=>{C.value=toEn(C.value).replace(/[^0-9A-Za-z\-\/]/g,'');const c=C.value.trim(),dup=c&&entries.some(e=>e.entryDate===todayISO()&&toEn(e.code||'')===c);hint('bzC',dup?'این شماره فاکتور امروز قبلاً ثبت شده':'',dup?'bad':'')};
     [P,M,C].forEach(el=>{if(el.value)el.oninput()});bzSugBind()}
-  if(st===2)bzItBind();
+  if(st===2)bz1Bind();
   if(st===3){const I=$('bzI'),K=$('bzK');
     I.oninput=()=>{const v=dg(I.value).slice(0,24);I.value=ibanGroups(v);const bb=$('bzIb'),b5=v.length>=5?BANKS[v.slice(2,5)]||'':'';if(bb)bb.innerHTML=b5?bankBadge(b5,'lg')+'<span>'+esc(b5)+'</span>':'';if(!v){hint('bzI','اگر شبا را ندارید خالی بگذارید؛ واریزی خطادار علامت می‌خورد');return}if(v.length<24){hint('bzI',toFa(v.length)+' از ۲۴ رقم');return}if(!ibanOk('IR'+v)){hint('bzI','شماره شبا اشتباه است','bad');return}const pv=dg(bz.d.prevIban||'');if(pv&&pv===v){hint('bzI','همان شبای ثبت قبلی این مشتری است · اگر عوض شده، شبای جدید را بنویسید','ok');return}if(pv){hint('bzI','شبای جدید — با شبای ثبت قبلی این مشتری فرق دارد','warn');return}hint('bzI','شماره شبا معتبر است','ok')};
     K.oninput=()=>{const v=dg(K.value).slice(0,16);K.value=grp4(v);hint('bzK',!v?'':v.length<16?toFa(v.length)+' از ۱۶ رقم':luhn(v)?'معتبر':'رقم کنترلی نمی‌خواند',v.length===16?(luhn(v)?'ok':'bad'):'')};
@@ -369,8 +414,8 @@ function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.te
 document.addEventListener('focusin',e=>{const t=e.target;document.body.classList.toggle('bzkb',!!(t&&t.matches&&t.matches('#view input')&&cur==='buy'&&typeof bz!=='undefined'&&bz&&bz.step===1))});
 document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(!(a&&a.matches&&a.matches('#view input')))document.body.classList.remove('bzkb')},60));
 ACT.bzNext=async()=>{bzRead();const d=bz.d;
-  if(bz.step===1){if(!clean(d.name||'')){toast('نام مشتری را وارد کنید',true);$('bzN').focus();return}const ph=toEn(d.phone||'');if(ph&&!phoneOk(ph)){toast('شماره تماس درست نیست',true);$('bzP').focus();return}const n=toEn(d.nid||'');if(n&&!nidOk(n)){toast('کد ملی معتبر نیست',true);$('bzM').focus();return}bz.step=2;bz.msg='';render();return}
-  if(bz.step===2){if(!num(d.amount||0)){toast('مبلغ را وارد کنید',true);const a=document.querySelector('#bzIt [data-f=amt]');if(a)a.focus();return}if(bzStlSum()>num(d.amount)){toast('جمع تسویه از مشتری از مبلغ بیشتر است؛ تسویه یا مبلغ را درست کنید',true);return}bz.step=3;bz.msg='';render();return}
+  if(bz.step===1){if(!clean(d.name||'')){toast('نام مشتری را وارد کنید',true);$('bzN').focus();return}const ph=toEn(d.phone||'');if(ph&&!phoneOk(ph)){toast('شماره تماس درست نیست',true);$('bzP').focus();return}const n=toEn(d.nid||'');if(n&&!nidOk(n)){toast('کد ملی معتبر نیست',true);$('bzM').focus();return}bz.step=2;bz.msg='';bz.anim=1;render();return}
+  if(bz.step===2){bz1Read();bz1Sum();if(!num(d.amount||0)){toast('مبلغ را وارد کنید',true);const a=$('bz1I');if(a)a.focus();return}if(bzStlSum()>num(d.amount)){toast('جمع تسویه از مشتری از مبلغ بیشتر است؛ تسویه یا مبلغ را درست کنید',true);return}bz.step=3;bz.msg='';bz.anim=1;render();return}
   const dI=dg(d.iban||'').slice(0,24);
   const card=dg(d.card||'').slice(0,16),now=new Date().toISOString(),iban=dI?'IR'+dI:'',name=stripName(d.name),holder=clean(d.holder||'');
   if(dateVal!==todayISO()){dateVal=todayISO();ls.set('m_date',dateVal)}
