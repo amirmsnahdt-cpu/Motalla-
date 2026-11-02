@@ -2888,3 +2888,22 @@ button.sssbtn.un svg{color:var(--mut)}
 .py7r.b.d .py7v small,.py7r.b.n .py7v small{color:var(--blu)}
 .py9h{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px;font-size:11px;font-weight:700;color:var(--mut)}.py9h svg{width:13px;height:13px;opacity:.6}
 .py7h .stladd.sh{margin-inline-start:6px}
+/* v69.7: پنل «پرداخت از کجا؟» — دکمه دوبخشی مشتری/بانک بالا سمت چپ، هر حساب کارت جدا مثل صفحه حساب مشتریان */
+.px9h{align-items:center;gap:8px}.px9h>div:first-child{flex:1;min-width:0}
+.px9seg{flex:none;display:flex;gap:3px;padding:3px;border-radius:13px;background:var(--seg)}
+.px9seg button{position:relative;display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--mut);font:inherit;font-size:12.5px;font-weight:850;cursor:pointer;transition:background .22s,color .22s,box-shadow .22s}
+.px9seg button svg{width:15px;height:15px}
+.px9seg button.on{background:var(--blu);color:#fff;box-shadow:0 6px 14px -8px color-mix(in srgb,var(--blu) 85%,transparent)}
+.px9seg button i{font-style:normal;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:color-mix(in srgb,var(--red) 14%,var(--card));color:var(--red);font-size:10px;font-weight:900;line-height:16px;text-align:center}
+.px9seg button.on i{background:#fff;color:var(--blu)}
+.px9 .px9g{margin:12px 6px 7px}
+.px9 .c6l.px9l{background:none;box-shadow:none;overflow:visible;border-radius:0;display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.px9 .px9l>.c6r{border-radius:18px;background:var(--card);box-shadow:var(--lift),inset 0 0 0 1px var(--hair);min-height:64px;animation:px9In .32s cubic-bezier(.2,.9,.25,1) both;animation-delay:calc(var(--r,0)*28ms)}
+.px9 .px9l>.c6r::after,.px9 .px9l>.c6r::before{display:none}
+.px9 .px9l>.c6r .c6a{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--blu) 10%,var(--card));color:var(--blu);font-weight:900;font-size:16px}
+.px9 .px9l>.c6r .c6a.m{background:var(--seg);color:var(--mut)}
+.px9 .px9l>.c6r.px9n .c6a{background:var(--blu);color:#fff}.px9 .px9l>.c6r.px9n{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 45%,transparent)}
+.px9 .px9l>.c6r.bxrow .c6a{background:none}
+.px9e{display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 10px;text-align:center}.px9e svg{width:26px;height:26px;color:var(--ok)}
+@keyframes px9In{from{opacity:0;transform:translateY(8px)}}
+@media (prefers-reduced-motion:reduce){.px9 .px9l>.c6r{animation:none}.px9seg button{transition:none}}

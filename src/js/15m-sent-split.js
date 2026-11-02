@@ -35,7 +35,10 @@ ACT.sentSplit=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!s
   const sid=n=>{const s=sources.find(z=>z.name===n);return s?String(s.id):''};
   const L=F.map(o=>({id:o.r.id,amount:+o.q.it.amount||0,to:sid(o.q.it.src),src:o.q.it.src,st:o.q.it.st||'pending',lock:ssLock(o.q.it)}));
   SS={root:famRoot(x),name:fullName(x),R:L.reduce((a,l)=>a+l.amount,0),L,L0:L.map(l=>({...l}))};
-  if(L.length===1){const o=sources.find(z=>String(z.id)!==L[0].to);SS.L.push({nw:1,amount:0,to:o?String(o.id):'',st:'pending'})}
+  /* v69.7: از پنل «پرداخت از کجا؟» بانک انتخاب‌شده (d.to) می‌آید؛ اگر همان بانک بخشی دارد، همان بخش ویرایش می‌شود */
+  const ex=d.to!=null&&L.find(l=>l.to===String(d.to)&&!l.lock);
+  if(d.to!=null&&!ex)SS.L.push({nw:1,amount:0,to:String(d.to),st:'pending'});
+  else if(L.length===1){const o=sources.find(z=>String(z.id)!==L[0].to);SS.L.push({nw:1,amount:0,to:o?String(o.id):'',st:'pending'})}
   sheet(ssHTML());ssBind();setTimeout(()=>{const I=document.querySelector('#sheet .psc:last-child [data-sa]');if(I&&cur==='ent')I.focus()},360)};
 ACT.ssAdd=()=>{const used=new Set(SS.L.map(l=>String(l.to))),o=sources.find(z=>!used.has(String(z.id)));SS.L.push({nw:1,amount:0,to:o?String(o.id):'',st:'pending'});ssAuto(-1);ssRedraw();
   const c=document.querySelector('#sheet .psc:last-child');if(c){if(!RM()&&c.animate)c.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,.9,.25,1)'});const f=c.querySelector('[data-sa]');if(f)setTimeout(()=>f.focus(),60)}};

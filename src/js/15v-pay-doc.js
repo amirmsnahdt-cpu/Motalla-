@@ -144,34 +144,47 @@ ACT.pkFrom=d=>{closeSheet();entId=d.id;setTimeout(()=>{PX={step:1,q:'',sel:null,
 const pxWho=()=>PX.bz?clean(bz.d.name||''):fullName(entRow()||{});
 function pxOpen(bzMode){PX={step:1,q:'',sel:null,amount:0,tn:'',note:'',imgD:'',bz:!!bzMode,dir:1,more:{}};sheet(pxHTML());pxBind()}
 ACT.pyAdd=()=>pxOpen(false);
-const pxRow=(k,id,av,name,sub,v,cls)=>`<button type="button" class="px7o${cls?' '+cls:''}" data-act="pxPick" data-k="${k}" data-id="${esc(id)}"><span class="py7a${k==='bk'?' bk':''}${k==='mem'||k==='new'?' m':''}">${av}</span><span class="tx"><b>${name}</b><small>${sub}</small></span>${v?`<span class="px7v">${v}</span>`:''}</button>`;
 const cuSub=c=>[c.grp?esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری';
 let PXM=[];
-/* بانک‌های مغازه برای «بخشی از مبلغ از بانک دیگر» (بانک اصلی همین واریزی نمی‌آید) */
-function pxBkRows(q,g,out){if(PX.bz||!can('split'))return;const x=entRow(),F=x?famOf(x):[];
-  /* v69.6: واریزی ارسال‌شده — «بخشی از مبلغ از بانک دیگر» همان پنجره منابع (مبلغ دلخواه، بانک فعلی بقیه را دارد) */
-  if(x&&F.some(r=>r.sentBid)){const xr=validated().find(z=>z.id===famRoot(x));if(xr&&ssCan(xr)&&(!q||'بانک'.includes(q)||ownL().some(z=>bkHit(z,q)))){g('بانک‌های مغازه');out.push(`<button type="button" class="px7o" data-act="mvSentSplit" data-id="${xr.id}"><span class="py7a bk">${ic('split')}</span><span class="tx"><b>بخشی از مبلغ از بانک دیگر</b><small>بانک و مبلغ را انتخاب کنید؛ بقیه در بانک فعلی می‌ماند</small></span></button>`)}return}
-  if(!x||!(x.amount>0)||x.id!==famRoot(x))return;const L=pkL(x),main=L[0]?L[0].src:'';
-  const B=ownL().filter(s=>String(s.id)!==main&&(!q||bkHit(s,q)));if(!B.length)return;
-  g('بانک‌های مغازه · بخشی از مبلغ از این حساب',B.length);B.forEach(s=>{const b=acBank(s),has=L.find((l,i)=>i&&l.src===String(s.id));out.push(pxRow('bk',s.id,b?bankBadge(b):ic('bank'),esc(s.name),has?'الان '+fmt(has.amount)+' تومان از این حساب':esc(bkSub(s)),bkTag(s)))})}
-function pxList(){if(PX.only==='bk'){const out=[],q=nzName(toEn(clean(PX.q||'')));pxBkRows(q,(t,n)=>out.push(`<div class="px7g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`),out);return out.length?out.join(''):'<div class="px7e"><b>بانکی برای انتخاب نیست</b><small>این واریزی ارسال شده یا بانک دیگری تعریف نشده</small></div>'}
-  const q0=clean(PX.q||''),q=nzName(toEn(q0)),dOk=pDig(q0),me=PX.bz?String(bz.d.cuId||''):(e=>e&&e.wd?String(e.wd.cu):'')(entries.find(z=>String(z.id)===String(entId))),A=CU().filter(c=>String(c.id)!==me),out=[],g=(t,n)=>out.push(`<div class="px7g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`);
-  if(!q){const owe=A.map(c=>({c,b:cuBal(c)})).filter(o=>o.b.R<0).sort((a,b)=>a.b.R-b.b.R),seen=new Set(owe.map(o=>String(o.c.id)));
-    if(owe.length){g('طلب ما از این مشتری‌ها',owe.length);owe.forEach(o=>out.push(pxRow('cu',o.c.id,esc(userInit(cuName(o.c))),esc(cuName(o.c)),cuSub(o.c),cuBalMini(o.c))))}
-    const R=A.filter(c=>!seen.has(String(c.id))).sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,15);
-    if(R.length){g('آخرین حساب‌ها');R.forEach(c=>out.push(pxRow('cu',c.id,esc(userInit(cuName(c))),esc(cuName(c)),cuSub(c),cuBalMini(c))))}}
-  else{const C=A.filter(c=>cuHit(c,q,dOk)).sort((a,b)=>(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||'')));
-    if(C.length){g('حساب‌های مشتری',C.length);C.slice(0,60).forEach(c=>out.push(pxRow('cu',c.id,esc(userInit(cuName(c))),esc(cuName(c)),cuSub(c),cuBalMini(c))))}
-    PXM=memPeople(q,dOk,8);if(PXM.length){g('از واریزی‌ها و خریدها · حساب مشتری باز نمی‌شود');PXM.forEach((p,i)=>out.push(pxRow('mem',i,esc(userInit(p.name)),esc(p.name),[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'بدون حساب')))}
-    if(!/^\d+$/.test(toEn(q0))&&!C.some(c=>nzName(c.name)===q))out.push(pxRow('new','',ic('plus'),'پرداخت‌کننده: «'+esc(q0)+'»','حساب مشتری باز نمی‌شود؛ فقط سند تسویه ثبت می‌شود','','nw'))}
-  /* v67.3: با جستجو، بانک‌های مغازه بالای فهرست (قبلاً آخر بودند و «حساب تازه» با نام بانک ساخته می‌شد) */
-  if(q){const B=[];pxBkRows(q,(t,n)=>B.push(`<div class="px7g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`),B);out.unshift(...B)}else pxBkRows(q,g,out);
-  return out.length?out.join(''):`<div class="px7e"><b>«${esc(q0)}» پیدا نشد</b><small>نام را کامل‌تر بنویسید یا با شماره تلفن جستجو کنید</small></div>`}
+/* v69.7 (خواسته صاحب اپ): پنل «پرداخت از کجا؟» دو بخش جدا با دکمه بالا سمت چپ — «مشتری»: فقط حساب‌هایی که از آن‌ها طلبکاریم
+   (با جستجو، حساب‌های دیگر و نام تازه هم جدا زیرش)، «بانک»: حساب‌های بانک مغازه. هر حساب یک کارت جدا مثل صفحه حساب مشتریان.
+   جستجو: همه کلمه‌ها (به هر ترتیب) در نام، تلفن، گروه یا عنوان؛ یا ۳ رقم به بالا از تلفن/کد ملی؛ ی/ک عربی و فاصله‌ها یکسان. */
+const pxMe=()=>PX.bz?String(bz.d.cuId||''):(e=>e&&e.wd?String(e.wd.cu):'')(entries.find(z=>String(z.id)===String(entId)));
+const pxOwe=()=>{const me=pxMe();return CU().filter(c=>String(c.id)!==me).map(c=>({c,b:cuBal(c)})).filter(o=>o.b.R<0).sort((a,b)=>a.b.R-b.b.R)};
+function pxTab(){if(PX.only==='bk')return 'bk';if(PX.tab)return PX.tab;return 'cu'}
+ACT.pxTab=d=>{pxRead();if(PX.tab===d.t)return;PX.tab=d.t;PX.q='';const W=$('sheet').querySelector('.px9');if(W){W.querySelectorAll('.px9seg button').forEach(b=>{const on=b.dataset.t===d.t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});const Q=$('pxQ');if(Q){Q.value='';Q.placeholder=d.t==='bk'?'جستجوی بانک مغازه…':'نام، تلفن یا گروه مشتری…'}const L=$('pxL');if(L){L.innerHTML=pxList();L.scrollTop=0;if(!RM()&&L.animate)L.animate([{opacity:0,transform:`translateX(${d.t==='bk'?18:-18}px)`},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.9,.25,1)'})}}else pxRe(0)};
+const pxTok=q=>nzName(toEn(clean(q||''))).split(/\s+/).filter(Boolean);
+const pxHitC=(c,T,dOk)=>{if(!T.length)return true;const h=nzName(toEn(cuHay(c)));return T.every(t=>h.includes(t))||dOk(cuHay(c))};
+function pxCuCard(c,b,ri){cbLst=1;const bp=cuZero(b)?cuZTag():balPills(b,0,0);cbLst=0;const nT=(b.G?1:0)+(b.R?1:0)+Object.keys(b.X||{}).filter(k=>b.X[k]).length;
+  return `<button type="button" class="c6r px7o px9c${nT<=1?' one':''}" data-act="pxPick" data-k="cu" data-id="${esc(c.id)}" style="--r:${Math.min(ri,8)}"><span class="c6a">${esc(userInit(cuName(c)))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'',c.grp?'<em>'+esc(c.grp)+'</em>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span>${cuZero(b)?bp:`<span class="c6v c6vb" style="--r:${Math.min(ri,8)};--n:${nT}">${bp}</span>`}</button>`}
+const pxGh=(t,n)=>`<div class="c6gh px9g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`;
+function pxCuList(){const q0=clean(PX.q||''),T=pxTok(q0),dOk=pDig(q0),me=pxMe(),O=pxOwe().filter(o=>pxHitC(o.c,T,dOk)),out=[];
+  if(O.length)out.push(pxGh(T.length?'طلب ما · نتیجه جستجو':'طلب ما از این مشتری‌ها',O.length),`<div class="c6l px9l">${O.map((o,i)=>pxCuCard(o.c,o.b,i)).join('')}</div>`);
+  else if(!T.length)out.push(`<div class="px7e px9e">${ic('check')}<b>از هیچ مشتری‌ای طلب نداریم</b><small>برای مشتری دیگر یا نام تازه، نامش را جستجو کنید</small></div>`);
+  if(T.length||dOk('')){const seen=new Set(O.map(o=>String(o.c.id))),C=CU().filter(c=>String(c.id)!==me&&!seen.has(String(c.id))&&pxHitC(c,T,dOk)).sort((a,b)=>(nzName(b.name).startsWith(T[0]||'#')-nzName(a.name).startsWith(T[0]||'#'))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,30);
+    if(C.length)out.push(pxGh('حساب‌های دیگر · طلبی از آن‌ها نداریم',C.length),`<div class="c6l px9l">${C.map((c,i)=>pxCuCard(c,cuBal(c),i)).join('')}</div>`);
+    PXM=memPeople(T.join(' '),dOk,6);if(PXM.length)out.push(pxGh('از واریزی‌ها و خریدها · بدون حساب'),`<div class="c6l px9l">${PXM.map((p,i)=>`<button type="button" class="c6r px7o px9c one" data-act="pxPick" data-k="mem" data-id="${i}"><span class="c6a m">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'بدون حساب'}</small></span></button>`).join('')}</div>`);
+    if(T.length&&!/^\d+$/.test(toEn(q0))&&![...O.map(o=>o.c),...C].some(c=>nzName(c.name)===T.join(' ')))out.push(`<div class="c6l px9l"><button type="button" class="c6r px7o px9c one px9n" data-act="pxPick" data-k="new" data-id=""><span class="c6a">${ic('plus')}</span><span class="tx"><b>پرداخت‌کننده تازه: «${esc(q0)}»</b><small>بدون باز کردن حساب؛ فقط سند تسویه ثبت می‌شود</small></span></button></div>`)}
+  return out.join('')}
+function pxBkList(){const x=entRow(),q0=clean(PX.q||''),q=nzName(toEn(q0)),out=[];if(!x)return '';const F=famOf(x),sent=F.some(r=>r.sentBid);
+  if(PX.bz||!can('split'))return `<div class="px7e px9e">${ic('bank')}<b>اینجا بانکی برای انتخاب نیست</b></div>`;
+  const xr=validated().find(z=>z.id===famRoot(x))||x;if(xr.id!==famRoot(x)||!(xr.amount>0))return `<div class="px7e px9e">${ic('bank')}<b>بانک را از واریزی اصلی عوض کنید</b></div>`;
+  if(sent&&!ssCan(xr))return F.some(r=>!r.sentBid)?`<div class="px7e px9e">${ic('bank')}<b>بخشی هنوز ثبت واریز نشده</b><small>اول ردیف‌های بانکی «آماده ارسال» را با کشیدن به چپ ثبت واریز کنید، بعد بانک یا مبلغ را عوض کنید</small></div>`:`<div class="px7e px9e">${ic('check')}<b>بخش‌های بانکی تأیید شده یا رسید دارند</b><small>بانک یا مبلغ قفل است</small></div>`;
+  const L=pkL(xr),main=sent?'':(L[0]?L[0].src:''),B=ownL().filter(s=>String(s.id)!==main&&(!q||bkHit(s,q0)));
+  if(!B.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانک دیگری در مغازه تعریف نشده'}</b></div>`;
+  out.push(pxGh(sent?'بخشی از مبلغ به این بانک · بقیه در بانک فعلی':'بانک‌های مغازه · بخشی یا همه مبلغ',B.length));
+  out.push(`<div class="c6l bxlist px9l">${B.map((s,ri)=>{const bk=acBank(s),m=acSum(s),has=!sent&&L.find((l,i)=>i&&l.src===String(s.id)),sub=has?'الان '+fmt(has.amount)+' تومان از این حساب':(bk&&!canon(s.name).includes(canon(bk))?'بانک '+bk:'حساب مغازه');
+    return `<button type="button" class="c6r bxrow px7o px9c" data-act="${sent?'pxSentBk':'pxPick'}" data-k="bk" data-id="${s.id}" style="--r:${Math.min(ri,8)}"><span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):esc(userInit(s.name))}</span><span class="tx"><b>${esc(s.name)}</b><small>${esc(sub)}</small></span><span class="bxv"><small>مانده نهایی</small>${bxV(m)}</span></button>`}).join('')}</div>`);
+  return out.join('')}
+function pxList(){return pxTab()==='bk'?pxBkList():pxCuList()}
+/* واریزی ارسال‌شده: بانک انتخاب‌شده در پنجره منابع با مبلغ خالی می‌آید (بقیه در بانک فعلی) */
+ACT.pxSentBk=d=>{const x=entRow();if(!x)return;const id=famRoot(x);PX=null;closeSheet();setTimeout(()=>ACT.sentSplit({id,to:d.id}),80)};
 function pxSel(){const s=PX.sel;if(!s)return null;if(s.k==='bk'){const z=sources.find(o=>String(o.id)===String(s.id));if(!z)return null;const bk=acBank(z);return {bk:z,name:z.name,av:bk?bankBadge(bk,'lg'):ic('bank'),sub:bkSub(z),bal:'',R:0}}if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return null;const R=cuBal(c).R;return {c,name:cuName(c),sub:cuSub(c),bal:R?`<b class="${R<0?'r':'b'}">${R<0?'طلب ما':'بدهی ما'} ${fmt(Math.abs(R))} تومان</b>`:'<b>حساب تسویه است</b>',R}}return {c:null,name:s.name,sub:'پرداخت‌کننده تسویه · حساب مشتری باز نمی‌شود',bal:'',R:0}}
 function pxHTML(){const rest=pxRest(),who0=pxWho();
-  if(PX.step===1)return `<div class="px7w s1"><div class="sh-h"><div><b>پرداخت از کجا؟</b><small class="shsub">مانده بانکی «${esc(who0)}»: ${fmt(rest)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="px7q"><div class="fsearch">${ic('search')}<input id="pxQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(PX.q)}" placeholder="نام، تلفن یا گروه مشتری، یا بانک…" aria-label="جستجوی پرداخت‌کننده" aria-controls="pxL"></div></div>
-  <div class="px7l" id="pxL" role="listbox">${pxList()}</div></div>`;
+  if(PX.step===1){const tb=pxTab(),seg=PX.only==='bk'||PX.bz||!can('split')?'':`<div class="px9seg" role="tablist"><button type="button" role="tab" class="${tb==='cu'?'on':''}" aria-selected="${tb==='cu'}" data-act="pxTab" data-t="cu">${ic('users')}<span>مشتری</span>${(n=>n?`<i>${toFa(n)}</i>`:'')(pxOwe().length)}</button><button type="button" role="tab" class="${tb==='bk'?'on':''}" aria-selected="${tb==='bk'}" data-act="pxTab" data-t="bk">${ic('bank')}<span>بانک</span></button></div>`;
+    return `<div class="px7w s1 px9"><div class="sh-h px9h"><div><b>پرداخت از کجا؟</b><small class="shsub">مانده بانکی «${esc(who0)}»: ${fmt(rest)} تومان</small></div>${seg}<button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="px7q"><div class="fsearch">${ic('search')}<input id="pxQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(PX.q)}" placeholder="${tb==='bk'?'جستجوی بانک مغازه…':'نام، تلفن یا گروه مشتری…'}" aria-label="جستجو" aria-controls="pxL"></div></div>
+  <div class="px7l" id="pxL" role="listbox">${pxList()}</div></div>`}
   /* v66.0 (خواسته صاحب اپ: «فیلدها دونه‌دونه، خودکار پر بشه و بعد مبلغ»): مسیر «از → به» خودکار پر است، بعد یک عدد بزرگ با دکمه‌های
      آماده، و فیلدهای اختیاری فقط وقتی لازم است با یک لمس باز می‌شوند */
   const S=pxSel()||{name:'',sub:'',bal:'',R:0},bkm=PX.sel&&PX.sel.k==='bk',owe=S.R<0?Math.min(rest,-S.R):0,a=+PX.amount||0,M=PX.more||{},x=entRow(),L0=bkm&&x?pkL(x)[0]:null;
