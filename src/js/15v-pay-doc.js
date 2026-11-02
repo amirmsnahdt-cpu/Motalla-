@@ -32,7 +32,8 @@ const cuOf=(o,why)=>cuFindBy(o)||cuMakeBy(o,why);
 function docMake(c,set){const S0=sv;let R=null;try{sv=svBlank(c.id);sv.rate=0;sv.mz=0;set(sv);R=svCommit()}finally{sv=S0}return R}
 const depDoc=e=>{if(!e||!e.wd)return null;const c=custs.find(z=>!z.del&&String(z.id)===String(e.wd.cu)),t=c&&(c.txs||[]).find(t=>!t.del&&t.type==='inv'&&String(t.no)===String(e.wd.no));return t?{c,t}:null};
 /* سند خرید فروشنده برای یک واریزی (e باید در entries باشد) */
-function depDocMake(e,c){const R=docMake(c,s=>{s.dk='buy';s.date=e.entryDate||todayISO();s.xr=depXr(e)});R.t.auto='dep';R.t.entId=e.id;
+/* v71.0: سند خرید همان شماره سیستمی خرید (e.sno) را می‌گیرد تا هر خرید یک شماره داشته باشد (اگر آن شماره قبلاً سند دیگری است، شماره بعدی) */
+function depDocMake(e,c){const R=docMake(c,s=>{s.dk='buy';s.date=e.entryDate||todayISO();s.xr=depXr(e);if(+e.sno)s.no0=+e.sno});R.t.auto='dep';R.t.entId=e.id;
   e.wd={cu:c.id,no:R.t.no,amt:+e.amount||0,w:String(e.weight||'')};e.cuId=c.id;saveCu();saveE();return R}
 /* بعد از ویرایش مبلغ/وزن واریزی: سند خودکارش با همان شماره دوباره ساخته می‌شود (ردیف‌های پرداخت می‌مانند) */
 function depDocFix(e){const D=depDoc(e);if(!D||D.t.auto!=='dep'||String(D.t.entId)!==String(e.id))return;if(+e.wd.amt===+e.amount&&String(e.wd.w||'')===String(e.weight||''))return;

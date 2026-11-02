@@ -419,7 +419,8 @@ const bzSum2=()=>{const I=(bz.d.items||[]).filter(x=>+x.amt);if(!I.length)return
 /* v69.11: ردیف یک‌خطی فرم (همان سبک «مشخصات مشتری»)؛ o.ok = دکمه کوچک «تایید» داخل ردیف نام */
 const f6Row=(id,lab,val,o={})=>`<div class="f6r${o.ac?' ac':''}"><label for="${id}">${lab}</label><div class="f6i"><input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(val||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="${o.last?'done':'next'}"${o.ac?` aria-autocomplete="list" aria-controls="${id}s"`:''}>${o.ok?`<button type="button" class="f6ok" data-act="bzNext" aria-label="تایید و مرحله بعد">${ic('check')}</button>`:o.ac?`<span class="f6ic">${ic('search')}</span>`:''}</div>${o.ac?`<div class="f6sug bzsug hide" id="${id}s" role="listbox"></div>`:''}${o.hint?`<small class="eh" id="${id}v"></small>`:''}</div>`;
 /* v69.11 (خواسته صاحب اپ): شماره سیستمی هر واریزی خرید — یکی بیشتر از بزرگ‌ترین شماره ثبت‌شده (سطل بازیافت هم حساب است تا تکرار نشود) */
-const snoNext=()=>Math.max(1000,...entries.map(e=>+e.sno||0),...trash.map(e=>+e.sno||0),...entries.flatMap(e=>(e.buys||[]).map(b=>+b.sno||0)))+1;
+/* v71.0: شماره سیستمی خرید در ادامه همان شماره فاکتورها و سندها (docNoMax در 15d-sales)، نه شمارنده جدا */
+const snoNext=()=>invNext();
 const aBuy=()=>'';/* v69.12: دکمه پایین برداشته شد؛ تأیید بالا سمت چپ است */
 function bindBuy(){const st=bz.step,hint=(id,t,c)=>{const o=$(id+'v');if(o){o.textContent=t;o.className='eh'+(c?' '+c:'')}};
   const ids={1:['bzN','bzP','bzM','bzC'],2:[],3:['bzI','bzK','bzH']}[st];

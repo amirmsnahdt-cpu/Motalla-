@@ -3069,3 +3069,10 @@ html.tt1:not(.locked) body{overflow:visible;height:calc(100% + 1px)}
 .bzsug:not(.dkl){max-height:min(392px,56dvh);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .bzsug:not(.dkl) .bzsr.nw{position:sticky;bottom:0;z-index:1;background:var(--card);box-shadow:0 -1px 0 var(--hair)}
 .bzsug:not(.dkl) .cblh{position:sticky;top:0;z-index:1;background:var(--card)}
+/* v71.0: کارت «اصلاح حساب» زدنی (ویرایش/حذف)، دکمه حذف قرمز زیر فرم، جزئیات سند واریز/برداشت دستی بانک */
+button.bxmk{width:100%;border:0;font:inherit;text-align:right;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lnk.acfxd{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;margin:10px 0 2px;padding:10px;color:var(--red);font-size:14px}
+.lnk.acfxd .i{width:16px;height:16px;vertical-align:-3px}.lnk.acfxd small{font-size:11px;font-weight:600;color:var(--mut)}
+.lgdl{margin:12px 0;padding:4px 14px}
+.lgdr{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--hair)}.lgdr:last-child{border-bottom:0}
+.lgdr small{flex:none;font-size:12px;font-weight:700;color:var(--mut)}.lgdr b{font-size:14px;font-weight:800;text-align:left;overflow-wrap:anywhere}

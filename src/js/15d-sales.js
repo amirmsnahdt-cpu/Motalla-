@@ -55,7 +55,12 @@ let sv=null,svAdd=-1;
 /* مظنه (هر مثقال ۷۰۵) = نرخ هر گرم ۱۸ عیار × ۴٫۳۳۱۸ */
 const MZK=4.3318,mzOf=r=>Math.round((+r||0)*MZK),rOfMz=m=>Math.round((+m||0)/MZK);
 const PM={off:{t:'تخفیف',i:'tag'},prev:{t:'مانده قبلی',i:'clock'},dep:{t:'حواله به فروشنده واریزی',i:'swap'},cash:{t:'نقد',i:'cash'},pos:{t:'کارتخوان',i:'card'},hav:{t:'حواله',i:'bank'},cust:{t:'حساب مشتری',i:'swap'},nm:{t:'حواله دستی',i:'swap'},gold:{t:'طلای مشتری',i:'coin'},disc:{t:'تخفیف',i:'tag'},wd:{t:'واریز بانکی',i:'bank'}};
-function invNext(){let m=1000;for(const c of custs)for(const t of c.txs||[])if(t.type==='inv'&&+t.no>m)m=+t.no;return m+1}
+/* v71.0 (خواسته صاحب اپ): یک شمارنده برای همه — فاکتور فروش، سند خرید، شماره سیستمی خرید دستی (sno) و سند واریز/برداشت دستی بانک؛
+   شماره بعدی = بزرگ‌ترین شماره صادرشده در هر کدام + ۱ (شماره‌های قبلی دست نمی‌خورند) */
+function docNoMax(){let m=1000;const up=v=>{v=+v||0;if(v>m)m=v};for(const c of custs)for(const t of c.txs||[])if(t.type==='inv')up(t.no);
+  for(const z of sources)for(const x of z.led||[])up(x.no);for(const e of entries){up(e.sno);for(const b of e.buys||[])up(b.sno)}for(const e of trash||[])up(e.sno);return m}
+function invNext(){return docNoMax()+1}
+const invNoUsed=n=>custs.some(c=>(c.txs||[]).some(t=>t.type==='inv'&&!t.del&&String(t.no)===String(n)));
 const svKeep=()=>ls.set('m_svd',sv);
 function svBlank(cu){const r=+ls.get('m_rate',0)||0;return{v:2,cuId:cu||'',date:todayISO(),rate:r,mz:+ls.get('m_mz',0)||mzOf(r),items:[],xr:[],tax:!!ls.get('m_tax',false),disc:0,pays:[],gconv:false,q:'',live:1}}
 const svFix=()=>{if(sv.gconv)sv.gconv=false;/* v60.9: «مانده ریالی طلایی ثبت شود» فعلاً برداشته شده */if(!sv.xr)sv.xr=[];if(!sv.items)sv.items=[];if(!sv.pays)sv.pays=[];if(sv.mz==null)sv.mz=mzOf(sv.rate);if(!sv.qa)sv.qa=qaBlank();
@@ -566,7 +571,7 @@ function svErr(){const c=svCu();if(!c)return 'مشتری سند انتخاب ن�
 function svCommit(){const c=svCu();let depOld=null;
   /* v61.7: ویرایش سند ثبت‌شده: نسخه قبلی (و ردیف‌های مرتبطش) کنار می‌رود و همین سند با همان شماره دوباره ثبت می‌شود */
   let OLD=null;if(sv.edit){const t0=(c.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)&&!x.del);if(t0){OLD=t0;const at=new Date().toISOString();t0.del=true;t0.delAt=at;t0.delBy=who();t0.edBy=1;txLinked(c,t0).forEach(x=>{x.t.del=true;x.t.delAt=at;x.t.delBy=who()});depOld=depKeep(t0);invDepOff(t0)}}
-  const T=svTot(),now=ns(),no=sv.edit?sv.edit.no:invNext(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}});
+  const T=svTot(),now=ns(),no=sv.edit?sv.edit.no:sv.no0&&!invNoUsed(sv.no0)?sv.no0:invNext(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}});
   const xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e}});
   const t={id:nid++,type:'inv',dk:sv.dk||undefined,no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>{const q={...p};delete q.xfId;return q}),at:now,by:who()};if(OLD){t.edOf=OLD.id;t.at0=OLD.at0||OLD.at}
   if(T.ge)t.ge=T.ge;if(Object.keys(T.xe).length)t.xe=T.xe;
