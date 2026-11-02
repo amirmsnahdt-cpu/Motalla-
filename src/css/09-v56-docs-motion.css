@@ -3059,3 +3059,7 @@ button.sssbtn.un svg{color:var(--mut)}
 html.tt1:not(.locked){overflow-y:auto;scrollbar-width:none}
 html.tt1:not(.locked)::-webkit-scrollbar{display:none}
 html.tt1:not(.locked) body{overflow:visible;height:calc(100% + 1px)}
+/* v70.5: لمس سرتیتر کارت منبع — خاکستری لمس کل ردیف سرتیتر را (با «⋯») تا لبه‌های گرد کارت می‌گیرد؛ نگه داشتن انگشت متن را انتخاب نمی‌کند (ذره‌بین آیفون) */
+.ldm:active{background:none}
+.ldh{transition:background-color .18s ease;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ldh:has(.ldm:active){background:var(--hair);transition-duration:0s}

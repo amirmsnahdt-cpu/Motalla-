@@ -7,7 +7,9 @@ const PRESS_SEL='button,[data-act],a[href],.opt,.lrow,.tcard,label.chk';
   let cur=null,x0=0,y0=0,t0=0;
   const RMq=matchMedia('(prefers-reduced-motion: reduce)');
   const target=e=>{const el=e.target&&e.target.closest&&e.target.closest(PRESS_SEL);if(!el||el.disabled||el.getAttribute('aria-disabled')==='true')return null;
-    return el.matches('input,textarea,select')?null:el};
+    if(el.matches('input,textarea,select'))return null;
+    /* v70.5 (خواسته صاحب اپ): سرتیتر کارت‌های بازشو (منبع‌های لیست واریز) = کل کارت با هم فرو می‌رود، نه فقط تکه‌ای از آن */
+    return el.matches('.ldm')&&el.closest('.ldg')||el};
   const depth=el=>{const r=el.getBoundingClientRect(),w=r.width,h=r.height;if(!w||!h)return 1;
     if(w>=300||h>=110)return .985;if(w>=200)return .975;if(w>=110)return .96;return .9};
   const down=el=>{const s=depth(el);el._pa&&el._pa.cancel();
