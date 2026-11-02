@@ -3089,3 +3089,9 @@ button.bxmk{width:100%;border:0;font:inherit;text-align:right;cursor:pointer;-we
 .sthk.two .stht b{font-size:15px;font-weight:900;color:var(--blu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stw .sthk.two~.sthx{margin-inline-start:0}
 @media (max-width:380px){.stw .sthb span{display:none}.stw .sthb{padding:0 9px}}
+/* v71.4: فهرست «بدهکاریم» در پنجره تسویه خودش اسکرول می‌خورد (قد محدود، عنوان بخش‌ها چسبان)؛ دکمه‌های پایین پنجره همیشه در دسترس.
+   سافاری آیفون: فاصله پایین پنجره به اندازه نوار شناور مرورگر */
+#sheet .stsug.ckl{max-height:min(430px,52dvh);overflow-y:auto;overscroll-behavior-y:auto;-webkit-overflow-scrolling:touch;animation:none}
+#sheet .stsug.ckl .stsh{position:sticky;top:0;z-index:1}
+html.iosbr #sheet{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;scroll-padding-bottom:96px}
+html.iosbr #sheet .px7l{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}

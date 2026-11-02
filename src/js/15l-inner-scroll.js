@@ -6,3 +6,6 @@ function inScr(t,stop){for(let el=t&&t.nodeType===1?t:t&&t.parentElement;el&&el!
   if(el.classList.contains('dkl')){if(el.scrollTop>0)return el;continue}if(el.scrollHeight>el.clientHeight+1){const o=getComputedStyle(el).overflowY;if(o==='auto'||o==='scroll')return el}}return null}
 /* v61.59 (خواسته صاحب اپ): کشیدن به پایین روی فهرست کالا وقتی بالای خودش است کل صفحه را پایین می‌آورد (نه فقط فهرست)؛
    چرخنده و تازه‌سازی جداگانه فهرست برداشته شد */
+/* v71.4 (خواسته صاحب اپ: «پنجره اسکرول نمی‌شود»): در سافاری آیفون (نه اپ نصب‌شده) نوار شناور پایین مرورگر روی پایین پنجره‌ها
+   می‌افتد و آخر فهرست زیرش پنهان می‌ماند؛ کلاس iosbr فاصله پایین پنجره‌ها را به اندازه همان نوار بیشتر می‌کند */
+(()=>{const u=navigator.userAgent||'',ios=/iPhone|iPad|iPod/.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(ios&&navigator.standalone!==true&&!window.AndroidBridge)document.documentElement.classList.add('iosbr')})();

@@ -180,7 +180,9 @@ function stLens(k0){const w=document.querySelector('#qa .stps'),o=w&&w.querySele
   Object.assign(z.style,B);const an=z.animate([{...A,offset:0},{...mid,offset:.45},{...B,offset:1}],{duration:520,easing:STE});
   const end=()=>{z.remove();w.classList.remove('lensing');o.animate([{transform:'scale(1.04)'},{transform:'none'}],{duration:280,easing:STE})};an.onfinish=end;an.oncancel=()=>{z.remove();w.classList.remove('lensing')}}
 function stFinish(){const K=stKind();if(K==='pv'){ACT.pvSave();return}if(K==='it'||K==='ab')ACT.qaAdd();else if(K==='xr')ACT.xrSave();else if(K==='py')ACT.pySave()}
-const stOk=s=>s.need&&s.need()?false:s.wOr?true:s.opt||s.type==='int'||(s.type==='wam'?(+sv.qa.x.w||+sv.qa.x.am):s.type==='text'?s.get():+s.get());
+/* v71.4 رفع باگ («تأیید پنجره را نمی‌بندد»): انتخاب از فهرست (pick) با هر شناسه‌ای درست است؛ قبلاً با +get بررسی می‌شد و
+   واریزی (شناسه «d…») عدد نبود → تأیید هر بار به پله «حواله به» برمی‌گشت */
+const stOk=s=>s.need&&s.need()?false:s.wOr?true:s.opt||s.type==='int'||(s.type==='wam'?(+sv.qa.x.w||+sv.qa.x.am):s.type==='text'?s.get():s.type==='pick'?(v=>v!==''&&v!=null&&v!=='dundefined')(s.get()):+s.get());
 ACT.stNext=()=>{stRead();const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1),s=S[i];
   if(!stOk(s)){toast(s.msg||s.lab+' را بزنید',true);const I=$('stI');if(I)I.focus();return}
   if(s.type==='int')s.set(+s.get()||750);
