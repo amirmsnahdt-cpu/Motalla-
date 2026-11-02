@@ -117,7 +117,7 @@ function dkShow(){const B=document.querySelector('.dkbox');if(!B)return;dkOpen=t
 /* v61.59 (خواسته صاحب اپ): وقتی فهرست باز است، زدن روی جستجو = کیبورد؛ وقتی بسته است، زدن = فقط باز شدن فهرست (بدون کیبورد).
    readonly یعنی «فهرست بسته»: لمس فوکوس نمی‌دهد و open() اجرا می‌شود؛ بعد از باز شدن، زدن بعدی فوکوس عادی = کیبورد */
 function kb2(el,isOpen,open){if(!el||el._kb2)return;el._kb2=1;const sync=()=>{el.readOnly=!isOpen()};sync();let x0=0,y0=0;
-  el.addEventListener('touchstart',e=>{if(el.readOnly)e.preventDefault()},{passive:false});
+  /* v70.2: touchstart دیگر جلوگیری نمی‌شود — شروع کشیدن روی این فیلد صفحه را اسکرول نمی‌کرد (آیفون). readonly خودش کیبورد را باز نمی‌کند */
   el.addEventListener('mousedown',e=>{if(el.readOnly)e.preventDefault()});
   el.addEventListener('pointerdown',e=>{x0=e.clientX;y0=e.clientY});
   el.addEventListener('pointerup',e=>{if(!el.readOnly||Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10)return;open();el.readOnly=false});

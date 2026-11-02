@@ -31,7 +31,7 @@ function vEnt(){const x=entRow();if(!x){setTimeout(()=>{if(cur==='ent')go('home'
     return `<div class="erem"><small>مبلغ واریز بانکی</small><b><span>${fmt(x.amount)}</span><i>تومان</i></b><em>${pd}</em></div>`})()}<span class="est ${st}">${st==='bad'?'خطادار':t?t[0]:'ثبت شده'}</span></div>
   ${st==='bad'&&x.issues&&x.issues.length?`<div class="msg bad">${esc(x.issues.join('، '))}</div>`:''}${entDocLink(x)}${mgPeerHTML(x)}
   <div class="kvh">حساب بانکی</div><div class="kvs">${rows}</div><div class="kvh">مبلغ</div><div class="kvs">${rows2}</div><div class="kvh">سایر</div><div class="kvs">${rows3}</div>${mgBuysHTML(x)||entItems(x)}${entPay(x)||entTrack(x)}
-  <div class="esec enote"><b>یادداشت</b><textarea id="enote" rows="2" placeholder="یادداشت برای این واریزی…"${can('edit')?'':' disabled'}>${esc(eD&&eD.note!=null?eD.note:(x.note||''))}</textarea></div>${can('del')?`<button class="edel" data-act="entDel" data-id="${x.id}">${ic('trash')} حذف این واریزی</button>`:''}`}
+  <div class="esec enote"><b>یادداشت</b><textarea id="enote" rows="2" placeholder="یادداشت برای این واریزی…"${can('edit')?'':' disabled'}>${esc(eD&&eD.note!=null?eD.note:(x.note||''))}</textarea></div>`}
 /* ---- اقلام خرید در جزئیات ---- */
 function entItems(x){const I=(x.items||[]).filter(z=>z.amt);if(!I.length||(I.length===1&&I[0].k==='طلا'&&!I[0].t&&!I[0].r))return '';const tot=I.reduce((s,z)=>s+(+z.amt||0),0),gw=I.filter(z=>z.k==='طلا').reduce((s,z)=>s+(parseFloat(z.q)||0),0),ga=I.filter(z=>z.k==='طلا').reduce((s,z)=>s+(+z.amt||0),0),pg=ppgOf(ga,gw);
   const icn={'طلا':'◆','سکه':'●','دلار':'$','یورو':'€'};
@@ -103,7 +103,7 @@ async function entCommit(){const x=entRow();if(!x||!eD)return;const e=entries.fi
 /* v70.1 (خواسته صاحب اپ): دکمه‌های جزئیات (کپی، ویرایش، ذخیره، انصراف) از پایین به سرتیتر بالا سمت چپ رفتند؛ پایین خالی است */
 const aEnt=()=>'';
 function entHdBtns(){const x=entRow();if(!x)return '';const b=(act,ico,t,cls,id)=>`<button type="button" class="hpb ${cls||''}" data-act="${act}"${id!=null?` data-id="${id}"`:''} aria-label="${t}">${ic(ico)}<span>${t}</span></button>`;
-  const k=entEdit?'e':eDirty()?'d':'v',h=k==='e'?b('entEditOff','x','انصراف','g')+b('entSave','check','ذخیره','ok'):k==='d'?b('entDraftOff','x','انصراف','g')+b('entCommit','check','ثبت','ok'):b('cpEnt','copy','کپی','g',x.id)+b('entEditOn','edit','ویرایش','p');
+  const k=entEdit?'e':eDirty()?'d':'v',h=k==='e'?b('entEditOff','x','انصراف','g')+b('entSave','check','ذخیره','ok'):k==='d'?b('entDraftOff','x','انصراف','g')+b('entCommit','check','ثبت','ok'):(can('del')?b('entDel','trash','حذف واریزی','g r',x.id):'')+b('cpEnt','copy','کپی','g',x.id)+b('entEditOn','edit','ویرایش','p');
   return `<span class="hbtns hpbs" data-k="${k}">${h}</span>`}
 let eeTitle='';
 function vEntEdit(x){const e=entries.find(y=>y.id===x.id)||x;eeTitle=e.title||'';

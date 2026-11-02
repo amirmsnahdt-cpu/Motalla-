@@ -30,7 +30,8 @@ ACT.entEditGo=d=>{ACT.openEnt(d);ACT.entEditOn()};
 ACT.fPay=d=>{fPay=d.iso;updPay()};
 ACT.fPayPick=()=>openCal(fPay||payDef(),iso=>ACT.fPay({iso}));
 ACT.openEnt=d=>{entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday','cust','inv','bank'].includes(cur)?cur:cur==='sell'&&custId?'cust':'home';go('ent')};
-ACT.entDel=d=>{navBack=true;go(PARENT.ent||'home');delEntry(d.id)};
+/* v70.2: دکمه حذف حالا در سرتیتر است؛ برای جلوگیری از زدن اشتباهی، تأیید می‌خواهد (به سطل بازیابی می‌رود) */
+ACT.entDel=d=>{const x=entries.find(z=>String(z.id)===String(d.id));if(!x)return;askConfirm('واریزی «'+esc(fullName(x))+'» ('+fmt(x.amount)+' تومان) حذف شود؟ به سطل بازیابی می‌رود.','حذف',()=>{closeSheet();navBack=true;go(PARENT.ent||'home');delEntry(d.id)})};
 ACT.fF=d=>{fF=d.f;fN=120;render()};
 ACT.arcCal=()=>{const M=new Set();validated().forEach(r=>{M.add(PD(r));M.add(r.entryDate)});openCal(arcD||qDate(arcQ)||todayISO(),iso=>{arcD=iso;arcQ='';render();$('view').scrollTop=0},{title:'لیست‌های کدام روز؟',sub:'روزهای نقطه‌دار لیست دارند',q:[[-1,'دیروز'],[0,'امروز'],[1,'فردا']],marks:M})};
 ACT.arcClr=()=>{arcQ='';arcD='';arcN=120;render()};

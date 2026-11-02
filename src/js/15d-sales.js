@@ -142,8 +142,12 @@ function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
   return `<div class="bzsug cbl" role="listbox">${svBkRows(q0)}${L.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c))).join('')}
     ${cbRow('svCuNew',{},ic('plus'),add?'حساب تازه: «'+esc(q0)+'»':'افتتاح حساب تازه',(L.length?'':'مشتری‌ای پیدا نشد · ')+'اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
 let svQO=0;const cuAvI=c=>c&&c.av?`<img data-ik="${esc(c.av)}" alt="">`:esc(userInit(c?c.name:''));
-function svPick(id){svQO=0;sv.cuId=id;sv.q='';svKeep();if(cur!=='sell')go('sell');else{$('svCu').innerHTML=svCuHTML();svRe()}const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
-ACT.svCu=d=>svPick(d.id);
+/* v70.2 (خواسته صاحب اپ): سند تازه اول مشتری می‌خواهد؛ با انتخاب مشتری از فهرست، پنجره «مشخصات مشتری» باز می‌شود
+   (بستن = ذخیره خودکار) و بعد فهرست «تشخیص» برای ردیف اول باز می‌شود. حساب تازه: فرم مشخصات قبلاً پر شده، مستقیم «تشخیص». */
+function svPick(id,o){o=o||{};svQO=0;sv.cuId=id;sv.q='';svKeep();if(cur!=='sell')go('sell');else{$('svCu').innerHTML=svCuHTML();svRe()}
+  const dk=()=>{if(cur!=='sell'||!sv||!svCu()||svRows())return;const q=$('qa');if(q&&typeof qaRe==='function'&&!document.querySelector('.dkbox'))qaRe();setTimeout(()=>{if(typeof dkShow==='function')dkShow()},60)};
+  if(o.form&&can('debt')){setTimeout(()=>{if(cur!=='sell')return;sheetAfter=dk;ACT.cuEdit({id})},140)}else if(o.dk)setTimeout(dk,160);const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
+ACT.svCu=d=>svPick(d.id,{form:1});
 ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();$('svCu').innerHTML=svCuHTML();svBindCu();svQO=1;srchSwap('svCr',svCrHTML());phPaint($('svCr'));svRe()};
 ACT.svCuNew=()=>{cuRet='sell';sheet(cuFormHTML({name:clean(sv.q||'')}));cuBind();setTimeout(()=>{const n=$(sv.q?'cuP':'cuN');if(n)n.focus()},320)};
 ACT.svCal=()=>openCal(sv.date,iso=>{sv.date=iso;svKeep();closeSheet();render()});
@@ -184,7 +188,7 @@ function qaChips(){const a=sv.qa,q=nzName(toEn(a.q||''));if(!q)return '';
   return `<div class="bzsug cbl" role="listbox">${rows.join('')}</div>`}
 const numV=(v,dec)=>v===''||v==null||(!dec&&!+v)?'':dec?esc(v):Number(v).toLocaleString('en-US');
 const cell=(id,lab,val,o={})=>`<label class="d6c${o.cls?' '+o.cls:''}"><small>${lab}</small><input id="${id}" class="ltr" inputmode="${o.im||'decimal'}" value="${val}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="done"${o.ro?' readonly':''}></label>`;
-function qaHTML(){const a=sv.qa;if(a.pv)return stHTML();if(a.p&&a.p.m!=='disc'&&a.p.m!=='gold'||a.x||a.k)return stHTML();/* v61.6: همه ردیف‌ها پله‌به‌پله */if(a.p)return pyHTML();if(a.x)return xrHTML();
+function qaHTML(){const a=sv.qa;/* v70.2: تا مشتری انتخاب نشده، «تشخیص» بسته است (سند بدون مشتری ثبت نمی‌شود) */if(!svCu()&&!svRows()&&!a.pv&&!a.p&&!a.x&&!a.k)return `<div class="dkwait">${ic('user')}<span><b>اول مشتری سند را انتخاب کنید</b><small>بعد از انتخاب، فهرست «تشخیص» برای ردیف اول باز می‌شود</small></span></div>`;if(a.pv)return stHTML();if(a.p&&a.p.m!=='disc'&&a.p.m!=='gold'||a.x||a.k)return stHTML();/* v61.6: همه ردیف‌ها پله‌به‌پله */if(a.p)return pyHTML();if(a.x)return xrHTML();
   if(!a.k)return dkHTML();
   const ed=a.i!=null;
   if(a.ab)return `<div class="d6qh"><b><span class="d6ti gd">${ic('coin')}</span>${ed?'آبشده':'فروش › آبشده'}</b><button class="lnk" data-act="${ed?'qaX':'qaK'}" data-k="">${ed?'بستن':'تغییر'}</button></div>
@@ -534,9 +538,9 @@ ACT.rowPhV=d=>{if(!phT())return;GAL={k:'row'};zvOpen(+d.i||0)};
 /* عکس ردیف ثبت‌شده: فقط دیدن (data-ks = کلیدها با «,») */
 ACT.rowPhS=d=>{const K=String(d.ks||'').split(',').filter(Boolean);if(!K.length)return;GAL={k:'view',keys:K,name:d.n||'عکس کالا'};zvOpen(0)};
 function svBindRest(){phPaint($('svRows'));const G=$('svGc');if(G)G.onchange=()=>{sv.gconv=G.checked;svKeep();svRe()};const T=$('svT');if(T)T.onchange=()=>{sv.tax=T.checked;ls.set('m_tax',sv.tax);svKeep();svRe()}}
-function svBindCu(){const Q=$('svQ');if(!Q)return;svQO=0;const cr=()=>{srchSwap('svCr',svCrHTML());phPaint($('svCr'))};
+function svBindCu(){const Q=$('svQ');if(!Q)return;svQO=!svCu()&&!svRows()&&!clean(Q.value)?1:0;const cr=()=>{srchSwap('svCr',svCrHTML());phPaint($('svCr'))};if(svQO){const r=$('svCr');if(r){r.innerHTML=svCrHTML();phPaint(r)}}
   kb2(Q,()=>svQO||!!clean(Q.value),()=>{svQO=1;cr();const w=Q.closest('.d6pick');try{(w||Q).scrollIntoView({block:'start',behavior:RM()?'auto':'smooth'})}catch(_){}});
-  const out=e=>{if(!Q.isConnected){document.removeEventListener('pointerdown',out,true);return}if(!svQO||clean(Q.value)||document.activeElement===Q)return;const w=Q.closest('.d6pick');if(w&&w.contains(e.target))return;svQO=0;Q.readOnly=true;cr()};document.addEventListener('pointerdown',out,true);Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{srchSwap('svCr',svCrHTML())},80)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(Q._t);sv.q=Q.value;const r=$('svCr');if(r)r.innerHTML=svCrHTML();const f=document.querySelector('#svCr [data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}};const C=$('svCr');if(C)C.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
+  const out=e=>{if(!Q.isConnected){document.removeEventListener('pointerdown',out,true);return}if(!svQO||clean(Q.value)||document.activeElement===Q)return;const w=Q.closest('.d6pick');if(w&&w.contains(e.target))return;svQO=0;Q.readOnly=true;cr()};document.addEventListener('pointerdown',out,true);Q.oninput=()=>{sv.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{srchSwap('svCr',svCrHTML())},80)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(Q._t);sv.q=Q.value;const r=$('svCr');if(r)r.innerHTML=svCrHTML();const f=document.querySelector('#svCr [data-act=svCu]');if(f)svPick(f.dataset.id);else if(clean(Q.value))ACT.svCuNew()}};const C=$('svCr');if(C)C.onpointerdown=e=>{if(document.activeElement===Q&&e.target.closest('button'))e.preventDefault()}}
 function bindSell(){if(!sv)return;svBindCu();svCuBSync();phPaint($('svCu'));svBindRest();qaBind();const M=$('svM');TITLES.sell=sv.edit?'ویرایش سند '+toFa(sv.edit.no):'سند جدید';
   const setRate=(r,m)=>{sv.rate=r;sv.mz=m;if(r)ls.set('m_rate',r);if(m)ls.set('m_mz',m);const x=$('svRx'),w=$('svRate');if(x)x.innerHTML=rateX();if(w)w.classList.toggle('need',!r);svKeep();glPaint();clearTimeout(bindSell._t);bindSell._t=setTimeout(()=>{if(cur!=='sell')return;svRe();if(sv.qa.x)xrHint()},140)};
   const ref=+sv.rate||+ls.get('m_rate',0)||0;
