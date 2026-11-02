@@ -317,14 +317,14 @@ const bz1Btn=last=>last?ic('check')+'<span>ثبت قلم</span>':'<span>بعدی
    خیلی پایین‌تر از نرخ خرید (بیش از ۲٪) = زرد تا وزن و مبلغ دوباره دیده شود. نرخ = مبلغ ÷ وزن (همان چیزی که واقعاً پرداخت می‌شود). */
 const bz1Pg=x=>{const q=parseFloat(x&&x.q)||0;return x&&x.k==='طلا'&&q&&+x.amt?Math.round(+x.amt/q):0};
 function bz1Vd(x){const pg=bz1Pg(x);if(!pg||!glOk())return null;const M=+GL.g18,B=glAy(735),d=(pg-M)/M*100,lo=(B-pg)/B*100;
-  if(pg>M)return {c:'hi',t:'بالا می‌خرید',s:toFa(Math.abs(d)<0.05?'کمی':Math.abs(d).toFixed(1)+'٪')+' بالاتر از قیمت خام بازار'};
-  if(lo<=2)return {c:'ok',t:'قیمت خرید درست است',s:pg>=B?'بین نرخ خرید و قیمت خام بازار':toFa(lo.toFixed(1))+'٪ زیر نرخ خرید بازار'};
-  return {c:'lo',t:'خیلی پایین‌تر از نرخ خرید',s:toFa(lo.toFixed(1))+'٪ زیر نرخ خرید بازار · وزن و مبلغ را چک کنید'}}
+  if(pg>M)return {c:'hi',t:'بالا می‌خرید',s:(Math.abs(d)<0.05?'کمی':toFa(Math.abs(d).toFixed(1))+'٪')+' بالاتر از خام '+fmt(M)};
+  if(lo<=2)return {c:'ok',t:'قیمت خرید درست است',s:'خرید بازار '+fmt(B)+' · خام '+fmt(M)};
+  return {c:'lo',t:'خیلی پایین‌تر از نرخ خرید',s:toFa(lo.toFixed(1))+'٪ زیر خرید بازار '+fmt(B)+' · وزن و مبلغ را چک کنید'}}
 function bz1Live(){const {x,f}=bz1Cur(),out=[];
   if(f.t==='rate'&&x.k==='طلا'){const r=bz1Ref();if(glOk())out.push(`<div class="bz1mk"><small>نرخ بازار${glOld()?' · '+esc(glTime()):''}</small><button type="button" data-act="bz1Mk" data-v="${+GL.g18}">هر گرم ۱۸ · <b>${fmt(+GL.g18)}</b></button><button type="button" data-act="bz1Mk" data-v="${+GL.mz}">مظنه · <b>${fmt(+GL.mz)}</b></button></div>`);
     if(+x.r)out.push(`<div class="bz1rt">${x.rk==='mz'?'مظنه '+fmt(x.rv)+' = هر گرم ۱۸ <b>'+fmt(x.r)+'</b>':'هر گرم ۱۸ '+fmt(x.r)+' = مظنه <b>'+fmt(mzOf(x.r))+'</b>'}${r&&Math.abs(x.r-r)/r>0.15?' <em>با نرخ بازار خیلی فرق دارد</em>':''}</div>`)}
   const q=parseFloat(x.q)||0,a=+x.amt||Math.round(q*(+x.r||0)),V=bz1Vd(x),pg=bz1Pg(x);
-  if(a)out.push(`<div class="stam c bz1am${V?' v'+V.c:''}"><small>مبلغ این قلم${x.amM?'':' · خودکار'}</small><div class="fz"><b>${fmt(a)}</b><i>تومان</i></div>${q&&+x.r&&x.k==='طلا'?`<em>${toFa(String(q))} گرم × ${fmt(pg||x.r)}${x.rD?' <i>(نرخ از مبلغ)</i>':''}</em>`:''}${V?`<div class="bz1vd"><b>${ic(V.c==='ok'?'check':V.c==='hi'?'bad':'info')}<span>${V.t}</span></b><small>${V.s}</small><span class="bz1vg"><span><i>هر گرم شما</i><b>${fmt(pg)}</b></span><span><i>خرید بازار</i><b>${fmt(glAy(735))}</b></span><span><i>خام بازار</i><b>${fmt(+GL.g18)}</b></span></span></div>`:''}</div>`);
+  if(a)out.push(`<div class="stam c bz1am${V?' v'+V.c:''}"><small>مبلغ این قلم${x.amM?'':' · خودکار'}</small><div class="fz"><b>${fmt(a)}</b><i>تومان</i></div>${q&&+x.r&&x.k==='طلا'?`<em>${toFa(String(q))} گرم × ${fmt(pg||x.r)}${x.rD?' <i>(نرخ از مبلغ)</i>':''}</em>`:''}${V?`<div class="bz1vd"><b>${V.c==='ok'?ic('check'):`<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="${V.c==='hi'?'M12 19V5M6 11l6-6 6 6':'M12 5v14M6 13l6 6 6-6'}"/></svg>`}<span>${V.t}</span></b><small>${V.s}</small></div>`:''}</div>`);
   const tot=num(bz.d.amount||0);if(tot&&bz.d.items.filter(z=>+z.amt).length>1)out.push(`<div class="bztot"><span>جمع کل</span><b>${fmt(tot)} <i>تومان</i></b></div>`);
   return out.join('')}
 /* v70.3 (خواسته صاحب اپ): هر کدام آخر زده شود همان معتبر است — مبلغ دستی = نرخ هر گرم/هر واحد خودکار از مبلغ ÷ وزن (x.rD)؛
@@ -481,7 +481,12 @@ function bzSugBind(){[['bzN','n'],['bzP','p'],['bzM','m']].forEach(([id,by])=>{c
   const hide=()=>{B.classList.add('hide');B.innerHTML='';N.setAttribute('aria-expanded','false')};
   const show=()=>{const h=by==='n'?bzSugHTML(N.value):bzSugD(N.value,by);if(!h||document.activeElement!==N){hide();return}B.innerHTML=h;B.classList.remove('hide');N.setAttribute('aria-expanded','true')};
   N.addEventListener('input',()=>{clearTimeout(N._t);N._t=setTimeout(show,90)});N.addEventListener('focus',show);
-  N.addEventListener('blur',()=>setTimeout(hide,150));N.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape')hide()});
+  /* v70.7 (خواسته صاحب اپ): بستن کیبورد (✓ آیفون) فهرست پیشنهاد را نمی‌بندد؛ فقط زدن جای دیگر صفحه، رفتن به خانه دیگر، انتخاب یا Enter */
+  const W=N.closest('.f6r')||N.parentNode;
+  const away=e=>{if(!N.isConnected){document.removeEventListener('pointerdown',away,true);document.removeEventListener('focusin',fin,true);return}if(B.classList.contains('hide'))return;if(W&&W.contains(e.target))return;hide()};
+  const fin=e=>{if(!N.isConnected){document.removeEventListener('focusin',fin,true);return}if(e.target!==N&&!(W&&W.contains(e.target)))hide()};
+  document.addEventListener('pointerdown',away,true);document.addEventListener('focusin',fin,true);
+  N.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape')hide()});
   B.onpointerdown=e=>{if(e.target.closest('.bzsr'))e.preventDefault()};
   B.onclick=e=>{const r=e.target.closest('.bzsr');if(!r)return;const p=r.dataset.k?bzPeople().find(z=>z.k===r.dataset.k):null;hide();
     if(p){const NN=$('bzN'),P=$('bzP'),M=$('bzM');NN.value=p.name;if(P&&p.phone){P.value=p.phone;P.oninput&&P.oninput()}if(M&&p.nid){M.value=p.nid;M.oninput&&M.oninput()}
