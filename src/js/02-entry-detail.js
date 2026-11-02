@@ -86,7 +86,8 @@ function entTrack(x){const q=entBI(x);if(!q)return `<div class="esec"><b>پیگ�
 /* همه رسیدهای یک واریزی: بانکی + تسویه‌های مشتری */
 function rcOfEnt(x){const e=entries.find(z=>z.id===x.id)||x,q=entBI(x),L=[];if(q)itImgs(q.b,q.it).forEach(k=>L.push({key:k,name:fullName(x),holder:x.holder||fullName(x),amount:q.it.amount,tn:q.it.tn||'',src:q.it.src||'',date:PD(x),kind:'bank',bid:q.b.id,iid:q.it.id}));(e.settles||[]).forEach(z=>{stImgs(z).forEach(k=>L.push({key:k,name:fullName(x)+' (از '+z.name+')',holder:x.holder||fullName(x),payer:z.name,amount:z.amount,tn:z.tn||'',date:z.date,kind:'cust',sid:z.id}))});return L}
 const eDirty=()=>{if(!eD)return false;const x=entRow();if(!x)return false;const q=entBI(x);return (eD.note!=null&&eD.note.trim()!==(x.note||''))||(q&&((eD.st!=null&&eD.st!==q.it.st)||(eD.tn!=null&&eD.tn!==(q.it.tn||''))||!!eD.imgD))};
-const eUpd=()=>{const a=$('act');if(a)a.innerHTML=aEnt()};
+/* دکمه‌های سرتیتر با تغییر یادداشت/پیگیری عوض می‌شوند (کپی·ویرایش ↔ انصراف·ثبت) با انیمیشن */
+const eUpd=()=>{const o=document.querySelector('#bar .hpbs');if(!o)return;const t=document.createElement('div');t.innerHTML=entHdBtns();const n=t.firstElementChild;if(n&&n.dataset.k!==o.dataset.k){n.classList.add('sw');o.replaceWith(n)}};
 const entRemLast=new Map();
 function bindEnt(){/* v60.3: باز شدن صفحه: مانده از «کل خرید» تا مانده واقعی می‌شمارد (یک بار، نه با هر تازه‌سازی) */
   /* v61.48: هم بالای صفحه و هم ردیف «مانده» در مشخصات می‌شمارند؛ بار اول از کل خرید، بعد از هر تسویه از مانده قبلی تا مانده تازه */
@@ -99,7 +100,11 @@ async function entCommit(){const x=entRow();if(!x||!eD)return;const e=entries.fi
   if(q){if(eD.st!=null){q.it.st=eD.st;q.it.at=now}if(eD.tn!=null)q.it.tn=eD.tn;saveB()}
   if(e&&eD.note!=null&&eD.note.trim()!==(e.note||'')){e.note=eD.note.trim();e.updatedBy=who();e.updatedAt=now;saveE()}
   eD=null;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('تغییرات ثبت شد')}
-const aEnt=()=>{const x=entRow();if(x&&!entEdit&&eDirty())return `<button class="btn sec" data-act="entDraftOff">انصراف</button><button class="btn gold" data-act="entCommit">${ic('check')} ثبت تغییرات</button>`;if(x&&entEdit)return `<button class="btn sec" data-act="entEditOff">انصراف</button><button class="btn gold" data-act="entSave">${ic('check')} ذخیره</button>`;return x?`<button class="btn sec" data-act="cpEnt" data-id="${x.id}">${ic('copy')} کپی همه</button><button class="btn gold" data-act="entEditOn">${ic('edit')} ویرایش</button>`:''};
+/* v70.1 (خواسته صاحب اپ): دکمه‌های جزئیات (کپی، ویرایش، ذخیره، انصراف) از پایین به سرتیتر بالا سمت چپ رفتند؛ پایین خالی است */
+const aEnt=()=>'';
+function entHdBtns(){const x=entRow();if(!x)return '';const b=(act,ico,t,cls,id)=>`<button type="button" class="hpb ${cls||''}" data-act="${act}"${id!=null?` data-id="${id}"`:''} aria-label="${t}">${ic(ico)}<span>${t}</span></button>`;
+  const k=entEdit?'e':eDirty()?'d':'v',h=k==='e'?b('entEditOff','x','انصراف','g')+b('entSave','check','ذخیره','ok'):k==='d'?b('entDraftOff','x','انصراف','g')+b('entCommit','check','ثبت','ok'):b('cpEnt','copy','کپی','g',x.id)+b('entEditOn','edit','ویرایش','p');
+  return `<span class="hbtns hpbs" data-k="${k}">${h}</span>`}
 let eeTitle='';
 function vEntEdit(x){const e=entries.find(y=>y.id===x.id)||x;eeTitle=e.title||'';
   const row=(id,l,v,o={})=>`<label class="er${o.ib?' col ib':''}${o.big?' big':''}" for="${id}"><span class="erl">${l}${o.suf?` <i class="eu">(${o.suf})</i>`:''}</span><span class="erv">${id==='eeI'?'<span id="eeIb"></span>':''}${o.pre?`<em>${o.pre}</em>`:''}<input id="${id}"${o.ltr?' class="ltr"':''}${o.im?` inputmode="${o.im}"`:''} value="${esc(v||'')}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="next"></span></label>${o.hint?`<small class="eh erh" id="${id}v"></small>`:''}`;
