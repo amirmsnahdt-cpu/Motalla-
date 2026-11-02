@@ -334,7 +334,7 @@ ACT.offOk=()=>{const I=$('offA');if(I)OFF.a=num(I.value);svOffApply(OFF.a)};
 /* حساب پیش‌فرض: آخرین کارتخوان یا حساب استفاده‌شده */
 function pyAcc(p){if(p.m==='pos'&&!p.chId){const L=CH('pos'),last=ls.get('m_ch_pos','');p.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
   if(p.m==='hav'&&p.srcId==null&&!p.chId){const last=ls.get('m_src_hav',''),O=ownL();const s=O.find(z=>String(z.id)===String(last))||O[0];if(s)p.srcId=s.id;else{const B=CH('bank');if(B[0])p.chId=B[0].id}}}
-function pyCuCap(p){const c=CU().find(z=>String(z.id)===String(p.cuId));if(!c)return;p.cuName=cuName(c);if(p.dir==='in'){const cr=Math.max(0,cuBal(c).R);if(cr)p.amount=Math.min(pyLeft(p),cr)}}
+function pyCuCap(p){const c=CU().find(z=>String(z.id)===String(p.cuId));if(!c)return;p.cuName=cuName(c);if(p.dir==='in'){/* v71.2: فقط طلب آزاد (بدون بخشی که پشتش واریزی است) */const cr=cuFree(c,p.i);if(cr)p.amount=Math.min(pyLeft(p)||cr,cr)}}
 /* v66.0: حساب (یا کارتخوان) خودکار انتخاب‌شده → از همان اول پله «مبلغ»؛ حساب در نوار پله‌ها با یک لمس عوض می‌شود */
 const pyStart=p=>{qaRead();sv.qa.p=p;sv.qa.x=null;sv.qa.q='';sv.qa.sq='';const pre=(p.m==='hav'&&p.srcId!=null&&p.srcId!=='')||(p.m==='pos'&&!!p.chId);sv.qa.st=pre?1:0;sv.qa.stMax=sv.qa.st;svKeep();qaRe()};
 ACT.qaCh=d=>{const c=CH().find(z=>String(z.id)===String(d.id));if(!c)return;pyStart(pyNew(c.kind==='pos'?'pos':'hav',{chId:c.id}))};

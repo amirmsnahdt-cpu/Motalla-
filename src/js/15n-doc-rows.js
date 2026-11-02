@@ -107,6 +107,25 @@ function depImgSync(z,K){if(!z||!z.byInv)return;const c=custs.find(q=>String(q.i
   if(typeof sv!=='undefined'&&sv&&sv.edit&&String(sv.edit.tx)===String(t.id))(sv.pays||[]).forEach(p=>{if(p.m==='dep'&&p.stlId===z.id){p.imgs=K.slice();p.img=K[0]||''}})}
 /* مانده قابل حواله یک واریزی: مانده بانکی + تسویه‌هایی که خود همین سند (در ویرایش) قبلاً روی آن گذاشته (وگرنه ویرایش سند رد می‌شد) */
 const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&String(z.byInv.tx)===String(sv.edit.tx)).reduce((a,z)=>a+(+z.amount||0),0):0;return (x.full&&!own?0:(+x.amount||0))+own};
+/* ============ v71.2 رفع باگ (خواسته صاحب اپ): «دریافت › حواله به مشتری» از حساب پرداخت‌کننده ============
+   بدهی ما به فروشنده‌ای که واریزی دارد (سند خرید e.wd) با همان واریزی پرداخت می‌شود. اگر حواله مشتری به حساب خود فروشنده
+   (m:'cust') نوشته می‌شد، حساب فروشنده کم می‌شد ولی واریزی هنوز کامل از بانک می‌رفت = دو بار پرداخت. پس:
+   - cuDepPend(c): بخشی از طلب مشتری که پشتش واریزی هست (مانده تأییدنشده هر واریزی با سند خرید همین مشتری، wdState.pend)
+   - طلب آزاد مشتری = مانده − همان بخش؛ فقط این مقدار با حواله به حساب خودش پرداخت می‌شود و بقیه فقط روی واریزی (m:'dep')
+   - فهرست طرف حواله (پله‌ها و پنجره تسویه): واریزی‌های ارسال‌نشده + مشتری‌هایی که طلب آزاد دارند، مثل همان پنجره تسویه سند */
+const cuDepPend=c=>{let a=0;for(const e of entries){if(e.del||!e.wd||String(e.wd.cu)!==String(c.id))continue;if(e.splitOf!=null&&entries.some(z=>z.id===e.splitOf&&z.wd))continue;a+=wdState(e).pend}return a};
+const cuFree=(c,skip)=>Math.max(0,Math.round(cuBal(c).R-cuDepPend(c)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='cust'&&String(p.cuId)===String(c.id)).reduce((s,p)=>s+pAmt(p),0):0)));
+const depLeft=(x,skip)=>Math.max(0,Math.round(depAvail(x)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='dep'&&String(p.entId)===String(x.id)).reduce((s,p)=>s+pAmt(p),0):0)));
+/* گزینه‌های پله «طرف حواله» وقتی مشتری سند پول را به شخص دیگری داده (dir:'in') */
+function peerInOpts(q,skip){const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv.cuId);
+  const D=validated().filter(x=>!x.sentBid&&!(x.wd&&String(x.wd.cu)===me)).map(x=>[x,depLeft(x,skip)]).filter(([x,r])=>r>0&&(!nq||nzName(fullName(x)+' '+(x.holder||'')).includes(nq)||dOk([x.phone,x.iban,x.code,x.card].join(' '))))
+    .sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0])))).slice(0,nq?12:8)
+    .map(([x,r])=>({v:'d'+x.id,t:fullName(x),sub:['واریزی '+payLab(PD(x)),x.bankShow||(x.iban?ibanBank(x.iban):'')||''].filter(Boolean).join('، '),amt:fmt(r),lab:'بدهکاریم',ico:'bank',bk:x.iban?ibanBank(x.iban):'',cls:'c'}));
+  const C=CU().filter(c=>String(c.id)!==me&&(!nq||cuHit(c,nq,dOk))).map(c=>[c,cuFree(c,skip),cuDepPend(c)]).filter(([c,f,dp])=>f>0||(nq&&!dp)).sort((a,b)=>b[1]-a[1]).slice(0,nq?8:6)
+    .map(([c,f])=>{const r=cuBal(c).R;return f>0?{v:c.id,t:cuName(c),sub:[c.grp||'',c.phone?toFa(c.phone):''].filter(Boolean).join('، ')||'حساب مشتری',amt:fmt(f),lab:'بدهکاریم',ico:'user',cls:'c'}:{v:c.id,t:cuName(c),sub:[c.grp||'',c.phone?toFa(c.phone):''].filter(Boolean).join('، ')||'حساب مشتری',amt:r?fmt(Math.abs(r)):'۰',lab:ourLab(r),ico:'user',cls:r<0?'d':'z'}});
+  return [...C,...D]}
+function peerInSet(p,v){const s=String(v||'');if(s[0]==='d'){const x=validated().find(z=>String(z.id)===s.slice(1));if(!x)return;p.m='dep';p.entId=x.id;p.entName=fullName(x);delete p.cuId;delete p.cuName;const r=depLeft(x,p.i);p.amount=Math.min(pyLeft(p)||r,r);return}
+  const c=CU().find(z=>String(z.id)===s);if(!c)return;p.m='cust';p.cuId=c.id;p.cuName=cuName(c);delete p.entId;delete p.entName;delete p.stlId;p.amount=pyLeft(p);pyCuCap(p)}
 
 /* ============ v61.77 (خواسته صاحب اپ): از همان پنل حواله، اطلاعات حساب فروشنده واریزی با «مبلغ همین حواله» کپی یا فرستاده شود ============
    (نه مانده واریزی) تا مشتری پرداخت‌کننده واریز کند؛ و دکمه رفتن به خود واریزی. در جزئیات ردیف سند، سند ثبت‌شده و فرم تسویه. */
