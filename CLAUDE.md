@@ -1,5 +1,7 @@
 # بده بستون (اپ واریزی مطلا)
 
+> Owner rules, design rules, accounting rules and workflow for ANY AI: read `AGENTS.md` first. This file is the technical map.
+
 Single-page PWA for the gold shop مطلا: deposits, split into bank sources, tracking, customer accounts.
 UI is Persian/RTL. Owner writes Persian; reply in Persian.
 
