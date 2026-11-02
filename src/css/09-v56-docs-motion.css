@@ -3032,3 +3032,26 @@ button.sssbtn.un svg{color:var(--mut)}
 .dkwait{display:flex;align-items:center;gap:10px;padding:14px;border-radius:16px;border:1.5px dashed var(--line);color:var(--mut)}
 .dkwait svg{width:22px;height:22px;flex:none;color:var(--blu)}.dkwait span{display:flex;flex-direction:column;gap:2px}.dkwait b{font-size:13.5px;color:var(--ink);font-weight:850}.dkwait small{font-size:11.5px;font-weight:700}
 .hpb.g.r{color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--card))}
+/* v70.3: خرید دستی — دکمه «تأیید و ادامه» پایین چپ هر مرحله (کنار دکمه بالا) */
+.bzft9{display:flex;justify-content:flex-end;padding-top:14px}
+.bzgo9b{height:46px;padding:0 18px;border-radius:15px;font-size:14.5px}
+/* v70.3: کادر مبلغ قلم = اعلام نرخ خرید در برابر قیمت روز بازار؛ قرمز بالا می‌خرید، سبز درست، زرد خیلی پایین */
+.bz1am{transition:background-color .3s,box-shadow .3s}
+.bz1am.vhi{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--red) 45%,transparent);background:color-mix(in srgb,var(--red) 7%,var(--card))}
+.bz1am.vok{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ok) 45%,transparent);background:color-mix(in srgb,var(--ok) 7%,var(--card))}
+.bz1am.vlo{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--warn) 50%,transparent);background:color-mix(in srgb,var(--warn) 8%,var(--card))}
+.bz1am.vhi small,.bz1am.vhi .fz b{color:var(--red)}.bz1am.vok small,.bz1am.vok .fz b{color:var(--ok)}.bz1am.vlo small,.bz1am.vlo .fz b{color:var(--ink)}
+.bz1am em i{font-style:normal;color:var(--gold)}
+.bz1vd{align-self:stretch;display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:8px;padding-top:9px;border-top:1px dashed color-mix(in srgb,currentColor 25%,transparent)}
+.bz1vd>b{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:900}.bz1vd>b svg{width:17px;height:17px;flex:none}
+.bz1am.vhi .bz1vd{color:var(--red)}.bz1am.vok .bz1vd{color:var(--ok)}.bz1am.vlo .bz1vd{color:color-mix(in srgb,var(--warn) 75%,var(--ink))}
+.bz1vd>small{font-size:11.5px;font-weight:750;color:inherit;opacity:.85}
+.bz1vg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;margin-top:6px}
+.bz1vg>span{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 4px;border-radius:11px;background:color-mix(in srgb,var(--card) 70%,transparent);box-shadow:0 0 0 1px var(--line)}
+.bz1vg i{font-style:normal;font-size:10.5px;font-weight:750;color:var(--mut)}.bz1vg b{font-size:12.5px;font-weight:900;color:var(--ink);font-feature-settings:"tnum";white-space:nowrap}
+.bz1am.vhi .bz1vg>span:first-child b{color:var(--red)}.bz1am.vok .bz1vg>span:first-child b{color:var(--ok)}
+.bz1dv{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:850;padding:1px 8px;border-radius:99px;margin-top:3px}
+.bz1dv.hi{color:var(--red);background:color-mix(in srgb,var(--red) 11%,var(--card))}.bz1dv.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 11%,var(--card))}.bz1dv.lo{color:color-mix(in srgb,var(--warn) 75%,var(--ink));background:color-mix(in srgb,var(--warn) 13%,var(--card))}
+/* v70.3: جستجوی حساب مشتری — نام بلند کامل دیده شود (به خط بعد می‌رود، نه «…») */
+.cbl .bzsr .tx b,.cbl .bzsr .tx small{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+.cbl .bzsr{align-items:center;padding-block:9px}
