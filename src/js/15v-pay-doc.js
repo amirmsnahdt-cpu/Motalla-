@@ -150,18 +150,47 @@ let PXM=[];
    (با جستجو، حساب‌های دیگر و نام تازه هم جدا زیرش)، «بانک»: حساب‌های بانک مغازه. هر حساب یک کارت جدا مثل صفحه حساب مشتریان.
    جستجو: همه کلمه‌ها (به هر ترتیب) در نام، تلفن، گروه یا عنوان؛ یا ۳ رقم به بالا از تلفن/کد ملی؛ ی/ک عربی و فاصله‌ها یکسان. */
 const pxMe=()=>PX.bz?String(bz.d.cuId||''):(e=>e&&e.wd?String(e.wd.cu):'')(entries.find(z=>String(z.id)===String(entId)));
-const pxOwe=()=>{const me=pxMe();return CU().filter(c=>String(c.id)!==me).map(c=>({c,b:cuBal(c)})).filter(o=>o.b.R<0).sort((a,b)=>a.b.R-b.b.R)};
+const pxOwe=()=>{const me=pxMe();return CU().filter(c=>String(c.id)!==me).map(c=>({c,b:cuBal(c)})).filter(o=>o.b.R<0||o.b.G<0).sort((a,b)=>a.b.R-b.b.R||a.b.G-b.b.G)}/* v69.9: طلب طلا هم طلب است */;
 function pxTab(){if(PX.only==='bk')return 'bk';if(PX.tab)return PX.tab;return 'cu'}
-ACT.pxTab=d=>{pxRead();if(PX.tab===d.t)return;PX.tab=d.t;PX.q='';const W=$('sheet').querySelector('.px9');if(W){W.querySelectorAll('.px9seg button').forEach(b=>{const on=b.dataset.t===d.t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});const Q=$('pxQ');if(Q){Q.value='';Q.placeholder=d.t==='bk'?'جستجوی بانک مغازه…':'نام، تلفن یا گروه مشتری…'}const L=$('pxL');if(L){L.innerHTML=pxList();L.scrollTop=0;if(!RM()&&L.animate)L.animate([{opacity:0,transform:`translateX(${d.t==='bk'?18:-18}px)`},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.9,.25,1)'})}}else pxRe(0)};
+/* v69.9 (خواسته صاحب اپ): دکمه دوبخشی تازه — یک «قرص» آبی زیر دو دکمه که با فنر به سمت انتخاب‌شده می‌لغزد (بدون ساختن دوباره پنل، پس پرش ندارد) */
+const pxSegHTML=tb=>`<div class="px9seg" role="tablist" style="--i:${tb==='bk'?1:0}"><i class="px9th" aria-hidden="true"></i><button type="button" role="tab" class="${tb==='cu'?'on':''}" aria-selected="${tb==='cu'}" data-act="pxTab" data-t="cu">${ic('users')}<span>حساب مشتری</span>${(n=>n?`<em>${toFa(n)}</em>`:'')(pxOwe().length)}</button><button type="button" role="tab" class="${tb==='bk'?'on':''}" aria-selected="${tb==='bk'}" data-act="pxTab" data-t="bk">${ic('bank')}<span>بانک‌های مغازه</span></button></div>`;
+ACT.pxTab=d=>{pxRead();if(pxTab()===d.t)return;PX.tab=d.t;PX.q='';PX.dt='';PX.fo=0;PX.fg='';PX.fk='';PX.fb=0;const W=$('sheet').querySelector('.px9');if(!W){pxRe(0);return}
+  const S=W.querySelector('.px9seg');if(S){S.style.setProperty('--i',d.t==='bk'?1:0);S.querySelectorAll('button').forEach(b=>{const on=b.dataset.t===d.t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)})}
+  pxTopRe();const L=$('pxL');if(L){L.innerHTML=pxList();L.scrollTop=0;if(!RM()&&L.animate)L.animate([{opacity:0,transform:`translateX(${d.t==='bk'?-22:22}px)`},{opacity:1,transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.9,.25,1)'})}};
+/* v69.9 (خواسته صاحب اپ): جستجو دقیقاً مثل جستجوی واریزی‌ها — ذره‌بین، فیلد، ×، تقویم، «فیلتر»؛ با حاله آبی.
+   تقویم: مشتری = حساب‌هایی که آن روز گردش دارند، بانک = حساب‌هایی که آن روز حواله/برداشت دارند. فیلتر زیر جستجو باز می‌شود. */
+const pxFN=()=>pxTab()==='bk'?(PX.fb?1:0):(PX.fg?1:0)+(PX.fk?1:0);
+function pxTopHTML(){const tb=pxTab(),n=pxFN(),G=tb==='cu'?groupsList().filter(g=>clean(g)):[];
+  const bar=`<div class="fwrap pxfw"><div class="fsearch">${ic('search')}<input id="pxQ" type="search" placeholder="${tb==='bk'?'نام بانک یا حساب…':'نام، تلفن یا گروه مشتری…'}" value="${esc(PX.q||'')}" autocomplete="off" enterkeyhint="search" aria-label="جستجو" aria-controls="pxL"><button class="x${PX.q?'':' hide'}" data-act="pxQClr" aria-label="پاک کردن">×</button><button class="fcal${PX.dt?' on':''}" data-act="pxCal" aria-label="جستجوی تاریخ">${ic('cal')}</button><button class="cufbtn${n||PX.fo?' on':''}" data-act="pxFlt" aria-label="فیلتر" aria-expanded="${!!PX.fo}">${ic('filter')}<span>فیلتر</span>${n?`<em>${toFa(n)}</em>`:''}</button></div></div>`;
+  const chip=(act,v,on,t)=>`<button type="button" class="${on?'on':''}" data-act="${act}" data-v="${esc(v)}">${t}</button>`;
+  const fp=PX.fo?`<div class="pxfp">${tb==='bk'?`<div class="pxfr"><small>نمایش</small><div>${chip('pxFb','0',!PX.fb,'همه حساب‌ها')}${chip('pxFb','1',!!PX.fb,'فقط با مانده ثبت‌شده')}</div></div>`:
+    `<div class="pxfr"><small>نوع طلب</small><div>${chip('pxFk','',!PX.fk,'همه')}${chip('pxFk','r',PX.fk==='r','طلب مبلغ')}${chip('pxFk','g',PX.fk==='g','طلب طلا')}</div></div>${G.length?`<div class="pxfr"><small>گروه</small><div>${chip('pxFg','',!PX.fg,'همه')}${G.map(g=>chip('pxFg',g,PX.fg===g,esc(g))).join('')}</div></div>`:''}`}</div>`:'';
+  const act=[PX.dt?`<div class="fdate">${ic('cal')} ${tb==='bk'?'گردش':'گردش حساب'}: ${esc(relDay(PX.dt))}، ${esc(dates(PX.dt).fa)}<button data-act="pxDtClr" aria-label="حذف">×</button></div>`:'',
+    !PX.fo&&PX.fk?`<div class="fdate">${ic('filter')} ${PX.fk==='g'?'طلب طلا':'طلب مبلغ'}<button data-act="pxFk" data-v="" aria-label="حذف">×</button></div>`:'',
+    !PX.fo&&PX.fg?`<div class="fdate">${ic('filter')} گروه «${esc(PX.fg)}»<button data-act="pxFg" data-v="" aria-label="حذف">×</button></div>`:'',
+    !PX.fo&&PX.fb?`<div class="fdate">${ic('filter')} فقط با مانده ثبت‌شده<button data-act="pxFb" data-v="0" aria-label="حذف">×</button></div>`:''].join('');
+  return bar+fp+act}
+function pxTopRe(focus){const T=$('pxTop');if(!T)return;T.innerHTML=pxTopHTML();pxBindQ();if(focus){const Q=$('pxQ');if(Q)Q.focus()}}
+function pxListRe(){const L=$('pxL');if(L){L.innerHTML=pxList();L.scrollTop=0}}
+const pxFRe=()=>{pxTopRe();pxListRe()};
+ACT.pxFlt=()=>{pxRead();PX.fo=PX.fo?0:1;pxTopRe();const F=document.querySelector('#pxTop .pxfp');if(F&&!RM()&&F.animate)F.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.9,.25,1)'})};
+ACT.pxFk=d=>{pxRead();PX.fk=d.v||'';pxFRe()};ACT.pxFg=d=>{pxRead();PX.fg=d.v||'';pxFRe()};ACT.pxFb=d=>{pxRead();PX.fb=+d.v?1:0;pxFRe()};
+ACT.pxQClr=()=>{PX.q='';pxTopRe(true);pxListRe()};ACT.pxDtClr=()=>{pxRead();PX.dt='';pxFRe()};
+/* تقویم همان پنجره سراسری است؛ بعد از انتخاب یا بستن، همین پنل با همان بخش برمی‌گردد */
+ACT.pxCal=()=>{pxRead();const P=PX,tb=pxTab(),M=new Set();if(tb==='bk')ownL().forEach(s=>{srcMoves(s).forEach(m=>m.date&&M.add(m.date));(s.led||[]).forEach(x=>!x.del&&x.date&&M.add(x.date))});else CU().forEach(c=>(c.txs||[]).forEach(t=>!t.del&&t.date&&M.add(t.date)));
+  openCal(P.dt||todayISO(),iso=>{PX=P;PX.dt=iso;PX.step=1;sheet(pxHTML());pxBind(true)},{title:tb==='bk'?'گردش بانک در روز':'حساب‌هایی که این روز گردش دارند',marks:M})};
+const pxCuDay=c=>!PX.dt||(c.txs||[]).some(t=>!t.del&&t.date===PX.dt);
+const pxCuF=(c,b)=>(!PX.fg||(c.grp||'')===PX.fg)&&(!PX.fk||(PX.fk==='g'?b.G<0:b.R<0))&&pxCuDay(c);
+const pxBkDay=s=>!PX.dt||srcMoves(s).some(m=>m.date===PX.dt)||(s.led||[]).some(x=>!x.del&&x.date===PX.dt);
 const pxTok=q=>nzName(toEn(clean(q||''))).split(/\s+/).filter(Boolean);
 const pxHitC=(c,T,dOk)=>{if(!T.length)return true;const h=nzName(toEn(cuHay(c)));return T.every(t=>h.includes(t))||dOk(cuHay(c))};
 /* v69.8 (خواسته صاحب اپ): فهرست مشتری‌ها دقیقاً همان فهرست صفحه «حساب مشتریان» (همان ردیف cuRowH و همان سبک، .cuLs) */
 function pxCuL(B){const PW=pendMap();return `<div class="cuLs"><div class="c6l c6lb cuL">${B.map(([c,b],ri)=>cuRowH(c,b,ri,PW,{act:'pxPick',k:'cu',sw:false,cls:'px7o'})).join('')}</div></div>`}
 const pxGh=(t,n)=>`<div class="c6gh px9g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`;
-function pxCuList(){const q0=clean(PX.q||''),T=pxTok(q0),dOk=pDig(q0),me=pxMe(),O=pxOwe().filter(o=>pxHitC(o.c,T,dOk)),out=[];
+function pxCuList(){const q0=clean(PX.q||''),T=pxTok(q0),dOk=pDig(q0),me=pxMe(),O=pxOwe().filter(o=>pxHitC(o.c,T,dOk)&&pxCuF(o.c,o.b)),out=[],fl=!!(PX.dt||PX.fg||PX.fk);
   if(O.length)out.push(pxGh(T.length?'طلب ما · نتیجه جستجو':'طلب ما از این مشتری‌ها',O.length),pxCuL(O.map(o=>[o.c,o.b])));
-  else if(!T.length)out.push(`<div class="px7e px9e">${ic('check')}<b>از هیچ مشتری‌ای طلب نداریم</b><small>برای مشتری دیگر یا نام تازه، نامش را جستجو کنید</small></div>`);
-  if(T.length||dOk('')){const seen=new Set(O.map(o=>String(o.c.id))),C=CU().filter(c=>String(c.id)!==me&&!seen.has(String(c.id))&&pxHitC(c,T,dOk)).sort((a,b)=>(nzName(b.name).startsWith(T[0]||'#')-nzName(a.name).startsWith(T[0]||'#'))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,30);
+  else if(!T.length)out.push(fl?`<div class="px7e px9e">${ic('filter')}<b>با این فیلتر حسابی نیست</b><small>تاریخ یا فیلتر را بردارید</small></div>`:`<div class="px7e px9e">${ic('check')}<b>از هیچ مشتری‌ای طلب نداریم</b><small>برای مشتری دیگر یا نام تازه، نامش را جستجو کنید</small></div>`);
+  if(T.length||dOk('')){const seen=new Set(O.map(o=>String(o.c.id))),C=CU().filter(c=>String(c.id)!==me&&!seen.has(String(c.id))&&pxHitC(c,T,dOk)&&(!PX.dt&&!PX.fg||pxCuF(c,{R:-1,G:-1}))).sort((a,b)=>(nzName(b.name).startsWith(T[0]||'#')-nzName(a.name).startsWith(T[0]||'#'))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,30);
     if(C.length)out.push(pxGh('حساب‌های دیگر · طلبی از آن‌ها نداریم',C.length),pxCuL(C.map(c=>[c,cuBal(c)])));
     PXM=memPeople(T.join(' '),dOk,6);if(PXM.length)out.push(pxGh('از واریزی‌ها و خریدها · بدون حساب'),`<div class="c6l px9l">${PXM.map((p,i)=>`<button type="button" class="c6r px7o px9c one" data-act="pxPick" data-k="mem" data-id="${i}"><span class="c6a m">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'بدون حساب'}</small></span></button>`).join('')}</div>`);
     if(T.length&&!/^\d+$/.test(toEn(q0))&&![...O.map(o=>o.c),...C].some(c=>nzName(c.name)===T.join(' ')))out.push(`<div class="c6l px9l"><button type="button" class="c6r px7o px9c one px9n" data-act="pxPick" data-k="new" data-id=""><span class="c6a">${ic('plus')}</span><span class="tx"><b>پرداخت‌کننده تازه: «${esc(q0)}»</b><small>بدون باز کردن حساب؛ فقط سند تسویه ثبت می‌شود</small></span></button></div>`)}
@@ -170,7 +199,7 @@ function pxBkList(){const x=entRow(),q0=clean(PX.q||''),q=nzName(toEn(q0)),out=[
   if(PX.bz||!can('split'))return `<div class="px7e px9e">${ic('bank')}<b>اینجا بانکی برای انتخاب نیست</b></div>`;
   const xr=validated().find(z=>z.id===famRoot(x))||x;if(xr.id!==famRoot(x)||!(xr.amount>0))return `<div class="px7e px9e">${ic('bank')}<b>بانک را از واریزی اصلی عوض کنید</b></div>`;
   if(sent&&!ssCan(xr))return F.some(r=>!r.sentBid)?`<div class="px7e px9e">${ic('bank')}<b>بخشی هنوز ثبت واریز نشده</b><small>اول ردیف‌های بانکی «آماده ارسال» را با کشیدن به چپ ثبت واریز کنید، بعد بانک یا مبلغ را عوض کنید</small></div>`:`<div class="px7e px9e">${ic('check')}<b>بخش‌های بانکی تأیید شده یا رسید دارند</b><small>بانک یا مبلغ قفل است</small></div>`;
-  const L=pkL(xr),main=sent?'':(L[0]?L[0].src:''),B=ownL().filter(s=>String(s.id)!==main&&(!q||bkHit(s,q0)));
+  const L=pkL(xr),main=sent?'':(L[0]?L[0].src:''),B=ownL().filter(s=>String(s.id)!==main&&(!q||bkHit(s,q0))&&pxBkDay(s)&&(!PX.fb||s.bal!=null));
   if(!B.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانک دیگری در مغازه تعریف نشده'}</b></div>`;
   out.push(pxGh(sent?'بخشی از مبلغ به این بانک · بقیه در بانک فعلی':'بانک‌های مغازه · بخشی یا همه مبلغ',B.length));
   out.push(`<div class="c6l bxlist px9l">${B.map((s,ri)=>{const bk=acBank(s),m=acSum(s),has=!sent&&L.find((l,i)=>i&&l.src===String(s.id)),sub=has?'الان '+fmt(has.amount)+' تومان از این حساب':(bk&&!canon(s.name).includes(canon(bk))?'بانک '+bk:'حساب مغازه');
@@ -181,9 +210,9 @@ function pxList(){return pxTab()==='bk'?pxBkList():pxCuList()}
 ACT.pxSentBk=d=>{const x=entRow();if(!x)return;const id=famRoot(x);PX=null;closeSheet();setTimeout(()=>ACT.sentSplit({id,to:d.id}),80)};
 function pxSel(){const s=PX.sel;if(!s)return null;if(s.k==='bk'){const z=sources.find(o=>String(o.id)===String(s.id));if(!z)return null;const bk=acBank(z);return {bk:z,name:z.name,av:bk?bankBadge(bk,'lg'):ic('bank'),sub:bkSub(z),bal:'',R:0}}if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return null;const R=cuBal(c).R;return {c,name:cuName(c),sub:cuSub(c),bal:R?`<b class="${R<0?'r':'b'}">${R<0?'طلب ما':'بدهی ما'} ${fmt(Math.abs(R))} تومان</b>`:'<b>حساب تسویه است</b>',R}}return {c:null,name:s.name,sub:'پرداخت‌کننده تسویه · حساب مشتری باز نمی‌شود',bal:'',R:0}}
 function pxHTML(){const rest=pxRest(),who0=pxWho();
-  if(PX.step===1){const tb=pxTab(),seg=PX.only==='bk'||PX.bz||!can('split')?'':`<div class="px9seg" role="tablist"><button type="button" role="tab" class="${tb==='cu'?'on':''}" aria-selected="${tb==='cu'}" data-act="pxTab" data-t="cu">${ic('users')}<span>مشتری</span>${(n=>n?`<i>${toFa(n)}</i>`:'')(pxOwe().length)}</button><button type="button" role="tab" class="${tb==='bk'?'on':''}" aria-selected="${tb==='bk'}" data-act="pxTab" data-t="bk">${ic('bank')}<span>بانک</span></button></div>`;
-    return `<div class="px7w s1 px9"><div class="sh-h px9h"><div><b>پرداخت از کجا؟</b><small class="shsub">مانده بانکی «${esc(who0)}»: ${fmt(rest)} تومان</small></div>${seg}<button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="px7q"><div class="fsearch">${ic('search')}<input id="pxQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(PX.q)}" placeholder="${tb==='bk'?'جستجوی بانک مغازه…':'نام، تلفن یا گروه مشتری…'}" aria-label="جستجو" aria-controls="pxL"></div></div>
+  if(PX.step===1){const tb=pxTab(),seg=PX.only==='bk'||PX.bz||!can('split')?'':pxSegHTML(tb);
+    return `<div class="px7w s1 px9"><div class="sh-h px9h"><div><b>پرداخت از کجا؟</b><small class="shsub">مانده بانکی «${esc(who0)}»: ${fmt(rest)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  ${seg}<div class="px7q" id="pxTop">${pxTopHTML()}</div>
   <div class="px7l" id="pxL" role="listbox">${pxList()}</div></div>`}
   /* v66.0 (خواسته صاحب اپ: «فیلدها دونه‌دونه، خودکار پر بشه و بعد مبلغ»): مسیر «از → به» خودکار پر است، بعد یک عدد بزرگ با دکمه‌های
      آماده، و فیلدهای اختیاری فقط وقتی لازم است با یک لمس باز می‌شوند */
@@ -214,10 +243,10 @@ function pxAv(){const A=$('pxA'),h=$('pxAv');if(!A||!h)return;const a=num(A.valu
   document.querySelectorAll('#sheet .px8q button').forEach(b=>b.classList.toggle('on',+b.dataset.v===a))}
 ACT.pxMore=d=>{pxRead();(PX.more=PX.more||{})[d.f]=1;$('sheet').innerHTML=pxHTML();pxBind(true);const f=document.querySelector('#sheet .px8fs .px8f:last-child');if(f){if(!RM()&&f.animate)f.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});const i=f.querySelector('input:not([type=file])');if(i)i.focus();else{const fi=f.querySelector('input[type=file]');if(fi)fi.click()}}};
 function pxBind(still){const W=$('sheet').querySelector('.px7w');if(W&&!still&&!RM()&&W.animate)W.animate([{opacity:0,transform:`translateX(${PX.dir*-18}px)`},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});
-  if(PX.step===1){const Q=$('pxQ'),L=$('pxL');if(Q){Q.oninput=()=>{PX.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{if(L.isConnected){L.innerHTML=pxList();L.scrollTop=0;const s=$('sheet');if(s&&s.scrollTop>0)s.scrollTop=0}},90)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const b=L.querySelector('.px7o');if(b)b.click()}}}
-    if(L)L.onpointerdown=e=>{if(e.target.closest('.px7o'))e.preventDefault()};return}
+  if(PX.step===1){pxBindQ();const L=$('pxL');if(L)L.onpointerdown=e=>{if(e.target.closest('.px7o'))e.preventDefault()};return}
   const A=$('pxA'),F=$('pxF');if(A){A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):'';PX.amount=v;pxAv()};A.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();A.blur()}};pxAv();if(!PX.amount&&!still)setTimeout(()=>{if(A.isConnected)A.focus()},280)}
   if(F)F.onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{PX.imgD=await shrink(f);pxRead();PX.more.img=1;$('sheet').innerHTML=pxHTML();pxBind(true)}catch(z){toast('این عکس خوانده نشد',true)}}}
+function pxBindQ(){const Q=$('pxQ');if(!Q)return;Q.oninput=()=>{PX.q=Q.value;const x=Q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!PX.q);clearTimeout(Q._t);Q._t=setTimeout(()=>{const L=$('pxL');if(L&&L.isConnected){L.innerHTML=pxList();L.scrollTop=0}},90)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const b=document.querySelector('#pxL .px7o');if(b)b.click()}}}
 function pxRe(dir){PX.dir=dir==null?1:dir;$('sheet').innerHTML=pxHTML();pxBind()}
 ACT.pxPick=d=>{pxRead();if(d.k==='bk'){PX.sel={k:'bk',id:d.id};const x=entRow(),L=x?pkL(x):[],has=L.find((l,i)=>i&&l.src===String(d.id));if(has&&PX.edit==null)PX.edit=has.id;PX.amount=PX.edit!=null?pkCur():Math.min(pxRest(),+PX.amount||0)||0;PX.step=2;pxRe(1);return}
   if(d.k==='cu')PX.sel={k:'cu',id:d.id};else if(d.k==='mem'){const p=PXM[+d.id];if(!p)return;const c=cuFindBy({name:p.name,phone:p.phone});PX.sel=c?{k:'cu',id:c.id}:{k:'mem',name:p.name,phone:p.phone||'',nid:p.nid||''}}

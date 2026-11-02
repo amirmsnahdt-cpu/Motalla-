@@ -2890,12 +2890,6 @@ button.sssbtn.un svg{color:var(--mut)}
 .py7h .stladd.sh{margin-inline-start:6px}
 /* v69.7: پنل «پرداخت از کجا؟» — دکمه دوبخشی مشتری/بانک بالا سمت چپ، هر حساب کارت جدا مثل صفحه حساب مشتریان */
 .px9h{align-items:center;gap:8px}.px9h>div:first-child{flex:1;min-width:0}
-.px9seg{flex:none;display:flex;gap:3px;padding:3px;border-radius:13px;background:var(--seg)}
-.px9seg button{position:relative;display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--mut);font:inherit;font-size:12.5px;font-weight:850;cursor:pointer;transition:background .22s,color .22s,box-shadow .22s}
-.px9seg button svg{width:15px;height:15px}
-.px9seg button.on{background:var(--blu);color:#fff;box-shadow:0 6px 14px -8px color-mix(in srgb,var(--blu) 85%,transparent)}
-.px9seg button i{font-style:normal;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:color-mix(in srgb,var(--red) 14%,var(--card));color:var(--red);font-size:10px;font-weight:900;line-height:16px;text-align:center}
-.px9seg button.on i{background:#fff;color:var(--blu)}
 .px9 .px9g{margin:12px 6px 7px}
 .px9 .c6l.px9l{background:none;box-shadow:none;overflow:visible;border-radius:0;display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
 .px9 .px9l>.c6r{border-radius:18px;background:var(--card);box-shadow:var(--lift),inset 0 0 0 1px var(--hair);min-height:64px;animation:px9In .32s cubic-bezier(.2,.9,.25,1) both;animation-delay:calc(var(--r,0)*28ms)}
@@ -2906,7 +2900,7 @@ button.sssbtn.un svg{color:var(--mut)}
 .px9 .px9l>.c6r.bxrow .c6a{background:none}
 .px9e{display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 10px;text-align:center}.px9e svg{width:26px;height:26px;color:var(--ok)}
 @keyframes px9In{from{opacity:0;transform:translateY(8px)}}
-@media (prefers-reduced-motion:reduce){.px9 .px9l>.c6r{animation:none}.px9seg button{transition:none}}
+@media (prefers-reduced-motion:reduce){.px9 .px9l>.c6r{animation:none}}
 /* v69.8: پنل مبلغ تخصیص/تسویه — مسیر فشرده، مبلغ بزرگ وسط، دکمه ثبت چسبیده پایین */
 .px10{display:flex;flex-direction:column;gap:12px}
 .px10 .sh-h{margin-bottom:0}
@@ -2937,3 +2931,35 @@ button.sssbtn.un svg{color:var(--mut)}
 .px10 .pxin input,.px10 .pxin input:focus{border:0!important;background:none!important;box-shadow:none!important;outline:none!important;min-height:0!important;height:auto!important;padding:2px 0!important;font-size:34px!important;border-radius:0!important}
 .px10 .pxam:focus-within{box-shadow:inset 0 0 0 2px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 14%,transparent)}
 .px10 .pxin input::placeholder{font-size:34px!important;font-weight:900}
+
+/* v69.9 (خواسته صاحب اپ: «پرش» در ویدیو): پنل جستجو ارتفاع ثابت دارد و فقط فهرست خودش اسکرول می‌شود — با عوض کردن بخش یا جستجو،
+   پنجره بالا و پایین نمی‌پرد و کشیدن روی فهرست پنجره را جابه‌جا نمی‌کند */
+.px7w.px9{display:flex;flex-direction:column;height:min(86dvh,760px);min-height:0}
+.px9>.sh-h,.px9>.px9seg,.px9>.px7q{flex:none}
+.px9>.px7q{position:static;margin:0 0 4px;padding:2px 2px 6px}
+.px9>.px7l{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:2px 16px calc(18px + env(safe-area-inset-bottom))}
+/* دکمه دوبخشی تازه: قرص لغزان */
+.px9seg{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;margin:2px 0 10px;border-radius:16px;background:var(--seg);isolation:isolate}
+.px9th{position:absolute;z-index:-1;top:4px;bottom:4px;inset-inline-start:4px;width:calc(50% - 4px);border-radius:12px;background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.08),0 6px 16px -8px color-mix(in srgb,var(--blu) 55%,transparent),inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 55%,transparent);transform:translateX(calc(var(--i,0) * -100%));transition:transform .42s cubic-bezier(.3,1.35,.45,1)}
+.px9seg button{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;border:0;border-radius:12px;background:none;color:var(--mut);font:inherit;font-size:13.5px;font-weight:850;cursor:pointer;transition:color .25s}
+.px9seg button svg{width:17px;height:17px;transition:transform .35s cubic-bezier(.3,1.5,.45,1)}
+.px9seg button.on{color:var(--blu)}.px9seg button.on svg{transform:scale(1.12)}
+.px9seg button em{font-style:normal;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:10.5px;font-weight:900;line-height:18px;text-align:center}
+/* جستجو مثل جستجوی واریزی‌ها + حاله آبی */
+.pxfw .fsearch{margin:0;min-height:52px;border:1px solid var(--blu)!important;border-radius:16px;background:var(--card);box-shadow:0 0 0 4px color-mix(in srgb,var(--blu) 13%,transparent),0 10px 24px -14px color-mix(in srgb,var(--blu) 60%,transparent);transition:box-shadow .2s}
+.pxfw .fsearch:focus-within{box-shadow:0 0 0 5px color-mix(in srgb,var(--blu) 18%,transparent),0 12px 28px -12px color-mix(in srgb,var(--blu) 70%,transparent)}
+.pxfw .fsearch input{min-width:0}
+.px7q .fdate{margin-top:8px}
+.pxfp{margin-top:10px;padding:10px 12px;border-radius:16px;background:var(--seg);display:flex;flex-direction:column;gap:10px}
+.pxfr{display:flex;flex-direction:column;gap:6px}.pxfr>small{font-size:11px;font-weight:800;color:var(--mut)}
+.pxfr>div{display:flex;flex-wrap:wrap;gap:6px}
+.pxfr button{border:0;border-radius:10px;padding:7px 11px;background:var(--card);color:var(--ink);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 0 0 1px var(--hair);transition:background .18s,color .18s}
+.pxfr button.on{background:var(--blu);color:#fff;box-shadow:none}
+/* کارت بانک: مانده داخل کادر می‌ماند و هم‌تراز است */
+.px9 .px9l>.c6r.bxrow{flex-wrap:nowrap;gap:10px;padding:10px 12px}
+.px9 .px9l>.c6r.bxrow .tx{flex:1 1 auto;min-width:0}
+.px9 .px9l>.c6r.bxrow .tx b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.px9 .px9l>.c6r.bxrow .bxv{flex:0 0 auto;max-width:48%;min-width:0;align-items:flex-end;padding:6px 9px;border-radius:12px;background:var(--seg)}
+.px9 .px9l>.c6r.bxrow .bxv b{font-size:14.5px;max-width:100%;overflow:hidden}
+.px9 .px9l>.c6r.bxrow .bxv b .cbn{overflow:hidden;text-overflow:ellipsis}
+@media (prefers-reduced-motion:reduce){.px9th,.px9seg button svg{transition:none}}
