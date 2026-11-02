@@ -3104,3 +3104,7 @@ html.iosbr #sheet .px7l{padding-bottom:calc(88px + env(safe-area-inset-bottom,0p
 .txr.ldcu .bri.t-pin{background:var(--ok2);color:var(--ok)}.txr.ldcu .bri.t-pend{background:var(--warn2);color:var(--warn)}
 .ldg .ldcul{padding:8px 10px 12px}.ldg .ldcul .fcard{border-radius:16px!important;margin:0!important}
 .ldcul .txr.ldcu .bri.bxbi.t-pin{background:var(--ok2)!important;color:var(--ok)!important}.ldcul .txr.ldcu .bri.bxbi.t-pend{background:var(--warn2)!important;color:var(--warn)!important}
+/* v71.6 رفع باگ (خواسته صاحب اپ: «کالاهای اضافه‌شده درست نشان داده نمی‌شوند»): ردیف کالای اضافه‌شده (.dkg) یک قاعده قدیمی
+   «سه‌ستونه» داشت؛ ردیف یک‌سوم عرض می‌شد و نام کالا حرف‌به‌حرف زیر هم می‌شکست. ردیف تمام‌عرض، دکمه ⋯ همان جای خودش */
+.dkg{display:block;grid-template-columns:none}
+.dkg>.dkrw{width:100%}
