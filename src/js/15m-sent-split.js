@@ -81,11 +81,24 @@ ACT.mvSentSplit=d=>{closeSheet();setTimeout(()=>ACT.sentSplit({id:d.id}),80)};
 ACT.entUnsend=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;const root=validated().find(r=>r.id===famRoot(x))||x;
   if(!unsendCan(root)){toast('این واریزی تأیید شده، شماره پیگیری یا رسید دارد، یا لیستش بایگانی شده؛ برنمی‌گردد',true);return}
   const F=unsendFam(root),tot=F.reduce((a,o)=>a+(+o.q.it.amount||0),0);
-  askConfirm(`«${esc(fullName(root))}» (${fmt(tot)} تومان${F.length>1?'، '+toFa(F.length)+' بخش':''}) از ارسال برگردد به تخصیص؟`,'برگردد',()=>{
-    const G=unsendFam(root);if(!G){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return}const now=new Date().toISOString(),pay=PD(root);
+  askConfirm(`«${esc(fullName(root))}» (${fmt(tot)} تومان${F.length>1?'، '+toFa(F.length)+' بخش':''}) از ارسال برگردد به تخصیص؟`,'برگردد',()=>{if(!unsendDo(root))return;
+    closeSheet();const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('برگشت به تخصیص — دوباره ارسال‌نشده است')})};
+/* برگرداندن از ارسال (بانک هر بخش در تخصیص همان روز می‌ماند) */
+function unsendDo(root){const G=unsendFam(root);if(!G){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return false}const now=new Date().toISOString(),pay=PD(root),tot=G.reduce((a,o)=>a+(+o.q.it.amount||0),0);
     G.forEach(o=>{const id=o.r.id,b=o.q.b,src=o.q.it.src;b.items=b.items.filter(z=>z.id!==id);if(!b.items.length)batches=batches.filter(z=>z!==b);delete o.e.sentBid;o.e.updatedAt=now;o.e.updatedBy=who();
       let sp=null;allParts().forEach(p=>{if(p.sent&&(p.ids||[]).includes(id)){sp=sp||p;p.ids=p.ids.filter(z=>z!==id);if(!p.ids.length)delPart(p)}});
       const so=sp?sp.src:(z=>z?{id:z.id,name:z.name,bank:z.bank||'',limit:0}:null)(sources.find(z=>z.name===src));if(!so)return;
       let to=allParts().find(p=>!p.sent&&p.pay===pay&&String(p.src.id)===String(so.id));if(!to){to={id:nid++,src:{id:so.id,name:so.name,bank:so.bank||'',limit:0},method:'manual',param:{},ids:[],at:now};addPart(to,pay)}if(!to.ids.includes(id))to.ids.push(id)});
-    memoClear();saveE();saveB();saveD();alloc=null;logA('uncommit','برگرداندن واریزی از ارسال',fullName(root)+' | '+fmt(tot)+' تومان | '+G.map(o=>o.q.it.src).join('، '));
-    closeSheet();const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('برگشت به تخصیص — دوباره ارسال‌نشده است')})};
+    memoClear();saveE();saveB();saveD();alloc=null;logA('uncommit','برگرداندن واریزی از ارسال',fullName(root)+' | '+fmt(tot)+' تومان | '+G.map(o=>o.q.it.src).join('، '));return true}
+/* v69.10 (خواسته صاحب اپ): «حذف تخصیص» — واریزی کامل به اول برمی‌گردد: اگر ارسال شده از پیگیری بیرون می‌آید، بخش‌های بانکی یکی می‌شوند
+   و بانکش برداشته می‌شود (در لیست‌ها دوباره «بدون منبع»، در جزئیات «انتخاب بانک»). بخش تأییدشده/رسیددار/پیگیری‌دار قفل است. */
+const unallocCan=x=>{if(!x||!can('split')||x.full)return false;const F=famOf(x);if(F.some(r=>r.sentBid))return unsendCan(x);const A=allocMap();return F.length>1||F.some(r=>(A.get(r.id)||{}).src)};
+ACT.entUnalloc=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;const root=validated().find(r=>r.id===famRoot(x))||x;
+  if(!unallocCan(root)){toast('تخصیص این واریزی قفل است (تأیید، رسید یا شماره پیگیری دارد، یا لیستش بایگانی شده)',true);return}
+  const F=famOf(root),sent=F.some(r=>r.sentBid),tot=F.reduce((a,r)=>a+(+r.amount||0),0);
+  askConfirm(`تخصیص «${esc(fullName(root))}» برداشته شود؟${sent?' از پیگیری هم بیرون می‌آید و':''} دوباره بدون بانک می‌شود.`,'حذف تخصیص',()=>{
+    if(sent&&!unsendDo(root))return;const R=validated().find(r=>r.id===root.id)||root,G=famOf(R);
+    if(G.length>1){PS={root:famRoot(R),name:fullName(R),pay:PD(R),R:sum(G),L:[{src:'',amount:sum(G)}]};psApply()}
+    else{allParts().forEach(p=>{if(!p.sent&&(p.ids||[]).includes(R.id)){p.ids=p.ids.filter(z=>z!==R.id);if(!p.ids.length)delPart(p)}});memoClear();saveD();alloc=null}
+    logA('split','حذف تخصیص',fullName(R)+' | '+fmt(tot)+' تومان');closeSheet();const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('تخصیص برداشته شد — دوباره بانک را انتخاب کنید')})};
+

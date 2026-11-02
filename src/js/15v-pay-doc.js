@@ -91,10 +91,10 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
     const row=`<div class="py7r b py9 ${st[0]}${pyFlash!=null&&String(pyFlash)===String(r.id)?' nw':''}"><${act?'button':'div'} class="py7b" ${act}><span class="py7a bk">${bkAv(s)}</span><span class="tx"><b>${ttl}</b><small>${sub}</small></span><span class="py7v"><em class="py9t b">${tag}</em><b>${fmt(q&&q.it.amount!=null?+q.it.amount:r.amount)}<i>تومان</i></b></span></${act?'button':'div'}>${cam}</div>`;
     let R=[],L=[];
     if(q){if(tk&&!cl)R=q.it.st==='ok'?[['entTkQ','لغو تأیید','undo','#6b7385']]:[['entTkQ','تأیید','check','#178049']];
-      if(edB&&!cl){const xr=validated().find(z=>z.id===rootId);if(xr&&ssCan(xr)&&!lk)L.push(['sentSplit','ویرایش','edit','#3b6fd6']);if(tk&&q.it.st!=='fail'&&q.it.st!=='ok')L.push(['entTkF','ناموفق','x','#d23c48']);if(root&&xr&&unsendCan(xr))L.push(['entUnsend','برگرداندن','undo','#6b7385'])}}
+      if(edB&&!cl){const xr=validated().find(z=>z.id===rootId);if(xr&&ssCan(xr)&&!lk)L.push(['sentSplit','ویرایش','edit','#3b6fd6']);if(tk&&q.it.st!=='fail'&&q.it.st!=='ok')L.push(['entTkF','ناموفق','x','#d23c48']);if(root&&xr&&unsendCan(xr))L.push(['entUnalloc','حذف تخصیص','x','#d23c48'])}}
     else{if(s&&tk)R=[['bkGo','ثبت واریز','check','#178049']];
       /* بخشی ارسال شده باشد: مبلغ بخش‌های ارسال‌نشده از بانک اصلی ارسال‌شده کم/زیاد نمی‌شود؛ اول این بخش هم ثبت شود، بعد «ویرایش» همه بخش‌ها */
-      if(edB&&!F.some(z=>z.sentBid))L=root?[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6']]:[['pkEdit','ویرایش','edit','#3b6fd6'],['pkDel','برداشتن','trash','#d23c48']]}
+      if(edB&&!F.some(z=>z.sentBid))L=root?[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6'],...(s||F.length>1?[['entUnalloc','حذف تخصیص','x','#d23c48']]:[])]:[['pkEdit','ویرایش','edit','#3b6fd6'],['pkDel','برداشتن','trash','#d23c48']]}
     return swW(row,{r:R,l:L,data:{id:r.id,st:'ok',b:q?q.b.id:'',i:q?q.i:''}})};
   const bkS=bk.slice().sort((p,q)=>(p.r.id===rootId)-(q.r.id===rootId)||p.r.id-q.r.id);
   const head=x.full?'<em class="py7st ok">تسویه کامل</em>':cW?`<em class="py7st w">${toFa(S.filter(z=>z.st==='wait').length)} در انتظار</em>`:'';
@@ -104,7 +104,7 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
   <div class="py7k"><span class="k">از مشتری ${fmt(cOk+cW)}</span><span class="b">از بانک ${fmt(bAll)}</span></div>
   <div class="py7l">${S.map(cuRow).join('')}${bAll||!S.length?bkS.map(bkRow).join(''):''}</div>
   ${addOk?`<button class="py7add" data-act="pyAdd"><span class="py7s">${ic('search')}</span><span class="tx"><b>افزودن پرداخت</b><small>مشتری (با حساب یا بدون حساب) یا بخشی از بانک دیگر مغازه</small></span><span class="py7p">${ic('plus')}</span></button>`:''}
-  ${(ed||tk)&&(bAll||!S.length)?`<div class="py9h">${ic('back').replace('class="i"','class="i flip"')}<span>ردیف را بکشید: به چپ ${x.sentBid?'تأیید':'ثبت واریز'} · به راست ${x.sentBid?'ویرایش، ناموفق، برگرداندن':'تغییر بانک'}</span></div>`:''}
+  ${(ed||tk)&&(bAll||!S.length)?`<div class="py9h">${ic('back').replace('class="i"','class="i flip"')}<span>ردیف را بکشید: به چپ ${x.sentBid?'تأیید':'ثبت واریز'} · به راست ${x.sentBid?'ویرایش، ناموفق، حذف تخصیص':'تغییر بانک، حذف تخصیص'}</span></div>`:''}
   ${multi&&can('split')&&!F.some(r=>r.sentBid)&&!x.full?`<button class="link" data-act="paySplitUndo" data-id="${x.id}">یکی کردن بخش‌های بانکی</button>`:''}</div>`}
 /* v68.8: ردیف پیگیری یک واریزی؛ اگر هنوز ارسال نشده، فقط همین واریزی (جدا از بقیه همان منبع) به پیگیری می‌رود */
 function bkItem(e){const b=e&&e.sentBid&&batches.find(z=>z.id===e.sentBid),i=b?b.items.findIndex(x=>x.id===e.id):-1;return i<0?null:{b,i,it:b.items[i]}}
@@ -156,7 +156,7 @@ function pxTab(){if(PX.only==='bk')return 'bk';if(PX.tab)return PX.tab;return 'c
 const pxSegHTML=tb=>`<div class="px9seg" role="tablist" style="--i:${tb==='bk'?1:0}"><i class="px9th" aria-hidden="true"></i><button type="button" role="tab" class="${tb==='cu'?'on':''}" aria-selected="${tb==='cu'}" data-act="pxTab" data-t="cu">${ic('users')}<span>حساب مشتری</span>${(n=>n?`<em>${toFa(n)}</em>`:'')(pxOwe().length)}</button><button type="button" role="tab" class="${tb==='bk'?'on':''}" aria-selected="${tb==='bk'}" data-act="pxTab" data-t="bk">${ic('bank')}<span>بانک‌های مغازه</span></button></div>`;
 ACT.pxTab=d=>{pxRead();if(pxTab()===d.t)return;PX.tab=d.t;PX.q='';PX.dt='';PX.fo=0;PX.fg='';PX.fk='';PX.fb=0;const W=$('sheet').querySelector('.px9');if(!W){pxRe(0);return}
   const S=W.querySelector('.px9seg');if(S){S.style.setProperty('--i',d.t==='bk'?1:0);S.querySelectorAll('button').forEach(b=>{const on=b.dataset.t===d.t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)})}
-  pxTopRe();const L=$('pxL');if(L){L.innerHTML=pxList();L.scrollTop=0;if(!RM()&&L.animate)L.animate([{opacity:0,transform:`translateX(${d.t==='bk'?-22:22}px)`},{opacity:1,transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.9,.25,1)'})}};
+  pxTopRe();const L=$('pxL');if(L){L.innerHTML=pxList();L.scrollTop=0;if(!RM()&&L.animate)L.animate([{opacity:0},{opacity:1}],{duration:180,easing:'ease-out'})}};
 /* v69.9 (خواسته صاحب اپ): جستجو دقیقاً مثل جستجوی واریزی‌ها — ذره‌بین، فیلد، ×، تقویم، «فیلتر»؛ با حاله آبی.
    تقویم: مشتری = حساب‌هایی که آن روز گردش دارند، بانک = حساب‌هایی که آن روز حواله/برداشت دارند. فیلتر زیر جستجو باز می‌شود. */
 const pxFN=()=>pxTab()==='bk'?(PX.fb?1:0):(PX.fg?1:0)+(PX.fk?1:0);
@@ -169,11 +169,16 @@ function pxTopHTML(){const tb=pxTab(),n=pxFN(),G=tb==='cu'?groupsList().filter(g
     !PX.fo&&PX.fk?`<div class="fdate">${ic('filter')} ${PX.fk==='g'?'طلب طلا':'طلب مبلغ'}<button data-act="pxFk" data-v="" aria-label="حذف">×</button></div>`:'',
     !PX.fo&&PX.fg?`<div class="fdate">${ic('filter')} گروه «${esc(PX.fg)}»<button data-act="pxFg" data-v="" aria-label="حذف">×</button></div>`:'',
     !PX.fo&&PX.fb?`<div class="fdate">${ic('filter')} فقط با مانده ثبت‌شده<button data-act="pxFb" data-v="0" aria-label="حذف">×</button></div>`:''].join('');
-  return bar+fp+act}
-function pxTopRe(focus){const T=$('pxTop');if(!T)return;T.innerHTML=pxTopHTML();pxBindQ();if(focus){const Q=$('pxQ');if(Q)Q.focus()}}
+  return bar+`<div id="pxFa">${fp+act}</div>`}
+/* v69.10 (خواسته صاحب اپ: «باز هم موقع سوییچ و سرچ می‌پره»): فیلد جستجو دیگر از نو ساخته نمی‌شود (ساختن دوباره، کیبورد آیفون را
+   می‌بست و صفحه می‌پرید)؛ فقط متن راهنما، ×، تقویم، شمار فیلتر و بخش فیلترها عوض می‌شوند */
+function pxTopRe(focus){const T=$('pxTop'),Q=$('pxQ');if(!T)return;if(!Q){T.innerHTML=pxTopHTML();pxBindQ();return}
+  const H=document.createElement('div');H.innerHTML=pxTopHTML();const tb=pxTab();if(Q.value!==(PX.q||''))Q.value=PX.q||'';Q.placeholder=tb==='bk'?'نام بانک یا حساب…':'نام، تلفن یا گروه مشتری…';
+  const F=T.querySelector('.fsearch'),NF=H.querySelector('.fsearch');['.x','.fcal','.cufbtn'].forEach(k=>{const o=F.querySelector(k),n=NF.querySelector(k);if(o&&n&&o.outerHTML!==n.outerHTML)o.replaceWith(n)});
+  const A=$('pxFa'),NA=H.querySelector('#pxFa');if(A&&NA&&A.innerHTML!==NA.innerHTML)A.innerHTML=NA.innerHTML;if(focus)Q.focus()}
 function pxListRe(){const L=$('pxL');if(L){L.innerHTML=pxList();L.scrollTop=0}}
 const pxFRe=()=>{pxTopRe();pxListRe()};
-ACT.pxFlt=()=>{pxRead();PX.fo=PX.fo?0:1;pxTopRe();const F=document.querySelector('#pxTop .pxfp');if(F&&!RM()&&F.animate)F.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.9,.25,1)'})};
+ACT.pxFlt=()=>{pxRead();PX.fo=PX.fo?0:1;pxTopRe();const F=document.querySelector('#pxFa .pxfp');if(F&&!RM()&&F.animate)F.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.9,.25,1)'})};
 ACT.pxFk=d=>{pxRead();PX.fk=d.v||'';pxFRe()};ACT.pxFg=d=>{pxRead();PX.fg=d.v||'';pxFRe()};ACT.pxFb=d=>{pxRead();PX.fb=+d.v?1:0;pxFRe()};
 ACT.pxQClr=()=>{PX.q='';pxTopRe(true);pxListRe()};ACT.pxDtClr=()=>{pxRead();PX.dt='';pxFRe()};
 /* تقویم همان پنجره سراسری است؛ بعد از انتخاب یا بستن، همین پنل با همان بخش برمی‌گردد */
@@ -243,10 +248,10 @@ function pxAv(){const A=$('pxA'),h=$('pxAv');if(!A||!h)return;const a=num(A.valu
   document.querySelectorAll('#sheet .px8q button').forEach(b=>b.classList.toggle('on',+b.dataset.v===a))}
 ACT.pxMore=d=>{pxRead();(PX.more=PX.more||{})[d.f]=1;$('sheet').innerHTML=pxHTML();pxBind(true);const f=document.querySelector('#sheet .px8fs .px8f:last-child');if(f){if(!RM()&&f.animate)f.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});const i=f.querySelector('input:not([type=file])');if(i)i.focus();else{const fi=f.querySelector('input[type=file]');if(fi)fi.click()}}};
 function pxBind(still){const W=$('sheet').querySelector('.px7w');if(W&&!still&&!RM()&&W.animate)W.animate([{opacity:0,transform:`translateX(${PX.dir*-18}px)`},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});
-  if(PX.step===1){pxBindQ();const L=$('pxL');if(L)L.onpointerdown=e=>{if(e.target.closest('.px7o'))e.preventDefault()};return}
+  if(PX.step===1){if(W&&!still&&!RM()){W.classList.add('in');setTimeout(()=>W.classList.remove('in'),700)}pxBindQ();const L=$('pxL');if(L)L.onpointerdown=e=>{if(e.target.closest('.px7o'))e.preventDefault()};return}
   const A=$('pxA'),F=$('pxF');if(A){A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):'';PX.amount=v;pxAv()};A.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();A.blur()}};pxAv();if(!PX.amount&&!still)setTimeout(()=>{if(A.isConnected)A.focus()},280)}
   if(F)F.onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{PX.imgD=await shrink(f);pxRead();PX.more.img=1;$('sheet').innerHTML=pxHTML();pxBind(true)}catch(z){toast('این عکس خوانده نشد',true)}}}
-function pxBindQ(){const Q=$('pxQ');if(!Q)return;Q.oninput=()=>{PX.q=Q.value;const x=Q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!PX.q);clearTimeout(Q._t);Q._t=setTimeout(()=>{const L=$('pxL');if(L&&L.isConnected){L.innerHTML=pxList();L.scrollTop=0}},90)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const b=document.querySelector('#pxL .px7o');if(b)b.click()}}}
+function pxBindQ(){const Q=$('pxQ');if(!Q)return;const W=Q.closest('.px9');if(W&&!W._pd){W._pd=1;W.addEventListener('pointerdown',e=>{if(document.activeElement===Q&&e.target.closest('.px9seg button,.pxfr button,.cufbtn,.x,.fdate button'))e.preventDefault()})}Q.oninput=()=>{PX.q=Q.value;const x=Q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!PX.q);clearTimeout(Q._t);Q._t=setTimeout(()=>{const L=$('pxL');if(L&&L.isConnected){L.innerHTML=pxList();L.scrollTop=0}},90)};Q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const b=document.querySelector('#pxL .px7o');if(b)b.click()}}}
 function pxRe(dir){PX.dir=dir==null?1:dir;$('sheet').innerHTML=pxHTML();pxBind()}
 ACT.pxPick=d=>{pxRead();if(d.k==='bk'){PX.sel={k:'bk',id:d.id};const x=entRow(),L=x?pkL(x):[],has=L.find((l,i)=>i&&l.src===String(d.id));if(has&&PX.edit==null)PX.edit=has.id;PX.amount=PX.edit!=null?pkCur():Math.min(pxRest(),+PX.amount||0)||0;PX.step=2;pxRe(1);return}
   if(d.k==='cu')PX.sel={k:'cu',id:d.id};else if(d.k==='mem'){const p=PXM[+d.id];if(!p)return;const c=cuFindBy({name:p.name,phone:p.phone});PX.sel=c?{k:'cu',id:c.id}:{k:'mem',name:p.name,phone:p.phone||'',nid:p.nid||''}}

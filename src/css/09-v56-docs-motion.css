@@ -2892,7 +2892,9 @@ button.sssbtn.un svg{color:var(--mut)}
 .px9h{align-items:center;gap:8px}.px9h>div:first-child{flex:1;min-width:0}
 .px9 .px9g{margin:12px 6px 7px}
 .px9 .c6l.px9l{background:none;box-shadow:none;overflow:visible;border-radius:0;display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
-.px9 .px9l>.c6r{border-radius:18px;background:var(--card);box-shadow:var(--lift),inset 0 0 0 1px var(--hair);min-height:64px;animation:px9In .32s cubic-bezier(.2,.9,.25,1) both;animation-delay:calc(var(--r,0)*28ms)}
+.px9 .px9l>.c6r{border-radius:18px;background:var(--card);box-shadow:var(--lift),inset 0 0 0 1px var(--hair);min-height:64px}
+/* v69.10: ورود ردیف‌ها فقط یک بار، وقتی پنل باز می‌شود (نه با هر حرف جستجو یا عوض کردن بخش — همان پرش) */
+.px9.in .px9l>.c6r,.px9.in .cuL>.swr{animation:px9In .32s cubic-bezier(.2,.9,.25,1) both;animation-delay:calc(var(--r,0)*28ms)}
 .px9 .px9l>.c6r::after,.px9 .px9l>.c6r::before{display:none}
 .px9 .px9l>.c6r .c6a{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--blu) 10%,var(--card));color:var(--blu);font-weight:900;font-size:16px}
 .px9 .px9l>.c6r .c6a.m{background:var(--seg);color:var(--mut)}
@@ -2963,3 +2965,6 @@ button.sssbtn.un svg{color:var(--mut)}
 .px9 .px9l>.c6r.bxrow .bxv b{font-size:14.5px;max-width:100%;overflow:hidden}
 .px9 .px9l>.c6r.bxrow .bxv b .cbn{overflow:hidden;text-overflow:ellipsis}
 @media (prefers-reduced-motion:reduce){.px9th,.px9seg button svg{transition:none}}
+/* v69.10: «حذف تخصیص» در پنجره تغییر بانک */
+.acrow.mvdel b{color:var(--red)}.acrow.mvdel .mvuni{background:color-mix(in srgb,var(--red) 85%,var(--card))!important;color:#fff}
+.acrow.mvend{margin-top:10px}
