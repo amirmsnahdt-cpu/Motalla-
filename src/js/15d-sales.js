@@ -137,7 +137,7 @@ function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
   /* v61.93: زدن اول روی جستجو = فهرست آخرین مشتری‌ها با مانده (بدون کیبورد)؛ زدن دوم = تایپ */
   if(!q){if(!svQO)return '';const R=A.slice().sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,8);
     return `<div class="bzsug cbl" role="listbox"><div class="cblh">آخرین حساب‌ها<small>برای جستجو دوباره بزنید</small></div>${R.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c))).join('')}${cbRow('svCuNew',{},ic('plus'),'افتتاح حساب تازه','اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
-  const L=A.filter(c=>nzName([c.name,c.phone,c.nid,c.grp].join(' ')).includes(q)).sort((a,b)=>(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,6);
+  const L=A.filter(c=>nzName([c.name,c.phone,c.nid,c.grp].join(' ')).includes(q)).sort((a,b)=>(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,30);
   const add=!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0));
   return `<div class="bzsug cbl" role="listbox">${svBkRows(q0)}${L.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c))).join('')}
     ${cbRow('svCuNew',{},ic('plus'),add?'حساب تازه: «'+esc(q0)+'»':'افتتاح حساب تازه',(L.length?'':'مشتری‌ای پیدا نشد · ')+'اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}

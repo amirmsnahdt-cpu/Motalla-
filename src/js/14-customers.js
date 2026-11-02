@@ -472,7 +472,7 @@ function bzPeople(){const M=new Map(),add=(name,o)=>{const k=nzName(name);if(!k)
   return [...M.values()]}
 function bzSugHTML(q){const nq=nzName(q),qd=toEn(q).replace(/\D/g,'');if(!nq)return '';
   const L=bzPeople().filter(p=>p.k.includes(nq)||(qd.length>=3&&(p.phone.includes(qd)||p.nid.includes(qd))))
-    .sort((a,b)=>(b.k.startsWith(nq)-a.k.startsWith(nq))||(b.n-a.n)||String(b.last).localeCompare(String(a.last))).slice(0,6);
+    .sort((a,b)=>(b.k.startsWith(nq)-a.k.startsWith(nq))||(b.n-a.n)||String(b.last).localeCompare(String(a.last))).slice(0,30);
   const exact=L.some(p=>p.k===nq);
   return L.map((p,i)=>`<button type="button" class="bzsr" role="option" data-i="${i}" data-k="${esc(p.k)}"><span class="av">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.cuId?'حساب مشتری':'',p.n?toFa(p.n)+' بار ثبت شده':'',p.phone?'<span class="ltr">'+esc(toFa(p.phone))+'</span>':'',p.nid?'کد ملی <span class="ltr">'+esc(toFa(p.nid))+'</span>':''].filter(Boolean).join(' · ')||'مشتری'}</small></span></button>`).join('')
     +(exact?'':`<button type="button" class="bzsr nw" data-k=""><span class="av">${ic('plus')}</span><span class="tx"><b>مشتری جدید: «${esc(clean(q))}»</b><small>با همین نام ثبت می‌شود</small></span></button>`)}
@@ -497,7 +497,7 @@ function bzSugBind(){[['bzN','n'],['bzP','p'],['bzM','m']].forEach(([id,by])=>{c
     else{['cuId','pk','prevIban','iban','card','holder'].forEach(k=>delete bz.d[k])}
     const nx=[$('bzP'),$('bzM'),$('bzC')].find(el=>el&&!el.value)||$('bzC');if(nx)nx.focus()}})}
 /* پیشنهاد از روی شماره تماس یا کد ملی (از ۳ رقم) */
-function bzSugD(v,by){const qd=toEn(v||'').replace(/\D/g,'');if(qd.length<3)return '';const L=bzPeople().filter(p=>(by==='p'?p.phone:p.nid).includes(qd)).sort((a,b)=>(b.n-a.n)||String(b.last).localeCompare(String(a.last))).slice(0,6);
+function bzSugD(v,by){const qd=toEn(v||'').replace(/\D/g,'');if(qd.length<3)return '';const L=bzPeople().filter(p=>(by==='p'?p.phone:p.nid).includes(qd)).sort((a,b)=>(b.n-a.n)||String(b.last).localeCompare(String(a.last))).slice(0,30);
   return L.map(p=>`<button type="button" class="bzsr" role="option" data-k="${esc(p.k)}"><span class="av">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.cuId?'حساب مشتری':'',p.phone?'<span class="ltr">'+esc(toFa(p.phone))+'</span>':'',p.nid?'کد ملی <span class="ltr">'+esc(toFa(p.nid))+'</span>':''].filter(Boolean).join(' · ')}</small></span></button>`).join('')}
 /* ---------- خرید طلا: تسویه از مشتری همان موقع ثبت (همان پنجره صفحه جزئیات؛ با ثبت واریزی ذخیره می‌شود) ---------- */
 const bzStlSum=S=>(S||bz.d.settles||[]).reduce((a,z)=>a+(+z.amount||0),0);

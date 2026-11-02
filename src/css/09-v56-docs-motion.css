@@ -3063,3 +3063,9 @@ html.tt1:not(.locked) body{overflow:visible;height:calc(100% + 1px)}
 .bz1vd{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:2px 8px;margin-top:6px;padding-top:6px}
 .bz1vd>b{font-size:12.5px;gap:4px;padding:2px 9px 2px 10px;border-radius:99px;background:color-mix(in srgb,currentColor 12%,transparent)}.bz1vd>b svg{width:14px;height:14px}
 .bz1vd>small{font-size:10.5px;font-feature-settings:"tnum";line-height:1.6}
+/* v70.8 (خواسته صاحب اپ: «لیست‌های این شکلی باید اسکرول بشه»): فهرست پیشنهاد زیر هر جستجو (مشتری، تلفن، کد ملی، حساب‌ها)
+   قد محدود دارد و خودش اسکرول می‌خورد (تا ۳۰ نتیجه)؛ «مشتری جدید / افتتاح حساب» پایینش همیشه دیده می‌شود و عنوان فهرست بالا می‌ماند.
+   کشیدن روی فهرست فقط خود فهرست را می‌برد (inScr: صفحه پایین نمی‌آید و تازه‌سازی نمی‌شود) */
+.bzsug:not(.dkl){max-height:min(392px,56dvh);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.bzsug:not(.dkl) .bzsr.nw{position:sticky;bottom:0;z-index:1;background:var(--card);box-shadow:0 -1px 0 var(--hair)}
+.bzsug:not(.dkl) .cblh{position:sticky;top:0;z-index:1;background:var(--card)}
