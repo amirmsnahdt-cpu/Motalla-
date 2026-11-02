@@ -69,7 +69,8 @@ ACT.ssSave=()=>{if(!SS)return;if(ssLeft()!==0||SS.L.some(l=>!(+l.amount>0)||!l.t
    حالا: در همان پنجره، «بخشی از مبلغ از بانک دیگر» (همان پنجره منابع، مبلغ دلخواه) و «برگرداندن به تخصیص» بالای فهرست بانک‌ها؛
    در جزئیات واریزی هم «برگرداندن به تخصیص» زیر کارت واریز بانکی. برگرداندن فقط برای بخش‌هایی که تأیید، شماره پیگیری یا رسید ندارند؛
    واریزی با همان بانک به تخصیص همان تاریخ واریز برمی‌گردد (ارسال‌نشده) و از پیگیری برداشته می‌شود. */
-function unsendFam(x){const F=ssFam(x);if(!F||F.some(o=>ssLock(o.q.it)))return null;return F}
+/* v69.6: بخش‌های ارسال‌شده (اگر بخشی هنوز ارسال نشده، همان در تخصیص می‌ماند) */
+function unsendFam(x){const F=famOf(x).filter(r=>r.sentBid).map(r=>({r,e:entries.find(z=>z.id===r.id),q:entBI(r)}));if(!F.length||F.some(o=>!o.e||!o.q||o.q.b.closed||ssLock(o.q.it)))return null;return F}
 const unsendCan=x=>!!x&&!!x.sentBid&&can('split')&&!!unsendFam(x);
 function unsentRowsHTML(one){const a=ssCan(one),b=unsendCan(one);if(!a&&!b)return '';
   return `${a?`<button class="acrow mvps" data-act="mvSentSplit" data-id="${one.id}"><span class="bkb lg mvpsi">${ic('split')}</span><span class="tx"><b>بخشی از مبلغ از بانک دیگر</b><small>مبلغ دلخواه را بزنید؛ بقیه در بانک فعلی می‌ماند</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:''}${b?`<button class="acrow mvun" data-act="entUnsend" data-id="${one.id}"><span class="bkb lg mvuni">${ic('undo')}</span><span class="tx"><b>برگرداندن به تخصیص</b><small>از پیگیری برداشته می‌شود و دوباره ارسال‌نشده است</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:''}<div class="mvor"><span>یا همه مبلغ از یک منبع</span></div>`}
