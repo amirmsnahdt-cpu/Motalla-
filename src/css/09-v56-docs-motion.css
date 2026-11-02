@@ -3095,3 +3095,12 @@ button.bxmk{width:100%;border:0;font:inherit;text-align:right;cursor:pointer;-we
 #sheet .stsug.ckl .stsh{position:sticky;top:0;z-index:1}
 html.iosbr #sheet{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;scroll-padding-bottom:96px}
 html.iosbr #sheet .px7l{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+/* v71.5: گروه «مشتری به مشتری» در لیست واریز — ردیف هر پرداخت از مشتری مثل ردیف‌های گردش حساب */
+.ldcul{display:flex;flex-direction:column;gap:8px;padding:4px 0}.ldcul .fcard{margin:0}
+.txr.ldcu .bri{font-weight:900;font-size:14px}
+.ldcul .fcard{border-radius:16px;background:var(--card);border:1.5px solid color-mix(in srgb,var(--ok) 45%,transparent);box-shadow:none;overflow:hidden}
+.ldcul .fcard:has(.way){border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.ldcul .txr.ldcu{width:100%;padding:12px 12px}.ldcul .txr.ldcu .tx b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.txr.ldcu .bri.t-pin{background:var(--ok2);color:var(--ok)}.txr.ldcu .bri.t-pend{background:var(--warn2);color:var(--warn)}
+.ldg .ldcul{padding:8px 10px 12px}.ldg .ldcul .fcard{border-radius:16px!important;margin:0!important}
+.ldcul .txr.ldcu .bri.bxbi.t-pin{background:var(--ok2)!important;color:var(--ok)!important}.ldcul .txr.ldcu .bri.bxbi.t-pend{background:var(--warn2)!important;color:var(--warn)!important}

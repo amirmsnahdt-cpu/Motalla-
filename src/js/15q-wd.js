@@ -9,14 +9,20 @@
    ردیف m:'wd' در حساب بانکی ما (srcMoves) شمرده نمی‌شود چون خود واریزی در دفتر بانک هست. */
 const wdRoots=()=>entries.filter(e=>e&&e.wd&&!e.del);
 /* وضعیت یک واریزی: بخش‌های تأییدشده (هر بخش «پرداخت از چند منبع» جدا) و تسویه‌های تأییدشده از مشتری دیگر */
+/* v71.5 رفع باگ (خواسته صاحب اپ: «واریزی کامل تسویه شده ولی سند فروشنده هنوز «رفته برای واریز» است»):
+   تسویه از مشتری در سند فروشنده حساب می‌شود اگر تأیید شده باشد (هر چیزی جز st:'wait' — تسویه‌های قدیمی st ندارند و در صفحه واریزی
+   «تأیید شد» دیده می‌شدند ولی اینجا شمرده نمی‌شدند)، یا اگر هنوز در انتظار است ولی سند دریافتش در حساب پرداخت‌کننده ثبت شده
+   (پول از حساب او کم شده؛ پس حساب فروشنده هم باید همان لحظه تسویه شود — دوطرفه). فقط آن ردیف «در انتظار تأیید» برچسب می‌خورد (w). */
+const stlBooked=z=>{if(!z||!z.byInv)return false;const c=custs.find(q=>String(q.id)===String(z.byInv.cu));return !!(c&&(c.txs||[]).some(t=>String(t.id)===String(z.byInv.tx)&&!t.del))};
+const stlCounts=z=>!!(+(z&&z.amount))&&(z.st!=='wait'||stlBooked(z));
 function wdState(e,F,BI){const ok=[],bi=BI||entBI;if(!F){try{F=famOf(e)}catch(_){F=[e]}}if(!F.length)F=[e];
   F.forEach(p=>{const b=bi(p);if(b&&b.it.st==='ok')ok.push({k:'wd'+p.id,a:+b.it.amount||+p.amount||0,src:b.it.src||'',tn:b.it.tn||'',at:b.it.at||''})});
-  (e.settles||[]).forEach((z,i)=>{if(z.st==='ok'&&+z.amount)ok.push({k:'wds'+e.id+'.'+(z.id||i),a:+z.amount,nm:z.name||'',tn:z.tn||'',at:z.okAt||''})});
+  (e.settles||[]).forEach((z,i)=>{if(stlCounts(z))ok.push({k:'wds'+e.id+'.'+(z.id||i),a:+z.amount,nm:z.name||'',tn:z.tn||'',at:z.okAt||z.at||'',w:z.st==='wait'?1:0})});
   const done=ok.reduce((s,o)=>s+o.a,0),amt=+(e.wd.amt)||+e.amount||0;return {ok,done,amt,pend:Math.max(0,Math.round(amt-done))}}
 /* v67.5 (خواسته صاحب اپ): مانده در انتظار یک واریزی به تفکیک — هر تسویه از مشتری (با سند دریافت خودش) و هر بخش بانکی جدا،
    تا در سند فروشنده هر بخش ردیف خودش را داشته باشد (نه یک ردیف کلی). جمع بخش‌ها = S.pend (اختلاف احتمالی در ردیف بانک). */
 function wdParts(e,S,A){S=S||wdState(e);if(!S.pend)return [];let F;try{F=famOf(e)}catch(_){F=[e]}if(!F.length)F=[e];const P=[];
-  (e.settles||[]).forEach((z,i)=>{if(z.st==='ok'||!(+z.amount))return;const c=z.byInv&&custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);
+  (e.settles||[]).forEach((z,i)=>{if(stlCounts(z)||!(+z.amount))return;const c=z.byInv&&custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);
     P.push({k:'s'+(z.id||i),t:'s',a:+z.amount,nm:z.name||'مشتری',doc:t?invTitle(t):'',cu:t?c.id:null,tx:t?t.id:null,tn:z.tn||''})});
   const sOf=p=>(p.settles||[]).reduce((s,z)=>s+(+z.amount||0),0);
   F.forEach(p=>{const b=entBI(p);if(b&&b.it.st==='ok')return;const a=Math.max(0,Math.round((+p.amount||0)-sOf(p)));if(!a)return;const al=A&&A.get(p.id);
@@ -46,8 +52,8 @@ function wdSync(){if(wdBusy)return;const R=wdRoots();let any=R.length;if(!any){f
       for(const p of t.pays||[]){if(p.m!=='wd'){P.push(p);continue}
         /* ردیف تکراری، یا ردیفی که واریزی‌اش هنوز هست ولی دیگر تأیید ندارد → برداشته می‌شود؛ واریزی پاک‌شده → ردیف می‌ماند */
         if(seen.has(p.wk)){tc=true;continue}const o=want.get(p.wk);if(!o&&live.has(String(p.entId))){tc=true;continue}seen.add(p.wk);
-        if(o&&(Math.abs(pAmt(p))!==o.a||(p.src||'')!==(o.src||'')||(p.tn||'')!==(o.tn||''))){p.amount=-o.a;p.src=o.src||'';p.tn=o.tn||'';tc=true}P.push(p)}
-      L.forEach(o=>{if(seen.has(o.k))return;seen.add(o.k);P.push({m:'wd',dir:'out',amount:-o.a,wk:o.k,entId:o.ent,src:o.src||'',nm:o.nm||'',tn:o.tn||'',q:'',at:o.at||now});tc=true});
+        if(o&&(Math.abs(pAmt(p))!==o.a||(p.src||'')!==(o.src||'')||(p.tn||'')!==(o.tn||'')||!!p.w!==!!o.w)){p.amount=-o.a;p.src=o.src||'';p.tn=o.tn||'';if(o.w)p.w=1;else delete p.w;tc=true}P.push(p)}
+      L.forEach(o=>{if(seen.has(o.k))return;seen.add(o.k);P.push({m:'wd',dir:'out',amount:-o.a,wk:o.k,entId:o.ent,src:o.src||'',nm:o.nm||'',tn:o.tn||'',q:'',at:o.at||now,...(o.w?{w:1}:{})});tc=true});
       if(tc){t.pays=P;c.lastAt=now;ch=true;logA('cust','پرداخت خودکار از واریزی',cuName(c)+' | '+invTitle(t)+' | '+fmt(L.reduce((s,o)=>s+o.a,0))+' تومان تأییدشده')}}}
     if(ch){saveCu();if(sv&&sv.edit){const c=svCu(),t=c&&(c.txs||[]).find(x=>!x.del&&x.type==='inv'&&String(x.no)===String(sv.edit.no));if(t){const keep=sv.pays.filter(p=>p.m!=='wd');sv.pays=keep.concat((t.pays||[]).filter(p=>p.m==='wd').map(p=>({...p})));svKeep()}}}}
   finally{wdBusy=false}}
