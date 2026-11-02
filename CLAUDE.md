@@ -72,6 +72,7 @@ Status frames (green/yellow/red row borders) are defined ONCE at the end of 08-v
 ## Workflow
 1. Edit `src/` with targeted greps; don't read whole files.
 2. `python3 tools/bump.py <new version>` (rebuilds app.js/styles.css, updates APP_V, boot V, `?v=`).
+   Versions are compared as NUMBERS everywhere (APP_V, githack updater, boot swap, /api/status): use ONE digit after the dot and go 70.9 → 71.0, never 70.10 (= 70.1 < 70.9; this broke updates for 69.10–69.13). bump.py refuses it.
    Deploy fails if app.js/styles.css are stale (`python3 tools/build.py --check`).
 3. Tests: `npm test` (server API, no deps) and `node tests/smoke.mjs` (Playwright: real server with temp data,
    opens all 26 views, fails on any JS error). Both run in CI (`.github/workflows/tests.yml`); deploy runs `npm test`.
