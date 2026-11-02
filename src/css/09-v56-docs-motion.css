@@ -3055,3 +3055,7 @@ button.sssbtn.un svg{color:var(--mut)}
 /* v70.3: جستجوی حساب مشتری — نام بلند کامل دیده شود (به خط بعد می‌رود، نه «…») */
 .cbl .bzsr .tx b,.cbl .bzsr .tx small{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
 .cbl .bzsr{align-items:center;padding-block:9px}
+/* v70.4: آیفون — صفحه یک پیکسل جای اسکرول دارد تا لمس نوار ساعت به برنامه برسد (15zb-top-tap.js)؛ #app ثابت است و تکان نمی‌خورد */
+html.tt1:not(.locked){overflow-y:auto;scrollbar-width:none}
+html.tt1:not(.locked)::-webkit-scrollbar{display:none}
+html.tt1:not(.locked) body{overflow:visible;height:calc(100% + 1px)}
