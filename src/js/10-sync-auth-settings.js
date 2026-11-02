@@ -113,7 +113,7 @@ function applyRemote(res,sent){const touched=new Set(),byColl={};
   SY.since=res.ver;rawSet('m_since',SY.since);rawSet('m_pend',SY.pend);
   if(touched.size){alloc=null;remoteRefresh()}
   if(SY.scanned&&!SY.manual){const k=(SY.newN||0)-(SY.annN||0);if(k>0&&res.changes&&res.changes.length&&!res.full){SY.annN=SY.newN;if(!SY.quiet)toast(toFa(k)+' مورد تازه دریافت شد')}else SY.annN=SY.newN}}
-const canRender=()=>!['entry','bulk','cwiz','pwiz'].includes(cur)&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&!document.querySelector('.swr.on');
+/* v71.8: فرم خرید دستی (buy) هم وسط پر کردن با داده همکارها دوباره ساخته نمی‌شود */const canRender=()=>!['entry','bulk','cwiz','pwiz','buy'].includes(cur)&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&!document.querySelector('.swr.on');
 function remoteRefresh(){if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}
 document.addEventListener('focusout',()=>setTimeout(()=>{if(SY.needRender&&canRender())remoteRefresh()},250));
 setInterval(()=>{if(TOKEN&&document.visibilityState==='visible')syncNow()},4000);
