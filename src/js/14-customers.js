@@ -6,7 +6,7 @@ const saveCu=()=>{cuNoFix();ls.set('m_custs',custs)};
 function cuNoFix(){const L=custs.filter(c=>c&&!c.sys).sort((a,b)=>String(a.createdAt||'').localeCompare(String(b.createdAt||''))||(+a.id||0)-(+b.id||0));
   let mx=0;for(const c of L){const n=+c.cno;if(Number.isInteger(n)&&n>0&&n>mx)mx=n}const seen=new Set();let ch=0;
   for(const c of L){const n=+c.cno;if(Number.isInteger(n)&&n>0&&!seen.has(n)){seen.add(n);continue}c.cno=++mx;seen.add(mx);ch=1}return ch}
-const cuNoH=c=>c&&c.cno?`<span class="cuno" title="شماره مشتری"><i>#</i>${toFa(c.cno)}</span>`:'';
+const cuNoH=c=>c&&c.cno?`<span class="cuno" title="شماره مشتری">${toFa(c.cno)}</span>`:'';
 let custId=null,cuQ='';
 /* فقط مشتری‌ها (رکوردهای سیستمی مثل کارتخوان‌ها و تنظیمات فروش sys دارند و مشتری نیستند) */
 const CU=()=>custs.filter(c=>!c.del&&!c.sys);
