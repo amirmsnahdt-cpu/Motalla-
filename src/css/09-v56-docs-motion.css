@@ -3315,3 +3315,13 @@ html.cdon .cdez{display:none}
 .edk.edk4{grid-template-columns:repeat(2,minmax(0,1fr))}
 .edk.edk4 .edkb{min-height:54px;font-size:15.5px}
 .cunof input{font-weight:900;font-size:17px;letter-spacing:.5px}
+/* v73.8 کارت «سند خرید و فروش» بازشونده */
+.edkw{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s cubic-bezier(.2,.9,.25,1)}
+.edkw>.edk{overflow:hidden;min-height:0;padding-top:0;padding-bottom:0;transition:padding .42s cubic-bezier(.2,.9,.25,1)}
+.edoc.open .edkw{grid-template-rows:1fr}
+.edoc.open .edkw>.edk{padding-bottom:12px}
+.edoc{transition:box-shadow .3s,border-color .3s}
+.edoc.open{border-color:color-mix(in srgb,var(--blu) 45%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--blu) 10%,transparent)}
+@media (prefers-reduced-motion:reduce){.edkw,.edkw>.edk{transition:none}}
+#sheet .edoc>.opt::after{transform:rotate(-45deg);transition:transform .35s cubic-bezier(.2,.9,.25,1)}
+#sheet .edoc.open>.opt::after{transform:rotate(135deg)}
