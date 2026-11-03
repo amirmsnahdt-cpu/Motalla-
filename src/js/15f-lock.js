@@ -143,7 +143,7 @@ function lockDraw(){const S=lockUI,e=lockEl();if(!S)return;const c=lockCfg(),bio
   const dots=Array.from({length:6},(_,i)=>`<i class="${i<S.pin.length?'on':''}"></i>`).join('');
   const k=n=>`<button data-lk="${n}" aria-label="${n}"><b>${toFa(String(n))}</b></button>`;
   const left=bio?`<button data-lk="bio" class="lkf" aria-label="${bioName()}">${lkI(window.AndroidBridge?'fp':'face')}</button>`:'<span></span>';
-  e.innerHTML=`<div class="lkw"><div class="lkmark">${S.m==='unlock'?'<span class="lkm">م</span>':lkI('pad')}</div><b class="lkt">${T[0]}</b><p class="lks">${T[1]}</p>
+  e.innerHTML=`<div class="lkw"><div class="lkmark${S.m==='unlock'?' lklogo':''}">${S.m==='unlock'?'<span class="lklg" role="img" aria-label="طلای مطلا"></span>'/* v72.0: لوگوی مطلا به‌جای «م» */:lkI('pad')}</div><b class="lkt">${T[0]}</b><p class="lks">${T[1]}</p>
     <div class="lkd${S.shake?' shake':''}" aria-label="${toFa(S.pin.length)} رقم از ۶">${dots}</div><p class="lkerr" aria-live="polite">${esc(S.err||'')}</p>
     <div class="lkp">${[1,2,3,4,5,6,7,8,9].map(k).join('')}${left}${k(0)}<button data-lk="del" class="lkf" aria-label="پاک کردن">${lkI('del')}</button></div>
     ${bio&&c.bio.t==='pw'?`<button class="btn bkgo lkfid" data-lk="bio">${lkI('face')} باز کردن با Face ID</button>`:''}<button class="lkl" data-lk="${S.m==='unlock'?'forgot':'cancel'}">${S.m==='unlock'?'رمز را فراموش کرده‌ام':'انصراف'}</button></div>`;

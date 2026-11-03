@@ -144,5 +144,5 @@ function entSave(){const x=entRow(),i=x?entries.findIndex(y=>y.id===x.id):-1;if(
   if(!name){toast('نام را وارد کنید',true);$('eeN').focus();return}if(!amount){toast('مبلغ را وارد کنید',true);$('eeA').focus();return}
   if((e0.settles||[]).reduce((a,z)=>a+(+z.amount||0),0)>amount){toast('مبلغ از جمع واریز مستقیم مشتری کمتر است',true);return}
   const iban=dI?'IR'+dI:'',before=pick(e0);entries[i]={...e0,name,amount,code,iban,card,phone,nid:nidv,weight,ppg:ppgOf(amount,weight),holder:holder&&holder!==name?holder:'',title:'',payDate:fPay||e0.payDate||e0.entryDate,bank:iban===e0.iban?e0.bank:'',updatedBy:who(),updatedAt:new Date().toISOString()};
-  logA('edit','ویرایش واریزی',name+' | '+fmt(amount)+' تومان',{ids:[e0.id],before,after:pick(entries[i])});saveE();depDocFix(entries[i]);alloc=null;entEdit=false;eD=null;back();
+  logA('edit','ویرایش واریزی',name+' | '+fmt(amount)+' تومان',{ids:[e0.id],before,after:pick(entries[i])});saveE();entItSync(entries[i],true)/* v72.0: ردیف بانکِ ارسال‌شده هم همراه ویرایش */;depDocFix(entries[i]);alloc=null;entEdit=false;eD=null;back();
   const bad=iban&&!ibanOk(iban);toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد ✓',bad)}

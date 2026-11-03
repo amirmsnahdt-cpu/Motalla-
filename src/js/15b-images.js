@@ -39,8 +39,10 @@ function galThumbs(){const c=galCtx();if(!c)return;c.keys.forEach(async(k,i)=>{c
 function galRefresh(){if(GAL&&GAL.ck){if($('sheet').querySelector('.ckw'))ckRe();else if($('sheet').querySelector('.galg'))$('sheet').innerHTML=galHTML(),galThumbs();return}if(GAL&&GAL.k==='row'&&cur==='sell'&&typeof qaRe==='function')qaRe();const ig=$('itgal');if(!$('ov').classList.contains('hide')&&GAL&&ig){ig.innerHTML=itGalHTML();galThumbs()}else if(!$('ov').classList.contains('hide')&&GAL&&$('sheet').querySelector('.galg'))$('sheet').innerHTML=galHTML(),galThumbs();if(['ent','lday','part','batch','day'].includes(cur)){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}}
 const galFiles=c=>c.keys.map(k=>({key:k,...c.meta}));
 document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.dataset||t.dataset.galadd==null)return;const F=[...(t.files||[])];t.value='';if(!F.length)return;const c=galCtx();if(!c||!c.ed){toast(c?'اجازه افزودن عکس ندارید':'ردیف این عکس دیگر باز نیست؛ ردیف را دوباره باز کنید و عکس را اضافه کنید',true);return}
-  const K=c.keys;let n=0;for(const f of F){try{const d=await shrink(f),k=newImgKey(c.pre);if(await imgPut(k,d)){K.push(k);n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}catch(e){toast('این عکس خوانده نشد',true)}}
-  if(n){galCtx().set(K);if(GAL.k!=='row')logA('edit','افزودن رسید',c.meta.name+' | '+fmt(n)+' عکس');galRefresh();toast(n>1?fmt(n)+' عکس اضافه شد':'عکس اضافه شد')}});
+  /* v72.0: اول پیش‌نمایش و تأیید نهایی، بعد ذخیره */
+  const D=await picPrep(F,c.meta);if(!D)return;const c2=galCtx();if(!c2||!c2.ed){toast('ردیف این عکس دیگر باز نیست؛ ردیف را دوباره باز کنید و عکس را اضافه کنید',true);return}
+  const K=c2.keys;let n=0;for(const d of D){const k=newImgKey(c2.pre);if(await imgPut(k,d)){K.push(k);n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}
+  if(n){c2.set(K);if(GAL.k!=='row')logA('edit','افزودن رسید',c2.meta.name+' | '+fmt(n)+' عکس');galRefresh();toast(n>1?fmt(n)+' عکس اضافه شد':'عکس اضافه شد')}});
 ACT.galIt=d=>{const e=entries.find(z=>String(z.id)===String(d.id));if(!e||!entBI(e)){toast('این واریزی هنوز ارسال نشده است',true);return}openGal({k:'it',eid:e.id})};
 /* v61.2: رسید تسویه‌های یک واریزیِ کامل با مشتری — یک پنجره با همه تسویه‌ها؛ هر تسویه عکس‌هایش و دکمه گالری/دوربین همان‌جا */
 let FSE=null;
@@ -52,8 +54,11 @@ function fsThumbs(){const e=entries.find(z=>String(z.id)===String(FSE));if(!e)re
 ACT.galFs=d=>{const e=entries.find(z=>String(z.id)===String(d.id));if(!e||!(e.settles||[]).length)return;FSE=e.id;sheet(fsHTML());fsThumbs()};
 ACT.galFsP=d=>{openGal({k:'st',eid:+d.id||d.id,sid:+d.sid||d.sid});if(d.i!=null)setTimeout(()=>zvOpen(+d.i),60)};
 document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.dataset||t.dataset.fsadd==null)return;const F=[...(t.files||[])];t.value='';if(!F.length||!can('edit'))return;
-  const e=entries.find(z=>String(z.id)===String(FSE)),z=e&&(e.settles||[]).find(q=>String(q.id)===String(t.dataset.fsadd));if(!z)return;const K=stImgs(z);let n=0;
-  for(const f of F){try{const d=await shrink(f),k=newImgKey('stl:'+z.id);if(await imgPut(k,d)){K.push(k);n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}catch(x){toast('این عکس خوانده نشد',true)}}
+  const sid=t.dataset.fsadd,e0=entries.find(z=>String(z.id)===String(FSE)),z0=e0&&(e0.settles||[]).find(q=>String(q.id)===String(sid));if(!z0)return;
+  /* v72.0: پیش‌نمایش و تأیید نهایی؛ بعد از تأیید واریزی و تسویه دوباره پیدا می‌شوند (شاید همگام‌سازی عوضشان کرده باشد) */
+  const D=await picPrep(F,{name:z0.name,amount:z0.amount});if(!D)return;
+  const e=entries.find(q=>String(q.id)===String(e0.id)),z=e&&(e.settles||[]).find(q=>String(q.id)===String(sid));if(!z){toast('این تسویه دیگر پیدا نشد؛ عکس اضافه نشد',true);return}const K=stImgs(z);let n=0;
+  for(const d of D){const k=newImgKey('stl:'+z.id);if(await imgPut(k,d)){K.push(k);n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}
   if(n){z.imgs=K;z.img=K[0]||'';e.updatedAt=new Date().toISOString();e.updatedBy=who();saveE();stlSync(e);logA('edit','افزودن رسید تسویه',fullName(e)+' ← '+z.name+' | '+fmt(n)+' عکس');if($('sheet').querySelector('.fss')){$('sheet').innerHTML=fsHTML();fsThumbs()}if(['lday','ent'].includes(cur)){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}toast(n>1?fmt(n)+' عکس اضافه شد':'عکس اضافه شد')}});
 ACT.galSt=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;openGal({k:'st',eid:e.id,sid:z.id})};
 ACT.galView=d=>zvOpen(+d.i);ACT.rcOldSave=()=>{const f=RCOLD;RCOLD=null;closeSheet();if(f)rcDown(f)};ACT.rcOldApk=()=>{RCOLD=null;closeSheet();ACT.getApk()}; /* اپ اندروید قدیمی: پنجره «نسخه تازه لازم است» در rcShare */

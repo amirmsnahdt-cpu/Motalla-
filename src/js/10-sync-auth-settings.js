@@ -114,7 +114,7 @@ function applyRemote(res,sent){const touched=new Set(),byColl={};
   if(touched.size){alloc=null;remoteRefresh()}
   if(SY.scanned&&!SY.manual){const k=(SY.newN||0)-(SY.annN||0);if(k>0&&res.changes&&res.changes.length&&!res.full){SY.annN=SY.newN;if(!SY.quiet)toast(toFa(k)+' مورد تازه دریافت شد')}else SY.annN=SY.newN}}
 /* v71.8: فرم خرید دستی (buy) هم وسط پر کردن با داده همکارها دوباره ساخته نمی‌شود */const canRender=()=>!['entry','bulk','cwiz','pwiz','buy'].includes(cur)&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&!document.querySelector('.swr.on');
-function remoteRefresh(){if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}
+function remoteRefresh(){try{entItSyncAll()}catch(e){}/* v72.0 */if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}
 document.addEventListener('focusout',()=>setTimeout(()=>{if(SY.needRender&&canRender())remoteRefresh()},250));
 setInterval(()=>{if(TOKEN&&document.visibilityState==='visible')syncNow()},4000);
 setInterval(()=>{if(TOKEN&&document.visibilityState!=='visible')syncNow()},60000);
@@ -127,12 +127,12 @@ window.addEventListener('online',()=>syncSoon(100));
   imgDel=async k=>{await _del(k);if(TOKEN)api('/api/img/'+encodeURIComponent(k),undefined,'DELETE').catch(e=>{if(e&&e.status===403)toast(e.message,true)})}}
 async function flushImgs(){const q=ls.get('m_imgq',[]);if(!q.length)return;const left=[];for(const k of q){try{const v=await imgGet(k);if(v)await api('/api/img/'+encodeURIComponent(k),{data:v},'PUT')}catch(e){if(!(e&&e.status===403))left.push(k)}}rawSet('m_imgq',left)}
 /* ---------- صفحه ورود و راه‌اندازی ---------- */
-function showAuth(msg){const a=$('auth');a.classList.remove('hide');a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">طلای مطلا</small><div class="aspin">در حال اتصال…</div></div>`;
-  api('/api/status').then(s=>authForm(s.setup?'setup':'login',msg)).catch(e=>{a.innerHTML=`<div class="authc"><div class="amk">م</div><b class="atl">بده بستون</b><div class="msg bad" style="margin-top:14px">${esc(e.message)}</div><button class="btn gold" data-act="authRetry" style="width:100%">تلاش دوباره</button></div>`})}
+function showAuth(msg){const a=$('auth');a.classList.remove('hide');a.innerHTML=`<div class="authc"><div class="amk amlg" role="img" aria-label="طلای مطلا"></div><b class="atl">بده بستون</b><small class="ast">طلای مطلا</small><div class="aspin">در حال اتصال…</div></div>`;
+  api('/api/status').then(s=>authForm(s.setup?'setup':'login',msg)).catch(e=>{a.innerHTML=`<div class="authc"><div class="amk amlg" role="img" aria-label="طلای مطلا"></div><b class="atl">بده بستون</b><div class="msg bad" style="margin-top:14px">${esc(e.message)}</div><button class="btn gold" data-act="authRetry" style="width:100%">تلاش دوباره</button></div>`})}
 /* اثر انگشت فقط در اولین باز شدن برنامه خودکار پرسیده می‌شود؛ درست بعد از «خروج» نه (دکمه‌اش هست) */
 let authBioAuto=!TOKEN;
 function authForm(mode,msg){const a=$('auth'),su=mode==='setup',bm=su?null:bioLoginMeta(),auto=!!(bm&&authBioAuto&&!msg);authBioAuto=false;
-  a.innerHTML=`<form class="authc" id="authf" autocomplete="on" action="#"><div class="amk">م</div><b class="atl">بده بستون</b><small class="ast">${su?'راه‌اندازی اولیه — ساخت حساب مدیر':'ورود به بده بستون'}</small>
+  a.innerHTML=`<form class="authc" id="authf" autocomplete="on" action="#"><div class="amk amlg" role="img" aria-label="طلای مطلا"></div><b class="atl">بده بستون</b><small class="ast">${su?'راه‌اندازی اولیه — ساخت حساب مدیر':'ورود به بده بستون'}</small>
   ${msg?`<div class="msg warn">${esc(msg)}</div>`:''}
   ${bm?`<button type="button" class="btn bkgo abio" id="abio" data-act="authBio">${lkI('fp')}<span>ورود با اثر انگشت<small>${esc(bm.n||bm.u)}</small></span></button><div class="aor"><span>یا با نام کاربری و رمز</span></div>`:''}
   ${su?`<div class="f"><label>نام شما</label><input id="an" autocomplete="name" placeholder="نام و نام خانوادگی"></div>`:''}

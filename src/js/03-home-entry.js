@@ -158,7 +158,7 @@ function saveEntry(){const m=$('fm'),dgI=dg($('fi').value).slice(0,24);
   const now=new Date().toISOString(),bad=!ibanOk(e.iban);
   if(editId){const i=entries.findIndex(x=>x.id===editId);if(i>=0){const before=pick(entries[i]);entries[i]={...entries[i],...e,updatedBy:who(),updatedAt:now};
       logA('edit','ویرایش واریزی',e.name+' | '+fmt(e.amount)+' تومان',{ids:[editId],before,after:pick(entries[i])})}
-    depDocFix(entries.find(x=>x.id===editId)||{});saveE();alloc=null;editId=null;toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد',bad);go(editBack||'list');editBack=null;return}
+    depDocFix(entries.find(x=>x.id===editId)||{});saveE();entItSync(entries.find(x=>x.id===editId),true)/* v72.0 */;alloc=null;editId=null;toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد',bad);go(editBack||'list');editBack=null;return}
   const ne={...e,id:nid++,entryDate:dateVal,createdBy:who(),updatedBy:who(),updatedAt:now,settles:[]};entries.push(ne);saveE();alloc=null;depLink(ne,{settles:e.settles});
   logA('add','ثبت واریزی',e.name+' | '+fmt(e.amount)+' تومان | '+dates(dateVal).fa,{ids:[ne.id],after:pick(ne)});
   FLD.forEach(i=>$(i).value='');fSet=[];fTitle='';$('ftl').innerHTML=titleChips();updSet();fPay=payDef();updPay();$('fiv').textContent='';$('fkv').textContent='';$('finfo').innerHTML='';$('rn').textContent=fmt(dayEntries().length+1);$('recent').innerHTML=recentHTML();$('dock').innerHTML=dockHTML();$('act').innerHTML=aEntry();{const fb=document.querySelector('#view .flow');if(fb)fb.outerHTML=flowBar(1)}

@@ -29,7 +29,7 @@ ACT.entUnok=d=>entSetSt(d.id,'pending');
 ACT.entEditGo=d=>{ACT.openEnt(d);ACT.entEditOn()};
 ACT.fPay=d=>{fPay=d.iso;updPay()};
 ACT.fPayPick=()=>openCal(fPay||payDef(),iso=>ACT.fPay({iso}));
-ACT.openEnt=d=>{entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday','cust','inv','bank'].includes(cur)?cur:cur==='sell'&&custId?'cust':'home';go('ent')};
+ACT.openEnt=d=>{entItSync(entries.find(z=>String(z.id)===String(d.id)),true)/* v72.0: ردیف‌های کهنه قبل از این نسخه با باز کردن درست می‌شوند */;entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday','cust','inv','bank'].includes(cur)?cur:cur==='sell'&&custId?'cust':'home';go('ent')};
 /* v70.2: دکمه حذف حالا در سرتیتر است؛ برای جلوگیری از زدن اشتباهی، تأیید می‌خواهد (به سطل بازیابی می‌رود) */
 ACT.entDel=d=>{const x=entries.find(z=>String(z.id)===String(d.id));if(!x)return;askConfirm('واریزی «'+esc(fullName(x))+'» ('+fmt(x.amount)+' تومان) حذف شود؟ به سطل بازیابی می‌رود.','حذف',()=>{closeSheet();navBack=true;go(PARENT.ent||'home');delEntry(d.id)})};
 ACT.fF=d=>{fF=d.f;fN=120;render()};
@@ -102,6 +102,16 @@ function stlBind(){const Q=$('stQ'),A=$('stA'),F=$('stF');if(Q&&!stl.cuId&&!stl.
     const out=e=>{if(!Q.isConnected){document.removeEventListener('pointerdown',out,true);return}if(!stl.open||clean(Q.value)||document.activeElement===Q)return;const w=Q.closest('.ef');if(w&&w.contains(e.target))return;stl.open=0;Q.readOnly=true;re()};document.addEventListener('pointerdown',out,true)}
   if(Q){Q.oninput=()=>{stl.q=Q.value;if(stl.cuId||stl.newName){stl.cuId='';stl.name='';stl.newName=false}clearTimeout(Q._t);Q._t=setTimeout(()=>{const c=$('stCs');if(c)c.innerHTML=stlChips()},120)};const C=$('stCs');if(C)C.onpointerdown=e=>{if(e.target.closest('.tch,.stsr'))e.preventDefault()}}if(A){A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):'';stlAv()};A.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();A.blur()}};stlAv()}
   if(F)F.onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{stl.imgD=await shrink(f);stlRead();(stl.more=stl.more||{}).img=1;stlRe(0)}catch(z){toast('این عکس خوانده نشد',true)}}}
+/* v72.0 (باگ گزارش‌شده: واریزی ۸ میلیون نوشته شده بود، به ۱۸ ویرایش شد، ولی ردیف بانکِ ارسال‌شده در «پرداخت این واریزی» و پیگیری ۸ ماند):
+   ردیف پیگیری (batch item) هنگام ارسال از روی واریزی کپی می‌شود؛ ویرایش واریزی آن را به‌روز نمی‌کرد. اینجا مبلغ (و با info نام، فاکتور، شبا) دوباره از خود واریزی گرفته می‌شود.
+   همان قاعده stlSync: مبلغ ردیف = مبلغ واریزی − تسویه مستقیم مشتری، total = مبلغ واریزی. فقط وقتی فرق دارد چیزی ذخیره می‌شود. */
+function entItSync(e,info){if(!e||!e.sentBid)return false;const st=(e.settles||[]).reduce((s,z)=>s+(+z.amount||0),0),tot=+e.amount||0,rem=Math.max(0,tot-st);let ch=false;
+  batches.forEach(b=>b.items.forEach(it=>{if(it.id!==e.id)return;
+    if(+it.amount!==rem||(it.total!=null&&+it.total!==tot)){it.amount=rem;it.total=tot;it.settled=st;it.settles=e.settles;ch=true}
+    if(info){const bk=ibanBank(e.iban||'')||e.bank||'',V={name:e.name,title:e.title||'',code:e.code||'',iban:e.iban||'',bank:bk};for(const f in V)if((it[f]||'')!==V[f]){it[f]=V[f];ch=true}}}));
+  if(ch)saveB();return ch}
+/* همه ردیف‌های کهنه (از قبل از این نسخه، یا رسیده از گوشی دیگر) یکجا؛ بعد از هر همگام‌سازی. مثال واقعی: ردیف هنوز «بهاره جعفری · ۸٬۰۰۰٬۰۰۰» بود */
+function entItSyncAll(){let n=0;const B=batches;for(const e of entries)if(e.sentBid&&B.some(b=>b.id===e.sentBid))try{if(entItSync(e,true))n++}catch(_){}return n}
 function stlSync(e){const st=(e.settles||[]).reduce((s,z)=>s+(+z.amount||0),0),rem=Math.max(0,(+e.amount||0)-st);batches.forEach(b=>b.items.forEach(it=>{if(it.id===e.id){it.amount=rem;it.settled=st;it.settles=e.settles;it.total=+e.amount||0}}));saveB()}
 ACT.stlNew=()=>{const x=entRow();if(!x)return;stl={amount:x.amount,q:''};sheet(stlHTML());stlBind();setTimeout(()=>{if($('stQ')&&!stl.cuId&&!stl.newName){stl.open=1;const c=$('stCs');if(c){c.innerHTML=stlChips();phPaint(c)}}},300)};
 ACT.stlOpen=d=>{const x=stlE();if(!x)return;const z=(x.settles||[])[+d.i];if(!z)return;stl={...z,i:+d.i,q:z.cuId?'':z.name,newName:!z.cuId&&!!z.name};sheet(stlHTML());stlBind();phPaint($('sheet'))};

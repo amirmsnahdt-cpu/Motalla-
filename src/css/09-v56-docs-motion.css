@@ -3115,3 +3115,29 @@ html.iosbr #sheet .px7l{padding-bottom:calc(88px + env(safe-area-inset-bottom,0p
 .edkb{display:flex;align-items:center;justify-content:center;gap:6px;height:44px;border:0;border-radius:12px;font:inherit;font-size:14px;font-weight:800;cursor:pointer;background:color-mix(in srgb,var(--blu) 10%,var(--card));color:var(--blu)}
 .edkb.r{background:color-mix(in srgb,var(--red) 10%,var(--card));color:var(--red)}
 .edkb i{display:grid;place-items:center}.edkb svg{width:17px;height:17px}
+/* v72.0: پیش‌نمایش عکس رسید قبل از افزودن — تمام‌صفحه، تیره مثل نمایش عکس؛ پایین: نام و مبلغ همان ردیف + «انصراف» و «تأیید و افزودن» */
+.pcf{position:fixed;inset:0;z-index:1001;background:#05080f;color:#fff;display:flex;flex-direction:column;animation:zvIn .2s cubic-bezier(.2,.8,.2,1)}
+.pcf.hide{display:none}
+.pcft{display:flex;flex-direction:column;gap:1px;min-width:0}
+.pcft b{font-size:15px;font-weight:800}
+.pcft small{font-size:12px;color:#ffffffa8}
+.pcft small:empty{display:none}
+.pcfs{flex:1;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior:contain}
+.pcfs::-webkit-scrollbar{display:none}
+.pcfp{flex:0 0 100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:6px 14px}
+.pcfp img{max-width:100%;max-height:100%;object-fit:contain;border-radius:14px;box-shadow:0 12px 40px -10px #000;-webkit-user-drag:none}
+.pcfb{flex:none;padding:12px 16px max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.pcfm{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:14px;background:#ffffff12}
+.pcfm span{font-size:14px;font-weight:700;color:#ffffffd8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcfm b{font-size:16px;font-weight:900;white-space:nowrap}
+.pcfm b i{font-style:normal;font-size:12px;font-weight:600;color:#ffffffa0}
+.pcfa{display:flex;gap:10px}
+.pcfa button{height:52px;border:0;border-radius:16px;font:inherit;font-size:15.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+.pcfa svg{width:20px;height:20px}
+.pcfx{flex:0 0 34%;background:#ffffff1a;color:#fff}
+.pcfo{flex:1;background:var(--blu);color:#fff}
+.pcfo:focus-visible,.pcfx:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* v72.0 (خواسته صاحب اپ): صفحه قفل و ورود — لوگوی مطلا (logo-stamp.png) به‌جای مربع آبی «م» */
+.lkmark.lklogo{width:min(58vw,230px);height:auto;aspect-ratio:477/202;border-radius:0;background:none;box-shadow:none;margin-bottom:16px}
+.lklg{display:block;width:100%;height:100%;background:url(logo-stamp.png) center/contain no-repeat;filter:drop-shadow(0 10px 18px #b8862b40)}
+.amk.amlg{width:min(58vw,230px)!important;height:auto!important;aspect-ratio:477/202;border-radius:0!important;background:url(logo-stamp.png) center/contain no-repeat!important;box-shadow:none!important;filter:drop-shadow(0 10px 18px #b8862b40)}
