@@ -219,7 +219,7 @@ function srchLeave(a,b){if(a===b)return;try{if(a==='custs')cuQ='';/* v70.2: جس
 window.addEventListener('popstate',e=>{srchLeave(cur,(e.state&&e.state.n)||'home');if(cur==='sell'&&((e.state&&e.state.n)||'home')!=='sell'&&typeof svAuto==='function')svAuto('leave');navBack=true;cur=(e.state&&e.state.n)||'home';if(cur!=='entry')editId=null;render(true)});
 const dchip=()=>{const D=dates(dateVal);return `<button class="dchip" data-act="date" aria-label="تاریخ گزارش: ${D.fa}">${ic('cal')}<span class="t"><b>${D.fa}</b><small>${esc(relDay(dateVal))}</small></span></button>`};
 function dockHTML(){const t=TAB[cur],bad=dayList().filter(r=>r.level===2).length,tb=(k,i,l,b)=>`<button class="tb${t===k?' on':''}" data-act="tab" data-n="${k}" aria-label="${l}" title="${l}">${ic(i)}<span class="lb">${l}</span>${b?`<span class="bd">${toFa(b)}</span>`:''}</button>`;
-  return tb('home','home','خانه',bad)+tb('banks','bank','بانک')+tb('custs','users','مشتریان')+tb('audit','clock','تاریخچه')+tb('settings','gear','تنظیمات')}
+  return tb('home','home','خانه',bad)+tb('banks','bank','بانک')+tb('custs','users','مشتریان')+tb('audit','clock','تاریخچه')}/* v73.5: تنظیمات در کشوی حساب کاربری (آواتار بالا) */
 /* v61.47: صفحه‌های مشتری (سند، نمایش سند، حساب مشتری) زیر عنوان نام مشتری را نشان می‌دهند نه کاربر */
 const hdCu=()=>cur==='sell'?(sv&&svCu()):cur==='inv'?(invGet()||{}).c:cur==='cust'?curCu():null;
 function render(anim){/* v71.8 رفع باگ (خواسته صاحب اپ: «تأیید و ادامه خرید دستی کار نمی‌کند، مشتری جدید اضافه نمی‌شود»): هر رسم دوباره صفحه

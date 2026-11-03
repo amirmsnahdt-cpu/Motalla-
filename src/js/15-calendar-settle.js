@@ -187,13 +187,8 @@ ACT.arcDayL=d=>{fD='';fP=d.iso;fG='pay';fF='all';fS='';fQ='';spTab='lists';rende
 ACT.fDClr=()=>{fD='';render()};
 ACT.fClr=()=>{fQ='';fN=120;render()};
 ACT.findMore=()=>{fN+=200;$('fres').innerHTML=findHTML()};
-ACT.acct=()=>{if(!ME){showAuth();return}sheet(`<div class="sh-h"><b>حساب کاربری</b><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="uh2"><div class="av">${esc(userInit(ME.name))}</div><div class="ux"><b>${esc(ME.name)}</b><span>${ROLE[ME.role]||ME.role} · <i class="ltrv">@${esc(ME.username)}</i></span></div></div>
-  <div class="sstat"><span class="sdot ${SY.state}"></span><span class="slbl">${esc(syncLabel())}</span>${SY.err&&SY.state!=='ok'?`<small>${esc(SY.err)}</small>`:''}</div>
-  <button class="opt big" data-act="settings">${ic('gear')}<span><b>تنظیمات</b><small>ظاهر، دسترسی‌ها، کاربران و پشتیبان</small></span></button>
-  <button class="opt big" data-act="pwSheet">${ic('key')}<span><b>تغییر رمز عبور</b><small>رمز ورود خودتان را عوض کنید</small></span></button>
-  <button class="opt big" data-act="logout" style="color:var(--red)">${ic('out')}<span><b>خروج از حساب</b><small>اطلاعات این گوشی پاک می‌شود و روی سرور می‌ماند</small></span></button>
-  <div class="ver">مطلا · نسخه ${toFa(APP_V)}</div>`)};
+/* v73.5 (خواسته صاحب اپ): آواتار بالا = کشوی کناری «حساب کاربری» مثل اپ Claude با همه تنظیمات (15ze)؛ تنظیمات از نوار پایین برداشته شد */
+ACT.acct=()=>{if(!ME){showAuth();return}if(document.documentElement.classList.contains('cdon')&&CD.open){cdClose();return}cdOpen(0,'me')};
 ACT.bkLoad=()=>{BK=null;loadBk();render()};
 ACT.bkTog=(d,e)=>{const r=e.target.closest('.hrow');if(!r)return;r.classList.toggle('open')?bkOpen.add(d.n):bkOpen.delete(d.n)};
 ACT.bkShare=async()=>{const k=bkReady;if(!k)return;try{await navigator.share({files:[k.f],title:k.name});bkReady=null;closeSheet();toast('پشتیبان ذخیره شد ✓');bkSaved()}catch(e){if(e&&e.name==='AbortError')return;toast('ذخیره انجام نشد: '+(e&&e.message||''),true)}};
