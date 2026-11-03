@@ -3171,3 +3171,40 @@ html.iosbr #sheet .px7l{padding-bottom:calc(88px + env(safe-area-inset-bottom,0p
 :is(#cures,.cuLs) .cuL .c6r:not(.zr)>.cul{grid-row:1/span 2;align-self:start}
 :is(#cures,.cuLs) .cuL .c6r:not(.zr)>.c6vb{grid-column:2}
 @media (max-width:519px){.c6q0 .cufbtn span{display:none}.c6q0 .cufbtn{padding:0 9px}.c6q0 .culast{padding:0 8px;gap:4px}}
+/* v72.3 سند بانکی چندردیفی (مثل کیمیا): تشخیص هر ردیف، مبلغ، شرح؛ واریزها سبز، برداشت‌ها قرمز */
+.bdtop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 10px}
+.bddt{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:0;border-radius:12px;background:var(--hair);color:var(--ink);font:inherit;font-size:13px;font-weight:800;cursor:pointer}.bddt svg{width:16px;height:16px;color:var(--blu)}
+.bdno{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 6px 0 12px;padding-inline:12px 6px;border-radius:12px;background:color-mix(in srgb,var(--gold,#c99a3a) 14%,var(--card));color:#a0731c;font-size:12.5px;font-weight:800}
+.bdno b{min-width:44px;text-align:center;padding:3px 8px;border-radius:9px;background:var(--gold,#c99a3a);color:#fff;font-size:15px}
+.bdacs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 10px}.bdacs::-webkit-scrollbar{display:none}
+.bdac{flex:none;display:flex;align-items:center;gap:9px;min-width:150px;padding:9px 12px;border:0;border-radius:16px;background:var(--card);box-shadow:0 0 0 1px var(--hair);color:var(--ink);font:inherit;text-align:right;cursor:pointer;transition:box-shadow .2s,background-color .2s}
+.bdac.one{width:100%;margin-bottom:10px;cursor:default}
+.bdac .tx{display:flex;flex-direction:column;line-height:1.4;min-width:0}.bdac .tx b{font-size:13.5px}.bdac .tx small{font-size:11.5px;color:var(--mut,#8a8f98)}
+.bdac.on{box-shadow:0 0 0 2px var(--blu);background:color-mix(in srgb,var(--blu) 7%,var(--card))}
+.bdl{display:flex;flex-direction:column;gap:8px}
+.bdr{--bc:#1f9d57;display:grid;grid-template-columns:24px minmax(0,1fr) minmax(0,1.3fr) auto;grid-template-areas:"n k a x" "n t t t";gap:7px 8px;align-items:center;padding:10px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--bc) 35%,transparent);transition:box-shadow .25s}
+.bdr.out{--bc:#d23c48}
+.bdn0{grid-area:n;align-self:start;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--bc,var(--blu)) 14%,transparent);color:var(--bc,var(--blu));font-size:12px;font-weight:800;margin-top:8px}
+.bdks{grid-area:k;position:relative;display:block}
+.bdk{width:100%;height:42px;padding:0 10px 0 26px;border:0;border-radius:12px;background:color-mix(in srgb,var(--bc) 12%,var(--card));color:var(--bc);font:inherit;font-size:14.5px;font-weight:800;appearance:none;-webkit-appearance:none;cursor:pointer}
+.bdks::after{content:'';position:absolute;left:11px;top:50%;width:7px;height:7px;border:solid var(--bc);border-width:0 0 2px 2px;transform:translateY(-70%) rotate(-45deg);pointer-events:none}
+.bdk option{color:var(--ink);background:var(--card)}
+.bdam{grid-area:a;display:flex;align-items:center;gap:4px;height:42px;padding:0 10px;border-radius:12px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--hair)}
+.bdam input{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:inherit;font-size:17px;font-weight:800;outline:0;padding:0}
+.bdam i{font-style:normal;font-size:11px;color:var(--mut,#8a8f98)}
+.bdx{grid-area:x;width:32px;height:32px;border:0;border-radius:50%;background:var(--hair);color:var(--mut,#8a8f98);font-size:19px;line-height:1;cursor:pointer}
+.bdnt{grid-area:t;height:38px;padding:0 12px;border:0;border-radius:11px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--hair);color:var(--ink);font:inherit;font-size:13.5px;outline:0;width:100%;box-sizing:border-box}
+.bdadd{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:44px;margin:10px 0;border:1.5px dashed color-mix(in srgb,var(--blu) 45%,transparent);border-radius:14px;background:none;color:var(--blu);font:inherit;font-size:14px;font-weight:800;cursor:pointer}.bdadd svg{width:17px;height:17px}
+.bdsum{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:6px;margin-bottom:12px}
+.bds{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;border-radius:14px;background:var(--card);box-shadow:0 0 0 1px var(--hair)}
+.bds small{font-size:11px;font-weight:700;color:var(--mut,#8a8f98)}.bds b{font-size:15px;font-weight:900}
+.bds.in b{color:#1f9d57}.bds.out b{color:#d23c48}.bds.net{background:var(--blu);box-shadow:none}.bds.net small{color:rgb(255 255 255/.8)}.bds.net b{color:#fff}
+.bdvl{padding:4px 0}.bdv{--bc:#1f9d57;display:flex;align-items:center;gap:10px;padding:10px 14px}.bdv.out{--bc:#d23c48}.bdv+.bdv{border-top:1px solid var(--hair)}
+.bdv .bdn0{margin:0}.bdv .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}.bdv .tx b{color:var(--bc);font-size:14px}.bdv .tx small{font-size:12px;color:var(--mut,#8a8f98)}
+.bdva{color:var(--bc);font-size:15.5px;font-weight:900;white-space:nowrap}.bdva i{font-style:normal;font-size:11px;color:var(--mut,#8a8f98);font-weight:700}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .bdr,:root:not([data-theme=light]) .bdv{--bc:#3ecf7e}:root:not([data-theme=light]) .bdr.out,:root:not([data-theme=light]) .bdv.out{--bc:#ff6b76}}
+:root[data-theme=dark] .bdr,:root[data-theme=dark] .bdv{--bc:#3ecf7e}:root[data-theme=dark] .bdr.out,:root[data-theme=dark] .bdv.out{--bc:#ff6b76}
+#sheet .bdam input,#sheet .bdam input:focus{height:auto;min-height:0;padding:0;margin:0;border:0!important;border-radius:0;background:none!important;box-shadow:none!important;font-size:17px;font-weight:800;text-align:left}
+#sheet .bdam:focus-within,#sheet .bdnt:focus{box-shadow:inset 0 0 0 1.5px var(--blu)!important}
+#sheet input.bdnt{height:38px;min-height:0;margin:0;padding:0 12px;border:0!important;border-radius:11px;background:var(--bg)!important;box-shadow:inset 0 0 0 1px var(--hair)!important;font-size:13.5px;font-weight:600}
+#sheet select.bdk{height:42px;min-height:0;margin:0;border:0!important;box-shadow:none!important;background:color-mix(in srgb,var(--bc) 12%,var(--card))!important;color:var(--bc)!important}
