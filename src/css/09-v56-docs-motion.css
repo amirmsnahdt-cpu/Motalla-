@@ -3341,3 +3341,16 @@ html.cdon .cdez{display:none}
 .cdu .tx small{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden}
 .cdu .sdot{flex:none;width:7px;height:7px}
 .cdug{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--blu) 10%,transparent);color:var(--blu)}.cdug svg{width:18px;height:18px}
+/* v74.0 ورود حساب: هر گزینه یک کارت با قاب رنگی برنامه؛ فلش داخل قاب */
+#sheet .edoc,#sheet .opt.ecd{border:1.5px solid color-mix(in srgb,var(--blu) 28%,var(--line))!important;border-radius:18px!important;background:var(--card)!important;margin:0 0 10px!important}
+#sheet .opt.ecd,#sheet .edoc>.opt{padding:14px 14px 14px 16px!important}
+#sheet .opt.ecd+.opt.ecd{border-top:1.5px solid color-mix(in srgb,var(--blu) 28%,var(--line))!important;border-radius:18px!important}
+#sheet .opt.ecd::after,#sheet .edoc>.opt::after{margin-inline-start:6px;margin-inline-end:2px}
+#sheet .edoc.open{border-color:var(--blu)!important}
+#sheet .opt.ecd:active{border-color:var(--blu)!important}
+/* v74.0: دکمه + مشتری تازه کنار جستجوی حساب‌ها */
+.cusrow{display:flex;align-items:stretch;gap:8px}.cusrow>.fsearch{flex:1;min-width:0}
+.cuadd{flex:none;width:54px;border:0;border-radius:18px;display:grid;place-items:center;background:var(--blu);color:#fff;cursor:pointer;box-shadow:0 10px 20px -12px color-mix(in srgb,var(--blu) 85%,transparent)}
+.cuadd svg{width:24px;height:24px;stroke-width:2.6}
+.cdf{border-top:0}
+.cuadd svg{width:26px!important;height:26px!important;stroke-width:2.6}

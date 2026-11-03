@@ -70,7 +70,7 @@ const curCu=()=>custs.find(c=>String(c.id)===String(custId))||null;
 /* ---- فهرست حساب‌ها: فقط جستجو و فهرست؛ مشتری تازه از همین جستجو ---- */
 function vCusts(){if(cuNoFix())setTimeout(()=>ls.set('m_custs',custs),0);const L=CU();
   if(!L.length&&!cuQ)return `<div class="c6s">${cuSearchHTML(0)}</div><div class="spempty"><div class="spill">${ic('users')}</div><b>هنوز حسابی باز نشده</b><span>نام مشتری را در جستجو بنویسید؛ اگر حسابی نداشته باشد، اول مشخصاتش را می‌گیریم و بعد وارد حساب و سند او می‌شوید.</span></div>`;
-  cuAnim=1;cuCntId=null;return `<div class="c6s cusr">${cuSearchHTML(L.length)}${cuLastBtn()}</div>${shBanner()}<div class="cugw"><nav id="cug" class="cugr" aria-label="گروه‌ها">${cuRailHTML()}</nav><div class="cugm"><div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div></div></div>`}
+  cuAnim=1;cuCntId=null;return `<div class="c6s cusr"><div class="cusrow">${cuSearchHTML(L.length)}${can('debt')?`<button class="cuadd" data-act="cuNewQ" aria-label="مشتری تازه" title="مشتری تازه">${ic('plus')}</button>`:''}</div>${cuLastBtn()}</div>${shBanner()}<div class="cugw"><nav id="cug" class="cugr" aria-label="گروه‌ها">${cuRailHTML()}</nav><div class="cugm"><div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div></div></div>`}
 /* v72.2 (خواسته صاحب اپ، مثل نرم‌افزار کیمیا): ستون گروه‌ها کنار فهرست (گوشی: نوار افقی بالای فهرست)؛ زدن = فیلتر گروه (همان cuF.g) */
 function cuRailHTML(){const G=groupsList();if(!G.length)return '';const A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,nn=n('-');
   const it=(g,lab)=>`<button class="cugi${(cuF.g||'')===g?' on':''}" data-act="cuGR" data-g="${esc(g)}"><span>${lab}</span><em>${fmt(n(g))}</em></button>`;
@@ -306,8 +306,8 @@ ACT.txDel=d=>{const c=curCu(),t=c&&(c.txs||[]).find(x=>String(x.id)===String(d.i
 ACT.entryMenu=()=>{if(!can('add')){toast('دسترسی «ثبت واریزی جدید» برای حساب شما فعال نیست',true);return}sheet(`<div class="sh-h"><div><b>ورود حساب</b><small class="shsub">نوع ثبت را انتخاب کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="edoc" id="edoc"><button class="opt big" data-act="edocT" aria-expanded="false">${ic('inv')}<span><b>سند خرید و فروش</b><small>بزنید تا فروش، خرید، دریافت و پرداخت باز شود؛ تعویض، مرجوعی و بقیه کارها داخل سند هست</small></span></button>
   <div class="edkw"><div class="edk edk4">${DK.filter(([k])=>['sell','buy','in','out'].includes(k)).map(([k,t,i])=>`<button type="button" class="edkb ${dkRed(k)?'r':'b'}" data-act="docDk" data-d="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div></div></div>
-  <button class="opt big" data-act="buyNew">${ic('plus')}<span><b>خرید دستی</b><small>اطلاعات مشتری، اقلام و حساب در یک صفحه، کادر به کادر</small></span></button>
-  <button class="opt big" data-act="go" data-n="bulk">${ic('paste')}<span><b>چسباندن لیست</b><small>چند واریزی یکجا از متن تلگرام یا یادداشت</small></span></button>`)};
+  <button class="opt big ecd" data-act="buyNew">${ic('plus')}<span><b>خرید دستی</b><small>اطلاعات مشتری، اقلام و حساب در یک صفحه، کادر به کادر</small></span></button>
+  <button class="opt big ecd" data-act="go" data-n="bulk">${ic('paste')}<span><b>چسباندن لیست</b><small>چند واریزی یکجا از متن تلگرام یا یادداشت</small></span></button>`)};
 /* v71.7 (خواسته صاحب اپ): «سند خرید» و «فروش» یکی شدند — «سند خرید و فروش» با کارهای سند (فروش، خرید، تعویض، دریافت، پرداخت، مرجوعی)؛
    زدن هر کار = سند تازه با همان کار باز (مثل «سند جدید» حساب مشتری)، مشتری از جستجوی بالای سند انتخاب می‌شود */
 /* v73.8 (خواسته صاحب اپ): کارت «سند خرید و فروش» اول بسته است؛ زدن = کارت با انیمیشن پایین باز می‌شود و چهار کار دیده می‌شود */
