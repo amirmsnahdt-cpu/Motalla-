@@ -6,7 +6,7 @@ const saveCu=()=>{cuNoFix();ls.set('m_custs',custs)};
 function cuNoFix(){const L=custs.filter(c=>c&&!c.sys).sort((a,b)=>String(a.createdAt||'').localeCompare(String(b.createdAt||''))||(+a.id||0)-(+b.id||0));
   let mx=0;for(const c of L){const n=+c.cno;if(Number.isInteger(n)&&n>0&&n>mx)mx=n}const seen=new Set();let ch=0;
   for(const c of L){const n=+c.cno;if(Number.isInteger(n)&&n>0&&!seen.has(n)){seen.add(n);continue}c.cno=++mx;seen.add(mx);ch=1}return ch}
-const cuNoH=c=>c&&c.cno?`<span class="cuno" title="شماره مشتری">${toFa(c.cno)}</span>`:'';
+const cuNoH=c=>c&&c.cno?`<span class="cuno" title="شماره مشتری"><i>#</i>${toFa(c.cno)}</span>`:'';
 let custId=null,cuQ='';
 /* فقط مشتری‌ها (رکوردهای سیستمی مثل کارتخوان‌ها و تنظیمات فروش sys دارند و مشتری نیستند) */
 const CU=()=>custs.filter(c=>!c.del&&!c.sys);
@@ -82,7 +82,9 @@ const cuGLab=()=>cuF.g==='-'?'بدون گروه':cuF.g||'';
 /* v72.9: دکمه ≡ بیرون جستجو، در سرتیتر روبه‌روی «حساب مشتریان»؛ گروه فعال = نقطه آبی روی دکمه */
 const cuGBtn=()=>CU().length?`<button class="ib0 cugh${cuF.g?' on':''}" id="cuGb" data-act="cuGMenu" aria-label="${cuF.g?'گروه '+esc(cuGLab()):'حساب‌ها و گروه‌ها'}">${ic('hamb')}</button>`:'';
 /* رنگ دایره هر حساب (بی‌عکس) از روی شناسه‌اش؛ همیشه ثابت */
-const cuHue=c=>{let h=0;for(const ch of String(c&&c.id||''))h=(h*31+ch.charCodeAt(0))>>>0;return Math.round(h*137.508)%360};
+/* v73.2 (خواسته صاحب اپ: رنگ‌ها «یه جوری» بود): فقط ۸ رنگ آرام و هماهنگ، پس‌زمینه کم‌رنگ + حرف پررنگ همان رنگ (بدون گرادیان) */
+const CU_HUES=[214,232,262,190,168,28,338,200];
+const cuHue=c=>{let h=0;for(const ch of String(c&&c.id||''))h=(h*31+ch.charCodeAt(0))>>>0;return CU_HUES[h%CU_HUES.length]};
 const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${n?'نام، فاکتور، مبلغ، وزن…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button>${n?`<button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button>`+cuFBtn():''}</div>`;
 /* v61.96 (خواسته صاحب اپ): فیلترها به‌جای دو ردیف چیپ، یک دکمه «فیلتر» داخل جستجو + پنجره مرتب (مثل iOS)؛ زیر جستجو فقط برچسب فیلتر فعال */
 Object.assign(IC,{filter:'<path d="M4 6h16M7 12h10M10 18h4"/>'});
@@ -128,6 +130,8 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
   if(dq){const S=new Set(TX.map(([c])=>String(c.id)));B=B.filter(([c])=>S.has(String(c.id)))}
   else if(q)B=B.filter(([c])=>cuHit(c,q,dOk));
   cuWPRe();B=B.filter(([c,b])=>cuGOk(cuF.g,c)&&cuFOk(cuF.b,b,c));
+  /* v73.2: عدد خالی = شماره مشتری → همان حساب اول از همه (جدا، بالای سندها)، حتی اگر فیلتر گروه دیگری روشن باشد */
+  const nq=toEn(q0).replace(/[\s#]/g,''),NH=!dq&&/^\d{1,7}$/.test(nq)?A.find(c=>String(c.cno)===String(+nq)):null;if(NH)B=B.filter(([c])=>c!==NH);
   /* v68.1 (خواسته صاحب اپ): حساب‌های مانده‌دار (و در انتظار) بالا، تسویه‌شده‌ها پایین؛ داخل هر دسته ترتیب قبلی */
   const PW=pendMap(),zOf=([c,b])=>cuZero(b)&&!PW.get(String(c.id))&&!(cuWP.get(String(c.id))||0)?1:0;
   B.sort((a,b)=>(zOf(a)-zOf(b))||(q?(nzName(b[0].name).startsWith(q)-nzName(a[0].name).startsWith(q)):0)||String(b[0].lastAt||b[0].createdAt||'').localeCompare(String(a[0].lastAt||a[0].createdAt||'')));
@@ -140,9 +144,11 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
   /* v61.33: شماره سند (فاکتور فروش، خرید و…) هم جستجو می‌شود؛ زدن = باز شدن همان سند */
   const IV=dq?[]:cuInvHits(q0),ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
   const IVS=new Set(IV.map(([,t])=>String(t.id))),txh=cuTxHTML(TX.filter(([,t])=>!IVS.has(String(t.id)))),dch=cuDtChip(qd);
+  const nhh=NH?`<div class="c6gh">شماره مشتری ${toFa(NH.cno)}</div><div class="c6l c6lb cuL cunoh">${cuRowH(NH,cuBal(NH),0,PW)}</div>`:'';
+  if(!B.length&&nhh)return dch+nhh+ivh+txh;
   if(!B.length)return dch+((dq?txh:ivh+txh+mem+add)||`<div class="bempty">${ic(dq?'cal':'search')}<b>${dq?'در این روز سندی ثبت نشده':cuF.b||cuF.g?'حسابی با این فیلتر نیست':'حسابی پیدا نشد'}</b>${!dq&&(cuF.b||cuF.g)?'<button class="fchip on" data-act="cuFClr">برداشتن فیلتر</button>':''}</div>`);
   const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'';cuAnim=0;
-  return `${dch}${ivh}${dq?txh:''}${cuSumHTML(B)}${dq?`<div class="c6gh">حساب‌های این روز · ${fmt(B.length)} حساب</div>`:''}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb cuL${an}">${B.map(([c,b],ri)=>cuRowH(c,b,ri,PW)).join('')}</div>${dq?'':txh}${mem}${add}`}
+  return `${dch}${nhh}${ivh}${dq?txh:''}${cuSumHTML(B)}${dq?`<div class="c6gh">حساب‌های این روز · ${fmt(B.length)} حساب</div>`:''}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb cuL${an}">${B.map(([c,b],ri)=>cuRowH(c,b,ri,PW)).join('')}</div>${dq?'':txh}${mem}${add}`}
 /* v69.8: ردیف یک حساب در فهرست حساب مشتریان — یک جا تعریف شده تا پنل «پرداخت از کجا؟» دقیقاً همین ردیف را نشان دهد.
    o.act/o.k = کار زدن ردیف (پیش‌فرض باز کردن حساب)، o.sw=false یعنی بدون کشیدن */
 function cuRowH(c,b,ri,PW,o){o=o||{};const pw=PW&&PW.get(String(c.id)),wp=cuWP.get(String(c.id))||0,z=cuZero(b)&&!pw&&!wp,nT=(b.G?1:0)+(b.R||pw||wp?1:0)+Object.keys(b.X||{}).filter(k=>b.X[k]).length;cbLst=1;const bp=z?'':balPills(b,pw,wp);cbLst=0;
@@ -489,7 +495,7 @@ const nzName=s=>clean(String(s||'')).replace(/ي/g,'ی').replace(/ك/g,'ک').rep
 /* v60.6: جستجوی مشترک افراد (صفحه مشتریان، تسویه از مشتری، …): همه مشخصات حساب + افراد واریزی/خرید بدون حساب */
 const pDig=q0=>{const qd=toEn(q0||'').replace(/\D/g,'');return v=>qd.length>=3&&toEn(String(v||'')).replace(/\D/g,'').includes(qd)};
 const cuHay=c=>Object.keys(c).filter(k=>typeof c[k]==='string'&&!/^(id|sys|createdAt|lastAt|updatedAt|by|createdBy|updatedBy)$/.test(k)).map(k=>c[k]).join(' ');
-const cuHit=(c,q,dOk)=>{const h=cuHay(c);return nzName(h).includes(q)||dOk(h)||!!(c.cno&&String(c.cno)===String(q).replace(/^#/,''))};
+const cuHit=(c,q,dOk)=>{const h=cuHay(c);return nzName(h).includes(q)||dOk(h)};
 function memPeople(q,dOk,n){const A=CU();return bzPeople().filter(p=>!p.cuId&&!A.some(c=>nzName(c.name)===p.k)&&(p.k.includes(q)||nzName(p.holder||'').includes(q)||dOk([p.phone,p.nid,p.iban,p.card].join(' ')))).sort((a,b)=>(b.k.startsWith(q)-a.k.startsWith(q))||String(b.last).localeCompare(String(a.last))).slice(0,n)}
 function bzPeople(){const M=new Map(),add=(name,o)=>{const k=nzName(name);if(!k)return;const p=M.get(k)||{name:clean(name),k,n:0,last:'',phone:'',nid:'',cuId:'',iban:'',card:'',holder:''};
     if(o.phone&&!p.phone)p.phone=o.phone;if(o.iban&&!p.iban){p.iban=o.iban;p.card=o.card||'';p.holder=o.holder||''}if(o.nid&&!p.nid)p.nid=o.nid;if(o.cuId&&!p.cuId)p.cuId=o.cuId;if(o.n)p.n+=o.n;if(o.last&&o.last>p.last)p.last=o.last;M.set(k,p)};
@@ -550,7 +556,7 @@ ACT.bzNewIban=()=>{bzRead();bz.d.iban='';bz.d.card='';const v=$('view'),y=v.scro
    و بخش «عکس کارت ملی» با دو خانه روی/پشت کارت. عکس‌ها مثل رسیدها کوچک و در IndexedDB + سرور (/api/img) ذخیره می‌شوند؛
    کلیدشان روی حساب مشتری (c.av، c.idImgs) با ذخیره فرم می‌نشیند. آواتار عکس‌دار همه‌جا (فهرست، سرتیتر، سند) نشان داده می‌شود. */
 let CUF={av:'',ids:[]};
-const cuAvH=c=>`<span class="c6a${c&&c.av?' cav':''}">${c&&c.av?`<img data-ik="${esc(c.av)}" alt="">`:''}${esc(userInit(c?c.name:''))}</span>`;
+const cuAvH=c=>`<span class="c6a cul${c&&c.av?' cav':''}" style="--h:${cuHue(c)}">${c&&c.av?`<img data-ik="${esc(c.av)}" alt="">`:''}${esc(userInit(c?c.name:''))}</span>`;
 function cuPhHTML(c){const n=clean(c.name||'');return `<div class="cufp"><label class="cuav${CUF.av?' on':''}" aria-label="عکس پروفایل"><span class="cuavi">${CUF.av?`<img data-ik="${esc(CUF.av)}" alt="">`:`<b>${esc(userInit(n||'؟'))}</b>`}</span><span class="cuavb">${ic('cam')}</span><input type="file" accept="image/*" data-cuph="av" class="fcov" aria-label="عکس پروفایل"></label>
   <div class="cufpt"><b>عکس پروفایل</b><small>${CUF.av?'برای عوض کردن روی عکس بزنید':'روی دایره بزنید: گالری یا دوربین'}</small><span class="cufpa">${picCam()?`<label class="cufb">${ic('cam')}<span>دوربین</span><input type="file" accept="image/*" capture="user" data-cuph="av" class="fcov" aria-label="دوربین"></label>`:''}${CUF.av?`<button type="button" class="cufb rd" data-act="cuPhDel" data-k="av">${ic('trash')}<span>حذف</span></button>`:''}</span></div></div>`}
 function cuIdHTML(){return ['روی کارت','پشت کارت'].map((t,i)=>{const k=CUF.ids[i];return `<div class="cuids${k?' on':''}"><label class="cuidp" aria-label="${t}">${k?`<img data-ik="${esc(k)}" alt="">`:`<span class="cuide">${ic('plus')}<b>${t}</b><small>گالری یا دوربین</small></span>`}<input type="file" accept="image/*" data-cuph="id${i}" class="fcov" aria-label="${t}"></label>
