@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS imgs_old(n INTEGER PRIMARY KEY AUTOINCREMENT, k TEXT 
 
 // ستون دسترسی‌ها (برای پایگاه‌داده‌های قدیمی اضافه می‌شود)
 try { db.exec('ALTER TABLE users ADD COLUMN perms TEXT'); } catch (e) { /* از قبل هست */ }
+try { db.exec('ALTER TABLE users ADD COLUMN av TEXT'); } catch (e) { /* v76.1: کلید عکس پروفایل کاربر */ }
 /* ---------- دسترسی‌ها: مدیر همه را دارد؛ کارمند فقط آنچه مدیر روشن کرده ---------- */
 const PERMS = ['add', 'edit', 'del', 'split', 'track', 'close', 'unsend', 'debt', 'src', 'undo', 'export'];
 const DEF_STAFF = ['add', 'edit', 'split', 'track', 'close', 'debt', 'export'];
@@ -140,7 +141,7 @@ function checkPass(p, stored) {
   try { const [alg, s, h] = String(stored).split('$'); if (alg !== 'scrypt') return false; const want = Buffer.from(h, 'hex'); const got = crypto.scryptSync(String(p), Buffer.from(s, 'hex'), want.length, { N: 16384, r: 8, p: 1 }); return crypto.timingSafeEqual(want, got); } catch (e) { return false; }
 }
 const sha = s => crypto.createHash('sha256').update(s).digest('hex');
-const pubUser = u => ({ id: u.id, username: u.username, name: u.name, role: u.role, perms: userPerms(u), active: !!u.active, created_at: u.created_at, last_login: u.last_login || null });
+const pubUser = u => ({ id: u.id, username: u.username, name: u.name, role: u.role, perms: userPerms(u), active: !!u.active, created_at: u.created_at, last_login: u.last_login || null, av: u.av || '' });
 
 /* ---------- ادغام سه‌طرفه (برای ویرایش هم‌زمان چند کاربر) ---------- */
 function stable(v) { if (v === undefined) return 'u'; if (v === null || typeof v !== 'object') return JSON.stringify(v); if (Array.isArray(v)) return '[' + v.map(stable).join(',') + ']'; return '{' + Object.keys(v).sort().filter(k => v[k] !== undefined).map(k => JSON.stringify(k) + ':' + stable(v[k])).join(',') + '}'; }
@@ -506,6 +507,14 @@ async function handle(req, res) {
     return send(res, 200, { id, secret });
   }
   if (p === '/api/bio/revoke' && req.method === 'POST') { const b = await readBody(req, 1e4); q.delBioKey.run(String(b.id || ''), me.id); return send(res, 200, { ok: true }); }
+  /* v76.1 (خواسته صاحب اپ): هر کاربر نام و عکس پروفایل خودش را عوض می‌کند (عکس = کلید تصویر همان انبار عکس‌ها) */
+  if (p === '/api/profile' && req.method === 'POST') {
+    const b = await readBody(req, 1e4), name = String(b.name || '').replace(/\s+/g, ' ').trim(), av = String(b.av || '');
+    if (!name || name.length > 60) return bad(res, 400, 'نام باید بین ۱ تا ۶۰ حرف باشد');
+    if (av && !/^[A-Za-z0-9_.:-]{1,120}$/.test(av)) return bad(res, 400, 'عکس نامعتبر است');
+    db.prepare('UPDATE users SET name=?, av=? WHERE id=?').run(name, av || null, me.id);
+    return send(res, 200, { user: pubUser(db.prepare('SELECT * FROM users WHERE id=?').get(me.id)) });
+  }
   if (p === '/api/password' && req.method === 'POST') {
     const b = await readBody(req, 1e5);
     if (!checkPass(b.old, me.pass)) return bad(res, 400, 'رمز فعلی اشتباه است');

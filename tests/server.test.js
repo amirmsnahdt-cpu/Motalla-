@@ -230,3 +230,13 @@ test('قیمت لحظه‌ای طلا: خواندن پاسخ tgju (ریال → 
   assert.equal((await api('/api/gold')).status, 401);
   const r = await api('/api/gold', { token: admin }); assert.ok(r.status === 200 || r.status === 503, 'answers even when tgju is unreachable');
 });
+
+test('هر کاربر نام و عکس پروفایل خودش را عوض می‌کند', async () => {
+  const r = await api('/api/profile', { method: 'POST', token: admin, body: { name: '  مدیر  تازه ', av: 'meav:abc123' } });
+  assert.equal(r.status, 200); assert.equal(r.j.user.name, 'مدیر تازه'); assert.equal(r.j.user.av, 'meav:abc123');
+  assert.equal((await api('/api/me', { token: admin })).j.user.av, 'meav:abc123');
+  assert.equal((await api('/api/profile', { method: 'POST', token: admin, body: { name: '' } })).status, 400);
+  assert.equal((await api('/api/profile', { method: 'POST', token: admin, body: { name: 'x', av: '<script>' } })).status, 400);
+  const d = await api('/api/profile', { method: 'POST', token: admin, body: { name: 'مدیر', av: '' } }); assert.equal(d.j.user.av, '');
+  assert.equal((await api('/api/profile', { method: 'POST', body: { name: 'x' } })).status, 401);
+});

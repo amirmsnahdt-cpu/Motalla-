@@ -87,7 +87,7 @@ async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.bu
   }catch(e){if(e.status!==401)setSync(e.net?'off':'err',e.message)}
   finally{SY.busy=false;if(SY.again){SY.again=false;syncSoon(50)}}}
 /* نقش یا دسترسی‌های این کاربر روی سرور عوض شد → فوراً در برنامه اعمال کن */
-function meUpdate(u){if(!ME||!u||u.id!==ME.id)return;const k=x=>JSON.stringify([x.role,(x.perms||[]).slice().sort(),x.name]);if(k(ME)===k(u))return;
+function meUpdate(u){if(!ME||!u||u.id!==ME.id)return;const k=x=>JSON.stringify([x.role,(x.perms||[]).slice().sort()]);if(k(ME)===k(u)){if(ME.name!==u.name||(ME.av||'')!==(u.av||'')){ME={...ME,...u};rawSet('m_me',ME);user=ME.name;try{remoteRefresh()}catch(e){}}return}
   const was=ME.role;ME={...ME,...u};rawSet('m_me',ME);user=ME.name;applyPerms();try{remoteRefresh()}catch(e){}
   toast(was!==u.role?'نقش حساب شما به «'+(ROLE[u.role]||u.role)+'» تغییر کرد ✓':'دسترسی‌های حساب شما به‌روز شد ✓')}
 function applyRemote(res,sent){const touched=new Set(),byColl={};
@@ -237,7 +237,7 @@ const APK_URL='https://talayemotalla.ir/app.apk',WEB_URL='https://talayemotalla.
 function vSettings(){const sgi=(act,icn,cls,t,sub,extra,attrs)=>`<button class="sgi${cls.indexOf('rd')>=0?' rd':''}" data-act="${act}"${attrs||''}><span class="si ${cls.replace('rd','')}">${ic(icn)}</span><span class="tx"><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span>${extra==null?`<span class="cv">${ic('back')}</span>`:extra}</button>`;
   const pv=k=>k==='a'?'<div class="pv a"><span></span></div>':`<div class="pv ${k}"><i class="b"></i><i></i><i class="g"></i></div>`;
   let h='<div class="stg">';
-  if(ME)h+=`<div class="prof"><div class="av">${esc(userInit(ME.name))}</div><div class="tx"><b>${esc(ME.name)}</b><div class="ln"><span class="pill ${isAdmin()?'gd':'g'}">${ROLE[ME.role]||ME.role}</span><bdi dir="ltr">@${esc(ME.username)}</bdi></div><div class="ln"><span class="sdot ${SY.state}"></span><span class="slbl">${esc(syncLabel())}</span></div></div></div>`;
+  if(ME)h+=`<button type="button" class="prof profb" data-act="meEdit" aria-label="ویرایش پروفایل"><div class="av${ME.av?' cav':''}">${meAvIn()}</div><div class="tx"><b>${esc(ME.name)}</b><div class="ln"><span class="pill ${isAdmin()?'gd':'g'}">${ROLE[ME.role]||ME.role}</span><bdi dir="ltr">@${esc(ME.username)}</bdi></div><div class="ln"><span class="sdot ${SY.state}"></span><span class="slbl">${esc(syncLabel())}</span></div></div><span class="profe">${ic('edit')}</span></button>`;
   /* v61.62 (خواسته صاحب اپ): آبشده شرطی زیر پروفایل — عیار واقعی یک بار زده می‌شود و در همه سندها می‌نشیند */
   if(ME&&can('debt')){const n=shN();h+=`<div class="sgh">طلا</div><div class="sgr">${sgi('shOpen','coin','g','آبشده شرطی',n?toFa(n)+' آبشده منتظر عیار':'آبشده‌ای منتظر عیار نیست',n?`<span class="shbd">${toFa(n)}</span><span class="cv">${ic('back')}</span>`:null)}</div>`}
   h+=`<div class="sgh">ظاهر</div><div class="sgr"><div class="thm">${THEMES.map(([k,t,sub,c])=>`<button class="${themePref===k?'on':''}" data-act="setTheme" data-t="${k}" aria-pressed="${themePref===k}">${pv(c)}<span>${t}</span><small>${sub}</small></button>`).join('')}</div>${IOS_SA?`<div class="thn">آیفون رنگ نوار ساعت و باتری را فقط موقع باز شدن برنامه می‌خواند؛ بعد از عوض کردن حالت، برنامه را یک بار کامل ببندید و دوباره باز کنید.</div>`:''}</div>`;

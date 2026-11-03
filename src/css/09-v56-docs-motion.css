@@ -3416,3 +3416,13 @@ html.cdon .cdez{display:none}
 #qa .sthd:is(.k-sell,.k-out) .stht b{color:var(--red)}
 /* v76.0 (خواسته صاحب اپ): در پنل فروش/پرداخت همه دکمه‌ها (تیک تأیید، بعدی، عکس، برگشت) هم قرمز — آبی همین پنل به قرمز عوض می‌شود */
 #qa.d6q:has(.sthd.k-sell),#qa.d6q:has(.sthd.k-out){--blu:var(--red);--blu2:var(--red2)}
+/* v76.1 پروفایل کاربر: کارت قابل زدن با مداد، عکس در دایره‌ها */
+.prof.profb{width:100%;border:0;font:inherit;text-align:right;cursor:pointer;position:relative}
+.profe{position:absolute;top:12px;left:12px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgb(255 255 255/.2);color:#fff}.profe svg{width:16px;height:16px}
+.prof .av,.mav,.cdua{position:relative;overflow:hidden}
+:is(.prof .av,.mav,.cdua)>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.c9hero.mehero .cufp{position:relative}
+/* v76.1 (خواسته صاحب اپ): ردیف «در انتظار واریز / تأیید» هم مثل بقیه کارت قاب‌دار — زرد (وضعیت در انتظار) */
+.d6rows.d7 .d6r:has(.d6k.k-wd){background:color-mix(in srgb,var(--pe,#b8862b) 6%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,var(--pe,#b8862b) 55%,transparent),0 12px 24px -18px color-mix(in srgb,var(--pe,#b8862b) 70%,transparent)}
+.d6rows.d7 .d6r:has(.d6k.k-wd)::after{background:var(--pe,#b8862b)}
+.d6rows.d7 .d6r:has(.d6k.k-wd) .d6ti{background:color-mix(in srgb,var(--pe,#b8862b) 14%,var(--card));color:var(--pe,#b8862b)}
