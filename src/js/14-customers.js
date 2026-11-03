@@ -72,10 +72,11 @@ ACT.cuLast=()=>{const L=cuLastDoc();if(!L){toast('هنوز سندی ثبت نش�
 const cuLastBtn=()=>{const L=cuLastDoc();return L?`<button class="culast" data-act="cuLast" aria-label="آخرین سند">${ic('inv')}<span><small>آخرین سند</small>${L[1].no!=null?`<b>${toFa(L[1].no)}</b>`:''}</span></button>`:''};
 /* v72.4/v72.8: گروه‌ها روی گوشی از دکمه ≡ داخل جستجو، در کشوی کناری (15ze-cu-drawer) */
 const cuGLab=()=>cuF.g==='-'?'بدون گروه':cuF.g||'';
-const cuGBtn=()=>groupsList().length?`<button class="cugb${cuF.g?' on':''}" id="cuGb" data-act="cuGMenu" aria-label="گروه‌ها">${cuF.g?`<span>${esc(cuGLab())}</span>`:''}${ic('hamb')}</button>`:'';
+/* v72.9: دکمه ≡ بیرون جستجو، در سرتیتر روبه‌روی «حساب مشتریان»؛ گروه فعال = نقطه آبی روی دکمه */
+const cuGBtn=()=>CU().length?`<button class="ib0 cugh${cuF.g?' on':''}" id="cuGb" data-act="cuGMenu" aria-label="${cuF.g?'گروه '+esc(cuGLab()):'حساب‌ها و گروه‌ها'}">${ic('hamb')}</button>`:'';
 /* رنگ دایره هر حساب (بی‌عکس) از روی شناسه‌اش؛ همیشه ثابت */
 const cuHue=c=>{let h=0;for(const ch of String(c&&c.id||''))h=(h*31+ch.charCodeAt(0))>>>0;return Math.round(h*137.508)%360};
-const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${n?'نام، فاکتور، مبلغ، وزن…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button>${n?cuGBtn():''}${n?`<button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button>`+cuFBtn():''}</div>`;
+const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${n?'نام، فاکتور، مبلغ، وزن…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button>${n?`<button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button>`+cuFBtn():''}</div>`;
 /* v61.96 (خواسته صاحب اپ): فیلترها به‌جای دو ردیف چیپ، یک دکمه «فیلتر» داخل جستجو + پنجره مرتب (مثل iOS)؛ زیر جستجو فقط برچسب فیلتر فعال */
 Object.assign(IC,{filter:'<path d="M4 6h16M7 12h10M10 18h4"/>'});
 const cuFN=()=>cuF.b?1:0;/* v72.2: گروه از ستون گروه‌ها انتخاب می‌شود و در شماره فیلتر نمی‌آید */
