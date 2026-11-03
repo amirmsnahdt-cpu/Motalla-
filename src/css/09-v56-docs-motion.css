@@ -3360,3 +3360,9 @@ html.cdon .cdez{display:none}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]) :is(.c6a.cul,.c6r .c6a.cul,.c6a.cul.cdav){background:color-mix(in srgb,var(--blu) 20%,var(--card));color:var(--blu);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent)}}
 :root[data-theme=dark] :is(.c6a.cul,.c6r .c6a.cul,.c6a.cul.cdav){background:color-mix(in srgb,var(--blu) 20%,var(--card));color:var(--blu);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent)}
 .cuh9 .c6a.cul,:root .cuh9 .c6a.cul{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent)!important}
+/* v74.4: حذف عکس پروفایل مشتری — دکمه قرمز روی گوشه دیگر عکس (روبه‌روی دوربین) */
+.cufp{position:relative}
+.cuavx{position:absolute;width:30px;height:30px;border:0;border-radius:50%;display:grid;place-items:center;background:var(--red,#d23c48);color:#fff;cursor:pointer;box-shadow:0 0 0 3px var(--card);z-index:2;top:52px;margin-inline-start:52px}
+.cuavx svg{width:15px;height:15px}
+.c9hero .cufp .cuavx{top:auto;bottom:0;right:calc(50% - 50px);margin:0;width:32px;height:32px}
+.c9hero .cufp{position:relative}
