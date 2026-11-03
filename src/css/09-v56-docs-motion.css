@@ -3366,3 +3366,7 @@ html.cdon .cdez{display:none}
 .cuavx svg{width:15px;height:15px}
 .c9hero .cufp .cuavx{top:auto;bottom:0;right:calc(50% - 50px);margin:0;width:32px;height:32px}
 .c9hero .cufp{position:relative}
+/* v74.5 (خواسته صاحب اپ: «اسکرول این قسمت کار نمی‌کند»): فهرست گروه در «مشخصات مشتری» دیگر اسکرول جدا ندارد —
+   روی آیفون یک فهرست داخلی با overscroll-behavior:contain که سر ریز نمی‌کرد، کشیدن انگشت را می‌بلعید و خود پنجره هم اسکرول نمی‌شد.
+   حالا فهرست کامل باز می‌شود و پنجره با همه چیز یکجا اسکرول می‌شود. */
+#cuGs{max-height:none;overflow:visible;overscroll-behavior:auto}
