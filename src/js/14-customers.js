@@ -298,8 +298,8 @@ ACT.txDel=d=>{const c=curCu(),t=c&&(c.txs||[]).find(x=>String(x.id)===String(d.i
   toast('حذف شد'+(L.length?' (همراه '+toFa(L.length)+' ردیف مرتبط در حساب‌های دیگر)':''),'', 'بازگردانی',()=>{t.del=false;L.forEach(x=>x.t.del=false);DU();saveCu();const v2=$('view'),y2=v2.scrollTop;render();v2.scrollTop=y2})};
 
 ACT.entryMenu=()=>{if(!can('add')){toast('دسترسی «ثبت واریزی جدید» برای حساب شما فعال نیست',true);return}sheet(`<div class="sh-h"><div><b>ورود حساب</b><small class="shsub">نوع ثبت را انتخاب کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="edoc"><button class="opt big" data-act="docDk" data-d="">${ic('inv')}<span><b>سند خرید و فروش</b><small>همان سند حساب مشتری با همه امکانات؛ کار را بزنید تا مستقیم باز شود</small></span></button>
-  <div class="edk">${DK.map(([k,t,i])=>`<button type="button" class="edkb ${dkRed(k)?'r':'b'}" data-act="docDk" data-d="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div></div>
+  <div class="edoc"><button class="opt big" data-act="docDk" data-d="">${ic('inv')}<span><b>سند خرید و فروش</b><small>کار را بزنید تا سند با همان باز شود؛ تعویض، مرجوعی و همه کارهای سند داخلش هست</small></span></button>
+  <div class="edk edk4">${DK.filter(([k])=>['sell','buy','in','out'].includes(k)).map(([k,t,i])=>`<button type="button" class="edkb ${dkRed(k)?'r':'b'}" data-act="docDk" data-d="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div></div>
   <button class="opt big" data-act="buyNew">${ic('plus')}<span><b>خرید دستی</b><small>اطلاعات مشتری، اقلام و حساب در یک صفحه، کادر به کادر</small></span></button>
   <button class="opt big" data-act="go" data-n="bulk">${ic('paste')}<span><b>چسباندن لیست</b><small>چند واریزی یکجا از متن تلگرام یا یادداشت</small></span></button>`)};
 /* v71.7 (خواسته صاحب اپ): «سند خرید» و «فروش» یکی شدند — «سند خرید و فروش» با کارهای سند (فروش، خرید، تعویض، دریافت، پرداخت، مرجوعی)؛

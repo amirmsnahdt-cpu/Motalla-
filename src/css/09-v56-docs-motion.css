@@ -3311,3 +3311,6 @@ html.cdon .cdez{display:none}
 .bzhero.nw .bzav::after,.bzhero.old .bzav::after{content:'';position:absolute;bottom:-2px;left:-2px;width:16px;height:16px;border-radius:50%;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f9d57' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat;box-shadow:0 0 0 2px var(--card)}
 .bzhero.old .bzav::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232152d9' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")}
 .bzg1{margin-top:10px}
+/* v73.6 ورود حساب: فقط چهار کار اصلی سند (فروش، خرید، دریافت، پرداخت) در دو ستون؛ بقیه کارها داخل خود سند */
+.edk.edk4{grid-template-columns:repeat(2,minmax(0,1fr))}
+.edk.edk4 .edkb{min-height:54px;font-size:15.5px}
