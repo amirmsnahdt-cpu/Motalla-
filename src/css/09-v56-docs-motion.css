@@ -3391,6 +3391,17 @@ html.cdon .cdez{display:none}
 .fsearch .cufbtn span{display:none}
 .fsearch .cufbtn em{position:absolute;top:-5px;left:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;display:grid;place-items:center;font-size:10.5px;font-style:normal;background:var(--blu);color:#fff;box-shadow:0 0 0 2px var(--card)}
 .fsearch .cufbtn.on em{background:var(--card);color:var(--blu);box-shadow:0 0 0 1.5px var(--blu)}
-/* v75.4 پنجره «نوع حساب» برای حساب تازه */
-.cufr.cunt{min-height:58px}.cufr.cunt .cufi{background:color-mix(in srgb,var(--blu) 12%,var(--card));color:var(--blu)}
-.cufr.cunt .cv svg{width:15px;height:15px;transform:scaleX(-1);color:var(--mut)}
+/* v75.5 پاپ‌آپ «نوع حساب تازه» از زیر کادر جستجو */
+.cntbd{position:fixed;inset:0;z-index:48;background:rgb(10 20 40/.18);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.cntp{position:fixed;z-index:49;overflow:auto;overscroll-behavior:contain;padding:12px;border-radius:24px;background:var(--card);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 30%,transparent),0 24px 50px -18px rgb(16 32 70/.45);transform-origin:50% 0}
+.cnth{display:flex;align-items:center;gap:10px;padding:2px 2px 12px}
+.cnthi{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:var(--blu);color:#fff}.cnthi svg{width:21px;height:21px;stroke-width:2.6}
+.cnth .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}.cnth .tx b{font-size:16px;font-weight:900}.cnth .tx small{font-size:12.5px;color:var(--blu);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cntx{flex:none;width:34px;height:34px;border:0;border-radius:50%;display:grid;place-items:center;background:var(--hair);color:var(--mut);cursor:pointer}.cntx svg{width:15px;height:15px}
+.cntg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.cntc{display:flex;align-items:center;gap:10px;min-height:62px;padding:10px 12px;border:0;border-radius:18px;background:color-mix(in srgb,var(--blu) 7%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 22%,transparent);color:var(--ink);font:inherit;text-align:right;cursor:pointer;transition:box-shadow .2s,background-color .2s}
+.cntc:active{background:color-mix(in srgb,var(--blu) 16%,var(--card));box-shadow:inset 0 0 0 2px var(--blu)}
+.cnti{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--card);color:var(--blu);box-shadow:0 4px 10px -6px color-mix(in srgb,var(--blu) 60%,transparent)}.cnti svg{width:19px;height:19px}
+.cntc .tx{min-width:0;display:flex;flex-direction:column;line-height:1.35}.cntc .tx b{font-size:14.5px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cntc .tx small{font-size:11.5px;color:var(--mut)}
+.cntc.ng{background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line)}.cntc.ng .cnti{color:var(--mut);box-shadow:none;background:var(--hair)}
+.fsearch.cntON{position:relative;z-index:49;box-shadow:0 0 0 4px color-mix(in srgb,var(--blu) 18%,transparent)!important}
