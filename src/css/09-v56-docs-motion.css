@@ -3314,3 +3314,4 @@ html.cdon .cdez{display:none}
 /* v73.6 ورود حساب: فقط چهار کار اصلی سند (فروش، خرید، دریافت، پرداخت) در دو ستون؛ بقیه کارها داخل خود سند */
 .edk.edk4{grid-template-columns:repeat(2,minmax(0,1fr))}
 .edk.edk4 .edkb{min-height:54px;font-size:15.5px}
+.cunof input{font-weight:900;font-size:17px;letter-spacing:.5px}
