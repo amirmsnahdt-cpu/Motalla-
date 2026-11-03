@@ -60,11 +60,22 @@ const curCu=()=>custs.find(c=>String(c.id)===String(custId))||null;
 /* ---- فهرست حساب‌ها: فقط جستجو و فهرست؛ مشتری تازه از همین جستجو ---- */
 function vCusts(){const L=CU();
   if(!L.length&&!cuQ)return `<div class="c6s">${cuSearchHTML(0)}</div><div class="spempty"><div class="spill">${ic('users')}</div><b>هنوز حسابی باز نشده</b><span>نام مشتری را در جستجو بنویسید؛ اگر حسابی نداشته باشد، اول مشخصاتش را می‌گیریم و بعد وارد حساب و سند او می‌شوید.</span></div>`;
-  cuAnim=1;cuCntId=null;return `<div class="c6s">${cuSearchHTML(L.length)}</div>${shBanner()}<div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div>`}
-const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${n?'نام، فاکتور، مبلغ، وزن…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button>${n?`<button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button>`+cuFBtn():''}</div>`;
+  cuAnim=1;cuCntId=null;return `<div class="c6s">${cuSearchHTML(L.length)}</div>${shBanner()}<div class="cugw"><nav id="cug" class="cugr" aria-label="گروه‌ها">${cuRailHTML()}</nav><div class="cugm"><div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div></div></div>`}
+/* v72.2 (خواسته صاحب اپ، مثل نرم‌افزار کیمیا): ستون گروه‌ها کنار فهرست (گوشی: نوار افقی بالای فهرست)؛ زدن = فیلتر گروه (همان cuF.g) */
+function cuRailHTML(){const G=groupsList();if(!G.length)return '';const A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,nn=n('-');
+  const it=(g,lab)=>`<button class="cugi${(cuF.g||'')===g?' on':''}" data-act="cuGR" data-g="${esc(g)}"><span>${lab}</span><em>${fmt(n(g))}</em></button>`;
+  return it('','همه')+G.map(g=>it(g,esc(g))).join('')+(nn?it('-','بدون گروه'):'')}
+ACT.cuGR=d=>{cuF.g=d.g||'';cuFRe();const o=document.querySelector('#cug .cugi.on');if(o&&o.scrollIntoView)o.scrollIntoView({block:'nearest',inline:'nearest',behavior:RM()?'auto':'smooth'})};
+/* v72.2: «آخرین سند» داخل جستجو: آخرین سند ثبت‌شده حساب‌ها (بزرگ‌ترین شماره) با یک زدن باز می‌شود */
+function cuLastDoc(){let R=null;for(const c of CU())for(const t of c.txs||[])if(t.type==='inv'&&!t.del){const k=[+t.no||0,String(t.createdAt||t.at||'')];if(!R||k[0]>R[2][0]||k[0]===R[2][0]&&k[1]>R[2][1])R=[c,t,k]}return R}
+ACT.cuLast=()=>{const L=cuLastDoc();if(!L){toast('هنوز سندی ثبت نشده');return}invOpen(L[0].id,L[1].id)};
+const cuLastBtn=()=>{const L=cuLastDoc();return L?`<button class="culast" data-act="cuLast" aria-label="آخرین سند">${ic('inv')}<span>آخرین سند</span>${L[1].no!=null?`<em>${toFa(L[1].no)}</em>`:''}</button>`:''};
+/* رنگ دایره هر حساب (بی‌عکس) از روی شناسه‌اش؛ همیشه ثابت */
+const cuHue=c=>{let h=0;for(const ch of String(c&&c.id||''))h=(h*31+ch.charCodeAt(0))>>>0;return Math.round(h*137.508)%360};
+const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}${n?cuLastBtn():''}<input id="cuq" type="search" placeholder="${n?'نام، فاکتور، مبلغ، وزن…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button>${n?`<button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button>`+cuFBtn():''}</div>`;
 /* v61.96 (خواسته صاحب اپ): فیلترها به‌جای دو ردیف چیپ، یک دکمه «فیلتر» داخل جستجو + پنجره مرتب (مثل iOS)؛ زیر جستجو فقط برچسب فیلتر فعال */
 Object.assign(IC,{filter:'<path d="M4 6h16M7 12h10M10 18h4"/>'});
-const cuFN=()=>(cuF.b?1:0)+(cuF.g?1:0);
+const cuFN=()=>cuF.b?1:0;/* v72.2: گروه از ستون گروه‌ها انتخاب می‌شود و در شماره فیلتر نمی‌آید */
 const cuFBtn=()=>`<button class="cufbtn${cuFN()?' on':''}" id="cuFb" data-act="cuFOpen" aria-label="فیلتر حساب‌ها">${ic('filter')}<span>فیلتر</span>${cuFN()?`<em>${toFa(cuFN())}</em>`:''}</button>`;
 /* v61.93 (خواسته صاحب اپ): فیلتر حساب‌ها — مانده‌دار، بدهکار/طلبکار تومانی و طلایی، تسویه؛ و گروه. با جستجو با هم کار می‌کنند.
    انتخاب در همین گوشی می‌ماند (m_cuf). جمع مانده‌های فیلتر بالای فهرست با شمارش. */
@@ -74,8 +85,8 @@ const CUFB=[['','همه'],['bal','مانده‌دار'],['rd','بدهکار تو
 let cuWP=new Map();const cuWPRe=()=>(cuWP=wdMap());
 const cuFOk=(k,b,c)=>!k?true:k==='wp'?!!(c&&cuWP.get(String(c.id))):k==='bal'?!!(b.R||b.G||Object.keys(b.X||{}).length):k==='z'?!(b.R||b.G||Object.keys(b.X||{}).length):k==='rd'?b.R<0:k==='rc'?b.R>0:k==='gd'?b.G<0:k==='gc'?b.G>0:true;
 const cuGOk=(g,c)=>!g?true:g==='-'?!c.grp:c.grp===g;
-function cuFiltHTML(){const G=groupsList();if(cuF.g&&cuF.g!=='-'&&!G.includes(cuF.g))cuF.g='';if(!cuFN())return '';const B=CUFB.find(x=>x[0]===cuF.b);
-  return `<div class="cufa">${B&&cuF.b?`<button class="cufp ${B[2]||''}" data-act="cuFB" data-k="${cuF.b}">${B[2]?'<i class="fdot"></i>':''}${B[1]}<span class="cufx">×</span></button>`:''}${cuF.g?`<button class="cufp" data-act="cuFG" data-g="${esc(cuF.g)}">${ic('users')}${cuF.g==='-'?'بدون گروه':esc(cuF.g)}<span class="cufx">×</span></button>`:''}${cuFN()>1?`<button class="cufclr" data-act="cuFClr">پاک کردن همه</button>`:''}</div>`}
+function cuFiltHTML(){const G=groupsList();if(cuF.g&&(!G.length||cuF.g!=='-'&&!G.includes(cuF.g)))cuF.g='';if(!cuF.b)return '';const B=CUFB.find(x=>x[0]===cuF.b);
+  return `<div class="cufa">${B&&cuF.b?`<button class="cufp ${B[2]||''}" data-act="cuFB" data-k="${cuF.b}">${B[2]?'<i class="fdot"></i>':''}${B[1]}<span class="cufx">×</span></button>`:''}${cuFN()>1?`<button class="cufclr" data-act="cuFClr">پاک کردن همه</button>`:''}</div>`}
 /* پنجره فیلتر: مانده (یکی) و گروه (یکی)؛ کنار هر گزینه تعداد حساب و برای مانده‌ها جمع همان مانده */
 function cuFSheetHTML(){cuWPRe();const A=CU().map(c=>[c,cuBal(c)]),G=groupsList(),inG=A.filter(([c])=>cuGOk(cuF.g,c)),inB=A.filter(([c,b])=>cuFOk(cuF.b,b,c));
   const sumOf=(k,L)=>{if(k==='wp')return fmt(L.reduce((a,[c])=>a+(cuWP.get(String(c.id))||0),0))+' تومان';if(k==='rd')return fmt(L.reduce((a,[,b])=>a+(b.R<0?-b.R:0),0))+' تومان';if(k==='rc')return fmt(L.reduce((a,[,b])=>a+(b.R>0?b.R:0),0))+' تومان';if(k==='gd')return wFmt(L.reduce((a,[,b])=>a+(b.G<0?-b.G:0),0))+' گرم';if(k==='gc')return wFmt(L.reduce((a,[,b])=>a+(b.G>0?b.G:0),0))+' گرم';return ''};
@@ -93,8 +104,8 @@ ACT.cuFS=d=>{if(d.b!=null)cuF.b=d.b;if(d.g!=null)cuF.g=d.g;cuFRe();const S=$('sh
 function cuSumHTML(B){if(!cuF.b&&!cuF.g)return '';let rd=0,rc=0,gd=0,gc=0;for(const [,b] of B){if(b.R<0)rd+=-b.R;else rc+=b.R;if(b.G<0)gd+=-b.G;else gc+=b.G}
   const showR=cuF.b!=='gd'&&cuF.b!=='gc',showG=cuF.b!=='rd'&&cuF.b!=='rc',cell=(l,k,v,cl)=>v?`<span class="cusc ${cl}"><small>${l}</small><b${fitS(balV(k,v)+' '+balU(k))}><span class="cbn" data-k="${k}" data-v="${v}">${balV(k,v)}</span><i>${balU(k)}</i></b></span>`:'';
   const wpT=cuF.b==='wp'?B.reduce((a,[c])=>a+(cuWP.get(String(c.id))||0),0):0,C=[wpT?cell('در انتظار واریز','r',wpT,'w'):'',showR?cell('طلبکاریم','r',rd,'d'):'',showR?cell('بدهکاریم','r',rc,'c'):'',showG?cell('طلبکاریم','g',Math.round(gd*1000)/1000,'d'):'',showG?cell('بدهکاریم','g',Math.round(gc*1000)/1000,'c'):''].filter(Boolean);
-  return `<div class="cusum"><div class="cush"><b>${fmt(B.length)} حساب</b><small>${esc([cuF.g?(cuF.g==='-'?'بدون گروه':'گروه '+cuF.g):'',(CUFB.find(x=>x[0]===cuF.b)||[])[1]||''].filter(Boolean).join(' · '))}</small></div>${C.length?`<div class="cusg">${C.join('')}</div>`:''}</div>`}
-function cuFRe(){ls.set('m_cuf',cuF);const f=$('cuf');if(f)f.innerHTML=cuFiltHTML();const fb=$('cuFb');if(fb)fb.outerHTML=cuFBtn();const r=$('cures');cuAnim=1;if(r)srchSwap(r,cuListHTML());requestAnimationFrame(()=>cuCount('#cures .cusum .cbn'));
+  return `<div class="cusum"><div class="cush"><b>${fmt(B.length)} حساب</b><small>${esc([cuF.g?(cuF.g==='-'?'بدون گروه':'گروه '+cuF.g):'',cuF.b?(CUFB.find(x=>x[0]===cuF.b)||[])[1]||'':''].filter(Boolean).join(' · '))}</small></div>${C.length?`<div class="cusg">${C.join('')}</div>`:''}</div>`}
+function cuFRe(){ls.set('m_cuf',cuF);const f=$('cuf');if(f)f.innerHTML=cuFiltHTML();const gr=$('cug');if(gr)gr.innerHTML=cuRailHTML();const fb=$('cuFb');if(fb)fb.outerHTML=cuFBtn();const r=$('cures');cuAnim=1;if(r)srchSwap(r,cuListHTML());requestAnimationFrame(()=>cuCount('#cures .cusum .cbn'));
   document.querySelectorAll('#cuf .cufp').forEach(o=>{if(!RM()&&o.animate)o.animate([{transform:'scale(.9)',opacity:.4},{transform:'none',opacity:1}],{duration:300,easing:'cubic-bezier(.3,1.4,.5,1)'})})}
 ACT.cuFB=d=>{cuF.b=cuF.b===d.k?'':d.k;cuFRe()};
 ACT.cuFG=d=>{cuF.g=cuF.g===d.g?'':d.g;cuFRe()};/* برچسب‌های زیر جستجو: زدن = برداشتن همان فیلتر */
@@ -124,7 +135,7 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
 /* v69.8: ردیف یک حساب در فهرست حساب مشتریان — یک جا تعریف شده تا پنل «پرداخت از کجا؟» دقیقاً همین ردیف را نشان دهد.
    o.act/o.k = کار زدن ردیف (پیش‌فرض باز کردن حساب)، o.sw=false یعنی بدون کشیدن */
 function cuRowH(c,b,ri,PW,o){o=o||{};const pw=PW&&PW.get(String(c.id)),wp=cuWP.get(String(c.id))||0,z=cuZero(b)&&!pw&&!wp,nT=(b.G?1:0)+(b.R||pw||wp?1:0)+Object.keys(b.X||{}).filter(k=>b.X[k]).length;cbLst=1;const bp=z?'':balPills(b,pw,wp);cbLst=0;
-  return swW(`<button class="c6r${z?' zr':''}${nT<=1?' one':''}${o.cls?' '+o.cls:''}" data-act="${o.act||'cuOpen'}"${o.k?` data-k="${o.k}"`:''} data-id="${c.id}"><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'',c.grp?'<em>'+esc(c.grp)+'</em>':''].filter(Boolean).join(' · ')}</small></span>${z?cuZTag(ri):`<span class="c6v c6vb${Object.keys(b.X||{}).some(k=>b.X[k])?' nx':''}" style="--r:${Math.min(ri,8)};--n:${nT}">${bp}</span>`}</button>`,o.sw===false?{r:[],l:[],data:{id:c.id}}:{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})}
+  return swW(`<button class="c6r${z?' zr':''}${nT<=1?' one':''}${o.cls?' '+o.cls:''}" data-act="${o.act||'cuOpen'}"${o.k?` data-k="${o.k}"`:''} data-id="${c.id}"><span class="c6a cul${c.av?' cav':''}" style="--h:${cuHue(c)}">${c.av?`<img data-ik="${esc(c.av)}" alt="">`:''}${esc(userInit(c.name))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${[c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'',c.grp?'<em>'+esc(c.grp)+'</em>':''].filter(Boolean).join(' · ')}</small></span>${z?cuZTag(ri):`<span class="c6v c6vb${Object.keys(b.X||{}).some(k=>b.X[k])?' nx':''}" style="--r:${Math.min(ri,8)};--n:${nT}">${bp}</span>`}</button>`,o.sw===false?{r:[],l:[],data:{id:c.id}}:{r:[['cuEdit','ویرایش','edit','#3b6fd6']],l:[['cuDel','حذف','trash','#d23c48']],data:{id:c.id}})}
 /* v61.93 (خواسته صاحب اپ): حساب تسویه‌شده در فهرست‌ها کوچک و کم‌رنگ (یک برچسب کنار نام، نه کارت سبز بزرگ) */
 const cuZero=b=>!(b.R||b.G||Object.keys(b.X||{}).length);
 const cuZTag=ri=>`<span class="c6z"${ri!=null?` style="--r:${Math.min(ri,8)}"`:''}>${ic('check')}تسویه</span>`;
