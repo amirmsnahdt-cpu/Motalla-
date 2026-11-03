@@ -29,7 +29,7 @@ ACT.entUnok=d=>entSetSt(d.id,'pending');
 ACT.entEditGo=d=>{ACT.openEnt(d);ACT.entEditOn()};
 ACT.fPay=d=>{fPay=d.iso;updPay()};
 ACT.fPayPick=()=>openCal(fPay||payDef(),iso=>ACT.fPay({iso}));
-ACT.openEnt=d=>{entItSync(entries.find(z=>String(z.id)===String(d.id)),true)/* v72.0: ردیف‌های کهنه قبل از این نسخه با باز کردن درست می‌شوند */;entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday','cust','inv','bank'].includes(cur)?cur:cur==='sell'&&custId?'cust':'home';go('ent')};
+ACT.openEnt=d=>{if(cur==='inv'&&invV)DST.push({k:'inv',inv:{...invV},cu:custId,p:PARENT.inv});entItSync(entries.find(z=>String(z.id)===String(d.id)),true)/* v72.0: ردیف‌های کهنه قبل از این نسخه با باز کردن درست می‌شوند */;entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday','cust','inv','bank'].includes(cur)?cur:cur==='sell'&&custId?'cust':'home';go('ent')};
 /* v70.2: دکمه حذف حالا در سرتیتر است؛ برای جلوگیری از زدن اشتباهی، تأیید می‌خواهد (به سطل بازیابی می‌رود) */
 ACT.entDel=d=>{const x=entries.find(z=>String(z.id)===String(d.id));if(!x)return;askConfirm('واریزی «'+esc(fullName(x))+'» ('+fmt(x.amount)+' تومان) حذف شود؟ به سطل بازیابی می‌رود.','حذف',()=>{closeSheet();navBack=true;go(PARENT.ent||'home');delEntry(d.id)})};
 ACT.fF=d=>{fF=d.f;fN=120;render()};
