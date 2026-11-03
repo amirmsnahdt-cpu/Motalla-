@@ -3325,3 +3325,19 @@ html.cdon .cdez{display:none}
 @media (prefers-reduced-motion:reduce){.edkw,.edkw>.edk{transition:none}}
 #sheet .edoc>.opt::after{transform:rotate(-45deg);transition:transform .35s cubic-bezier(.2,.9,.25,1)}
 #sheet .edoc.open>.opt::after{transform:rotate(135deg)}
+/* v73.9 کشوها هم‌رنگ برنامه: آبی اپ برای انتخاب، آیکن‌ها و دکمه؛ پایین کشو کارت کاربر با نام و نقش */
+.cdic{color:var(--blu);opacity:1}
+.cdi.on{background:color-mix(in srgb,var(--blu) 12%,transparent);color:var(--blu)}
+.cdi.on em{background:var(--blu);color:#fff}
+.cdi em{min-width:24px;text-align:center;padding:2px 7px;border-radius:10px;background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.cdsb{color:var(--blu)}
+.cdh>b{color:var(--ink)}
+.cdf{flex-direction:column;align-items:stretch;gap:10px;padding:10px 14px 0;border-top:1px solid var(--hair);margin-top:4px}
+.cdnew{flex:none;width:100%;height:50px;border-radius:16px;background:var(--blu);color:#fff;box-shadow:0 10px 22px -12px color-mix(in srgb,var(--blu) 80%,transparent)}
+.cdu{display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border:0;border-radius:16px;background:var(--card);box-shadow:0 0 0 1px var(--hair);color:var(--ink);font:inherit;text-align:right;cursor:pointer}
+.cdua{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--blu);color:#fff;font-weight:900;font-size:17px}
+.cdu .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}
+.cdu .tx b{font-size:15px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdu .tx small{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden}
+.cdu .sdot{flex:none;width:7px;height:7px}
+.cdug{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--blu) 10%,transparent);color:var(--blu)}.cdug svg{width:18px;height:18px}
