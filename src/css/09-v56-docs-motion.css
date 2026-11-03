@@ -3405,3 +3405,5 @@ html.cdon .cdez{display:none}
 .cntc .tx{min-width:0;display:flex;flex-direction:column;line-height:1.35}.cntc .tx b{font-size:14.5px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cntc .tx small{font-size:11.5px;color:var(--mut)}
 .cntc.ng{background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line)}.cntc.ng .cnti{color:var(--mut);box-shadow:none;background:var(--hair)}
 .fsearch.cntON{position:relative;z-index:49;box-shadow:0 0 0 4px color-mix(in srgb,var(--blu) 18%,transparent)!important}
+/* v75.8 (خواسته صاحب اپ): قاب پله فعال ساده (بدون شیشه و تاری)، همان قاب آبی پله‌ها */
+.stlens,:root .stlens{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:0 0 0 2px var(--blu)!important;border-radius:11px}
