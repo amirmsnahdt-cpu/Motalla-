@@ -3370,3 +3370,9 @@ html.cdon .cdez{display:none}
    روی آیفون یک فهرست داخلی با overscroll-behavior:contain که سر ریز نمی‌کرد، کشیدن انگشت را می‌بلعید و خود پنجره هم اسکرول نمی‌شد.
    حالا فهرست کامل باز می‌شود و پنجره با همه چیز یکجا اسکرول می‌شود. */
 #cuGs{max-height:none;overflow:visible;overscroll-behavior:auto}
+/* v74.9 (خواسته صاحب اپ): هر ردیف سند کارت جدا با قاب هم‌رنگ اثرش — قرمز طلبکاریم، آبی بدهکاریم (مثل قاب مانده) */
+.d6rows.d7{background:none!important;box-shadow:none!important;overflow:visible;display:flex;flex-direction:column;gap:9px;border-radius:0}
+.d6rows.d7 .d6r{border-radius:20px;background:var(--card);box-shadow:0 0 0 1.5px var(--line),0 10px 22px -18px rgb(0 0 0/.25);overflow:hidden}
+.d6rows.d7 .d6r+.d6r{border-top:0}.d6rows.d7 .d6r+.d6r::before{display:none}
+.d6rows.d7 .d6r.rd{background:color-mix(in srgb,var(--red) 4%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,var(--red) 45%,transparent),0 12px 24px -18px color-mix(in srgb,var(--red) 70%,transparent)}
+.d6rows.d7 .d6r.rc{background:color-mix(in srgb,var(--blu) 4%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 45%,transparent),0 12px 24px -18px color-mix(in srgb,var(--blu) 70%,transparent)}
