@@ -3208,3 +3208,16 @@ html.iosbr #sheet .px7l{padding-bottom:calc(88px + env(safe-area-inset-bottom,0p
 #sheet .bdam:focus-within,#sheet .bdnt:focus{box-shadow:inset 0 0 0 1.5px var(--blu)!important}
 #sheet input.bdnt{height:38px;min-height:0;margin:0;padding:0 12px;border:0!important;border-radius:11px;background:var(--bg)!important;box-shadow:inset 0 0 0 1px var(--hair)!important;font-size:13.5px;font-weight:600}
 #sheet select.bdk{height:42px;min-height:0;margin:0;border:0!important;box-shadow:none!important;background:color-mix(in srgb,var(--bc) 12%,var(--card))!important;color:var(--bc)!important}
+/* v72.4: «آخرین سند» بیرون جستجو، سمت چپ؛ گروه‌ها روی گوشی از دکمه سه‌نقطه داخل جستجو */
+.cusr{display:flex;align-items:stretch;gap:8px}.cusr>.fsearch{flex:1;min-width:0}
+.cusr>.culast{height:auto;min-height:48px;border-radius:16px;padding:0 12px;gap:7px;align-self:stretch}
+.culast>span{display:flex;flex-direction:column;align-items:center;line-height:1.25}.culast small{font-size:10.5px;font-weight:700;opacity:.85}.culast>span>b{font-size:15px;font-weight:900}
+.culast svg{width:19px;height:19px}
+.cugb{flex:none;display:inline-flex;align-items:center;gap:4px;height:34px;min-width:34px;justify-content:center;padding:0 7px;border:0;border-radius:12px;background:var(--hair);color:var(--ink);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;max-width:42%}
+.cugb svg{width:18px;height:18px;fill:currentColor;stroke:none;flex:none}.cugb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cugb.on{background:var(--blu);color:#fff}
+.pmenu.cugm{max-height:min(65vh,520px);overflow:auto;overscroll-behavior:contain}
+.pmenu.cugm .pmi em{font-style:normal;font-size:11.5px;font-weight:800;min-width:22px;text-align:center;padding:1px 6px;border-radius:9px;background:var(--hair);color:var(--mut,#8a8f98);margin-inline-start:auto}
+.pmenu.cugm .pmi.on{color:var(--blu);font-weight:800}.pmenu.cugm .pmi.on em{background:var(--blu);color:#fff}
+@media (max-width:639px){.cugr{display:none}}
+@media (min-width:640px){.cugb{display:none}}

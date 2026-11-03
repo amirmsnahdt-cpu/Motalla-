@@ -60,7 +60,7 @@ const curCu=()=>custs.find(c=>String(c.id)===String(custId))||null;
 /* ---- فهرست حساب‌ها: فقط جستجو و فهرست؛ مشتری تازه از همین جستجو ---- */
 function vCusts(){const L=CU();
   if(!L.length&&!cuQ)return `<div class="c6s">${cuSearchHTML(0)}</div><div class="spempty"><div class="spill">${ic('users')}</div><b>هنوز حسابی باز نشده</b><span>نام مشتری را در جستجو بنویسید؛ اگر حسابی نداشته باشد، اول مشخصاتش را می‌گیریم و بعد وارد حساب و سند او می‌شوید.</span></div>`;
-  cuAnim=1;cuCntId=null;return `<div class="c6s">${cuSearchHTML(L.length)}</div>${shBanner()}<div class="cugw"><nav id="cug" class="cugr" aria-label="گروه‌ها">${cuRailHTML()}</nav><div class="cugm"><div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div></div></div>`}
+  cuAnim=1;cuCntId=null;return `<div class="c6s cusr">${cuSearchHTML(L.length)}${cuLastBtn()}</div>${shBanner()}<div class="cugw"><nav id="cug" class="cugr" aria-label="گروه‌ها">${cuRailHTML()}</nav><div class="cugm"><div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div></div></div>`}
 /* v72.2 (خواسته صاحب اپ، مثل نرم‌افزار کیمیا): ستون گروه‌ها کنار فهرست (گوشی: نوار افقی بالای فهرست)؛ زدن = فیلتر گروه (همان cuF.g) */
 function cuRailHTML(){const G=groupsList();if(!G.length)return '';const A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,nn=n('-');
   const it=(g,lab)=>`<button class="cugi${(cuF.g||'')===g?' on':''}" data-act="cuGR" data-g="${esc(g)}"><span>${lab}</span><em>${fmt(n(g))}</em></button>`;
@@ -69,10 +69,16 @@ ACT.cuGR=d=>{cuF.g=d.g||'';cuFRe();const o=document.querySelector('#cug .cugi.on
 /* v72.2: «آخرین سند» داخل جستجو: آخرین سند ثبت‌شده حساب‌ها (بزرگ‌ترین شماره) با یک زدن باز می‌شود */
 function cuLastDoc(){let R=null;for(const c of CU())for(const t of c.txs||[])if(t.type==='inv'&&!t.del){const k=[+t.no||0,String(t.createdAt||t.at||'')];if(!R||k[0]>R[2][0]||k[0]===R[2][0]&&k[1]>R[2][1])R=[c,t,k]}return R}
 ACT.cuLast=()=>{const L=cuLastDoc();if(!L){toast('هنوز سندی ثبت نشده');return}invOpen(L[0].id,L[1].id)};
-const cuLastBtn=()=>{const L=cuLastDoc();return L?`<button class="culast" data-act="cuLast" aria-label="آخرین سند">${ic('inv')}<span>آخرین سند</span>${L[1].no!=null?`<em>${toFa(L[1].no)}</em>`:''}</button>`:''};
+const cuLastBtn=()=>{const L=cuLastDoc();return L?`<button class="culast" data-act="cuLast" aria-label="آخرین سند">${ic('inv')}<span><small>آخرین سند</small>${L[1].no!=null?`<b>${toFa(L[1].no)}</b>`:''}</span></button>`:''};
+/* v72.4 (خواسته صاحب اپ): گروه‌ها روی گوشی نوار زیر جستجو نیستند؛ دکمه سه‌نقطه داخل جستجو فهرست گروه‌ها را باز می‌کند (زدن = فیلتر) */
+Object.assign(IC,{vdots:'<circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/>'});
+const cuGLab=()=>cuF.g==='-'?'بدون گروه':cuF.g||'';
+const cuGBtn=()=>groupsList().length?`<button class="cugb${cuF.g?' on':''}" id="cuGb" data-act="cuGMenu" aria-label="گروه‌ها">${cuF.g?`<span>${esc(cuGLab())}</span>`:''}${ic('vdots')}</button>`:'';
+ACT.cuGMenu=()=>{const b=$('cuGb');if(!b)return;const G=groupsList(),A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,on=g=>(cuF.g||'')===g,it=(g,l)=>['cuGR',on(g)?ic('check'):ic('users'),l,{g}];
+  popMenu(b,[it('','همه حساب‌ها'),...G.map(g=>it(g,g)),...(n('-')?[it('-','بدون گروه')]:[])]);const m=$('pmenu');if(!m)return;m.classList.add('cugm');m.querySelectorAll('.pmi').forEach(x=>{const g=x.dataset.g||'';if(on(g))x.classList.add('on');x.insertAdjacentHTML('beforeend',`<em>${fmt(n(g))}</em>`)});const w=m.getBoundingClientRect().width,r=b.getBoundingClientRect();m.style.left=Math.max(8,Math.min(Math.round(r.right-w),innerWidth-w-8))+'px'};
 /* رنگ دایره هر حساب (بی‌عکس) از روی شناسه‌اش؛ همیشه ثابت */
 const cuHue=c=>{let h=0;for(const ch of String(c&&c.id||''))h=(h*31+ch.charCodeAt(0))>>>0;return Math.round(h*137.508)%360};
-const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}${n?cuLastBtn():''}<input id="cuq" type="search" placeholder="${n?'نام، فاکتور، مبلغ، وزن…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button>${n?`<button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button>`+cuFBtn():''}</div>`;
+const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${n?'نام، فاکتور، مبلغ، وزن…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button>${n?cuGBtn():''}${n?`<button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button>`+cuFBtn():''}</div>`;
 /* v61.96 (خواسته صاحب اپ): فیلترها به‌جای دو ردیف چیپ، یک دکمه «فیلتر» داخل جستجو + پنجره مرتب (مثل iOS)؛ زیر جستجو فقط برچسب فیلتر فعال */
 Object.assign(IC,{filter:'<path d="M4 6h16M7 12h10M10 18h4"/>'});
 const cuFN=()=>cuF.b?1:0;/* v72.2: گروه از ستون گروه‌ها انتخاب می‌شود و در شماره فیلتر نمی‌آید */
@@ -105,7 +111,7 @@ function cuSumHTML(B){if(!cuF.b&&!cuF.g)return '';let rd=0,rc=0,gd=0,gc=0;for(co
   const showR=cuF.b!=='gd'&&cuF.b!=='gc',showG=cuF.b!=='rd'&&cuF.b!=='rc',cell=(l,k,v,cl)=>v?`<span class="cusc ${cl}"><small>${l}</small><b${fitS(balV(k,v)+' '+balU(k))}><span class="cbn" data-k="${k}" data-v="${v}">${balV(k,v)}</span><i>${balU(k)}</i></b></span>`:'';
   const wpT=cuF.b==='wp'?B.reduce((a,[c])=>a+(cuWP.get(String(c.id))||0),0):0,C=[wpT?cell('در انتظار واریز','r',wpT,'w'):'',showR?cell('طلبکاریم','r',rd,'d'):'',showR?cell('بدهکاریم','r',rc,'c'):'',showG?cell('طلبکاریم','g',Math.round(gd*1000)/1000,'d'):'',showG?cell('بدهکاریم','g',Math.round(gc*1000)/1000,'c'):''].filter(Boolean);
   return `<div class="cusum"><div class="cush"><b>${fmt(B.length)} حساب</b><small>${esc([cuF.g?(cuF.g==='-'?'بدون گروه':'گروه '+cuF.g):'',cuF.b?(CUFB.find(x=>x[0]===cuF.b)||[])[1]||'':''].filter(Boolean).join(' · '))}</small></div>${C.length?`<div class="cusg">${C.join('')}</div>`:''}</div>`}
-function cuFRe(){ls.set('m_cuf',cuF);const f=$('cuf');if(f)f.innerHTML=cuFiltHTML();const gr=$('cug');if(gr)gr.innerHTML=cuRailHTML();const fb=$('cuFb');if(fb)fb.outerHTML=cuFBtn();const r=$('cures');cuAnim=1;if(r)srchSwap(r,cuListHTML());requestAnimationFrame(()=>cuCount('#cures .cusum .cbn'));
+function cuFRe(){ls.set('m_cuf',cuF);const f=$('cuf');if(f)f.innerHTML=cuFiltHTML();const gr=$('cug');if(gr)gr.innerHTML=cuRailHTML();const gb=$('cuGb');if(gb)gb.outerHTML=cuGBtn();const fb=$('cuFb');if(fb)fb.outerHTML=cuFBtn();const r=$('cures');cuAnim=1;if(r)srchSwap(r,cuListHTML());requestAnimationFrame(()=>cuCount('#cures .cusum .cbn'));
   document.querySelectorAll('#cuf .cufp').forEach(o=>{if(!RM()&&o.animate)o.animate([{transform:'scale(.9)',opacity:.4},{transform:'none',opacity:1}],{duration:300,easing:'cubic-bezier(.3,1.4,.5,1)'})})}
 ACT.cuFB=d=>{cuF.b=cuF.b===d.k?'':d.k;cuFRe()};
 ACT.cuFG=d=>{cuF.g=cuF.g===d.g?'':d.g;cuFRe()};/* برچسب‌های زیر جستجو: زدن = برداشتن همان فیلتر */
