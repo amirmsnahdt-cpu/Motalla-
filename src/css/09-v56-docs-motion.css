@@ -3355,3 +3355,8 @@ html.cdon .cdez{display:none}
 .cdf{border-top:0}
 .cuadd svg{width:26px!important;height:26px!important;stroke-width:2.6}
 .bzsr .tx b .cuno{height:20px;font-size:12px;padding:0 6px;margin:0 0 0 7px;vertical-align:1px}
+/* v74.3 (خواسته صاحب اپ): دایره عکس همه مشتری‌ها به آبی برنامه (نه رنگ جدا برای هر حساب) */
+.c6a.cul,.c6r .c6a.cul,.c6a.cul.cdav,:root .c6a.cul{background:color-mix(in srgb,var(--blu) 12%,var(--card));color:var(--blu);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 30%,transparent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) :is(.c6a.cul,.c6r .c6a.cul,.c6a.cul.cdav){background:color-mix(in srgb,var(--blu) 20%,var(--card));color:var(--blu);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent)}}
+:root[data-theme=dark] :is(.c6a.cul,.c6r .c6a.cul,.c6a.cul.cdav){background:color-mix(in srgb,var(--blu) 20%,var(--card));color:var(--blu);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent)}
+.cuh9 .c6a.cul,:root .cuh9 .c6a.cul{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent)!important}
