@@ -3443,3 +3443,5 @@ html.cdon .cdez{display:none}
 .wdw .wdam2 .px8l .n{color:var(--blu)}
 .wdw .wdibr .f6i.ibin input{font-size:15.5px;letter-spacing:0}
 .wdw .wdibr .ibbk>span{display:none}
+.wdw .wdibr .f6i.ibin{border:0!important;background:none!important;box-shadow:none!important;padding:2px 0!important;min-height:0}
+.wdw .wdibr .f6i.ibin input{border:0!important;background:none!important;box-shadow:none!important;padding:4px 0!important;height:auto!important;min-height:0!important;font-weight:800}
