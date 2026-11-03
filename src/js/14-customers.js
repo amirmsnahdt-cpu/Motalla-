@@ -567,7 +567,8 @@ ACT.bzStlSave=()=>{stlRead();const name=clean(stl.name||stl.q||'');if(!name){toa
 /* هنگام ثبت واریزی: تسویه‌ها با وضعیت «در انتظار تأیید» ساخته می‌شوند، مثل ثبت از صفحه جزئیات */
 async function bzStlMake(){const now=new Date().toISOString(),R=[];for(const s of (bz.d.settles||[])){const z={st:'wait',id:nid++,name:s.name,phone:s.phone,inv:s.inv,amount:s.amount,tn:s.tn,note:s.note,cuId:s.cuId,date:todayISO(),at:now,by:who()};
     if(s.imgD){const k=newImgKey('stl:'+z.id);if(await imgPut(k,s.imgD)){z.imgs=[k];z.img=k}else toast('حافظه پر است؛ عکس رسید ذخیره نشد',true)}R.push(z)}return R}
-ACT.bzNewIban=()=>{bzRead();bz.d.iban='';bz.d.card='';const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;const I=$('bzI');if(I)I.focus()};
+/* v74.2: «شبای جدید وارد می‌کنم» کار نمی‌کرد — render() اول همان کادرها را دوباره می‌خواند (v71.8) و شبای قبلی برمی‌گشت؛ حالا خود کادرها خالی می‌شوند */
+ACT.bzNewIban=()=>{const I=$('bzI'),K=$('bzK');bz.d.iban='';bz.d.card='';if(K){K.value='';K.oninput&&K.oninput()}if(I){I.value='';I.oninput&&I.oninput();I.focus();if(!RM()&&I.animate)I.animate([{boxShadow:'0 0 0 4px color-mix(in srgb,#2152d9 35%,transparent)'},{boxShadow:'0 0 0 0 transparent'}],{duration:700,easing:'ease-out'})}toast('شبای جدید را بنویسید')};
 
 /* ============ v61.69 (خواسته صاحب اپ): عکس پروفایل مشتری و عکس کارت ملی ============
    در فرم مشخصات: دایره عکس بالای فرم (زدن = انتخاب یا گرفتن عکس، آیفون خودش «Take Photo» دارد؛ اندروید دکمه دوربین جدا)،
