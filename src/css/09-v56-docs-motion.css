@@ -3228,3 +3228,8 @@ html.iosbr #sheet .px7l{padding-bottom:calc(88px + env(safe-area-inset-bottom,0p
 .cusr>.culast small{font-size:12.5px;font-weight:800;opacity:1}
 .cusr>.culast>span>b{font-size:12px;padding:1px 8px;border-radius:9px;background:var(--blu);color:#fff}
 .cusr>.culast svg{width:16px;height:16px}
+/* v72.7 (خواسته صاحب اپ: دایره پروفایل جای زیادی می‌گیرد): دایره کوچک فقط کنار نام؛ مانده‌ها زیرش تمام‌عرض */
+.c6r .c6a.cul{width:32px;height:32px;font-size:14px}
+:is(#cures,.cuLs) .cuL .c6r:not(.zr):has(>.cul){grid-template-columns:32px minmax(0,1fr);column-gap:9px;row-gap:6px}
+:is(#cures,.cuLs) .cuL .c6r:not(.zr)>.cul{grid-row:auto;align-self:center}
+:is(#cures,.cuLs) .cuL .c6r:not(.zr)>.c6vb{grid-column:1/-1}
