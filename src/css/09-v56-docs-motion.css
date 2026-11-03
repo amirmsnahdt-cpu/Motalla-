@@ -3414,3 +3414,5 @@ html.cdon .cdez{display:none}
 #qa.d6q:has(.sthd.k-sell) .stp.on :is(small,b),#qa.d6q:has(.sthd.k-out) .stp.on :is(small,b){color:var(--red)}
 #qa.d6q:has(.sthd.k-sell) .stlens,#qa.d6q:has(.sthd.k-out) .stlens{box-shadow:0 0 0 2px var(--red)!important}
 #qa .sthd:is(.k-sell,.k-out) .stht b{color:var(--red)}
+/* v76.0 (خواسته صاحب اپ): در پنل فروش/پرداخت همه دکمه‌ها (تیک تأیید، بعدی، عکس، برگشت) هم قرمز — آبی همین پنل به قرمز عوض می‌شود */
+#qa.d6q:has(.sthd.k-sell),#qa.d6q:has(.sthd.k-out){--blu:var(--red);--blu2:var(--red2)}
