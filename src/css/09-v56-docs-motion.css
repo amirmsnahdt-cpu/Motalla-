@@ -3407,3 +3407,10 @@ html.cdon .cdez{display:none}
 .fsearch.cntON{position:relative;z-index:49;box-shadow:0 0 0 4px color-mix(in srgb,var(--blu) 18%,transparent)!important}
 /* v75.8 (خواسته صاحب اپ): قاب پله فعال ساده (بدون شیشه و تاری)، همان قاب آبی پله‌ها */
 .stlens,:root .stlens{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:0 0 0 2px var(--blu)!important;border-radius:11px}
+/* v75.9 (خواسته صاحب اپ): قاب پنل ثبت ردیف هم‌رنگ کار — فروش و پرداخت قرمز، خرید/دریافت/تعویض/مرجوعی آبی */
+#qa.d6q:has(.dkbox .sthd){border:0!important;box-shadow:inset 0 0 0 1.5px var(--blu),0 0 0 4px color-mix(in srgb,var(--blu) 12%,transparent),var(--lift)!important}
+#qa.d6q:has(.sthd.k-sell),#qa.d6q:has(.sthd.k-out){box-shadow:inset 0 0 0 1.5px var(--red),0 0 0 4px color-mix(in srgb,var(--red) 13%,transparent),var(--lift)!important}
+#qa.d6q:has(.sthd.k-sell) .stp.on,#qa.d6q:has(.sthd.k-out) .stp.on{border-color:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--card));box-shadow:0 0 0 1px var(--red)}
+#qa.d6q:has(.sthd.k-sell) .stp.on :is(small,b),#qa.d6q:has(.sthd.k-out) .stp.on :is(small,b){color:var(--red)}
+#qa.d6q:has(.sthd.k-sell) .stlens,#qa.d6q:has(.sthd.k-out) .stlens{box-shadow:0 0 0 2px var(--red)!important}
+#qa .sthd:is(.k-sell,.k-out) .stht b{color:var(--red)}
