@@ -3141,3 +3141,12 @@ html.iosbr #sheet .px7l{padding-bottom:calc(88px + env(safe-area-inset-bottom,0p
 .lkmark.lklogo{width:min(58vw,230px);height:auto;aspect-ratio:477/202;border-radius:0;background:none;box-shadow:none;margin-bottom:16px}
 .lklg{display:block;width:100%;height:100%;background:url(logo-stamp.png) center/contain no-repeat;filter:drop-shadow(0 10px 18px #b8862b40)}
 .amk.amlg{width:min(58vw,230px)!important;height:auto!important;aspect-ratio:477/202;border-radius:0!important;background:url(logo-stamp.png) center/contain no-repeat!important;box-shadow:none!important;filter:drop-shadow(0 10px 18px #b8862b40)}
+/* v72.1: قفل — وقتی محتوا از صفحه بلندتر است بالای لوگو بریده نشود (margin:auto به‌جای align-items:center که بالا را بیرون از اسکرول می‌برد) + لوگو در صفحه‌های کوتاه کوچک‌تر */
+.lk{align-items:flex-start}
+.lkw{margin-block:auto}
+.lkmark.lklogo{width:min(58vw,230px,30vh)}
+.lk{--lkb:clamp(56px,calc((100vh - 410px)/4.4),76px);--lkb:clamp(56px,calc((100dvh - 410px)/4.4),76px)}
+.lkp{grid-template-columns:repeat(3,var(--lkb));gap:clamp(10px,1.9vh,16px) 22px}
+.lkp button{width:var(--lkb);height:var(--lkb)}
+.lkmark.lklogo{width:min(58vw,230px,26vh);margin-bottom:clamp(8px,1.6vh,16px)}
+@media (max-height:700px){.lkd{margin:14px 0 2px}}
