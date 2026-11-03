@@ -3426,3 +3426,20 @@ html.cdon .cdez{display:none}
 .d6rows.d7 .d6r:has(.d6k.k-wd){background:color-mix(in srgb,var(--pe,#b8862b) 6%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,var(--pe,#b8862b) 55%,transparent),0 12px 24px -18px color-mix(in srgb,var(--pe,#b8862b) 70%,transparent)}
 .d6rows.d7 .d6r:has(.d6k.k-wd)::after{background:var(--pe,#b8862b)}
 .d6rows.d7 .d6r:has(.d6k.k-wd) .d6ti{background:color-mix(in srgb,var(--pe,#b8862b) 14%,var(--card));color:var(--pe,#b8862b)}
+/* v76.2: ردیف سند در حال نوشتن داخل قاب کشیدنی (.swr، overflow:clip) است — قاب رنگی لبه پایین بریده می‌شد؛ جای قاب داده شد */
+.d6rows.d7 .swr{padding:2px;margin:-2px;border-radius:22px}
+/* v76.2 پنجره «واریز به حساب مشتری» مثل فرم خرید دستی */
+.wdw .wdam2{margin-bottom:6px}
+.wdw .wdf6 .c9h i{margin-inline-start:auto;font-style:normal;font-size:11.5px;font-weight:700;color:var(--blu)}
+.wdw .wdibr .f6i.ibin{position:relative;display:flex;align-items:center;gap:6px}
+.wdw .wdibr .f6i.ibin input{flex:1;min-width:0;direction:ltr;text-align:left}
+.wdw .wdibr .ibir{position:static;order:-1}.wdw .wdibr .ibbk{position:static}
+.wdw .bzdate.wdd{width:100%;border:0;background:none;box-shadow:none;margin:0}
+.wdw .bzrev.wdrev{margin-top:10px}
+.wdw .f6r.wdibr{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.wdw .f6r.wdibr>label{width:auto}
+.wdw .wdibr .f6i.ibin{width:100%;max-width:none;box-sizing:border-box}
+.wdw .wdibr .f6i.ibin input{font-size:17px;letter-spacing:.3px}
+.wdw .wdam2 .px8l .n{color:var(--blu)}
+.wdw .wdibr .f6i.ibin input{font-size:15.5px;letter-spacing:0}
+.wdw .wdibr .ibbk>span{display:none}
