@@ -40,7 +40,7 @@ function meHTML(){return `<div class="cdh"><b>مطلا</b><button class="cdsb" d
 function cuDrHTML(){const G=groupsList(),A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,on=g=>(cuF.g||'')===g;
   const it=(g,l,i)=>`<button class="cdi${on(g)?' on':''}" data-act="cdG" data-g="${esc(g)}"><span class="cdic">${ic(i)}</span><span class="cdl">${l}</span><em>${fmt(n(g))}</em></button>`;
   const rec=A.slice().sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,12);
-  return `<div class="cdh"><b>حساب‌ها</b><button class="cdsb" data-act="cdFind" aria-label="جستجو">${ic('search')}</button></div>
+  return `<div class="cdh"><b>حساب‌ها</b><span class="cdhb">${can('debt')?`<button class="cdsb cdad" data-act="cdNew" aria-label="حساب تازه" title="حساب تازه">${ic('plus')}</button>`:''}<button class="cdsb" data-act="cdFind" aria-label="جستجو">${ic('search')}</button></span></div>
   <div class="cdsc2"><nav class="cdn">${it('','همه حساب‌ها','users')}${G.map(g=>it(g,esc(g),'users')).join('')}${n('-')&&G.length?it('-','بدون گروه','user'):''}</nav>
   ${rec.length?`<div class="cdsh">اخیر</div><div class="cdr">${rec.map(c=>`<button class="cdi cdrc" data-act="cdCu" data-id="${c.id}"><span class="c6a cul cdav${c.av?' cav':''}" style="--h:${cuHue(c)}">${c.av?`<img data-ik="${esc(c.av)}" alt="">`:''}${esc(userInit(c.name))}</span><span class="cdl">${esc(cuName(c))}</span>${c.cno?`<em>${toFa(c.cno)}</em>`:''}${c.grp?`<small>${esc(c.grp)}</small>`:''}</button>`).join('')}</div>`:''}</div>
   <div class="cdf">${ME?`<button class="cdu" data-act="cdMe" aria-label="حساب کاربری"><span class="cdua">${esc(userInit(ME.name))}</span><span class="tx"><b>${esc(ME.name||ME.username)}</b><small><span class="sdot ${SY.state}"></span>${esc(ROLE[ME.role]||ME.role||'')} · <bdi dir="ltr">@${esc(ME.username)}</bdi></small></span><span class="cdug">${ic('gear')}</span></button>`:''}</div>`}
@@ -48,6 +48,8 @@ function cuDrHTML(){const G=groupsList(),A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).len
 ACT.cdMe=()=>{const w=cdEl();if(!w||!CD.open)return;CD.k='me';CD.W=cdW();w.dataset.k='me';w.style.width=CD.W+'px';w.innerHTML=cdHTML();cdPaint(1,RM()?0:300);if(!RM()&&w.animate)w.animate([{opacity:.4},{opacity:1}],{duration:260,easing:'ease-out'})};
 ACT.cdG=d=>{cuF.g=d.g||'';cuFRe();const w=cdEl();if(w)w.querySelectorAll('.cdi[data-g]').forEach(b=>b.classList.toggle('on',(b.dataset.g||'')===cuF.g));setTimeout(()=>cdClose(),RM()?0:120)};
 ACT.cdCu=d=>{cdClose(1);ACT.cuOpen({id:d.id})};
+/* v75.0 (خواسته صاحب اپ): «+ حساب تازه» بالای کشوی حساب‌ها، کنار جستجو (نه کنار جستجوی صفحه) */
+ACT.cdNew=()=>{cdClose(1);ACT.cuNewQ()};
 ACT.cdFind=()=>{cdClose();setTimeout(()=>{const q=$('cuq');if(q)q.focus()},RM()?0:300)};
 /* لبه کشیدن فقط در صفحه حساب‌ها و وقتی پنجره‌ای باز نیست */
 /* v73.0: محتوای کشو بعد از هر ساخت صفحه حساب‌ها در وقت آزاد آماده می‌شود تا باز شدن همان فریم اول راه بیفتد */

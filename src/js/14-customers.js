@@ -70,7 +70,7 @@ const curCu=()=>custs.find(c=>String(c.id)===String(custId))||null;
 /* ---- فهرست حساب‌ها: فقط جستجو و فهرست؛ مشتری تازه از همین جستجو ---- */
 function vCusts(){if(cuNoFix())setTimeout(()=>ls.set('m_custs',custs),0);const L=CU();
   if(!L.length&&!cuQ)return `<div class="c6s">${cuSearchHTML(0)}</div><div class="spempty"><div class="spill">${ic('users')}</div><b>هنوز حسابی باز نشده</b><span>نام مشتری را در جستجو بنویسید؛ اگر حسابی نداشته باشد، اول مشخصاتش را می‌گیریم و بعد وارد حساب و سند او می‌شوید.</span></div>`;
-  cuAnim=1;cuCntId=null;return `<div class="c6s cusr"><div class="cusrow">${cuSearchHTML(L.length)}${can('debt')?`<button class="cuadd" data-act="cuNewQ" aria-label="مشتری تازه" title="مشتری تازه">${ic('plus')}</button>`:''}</div>${cuLastBtn()}</div>${shBanner()}<div class="cugw"><nav id="cug" class="cugr" aria-label="گروه‌ها">${cuRailHTML()}</nav><div class="cugm"><div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div></div></div>`}
+  cuAnim=1;cuCntId=null;return `<div class="c6s cusr"><div class="cusrow">${cuSearchHTML(L.length)}</div>${cuLastBtn()}</div>${shBanner()}<div class="cugw"><nav id="cug" class="cugr" aria-label="گروه‌ها">${cuRailHTML()}</nav><div class="cugm"><div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div></div></div>`}
 /* v72.2 (خواسته صاحب اپ، مثل نرم‌افزار کیمیا): ستون گروه‌ها کنار فهرست (گوشی: نوار افقی بالای فهرست)؛ زدن = فیلتر گروه (همان cuF.g) */
 function cuRailHTML(){const G=groupsList();if(!G.length)return '';const A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,nn=n('-');
   const it=(g,lab)=>`<button class="cugi${(cuF.g||'')===g?' on':''}" data-act="cuGR" data-g="${esc(g)}"><span>${lab}</span><em>${fmt(n(g))}</em></button>`;

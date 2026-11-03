@@ -3376,3 +3376,7 @@ html.cdon .cdez{display:none}
 .d6rows.d7 .d6r+.d6r{border-top:0}.d6rows.d7 .d6r+.d6r::before{display:none}
 .d6rows.d7 .d6r.rd{background:color-mix(in srgb,var(--red) 4%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,var(--red) 45%,transparent),0 12px 24px -18px color-mix(in srgb,var(--red) 70%,transparent)}
 .d6rows.d7 .d6r.rc{background:color-mix(in srgb,var(--blu) 4%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 45%,transparent),0 12px 24px -18px color-mix(in srgb,var(--blu) 70%,transparent)}
+/* v75.0: + حساب تازه در سرتیتر کشوی حساب‌ها */
+.cdhb{display:flex;align-items:center;gap:10px}
+.cdsb.cdad{background:var(--blu);color:#fff;box-shadow:0 10px 20px -12px color-mix(in srgb,var(--blu) 85%,transparent)}
+.cdsb.cdad svg{width:24px;height:24px;stroke-width:2.6}
