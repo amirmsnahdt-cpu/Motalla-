@@ -3445,3 +3445,6 @@ html.cdon .cdez{display:none}
 .wdw .wdibr .ibbk>span{display:none}
 .wdw .wdibr .f6i.ibin{border:0!important;background:none!important;box-shadow:none!important;padding:2px 0!important;min-height:0}
 .wdw .wdibr .f6i.ibin input{border:0!important;background:none!important;box-shadow:none!important;padding:4px 0!important;height:auto!important;min-height:0!important;font-weight:800}
+/* v76.4 (خواسته صاحب اپ): فرم واریز داخل همان قاب آبی بخش فعال فرم خرید دستی */
+.wdw .wdf6{padding:12px 12px 14px;border-radius:20px;background:var(--card);box-shadow:0 0 0 1.5px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 10%,transparent);margin:10px 2px 12px}
+.wdw .wdf6>.c9h:first-child{margin-top:0}
