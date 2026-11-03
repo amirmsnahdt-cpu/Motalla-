@@ -38,7 +38,7 @@ function cdHTML(){const G=groupsList(),A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).lengt
   const me=who()||'';
   return `<div class="cdh"><b>حساب‌ها</b><button class="cdsb" data-act="cdFind" aria-label="جستجو">${ic('search')}</button></div>
   <div class="cdsc2"><nav class="cdn">${it('','همه حساب‌ها','users')}${G.map(g=>it(g,esc(g),'users')).join('')}${n('-')&&G.length?it('-','بدون گروه','user'):''}</nav>
-  ${rec.length?`<div class="cdsh">اخیر</div><div class="cdr">${rec.map(c=>`<button class="cdi cdrc" data-act="cdCu" data-id="${c.id}"><span class="c6a cul cdav${c.av?' cav':''}" style="--h:${cuHue(c)}">${c.av?`<img data-ik="${esc(c.av)}" alt="">`:''}${esc(userInit(c.name))}</span><span class="cdl">${esc(cuName(c))}</span>${c.grp?`<small>${esc(c.grp)}</small>`:''}</button>`).join('')}</div>`:''}</div>
+  ${rec.length?`<div class="cdsh">اخیر</div><div class="cdr">${rec.map(c=>`<button class="cdi cdrc" data-act="cdCu" data-id="${c.id}"><span class="c6a cul cdav${c.av?' cav':''}" style="--h:${cuHue(c)}">${c.av?`<img data-ik="${esc(c.av)}" alt="">`:''}${esc(userInit(c.name))}</span><span class="cdl">${esc(cuName(c))}</span>${c.cno?`<em>${toFa(c.cno)}</em>`:''}${c.grp?`<small>${esc(c.grp)}</small>`:''}</button>`).join('')}</div>`:''}</div>
   <div class="cdf"><span class="cdme" title="${esc(me)}">${esc(userInit(me))}</span>${can('debt')?`<button class="cdnew" data-act="cdNew">${ic('plus')}<span>حساب تازه</span></button>`:''}</div>`}
 ACT.cdG=d=>{cuF.g=d.g||'';cuFRe();const w=cdEl();if(w)w.querySelectorAll('.cdi[data-g]').forEach(b=>b.classList.toggle('on',(b.dataset.g||'')===cuF.g));setTimeout(()=>cdClose(),RM()?0:120)};
 ACT.cdCu=d=>{cdClose(1);ACT.cuOpen({id:d.id})};

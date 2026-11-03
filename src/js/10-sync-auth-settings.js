@@ -41,7 +41,7 @@ const SYNC={
   sources:{get:()=>sources,set:v=>{sources=v},key:'m_sources',cmp:(a,b)=>a.id-b.id},
   batches:{get:()=>batches,set:v=>{batches=v},key:'m_batches',cmp:(a,b)=>b.id-a.id},
   creds:{get:()=>creds,set:v=>{creds=v},key:'m_creds',cmp:(a,b)=>a.id-b.id},
-  custs:{get:()=>custs,set:v=>{custs=v},key:'m_custs',cmp:(a,b)=>a.id-b.id},
+  custs:{get:()=>custs,set:v=>{custs=v;/* v73.1: شماره مشتری برای حساب‌های تازه همکاران */if(typeof cuNoFix==='function'&&cuNoFix())setTimeout(()=>saveCu(),0)},key:'m_custs',cmp:(a,b)=>a.id-b.id},
   trash:{get:()=>trash,set:v=>{trash=v},key:'m_trash',cmp:(a,b)=>String(b.deletedAt||'').localeCompare(String(a.deletedAt||''))},
   audit:{get:()=>audit,set:v=>{audit=v.slice(0,400)},key:'m_audit',cmp:(a,b)=>b.id-a.id,noDel:true},
   drafts:{get:()=>Object.keys(drafts).filter(k=>Array.isArray(drafts[k])&&drafts[k].length).map(k=>({id:k,parts:drafts[k]})),
