@@ -52,7 +52,7 @@ window.addEventListener('resize',()=>requestAnimationFrame(segFx));
    تا اسکرول بقیه صفحه منتظر جاوااسکریپت نماند. ضربه کوتاه روی نوار به چیزی که زیرش است می‌رسد. */
 (()=>{let g=null;const V=()=>$('view'),EP=()=>['view','bar','act'].map(i=>$(i)).filter(Boolean);
   const Z=document.createElement('div');Z.id='edgez';Z.setAttribute('aria-hidden','true');document.body.appendChild(Z);
-  window.edgeZ=()=>{Z.classList.toggle('on',edgeOK())};
+  window.edgeZ=()=>{Z.classList.toggle('on',edgeOK());if(window.cdZ)cdZ()};
   Z.addEventListener('touchstart',e=>{if(e.touches.length!==1||!edgeOK())return;const t=e.touches[0];g={x:t.clientX,y:t.clientY,lk:null,dx:0}},{passive:true});
   Z.addEventListener('touchmove',e=>{if(!g){e.preventDefault();return}const t=e.touches[0],dx=g.x-t.clientX,dy=t.clientY-g.y;
     if(!g.lk){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;g.lk=dx>0&&dx>Math.abs(dy)?'h':'v';if(g.lk!=='h'){g.lk='v'}else{V().classList.add('edge');EP().forEach(el=>{el.style.transition='none'})}}

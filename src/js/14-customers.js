@@ -70,12 +70,9 @@ ACT.cuGR=d=>{cuF.g=d.g||'';cuFRe();const o=document.querySelector('#cug .cugi.on
 function cuLastDoc(){let R=null;for(const c of CU())for(const t of c.txs||[])if(t.type==='inv'&&!t.del){const k=[+t.no||0,String(t.createdAt||t.at||'')];if(!R||k[0]>R[2][0]||k[0]===R[2][0]&&k[1]>R[2][1])R=[c,t,k]}return R}
 ACT.cuLast=()=>{const L=cuLastDoc();if(!L){toast('هنوز سندی ثبت نشده');return}invOpen(L[0].id,L[1].id)};
 const cuLastBtn=()=>{const L=cuLastDoc();return L?`<button class="culast" data-act="cuLast" aria-label="آخرین سند">${ic('inv')}<span><small>آخرین سند</small>${L[1].no!=null?`<b>${toFa(L[1].no)}</b>`:''}</span></button>`:''};
-/* v72.4 (خواسته صاحب اپ): گروه‌ها روی گوشی نوار زیر جستجو نیستند؛ دکمه سه‌نقطه داخل جستجو فهرست گروه‌ها را باز می‌کند (زدن = فیلتر) */
-Object.assign(IC,{vdots:'<circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/>'});
+/* v72.4/v72.8: گروه‌ها روی گوشی از دکمه ≡ داخل جستجو، در کشوی کناری (15ze-cu-drawer) */
 const cuGLab=()=>cuF.g==='-'?'بدون گروه':cuF.g||'';
-const cuGBtn=()=>groupsList().length?`<button class="cugb${cuF.g?' on':''}" id="cuGb" data-act="cuGMenu" aria-label="گروه‌ها">${cuF.g?`<span>${esc(cuGLab())}</span>`:''}${ic('vdots')}</button>`:'';
-ACT.cuGMenu=()=>{const b=$('cuGb');if(!b)return;const G=groupsList(),A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,on=g=>(cuF.g||'')===g,it=(g,l)=>['cuGR',on(g)?ic('check'):ic('users'),l,{g}];
-  popMenu(b,[it('','همه حساب‌ها'),...G.map(g=>it(g,g)),...(n('-')?[it('-','بدون گروه')]:[])]);const m=$('pmenu');if(!m)return;m.classList.add('cugm');m.querySelectorAll('.pmi').forEach(x=>{const g=x.dataset.g||'';if(on(g))x.classList.add('on');x.insertAdjacentHTML('beforeend',`<em>${fmt(n(g))}</em>`)});const w=m.getBoundingClientRect().width,r=b.getBoundingClientRect();m.style.left=Math.max(8,Math.min(Math.round(r.right-w),innerWidth-w-8))+'px'};
+const cuGBtn=()=>groupsList().length?`<button class="cugb${cuF.g?' on':''}" id="cuGb" data-act="cuGMenu" aria-label="گروه‌ها">${cuF.g?`<span>${esc(cuGLab())}</span>`:''}${ic('hamb')}</button>`:'';
 /* رنگ دایره هر حساب (بی‌عکس) از روی شناسه‌اش؛ همیشه ثابت */
 const cuHue=c=>{let h=0;for(const ch of String(c&&c.id||''))h=(h*31+ch.charCodeAt(0))>>>0;return Math.round(h*137.508)%360};
 const cuSearchHTML=n=>`<div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${n?'نام، فاکتور، مبلغ، وزن…':'نام مشتری…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button>${n?cuGBtn():''}${n?`<button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button>`+cuFBtn():''}</div>`;
