@@ -3391,3 +3391,6 @@ html.cdon .cdez{display:none}
 .fsearch .cufbtn span{display:none}
 .fsearch .cufbtn em{position:absolute;top:-5px;left:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;display:grid;place-items:center;font-size:10.5px;font-style:normal;background:var(--blu);color:#fff;box-shadow:0 0 0 2px var(--card)}
 .fsearch .cufbtn.on em{background:var(--card);color:var(--blu);box-shadow:0 0 0 1.5px var(--blu)}
+/* v75.4 پنجره «نوع حساب» برای حساب تازه */
+.cufr.cunt{min-height:58px}.cufr.cunt .cufi{background:color-mix(in srgb,var(--blu) 12%,var(--card));color:var(--blu)}
+.cufr.cunt .cv svg{width:15px;height:15px;transform:scaleX(-1);color:var(--mut)}

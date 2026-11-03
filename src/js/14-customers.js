@@ -281,7 +281,14 @@ ACT.cuWpFlip=(d,e)=>{const el=e&&e.target.closest('.cbk');if(!el||el._fl)return;
 ACT.cuOpen=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(isPy(c)){toast('«'+cuName(c)+'» پرداخت‌کننده تسویه است، حساب مشتری ندارد'+(c.src!=null?'؛ مانده‌اش در صفحه بانک است':''));return}custId=d.id;go('cust')};
 let CUP=[];
 ACT.cuNewP=d=>{const p=CUP[+d.i];if(!p||!can('debt'))return;cuRet='';sheet(cuFormHTML({name:p.name,phone:p.phone,nid:p.nid}));cuBind()};
-ACT.cuNewQ=()=>{cuRet='';const q=clean(cuQ||'');sheet(cuFormHTML({name:q}));cuBind();sheetFocus($('cuP'))};
+ACT.cuNewQ=()=>{cuRet='';const q=clean(cuQ||'');cuTypeOpen({name:q},q?'cuP':'cuN')};
+/* v75.4 (خواسته صاحب اپ): حساب تازه اول «نوع حساب» (گروه) را می‌پرسد؛ با زدن یکی، پنجره «مشخصات مشتری» با همان گروه باز می‌شود. بی‌گروه‌ها مستقیم فرم */
+let CUNT=null;
+function cuTypeOpen(o,fid){const G=groupsList();if(!G.length){sheet(cuFormHTML(o));cuBind();sheetFocus($(fid||'cuN'));return}CUNT={o,fid};const A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length;
+  const row=(g,lab,ico,sub)=>`<button class="cufr cunt" data-act="cuNT" data-g="${esc(g)}"><span class="cufi">${ic(ico)}</span><span class="tx"><b>${lab}</b><small>${sub}</small></span><span class="cv">${ic('back')}</span></button>`;
+  sheet(`<div class="sh-h"><div><b>نوع حساب</b><small class="shsub">${o.name?'«'+esc(o.name)+'» · ':''}گروه حساب تازه را انتخاب کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="cufs"><div class="cufg2">${G.map(g=>row(g,esc(g),'users',fmt(n(g))+' حساب')).join('')}${row('','بدون گروه','user','بعداً هم می‌شود گروه داد')}</div></div>`)}
+ACT.cuNT=d=>{const z=CUNT;if(!z)return;CUNT=null;sheet(cuFormHTML({...z.o,grp:d.g||''}));cuBind();sheetFocus($(z.fid||'cuN'))};
 /* موجودی مغازه به تفکیک نوع طلا: خرید و دریافت اضافه می‌کند، فروش و تحویل کم می‌کند (پولی‌ها موجودی را تغییر نمی‌دهند) */
 function goldStock(){const m={};GK.forEach(k=>m[k]=0);for(const c of custs){if(c.del||c.sys)continue;for(const t of (c.txs||[])){if(t.del)continue;
     if(t.type==='inv'){for(const it of t.items||[]){const k=it.cat||'نو';m[k]=(m[k]||0)-(+it.w||0)}for(const p of t.pays||[])if(p.m==='gold'){const k=p.cat||'کارکرده';m[k]=(m[k]||0)+(+p.w||0)}

@@ -154,7 +154,7 @@ function svPick(id,o){o=o||{};svQO=0;sv.cuId=id;sv.q='';svKeep();if(cur!=='sell'
   if(o.form&&can('debt')){setTimeout(()=>{if(cur!=='sell')return;sheetAfter=dk;ACT.cuEdit({id})},140)}else if(o.dk)setTimeout(dk,160);const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
 ACT.svCu=d=>svPick(d.id,{form:1});
 ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();$('svCu').innerHTML=svCuHTML();svBindCu();svQO=1;srchSwap('svCr',svCrHTML());phPaint($('svCr'));svRe()};
-ACT.svCuNew=()=>{cuRet='sell';sheet(cuFormHTML({name:clean(sv.q||'')}));cuBind();setTimeout(()=>{const n=$(sv.q?'cuP':'cuN');if(n)n.focus()},320)};
+ACT.svCuNew=()=>{cuRet='sell';cuTypeOpen({name:clean(sv.q||'')},sv.q?'cuP':'cuN')};/* v75.4: اول نوع حساب */
 ACT.svCal=()=>openCal(sv.date,iso=>{sv.date=iso;svKeep();closeSheet();render()});
 /* ----- ردیف تازه: یک جستجو برای همه چیز (مثل «شرح» در کیمیا) ----- */
 let svUsed={};
