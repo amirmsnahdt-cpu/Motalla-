@@ -87,7 +87,10 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
   const bkRow=({r,s},k)=>{const root=r.id===rootId,q=r.sentBid?entBI(r):null,st=bkSt(s,q),lk=q&&ssLock(q.it),cl=q&&q.b.closed,n=q?itImgs(q.b,q.it).length:0;
     const tag=root&&hasCu&&!multi?'مانده · بانک':'بانک',ttl=s?esc(s.name):'انتخاب بانک',
       sub=[st[1],multi?'بخش '+toFa(k+1):'',q&&q.it.tn?'پیگیری '+esc(toFa(q.it.tn)):''].filter(Boolean).join(' · ');
-    const act=q?`data-act="itOpen" data-b="${q.b.id}" data-i="${q.i}"`:!edB||F.some(z=>z.sentBid)?(s&&tk?`data-act="bkGo" data-id="${r.id}"`:''):root?`data-act="entMove" data-id="${r.id}"`:`data-act="pkEdit" data-id="${r.id}"`;
+    /* v77.3 (باگ گزارش‌شده): بخشی از واریزی به بانک‌ها رفته (ارسال‌شده) و مانده اصلی هنوز بانک ندارد — ردیف مانده قابل زدن نبود و
+       «افزودن پرداخت › بانک» هم بسته بود. حالا مانده اصلی ارسال‌نشده همیشه بانک می‌گیرد (زدن = انتخاب/تغییر بانک؛ با بانک = ثبت واریز) */
+    const rootFree=root&&edB&&!r.sentBid&&F.some(z=>z.sentBid);
+    const act=q?`data-act="itOpen" data-b="${q.b.id}" data-i="${q.i}"`:rootFree?(s&&tk?`data-act="bkGo" data-id="${r.id}"`:`data-act="entMove" data-id="${r.id}"`):!edB||F.some(z=>z.sentBid)?(s&&tk?`data-act="bkGo" data-id="${r.id}"`:''):root?`data-act="entMove" data-id="${r.id}"`:`data-act="pkEdit" data-id="${r.id}"`;
     const cam=q?(n||tk?`<button class="py7c${n?' on':''}" data-act="galIt" data-id="${r.id}" aria-label="رسیدهای واریز">${ic(n?'cam':'plus')}${n>1?`<em>${toFa(n)}</em>`:''}</button>`:''):s&&tk?`<button class="py7c" data-act="bkGo" data-id="${r.id}" aria-label="ثبت واریز و رسید">${ic('plus')}</button>`:'';
     const row=`<div class="py7r b py9 ${st[0]}${pyFlash!=null&&String(pyFlash)===String(r.id)?' nw':''}"><${act?'button':'div'} class="py7b" ${act}><span class="py7a bk">${bkAv(s)}</span><span class="tx"><b>${ttl}</b><small>${sub}</small></span><span class="py7v"><em class="py9t b">${tag}</em><b>${fmt(q&&q.it.amount!=null?+q.it.amount:r.amount)}<i>تومان</i></b></span></${act?'button':'div'}>${cam}</div>`;
     let R=[],L=[];
@@ -95,6 +98,7 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
       if(edB&&!cl){const xr=validated().find(z=>z.id===rootId);if(xr&&ssCan(xr)&&!lk)L.push(['sentSplit','ویرایش','edit','#3b6fd6']);if(tk&&q.it.st!=='fail'&&q.it.st!=='ok')L.push(['entTkF','ناموفق','x','#d23c48']);if(root&&xr)L.push(['entUnalloc','حذف تخصیص','x','#d23c48'])/* v69.13: همیشه دیده می‌شود؛ اگر قفل است، دلیلش گفته می‌شود */}}
     else{if(s&&tk)R=[['bkGo','ثبت واریز','check','#178049']];
       /* بخشی ارسال شده باشد: مبلغ بخش‌های ارسال‌نشده از بانک اصلی ارسال‌شده کم/زیاد نمی‌شود؛ اول این بخش هم ثبت شود، بعد «ویرایش» همه بخش‌ها */
+      if(rootFree)L=[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6']];
       if(edB&&!F.some(z=>z.sentBid))L=root?[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6'],...(s||F.length>1?[['entUnalloc','حذف تخصیص','x','#d23c48']]:[])]:[['pkEdit','ویرایش','edit','#3b6fd6'],['pkDel','برداشتن','trash','#d23c48']]}
     R=[...R,['pyCp','کپی','copy','#b8862b']];/* v77.2: کپی با کشیدن به چپ */
     return swW(row,{r:R,l:L,data:{id:r.id,st:'ok',b:q?q.b.id:'',i:q?q.i:'',k:'b',e:x.id}})};
@@ -205,6 +209,9 @@ function pxCuList(){const q0=clean(PX.q||''),T=pxTok(q0),dOk=pDig(q0),me=pxMe(),
 function pxBkList(){const x=entRow(),q0=clean(PX.q||''),q=nzName(toEn(q0)),out=[];if(!x)return '';const F=famOf(x),sent=F.some(r=>r.sentBid);
   if(PX.bz||!can('split'))return `<div class="px7e px9e">${ic('bank')}<b>اینجا بانکی برای انتخاب نیست</b></div>`;
   const xr=validated().find(z=>z.id===famRoot(x))||x;if(xr.id!==famRoot(x)||!(xr.amount>0))return `<div class="px7e px9e">${ic('bank')}<b>بانک را از واریزی اصلی عوض کنید</b></div>`;
+  /* v77.3: مانده اصلی هنوز ارسال نشده (بقیه بخش‌ها ارسال‌شده) → انتخاب بانک برای همین مانده */
+  if(sent&&!xr.sentBid){const B=ownL().filter(s=>!q||bkHit(s,q0));if(!B.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانکی در مغازه تعریف نشده'}</b></div>`;
+    return pxGh('مانده '+fmt(xr.amount)+' تومان به کدام بانک برود؟',B.length)+`<div class="c6l bxlist px9l">${B.map((s,ri)=>{const bk=acBank(s),m=acSum(s);return `<button type="button" class="c6r bxrow px7o px9c" data-act="pxRootBk" data-e="${xr.id}" data-id="${s.id}" style="--r:${Math.min(ri,8)}"><span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):esc(userInit(s.name))}</span><span class="tx"><b>${esc(s.name)}</b><small>${esc(bk?'بانک '+bk:'حساب مغازه')}</small></span><span class="bxv"><small>مانده نهایی</small>${bxV(m)}</span></button>`}).join('')}</div>`}
   if(sent&&!ssCan(xr))return F.some(r=>!r.sentBid)?`<div class="px7e px9e">${ic('bank')}<b>بخشی هنوز ثبت واریز نشده</b><small>اول ردیف‌های بانکی «آماده ارسال» را با کشیدن به چپ ثبت واریز کنید، بعد بانک یا مبلغ را عوض کنید</small></div>`:`<div class="px7e px9e">${ic('check')}<b>بخش‌های بانکی تأیید شده یا رسید دارند</b><small>بانک یا مبلغ قفل است</small></div>`;
   const L=pkL(xr),main=sent?'':(L[0]?L[0].src:''),B=ownL().filter(s=>String(s.id)!==main&&(!q||bkHit(s,q0))&&pxBkDay(s)&&(!PX.fb||s.bal!=null));
   if(!B.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانک دیگری در مغازه تعریف نشده'}</b></div>`;
@@ -281,3 +288,5 @@ ACT.pyCp=d=>{const e=validated().find(z=>String(z.id)===String(d.e))||entries.fi
   const S=(entries.find(z=>z.id===e.id)||e).settles||[],z=S[+d.i];if(!z)return;
   const dt=z.byInv&&(()=>{const c=custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);return t?invTitle(t):''})();
   cpOut('پرداخت از: '+Bo(z.name||'—')+'\nبه: '+Bo(accName(e))+'\nمبلغ: '+Bo(N(z.amount)+' تومان')+(e.iban?'\nشبا: '+Mo(ibanSp(e.iban)):'')+(e.card?'\nکارت: '+Mo(e.card):'')+(dt?'\nسند: '+dt:'')+(z.tn?'\nپیگیری: '+Mo(toEn(z.tn)):'')+(z.st==='wait'?'\nوضعیت: در انتظار تأیید':''),'تسویه '+fmt(z.amount)+' تومان کپی شد')};
+
+ACT.pxRootBk=d=>{const x=validated().find(r=>String(r.id)===String(d.e));if(!x)return;ldKey=PD(x);const own=parts().find(z=>z.ids.some(i=>String(i)===String(x.id)));PX=null;closeSheet();mvIds=[x.id];mvFrom=own?own.id:null;ACT.mvGo({s:d.id})};
