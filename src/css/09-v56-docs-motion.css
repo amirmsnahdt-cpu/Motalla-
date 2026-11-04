@@ -3530,3 +3530,8 @@ html.cdon .cdez{display:none}
 .tlph img{width:100%;height:100%;object-fit:cover;display:block}
 .btn.tlprn{width:100%;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px}
 .tlphs{grid-template-columns:repeat(auto-fill,84px)}
+/* v77.0 (خواسته صاحب اپ: «همه چیز به تفکیک»): در پنجره جزئیات فعالیت، ریز هر ردیف سند (نوع کالا، وزن، عیار، قیمت، اجرت، حواله، حساب…) همیشه باز */
+.tldoc2 .d8x{grid-template-rows:1fr!important;opacity:1!important}
+.tldoc2 .d8ch{display:none}
+.tldoc2 .d8eb[data-act]:not(.d8lk){display:none}
+.tlphs .tlph{width:84px;height:84px;max-width:84px}
