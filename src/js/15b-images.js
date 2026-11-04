@@ -41,8 +41,8 @@ const galFiles=c=>c.keys.map(k=>({key:k,...c.meta}));
 document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!t.dataset||t.dataset.galadd==null)return;const F=[...(t.files||[])];t.value='';if(!F.length)return;const c=galCtx();if(!c||!c.ed){toast(c?'اجازه افزودن عکس ندارید':'ردیف این عکس دیگر باز نیست؛ ردیف را دوباره باز کنید و عکس را اضافه کنید',true);return}
   /* v72.0: اول پیش‌نمایش و تأیید نهایی، بعد ذخیره */
   const D=await picPrep(F,c.meta);if(!D)return;const c2=galCtx();if(!c2||!c2.ed){toast('ردیف این عکس دیگر باز نیست؛ ردیف را دوباره باز کنید و عکس را اضافه کنید',true);return}
-  const K=c2.keys;let n=0;for(const d of D){const k=newImgKey(c2.pre);if(await imgPut(k,d)){K.push(k);n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}
-  if(n){c2.set(K);if(GAL.k!=='row')logA('edit','افزودن رسید',c2.meta.name+' | '+fmt(n)+' عکس');galRefresh();toast(n>1?fmt(n)+' عکس اضافه شد':'عکس اضافه شد')}});
+  const K=c2.keys,NK=[];let n=0;for(const d of D){const k=newImgKey(c2.pre);if(await imgPut(k,d)){K.push(k);NK.push(k);n++}else{toast('حافظه پر است؛ عکس ذخیره نشد',true);break}}
+  if(n){c2.set(K);/* v77.7: کلید عکس‌ها و واریزی در تاریخچه، تا جزئیات فعالیت خود عکس را نشان دهد */if(GAL.k!=='row')logA('edit','افزودن رسید',c2.meta.name+' | '+fmt(n)+' عکس',{imgs:NK,...(GAL.eid!=null?{ids:[GAL.eid]}:{})});galRefresh();toast(n>1?fmt(n)+' عکس اضافه شد':'عکس اضافه شد')}});
 ACT.galIt=d=>{const e=entries.find(z=>String(z.id)===String(d.id));if(!e||!entBI(e)){toast('این واریزی هنوز ارسال نشده است',true);return}openGal({k:'it',eid:e.id})};
 /* v61.2: رسید تسویه‌های یک واریزیِ کامل با مشتری — یک پنجره با همه تسویه‌ها؛ هر تسویه عکس‌هایش و دکمه گالری/دوربین همان‌جا */
 let FSE=null;
