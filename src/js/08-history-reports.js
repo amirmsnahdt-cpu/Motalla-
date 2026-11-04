@@ -24,7 +24,7 @@ function vAudit(){
   /* v76.5: خط زمانی همه فعالیت‌ها با علامت «وارد سیستم حسابداری شد» (15zg-timeline) */
   h+=tlHead();
   h+=`<div class="seg hseg2 tlseg">${Object.entries(TLF).map(([a,[b]])=>`<button class="${tlF===a?'on':''}" data-act="tlF" data-f="${a}">${b}${a==='todo'&&tlTodo()?` <i>${fmt(tlTodo())}</i>`:''}</button>`).join('')}</div>`;
-  const L=audit.filter(a=>TLF[tlF][1](a));
+  const L=audit.filter(a=>a.type!=='acc'&&TLF[tlF][1](a));
   if(!L.length)return h+`<div class="card empty">${ic('clock')}<b>${tlF==='todo'?'همه فعالیت‌ها وارد سیستم شده ✓':'فعالیتی برای نمایش نیست'}</b>هر سند، واریزی، حواله و تغییر بانک اینجا به ترتیب زمان می‌آید.</div>`;
   let last='',open=false;
   L.slice(0,200).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){if(open)h+='</div>';last=d;open=true;h+=`<div class="hday tlday">${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</div><div class="tlg">`}h+=tlRow(x)});

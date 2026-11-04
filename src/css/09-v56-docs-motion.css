@@ -3485,3 +3485,11 @@ html.cdon .cdez{display:none}
 .tlbn .tld{position:static;box-shadow:none;flex:none;width:36px;height:36px}
 .tlbn .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}.tlbn .tx b{font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tlbn .tx small{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tlbn em{flex:none;font-style:normal;font-size:11.5px;font-weight:800;color:var(--mut)}
+/* v76.6 دایره تأیید روی هر کارت خط زمانی (هر فعالیت جدا) */
+.tlc{position:relative}
+.tlh{padding-inline-end:54px}
+.tlcb{position:absolute;inset-inline-end:10px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--line);background:var(--card);color:transparent;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
+.tlr.open .tlcb{top:30px;transform:none}
+.tlcb svg{width:17px;height:17px;stroke-width:3}
+.tlcb.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.tlcb:not(.on):active{border-color:var(--ok);color:var(--ok)}
