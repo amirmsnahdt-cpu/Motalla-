@@ -90,7 +90,7 @@ async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.bu
 function meUpdate(u){if(!ME||!u||u.id!==ME.id)return;const k=x=>JSON.stringify([x.role,(x.perms||[]).slice().sort()]);if(k(ME)===k(u)){if(ME.name!==u.name||(ME.av||'')!==(u.av||'')){ME={...ME,...u};rawSet('m_me',ME);user=ME.name;try{remoteRefresh()}catch(e){}}return}
   const was=ME.role;ME={...ME,...u};rawSet('m_me',ME);user=ME.name;applyPerms();try{remoteRefresh()}catch(e){}
   toast(was!==u.role?'نقش حساب شما به «'+(ROLE[u.role]||u.role)+'» تغییر کرد ✓':'دسترسی‌های حساب شما به‌روز شد ✓')}
-function applyRemote(res,sent){const touched=new Set(),byColl={};
+function applyRemote(res,sent){const touched=new Set(),byColl={},NEWAUD=[];
   for(const ch of res.changes||[]){if(!SYNC[ch.coll])continue;(byColl[ch.coll]=byColl[ch.coll]||[]).push(ch)}
   for(const c in SYNC){const S=SYNC[c],B=SY.base[c]||(SY.base[c]=new Map()),list=byColl[c]||[];
     if(!res.full&&!list.length)continue;
@@ -105,6 +105,7 @@ function applyRemote(res,sent){const touched=new Set(),byColl={};
       if(keepLocal(pk,id)){if(pk in sent){if(sent[pk]===null)B.delete(id);else B.set(id,sent[pk]);SY.pend[pk]=sent[pk]}continue}
       if(ch.deleted){if(idx.has(id)){arr.splice(idx.get(id),1);idx=findIdx(arr)}B.delete(id)}
       else{const isNew=!idx.has(id),mine=pk in sent;if(idx.has(id))patchIn(arr[idx.get(id)],ch.data);else{arr.push(ch.data);idx.set(id,arr.length-1)}B.set(id,sj(ch.data));
+        if(isNew&&!mine&&c==='audit')NEWAUD.push(ch.data);/* v76.5: اعلان فعالیت تازه همکاران */
         if(!mine&&FRESH_C.includes(c)){FLASH.add(id);SY.newN=(SY.newN||0)+1;if(isNew)SY.addN=(SY.addN||0)+1}}
       delete SY.pend[pk];touched.add(c)}
     if(touched.has(c)){if(S.cmp)arr.sort(S.cmp);S.set(arr);rawSet(S.key,S.cache?S.cache():S.get())}}
@@ -112,6 +113,7 @@ function applyRemote(res,sent){const touched=new Set(),byColl={};
     if(cj===sent[pk]){delete SY.pend[pk];const B=SY.base[c];if(cj===null)B.delete(id);else B.set(id,cj)}}
   SY.since=res.ver;rawSet('m_since',SY.since);rawSet('m_pend',SY.pend);
   if(touched.size){alloc=null;remoteRefresh()}
+  if(NEWAUD.length&&!res.full&&SY.scanned&&typeof tlNotify==='function')try{tlNotify(NEWAUD)}catch(e){}
   if(SY.scanned&&!SY.manual){const k=(SY.newN||0)-(SY.annN||0);if(k>0&&res.changes&&res.changes.length&&!res.full){SY.annN=SY.newN;if(!SY.quiet)toast(toFa(k)+' مورد تازه دریافت شد')}else SY.annN=SY.newN}}
 /* v71.8: فرم خرید دستی (buy) هم وسط پر کردن با داده همکارها دوباره ساخته نمی‌شود */const canRender=()=>!['entry','bulk','cwiz','pwiz','buy'].includes(cur)&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&!document.querySelector('.swr.on');
 function remoteRefresh(){try{entItSyncAll()}catch(e){}/* v72.0 */if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}

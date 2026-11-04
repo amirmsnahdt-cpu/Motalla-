@@ -18,17 +18,16 @@ function evHTML(x){
     <div class="hb">${x.detail?`<div class="hd">${esc(x.detail)}</div>`:''}${x.type==='edit'?diffHTML(x.before,x.after):''}<div class="hmeta">${meta.map(([k,v])=>`<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>${acts.length?`<div class="hact">${acts.map(a=>`<button class="sm ${a[0]==='undoEv'?'gold':'sec'}" data-act="${a[0]}" data-ev="${x.id}">${ic(a[2])} ${a[1]}</button>`).join('')}</div>`:''}</div></div>`;
   return (A.R.length||A.L.length)?swW(inner,{r:A.R,l:A.L,data:{ev:x.id}}):inner}
 const histTip=()=>ls.get('m_hswiped',false)?'':`<div class="hhint swtip">برای جزئیات روی هر مورد بزنید · برای برگرداندن به چپ بکشید</div>`;
-function vAudit(){const t=todayISO(),td=audit.filter(a=>a.ts&&isoOfTs(a.ts)===t),k=ty=>td.filter(a=>ty.includes(a.type)).length;
+function vAudit(){
   let h=`<div class="seg"><button data-act="htab" data-t="ev" class="${histTab==='ev'?'on':''}">فعالیت‌ها</button><button data-act="htab" data-t="tr" class="${histTab==='tr'?'on':''}">سطل بازیابی ${trash.length?fmt(trash.length):''}</button></div>`;
   if(histTab==='tr')return h+trashHTML();
-  const nA=k(['add','bulk']),nE=k(['edit']),nD=k(['del','clear']),nS=k(['split']);
-  h+=`<div class="hsum"><span>امروز</span><span><b>${fmt(nA)}</b> ثبت</span><span><b>${fmt(nE)}</b> ویرایش</span><span><b class="${nD?'r':''}">${fmt(nD)}</b> حذف</span><span><b>${fmt(nS)}</b> تقسیم</span></div>`;
-  const F={all:'همه',add:'ثبت',edit:'ویرایش',del:'حذف',split:'تقسیم'},grp={add:['add','bulk'],edit:['edit'],del:['del','clear','purge'],split:['split']};
-  h+=`<div class="seg hseg2">${Object.entries(F).map(([a,b])=>`<button class="${histFilter===a?'on':''}" data-act="hfilter" data-f="${a}">${b}</button>`).join('')}</div>`;
-  const L=audit.filter(a=>histFilter==='all'||(a.ts&&grp[histFilter].includes(a.type)));
-  if(!L.length)return h+`<div class="card empty">${ic('clock')}<b>فعالیتی برای نمایش نیست</b>هر ثبت، ویرایش، حذف و تقسیم اینجا ثبت می‌شود و قابل برگشت است.</div>`;
-  h+=histTip();let last='',open=false;
-  L.slice(0,150).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){if(open)h+='</div>';last=d;open=true;h+=`<div class="hday">${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</div><div class="hgrp">`}h+=evHTML(x)});
+  /* v76.5: خط زمانی همه فعالیت‌ها با علامت «وارد سیستم حسابداری شد» (15zg-timeline) */
+  h+=tlHead();
+  h+=`<div class="seg hseg2 tlseg">${Object.entries(TLF).map(([a,[b]])=>`<button class="${tlF===a?'on':''}" data-act="tlF" data-f="${a}">${b}${a==='todo'&&tlTodo()?` <i>${fmt(tlTodo())}</i>`:''}</button>`).join('')}</div>`;
+  const L=audit.filter(a=>TLF[tlF][1](a));
+  if(!L.length)return h+`<div class="card empty">${ic('clock')}<b>${tlF==='todo'?'همه فعالیت‌ها وارد سیستم شده ✓':'فعالیتی برای نمایش نیست'}</b>هر سند، واریزی، حواله و تغییر بانک اینجا به ترتیب زمان می‌آید.</div>`;
+  let last='',open=false;
+  L.slice(0,200).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){if(open)h+='</div>';last=d;open=true;h+=`<div class="hday tlday">${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</div><div class="tlg">`}h+=tlRow(x)});
   return h+(open?'</div>':'')}
 function trashHTML(){if(!trash.length)return `<div class="card empty">${ic('trash')}<b>سطل بازیابی خالی است</b>واریزی‌هایی که حذف می‌کنید تا ۶۰ روز اینجا می‌مانند و قابل بازگردانی‌اند.</div>`;
   let h=`<div class="hsum"><span>${fmt(trash.length)} واریزی حذف‌شده</span><span><b>${fmt(sum(trash))}</b> تومان</span></div><div class="row" style="margin:0 0 10px"><button class="sm gold" data-act="restoreAll">${ic('restore')} بازگردانی همه</button>${can('del')?`<button class="sm red" data-act="emptyTrash">خالی کردن سطل</button>`:''}</div>`;
