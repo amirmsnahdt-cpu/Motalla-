@@ -3515,3 +3515,10 @@ html.cdon .cdez{display:none}
 .tlda{display:flex;flex-direction:column;gap:8px}
 .btn.tlok2{background:var(--ok);color:#fff;border:0}
 .brw.tlbr.ok .bri.tlki{background:var(--ok)!important;color:#fff!important}.brw.tlbr .bri.tlki{background:color-mix(in srgb,var(--kc) 13%,var(--card))!important;color:var(--kc)!important}.brw.tlbr.ok .bri.tlki{background:var(--ok)!important;color:#fff!important}
+/* v76.8 برگه جزئیات فعالیت با قطعه‌های جزئیات واریزی */
+.tldoc2 .eav.tlav{background:color-mix(in srgb,var(--kc) 14%,var(--card));color:var(--kc)}.tldoc2 .eav.tlav svg{width:28px;height:28px}
+.tldoc2 .erem{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--kc) 40%,transparent),0 14px 28px -20px var(--kc)}.tldoc2 .erem b span{color:var(--kc)}
+.tldoc2 .kvh{margin:14px 4px 6px;font-size:13px;font-weight:800;color:var(--mut)}
+.tldoc2 .kv b{flex:1;text-align:left;font-weight:800}.tldoc2 .kv small{flex:none;min-width:84px;color:var(--mut)}
+.tlg2{color:var(--ok)}.tlw2{color:#b8862b}
+.tlda{margin-top:12px}

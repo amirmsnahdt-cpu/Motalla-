@@ -42,19 +42,23 @@ function tlRow(x){if(!x.ts)return evHTML(x);const[k,lab,ico,col]=TLK(x),dn=tlDon
   const R=[...(x.undone?[]:dn?[['tlUn','لغو تأیید','undo','#6b7385']]:[['tlChk','وارد شد','check','#178049']]),...A.R.filter(a=>canAct(a[0]))],L=[['tlOpen','سند','inv','#3b6fd6'],...A.L.filter(a=>canAct(a[0]))];
   return swW(inner,{r:R,l:L,data:{ev:x.id}})}
 /* برگه سند برای فعالیتی که سند جدا ندارد (یا دکمه «جزئیات») */
-function tlDocHTML(x){const[k,lab,ico,col]=TLK(x),dn=tlDone(x),D=isoOfTs(x.ts),parts=String(x.detail||'').split(' | ').filter(Boolean),am=tlAmt(x),f=tlFind(x),n=tlNum(x),by=dn&&(tlSet0().get(String(x.id))||{}).by;
-  return `<div class="sh-h"><div><b>${esc(x.summary||lab)}</b><small class="shsub">${esc(lab)}${n?' · شماره '+toFa(n):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="tldoc" style="--kc:${col}"><div class="tldh"><span class="tldi">${ic(ico)}</span><span class="tx"><b>${esc(x.summary||lab)}</b><small>${esc(relDay(D)+'، '+dates(D).fa+' · ساعت '+hm(x.ts))}</small></span>${n?`<span class="tldn"><small>شماره</small><b>${toFa(n)}</b></span>`:''}</div>
-  <div class="tldr"><div><small>انجام‌دهنده</small><b>${esc(x.user||'—')}</b></div><div><small>نوع</small><b>${esc(lab)}${x.undone?' · لغو شد':''}</b></div><div><small>وضعیت حسابداری</small><b class="${dn?'ok':'w'}">${dn?'وارد شد'+(by?' · '+esc(by):''):'وارد نشده'}</b></div></div>
-  ${parts.length?`<div class="tldl2"><div class="tldlh">شرح</div>${parts.map((p,i)=>`<div class="tldli"><i>${toFa(i+1)}</i><span>${esc(p)}</span></div>`).join('')}</div>`:''}
-  ${x.type==='edit'?diffHTML(x.before,x.after):''}
-  ${am?`<div class="tldt"><small>مبلغ</small><b>${fmt(am)} <i>تومان</i></b></div>`:''}</div>
+/* v76.8 (خواسته صاحب اپ: «شبیه جزئیات واریزی»): همان قطعه‌های صفحه جزئیات واریزی — سرتیتر وسط‌چین با دایره، نام و زیرعنوان،
+   کادر بزرگ مبلغ (erem)، برچسب وضعیت (est)، بخش‌های عنوان‌دار با ردیف‌های برچسب/مقدار (kvh/kvs/kv) */
+function tlDocHTML(x){const[k,lab,ico,col]=TLK(x),dn=tlDone(x),D=isoOfTs(x.ts),parts=String(x.detail||'').split(' | ').filter(Boolean),am=tlAmt(x),f=tlFind(x),n=tlNum(x),by=dn&&(tlSet0().get(String(x.id))||{}),st=x.undone?'fail':dn?'ok':'pend';
+  const kv=(l,v)=>`<div class="kv"><small>${l}</small><b>${v}</b><span class="ksp"></span></div>`,cust=parts[0]||'';
+  const rows1=[n?kv('شماره سند',toFa(n)):'',kv('نوع',esc(lab)),cust?kv(x.type==='cust'?'مشتری':'طرف حساب',esc(cust)):''].join('');
+  const rows2=parts.slice(cust?1:0).map((p,i)=>{const m=p.match(/^([^:：]{2,24})[:：]\s*(.+)$/);return m?kv(esc(m[1]),esc(m[2])):kv(toFa(i+1),esc(p))}).join('');
+  const rows3=[kv('انجام‌دهنده',esc(x.user||'—')),kv('تاریخ',esc(relDay(D)+'، '+dates(D).fa)),kv('ساعت',hm(x.ts)),kv('حسابداری',dn?'<span class="tlg2">وارد شد'+(by&&by.by?' · '+esc(by.by):'')+'</span>':'<span class="tlw2">وارد نشده</span>')].join('');
+  return `<div class="sh-h"><div><b>جزئیات فعالیت</b><small class="shsub">${esc(lab)}${n?' · '+toFa(n):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="tldoc2" style="--kc:${col}"><div class="ehead"><div class="eav tlav">${ic(ico)}</div><b class="enm">${esc(x.summary||lab)}</b><small class="enms">${esc(x.user||'')} · ${esc(relDay(D))} ساعت ${hm(x.ts)}</small>
+  ${am?`<div class="erem"><small>مبلغ</small><b><span>${fmt(am)}</span><i>تومان</i></b></div>`:''}<span class="est ${st}">${x.undone?'لغو شد':dn?'وارد سیستم حسابداری شد':'هنوز وارد سیستم حسابداری نشده'}</span></div>
+  <div class="kvh">سند</div><div class="kvs">${rows1}</div>${rows2?`<div class="kvh">جزئیات</div><div class="kvs">${rows2}</div>`:''}${x.type==='edit'?`<div class="kvh">تغییرها</div>${diffHTML(x.before,x.after)}`:''}<div class="kvh">ثبت</div><div class="kvs">${rows3}</div></div>
   <div class="tlda">${f?`<button class="xgo" data-act="tlGo" data-ev="${x.id}">${ic(f.k==='ent'?'eye':'inv')} ${f.k==='ent'?'دیدن واریزی':'دیدن سند کامل'}</button>`:''}${x.undone?'':dn?`<button class="btn sec" data-act="tlUn" data-ev="${x.id}">${ic('undo')} لغو تأیید</button>`:`<button class="btn tlok2" data-act="tlChk" data-ev="${x.id}">${ic('check')} وارد سیستم شد</button>`}</div>`}
 ACT.tlOpen=d=>{const x=audit.find(a=>String(a.id)===String(d.ev));if(!x)return;const f=tlFind(x);if(f&&f.k!=='bank'){tlGoF(f);return}sheet(tlDocHTML(x))};
 function tlGoF(f){closeSheet();if(f.k==='inv'){invOpen(f.cu,f.tx);PARENT.inv='audit'}else if(f.k==='ent'){ACT.openEnt({id:f.id});PARENT.ent='audit'}else if(f.k==='bank'){const s=sources.find(z=>String(z.id)===String(f.sid)),l=s&&(s.led||[]).find(z=>String(z.id)===String(f.l));if(s&&l)sheet(bdViewHTML(s,l))}}
 ACT.tlGo=d=>{const x=audit.find(a=>String(a.id)===String(d.ev)),f=x&&tlFind(x);if(f)tlGoF(f)};
 function tlAcc(of,un){const n=(of||[]).length+(un||[]).length;if(!n)return;logA('acc',of&&of.length?'تأیید ورود به سیستم حسابداری':'برداشتن تأیید ورود',toFa(n)+' فعالیت',of&&of.length?{of}:{un});TLM.k='';
-  if(!$('ov').classList.contains('hide')&&$('sheet').querySelector('.tldoc')){const x=audit.find(a=>String(a.id)===String((of||un)[0]));if(x&&(of||un).length===1)sheetKeep(tlDocHTML(x));else closeSheet()}
+  if(!$('ov').classList.contains('hide')&&$('sheet').querySelector('.tldoc2')){const x=audit.find(a=>String(a.id)===String((of||un)[0]));if(x&&(of||un).length===1)sheetKeep(tlDocHTML(x));else closeSheet()}
   const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;
   if(!RM()&&of)of.slice(0,20).forEach(id=>{const b=document.querySelector(`.swr [data-ev="${id}"] .bri`)||document.querySelector(`[data-act=tlOpen][data-ev="${id}"] .bri`);if(b&&b.animate)b.animate([{transform:'scale(.4)'},{transform:'scale(1.2)'},{transform:'none'}],{duration:360,easing:'cubic-bezier(.3,1.4,.5,1)'})})}
 ACT.tlChk=d=>{const x=audit.find(a=>String(a.id)===String(d.ev));if(!x||tlDone(x))return;tlAcc([x.id]);toast('«'+(x.summary||'فعالیت')+'» وارد سیستم شد ✓')};
