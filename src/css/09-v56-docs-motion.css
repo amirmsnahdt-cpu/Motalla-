@@ -3543,3 +3543,5 @@ html.cdon .cdez{display:none}
 .ib0.hal{width:auto;display:inline-flex;align-items:center;gap:5px;padding:0 14px;background:var(--blu)!important;color:#fff!important;border-color:var(--blu)!important;font:inherit;font-size:14px;font-weight:850}
 .ib0.hal svg{width:18px;height:18px;stroke-width:2.6}
 .tlbn{touch-action:none}
+/* v77.6 (خواسته صاحب اپ): همه کادرهای مشخصات (برچسب/مقدار، .kvs) — جزئیات واریزی، جزئیات فعالیت و هر جای دیگر — داخل همان قاب آبی */
+.kvs,#app.ent .kvs,#app.ent:not(.editing) .kvs{border:0!important;border-radius:20px!important;background:var(--card)!important;padding:0 14px!important;box-shadow:0 0 0 1.5px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 10%,transparent)!important;margin:4px 3px 10px}

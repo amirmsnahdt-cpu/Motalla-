@@ -44,7 +44,7 @@ function tlRow(x){if(!x.ts)return evHTML(x);const[k,lab,ico,col]=TLK(x),dn=tlDon
 /* برگه سند برای فعالیتی که سند جدا ندارد (یا دکمه «جزئیات») */
 /* v76.8 (خواسته صاحب اپ: «شبیه جزئیات واریزی»): همان قطعه‌های صفحه جزئیات واریزی — سرتیتر وسط‌چین با دایره، نام و زیرعنوان،
    کادر بزرگ مبلغ (erem)، برچسب وضعیت (est)، بخش‌های عنوان‌دار با ردیف‌های برچسب/مقدار (kvh/kvs/kv) */
-function tlDocHTML(x){const[k,lab,ico,col]=TLK(x),dn=tlDone(x),D=isoOfTs(x.ts),parts=String(x.detail||'').split(' | ').filter(Boolean),am=tlAmt(x),f=tlFind(x),n=tlNum(x),by=dn&&(tlSet0().get(String(x.id))||{}),st=x.undone?'fail':dn?'ok':'pend';
+function tlDocHTML(x){const[k,lab,ico,col]=TLK(x),dn=tlDone(x),D=isoOfTs(x.ts),parts=String(x.detail||'').split(' | ').filter(Boolean),f=tlFind(x),am=tlAmt(x)||(f&&f.k==='ent'?(e=>e?famOf(e).reduce((a,r)=>a+(+r.amount||0),0)+(e.settles||[]).reduce((a,z)=>a+(+z.amount||0),0):0)(validated().find(r=>r.id===f.id)):0),n=tlNum(x),by=dn&&(tlSet0().get(String(x.id))||{}),st=x.undone?'fail':dn?'ok':'pend';
   const kv=(l,v)=>`<div class="kv"><small>${l}</small><b>${v}</b><span class="ksp"></span></div>`,cust=parts[0]||'';
   const rows1=[n?kv('شماره سند',toFa(n)):'',kv('نوع',esc(lab)),cust?kv(x.type==='cust'?'مشتری':'طرف حساب',esc(cust)):''].join('');
   const rows2=parts.slice(cust?1:0).map((p,i)=>{const m=p.match(/^([^:：]{2,24})[:：]\s*(.+)$/);return m?kv(esc(m[1]),esc(m[2])):kv(toFa(i+1),esc(p))}).join('');
@@ -59,12 +59,14 @@ function tlDocHTML(x){const[k,lab,ico,col]=TLK(x),dn=tlDone(x),D=isoOfTs(x.ts),p
    همه عکس‌ها و رسیدها (زدن = بزرگ)، و دکمه «فاکتور · چاپ». برای واریزی: مشخصات بانکی، مبلغ، وضعیت و رسیدهای واریز. */
 function tlPhH(K,name){K=[...new Set((K||[]).filter(Boolean))];if(!K.length)return '';return `<div class="kvh">رسیدها و عکس‌ها · ${toFa(K.length)}</div><div class="tlphs">${K.map((k,i)=>`<button type="button" class="tlph" data-act="rowPhS" data-ks="${esc(K.slice(i).concat(K.slice(0,i)).join(','))}" data-n="${esc(name)}"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</div>`}
 function tlFull(f){if(!f)return '';const kv=(l,v)=>v?`<div class="kv"><small>${l}</small><b>${v}</b><span class="ksp"></span></div>`:'';
+  /* v77.6: همه رسیدهای واریز یک واریزی و همه بخش‌هایش (بانکی + تسویه‌ها) */
+  const depK=e=>e?[...new Set(famOf(e).flatMap(r=>rcOfEnt(r).map(o=>o.key)))]:[];
   if(f.k==='inv'){const c=custs.find(z=>String(z.id)===String(f.cu)),t=c&&(c.txs||[]).find(z=>String(z.id)===String(f.tx));if(!t)return '';const b=cuBal(c),bl=[b.R?fmt(Math.abs(b.R))+' تومان '+(b.R>0?'بدهکاریم':'طلبکاریم'):'',b.G?wFmt(Math.abs(b.G))+' گرم '+(b.G>0?'بدهکاریم':'طلبکاریم'):''].filter(Boolean).join(' · ');
-    const K=[...(t.items||[]).flatMap(xrPh),...(t.xr||[]).flatMap(xrPh),...(t.pays||[]).flatMap(xrPh)];
+    const K=[...(t.items||[]).flatMap(xrPh),...(t.xr||[]).flatMap(xrPh),...(t.pays||[]).flatMap(xrPh),...(t.pays||[]).filter(p=>p.entId!=null).flatMap(p=>depK(validated().find(r=>String(r.id)===String(p.entId))||entries.find(r=>String(r.id)===String(p.entId)))),...entries.filter(e=>e.wd&&String(e.wd.cu)===String(c.id)&&+e.wd.no===+t.no).flatMap(e=>depK(validated().find(r=>r.id===e.id)||e))];
     return `<div class="kvh">مشتری</div><div class="kvs">${kv('نام',(c.cno?cuNoH(c):'')+esc(cuName(c)))}${kv('تلفن',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'')}${kv('گروه',esc(c.grp||''))}${kv('مانده الان',bl||'تسویه')}</div>
     <div class="kvh">${esc(invTitle(t))}</div>${ivMeta(t)}<div class="tlinv">${ivDet(c,t)}</div>${tlPhH(K,invTitle(t))}
     <button type="button" class="btn sec tlprn" data-act="tlPrn" data-cu="${esc(c.id)}" data-tx="${esc(t.id)}">${ic('print')} فاکتور · چاپ / PDF</button>`}
-  if(f.k==='ent'){const e=entries.find(z=>z.id===f.id);if(!e)return '';const q=e.sentBid&&entBI(e),K=[...(q?itImgs(q.b,q.it):[]),...(e.settles||[]).flatMap(z=>Array.isArray(z.imgs)?z.imgs:[])],t=entSt(e);
+  if(f.k==='ent'){const e=entries.find(z=>z.id===f.id);if(!e)return '';const K=depK(validated().find(r=>r.id===e.id)||e),t=entSt(e);
     return `<div class="kvh">واریزی</div><div class="kvs">${kv('مشتری',esc(fullName(e)||'—'))}${kv('صاحب حساب',e.holder&&e.holder!==e.name?esc(e.holder):'')}${kv('مبلغ واریز',fmt(e.amount)+' تومان')}${e.total&&+e.total!==+e.amount?kv('کل خرید',fmt(e.total)+' تومان'):''}${kv('بانک',esc(ibanBank(e.iban)||e.bank||''))}${kv('شبا',e.iban?'<bdi dir="ltr">'+esc(e.iban)+'</bdi>':'')}${kv('تاریخ واریز',e.payDate?esc(payLab(e.payDate)+'، '+dates(e.payDate).fa):'')}${kv('فاکتور',e.code?esc(toEn(e.code)):'')}${kv('وضعیت',t?esc(t[0]):'ثبت شده')}${kv('ثبت‌کننده',esc(e.createdBy||''))}</div>${tlPhH(K,fullName(e)||'رسید')}`}
   return ''}
 ACT.tlPrn=d=>{invV={cu:d.cu,tx:+d.tx||d.tx,fresh:false};custId=d.cu;ACT.invPrint()};
