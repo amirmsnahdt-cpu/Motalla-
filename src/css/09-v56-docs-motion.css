@@ -3493,3 +3493,25 @@ html.cdon .cdez{display:none}
 .tlcb svg{width:17px;height:17px;stroke-width:3}
 .tlcb.on{background:var(--ok);border-color:var(--ok);color:#fff}
 .tlcb:not(.on):active{border-color:var(--ok);color:var(--ok)}
+/* v76.7 تاریخچه مثل فهرست واریزی‌ها + برگه سند فعالیت */
+.tlbr .bri.tlki{background:color-mix(in srgb,var(--kc) 13%,var(--card));color:var(--kc)}
+.tlbr.ok .bri.tlki{background:var(--ok);color:#fff}
+.tlbr .bri.tlki svg{width:18px;height:18px}
+.tlkb{font-style:normal;font-size:10.5px;font-weight:900;padding:1px 7px;border-radius:7px;margin-inline-end:5px;color:var(--kc);background:color-mix(in srgb,var(--kc) 12%,var(--card))}
+.tlbr .brv .tltm{font-variant-numeric:tabular-nums}
+.tldoc{border-radius:22px;background:var(--card);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--kc) 40%,transparent),0 16px 30px -22px var(--kc);overflow:hidden;margin:4px 0 12px}
+.tldh{display:flex;align-items:center;gap:11px;padding:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--kc) 12%,var(--card)),var(--card))}
+.tldi{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--kc);color:#fff}.tldi svg{width:22px;height:22px}
+.tldh .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}.tldh .tx b{font-size:16px;font-weight:900}.tldh .tx small{font-size:12px;color:var(--mut)}
+.tldn{flex:none;display:flex;flex-direction:column;align-items:center;padding:4px 10px;border-radius:12px;background:var(--card);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--kc) 35%,transparent)}.tldn small{font-size:10px;color:var(--mut)}.tldn b{font-size:16px;font-weight:900;color:var(--kc)}
+.tldr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.tldr>div{padding:9px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}.tldr>div+div{border-inline-start:1px solid var(--hair)}
+.tldr small{font-size:10.5px;color:var(--mut);font-weight:700}.tldr b{font-size:12.5px;font-weight:850;overflow:hidden;text-overflow:ellipsis}.tldr b.ok{color:var(--ok)}.tldr b.w{color:#b8862b}
+.tldl2{padding:10px 14px}.tldlh{font-size:11.5px;font-weight:800;color:var(--mut);margin-bottom:6px}
+.tldli{display:flex;gap:9px;align-items:baseline;padding:7px 0;font-size:13.5px;line-height:1.6}.tldli+.tldli{border-top:1px dashed var(--line)}
+.tldli i{flex:none;font-style:normal;width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;font-size:10.5px;font-weight:900;background:var(--hair);color:var(--mut)}
+.tldt{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:color-mix(in srgb,var(--kc) 8%,var(--card));border-top:1.5px solid color-mix(in srgb,var(--kc) 30%,transparent)}
+.tldt small{font-size:13px;font-weight:800}.tldt b{font-size:20px;font-weight:900;color:var(--kc)}.tldt b i{font-style:normal;font-size:12px;color:var(--mut)}
+.tlda{display:flex;flex-direction:column;gap:8px}
+.btn.tlok2{background:var(--ok);color:#fff;border:0}
+.brw.tlbr.ok .bri.tlki{background:var(--ok)!important;color:#fff!important}.brw.tlbr .bri.tlki{background:color-mix(in srgb,var(--kc) 13%,var(--card))!important;color:var(--kc)!important}.brw.tlbr.ok .bri.tlki{background:var(--ok)!important;color:#fff!important}

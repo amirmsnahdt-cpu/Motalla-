@@ -27,7 +27,7 @@ function vAudit(){
   const L=audit.filter(a=>a.type!=='acc'&&TLF[tlF][1](a));
   if(!L.length)return h+`<div class="card empty">${ic('clock')}<b>${tlF==='todo'?'همه فعالیت‌ها وارد سیستم شده ✓':'فعالیتی برای نمایش نیست'}</b>هر سند، واریزی، حواله و تغییر بانک اینجا به ترتیب زمان می‌آید.</div>`;
   let last='',open=false;
-  L.slice(0,200).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){if(open)h+='</div>';last=d;open=true;h+=`<div class="hday tlday">${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</div><div class="tlg">`}h+=tlRow(x)});
+  L.slice(0,200).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){if(open)h+='</div>';last=d;open=true;const dl=L.filter(z=>(z.ts?isoOfTs(z.ts):'old')===d),dt=dl.filter(z=>!tlDone(z)&&!z.undone).length;h+=`<div class="fday sticky"><span>${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</span><small>${fmt(dl.length)} فعالیت${dt?' · <b>'+fmt(dt)+'</b> وارد نشده':' · همه وارد شد'}</small></div><div class="blist fcard tll">`}h+=tlRow(x)});
   return h+(open?'</div>':'')}
 function trashHTML(){if(!trash.length)return `<div class="card empty">${ic('trash')}<b>سطل بازیابی خالی است</b>واریزی‌هایی که حذف می‌کنید تا ۶۰ روز اینجا می‌مانند و قابل بازگردانی‌اند.</div>`;
   let h=`<div class="hsum"><span>${fmt(trash.length)} واریزی حذف‌شده</span><span><b>${fmt(sum(trash))}</b> تومان</span></div><div class="row" style="margin:0 0 10px"><button class="sm gold" data-act="restoreAll">${ic('restore')} بازگردانی همه</button>${can('del')?`<button class="sm red" data-act="emptyTrash">خالی کردن سطل</button>`:''}</div>`;

@@ -28,18 +28,35 @@ const tlTodo=()=>audit.filter(x=>x.ts&&x.type!=='acc'&&!x.undone&&!tlDone(x)).le
 function tlHead(){const c=tlChk(),n=tlTodo();
   return `<div class="tlhd ${n?'w':'ok'}"><span class="tlhi">${ic(n?'clock':'check')}</span><span class="tx"><b>${n?fmt(n)+' فعالیت هنوز وارد سیستم حسابداری نشده':'همه فعالیت‌ها وارد سیستم حسابداری شده'}</b><small>${(()=>{const a=audit.find(z=>z.type==='acc'&&(z.of||[]).length);return a?'آخرین تأیید: '+esc(relDay(isoOfTs(a.ts)))+' ساعت '+hm(a.ts)+' · '+esc(a.user||''):c?'آخرین تأیید: '+esc(c.by||''):'روی دایره کنار هر فعالیت بزنید تا تأیید شود'})()}</small></span>${n?`<button class="tlall" data-act="tlChkAll">${ic('check')}<span>تأیید همه</span></button>`:''}</div>
   <div class="tlnt">${tlNtBtn()}</div>`}
-function tlRow(x){if(!x.ts)return evHTML(x);const[k,lab,ico,col]=TLK(x),op=histOpen.has(String(x.id)),dn=tlDone(x),A=evActs(x),acts=[...A.R,...A.L].filter(a=>canAct(a[0]));
-  const parts=String(x.detail||'').split(' | ').filter(Boolean),D=isoOfTs(x.ts),cu=x.cu!=null&&custs.find(z=>String(z.id)===String(x.cu)),e=(x.ids||[]).length&&entries.find(z=>z.id===x.ids[0]);
-  const links=[cu&&x.tx!=null?`<button class="sm sec" data-act="cuInv" data-cu="${esc(x.cu)}" data-tx="${esc(x.tx)}">${ic('inv')} دیدن سند</button>`:'',e?`<button class="sm sec" data-act="showEnt" data-ev="${x.id}">${ic('eye')} دیدن واریزی</button>`:''].join('');
-  const inner=`<div class="tlr k-${k}${op?' open':''}${x.undone?' undone':''}${dn?' dn':''}" style="--c:${col}"><span class="tld">${ic(dn?'check':ico)}</span>
-  <div class="tlc"><button class="hh tlh" data-act="evTog" data-ev="${x.id}" aria-expanded="${op}"><span class="tx"><span class="tlt"><em>${lab}</em>${dn?'<i class="tlok">وارد شد</i>':''}${x.undone?'<i class="tlun">لغو شد</i>':''}</span><b>${esc(x.summary||lab)}</b><small><span class="tlu">${esc(userInit(x.user||'؟'))}</span>${esc(x.user||'')}${parts[0]?' · '+esc(parts[0]):''}</small></span><span class="hm"><b>${hm(x.ts)}</b></span>${chevI()}</button><button type="button" class="tlcb${dn?' on':''}" data-act="${dn?'tlUn':'tlChk'}" data-ev="${x.id}" aria-label="${dn?'برداشتن تأیید':'وارد سیستم شد'}" title="${dn?'تأیید شده توسط '+esc((tlSet0().get(String(x.id))||{}).by||''):'تأیید ورود به سیستم'}">${ic('check')}</button>
-  <div class="hb"><div class="tldl">${parts.map(p=>`<div>${esc(p)}</div>`).join('')}</div>${x.type==='edit'?diffHTML(x.before,x.after):''}
-  <div class="hmeta"><div><small>زمان</small><b>${esc(relDay(D)+'، '+dates(D).fa+' · ساعت '+hm(x.ts))}</b></div><div><small>انجام‌دهنده</small><b>${esc(x.user||'—')}</b></div></div>
-  <div class="hact">${links}${acts.map(a=>`<button class="sm ${a[0]==='undoEv'?'gold':'sec'}" data-act="${a[0]}" data-ev="${x.id}">${ic(a[2])} ${a[1]}</button>`).join('')}${dn?`<button class="sm sec" data-act="tlUn" data-ev="${x.id}">${ic('undo')} برداشتن تأیید</button>`:`<button class="sm tlck" data-act="tlChk" data-ev="${x.id}">${ic('check')} وارد سیستم شد</button>`}</div></div></div></div>`;
-  return (A.R.length||A.L.length)?swW(inner,{r:A.R,l:A.L,data:{ev:x.id}}):inner}
+/* v76.7 (خواسته صاحب اپ): ردیف‌ها مثل فهرست واریزی‌ها (.brw با قاب وضعیت: زرد = وارد نشده، سبز = وارد شد)،
+   کشیدن ردیف = «وارد شد» / «لغو تأیید» و «سند»؛ زدن = خود سند (یا واریزی / سند بانکی)، وگرنه برگه‌ای به شکل سند با همه جزئیات */
+const tlNum=x=>{const m=toEn(String(x.summary||'')).match(/(\d{3,7})/);return m?+m[1]:null};
+function tlFind(x){if(x.cu!=null&&x.tx!=null){const c=custs.find(z=>String(z.id)===String(x.cu)),t=c&&(c.txs||[]).find(z=>String(z.id)===String(x.tx));if(t&&!t.del)return {k:'inv',cu:c.id,tx:t.id}}
+  const id=(x.ids||[])[0];if(id!=null&&entries.some(z=>z.id===id))return {k:'ent',id};
+  const n=tlNum(x);if(n!=null){if(x.type==='cust')for(const c of custs)for(const t of c.txs||[])if(t.type==='inv'&&!t.del&&+t.no===n)return {k:'inv',cu:c.id,tx:t.id};
+    if(x.type==='src')for(const s of sources)for(const l of s.led||[])if(!l.del&&+l.no===n)return {k:'bank',sid:s.id,l:l.id}}
+  return null}
+const tlAmt=x=>{const m=String(x.detail||'').match(/(?:جمع|مبلغ)\s*([\d,۰-۹٬]+)/)||String(x.detail||'').match(/([\d,۰-۹٬]{5,})\s*تومان/);return m?+toEn(m[1]).replace(/\D/g,''):0};
+function tlRow(x){if(!x.ts)return evHTML(x);const[k,lab,ico,col]=TLK(x),dn=tlDone(x),A=evActs(x),parts=String(x.detail||'').split(' | ').filter(Boolean),am=tlAmt(x),st=x.undone?'':dn?'ok':'pend';
+  const inner=`<div class="brw tlbr ${st}" style="--kc:${col}"><button class="brh" data-act="tlOpen" data-ev="${x.id}"><span class="bri tlki">${ic(dn?'check':ico)}</span><span class="tx"><b>${esc(x.summary||lab)}</b><small><em class="tlkb">${lab}</em>${esc(x.user||'')}${parts[0]?' · '+esc(parts[0]):''}</small></span><span class="brv">${am?`<b>${fmt(am)} <i>تومان</i></b>`:`<b class="tltm">${hm(x.ts)}</b>`}<small>${am?hm(x.ts)+' · ':''}${x.undone?'لغو شد':dn?'وارد شد':'وارد نشده'}</small></span></button></div>`;
+  const R=[...(x.undone?[]:dn?[['tlUn','لغو تأیید','undo','#6b7385']]:[['tlChk','وارد شد','check','#178049']]),...A.R.filter(a=>canAct(a[0]))],L=[['tlOpen','سند','inv','#3b6fd6'],...A.L.filter(a=>canAct(a[0]))];
+  return swW(inner,{r:R,l:L,data:{ev:x.id}})}
+/* برگه سند برای فعالیتی که سند جدا ندارد (یا دکمه «جزئیات») */
+function tlDocHTML(x){const[k,lab,ico,col]=TLK(x),dn=tlDone(x),D=isoOfTs(x.ts),parts=String(x.detail||'').split(' | ').filter(Boolean),am=tlAmt(x),f=tlFind(x),n=tlNum(x),by=dn&&(tlSet0().get(String(x.id))||{}).by;
+  return `<div class="sh-h"><div><b>${esc(x.summary||lab)}</b><small class="shsub">${esc(lab)}${n?' · شماره '+toFa(n):''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="tldoc" style="--kc:${col}"><div class="tldh"><span class="tldi">${ic(ico)}</span><span class="tx"><b>${esc(x.summary||lab)}</b><small>${esc(relDay(D)+'، '+dates(D).fa+' · ساعت '+hm(x.ts))}</small></span>${n?`<span class="tldn"><small>شماره</small><b>${toFa(n)}</b></span>`:''}</div>
+  <div class="tldr"><div><small>انجام‌دهنده</small><b>${esc(x.user||'—')}</b></div><div><small>نوع</small><b>${esc(lab)}${x.undone?' · لغو شد':''}</b></div><div><small>وضعیت حسابداری</small><b class="${dn?'ok':'w'}">${dn?'وارد شد'+(by?' · '+esc(by):''):'وارد نشده'}</b></div></div>
+  ${parts.length?`<div class="tldl2"><div class="tldlh">شرح</div>${parts.map((p,i)=>`<div class="tldli"><i>${toFa(i+1)}</i><span>${esc(p)}</span></div>`).join('')}</div>`:''}
+  ${x.type==='edit'?diffHTML(x.before,x.after):''}
+  ${am?`<div class="tldt"><small>مبلغ</small><b>${fmt(am)} <i>تومان</i></b></div>`:''}</div>
+  <div class="tlda">${f?`<button class="xgo" data-act="tlGo" data-ev="${x.id}">${ic(f.k==='ent'?'eye':'inv')} ${f.k==='ent'?'دیدن واریزی':'دیدن سند کامل'}</button>`:''}${x.undone?'':dn?`<button class="btn sec" data-act="tlUn" data-ev="${x.id}">${ic('undo')} لغو تأیید</button>`:`<button class="btn tlok2" data-act="tlChk" data-ev="${x.id}">${ic('check')} وارد سیستم شد</button>`}</div>`}
+ACT.tlOpen=d=>{const x=audit.find(a=>String(a.id)===String(d.ev));if(!x)return;const f=tlFind(x);if(f&&f.k!=='bank'){tlGoF(f);return}sheet(tlDocHTML(x))};
+function tlGoF(f){closeSheet();if(f.k==='inv'){invOpen(f.cu,f.tx);PARENT.inv='audit'}else if(f.k==='ent'){ACT.openEnt({id:f.id});PARENT.ent='audit'}else if(f.k==='bank'){const s=sources.find(z=>String(z.id)===String(f.sid)),l=s&&(s.led||[]).find(z=>String(z.id)===String(f.l));if(s&&l)sheet(bdViewHTML(s,l))}}
+ACT.tlGo=d=>{const x=audit.find(a=>String(a.id)===String(d.ev)),f=x&&tlFind(x);if(f)tlGoF(f)};
 function tlAcc(of,un){const n=(of||[]).length+(un||[]).length;if(!n)return;logA('acc',of&&of.length?'تأیید ورود به سیستم حسابداری':'برداشتن تأیید ورود',toFa(n)+' فعالیت',of&&of.length?{of}:{un});TLM.k='';
+  if(!$('ov').classList.contains('hide')&&$('sheet').querySelector('.tldoc')){const x=audit.find(a=>String(a.id)===String((of||un)[0]));if(x&&(of||un).length===1)sheetKeep(tlDocHTML(x));else closeSheet()}
   const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;
-  if(!RM()&&of)of.slice(0,20).forEach(id=>{const b=document.querySelector(`.tlcb[data-ev="${id}"]`);if(b&&b.animate)b.animate([{transform:'scale(.4)'},{transform:'scale(1.2)'},{transform:'none'}],{duration:360,easing:'cubic-bezier(.3,1.4,.5,1)'})})}
+  if(!RM()&&of)of.slice(0,20).forEach(id=>{const b=document.querySelector(`.swr [data-ev="${id}"] .bri`)||document.querySelector(`[data-act=tlOpen][data-ev="${id}"] .bri`);if(b&&b.animate)b.animate([{transform:'scale(.4)'},{transform:'scale(1.2)'},{transform:'none'}],{duration:360,easing:'cubic-bezier(.3,1.4,.5,1)'})})}
 ACT.tlChk=d=>{const x=audit.find(a=>String(a.id)===String(d.ev));if(!x||tlDone(x))return;tlAcc([x.id]);toast('«'+(x.summary||'فعالیت')+'» وارد سیستم شد ✓')};
 ACT.tlUn=d=>{const x=audit.find(a=>String(a.id)===String(d.ev));if(!x||!tlDone(x))return;tlAcc(null,[x.id]);toast('تأیید برداشته شد')};
 ACT.tlChkAll=()=>{const L=audit.filter(x=>x.ts&&x.type!=='acc'&&!x.undone&&!tlDone(x));if(!L.length)return;askConfirm(toFa(L.length)+' فعالیتِ واردنشده همه «وارد سیستم حسابداری شد» علامت بخورند؟','تأیید همه',()=>{tlAcc(L.map(x=>x.id));toast(toFa(L.length)+' فعالیت تأیید شد ✓')})};
