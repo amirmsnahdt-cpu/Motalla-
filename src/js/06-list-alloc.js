@@ -62,7 +62,7 @@ function ldSwapKeep(inp){const V=$('view'),box=inp&&inp.closest('#view>*');if(!V
   const nb=T.querySelector('#'+inp.id);const nbox=nb&&nb.closest('div.fsearch');if(!nbox||nbox.parentNode!==T){render();return false}
   const K=[...T.children],i=K.indexOf(nbox),O=[...V.children],j=O.indexOf(box);O.forEach((e,k)=>{if(k!==j)e.remove()});K.slice(0,i).forEach(e=>V.insertBefore(e,box));K.slice(i+1).forEach(e=>V.appendChild(e));V.scrollTop=y;return true}
 const aLday=()=>{const d=hubData(ldKey);if(!d.rows.length)return '';const B=[];
-  if(d.un.length&&can('split'))B.push(`<button class="btn ${d.dr.length?'sec':'gold'}" data-act="allocNew">${ic('plus')} تخصیص به منبع</button>`);
+  /* v77.4 (خواسته صاحب اپ): «تخصیص به منبع» بالا سمت چپ سرتیتر؛ دکمه تنظیمات منابع از سرتیتر لیست برداشته شد */
   if(d.dr.length&&can('split'))B.push(`<button class="btn gold" data-act="hubSendAll">${ic('copy')} کپی و ارسال${d.dr.length>1?' '+fmt(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''}</button>`);
   if(!B.length&&d.sent&&!d.closed&&can('close'))B.push(`<button class="btn ${d.pend?'sec':'gold'}" data-act="hubArch">${ic('check')} بایگانی لیست</button>`);
   return B.join('')};

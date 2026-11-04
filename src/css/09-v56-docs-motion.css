@@ -3539,3 +3539,6 @@ html.cdon .cdez{display:none}
 .py7c.py7cp{background:color-mix(in srgb,var(--blu) 9%,var(--card));color:var(--blu);border-style:solid}
 .py7c.py7cp svg{width:17px;height:17px}
 .py7c.py7cp{width:36px;margin-inline-end:0}.py7c.py7cp+.py7c{width:38px}
+/* v77.4 دکمه «تخصیص» در سرتیتر لیست واریز */
+.ib0.hal{width:auto;display:inline-flex;align-items:center;gap:5px;padding:0 14px;background:var(--blu)!important;color:#fff!important;border-color:var(--blu)!important;font:inherit;font-size:14px;font-weight:850}
+.ib0.hal svg{width:18px;height:18px;stroke-width:2.6}
