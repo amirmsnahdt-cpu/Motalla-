@@ -94,8 +94,10 @@ Status frames (green/yellow/red row borders) are defined ONCE at the end of 08-v
    opens all 26 views, fails on any JS error). Both run in CI (`.github/workflows/tests.yml`); deploy runs `npm test`.
 4. Commit, push to main, send the user:
    `https://raw.githack.com/amirmsnahdt-cpu/Motalla-/<SHA>/index.html`
-5. Production deploy runs nightly 00:05 Tehran (`.github/workflows/deploy-liara.yml`).
-   Manual: `gh workflow run deploy-liara.yml --ref main -R amirmsnahdt-cpu/Motalla-`.
+5. Production deploy runs nightly 00:05 Tehran (`.github/workflows/deploy-liara.yml`; push does NOT deploy).
+   OWNER RULE: never run a manual deploy on your own. Only when the owner explicitly says to send that version to Liara, run it ONCE
+   (`gh workflow run deploy-liara.yml --ref main -R amirmsnahdt-cpu/Motalla-`); every later change waits for the nightly deploy
+   until the owner asks again. (Liara also has a daily deployment cap — «CODE 428: Max deployment count in day».)
 
 ## Rules from the owner
 - Root-cause fixes, no leftover bugs. Simple iOS-like blue UI, rounded cards, bold amounts.
