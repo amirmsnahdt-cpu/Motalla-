@@ -17,7 +17,9 @@ function findHay(x,al,BI){const bi=x.sentBid?BI.get(x.id):null,S=x.settles||[],D
 function findRows(){const q=toEn(fQ.trim()).toLowerCase(),qd=q.replace(/\D/g,''),QD=qDate(fQ);AM=AM||allocMap();const BI=new Map();if(q)batches.forEach(b=>b.items.forEach(it=>{if(!BI.has(it.id))BI.set(it.id,{b,it})}));
   return validated().filter(x=>{const al=AM.get(x.id);if(fF!=='all'&&rowSt(x)!==fF)return false;if(fS&&(!al||(al.src!==fS&&al.key!==fS)))return false;if(fS&&fR&&(!al||al.rnd!==fR))return false;if(fD&&x.entryDate!==fD)return false;if(fP&&PD(x)!==fP)return false;if(fT&&fTK(x)!==fT)return false;if(!q)return true;if(QD)return x.entryDate===QD||PD(x)===QD;
     const H=findHay(x,al,BI);return H.t.includes(q)||(qd.length>=2&&/^[\d\s,.\-\/+]+$/.test(q)&&H.d.some(v=>v.includes(qd)))})
-   .sort((a,b)=>{const ka=fG==='pay'?PD(a):a.entryDate,kb=fG==='pay'?PD(b):b.entryDate;return ka<kb?1:ka>kb?-1:(b.id-a.id)})}
+   .sort((a,b)=>{const ka=fG==='pay'?PD(a):a.entryDate,kb=fG==='pay'?PD(b):b.entryDate;return ka<kb?1:ka>kb?-1:(b.id-a.id)})
+   /* v77.9 (باگ گزارش‌شده): یک واریزی که از چند بانک پرداخت شده یک ردیف است (نه هر بخش جدا) — مگر فیلتر منبع روشن باشد */
+   .reduce((o,x)=>{if(fS)return o.push(x),o;const k=famRoot(x);if(o.seen.has(k))return o;o.seen.add(k);const F=famOf(x);if(F.length<2){o.push(x);return o}const r=F[0];o.push({...r,amount:F.reduce((a,z)=>a+(+z.amount||0),0),_fam:F});return o},Object.assign([],{seen:new Set()})).slice()}
 function listCardsHTML(){const aq=fT||fP||fD||qDate(fQ),D=listsData(),M={};D.forEach(d=>M[d.iso]=d);const L=pdOrd(D.map(d=>d.iso)).map(k=>M[k]).filter(d=>!aq||d.iso===aq||d.eds.includes(aq));
   if(!L.length)return `<div class="bempty">${ic('list')}<b>${aq?'برای این تاریخ لیستی نیست':'هنوز لیستی ثبت نشده'}</b></div>`;
   return `<div class="lcards">${L.map(listCard).join('')}</div>`}
