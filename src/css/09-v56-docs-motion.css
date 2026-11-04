@@ -3522,3 +3522,11 @@ html.cdon .cdez{display:none}
 .tldoc2 .kv b{flex:1;text-align:left;font-weight:800}.tldoc2 .kv small{flex:none;min-width:84px;color:var(--mut)}
 .tlg2{color:var(--ok)}.tlw2{color:#b8862b}
 .tlda{margin-top:12px}
+/* v76.9 جزئیات کامل فعالیت: ردیف‌های سند، عکس‌ها، چاپ */
+.tldoc2 .tlinv .d6sh{display:none}
+.tldoc2 .iv8m{margin:4px 0 8px}
+.tlphs{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.tlph{aspect-ratio:1;border:0;padding:0;border-radius:14px;overflow:hidden;background:var(--hair);cursor:zoom-in;box-shadow:0 0 0 1px var(--line)}
+.tlph img{width:100%;height:100%;object-fit:cover;display:block}
+.btn.tlprn{width:100%;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px}
+.tlphs{grid-template-columns:repeat(auto-fill,84px)}
