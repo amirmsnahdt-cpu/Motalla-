@@ -72,8 +72,8 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
   const bk=F.length>1?F.map(r=>({r,s:famSrc(r,A)})):[{r:x,s:famSrc(x,A)}],bOk=bk.filter(o=>o.s&&o.s.sent&&o.s.st==='ok').reduce((a,o)=>a+(+o.r.amount||0),0),bAll=Math.max(0,tot-cOk-cW);
   const pc=v=>tot?Math.max(0,Math.min(100,v/tot*100)).toFixed(2)+'%':'0%';
   const cuRow=(z,i)=>{const w=z.st==='wait',n=stImgs(z).length,dt=z.byInv&&(()=>{const c=custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);return t?invTitle(t):''})(),sub=[dt||'',!dt&&z.cuId?'حساب مشتری':!dt?'بدون حساب':'',z.tn?'پیگیری '+esc(toFa(z.tn)):''].filter(Boolean).join(' · ');
-    return swW(`<div class="py7r ${w?'w':'k'}${pyFlash!=null&&String(pyFlash)===String(z.id)?' nw':''}"><button class="py7b" data-act="pyOpen" data-i="${i}" aria-label="${z.byInv?'دیدن سند ':''}${esc(z.name||'')}"><span class="py7a">${esc(userInit(z.name||'؟'))}</span><span class="tx"><b>${esc(z.name||'—')}</b><small>${sub}</small></span><span class="py7v"><em class="py9t c">مشتری</em><b>${fmt(z.amount)}<i>تومان</i></b><small>${w?'در انتظار تأیید':'تأیید شد'}</small></span></button><button class="py7c py7cp" data-act="pyCp" data-k="c" data-e="${x.id}" data-i="${i}" aria-label="کپی این تسویه">${ic('copy')}</button>${n||can('track')?`<button class="py7c${n?' on':''}" data-act="galSt" data-i="${i}" aria-label="رسیدهای تسویه">${ic(n?'cam':'plus')}${n>1?`<em>${toFa(n)}</em>`:''}</button>`:''}</div>`,
-      {r:ed&&w?[['stlOk','تأیید','check','#178049']]:ed?[['stlUnok','لغو تأیید','undo','#6b7385']]:[],l:ed?[['stlDelI',w?'رد':'حذف',w?'undo':'trash','#d23c48']]:[],data:{i}})};
+    return swW(`<div class="py7r ${w?'w':'k'}${pyFlash!=null&&String(pyFlash)===String(z.id)?' nw':''}"><button class="py7b" data-act="pyOpen" data-i="${i}" aria-label="${z.byInv?'دیدن سند ':''}${esc(z.name||'')}"><span class="py7a">${esc(userInit(z.name||'؟'))}</span><span class="tx"><b>${esc(z.name||'—')}</b><small>${sub}</small></span><span class="py7v"><em class="py9t c">مشتری</em><b>${fmt(z.amount)}<i>تومان</i></b><small>${w?'در انتظار تأیید':'تأیید شد'}</small></span></button>${n||can('track')?`<button class="py7c${n?' on':''}" data-act="galSt" data-i="${i}" aria-label="رسیدهای تسویه">${ic(n?'cam':'plus')}${n>1?`<em>${toFa(n)}</em>`:''}</button>`:''}</div>`,
+      {r:[...(ed&&w?[['stlOk','تأیید','check','#178049']]:ed?[['stlUnok','لغو تأیید','undo','#6b7385']]:[]),['pyCp','کپی','copy','#b8862b']],l:ed?[['stlDelI',w?'رد':'حذف',w?'undo':'trash','#d23c48']]:[],data:{i,k:'c',e:x.id}})};
   /* v69.6 (خواسته صاحب اپ: «همه نحوه تسویه‌ها در یک لیست، ولی نوعشان جدا؛ واریزی دو بار نخورد»):
      یک فهرست برای همه: تسویه از مشتری، هر بخش واریز بانکی (ارسال‌شده یا نه) و مانده. کارت جدای «واریز بانکی» دیگر نیست.
      هر ردیف برچسب نوع دارد (مشتری / بانک / مانده). کارها با کشیدن:
@@ -89,15 +89,15 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
       sub=[st[1],multi?'بخش '+toFa(k+1):'',q&&q.it.tn?'پیگیری '+esc(toFa(q.it.tn)):''].filter(Boolean).join(' · ');
     const act=q?`data-act="itOpen" data-b="${q.b.id}" data-i="${q.i}"`:!edB||F.some(z=>z.sentBid)?(s&&tk?`data-act="bkGo" data-id="${r.id}"`:''):root?`data-act="entMove" data-id="${r.id}"`:`data-act="pkEdit" data-id="${r.id}"`;
     const cam=q?(n||tk?`<button class="py7c${n?' on':''}" data-act="galIt" data-id="${r.id}" aria-label="رسیدهای واریز">${ic(n?'cam':'plus')}${n>1?`<em>${toFa(n)}</em>`:''}</button>`:''):s&&tk?`<button class="py7c" data-act="bkGo" data-id="${r.id}" aria-label="ثبت واریز و رسید">${ic('plus')}</button>`:'';
-    const cpB=`<button class="py7c py7cp" data-act="pyCp" data-k="b" data-e="${x.id}" data-id="${r.id}" aria-label="کپی این بخش">${ic('copy')}</button>`;
-    const row=`<div class="py7r b py9 ${st[0]}${pyFlash!=null&&String(pyFlash)===String(r.id)?' nw':''}"><${act?'button':'div'} class="py7b" ${act}><span class="py7a bk">${bkAv(s)}</span><span class="tx"><b>${ttl}</b><small>${sub}</small></span><span class="py7v"><em class="py9t b">${tag}</em><b>${fmt(q&&q.it.amount!=null?+q.it.amount:r.amount)}<i>تومان</i></b></span></${act?'button':'div'}>${cpB}${cam}</div>`;
+    const row=`<div class="py7r b py9 ${st[0]}${pyFlash!=null&&String(pyFlash)===String(r.id)?' nw':''}"><${act?'button':'div'} class="py7b" ${act}><span class="py7a bk">${bkAv(s)}</span><span class="tx"><b>${ttl}</b><small>${sub}</small></span><span class="py7v"><em class="py9t b">${tag}</em><b>${fmt(q&&q.it.amount!=null?+q.it.amount:r.amount)}<i>تومان</i></b></span></${act?'button':'div'}>${cam}</div>`;
     let R=[],L=[];
     if(q){if(tk&&!cl)R=q.it.st==='ok'?[['entTkQ','لغو تأیید','undo','#6b7385']]:[['entTkQ','تأیید','check','#178049']];
       if(edB&&!cl){const xr=validated().find(z=>z.id===rootId);if(xr&&ssCan(xr)&&!lk)L.push(['sentSplit','ویرایش','edit','#3b6fd6']);if(tk&&q.it.st!=='fail'&&q.it.st!=='ok')L.push(['entTkF','ناموفق','x','#d23c48']);if(root&&xr)L.push(['entUnalloc','حذف تخصیص','x','#d23c48'])/* v69.13: همیشه دیده می‌شود؛ اگر قفل است، دلیلش گفته می‌شود */}}
     else{if(s&&tk)R=[['bkGo','ثبت واریز','check','#178049']];
       /* بخشی ارسال شده باشد: مبلغ بخش‌های ارسال‌نشده از بانک اصلی ارسال‌شده کم/زیاد نمی‌شود؛ اول این بخش هم ثبت شود، بعد «ویرایش» همه بخش‌ها */
       if(edB&&!F.some(z=>z.sentBid))L=root?[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6'],...(s||F.length>1?[['entUnalloc','حذف تخصیص','x','#d23c48']]:[])]:[['pkEdit','ویرایش','edit','#3b6fd6'],['pkDel','برداشتن','trash','#d23c48']]}
-    return swW(row,{r:R,l:L,data:{id:r.id,st:'ok',b:q?q.b.id:'',i:q?q.i:''}})};
+    R=[...R,['pyCp','کپی','copy','#b8862b']];/* v77.2: کپی با کشیدن به چپ */
+    return swW(row,{r:R,l:L,data:{id:r.id,st:'ok',b:q?q.b.id:'',i:q?q.i:'',k:'b',e:x.id}})};
   const bkS=bk.slice().sort((p,q)=>(p.r.id===rootId)-(q.r.id===rootId)||p.r.id-q.r.id);
   const head=x.full?'<em class="py7st ok">تسویه کامل</em>':cW?`<em class="py7st w">${toFa(S.filter(z=>z.st==='wait').length)} در انتظار</em>`:'';
   const xr=validated().find(z=>z.id===rootId)||x,lockR=xr.sentBid&&(q0=>!q0||ssLock(q0.it)||q0.b.closed)(entBI(xr)),addOk=ed&&open&&x.id===rootId&&!lockR,rc=rcOfEnt(x);
@@ -106,7 +106,7 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
   <div class="py7k"><span class="k">از مشتری ${fmt(cOk+cW)}</span><span class="b">از بانک ${fmt(bAll)}</span></div>
   <div class="py7l">${S.map(cuRow).join('')}${bAll||!S.length?bkS.map(bkRow).join(''):''}</div>
   ${addOk?`<button class="py7add" data-act="pyAdd"><span class="py7s">${ic('search')}</span><span class="tx"><b>افزودن پرداخت</b><small>مشتری (با حساب یا بدون حساب) یا بخشی از بانک دیگر مغازه</small></span><span class="py7p">${ic('plus')}</span></button>`:''}
-  ${(ed||tk)&&(bAll||!S.length)?`<div class="py9h">${ic('back').replace('class="i"','class="i flip"')}<span>ردیف را بکشید: به چپ ${x.sentBid?'تأیید':'ثبت واریز'} · به راست ${x.sentBid?'ویرایش، ناموفق، حذف تخصیص':'تغییر بانک، حذف تخصیص'}</span></div>`:''}
+  ${(ed||tk)&&(bAll||!S.length)?`<div class="py9h">${ic('back').replace('class="i"','class="i flip"')}<span>ردیف را بکشید: به چپ ${x.sentBid?'تأیید':'ثبت واریز'} و کپی · به راست ${x.sentBid?'ویرایش، ناموفق، حذف تخصیص':'تغییر بانک، حذف تخصیص'}</span></div>`:''}
   ${multi&&can('split')&&!F.some(r=>r.sentBid)&&!x.full?`<button class="link" data-act="paySplitUndo" data-id="${x.id}">یکی کردن بخش‌های بانکی</button>`:''}</div>`}
 /* v68.8: ردیف پیگیری یک واریزی؛ اگر هنوز ارسال نشده، فقط همین واریزی (جدا از بقیه همان منبع) به پیگیری می‌رود */
 function bkItem(e){const b=e&&e.sentBid&&batches.find(z=>z.id===e.sentBid),i=b?b.items.findIndex(x=>x.id===e.id):-1;return i<0?null:{b,i,it:b.items[i]}}
