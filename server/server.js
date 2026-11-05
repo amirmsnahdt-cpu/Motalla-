@@ -327,6 +327,8 @@ function doSync(user, body) {
         if (!isObj(ch.data)) continue;
         const merged = theirs ? merge3(ch.base === undefined ? null : ch.base, ch.data, theirs) : ch.data;
         if (isObj(merged)) merged.id = ch.data.id;
+        // v78.8 امنیت: ردیف تازه تاریخچه همیشه به نام همان کسی ثبت می‌شود که فرستاده (کارمند نمی‌تواند به نام همکار فعالیت بسازد)
+        if (coll === 'audit' && !theirs && isObj(merged) && 'user' in merged) merged.user = user.name;
         // تاریخچه: کارمند فقط ثبت تازه اضافه می‌کند؛ روی ثبت‌های قبلی تنها علامت «لغو شد» (undone) را می‌تواند بزند
         if (coll === 'audit' && theirs && user.role !== 'admin' && !auditEditOk(theirs, merged)) { rejected.push({ coll, id, why: 'تغییر تاریخچه برای حساب شما مجاز نیست' }); touched.add(coll + '\u0000' + id); continue; }
         if (cur && !cur.deleted && eq(merged, theirs)) { touched.add(coll + '\u0000' + id); continue; }

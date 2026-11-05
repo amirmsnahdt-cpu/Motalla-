@@ -75,9 +75,10 @@ test('کارمند بدون مجوز حذف، واریزی را حذف نمی‌
 });
 
 test('تاریخچه: فقط افزودن و علامت «لغو شد»', async () => {
-  const ev = { id: 'a1', type: 'add', user: 'clerk', ts: '2026-10-18T00:00:00Z', summary: 'ثبت' };
+  const ev = { id: 'a1', type: 'add', user: 'جعلی', ts: '2026-10-18T00:00:00Z', summary: 'ثبت' };
   let r = await api('/api/sync', { method: 'POST', token: staff, body: { since: 0, changes: [{ coll: 'audit', id: 'a1', data: ev }] } });
   assert.deepEqual(r.j.rejected || [], []);
+  const a1 = r.j.changes.find(c => c.coll === 'audit' && c.id === 'a1'); assert.notEqual(a1.data.user, 'جعلی', 'نام ثبت‌کننده را سرور می‌گذارد، نه گوشی'); assert.equal(a1.data.user, r.j.me.name);
   r = await api('/api/sync', { method: 'POST', token: staff, body: { since: 0, changes: [{ coll: 'audit', id: 'a1', base: ev, data: { ...ev, summary: 'دستکاری' } }] } });
   assert.equal(r.j.rejected.length, 1, 'ویرایش متن تاریخچه باید رد شود');
   r = await api('/api/sync', { method: 'POST', token: staff, body: { since: 0, changes: [{ coll: 'audit', id: 'a1', base: ev, data: { ...ev, undone: true } }] } });
