@@ -37,10 +37,6 @@ async function glPull(){if(!TOKEN||GLbusy||document.visibilityState==='hidden')r
 function glHomeHTML(){const k=glOk();
   return `<button type="button" class="glc${glOld()?' old':''}${k?'':' none'}" id="glH" data-act="glPop" aria-haspopup="dialog"><span class="glt"><b><i class="gldot"></i>قیمت لحظه‌ای طلا</b><small>${esc(glSub())}</small></span>
     <span class="glv"><small>هر گرم ۱۸</small><b>${k?fmt(GL.g18):'—'}</b></span><span class="glv"><small>مثقال</small><b>${k?fmt(GL.mz):'—'}</b></span></button>`}
-/* فاصله نرخ دستی سند از بازار (بر حسب هر گرم ۱۸) */
-function glDiff(){if(!glOk()||!sv||!+sv.rate)return '';const d=(sv.rate-GL.g18)/GL.g18*100,a=Math.abs(d);
-  if(a<0.05)return '<em class="eq">برابر بازار</em>';
-  return `<em class="${a>=1?'far':''}">${toFa(a.toFixed(1))}٪ ${d>0?'بالاتر':'پایین‌تر'} از بازار</em>`}
 const glOn=()=>!!(sv&&sv.live&&!sv.edit);
 /* v61.93 (خواسته صاحب اپ): وضعیت بازار داخل خود پنل مظنه سند (نه نوار جدا): نقطه سبز + ساعت تغییر بازار؛
    اگر نرخ سند دستی است، فاصله از بازار. زدن = پنجره کوچک نرخ‌های بازار (مثل منوی ⋯) */

@@ -39,16 +39,11 @@ function psBind(){const sh=$('sheet');sh.oninput=e=>{const t=e.target;if(t.datas
     let p=0,d=0;while(p<t.value.length&&d<before){if(/\d/.test(t.value[p]))d++;p++}try{t.setSelectionRange(p,p)}catch(_){}
     PS.L[i].amount=v;if(i===PS.L.length-1)PS.L[i].man=true;psAuto(i);psPaint(i)};
   sh.onchange=null;psPaint()}
-ACT.paySplit=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;const F=famOf(x);if(F.some(r=>r.sentBid)){toast('یکی از بخش‌ها ارسال شده؛ اول از پیگیری برگردانید',true);return}
-  AM=allocMap();const sid=n=>{const s=sources.find(z=>z.name===n);return s?String(s.id):''};
-  const L=F.map(r=>{const a=AM.get(r.id);return{src:a&&a.src?sid(a.src):'',amount:r.amount}});if(L.length===1){const o=sources.find(z=>String(z.id)!==L[0].src);L[0].amount=0;L.push({src:o?String(o.id):'',amount:0})}
-  PS={root:famRoot(x),name:fullName(x),pay:PD(x),R:sum(F),L};if(PS.L.length>1&&!PS.L.slice(1).some(l=>+l.amount))psAuto(0);sheet(psHTML());psBind()};
 ACT.psAdd=()=>{const used=new Set(PS.L.map(l=>String(l.src))),o=sources.find(z=>!used.has(String(z.id)));PS.L.forEach(l=>l.man=true);PS.L.push({src:o?String(o.id):'',amount:0});psAuto(-1);psRedraw();const c=document.querySelector('#sheet .psc:last-child');if(c){if(!RM()&&c.animate)c.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,.9,.25,1)'});const f=c.querySelector('[data-pa]');if(f)setTimeout(()=>f.focus(),60)}};
 ACT.psDel=d=>{if(PS.L.length<=2)return;PS.L.splice(+d.i,1);PS.L[PS.L.length-1].man=false;psAuto(-1);psRedraw()};
 ACT.psSrc=d=>{const l=PS.L[+d.i];if(!l)return;l.src=String(d.s);const c=document.querySelector(`#sheet .psc[data-i="${d.i}"]`);if(c)c.querySelectorAll('.psch').forEach(b=>b.classList.toggle('on',b.dataset.s===String(d.s)))};
 ACT.psHalf=d=>{const i=+d.i;PS.L[i].amount=Math.round(PS.R/2);if(i===PS.L.length-1)PS.L[i].man=true;psAuto(i);psPaint()};
 ACT.psRest=d=>{const i=+d.i,s=PS.L.reduce((a,l,k)=>k===i?a:a+(+l.amount||0),0);PS.L[i].amount=Math.max(0,PS.R-s);if(i===PS.L.length-1)PS.L[i].man=true;psAuto(i);psPaint()};
-ACT.psFill=()=>ACT.psRest({i:PS.L.length-1});
 ACT.paySplitUndo=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;askConfirm('همه بخش‌ها دوباره یک واریزی شوند؟ تخصیص بخش‌ها برداشته می‌شود.','یکی کردن',()=>{const F=famOf(x);PS={root:famRoot(x),name:fullName(x),pay:PD(x),R:sum(F),L:[{src:'',amount:sum(F)}]};psApply()})};
 ACT.paySplitSave=()=>{if(!PS)return;const s=PS.L.reduce((a,l)=>a+(+l.amount||0),0);if(s!==PS.R||PS.L.some(l=>!(+l.amount>0))){toast('جمع بخش‌ها باید برابر مبلغ بانکی باشد',true);return}psApply()};
 function psApply(){const root=entries.find(e=>e.id===PS.root);if(!root){closeSheet();return}const fam=entries.filter(e=>e.id===root.id||e.splitOf===root.id).sort((a,b)=>a.id===root.id?-1:b.id===root.id?1:a.id-b.id);

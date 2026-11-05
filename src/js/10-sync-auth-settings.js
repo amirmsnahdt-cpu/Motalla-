@@ -213,7 +213,6 @@ if(window.AndroidBridge){
 let homeSt=ls.get('m_homest','pend');
 /* ---------- نشان وضعیت مینیمال ---------- */
 const stMark=st=>`<span class="stm ${st}" role="img" aria-label="${ST[st]?ST[st][0]:''}">${st==='ok'?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':st==='fail'?'<svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg>':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 2"/></svg>'}</span>`;
-let dayOpen=new Set();
 /* پیش‌نمایش: گزارش A4 را به عرض صفحه گوشی کوچک کن (فقط نمایش؛ چاپ دست نمی‌خورد) */
 function pvFit(){const f=$('pvf');if(!f)return;try{const d=f.contentDocument;if(!d||!d.body)return;d.documentElement.style.zoom='';const w=Math.max(d.documentElement.scrollWidth,d.body.scrollWidth),W=f.clientWidth;if(w>W+2)d.documentElement.style.zoom=String(Math.max(.3,(W-4)/w))}catch(e){}}
 {const f=$('pvf');if(f)f.addEventListener('load',()=>setTimeout(pvFit,60))}

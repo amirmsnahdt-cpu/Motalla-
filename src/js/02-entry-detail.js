@@ -128,7 +128,7 @@ function vEntEdit(x){const e=entries.find(y=>y.id===x.id)||x;eeTitle=e.title||''
     ${row('eeK','کارت',grp4(e.card||''),{ltr:1,im:'numeric',ph:'اختیاری',hint:1})}
     ${row('eeH','صاحب حساب',e.holder||'',{ph:'اگر با مشتری فرق دارد'})}
     <button class="er ebtn" data-act="eePay"><span class="erl">تاریخ واریز</span><span class="erv"><b id="eePayL">${esc(payLab(fPay))}، ${esc(dates(fPay).fa)}</b>${ic('cal')}</span></button></div>
-  <button class="emore" data-act="edit" data-id="${e.id}">${ic('debt')} واریز مستقیم مشتری و تنظیمات بیشتر</button></div>`}
+  </div>`}
 const eeTitles=()=>['خانم','آقا',''].map(t=>`<button class="tch${eeTitle===t?' on':''}" data-act="eeT" data-t="${t}">${t||'بدون عنوان'}</button>`).join('');
 function eeIbanChk(){const el=$('eeI'),o=$('eeIv');if(!el||!o)return;const v=dg(el.value).slice(0,24);{const bb=$('eeIb'),b5=v.length>=5?BANKS[v.slice(2,5)]||'':'';if(bb)bb.innerHTML=b5?bankBadge(b5,'lg'):''}if(!v){o.textContent='';o.className='eh erh';return}
   if(v.length<24){o.className='eh erh';o.textContent=toFa(v.length)+' از ۲۴ رقم';return}if(!ibanOk('IR'+v)){o.className='eh erh bad';o.textContent='شماره شبا اشتباه است';return}const b=ibanBank('IR'+v);o.className='eh erh ok';o.textContent='شبا معتبر است'+(b?' · بانک '+b:'')}

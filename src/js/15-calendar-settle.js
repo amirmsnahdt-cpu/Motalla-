@@ -12,7 +12,6 @@ function calHTML(){const{y,m}=cal,n=jDays(y,m),[gy,gm,gd]=j2g(y,m,1),first=(new 
 ACT.calMv=d=>{let m=cal.m+(+d.d),y=cal.y;if(m<1){m=12;y--}if(m>12){m=1;y++}cal.m=m;cal.y=y;$('sheet').innerHTML=calHTML()};
 ACT.calPick=d=>{const cb=cal.cb;cal.sel=d.iso;closeSheet();if(cb)cb(d.iso)};
 
-ACT.entTk=d=>{const x=entRow(),q=x&&entBI(x);if(!q||q.b.closed)return;eD=eD||{};const curS=eD.st!=null?eD.st:q.it.st;eD.st=curS===d.st?'pending':d.st;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.entCommit=()=>entCommit();
 ACT.entDraftOff=()=>{eD=null;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.entPay=()=>{const x=entRow();openCal((x&&x.payDate)||todayISO(),v=>{tmpISO=v;dpMode='epay';ACT.dok()})};
@@ -31,11 +30,10 @@ ACT.fPay=d=>{fPay=d.iso;updPay()};
 ACT.fPayPick=()=>openCal(fPay||payDef(),iso=>ACT.fPay({iso}));
 ACT.openEnt=d=>{if(cur==='inv'&&invV)DST.push({k:'inv',inv:{...invV},cu:custId,p:PARENT.inv});entItSync(entries.find(z=>String(z.id)===String(d.id)),true)/* v72.0: ردیف‌های کهنه قبل از این نسخه با باز کردن درست می‌شوند */;entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday','cust','inv','bank'].includes(cur)?cur:cur==='sell'&&custId?'cust':'home';go('ent')};
 /* v70.2: دکمه حذف حالا در سرتیتر است؛ برای جلوگیری از زدن اشتباهی، تأیید می‌خواهد (به سطل بازیابی می‌رود) */
-ACT.entDel=d=>{const x=entries.find(z=>String(z.id)===String(d.id));if(!x)return;askConfirm('واریزی «'+esc(fullName(x))+'» ('+fmt(x.amount)+' تومان) حذف شود؟ به سطل بازیابی می‌رود.','حذف',()=>{closeSheet();navBack=true;go(PARENT.ent||'home');delEntry(d.id)})};
+ACT.entDel=d=>{const x=entries.find(z=>String(z.id)===String(d.id));if(!x)return;askConfirm('واریزی «'+fullName(x)+'» ('+fmt(x.amount)+' تومان) حذف شود؟ به سطل بازیابی می‌رود.','حذف',()=>{closeSheet();navBack=true;go(PARENT.ent||'home');delEntry(d.id)})};
 ACT.fF=d=>{fF=d.f;fN=120;render()};
 ACT.arcCal=()=>{const M=new Set();validated().forEach(r=>{M.add(PD(r));M.add(r.entryDate)});openCal(arcD||qDate(arcQ)||todayISO(),iso=>{arcD=iso;arcQ='';render();$('view').scrollTop=0},{title:'لیست‌های کدام روز؟',sub:'روزهای نقطه‌دار لیست دارند',q:[[-1,'دیروز'],[0,'امروز'],[1,'فردا']],marks:M})};
 ACT.arcClr=()=>{arcQ='';arcD='';arcN=120;render()};
-ACT.telCall=d=>{const h=String(d.p||'');if(/^tel:\+?\d{5,15}$/.test(h))location.href=h};
 /* v66.6: باز و بسته شدن کارت ماه بدون ساختن دوباره صفحه (انیمیشن ارتفاع با grid-rows؛ بستن: لیست‌ها جمع می‌شوند و کارت ماه در دید می‌ماند) */
 ACT.arcMo=d=>{const k=+d.mo,box=document.querySelector(`.armo[data-mo="${k}"]`);if(!box){arcMo.has(k)?arcMo.delete(k):arcMo.add(k);render();return}
   const inn=box.querySelector('.armi'),h=box.querySelector('.armh');
@@ -113,7 +111,6 @@ function entItSync(e,info){if(!e||!e.sentBid)return false;const st=(e.settles||[
 /* همه ردیف‌های کهنه (از قبل از این نسخه، یا رسیده از گوشی دیگر) یکجا؛ بعد از هر همگام‌سازی. مثال واقعی: ردیف هنوز «بهاره جعفری · ۸٬۰۰۰٬۰۰۰» بود */
 function entItSyncAll(){let n=0;const B=batches;for(const e of entries)if(e.sentBid&&B.some(b=>b.id===e.sentBid))try{if(entItSync(e,true))n++}catch(_){}return n}
 function stlSync(e){const st=(e.settles||[]).reduce((s,z)=>s+(+z.amount||0),0),rem=Math.max(0,(+e.amount||0)-st);batches.forEach(b=>b.items.forEach(it=>{if(it.id===e.id){it.amount=rem;it.settled=st;it.settles=e.settles;it.total=+e.amount||0}}));saveB()}
-ACT.stlNew=()=>{const x=entRow();if(!x)return;stl={amount:x.amount,q:''};sheet(stlHTML());stlBind();setTimeout(()=>{if($('stQ')&&!stl.cuId&&!stl.newName){stl.open=1;const c=$('stCs');if(c){c.innerHTML=stlChips();phPaint(c)}}},300)};
 ACT.stlOpen=d=>{const x=stlE();if(!x)return;const z=(x.settles||[])[+d.i];if(!z)return;stl={...z,i:+d.i,q:z.cuId?'':z.name,newName:!z.cuId&&!!z.name};sheet(stlHTML());stlBind();phPaint($('sheet'))};
 ACT.stlCu=d=>{stlRead();const clr=!d.id;if(d.id==='new'){stl.cuId='';stl.name=clean(stl.q||'');stl.newName=true}else if(clr){stl.cuId='';stl.name='';stl.q='';stl.newName=false}else{const c=custs.find(z=>String(z.id)===String(d.id));if(c){stl.cuId=c.id;stl.name=cuName(c);stl.newName=false;if(!stl.phone)stl.phone=c.phone||''}}stlRe(clr?-1:1);if(clr)setTimeout(()=>{const Q=$('stQ');if(Q){stl.open=1;const c2=$('stCs');if(c2){c2.innerHTML=stlChips();phPaint(c2)}}},60)};
 ACT.stlImg=async()=>{const k=stl&&stl.img;if(!k)return;const v=await imgGet(k);if(!v){toast('عکس پیدا نشد',true);return}sheet(`<div class="sh-h"><b>رسید ${esc(stl.name||'')}</b><button class="x" data-act="stlBack">×</button></div><img src="${v}" class="rcpt" style="max-height:70vh" alt="رسید">`)};
@@ -133,9 +130,7 @@ ACT.rcSave1=async d=>{const r=RC[+d.i];if(r)rcDown(await rcFiles([r]))};
 ACT.rcShare1=async d=>{const r=RC[+d.i];if(r)rcShare(await rcFiles([r]),r.name)};
 ACT.rcSaveAll=async()=>rcDown(await rcFiles(RC));
 ACT.rcShareAll=async()=>rcShare(await rcFiles(RC),RCT);
-ACT.rcEnt=async d=>{const b=batches.find(z=>z.id==d.b),x=b&&b.items.find(z=>String(z.id)===String(d.id));if(!x)return;rcShare(await rcFiles(itImgs(b,x).map(k=>({key:k,name:x.name,amount:x.amount,tn:x.tn||''}))),x.name)};
 ACT.ldQClr=()=>{ldQ='';const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
-ACT.rcOne=async d=>{RC=[{key:d.k,name:d.n,amount:+d.a,tn:d.t}];RC.one=1;RCT='رسید '+d.n;ACT.rcView({i:0})};
 function stlTx(e,z){if(z.byInv)return;/* تسویه ساخته‌شده از سند فروش: اثرش در خود سند است */const c=custs.find(q=>String(q.id)===String(z.cuId));if(!c)return;const now=new Date().toISOString(),t={id:nid++,type:'pin',kind:'',weight:0,ppg:0,amount:+z.amount||0,note:'تسویه واریزی «'+fullName(e)+'»'+(z.inv?' · فاکتور '+z.inv:'')+(z.tn?' · پیگیری '+z.tn:''),date:todayISO(),at:now,by:who(),entId:e.id,stlId:z.id,img:z.img||''};(c.txs=c.txs||[]).push(t);c.lastAt=now;z.txId=t.id;saveCu()}
 function stlUntx(z){if(!z.cuId||!z.txId)return;const c=custs.find(q=>String(q.id)===String(z.cuId)),t=c&&(c.txs||[]).find(q=>q.id===z.txId);if(t){t.del=true;c.lastAt=new Date().toISOString();saveCu()}delete z.txId}
 const stlE=()=>{const x=entRow();return x&&entries.find(z=>z.id===x.id)};
@@ -143,7 +138,6 @@ const stlDone=(e,msg)=>{e.updatedAt=new Date().toISOString();e.updatedBy=who();s
 ACT.stlOk=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;z.st='ok';z.okAt=new Date().toISOString();if(z.cuId&&!z.txId)stlTx(e,z);logA('edit','تأیید تسویه از مشتری',fullName(e)+' ← '+z.name+' | '+fmt(z.amount));const r=()=>entRow();stlDone(e,'تأیید شد'+(z.cuId?' · در حساب مشتری ثبت شد':''))};
 ACT.stlUnok=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;z.st='wait';stlUntx(z);stlDone(e,'به «در انتظار تأیید» برگشت')};
 ACT.stlDelI=d=>{const e=stlE();if(!e)return;const z0=(e.settles||[])[+d.i];if(!z0)return;askConfirm((z0.st==='wait'?'این تسویه رد شود؟':'این تسویه حذف شود؟')+' مبلغ '+fmt(z0.amount)+' دوباره به مانده «'+fullName(e)+'» برمی‌گردد.',z0.st==='wait'?'رد':'حذف',()=>{const S=e.settles=(e.settles||[]).slice(),z=S[+d.i];if(!z)return;stlUntx(z);stlDocOff(z);S.splice(+d.i,1);stlDone(e,'مبلغ به مانده برگشت')})};
-ACT.stlImgI=d=>ACT.galSt(d);
 ACT.entTkF=d=>ACT.entTkQ({id:d.id,st:'fail'});
 ACT.rcEntAll=d=>{const x=validated().find(z=>String(z.id)===String(d.id));if(!x)return;openRcpts(rcOfEnt(x),'رسیدهای '+fullName(x))};
 ACT.fV=d=>{fV=d.v;fN=120;render()};
@@ -183,7 +177,6 @@ ACT.fClrAll=()=>{fF='all';fP='';fS='';fR=0;fN=120;render();const S=$('sheet');if
 ACT.spLists=()=>{spTab='lists';go('split1')};
 ACT.spTab=d=>{spTab=d.t;AM=null;render();$('view').scrollTop=0};
 ACT.arcDay=d=>{ldKey=d.iso;ldX=null;ldOpen=new Set();ldQ='';go('lday')};
-ACT.arcDayL=d=>{fD='';fP=d.iso;fG='pay';fF='all';fS='';fQ='';spTab='lists';render();$('view').scrollTop=0};
 ACT.fDClr=()=>{fD='';render()};
 ACT.fClr=()=>{fQ='';fN=120;render()};
 ACT.findMore=()=>{fN+=200;$('fres').innerHTML=findHTML()};

@@ -156,6 +156,9 @@ test('امنیت: کارمند بدون مجوز ویرایش، شبا و مبل
   // کارهای عادی پیگیری (تسویه، وضعیت) همچنان مجاز است
   const e1 = { ...e0, status: 'ok', settles: [{ amount: 200 }] };
   r = await sync(tr, [{ coll: 'entries', id: 's1', base: e0, data: e1 }]); assert.equal(r.j.rejected.length, 0);
+  // v78.8: تاریخ واریز و یادداشت بدون مجوز ویرایش/تقسیم رد می‌شود
+  r = await sync(tr, [{ coll: 'entries', id: 's1', base: e1, data: { ...e1, payDate: '2026-12-01' } }]); assert.equal(r.j.rejected.length, 1, 'payDate needs edit/split');
+  r = await sync(tr, [{ coll: 'entries', id: 's1', base: e1, data: { ...e1, note: 'x' } }]); assert.equal(r.j.rejected.length, 1, 'note needs edit');
   // لیست پیگیری: ردیف تازه با شبای جعلی رد، با شبای درست قبول؛ مبلغ مانده بعد از تسویه مجاز، مبلغ دلخواه رد
   r = await sync(tr, [{ coll: 'batches', id: 'b1', data: { id: 'b1', items: [{ id: 's1', iban: IB2, amount: 1000 }] } }]); assert.equal(r.j.rejected.length, 1);
   const b0 = { id: 'b1', items: [{ id: 's1', iban: IB, amount: 1000, name: 'مشتری' }] };

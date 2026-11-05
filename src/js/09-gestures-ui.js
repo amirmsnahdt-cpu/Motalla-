@@ -98,10 +98,6 @@ function tkRow(x,q,qd,b){const hit=qd&&qd.length>=3&&String(x.amount).includes(q
   ${x.img?`<button class="mb" data-act="viewImg" data-b="${b.id}" data-id="${x.id}" aria-label="دیدن رسید">${ic('eye')}</button>`:''}<button class="mb" data-act="itOpen" data-b="${b.id}" data-i="${x.i}" aria-label="جزئیات بیشتر">⋯</button></div>
   ${x.requeued?'<div class="note rq">برای واریز مجدد به لیست بعدی منتقل شد</div>':x.st==='fail'?'<div class="note">انجام نشد — با «واریز مجدد ناموفق‌ها» دوباره تقسیم می‌شود</div>':''}</div>`;
   return swW(inner,{r:[['itOpen','جزئیات','eye','#3b6fd6'],['tkCopy','کپی','copy','#b8862b']],l:canBack?[['tkBack','به تقسیم','undo','#6b7385']]:[],data:{b:b.id,i:x.i}})}
-function badNotice(iso){const n=validated().filter(r=>r.entryDate===iso&&r.level===2&&!r.sentBid&&!r.full).length;
-  return n?`<button class="lrow bad" data-act="tkFixBad" data-iso="${iso}"><span class="ic">!</span><span class="tx"><b>${fmt(n)} واریزی خطادار در تقسیم نیامده</b><small>بزنید تا اصلاح شود؛ بعد از اصلاح در تقسیم ظاهر می‌شود</small></span>${fwd()}</button>`:''}
-/* ================= v21: خروجی کامل همه تخصیص‌های روز ================= */
-const dayParts=()=>parts().filter(p=>!(p.sent&&batches.some(b=>b.id===p.bid&&b.closed)));
 function dlFile(f){/* v61.50: اپ اندروید blob را دانلود نمی‌کند؛ از پل بومی در Download/Motalla */if(window.AndroidBridge&&AndroidBridge.saveFile){rcB64(f).then(d=>AndroidBridge.saveFile(f.name,d,f.type||'application/octet-stream')).catch(()=>toast('ذخیره فایل انجام نشد',true));return true}try{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000);return true}catch(e){return false}}
 async function expAllGo(){closeSheet();const nm=ctxName(),hasX=typeof XLSX!=='undefined',files=[];
   try{if(hasX)files.push(new File([withCtx(xlsx)],nm+'.xlsx',{type:MIME.xlsx}))}catch(e){}
@@ -120,10 +116,6 @@ function bestN(items,cap,N){if(!items.length||!(N>0))return[];N=Math.min(N,items
 const cntHTML=()=>`<div class="cnt"><span class="lb"><b>تعداد واریزی</b><small id="pcntl">${aSt.count?fmt(aSt.count)+' واریزی به این منبع برود':'بدون محدودیت تعداد'}</small></span><div class="stepper"><button data-act="aCnt" data-v="1" aria-label="بیشتر">+</button><input id="pcnt" class="ltr" inputmode="numeric" autocomplete="off" value="${aSt.count?toFa(aSt.count):''}" placeholder="—" aria-label="تعداد واریزی"><button data-act="aCnt" data-v="-1" aria-label="کمتر">−</button></div></div>`;
 function paramRefresh(){const sw=document.querySelector('#aparam .sw');if(sw)sw.style.display=aSt.count?'none':''}
 function setCnt(v){aSt.count=Math.max(0,Math.min(999,+v||0));const i=$('pcnt');if(i&&document.activeElement!==i)i.value=aSt.count?toFa(aSt.count):'';const l=$('pcntl');if(l)l.textContent=aSt.count?fmt(aSt.count)+' واریزی به این منبع برود':'بدون محدودیت تعداد'}
-/* ================= v21: ویرایش تخصیص ================= */
-function allocEdit(pid){const p=parts().find(z=>z.id==pid);if(!p)return;if(p.sent){partId=p.id;go('part');return}const q=p.param||{};
-  aSt={srcId:p.src.id,method:p.method,amount:q.amount||0,min:q.min||0,max:q.max||0,cap:q.cap||0,count:q.count||0,bank:q.bank||p.src.bank||'',sameFirst:true,sel:new Set(p.ids),q:'',editPid:p.id};
-  allocSheet();renderPrev()}
 /* ================= v21: مدیریت منابع ================= */
 let srcRet='';
 function srcMgr(){srcRet='mgr';
@@ -146,7 +138,3 @@ function entMenu(id){const r=validated().find(x=>x.id==id);if(!r)return;const si
   <button class="opt big" data-act="del" data-id="${r.id}" style="color:var(--red)">${ic('trash')}<span><b>حذف</b><small>به سطل بازیابی می‌رود و قابل برگشت است</small></span></button>`)}
 /* ================= v22: لیست — جست‌وجوی جمع‌وجور ================= */
 let lsOpen=false;
-function ltoolsHTML(){const all=listMode==='all',D=dates(dateVal);
-  return `<div class="ltools${lsOpen||listQ?' sopen':''}"><div class="lt"><b>${all?'همه لیست‌ها':'لیست '+esc(relDay(dateVal)==='امروز'?'امروز':D.fa)}</b><small>${all?'بر اساس تاریخ':esc(D.fa)}</small></div>
-  <button class="ib0" data-act="lsOpen" aria-label="جست‌وجو">${ic('search')}</button><button class="ib0${listSort!=='seq'?' on':''}" data-act="sortSheet" aria-label="مرتب‌سازی: ${SORTS[listSort]}">${ic('sort')}</button><button class="ib0" data-act="lexp" data-a="menu" aria-label="خروجی متن، PDF و Excel">${ic('open')}</button>
-  <div class="lsrch"><div class="sbox" style="flex:1">${ic('search')}<input id="lq" type="search" enterkeyhint="search" placeholder="نام، فاکتور، شبا، مبلغ، منبع…" value="${esc(listQ)}" autocomplete="off"><button class="clr${listQ?'':' hide'}" data-act="clearQ" aria-label="پاک کردن">×</button></div><button class="link" data-act="lsClose">انصراف</button></div></div>`}

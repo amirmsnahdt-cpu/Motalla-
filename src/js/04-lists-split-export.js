@@ -24,7 +24,6 @@ function dayDone(iso,V){V=V||validated();const L=V.filter(r=>r.entryDate===iso);
 const doneCnt=L=>L.filter(r=>{const t=entSt(r);return t&&t[1]==='ok'}).length;
 function lstrip(){const D=datesWith(),V=validated(),all=listMode==='all';if(!all&&!D.some(x=>x.iso===dateVal))D.unshift({iso:dateVal,n:0,s:0,bad:0});D.sort((a,b)=>a.iso<b.iso?1:-1);
   return `<div class="dstrip lstrip"><button class="dpill all${all?' on':''}" data-act="lsel" data-iso="all"><b>همه لیست‌ها</b><small>${fmt(datesWith().length)} روز</small></button>${D.map(x=>{const r=relDay(x.iso),dn=dayDone(x.iso,V),Dt=dates(x.iso);return `<button class="dpill${!all&&x.iso===dateVal?' on':''}${x.bad?' err':''}${dn?' done':''}" data-act="lsel" data-iso="${x.iso}"><b>${dn?'✓ ':''}${['امروز','دیروز','فردا'].includes(r)?r:toFa(Dt.jd)+' '+JM[Dt.jm-1]}</b><small>${x.n?fmt(x.n)+' واریزی':'خالی'}${dn?'، تسویه':''}</small></button>`}).join('')}</div>`}
-function vList(){return `${lstrip()}${ltoolsHTML()}<div id="lst"></div>`}
 function listBody(){const V=validated(),q=listQ.trim(),base=listMode==='day'?V.filter(r=>r.entryDate===dateVal):V;
   let rows=base.map(r=>({r,h:q?match(r,q):{}})).filter(x=>!q||x.h);
   const nBad=rows.filter(x=>x.r.level===2).length,nOk=rows.length-nBad;
@@ -52,8 +51,6 @@ function listBody(){const V=validated(),q=listQ.trim(),base=listMode==='day'?V.f
     <div class="in">${g.map(r=>slipHTML(r,q,H.get(r.id),false)).join('')}</div></div>`});
   return h}
 function refreshList(fx){const l=$('lst');if(l){if(fx)srchSwap(l,listBody());else l.innerHTML=listBody()}const c=document.querySelector('.sbox .clr');if(c)c.classList.toggle('hide',!listQ)}
-function bindList(){const q=$('lq');if(!q)return;q.oninput=()=>{listQ=q.value;clearTimeout(q._t);q._t=setTimeout(()=>refreshList(true),140)};
-  q.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);listQ=q.value;refreshList();q.blur()}});refreshList()}
 function openSort(){sheet(`<div class="sh-h"><b>مرتب‌سازی لیست</b><button class="x" data-act="close" aria-label="بستن">×</button></div>${Object.entries(SORTS).map(([k,t])=>`<button class="opt${listSort===k?' on':''}" data-act="setSort" data-s="${k}">${ic(listSort===k?'check':'sort')}<span>${t}</span></button>`).join('')}`)}
 /* ============ الگوریتم تقسیم ============ */
 const gcd=(a,b)=>b?gcd(b,a%b):a;
@@ -65,27 +62,7 @@ function best(items,cap,maxCount){if(!items.length||cap<=0)return[];
   let s=C;while(s>0&&dp[s]===-1)s--;const out=[];while(s>0){const k=dp[s];out.push(items[k]);s-=items[k].amount/u}return out}
 /* ============ تقسیم: مرحله ۱ — مبلغ هر منبع ============ */
 let srcIdx=0,expCtx=null;
-/* ============ تقسیم: مرحله ۲ — نتیجه (لایه‌لایه) ============ */
-function vSplit3(){if(!alloc)return `<div class="card empty">${ic('split')}<b>هنوز تقسیمی انجام نشده</b><div class="row"><button class="btn gold" data-act="tab" data-n="split">شروع تقسیم</button></div></div>`;
-  const A=alloc,tot=sum(A.res.flatMap(r=>r.items)),cnt=A.res.reduce((s,r)=>s+r.items.length,0);
-  let h=flowBar(2)+(A.bid?`<div class="msg ok">✓ ارسال شد و به پیگیری رفت. هنوز می‌توانید متن هر منبع را دوباره کپی کنید.</div>`:`<div class="banner"><span>با کپی متن یا خروجی، این واریزی‌ها از تقسیم خارج و وارد پیگیری می‌شوند.</span></div>`)+(A.fromHist?`<div class="banner"><span>نتیجه ذخیره‌شده از تاریخچه — ${relDay(isoOfTs(A.fromHist))} ${hm(A.fromHist)}</span></div>`:'');
-  h+=`<div class="ingot"><div class="lb">تقسیم ${A.D.fa}</div><div class="v">${fmt(tot)}<small>تومان</small></div><div class="rule"></div><div class="row3"><div><small>تقسیم‌شده</small><b>${fmt(cnt)}</b></div><div><small>منبع</small><b>${fmt(A.res.length)}</b></div>${A.left.length?`<div><small>بدون منبع</small><b class="r">${fmt(A.left.length)}</b></div>`:''}</div></div>`;
-  if(!A.left.length&&!A.excl.length)h+='<div class="msg ok">همه واریزی‌ها تقسیم شدند.</div>';
-  h+=`<div class="sec-h"><b>منابع</b><small class="muted">برای دیدن لیست و خروجی، روی هر منبع بزنید</small></div>`;
-  A.res.forEach((R,i)=>{const s=sum(R.items),l=+R.src.limit||0;
-    h+=`<button class="lrow" data-act="srcView" data-i="${i}"><span class="ic gd">${esc(userInit(R.src.name))}</span><span class="tx"><b>${esc(R.src.name)}</b><small>${fmt(R.items.length)} واریزی${l&&l-s>0?`، ${fmt(l-s)} از موجودی ماند`:''}</small></span><span class="v">${fmt(s)}</span>${ic('back').replace('class="i"','class="i flip"')}</button>`});
-  if(A.left.length)h+=`<button class="lrow bad" data-act="srcView" data-i="left"><span class="ic">!</span><span class="tx"><b>بدون منبع</b><small>${fmt(A.left.length)} واریزی؛ موجودی منابع کافی نبود</small></span><span class="v">${fmt(sum(A.left))}</span>${ic('back').replace('class="i"','class="i flip"')}</button>`;
-  if(alloc.bid&&splitList().length)h+=`<button class="lrow" data-act="tab" data-n="split" style="border-color:var(--gold2);background:var(--goldbg)"><span class="ic gd">↻</span><span class="tx"><b>${fmt(splitList().length)} واریزی مانده</b><small>تقسیم دور بعد با موجودی باقی‌مانده منابع</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`;
-  if(A.excl.length)h+=`<button class="lrow bad" data-act="srcView" data-i="excl"><span class="ic">×</span><span class="tx"><b>خطادار (تقسیم نشد)</b><small>${fmt(A.excl.length)} واریزی؛ اول اصلاحشان کنید</small></span><span class="v">${fmt(sum(A.excl))}</span>${ic('back').replace('class="i"','class="i flip"')}</button>`;
-  return h}
-const aSplit3=()=>alloc?(alloc.bid?`<button class="btn sec" data-act="expOpen" data-sc="all">خروجی همه</button><button class="btn gold" data-act="openBatch" data-id="${alloc.bid}">رفتن به پیگیری</button>`:`<button class="btn sec" data-act="expOpen" data-sc="all">خروجی همه</button><button class="btn gold" data-act="trackNow">ارسال شد ← پیگیری</button>`):'';
 function srcRows(){if(!alloc)return null;if(srcIdx==='left')return{name:'تخصیص نیافته',rows:alloc.left,x:1};if(srcIdx==='excl')return{name:'خطادار',rows:alloc.excl,x:1};const R=alloc.res[+srcIdx];return R?{name:R.src.name,rows:R.items,limit:+R.src.limit||0}:null}
-function vSrc(){const S=srcRows();if(!S)return '';const s=sum(S.rows);
-  let h=`<div class="ingot"><div class="lb">${esc(S.name)} — ${alloc.D.fa}</div><div class="v">${fmt(s)}<small>تومان</small></div><div class="rule"></div><div class="row3"><div><small>تعداد</small><b>${fmt(S.rows.length)}</b></div>${S.limit?`<div><small>موجودی</small><b>${fmt(S.limit)}</b></div><div><small>باقی‌مانده</small><b>${fmt(Math.max(0,S.limit-s))}</b></div>`:''}</div></div>`;
-  if(!S.rows.length)return h+'<div class="card empty"><b>چیزی به این منبع نرسید</b></div>';
-  S.rows.forEach((r,i)=>{h+=`<div class="slip${S.x?' bad':''}"><div class="a"><div class="nmb"><span class="idx">${fmt(i+1)}</span><b>${esc(r.name)}</b></div><div class="amt">${fmt(r.amount)}<small>تومان</small></div></div><div class="b"><div class="meta"><span class="pill">${esc(r.bankShow||'—')}</span>${r.code?`<span class="pill g">فاکتور ${esc(toEn(r.code))}</span>`:''}</div><div class="ibn">${cpIb((r.iban||'').slice(2))}</div>${r.issues&&r.issues.length?`<div class="iss">${esc(r.issues.join('، '))}</div>`:''}${srcIdx==='excl'&&entries.some(e=>e.id===r.id)?`<div class="eact"><button class="sm" data-act="edit" data-id="${r.id}">${ic('edit')} اصلاح</button></div>`:''}</div></div>`});
-  return h}
-const aSrc=()=>{const S=srcRows();return S&&S.rows.length&&!S.x?`<button class="btn sec" data-act="copySrc">${ic('copy')} کپی متن</button><button class="btn gold" data-act="expOpen" data-sc="${srcIdx}">خروجی</button>`:''};
 /* ============ خروجی: متن به فرمت بانک ============ */
 const N=n=>Number(n||0).toLocaleString('en-US');
 /* شبا در متن‌های ارسالی با همان فاصله‌های داخل برنامه: IR 12 3456 7890 … */

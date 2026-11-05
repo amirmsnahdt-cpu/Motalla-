@@ -18,8 +18,6 @@ const acEst=s=>s.bal==null?null:(+s.bal||0)+acLedSum(s)+srcInvSum(s)-acSent(s);
 /* تخصیص‌های ارسال‌نشده = رزرو */
 function acRes(s,exPid){let t=0;Object.values(drafts||{}).forEach(L=>(L||[]).forEach(p=>{if(p.sent||p.id===exPid||!p.src||String(p.src.id)!==String(s.id))return;t+=sum(partRows(p))}));return t}
 const acFree=(s,exPid)=>{const e=acEst(s);return e==null?null:e-acRes(s,exPid)};
-const posToday=()=>{const t=todayISO();let n=0,a=0;sources.forEach(s=>(s.led||[]).forEach(x=>{if(!x.del&&x.type==='pos'&&x.date===t){n++;a+=+x.amount||0}}));return{n,a}};
-function agoFa(iso){if(!iso)return '';const m=Math.round((Date.now()-new Date(iso))/6e4);if(m<1)return 'همین الان';if(m<60)return toFa(m)+' دقیقه پیش';const h=Math.round(m/60);if(h<24)return toFa(h)+' ساعت پیش';const d=Math.round(h/24);return d===1?'دیروز':toFa(d)+' روز پیش'}
 /* v66.0 (خواسته صاحب اپ: «قسمت بانک — ساده، شفاف، کاربردی»):
    صفحه بانک فقط «حساب‌های مغازه» (s.own=1) را نشان می‌دهد، نه همه منبع‌های واریزی. تا وقتی هیچ حسابی علامت نخورده،
    همه دیده می‌شوند و یک کارت «حساب‌های مغازه را مشخص کنید» بالای فهرست هست.
@@ -38,8 +36,6 @@ const acFin=s=>s.bal==null?null:acSum(s).fin;
 /* برچسب مانده کنار نام بانک در همه انتخابگرها */
 const bkTag=s=>{const f=acFin(s);return f==null?'':`<em class="bktg${f<0?' n':''}">${f<0?'−':''}${fmt(Math.abs(f))}</em>`};
 const bkSub=s=>{const f=acFin(s),bk=acBank(s);return f==null?(bk?'بانک '+bk:'حساب ما'):'مانده '+(f<0?'−':'')+fmt(Math.abs(f))+' تومان'};
-const acHv=s=>srcMoves(s).filter(m=>m.a>0);
-const bxN=(v,cls)=>`<span class="acn${cls?' '+cls:''}" data-v="${Math.abs(Math.round(v))}">${fmt(Math.abs(Math.round(v)))}</span>`;
 /* v66.1 (خواسته صاحب اپ: «رنگ‌ها با برنامه سینک نیست، طرح نسخه‌های قدیمی»): کارت جمع بانک‌ها و صفحه هر حساب با همان اجزای صفحه
    حساب مشتری ساخته می‌شوند — کارت سفید «مانده» با کاشی‌های cbk (آبی/قرمز/خاکستری، شمارش cbn)، فهرست ردیف‌های c6r،
    «گردش حساب» با سرتیتر روز (fday) و ردیف‌های fcard/txr. ریز حساب دیگر پنجره نیست، یک صفحه کامل است (bank). */
@@ -134,7 +130,6 @@ function chSrc(c){if(!c)return null;if(c.srcId!=null&&c.srcId!==''){if(c.srcId==
 const chAuto=c=>!(c.srcId!=null&&c.srcId!=='')&&!!chSrc(c);
 const acPOS=s=>CH('pos').filter(c=>{const z=chSrc(c);return z&&String(z.id)===String(s.id)});
 const acPosPend=s=>acPOS(s).reduce((a,c)=>a+Math.max(0,chBal(c)),0);
-const acTmr=s=>{const e=acEst(s);return e==null?null:e+acPosPend(s)-acRes(s)};
 let acV={id:null,f:'all'},bkId=null,bkCnt=null;
 const curBk=()=>bkId==null?null:sources.find(s=>String(s.id)===String(bkId))||null;
 const bxTime=at=>{if(!at)return '';const d=new Date(at);return isNaN(d)?'':toFa(p2(d.getHours())+':'+p2(d.getMinutes()))};
@@ -165,7 +160,6 @@ function acRows(s){const R=[],L=(s.led||[]).filter(x=>!x.del),ba=s.balAt||'',add
   /* v71.0 (خواسته صاحب اپ): کارت «اصلاح حساب» همیشه دیده می‌شود و زدنش = ویرایش مبلغ یا حذف همین اصلاح (acFixEd) */
   const bd=new Date(ba),bi=bd.getFullYear()+'-'+p2(bd.getMonth()+1)+'-'+p2(bd.getDate()),c=can('src'),tg=c?'button':'div',mk={f:'mark',old:true,at:ba,d:bi,h:`<${tg} class="bxmk"${c?` data-act="acFixEd" data-id="${s.id}"`:''}><span>${ic('edit')} اصلاح حساب · ${esc(relDay(bi))} ${esc(bxTime(ba))}</span><b>${s.bal<0?'−':''}${fmt(Math.abs(+s.bal||0))} <i>تومان</i></b><small>${O.length?'گردش‌های زیر در همین مانده حساب شده‌اند':'گردش‌های بالا از همین مانده حساب می‌شوند'}${c?' · زدن = ویرایش یا حذف':''}</small></${tg}>`};
   return [...N,mk,...O]}
-const ACF=[['hv','حواله‌ها'],['pos','کارتخوان'],['out','برداشت‌ها']];
 function acListHTML(s,R){const f=acV.f,L0=f==='all'?R:R.filter(r=>r.f===f||r.f==='mark'),L=L0,mk=L.find(r=>r.f==='mark');
   if(!L.some(r=>r.f!=='mark'))return (mk?mk.h:'')+`<div class="stmno">${ic(f==='pos'?'card':f==='out'?'share':'swap')}<b>${f==='all'?'گردشی ثبت نشده':f==='hv'?'حواله‌ای نخورده':f==='pos'?'کارتخوانی نیست':'برداشتی نیست'}</b><small>${s.balAt?'از تطبیق '+esc(dates(s.balAt.slice(0,10)).fa):'حواله‌های سندها اینجا می‌آیند'}</small></div>`;
   let g=null;return L.map(r=>{let d='';if(r.f==='mark'){g=null;return r.h}const k=r.res?'res':r.d||'';if(k!==g){g=k;if(r.res)d='<div class="fday">در صف ارسال · هنوز از حساب کم نشده</div>';else{const t=relDay(k);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(t)?t+'، ':''}${esc(dates(k).fa)}</div>`}}return d+r.h}).join('')}

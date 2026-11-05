@@ -119,7 +119,6 @@ function bkSend(e){let p=null;for(const d in drafts){p=(drafts[d]||[]).find(z=>z
   const k0=ldKey;ldKey=PD(e);try{if(p.ids.length>1)p=moveTo([e.id],p,p.src,'new');commitParts([p.id],true)}finally{ldKey=k0}
   const q=bkItem(e);if(q){const pid=p.id;toast('واریز بانکی ثبت شد · رسید و پیگیری را وارد کنید','','برگرداندن',()=>{const k1=ldKey;ldKey=PD(e);try{uncommitParts([pid])}finally{ldKey=k1}closeSheet();pyRe()})}return q}
 ACT.bkGo=d=>{const e=entries.find(z=>String(z.id)===String(d.id));if(!e||!can('track'))return;let q=bkItem(e);if(!q){q=bkSend(e);if(q)pyRe()/* v69.6: ردیف همان لحظه «در انتظار تأیید» می‌شود (قبلاً تا بستن صفحه کهنه می‌ماند) */}if(!q){toast('اول بانک این واریزی را انتخاب کنید',true);return}openItem(q.b.id,q.i)};
-ACT.bkOk=d=>{const e=entries.find(z=>String(z.id)===String(d.id)),q=e&&bkItem(e);if(!q||!can('track'))return;q.it.st='ok';q.it.at=new Date().toISOString();saveB();logA('edit','تأیید واریز بانکی',fullName(e)+' | '+fmt(e.amount)+' تومان | '+(q.it.src||''));pyRe();toast('واریز بانکی تأیید شد ✓')};
 ACT.pyOpen=d=>{const e=stlE(),z=e&&(e.settles||[])[+d.i];if(!z)return;if(z.byInv&&custs.some(c=>String(c.id)===String(z.byInv.cu)&&(c.txs||[]).some(t=>String(t.id)===String(z.byInv.tx)&&!t.del))){invOpen(z.byInv.cu,z.byInv.tx);return}ACT.stlOpen(d)};
 function pyRe(){const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y}
 

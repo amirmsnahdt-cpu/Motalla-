@@ -22,7 +22,6 @@ const ckGold=()=>{const g=svBalL().find(z=>z[0]==='g');if(!g)return 0;const ix={
 const ckRgW=()=>{const a=+CK.amount||0,pg=+CK.pg||0;return a&&pg?Math.round(a/pg*1000)/1000:0};
 const ckRgX=()=>{const w=ckRgW();return !(+CK.pg)?'نرخ هر گرم ۱۸ را بزنید':w?'معادل: <b>'+wFmt(w)+'</b> گرم ۷۵۰ · '+(ckOut()?'مشتری طلا طلبکار می‌شود':'مشتری طلا بدهکار می‌شود'):'مبلغ را بزنید'};
 const ckUsedDep=id=>sv.pays.filter(p=>p.m==='dep'&&String(p.entId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
-const ckUsedCu=id=>sv.pays.filter(p=>p.m==='cust'&&String(p.cuId)===String(id)).reduce((s,p)=>s+pAmt(p),0);
 function ckOpen(tg){if(GAL&&GAL.ck)GAL=null;CK={m:'',tg:tg||''};sheet(ckHTML());ckBind()}
 ACT.ckTg=d=>{ckRead();CK={m:'',tg:d.w||''};ckRe()};
 function ckRe(f){if(!CK||!$('sheet').querySelector('.ckw'))return;$('sheet').innerHTML=ckHTML();ckBind(f)}

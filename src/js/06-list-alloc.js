@@ -137,25 +137,9 @@ function allocSave(){const s=sources.find(x=>x.id==aSt.srcId);if(!s){toast('من
 const curPart=()=>parts().find(p=>p.id===partId);
 const partPay=(p,M)=>{if(p.pay)return p.pay;M=M||new Map(validated().map(r=>[r.id,r]));const S=new Set((p.ids||[]).map(id=>M.get(id)).filter(Boolean).map(PD));return S.size===1?[...S][0]:''};
 const partSibs=p=>{const M=new Map(validated().map(r=>[r.id,r])),pp=partPay(p,M);return parts().filter(z=>String(z.src.id!=null?z.src.id:z.src.name)===String(p.src.id!=null?p.src.id:p.src.name)&&partPay(z,M)===pp)};
-function vPart(){const p=curPart();if(!p)return '<div class="spempty"><b>این تخصیص پیدا نشد</b></div>';const SB=partSibs(p),RN=new Map();SB.forEach((z,k)=>z.ids.forEach(id=>RN.set(id,k+1)));const allRows=SB.flatMap(partRows),rows=partOrder((partAll||SB.length<2?SB:[p]).flatMap(partRows)),sm=sum(rows),bk=p.src.bank||'';
-  const S=p.sent?rows.map(r=>stOf(r.id)):[],ok=S.filter(x=>x==='ok').length,fl=S.filter(x=>x==='fail').length,pend=rows.length-ok-fl,bad=rows.filter(r=>r.level===2).length;
-  const st=!p.sent?['آماده ارسال','d']:ok===rows.length&&rows.length?['تسویه شده','ok']:['ارسال شده','w'];
-  let h=`<div class="pthero"><div class="pti">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:var(--blu)">${esc(userInit(p.src.name))}</span>`}</div><b class="ptn">${esc(p.src.name)}</b><small class="ptm">${esc(methLabel(p))}</small>
-    <div class="ptv">${fmt(sm)}<i>تومان</i></div><span class="est ${st[1]==='ok'?'ok':st[1]==='w'?'pend':''}">${st[0]}</span>
-    <div class="ptst"><span><b>${fmt(rows.length)}</b> واریزی</span>${p.sent?`<span class="g"><b>${fmt(ok)}</b> تسویه</span><span class="w"><b>${fmt(pend)}</b> در انتظار</span>${fl?`<span class="r"><b>${fmt(fl)}</b> ناموفق</span>`:''}`:''}${bad?`<span class="r"><b>${fmt(bad)}</b> خطادار</span>`:''}</div>
-    ${p.sent&&rows.length?`<div class="ptbar"><i class="ok" style="width:${ok/rows.length*100}%"></i><i class="no" style="width:${fl/rows.length*100}%"></i></div>`:''}</div>`;
-  if(SB.length>1)h+=`<div class="seg frnd prnd"><button class="${partAll?'on':''}" data-act="partAllOn">همه مراحل <i>${fmt(allRows.length)}</i></button>${SB.map((z,k)=>`<button class="${!partAll&&z===p?'on':''}" data-act="partView" data-id="${z.id}" data-r="1">مرحله ${toFa(k+1)} <i>${fmt(z.ids.length)}</i>${z.sent?'':' <em>●</em>'}</button>`).join('')}</div><div class="bknote" style="margin:0 4px 10px">${partAll?'کپی و خروجی پایین صفحه برای همه مراحل با هم است.':'کپی و خروجی پایین صفحه برای مرحله انتخاب‌شده است؛ برای همه با هم «همه مراحل» را بزنید.'}${SB.some(z=>!z.sent)?' · <em style="font-style:normal;color:var(--warn)">●</em> یعنی هنوز ارسال نشده':''}</div>`;
-  if(p.sent&&pend>0&&can('track'))h+=`<button class="okall" data-act="partOkAll">${ic('check')} همه ${fmt(pend)} واریز در انتظار، موفق</button>`;
-  if(!p.sent)h+=`<div class="bknote" style="margin:0 4px 10px">«کپی و ارسال» متن را کپی می‌کند و همزمان این منبع را به پیگیری می‌برد.</div>`;
-  ROWDATE=true;ROWSRC=false;ROWTRK=false;ROWMOVE=can('split');ROWRND=SB.length>1?RN:null;ROWTAP=can('edit')?'entEditGo':'openEnt';AM=allocMap();try{h+=`<div class="spsec"><b>واریزی‌های این منبع</b><small>برای جزئیات روی هر واریزی بزنید · کشیدن به چپ: تأیید، انتقال، کپی</small></div>${(()=>{const OK=partOrd.ok||new Set(),A=rows.filter(r=>!OK.has(r.id)),B=rows.filter(r=>OK.has(r.id));return (A.length?`<div class="blist fcard">${A.map(homeRow).join('')}</div>`:'')+(B.length?`<div class="spsec oksec"><b>${ic('check')} تسویه‌شده</b><small>${fmt(B.length)} واریزی · ${fmt(sum(B))} تومان</small></div><div class="blist fcard okc">${B.map(homeRow).join('')}</div>`:'')})()}`}finally{ROWDATE=false;ROWSRC=true;ROWTRK=false;ROWMOVE=false;ROWTAP='openEnt';ROWRND=null}
-  const sg=(act,icn,t,sub,cls,attrs)=>`<button class="sgi${cls?' '+cls:''}" data-act="${act}"${attrs||''}><span class="si">${ic(icn)}</span><span class="tx"><b>${t}</b><small>${sub}</small></span><span class="cv">${ic('back')}</span></button>`;
-  h+=`<div class="spsec"><b>تنظیمات این منبع</b></div><div class="sgr ptact">${sources.some(x=>String(x.id)===String(p.src.id))&&can('src')?sg('acEdit','bank','ویرایش حساب منبع','نام، بانک، شبا و کارت؛ همه‌جا به‌روز می‌شود','',` data-id="${p.src.id}"`):''}${can('split')&&rows.length?sg('partMoveAll','split','انتقال همه به منبع دیگر','همه واریزی‌های این منبع یکجا منتقل شوند'):''}${p.sent?sg('partUnsend','undo','برگرداندن از پیگیری به تخصیص','دوباره قابل ویرایش و تقسیم می‌شود'):sg('partDel','trash','لغو این تخصیص','واریزی‌ها به «مانده برای تقسیم» برمی‌گردند','rd')}</div>`;return h}
 let partAll=true,partOrd={k:'',ids:[]};
-/* ترتیب ردیف‌های منبع: موقع ورود، تسویه‌شده‌ها پایین می‌روند؛ تا بیرون رفتن ترتیب ثابت می‌ماند */
-function partOrder(L){const k=partId+'|'+partAll;if(partOrd.k!==k){const o=r=>stOf(r.id)==='ok'?1:0;partOrd={k,ids:L.slice().sort((a,b)=>o(a)-o(b)).map(r=>r.id),ok:new Set(L.filter(r=>o(r)).map(r=>r.id))}}const pos=new Map(partOrd.ids.map((id,i)=>[id,i]));return L.slice().sort((a,b)=>(pos.has(a.id)?pos.get(a.id):1e9)-(pos.has(b.id)?pos.get(b.id):1e9))}
 const partSel=()=>{const p=curPart();if(!p)return[];const SB=partSibs(p);return partAll&&SB.length>1?SB:[p]};
 const partSelAlloc=()=>{const P=partSel(),p=curPart();return P.length>1?{res:[{src:{...p.src,limit:0},items:P.flatMap(partRows)}],left:[],excl:[],D:dates(ldKey)}:partsAlloc(P)};
-const aPart=()=>curPart()?`${partSibs(curPart()).length>1?`<span class="rnlab">${partAll?'همه مراحل':'مرحله '+toFa(partSibs(curPart()).indexOf(curPart())+1)}</span>`:''}${curPart().sent?'':`<button class="btn sec" data-act="partEdit" data-id="${curPart().id}" style="flex:0 0 auto;padding:0 16px" aria-label="ویرایش تخصیص">${ic('edit')}</button>`}<button class="btn gold" data-act="partCopy">${ic('copy')} ${partSel().every(z=>z.sent)?'کپی دوباره':'کپی و ارسال'}</button>`:'';
 const partsAlloc=P=>({res:P.map(p=>({src:{...p.src,limit:0},items:partRows(p)})),left:[],excl:[],D:dates(ldKey)});
 /* ---------- ارسال تخصیص‌ها به پیگیری ---------- */
 function commitParts(ids,quiet){const P=parts().filter(p=>ids.includes(p.id)&&!p.sent);if(!P.length)return null;
@@ -178,9 +162,7 @@ const cWait=c=>(c.pays||[]).filter(p=>p.st==='wait').reduce((s,p)=>s+(+p.amount|
 const cRem=c=>Math.max(0,(+c.debt||0)-cPaid(c));
 const cDone=c=>cRem(c)<=0;
 const curC=()=>creds.find(c=>c.id===credId);
-const openCreds=()=>creds.filter(c=>!cDone(c));
 const ttlName=x=>(x.name||'');
-const tChips=(sel,act)=>['خانم','آقا',''].map(t=>`<button class="tch${sel===t?' on':''}" data-act="${act}" data-t="${t}">${t||'بدون عنوان'}</button>`).join('');
 /* اتصال به واریزی لیست روزانه: واریزهای انجام‌شده از مانده همان واریزی کم می‌شود */
 function syncLink(c){if(!c.linkId)return;const e=entries.find(z=>z.id===c.linkId);if(!e||e.sentBid)return;
   const keep=(e.settles||[]).filter(s=>s.cred!==c.id);

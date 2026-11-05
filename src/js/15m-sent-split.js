@@ -81,7 +81,7 @@ ACT.mvSentSplit=d=>{closeSheet();setTimeout(()=>ACT.sentSplit({id:d.id}),80)};
 ACT.entUnsend=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;const root=validated().find(r=>r.id===famRoot(x))||x;
   if(!unsendCan(root)){toast('این واریزی تأیید شده، شماره پیگیری یا رسید دارد، یا لیستش بایگانی شده؛ برنمی‌گردد',true);return}
   const F=unsendFam(root),tot=F.reduce((a,o)=>a+(+o.q.it.amount||0),0);
-  askConfirm(`«${esc(fullName(root))}» (${fmt(tot)} تومان${F.length>1?'، '+toFa(F.length)+' بخش':''}) از ارسال برگردد به تخصیص؟`,'برگردد',()=>{if(!unsendDo(root))return;
+  askConfirm(`«${fullName(root)}» (${fmt(tot)} تومان${F.length>1?'، '+toFa(F.length)+' بخش':''}) از ارسال برگردد به تخصیص؟`,'برگردد',()=>{if(!unsendDo(root))return;
     closeSheet();const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('برگشت به تخصیص — دوباره ارسال‌نشده است')})};
 /* برگرداندن از ارسال (بانک هر بخش در تخصیص همان روز می‌ماند) */
 function unsendDo(root){const G=unsendFam(root);if(!G){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return false}const now=new Date().toISOString(),pay=PD(root),tot=G.reduce((a,o)=>a+(+o.q.it.amount||0),0);
@@ -112,7 +112,7 @@ ACT.entUnalloc=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!
   const LK=unallocCan(root)?null:unlkFam(root);
   if(!unallocCan(root)&&!LK){toast(unallocWhy(root),true);return}
   const F=famOf(root),sent=F.some(r=>r.sentBid),tot=F.reduce((a,r)=>a+(+r.amount||0),0);
-  askConfirm(`تخصیص «${esc(fullName(root))}» برداشته شود؟${sent?' از پیگیری هم بیرون می‌آید و':''} دوباره بدون بانک می‌شود.${LK?`<small class="unlkw">${ic('info')} ${unlkTxt(LK)} — این‌ها از ردیف پیگیری برداشته می‌شوند (روی واریزی نگه داشته می‌شوند)${LK.some(o=>o.q.it.st==='ok')?'؛ اگر بانک واقعاً پرداخت کرده، بعداً دوباره همین بانک را بزنید':''}.</small>`:''}`,'حذف تخصیص',()=>{
+  askConfirm({html:`تخصیص «${esc(fullName(root))}» برداشته شود؟${sent?' از پیگیری هم بیرون می‌آید و':''} دوباره بدون بانک می‌شود.${LK?`<small class="unlkw">${ic('info')} ${unlkTxt(LK)} — این‌ها از ردیف پیگیری برداشته می‌شوند (روی واریزی نگه داشته می‌شوند)${LK.some(o=>o.q.it.st==='ok')?'؛ اگر بانک واقعاً پرداخت کرده، بعداً دوباره همین بانک را بزنید':''}.</small>`:''}`},'حذف تخصیص',()=>{
     if(LK){const L2=unlkFam(root);if(!L2){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return}unlkDo(L2)}
     if(sent&&!unsendDo(root))return;const R=validated().find(r=>r.id===root.id)||root,G=famOf(R);
     if(G.length>1){PS={root:famRoot(R),name:fullName(R),pay:PD(R),R:sum(G),L:[{src:'',amount:sum(G)}]};psApply()}

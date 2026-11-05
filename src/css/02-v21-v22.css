@@ -10,13 +10,13 @@
 
 .mark{width:34px;height:34px;border-radius:10px 10px 10px 3px;font-size:17px}
 
-.dchip{border-radius:12px;box-shadow:none}
+.dchip{box-shadow:none}
 #view{padding:6px 16px 22px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
-#view.in{animation:v21in .28s cubic-bezier(.2,.8,.2,1)}#view.in.bk{animation-name:v21bk}
+
 @keyframes v21in{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
 @keyframes v21bk{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 /* کارت‌ها */
-.card,.lrow,.tcard,.dgrp,details.rs,.dcard,.amtrow,.thead,.flowcard,.lpick,.lbar{border-color:var(--line);box-shadow:none}
+.card,.lrow,.tcard,.dgrp,.amtrow,.thead,.lbar{border-color:var(--line);box-shadow:none}
 .card{border-radius:16px}
 
 .sec-h b{font-size:15px;letter-spacing:-.2px}
@@ -32,11 +32,11 @@
 .ingot .row3>div{flex:1;padding:10px 16px 11px;border-left:1px solid #ffffff26!important;align-items:center;text-align:center}.ingot .row3>div:last-child{border-left:0}
 .ingot .row3 small{font-size:11px;font-weight:600}.ingot .row3 b{font-size:16px;font-weight:800}.ingot .row3 b.r{color:var(--red)}
 .ingot>*:last-child:not(.row3){margin-bottom:14px}
-.ingot .pbar.gold{background:var(--hair)}
+
 /* دکمه‌ها */
 .btn{min-height:52px;border-radius:15px;font-weight:800;background:var(--btn);}
 
-.btn.gold{background:var(--cta);color:var(--ctaink);box-shadow:0 8px 18px -8px #b8862b99}
+
 .btn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 button.sm{border-radius:10px;background:var(--btn)}button.sm.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 /* سگمنت (مثل iOS) */
@@ -65,13 +65,13 @@ button.sm{border-radius:10px;background:var(--btn)}button.sm.sec{background:var(
 
 
 /* برگه‌های پایین */
-.ov{background:#0b142673;}
-.sheet{box-shadow:0 -10px 40px #0b142633}
+
+
 .opt{border-color:var(--line);border-radius:14px}
 /* گروه‌های پیگیری (حالت بایگانی) */
 
 
-.tgh span{color:var(--ink)}
+
 /* ================= کشیدن برای حذف / ویرایش ================= */
 .swr{position:relative;margin-bottom:10px;border-radius:16px;isolation:isolate;overflow:hidden;overflow:clip;background:var(--hair)}
 /* اسکلت ثابت: فقط وسط صفحه اسکرول می‌شود */
@@ -96,10 +96,10 @@ html,body{background:var(--bg)}
 .hav svg{width:18px;height:18px}
 #act .btn{font-size:15px;white-space:nowrap;padding:0 12px}
 
-.swr>.swc>.srow,.swr>.swc>.lrow,.swr>.swc>.slip{border-radius:16px}
-.swr>.swc{position:relative;z-index:1;touch-action:pan-y;will-change:transform;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.swr>.swc>.lrow,.swr>.swc>.slip{border-radius:16px}
+.swr>.swc{position:relative;z-index:1;touch-action:pan-y;will-change:transform;}
 .swr>.swc>*{margin-bottom:0!important}
-.swr.gone{transition:height .25s,margin .25s,opacity .25s;opacity:0}
+
 .swtip{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11.5px;color:var(--mut);margin:-2px 0 10px}
 .swtip i{font-style:normal;display:inline-flex;align-items:center;gap:3px;border:1px solid var(--line);border-radius:20px;padding:1px 8px;background:var(--card)}
 /* ================= پیگیری: لیست‌های جدا ================= */
@@ -148,16 +148,16 @@ html,body{background:var(--bg)}
 .tk .note.rq{background:var(--pri2);color:var(--pri)}
 @media(max-width:380px){.tk .k3 .mb span{display:none}}
 /* ================= خروجی کامل تقسیم ================= */
-.xall{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin:16px 0 12px}
-.xall::before{content:'';display:block;width:34px;height:3px;border-radius:3px;background:var(--goldbar);margin-bottom:10px}
-.xall .xh b{display:block;font-weight:800;font-size:15px}.xall .xh small{font-size:12px;color:var(--mut)}
-.xg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.xg button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-weight:800;font-size:13.5px}
-.xg button svg{width:24px;height:24px;color:var(--gold)}
-.xg button small{font-size:10.5px;color:var(--mut);font-weight:600}
-.xg button:disabled{opacity:.45}
-.xg .all{grid-column:1/-1;flex-direction:row;justify-content:center;gap:8px;min-height:50px;background:var(--cta);border:0;color:var(--ctaink);box-shadow:0 8px 18px -8px #b8862b99}
-.xg .all svg{color:var(--ctaink)}
+
+
+
+
+
+
+
+
+
+
 /* ================= منابع ================= */
 .astep .link{font-size:12.5px;padding:4px 2px}
 .cnt{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
@@ -165,10 +165,10 @@ html,body{background:var(--bg)}
 .stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden;flex:none}
 .stepper button{width:40px;height:42px;border:0;background:none;color:var(--ink);font-size:20px;font-weight:700;cursor:pointer}
 .stepper input{width:46px;min-height:42px;border:0!important;border-radius:0;text-align:center;padding:0;font-size:17px;font-weight:800;box-shadow:none!important;background:none}
-.srow{display:flex;align-items:center;gap:12px;background:var(--card);padding:12px 12px;border:1px solid var(--line);border-radius:16px}
-.srow .av{width:40px;height:40px;background:var(--pri2);color:var(--pri)}
-.srow .tx{flex:1;min-width:0;display:flex;flex-direction:column}.srow .tx b{font-weight:800}.srow .tx small{font-size:12px;color:var(--mut)}
-.srow .ib0{width:38px;height:38px}
+
+
+
+
 
 /* ================= v22 ================= */
 /* کشیدن به سبک آیفون: دکمه‌ها از دو طرف باز می‌شوند */
@@ -193,18 +193,18 @@ html,body{background:var(--bg)}
 .chip.r.on{color:var(--red)}
 /* بازگشت با کشیدن از لبه */
 #view.edge{transition:none!important}
-#view.edgeback{transition:transform .25s ease,opacity .25s ease}
+
 /* لیست: ابزار جمع‌وجور */
 .ltools{display:flex;align-items:center;gap:8px;margin:2px 0 10px;min-height:42px}
 .ltools .lt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}
 .ltools .lt b{font-weight:800;font-size:15px}.ltools .lt small{font-size:11.5px;color:var(--mut)}
 .ltools .ib0{width:40px;height:40px;position:relative}
 .ltools .ib0.on{border-color:var(--gold);color:var(--warn);background:var(--goldbg)}
-.lsrch{display:none;flex:1;align-items:center;gap:6px}
-.ltools.sopen .lsrch{display:flex}.ltools.sopen>.lt,.ltools.sopen>.ib0{display:none}
-.lsrch .sbox input{min-height:42px;border-radius:12px;border-width:1px}
-.lsrch .sbox svg{top:11px}.lsrch .sbox .clr{top:4px}
-.lsrch .link{padding:8px 2px;white-space:nowrap}
+
+.ltools.sopen>.lt,.ltools.sopen>.ib0{display:none}
+
+
+
 /* کارت واریزی */
 .slip .more{width:30px;height:24px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--mut);font-weight:900;cursor:pointer;line-height:1;vertical-align:middle;margin:2px 0}
 .pill.psrc{background:var(--ok2);color:var(--ok)}
@@ -217,4 +217,4 @@ html,body{background:var(--bg)}
 
 
 
-.rowno .bts{display:flex;gap:6px}
+

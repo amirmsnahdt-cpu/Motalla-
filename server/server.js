@@ -210,7 +210,18 @@ function failed(key) { const f = fails.get(key) || { n: 0, until: 0 }; f.n += 1;
 /* ---------- ابزار HTTP ---------- */
 let APP_VER = '';
 let APP_V = 0;
-function appVersion() { try { const t = fs.readFileSync(path.join(ROOT, 'index.html')); APP_VER = sha(t).slice(0, 12); const m = String(t).match(/const APP_V=(\d+(?:\.\d+)?)/); APP_V = m ? +m[1] : 0; } catch (e) { APP_VER = 'dev'; } return APP_VER; }
+/* v78.8 امنیت: فقط اسکریپت‌های خود برنامه اجرا می‌شوند (فایل‌های همین سرور، کتابخانه Excel از cdnjs، و اسکریپت‌ها/دستگیره‌های
+   درون‌خطی ثابت index.html با هش). اگر روزی متنی مخرب وارد صفحه شود، مرورگر اجرایش نمی‌کند. هش‌ها با هر تغییر index.html تازه می‌شوند. */
+const CSP_BASE = "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'";
+const INLINE_HANDLERS = ['window.print()', 'window.close()', 'event.preventDefault();ACT.pwSave()'];
+let CSP = CSP_BASE;
+function cspBuild(html) {
+  const h = x => "'sha256-" + crypto.createHash('sha256').update(x, 'utf8').digest('base64') + "'";
+  const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(m => h(m[1]));
+  const attrs = [...html.matchAll(/\son[a-z]+="([^"]*)"/g)].map(m => h(m[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')));
+  CSP = CSP_BASE + "; script-src 'self' https://cdnjs.cloudflare.com 'unsafe-hashes' " + [...new Set([...scripts, ...attrs, ...INLINE_HANDLERS.map(h)])].join(' ');
+}
+function appVersion() { try { const t = fs.readFileSync(path.join(ROOT, 'index.html')); APP_VER = sha(t).slice(0, 12); try { cspBuild(String(t)); } catch (e) { CSP = CSP_BASE; } const m = String(t).match(/const APP_V=(\d+(?:\.\d+)?)/); APP_V = m ? +m[1] : 0; } catch (e) { APP_VER = 'dev'; } return APP_VER; }
 appVersion();
 function cors(req, res) {
   const o = req.headers.origin;
@@ -221,10 +232,19 @@ function send(res, code, obj) { const b = JSON.stringify(obj); res.writeHead(cod
    آدرس صفحه به سایت‌های دیگر فرستاده نمی‌شود، و مرورگر همیشه با HTTPS وصل می‌شود */
 function secHeaders(req, res) {
   res.setHeader('X-Frame-Options', 'DENY'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.setHeader('Referrer-Policy', 'same-origin');
-  res.setHeader('Content-Security-Policy', "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'");
+  res.setHeader('Content-Security-Policy', CSP);
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), payment=(), usb=()');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   if (String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https') res.setHeader('Strict-Transport-Security', 'max-age=15552000');
+}
+/* v78.8 امنیت: هر کارمند در روز حداکثر ۵۰۰ عکس یا ۶۰۰ مگابایت (جلوی پر کردن دیسک سرور)؛ مدیر محدودیت ندارد */
+const IMG_DAY = new Map(), IMG_MAX_N = 500, IMG_MAX_B = 600 * 1048576;
+function imgQuota(uid, bytes) {
+  const k = uid + '|' + new Date(Date.now() + 3.5 * 3600e3).toISOString().slice(0, 10), q = IMG_DAY.get(k) || { n: 0, b: 0 };
+  if (q.n + 1 > IMG_MAX_N || q.b + bytes > IMG_MAX_B) return false;
+  q.n += 1; q.b += bytes; IMG_DAY.set(k, q);
+  if (IMG_DAY.size > 500) for (const x of IMG_DAY.keys()) { if (!x.endsWith(k.slice(-10))) IMG_DAY.delete(x); }
+  return true;
 }
 const bad = (res, code, msg) => send(res, code, { error: msg });
 function readBody(req, limit) {
@@ -267,6 +287,7 @@ const validPass = p => typeof p === 'string' && p.length >= 8 && p.length <= 128
 function rowOut(r) { return { coll: r.coll, id: r.id, ver: r.ver, deleted: !!r.deleted, data: r.deleted ? null : JSON.parse(r.data) }; }
 /* فیلدهای اصلی واریزی: تغییرشان بعد از ثبت فقط با مجوز «ویرایش» (مبلغ با «ویرایش» یا «تقسیم»، برای پرداخت از چند منبع) */
 const CORE_FIELDS = ['name', 'code', 'iban', 'card', 'holder', 'bank', 'phone', 'nid', 'title', 'amount'], ITEM_FIELDS = ['iban', 'amount', 'name', 'code'];
+const ENTRY_FIELD_PERMS = [['payDate', ['edit', 'split']], ['entryDate', ['edit']], ['note', ['edit']], ['settles', ['edit', 'debt', 'track']]];
 const sv = v => v === undefined || v === null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
 const diffFields = (a, b, F) => F.filter(f => sv(a && a[f]) !== sv(b && b[f]));
 /* مبلغ ردیف لیست با ثبت تسویه مشتری خودکار به «مبلغ واریزی − تسویه‌ها» تغییر می‌کند؛ این تغییرِ سازگار با واریزی روی سرور مجاز و بی‌اعلان است */
@@ -280,6 +301,8 @@ function guardDoc(user, P, coll, theirs, merged) {
   if (user.role === 'admin') return null;
   if (coll === 'entries' && theirs) {
     for (const f of diffFields(theirs, merged, CORE_FIELDS)) if (f === 'amount' ? !(P.has('edit') || P.has('split')) : !P.has('edit')) return 'ویرایش واریزی برای حساب شما مجاز نیست';
+    // v78.8 امنیت: فیلدهای دیگر واریزی هم همان مجوزهایی را می‌خواهند که دکمه‌هایشان در برنامه دارند
+    for (const [f, need] of ENTRY_FIELD_PERMS) if (sv(theirs[f]) !== sv(merged[f]) && !need.some(x => P.has(x))) return 'این تغییر واریزی برای حساب شما مجاز نیست';
   }
   if (coll === 'batches' && !P.has('edit')) {
     const old = new Map(((theirs && theirs.items) || []).map(x => [sv(x && x.id), x]));
@@ -549,6 +572,7 @@ async function handle(req, res) {
       const old = q.getImg.get(k);
       if (old && old.data === b.data) return send(res, 200, { ok: true });
       if (old && !mayChange) return bad(res, 403, 'تغییر عکس برای حساب شما مجاز نیست');
+      if (me.role !== 'admin' && !imgQuota(me.id, b.data.length)) return bad(res, 429, 'سقف عکس امروز برای حساب شما پر شده؛ فردا دوباره یا از مدیر بخواهید');
       tx(() => { if (old) q.keepOldImg.run(now(), me.name, k); q.putImg.run(k, b.data, now()); });
       return send(res, 200, { ok: true });
     }

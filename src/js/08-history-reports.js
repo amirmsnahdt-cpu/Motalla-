@@ -17,7 +17,6 @@ function evHTML(x){
   const inner=`<div class="hrow${op?' open':''}${x.undone?' undone':''}"><button class="hh" data-act="evTog" data-ev="${x.id}" aria-expanded="${op}"><span class="hi" style="--c:${c}">${ic(EVI[x.type]||'clock')}</span><span class="tx"><b>${esc(x.summary||t)}</b><small>${esc(x.user||'')}${x.detail?' · '+esc(x.detail):''}</small></span><span class="hm"><small>${hm(x.ts)}</small>${x.undone?'<span class="pill g">لغو شد</span>':''}</span>${chevI()}</button>
     <div class="hb">${x.detail?`<div class="hd">${esc(x.detail)}</div>`:''}${x.type==='edit'?diffHTML(x.before,x.after):''}<div class="hmeta">${meta.map(([k,v])=>`<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>${acts.length?`<div class="hact">${acts.map(a=>`<button class="sm ${a[0]==='undoEv'?'gold':'sec'}" data-act="${a[0]}" data-ev="${x.id}">${ic(a[2])} ${a[1]}</button>`).join('')}</div>`:''}</div></div>`;
   return (A.R.length||A.L.length)?swW(inner,{r:A.R,l:A.L,data:{ev:x.id}}):inner}
-const histTip=()=>ls.get('m_hswiped',false)?'':`<div class="hhint swtip">برای جزئیات روی هر مورد بزنید · برای برگرداندن به چپ بکشید</div>`;
 function vAudit(){
   let h=`<div class="seg"><button data-act="htab" data-t="ev" class="${histTab==='ev'?'on':''}">فعالیت‌ها</button><button data-act="htab" data-t="tr" class="${histTab==='tr'?'on':''}">سطل بازیابی ${trash.length?fmt(trash.length):''}</button></div>`;
   if(histTab==='tr')return h+trashHTML();
@@ -181,9 +180,15 @@ function printWin(html){let w=null;try{w=window.open('','_blank')}catch(e){}if(!
   /* v61.71 (خواسته صاحب اپ): پنجره چاپ آیفون — برگه روی صفحه گوشی کامل و کوچک‌شده دیده می‌شود (فقط روی صفحه؛ چاپ اندازه واقعی)،
      و چاپ خودکار بعد از بار شدن فونت‌ها و عکس‌ها (نه با تأخیر ثابت) تا PDF ناقص یا با فونت پیش‌فرض نشود */
   const pw=/@page\{size:A5;/.test(html)?'132mm':/@page\{size:A4;/.test(html)?'190mm':'194mm';
-  const fit='<style id="pvz"></style><script>(function(){function z(){var g=document.querySelector(".pg"),W=g?g.scrollWidth:794;var k=Math.min(1,(window.innerWidth-16)/(W+8));document.getElementById("pvz").textContent="@media screen{body{margin:0!important;padding:0 8px 24px!important;overflow-x:hidden}.pg,section.pg{width:'+pw+'!important;max-width:none!important;zoom:"+k+";margin:10px auto 0!important}}"}z();window.addEventListener("resize",z);window.__z=z})()<\/script>';
-  const h=html.replace(/<head>/i,'<head><base href="'+base+'">').replace(/<body([^>]*)>/i,'<body$1>'+bar)+fit+'<script>window.onload=function(){var go=function(){try{window.__z&&window.__z();window.print()}catch(e){}};var f=document.fonts&&document.fonts.ready;(f?Promise.race([f,new Promise(function(r){setTimeout(r,2500)})]):Promise.resolve()).then(function(){setTimeout(go,250)})}<\/script>';
-  try{w.document.open();w.document.write(h);w.document.close();return true}catch(e){try{w.close()}catch(_){}return false}}
+  /* v78.8 امنیت (CSP): اسکریپت‌های درون صفحه چاپ برداشته شد؛ همان کارها (کوچک‌نمایی برگه روی صفحه و چاپ خودکار بعد از بار شدن فونت‌ها)
+     از خود برنامه روی پنجره چاپ انجام می‌شود */
+  const h=html.replace(/<head>/i,'<head><base href="'+base+'">').replace(/<body([^>]*)>/i,'<body$1>'+bar)+'<style id="pvz"></style>';
+  try{w.document.open();w.document.write(h);w.document.close()}catch(e){try{w.close()}catch(_){}return false}
+  const z=()=>{try{const d=w.document,g=d.querySelector('.pg'),W=g?g.scrollWidth:794,k=Math.min(1,(w.innerWidth-16)/(W+8)),st=d.getElementById('pvz');if(st)st.textContent='@media screen{body{margin:0!important;padding:0 8px 24px!important;overflow-x:hidden}.pg,section.pg{width:'+pw+'!important;max-width:none!important;zoom:'+k+';margin:10px auto 0!important}}'}catch(e){}};
+  z();try{w.addEventListener('resize',z)}catch(e){}
+  const go=()=>{try{z();w.print()}catch(e){}},ready=()=>{const f=w.document.fonts&&w.document.fonts.ready;(f?Promise.race([f,new Promise(r=>setTimeout(r,2500))]):Promise.resolve()).then(()=>setTimeout(go,250))};
+  try{if(w.document.readyState==='complete')ready();else w.addEventListener('load',ready)}catch(e){}
+  return true}
 function printReport(){const html=window.__pv||withCtx(reportHTML),doc=new DOMParser().parseFromString(html,'text/html');doc.querySelectorAll('.pb').forEach(b=>b.remove());
   if(isIOS()&&printWin('<!doctype html>'+doc.documentElement.outerHTML))return;
   let css=[...doc.querySelectorAll('style')].map(s=>s.textContent).join('\n');const pg=(css.match(/@page\{[^}]*\}/)||[''])[0];css=css.replace(pg,'').replace(/(^|\})\s*body\{/g,'$1 #printArea{');
@@ -230,7 +235,8 @@ function openDate(mode){dpMode=typeof mode==='string'?mode:'';const nw=dpMode===
   <div class="dprev" id="dprev"></div><div class="row"><button class="btn sec" data-act="today">امروز</button><button class="btn gold" data-act="dok">${nw?'شروع لیست':py?'همین روز':'تأیید'}</button></div>
   ${dw.length?`<div class="sec-h" style="margin-top:16px"><b>تاریخ‌های دارای لیست</b></div><div class="dstrip">${dw.map(x=>`<button class="dpill${x.iso===dateVal?' on':''}${x.bad?' err':''}" data-act="pickDate" data-iso="${x.iso}"><b>${dates(x.iso).fa}</b><small>${fmt(x.n)} واریزی، ${fmt(x.s)}</small></button>`).join('')}</div>`:''}`);
   ['d','m','y'].forEach(w=>$('w'+w).addEventListener('scroll',()=>onWheel(w),{passive:true}));buildWheels();updDp()}
-function askConfirm(msg,yes,cb){confirmCb=cb;sheet(`<div class="sh-h"><b>${msg}</b></div><div class="row"><button class="btn sec" data-act="close">انصراف</button><button class="btn red" data-act="yes">${yes}</button></div>`)}
+/* v78.8 امنیت: متن پیام همیشه escape می‌شود (نام مشتری‌ها در پیام‌ها خام وارد صفحه می‌شد = راه XSS)؛ پیامی که عمداً HTML دارد {html} می‌فرستد و خودش escape می‌کند */
+function askConfirm(msg,yes,cb){confirmCb=cb;const m=msg&&typeof msg==='object'&&msg.html!=null?msg.html:esc(String(msg==null?'':msg)).replace(/\n/g,'<br>');sheet(`<div class="sh-h"><b>${m}</b></div><div class="row"><button class="btn sec" data-act="close">انصراف</button><button class="btn red" data-act="yes">${yes}</button></div>`)}
 /* ============ رویدادها ============ */
 function delEntry(id){const x=entries.find(y=>y.id==id);if(!x)return;trashIds([x.id],'حذف دستی');logA('del','حذف واریزی',x.name+' | '+fmt(x.amount)+' تومان | '+dates(x.entryDate).fa,{ids:[x.id],before:pick(x)});
   const evId=audit[0].id;render();toast('«'+x.name+'» به سطل بازیابی رفت','', 'بازگردانی',()=>undoEv(evId))}

@@ -33,7 +33,6 @@ ACT.svPvEdit=d=>{const id=String(d.i),G=pvGroups(sv.pays,sv.xr||[]).L.find(z=>z.
   G.p.forEach(i=>{p.r=String((+p.r||0)+Math.abs(pAmt(sv.pays[i])))});
   G.x.forEach(i=>{const x=sv.xr[i];if(x.a==='gold')p.g=String(Math.round(((parseFloat(p.g)||0)+(parseFloat(x.w)||0))*1000)/1000);else p.xs.push({k:x.a,v:String(x.q||'')})});
   p.imgs=pvPh(G,sv.pays,sv.xr||[]);pvStart(p)};
-function pvRows(gid){const id=String(gid);return{P:sv.pays.filter(p=>String(p.pv||'')===id&&p.m==='prev'),X:(sv.xr||[]).filter(x=>String(x.pv||'')===id&&x.cat==='مانده قبلی')}}
 function pvDrop(gid){const id=String(gid),pi=[],xi=[];sv.pays.forEach((p,i)=>{if(String(p.pv||'')===id&&p.m==='prev')pi.push([i,p])});(sv.xr||[]).forEach((x,i)=>{if(String(x.pv||'')===id&&x.cat==='مانده قبلی')xi.push([i,x])});
   sv.pays=sv.pays.filter((p,i)=>!pi.some(z=>z[0]===i));sv.xr=(sv.xr||[]).filter((x,i)=>!xi.some(z=>z[0]===i));return{pi,xi}}
 ACT.pvSave=()=>{if($('stI'))stRead();const p=sv.qa.pv;if(!p)return;if(!pvHas(p)){toast('مبلغ یا طلای مانده قبلی را بزنید',true);const I=$('pvR');if(I)I.focus();return}

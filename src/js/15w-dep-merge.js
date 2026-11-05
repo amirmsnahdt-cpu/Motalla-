@@ -48,7 +48,7 @@ ACT.mgJoin=d=>{const a=entries.find(z=>String(z.id)===String(d.a)),b=entries.fin
   if(mgStl(a).length&&mgStl(b).length){toast('هر دو واریزی تسویه از مشتری دارند؛ یکی کردن خودکار ممکن نیست',true);return}
   /* واریزی‌ای که تسویه دارد می‌ماند (پیوند تسویه‌ها دست نمی‌خورد)؛ وگرنه قدیمی‌تر */
   const [t,s]=mgStl(b).length||(!mgStl(a).length&&b.id<a.id)?[b,a]:[a,b];
-  askConfirm(`دو واریزی «${esc(stripName(t.name))}» یکی شود؟ جمع ${fmt((+t.amount||0)+(+s.amount||0))} تومان`,'یکی شود',()=>{
+  askConfirm(`دو واریزی «${stripName(t.name)}» یکی شود؟ جمع ${fmt((+t.amount||0)+(+s.amount||0))} تومان`,'یکی شود',()=>{
     if(!mgOk(t)||!mgOk(s)){toast('یکی از واریزی‌ها همین حالا عوض شد؛ دوباره امتحان کنید',true);render();return}
     const snap=mgSnap(t),p=mgPart(s);trashIds([s.id],'یکی شد با واریزی '+stripName(t.name));mgApply(t,p,{iban:s.iban,card:s.card,holder:s.holder});
     logA('merge','دو واریزی یکی شد',stripName(t.name)+' | '+fmt(snap.amount)+' + '+fmt(p.amount)+' = '+fmt(t.amount)+' تومان | واریز '+dates(t.payDate).fa,{ids:[t.id],mg:{t:t.id,snap,abs:s.id}});

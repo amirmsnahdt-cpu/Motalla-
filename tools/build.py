@@ -13,7 +13,7 @@ Usage:
 Never edit app.js or styles.css directly: they carry a hash of their body, and
 the build refuses to overwrite a file whose body was changed by hand.
 """
-import hashlib, pathlib, re, sys
+import hashlib, pathlib, re, subprocess, sys, tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TARGETS = [('app.js', 'src/js', '*.js'), ('styles.css', 'src/css', '*.css')]
@@ -24,6 +24,92 @@ def sha(s):
     return hashlib.sha256(s.encode('utf-8')).hexdigest()[:12]
 
 
+RX_BEFORE = set('(,=:[!&|?{};+-*%~^<>')
+RX_WORDS = {'return', 'typeof', 'case', 'do', 'else', 'in', 'of', 'new', 'delete', 'void', 'throw', 'instanceof', 'yield', 'await'}
+
+
+def strip_js(src):
+    """v78.8: block comments (/* ... */) are dropped from the shipped app.js (≈260 KB of Persian notes); src/ keeps them.
+    A small scanner that knows strings, template literals (with ${} nesting) and regex literals; a comment becomes one
+    space (or a newline when it spanned lines, so automatic semicolons stay the same)."""
+    out = []; i = 0; n = len(src); stack = []  # stack of '`' (inside template) / '{' (code inside ${ })
+    last = ''  # last significant char/word in code
+    def prev_word():
+        m = re.search(r'([A-Za-z_$][\w$]*)\s*$', ''.join(out[-40:]))
+        return m.group(1) if m else ''
+    while i < n:
+        c = src[i]
+        if stack and stack[-1] == '`':
+            if c == '\\': out.append(src[i:i + 2]); i += 2; continue
+            if c == '`': stack.pop(); out.append(c); i += 1; last = '`'; continue
+            if c == '$' and src[i + 1:i + 2] == '{': stack.append('{'); out.append('${'); i += 2; last = '{'; continue
+            out.append(c); i += 1; continue
+        if c in '"\'':
+            j = i + 1
+            while j < n and src[j] != c:
+                j += 2 if src[j] == '\\' else 1
+            out.append(src[i:j + 1]); i = j + 1; last = c; continue
+        if c == '`': stack.append('`'); out.append(c); i += 1; continue
+        if c == '{': stack.append('{') if stack else None; out.append(c); i += 1; last = c; continue
+        if c == '}':
+            if stack and stack[-1] == '{':
+                stack.pop()
+                if stack and stack[-1] == '`': out.append(c); i += 1; continue
+            out.append(c); i += 1; last = c; continue
+        if c == '/' and src[i + 1:i + 2] == '*':
+            j = src.find('*/', i + 2); j = n if j < 0 else j + 2
+            out.append('\n' if '\n' in src[i:j] else ' '); i = j; continue
+        if c == '/' and src[i + 1:i + 2] == '/':
+            j = src.find('\n', i); j = n if j < 0 else j
+            out.append(src[i:j]); i = j; continue
+        if c == '/':
+            w = prev_word()
+            is_rx = last == '' or last in RX_BEFORE or (w in RX_WORDS and ''.join(out).rstrip().endswith(w))
+            if is_rx:
+                j = i + 1; cls = False
+                while j < n:
+                    d = src[j]
+                    if d == '\\': j += 2; continue
+                    if d == '[': cls = True
+                    elif d == ']': cls = False
+                    elif d == '/' and not cls: break
+                    elif d == '\n': break
+                    j += 1
+                j += 1
+                while j < n and (src[j].isalpha()): j += 1
+                out.append(src[i:j]); i = j; last = 'r'; continue
+            out.append(c); i += 1; last = c; continue
+        out.append(c); i += 1
+        if not c.isspace(): last = 'w' if (c.isalnum() or c in '_$') else c
+    return ''.join(out)
+
+
+def strip_css(src):
+    """block comments out of the shipped styles.css (strings respected)."""
+    out = []; i = 0; n = len(src)
+    while i < n:
+        c = src[i]
+        if c in '"\'':
+            j = i + 1
+            while j < n and src[j] != c:
+                j += 2 if src[j] == '\\' else 1
+            out.append(src[i:j + 1]); i = j + 1; continue
+        if c == '/' and src[i + 1:i + 2] == '*':
+            j = src.find('*/', i + 2); i = n if j < 0 else j + 2; continue
+        out.append(c); i += 1
+    return re.sub(r'\n[ \t]*\n+', '\n', ''.join(out))
+
+
+def node_ok(js):
+    """safety net: the stripped app.js must still parse; otherwise ship the unstripped body"""
+    try:
+        with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f:
+            f.write(js); name = f.name
+        return subprocess.run(['node', '--check', name], capture_output=True).returncode == 0
+    except FileNotFoundError:
+        return True
+
+
 def build(check):
     bad = False
     for out, folder, pat in TARGETS:
@@ -31,6 +117,12 @@ def build(check):
         if not parts:
             sys.exit(f'no source files in {folder}')
         body = ''.join(p.read_text(encoding='utf-8') for p in parts)
+        src_sha = sha(body)
+        if out == 'app.js':
+            sb = strip_js(body)
+            body = sb if node_ok(sb) else body
+        else:
+            body = strip_css(body)
         new = f'/* GENERATED by tools/build.py from {folder}/ — do not edit this file; edit the parts there. sha:{sha(body)} */\n' + body
         dst = ROOT / out
         old = dst.read_text(encoding='utf-8') if dst.exists() else ''
