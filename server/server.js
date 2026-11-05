@@ -354,6 +354,14 @@ const STATIC = {
   '/sw.js': ['sw.js', 'text/javascript; charset=utf-8'], '/app.js': ['app.js', 'text/javascript; charset=utf-8'], '/styles.css': ['styles.css', 'text/css; charset=utf-8'], '/icon-512-maskable.png': ['icon-512-maskable.png', 'image/png'], '/manifest.json': ['manifest.json', 'application/manifest+json'],
   '/apple-touch-icon.png': ['apple-touch-icon.png', 'image/png'], '/icon-192.png': ['icon-192.png', 'image/png'], '/icon-512.png': ['icon-512.png', 'image/png'], '/logo-stamp.png': ['logo-stamp.png', 'image/png'],
 };
+const ZC = new Map();
+const pickEnc = req => { const a = String(req.headers['accept-encoding'] || ''); return /\bbr\b/.test(a) ? 'br' : /\bgzip\b/.test(a) ? 'gzip' : ''; };
+function zipped(key, buf, enc) {
+  const k = enc + '|' + key + '|' + buf.length + '|' + sha(buf).slice(0, 16), hit = ZC.get(k); if (hit) return hit;
+  const z = enc === 'br' ? zlib.brotliCompressSync(buf, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 9, [zlib.constants.BROTLI_PARAM_SIZE_HINT]: buf.length } }) : zlib.gzipSync(buf, { level: 9 });
+  for (const x of ZC.keys()) if (x.startsWith(enc + '|' + key.split('|')[0] + '|')) ZC.delete(x);
+  ZC.set(k, z); return z;
+}
 function serveStatic(req, res, p) {
   const bm = /^\/banks\/([A-Za-z_]+\.svg)$/.exec(p);
   if (bm) {
@@ -384,7 +392,10 @@ function serveStatic(req, res, p) {
         buf = Buffer.from(h, 'utf8');
       }
     }
-    res.writeHead(200, { 'Content-Type': s[1], 'Cache-Control': isApp ? 'no-cache' : 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff', ...(s[0] === 'index.html' ? { 'X-App-Version': APP_VER, 'Vary': 'Cookie' } : {}) });
+    /* v78.7 بهینه‌سازی: فایل‌های متنی فشرده فرستاده می‌شوند (app.js ۱٫۳ مگ → حدود ۳۵۰ کیلو). نسخه فشرده یک بار ساخته و تا عوض شدن فایل نگه داشته می‌شود */
+    const enc = /text|javascript|json|svg|xml/.test(s[1]) && buf.length > 1024 ? pickEnc(req) : '';
+    if (enc) buf = zipped(s[0] + (s[0] === 'index.html' ? '|' + buf.length + '|' + sha(buf).slice(0, 12) : ''), buf, enc);
+    res.writeHead(200, { 'Content-Type': s[1], 'Cache-Control': isApp ? 'no-cache' : 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff', 'Vary': 'Accept-Encoding' + (s[0] === 'index.html' ? ', Cookie' : ''), ...(enc ? { 'Content-Encoding': enc } : {}), ...(s[0] === 'index.html' ? { 'X-App-Version': APP_VER } : {}) });
     res.end(buf);
   });
   return true;

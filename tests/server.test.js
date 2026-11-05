@@ -27,6 +27,15 @@ test('وضعیت و فایل‌های ثابت', async () => {
   assert.equal((await fetch(base + '/server/server.js')).status, 404);
 });
 
+test('فایل‌های برنامه فشرده فرستاده می‌شوند و بعد از باز شدن عین فایل اصلی‌اند', async () => {
+  const http = require('node:http'), zlib = require('node:zlib');
+  const get = (p, ae) => new Promise((ok, no) => http.get(base + p, { headers: { 'Accept-Encoding': ae } }, r => { const c = []; r.on('data', x => c.push(x)); r.on('end', () => ok({ h: r.headers, b: Buffer.concat(c) })); }).on('error', no));
+  const orig = fs.readFileSync(path.join(__dirname, '..', 'app.js'));
+  const br = await get('/app.js', 'gzip, deflate, br'); assert.equal(br.h['content-encoding'], 'br'); assert.ok(br.b.length < orig.length / 2); assert.ok(zlib.brotliDecompressSync(br.b).equals(orig));
+  const gz = await get('/app.js', 'gzip'); assert.equal(gz.h['content-encoding'], 'gzip'); assert.ok(zlib.gunzipSync(gz.b).equals(orig));
+  const raw = await get('/app.js', 'identity'); assert.equal(raw.h['content-encoding'], undefined); assert.ok(raw.b.equals(orig));
+});
+
 test('بدون ورود، API بسته است', async () => {
   assert.equal((await api('/api/sync', { method: 'POST', body: {} })).status, 401);
   assert.equal((await api('/api/backups')).status, 401);
