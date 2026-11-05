@@ -27,8 +27,10 @@ function vAudit(){
   const L=audit.filter(a=>a.type!=='acc'&&TLF[tlF][1](a));
   if(!L.length)return h+`<div class="card empty">${ic('clock')}<b>${tlF==='todo'?'همه فعالیت‌ها وارد سیستم شده ✓':'فعالیتی برای نمایش نیست'}</b>هر سند، واریزی، حواله و تغییر بانک اینجا به ترتیب زمان می‌آید.</div>`;
   let last='',open=false;
-  L.slice(0,200).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){if(open)h+='</div>';last=d;open=true;const dl=L.filter(z=>(z.ts?isoOfTs(z.ts):'old')===d),dt=dl.filter(z=>!tlDone(z)&&!z.undone).length;h+=`<div class="fday sticky"><span>${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</span><small>${fmt(dl.length)} فعالیت${dt?' · <b>'+fmt(dt)+'</b> وارد نشده':' · همه وارد شد'}</small></div><div class="blist fcard tll">`}h+=tlRow(x)});
-  return h+(open?'</div>':'')}
+  /* v78.7 رفع باگ: فقط ۲۰۰ فعالیت آخر دیده می‌شد و قدیمی‌ترها راهی نداشتند → دکمه «فعالیت‌های قبلی»؛ شمارش هر روز یک بار (نه فیلتر کل فهرست برای هر روز) */const DC=new Map();L.forEach(z=>{const k=z.ts?isoOfTs(z.ts):'old',o=DC.get(k)||{n:0,t:0};o.n++;if(!tlDone(z)&&!z.undone)o.t++;DC.set(k,o)});
+  L.slice(0,tlLim).forEach(x=>{const d=x.ts?isoOfTs(x.ts):'old';if(d!==last){if(open)h+='</div>';last=d;open=true;const dc=DC.get(d),dl={length:dc.n},dt=dc.t;h+=`<div class="fday sticky"><span>${d==='old'?'نسخه‌های قبلی':relDay(d)+'، '+dates(d).fa}</span><small>${fmt(dl.length)} فعالیت${dt?' · <b>'+fmt(dt)+'</b> وارد نشده':' · همه وارد شد'}</small></div><div class="blist fcard tll">`}h+=tlRow(x)});
+  return h+(open?'</div>':'')+(L.length>tlLim?`<button class="cumore" data-act="tlMore">${ic('chev')}<span>${fmt(L.length-tlLim)} فعالیت قبلی</span></button>`:'')}
+let tlLim=200;/* ACT.tlMore در 15zg-timeline (ACT اینجا هنوز ساخته نشده) */
 function trashHTML(){if(!trash.length)return `<div class="card empty">${ic('trash')}<b>سطل بازیابی خالی است</b>واریزی‌هایی که حذف می‌کنید تا ۶۰ روز اینجا می‌مانند و قابل بازگردانی‌اند.</div>`;
   let h=`<div class="hsum"><span>${fmt(trash.length)} واریزی حذف‌شده</span><span><b>${fmt(sum(trash))}</b> تومان</span></div><div class="row" style="margin:0 0 10px"><button class="sm gold" data-act="restoreAll">${ic('restore')} بازگردانی همه</button>${can('del')?`<button class="sm red" data-act="emptyTrash">خالی کردن سطل</button>`:''}</div>`;
   h+=ls.get('m_hswiped',false)?'':`<div class="hhint swtip">برای جزئیات بزنید · به چپ بکشید: بازگردانی · به راست: حذف دائمی</div>`;

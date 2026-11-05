@@ -99,6 +99,9 @@ const cuFBtn=()=>`<button class="cufbtn${cuFN()?' on':''}" id="cuFb" data-act="c
 let cuF=(()=>{const v=ls.get('m_cuf',null);return v&&typeof v==='object'?{b:v.b||'',g:v.g||''}:{b:'',g:''}})();
 const CUFB=[['','همه'],['bal','مانده‌دار'],['rd','بدهکار تومانی','d'],['rc','طلبکار تومانی','c'],['gd','بدهکار طلایی','d'],['gc','طلبکار طلایی','c'],['wp','در انتظار واریز','w'],['z','تسویه']];
 /* v67.5: مانده در انتظار واریز (واریزی‌هایی که هنوز تأیید نشده‌اند) برای فهرست و فیلتر؛ یک بار در هر ساخت فهرست */
+/* v78.7 بهینه‌سازی: فهرست حساب‌ها اول ۶۰ ردیف؛ بقیه با رسیدن به پایین (یا زدن دکمه) — ساختن و چیدن صدها ردیف یک‌جا کند بود */
+let cuLim=60;ACT.cuMore=()=>{cuLim+=200;const r=$('cures');if(r){r.innerHTML=cuListHTML();if(typeof phPaint==='function')phPaint(r)}};
+document.addEventListener('scroll',()=>{if(cur!=='custs')return;const m=document.querySelector('#cures .cumore');if(m&&!m._b&&m.getBoundingClientRect().top<innerHeight+500){m._b=1;requestAnimationFrame(()=>ACT.cuMore())}},true);
 let cuWP=new Map(),cuWA=new Map(),cuWF=new Map();const cuWPRe=()=>{cuWP=wdMap();cuWA=wdAL;cuWF=wdFR;return cuWP};
 const cuFOk=(k,b,c)=>!k?true:k==='wp'?!!(c&&cuWP.get(String(c.id))):k==='bal'?!!(b.R||b.G||Object.keys(b.X||{}).length):k==='z'?!(b.R||b.G||Object.keys(b.X||{}).length):k==='rd'?b.R<0:k==='rc'?b.R>0:k==='gd'?b.G<0:k==='gc'?b.G>0:true;
 const cuGOk=(g,c)=>!g?true:g==='-'?!c.grp:c.grp===g;
@@ -152,7 +155,7 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
   if(!B.length&&nhh)return dch+nhh+ivh+txh;
   if(!B.length)return dch+((dq?txh:ivh+txh+mem+add)||`<div class="bempty">${ic(dq?'cal':'search')}<b>${dq?'در این روز سندی ثبت نشده':cuF.b||cuF.g?'حسابی با این فیلتر نیست':'حسابی پیدا نشد'}</b>${!dq&&(cuF.b||cuF.g)?'<button class="fchip on" data-act="cuFClr">برداشتن فیلتر</button>':''}</div>`);
   const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'';cuAnim=0;
-  return `${dch}${nhh}${ivh}${dq?txh:''}${cuSumHTML(B)}${dq?`<div class="c6gh">حساب‌های این روز · ${fmt(B.length)} حساب</div>`:''}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb cuL${an}">${B.map(([c,b],ri)=>cuRowH(c,b,ri,PW)).join('')}</div>${dq?'':txh}${mem}${add}`}
+  return `${dch}${nhh}${ivh}${dq?txh:''}${cuSumHTML(B)}${dq?`<div class="c6gh">حساب‌های این روز · ${fmt(B.length)} حساب</div>`:''}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb cuL${an}">${B.slice(0,cuLim).map(([c,b],ri)=>cuRowH(c,b,ri,PW)).join('')}</div>${B.length>cuLim?`<button class="cumore" data-act="cuMore">${ic('chev')}<span>${fmt(B.length-cuLim)} حساب دیگر</span></button>`:''}${dq?'':txh}${mem}${add}`}
 /* v69.8: ردیف یک حساب در فهرست حساب مشتریان — یک جا تعریف شده تا پنل «پرداخت از کجا؟» دقیقاً همین ردیف را نشان دهد.
    o.act/o.k = کار زدن ردیف (پیش‌فرض باز کردن حساب)، o.sw=false یعنی بدون کشیدن */
 function cuRowH(c,b,ri,PW,o){o=o||{};const pw=PW&&PW.get(String(c.id)),wp=cuWP.get(String(c.id))||0,z=cuZero(b)&&!pw&&!wp,nT=(b.G?1:0)+(b.R||pw||wp?1:0)+Object.keys(b.X||{}).filter(k=>b.X[k]).length;cbLst=1;const bp=z?'':balPills(b,pw,wp,cuWA.get(String(c.id))||0);cbLst=0;

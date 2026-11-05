@@ -1,8 +1,12 @@
 /* ---------- پرداخت یک واریزی از چند منبع ---------- */
 /* واریزی به چند «بخش» مرتبط تقسیم می‌شود: خود واریزی (با تسویه‌های مشتری‌اش) + واریزی‌های همراه با splitOf.
    هر بخش یک واریزی کامل است که در منبع خودش تخصیص، ارسال، پیگیری و خروجی می‌شود. */
-const famRoot=x=>x.splitOf!=null&&entries.some(e=>e.id===x.splitOf)?x.splitOf:x.id;
-const famOf=x=>{const k=famRoot(x);return validated().filter(r=>r.id===k||r.splitOf===k).sort((a,b)=>(a.id===k?-1:b.id===k?1:a.id-b.id))};
+/* v78.7 بهینه‌سازی: famRoot/famOf برای هر ردیف کل واریزی‌ها را می‌گشتند (جستجو با ۳۰۰۰ واریزی ≈ ۰٫۵ ثانیه). حالا یک فهرست
+   شناسه‌ها و یک نقشه خانواده، هم‌عمر با حافظه validated() (همان validated برگردد = همان داده)، یک بار ساخته می‌شود. نتیجه دقیقاً مثل قبل. */
+let _fmV=null,_fmM=null,_fmI=null;
+const famIdx=()=>{const V=validated();if(_fmV!==V){_fmV=V;_fmI=new Set(entries.map(e=>e.id));_fmM=new Map();const add=(k,r)=>{const a=_fmM.get(k);if(a)a.push(r);else _fmM.set(k,[r])};for(const r of V){add(r.id,r);if(r.splitOf!=null&&r.splitOf!==r.id)add(r.splitOf,r)}}return _fmM};
+const famRoot=x=>{if(x.splitOf==null)return x.id;famIdx();return _fmI.has(x.splitOf)?x.splitOf:x.id};
+const famOf=x=>{const k=famRoot(x);return (famIdx().get(k)||[]).slice().sort((a,b)=>(a.id===k?-1:b.id===k?1:a.id-b.id))};
 function famSrc(r,A){const si=r.sentBid?srcInfo(r.id):null;if(si)return{name:si.src,st:si.st,sent:true};const a=A.get(r.id);return a&&a.src?{name:a.src,st:'none'}:null}
 let PS=null;
 /* v61.5: پنجره «پرداخت از چند منبع» بازطراحی شد:

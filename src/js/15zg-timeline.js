@@ -103,3 +103,5 @@ function tlNotify(L){L=L.filter(x=>x&&x.ts&&x.type!=='acc'&&x.user!==who());if(!
   clearTimeout(tlNotify.t);tlNotify.t=setTimeout(()=>{if(!B.isConnected)return;if(RM()||!B.animate){B.remove();return}B.animate([{transform:'translate(-50%,0)',opacity:1},{transform:'translate(-50%,-140%)',opacity:0}],{duration:300,easing:'ease-in',fill:'forwards'}).onfinish=()=>B.remove()},6000);
   try{if('vibrate' in navigator)navigator.vibrate(30)}catch(e){}
   if(tlNtOk()&&document.visibilityState!=='visible'){const o={body,tag:'motalla-'+x.id,icon:'icon-192.png'};(navigator.serviceWorker&&navigator.serviceWorker.ready?navigator.serviceWorker.ready.then(r=>r.showNotification(title,o)):Promise.reject()).catch(()=>{try{new Notification(title,o)}catch(e){}})}}
+
+ACT.tlMore=()=>{tlLim+=300;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
