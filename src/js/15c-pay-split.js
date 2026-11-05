@@ -57,6 +57,6 @@ function psApply(){const root=entries.find(e=>e.id===PS.root);if(!root){closeShe
     else{e={id:nid++,splitOf:root.id,name:root.name,title:root.title||'',code:root.code||'',iban:root.iban||'',card:root.card||'',bank:root.bank||'',holder:root.holder||'',phone:root.phone||'',nid:root.nid||'',entryDate:root.entryDate,payDate:root.payDate||root.entryDate,amount:+l.amount,settles:[],note:'',createdBy:who(),updatedBy:who(),updatedAt:now};entries.push(e)}
     keep.push({e,src:l.src})});
   const drop=fam.slice(PS.L.length).map(e=>e.id);if(drop.length)trashIds(drop,'یکی کردن بخش‌های پرداخت');saveE();saveD();
-  const k0=ldKey;ldKey=PS.pay;keep.forEach(({e,src})=>{const so=sources.find(z=>String(z.id)===String(src));if(so)moveTo([e.id],null,so)});ldKey=k0;
+  const k0=ldKey;keep.forEach(({e,src})=>{ldKey=e.payDate||PS.pay;/* v78.0: هر بخش در لیست روز خودش */const so=sources.find(z=>String(z.id)===String(src));if(so)moveTo([e.id],null,so)});ldKey=k0;
   logA('split',PS.L.length>1?'پرداخت از چند منبع':'یکی کردن بخش‌ها',PS.name+' | '+PS.L.map(l=>{const so=sources.find(z=>String(z.id)===String(l.src));return (so?so.name:'بدون منبع')+' '+fmt(l.amount)}).join('، '));
   const n=PS.L.length;PS=null;alloc=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(n>1?'پرداخت بین '+toFa(n)+' منبع تقسیم شد':'بخش‌ها یکی شدند')}

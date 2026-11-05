@@ -73,7 +73,7 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
   const pc=v=>tot?Math.max(0,Math.min(100,v/tot*100)).toFixed(2)+'%':'0%';
   const cuRow=(z,i)=>{const w=z.st==='wait',n=stImgs(z).length,dt=z.byInv&&(()=>{const c=custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);return t?invTitle(t):''})(),sub=[dt||'',!dt&&z.cuId?'حساب مشتری':!dt?'بدون حساب':'',z.tn?'پیگیری '+esc(toFa(z.tn)):''].filter(Boolean).join(' · ');
     return swW(`<div class="py7r ${w?'w':'k'}${pyFlash!=null&&String(pyFlash)===String(z.id)?' nw':''}"><button class="py7b" data-act="pyOpen" data-i="${i}" aria-label="${z.byInv?'دیدن سند ':''}${esc(z.name||'')}"><span class="py7a">${esc(userInit(z.name||'؟'))}</span><span class="tx"><b>${esc(z.name||'—')}</b><small>${sub}</small></span><span class="py7v"><em class="py9t c">مشتری</em><b>${fmt(z.amount)}<i>تومان</i></b><small>${w?'در انتظار تأیید':'تأیید شد'}</small></span></button>${n||can('track')?`<button class="py7c${n?' on':''}" data-act="galSt" data-i="${i}" aria-label="رسیدهای تسویه">${ic(n?'cam':'plus')}${n>1?`<em>${toFa(n)}</em>`:''}</button>`:''}</div>`,
-      {r:[...(ed&&w?[['stlOk','تأیید','check','#178049']]:ed?[['stlUnok','لغو تأیید','undo','#6b7385']]:[]),['pyCp','کپی','copy','#b8862b']],l:ed?[['stlDelI',w?'رد':'حذف',w?'undo':'trash','#d23c48']]:[],data:{i,k:'c',e:x.id}})};
+      {r:[...(ed&&w?[['stlOk','تأیید','check','#178049']]:ed?[['stlUnok','لغو تأیید','undo','#6b7385']]:[]),['pyCp','کپی','copy','#b8862b']],l:ed?[...(w?[['stlAmt','ویرایش مبلغ','edit','#3b6fd6']]:[]),['stlDelI',w?'رد':'حذف',w?'undo':'trash','#d23c48']]:[],data:{i,k:'c',e:x.id}})};
   /* v69.6 (خواسته صاحب اپ: «همه نحوه تسویه‌ها در یک لیست، ولی نوعشان جدا؛ واریزی دو بار نخورد»):
      یک فهرست برای همه: تسویه از مشتری، هر بخش واریز بانکی (ارسال‌شده یا نه) و مانده. کارت جدای «واریز بانکی» دیگر نیست.
      هر ردیف برچسب نوع دارد (مشتری / بانک / مانده). کارها با کشیدن:
@@ -86,7 +86,7 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
   const multi=bk.length>1,hasCu=S.length>0;
   const bkRow=({r,s},k)=>{const root=r.id===rootId,q=r.sentBid?entBI(r):null,st=bkSt(s,q),lk=q&&ssLock(q.it),cl=q&&q.b.closed,n=q?itImgs(q.b,q.it).length:0;
     const tag=root&&hasCu&&!multi?'مانده · بانک':'بانک',ttl=s?esc(s.name):'انتخاب بانک',
-      sub=[st[1],multi?'بخش '+toFa(k+1):'',q&&q.it.tn?'پیگیری '+esc(toFa(q.it.tn)):''].filter(Boolean).join(' · ');
+      sub=[st[1],multi?'بخش '+toFa(k+1):'',PD(r)!==PD(x)?'واریز '+esc(payLab(PD(r))):'',q&&q.it.tn?'پیگیری '+esc(toFa(q.it.tn)):''].filter(Boolean).join(' · ');
     /* v77.3 (باگ گزارش‌شده): بخشی از واریزی به بانک‌ها رفته (ارسال‌شده) و مانده اصلی هنوز بانک ندارد — ردیف مانده قابل زدن نبود و
        «افزودن پرداخت › بانک» هم بسته بود. حالا مانده اصلی ارسال‌نشده همیشه بانک می‌گیرد (زدن = انتخاب/تغییر بانک؛ با بانک = ثبت واریز) */
     const rootFree=root&&edB&&!r.sentBid&&F.some(z=>z.sentBid);
@@ -100,6 +100,7 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
       /* بخشی ارسال شده باشد: مبلغ بخش‌های ارسال‌نشده از بانک اصلی ارسال‌شده کم/زیاد نمی‌شود؛ اول این بخش هم ثبت شود، بعد «ویرایش» همه بخش‌ها */
       if(rootFree)L=[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6']];
       if(edB&&!F.some(z=>z.sentBid))L=root?[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6'],...(s||F.length>1?[['entUnalloc','حذف تخصیص','x','#d23c48']]:[])]:[['pkEdit','ویرایش','edit','#3b6fd6'],['pkDel','برداشتن','trash','#d23c48']]}
+    if(!q&&can('split')&&!x.full)L=[...L,['pkDate','تاریخ واریز','cal','#7a4fd6']];/* v78.0 */
     R=[...R,!q&&s&&tk?['pyCpSend','کپی و ارسال','copy','#b8862b']:['pyCp','کپی','copy','#b8862b']];/* v77.2: کپی با کشیدن به چپ؛ v77.8: بخش آماده ارسال = کپی و ارسال همان‌جا */
     return swW(row,{r:R,l:L,data:{id:r.id,st:'ok',b:q?q.b.id:'',i:q?q.i:'',k:'b',e:x.id}})};
   const bkS=bk.slice().sort((p,q)=>(p.r.id===rootId)-(q.r.id===rootId)||p.r.id-q.r.id);
