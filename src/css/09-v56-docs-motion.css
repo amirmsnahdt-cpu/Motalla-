@@ -3549,8 +3549,9 @@ html.cdon .cdez{display:none}
 /* v78.1 قانون طراحی (خواسته صاحب اپ: «هر جا سرچ هست با نوار آبی مثل جزئیات»): یک قاب آبی برای همه — کادرهای مشخصات، نوارهای جستجو
    و فیلدهای جستجوی داخل پنجره‌ها. توکن‌ها: --bfr (عادی) و --bfr2 (در حال تایپ). هر جای تازه هم فقط همین توکن‌ها را بگیرد. */
 :root{--bfr:0 0 0 1.5px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 10%,transparent);--bfr2:0 0 0 2px var(--blu),0 0 0 6px color-mix(in srgb,var(--blu) 17%,transparent)}
-.fsearch.fsearch.fsearch{border:0!important;border-radius:18px!important;background:var(--card)!important;box-shadow:var(--bfr)!important;transform:none!important;transition:box-shadow .18s ease}
-.fsearch.fsearch.fsearch:focus-within,.fsearch.fsearch.fsearch.cntON{box-shadow:var(--bfr2)!important}
+/* v78.2 (خواسته صاحب اپ: «فقط در جستجوی اصلی نباید باشه»): نوار جستجوی اصلی (صفحه «جستجو»، .fwrap) قاب قبلی خودش را دارد */
+.fsearch.fsearch.fsearch:not(.fwrap:not(.pxfw)>.fsearch){border:0!important;border-radius:18px!important;background:var(--card)!important;box-shadow:var(--bfr)!important;transform:none!important;transition:box-shadow .18s ease}
+.fsearch.fsearch.fsearch:not(.fwrap:not(.pxfw)>.fsearch):focus-within,.fsearch.fsearch.fsearch.cntON{box-shadow:var(--bfr2)!important}
 .sbox.sbox input{border:0!important;border-radius:18px!important;background:var(--card)!important;box-shadow:var(--bfr)!important;min-height:52px}
 .sbox.sbox input:focus{box-shadow:var(--bfr2)!important;outline:none}
 /* v78.1: کادرهای مبلغ (پنجره تخصیص، تسویه، بانک، ویرایش) و کارت «افزودن پرداخت» هم همان قاب آبی */
