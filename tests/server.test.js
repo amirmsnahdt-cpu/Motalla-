@@ -253,3 +253,58 @@ test('هر کاربر نام و عکس پروفایل خودش را عوض می�
   const d = await api('/api/profile', { method: 'POST', token: admin, body: { name: 'مدیر', av: '' } }); assert.equal(d.j.user.av, '');
   assert.equal((await api('/api/profile', { method: 'POST', body: { name: 'x' } })).status, 401);
 });
+
+test('امنیت v78.9: بدون مجوز حذف، حساب مشتری/واریزی با نسخه خالی پاک نمی‌شود؛ سطل زباله فقط با حذف', async () => {
+  const mk = async (u, perms) => { assert.equal((await api('/api/users', { method: 'POST', token: admin, body: { username: u, name: u, password: 'secret123', perms } })).status, 200); return (await api('/api/login', { method: 'POST', body: { username: u, password: 'secret123' } })).j.token; };
+  const acct = await mk('acct9', ['add', 'edit', 'split', 'track', 'close', 'debt', 'export']), deler = await mk('deler9', ['edit', 'debt', 'del']);
+  const sync = (token, changes) => api('/api/sync', { method: 'POST', token, body: { since: 0, changes } });
+  const get = async (coll, id) => ((await sync(admin, [])).j.changes.find(c => c.coll === coll && c.id === id) || {}).data;
+  const C = { id: 'cu9', name: 'مشتری نمونه', phone: '0000', txs: [{ id: 1, type: 'in', amount: 100 }, { id: 2, type: 'out', amount: 50 }] };
+  await sync(admin, [{ coll: 'custs', id: 'cu9', data: C }]);
+  // بازنویسی با نسخه خالی، بدون ردیف‌ها، بی‌نام یا سیستمی = رد
+  for (const bad of [{ id: 'cu9' }, { ...C, txs: [C.txs[0]] }, { ...C, name: '' }, { ...C, sys: 'cfg' }]) {
+    const r = await sync(acct, [{ coll: 'custs', id: 'cu9', base: C, data: bad }]);
+    assert.equal(r.j.rejected.length, 1, JSON.stringify(bad));
+  }
+  assert.deepEqual(await get('custs', 'cu9'), C, 'customer untouched');
+  // کار عادی همچنان مجاز: ردیف تازه، ویرایش تلفن، حذف نرم ردیف (del:true) مثل ویرایش سند
+  const C2 = { ...C, phone: '1111', txs: [{ ...C.txs[0], del: true }, C.txs[1], { id: 3, type: 'inv', amount: 70 }] };
+  assert.equal((await sync(acct, [{ coll: 'custs', id: 'cu9', base: C, data: C2 }])).j.rejected.length, 0);
+  assert.deepEqual(await get('custs', 'cu9'), C2);
+  // با مجوز حذف: حذف ردیف مجاز است و نسخه قبلی نگه داشته می‌شود
+  const C3 = { ...C2, txs: C2.txs.slice(1) };
+  assert.equal((await sync(deler, [{ coll: 'custs', id: 'cu9', base: C2, data: C3 }])).j.rejected.length, 0);
+  const { db } = require('../server/server.js');
+  const old = db.prepare("SELECT * FROM docs_old WHERE coll='custs' AND id='cu9' ORDER BY n DESC").get();
+  assert.ok(old && old.why === 'tx-removed' && JSON.parse(old.data).txs.length === 3, 'previous copy kept');
+  assert.equal((await sync(deler, [{ coll: 'custs', id: 'cu9', data: null }])).j.rejected.length, 0);
+  assert.equal(db.prepare("SELECT why FROM docs_old WHERE coll='custs' AND id='cu9' ORDER BY n DESC").get().why, 'delete');
+
+  // واریزی: خالی کردن بدون مجوز حذف رد؛ ویرایش عادی مجاز
+  const E = { id: 9901, name: 'واریزی نمونه', amount: 5000000, iban: 'IR000000000000000000000000', settles: [] };
+  await sync(admin, [{ coll: 'entries', id: '9901', data: E }]);
+  assert.equal((await sync(acct, [{ coll: 'entries', id: '9901', base: E, data: { id: 9901 } }])).j.rejected.length, 1);
+  assert.equal((await sync(acct, [{ coll: 'entries', id: '9901', base: E, data: { ...E, amount: '' } }])).j.rejected.length, 1);
+  assert.deepEqual(await get('entries', '9901'), E);
+  assert.equal((await sync(acct, [{ coll: 'entries', id: '9901', base: E, data: { ...E, name: 'نام تازه', amount: 6000000 } }])).j.rejected.length, 0);
+
+  // سطل زباله: حذف دائمی فقط با مجوز حذف
+  await sync(admin, [{ coll: 'trash', id: 'tr9', data: { id: 'tr9', item: { name: 'x' } } }]);
+  assert.equal((await sync(acct, [{ coll: 'trash', id: 'tr9', data: null }])).j.rejected.length, 1);
+  assert.ok(await get('trash', 'tr9'), 'trash item still there');
+  assert.equal((await sync(deler, [{ coll: 'trash', id: 'tr9', data: null }])).j.rejected.length, 0);
+  assert.equal(await get('trash', 'tr9'), undefined);
+});
+
+test('امنیت v78.9: ورود از پیش‌نمایش githack فقط یک ساعت؛ نشست قدیمی هم با اولین استفاده از آنجا کوتاه می‌شود', async () => {
+  const { db } = require('../server/server.js');
+  const P = { Origin: 'https://raw.githack.com', 'Content-Type': 'application/json' };
+  const exp = tok => Date.parse(db.prepare('SELECT expires_at e FROM sessions WHERE token=?').get(require('node:crypto').createHash('sha256').update(tok).digest('hex')).e);
+  const pv = (await (await fetch(base + '/api/login', { method: 'POST', headers: P, body: JSON.stringify({ username: 'boss', password: 'secret123' }) })).json()).token;
+  assert.ok(exp(pv) <= Date.now() + 3600e3 + 5e3, 'preview login lasts one hour');
+  const main = (await api('/api/login', { method: 'POST', body: { username: 'boss', password: 'secret123' } })).j.token;
+  assert.ok(exp(main) > Date.now() + 29 * 864e5, 'real app login still 30 days');
+  assert.equal((await fetch(base + '/api/me', { headers: { ...P, Authorization: 'Bearer ' + main } })).status, 200);
+  assert.ok(exp(main) <= Date.now() + 3600e3 + 5e3, 'a token used from the preview is cut to one hour');
+  assert.equal((await api('/api/me', { token: admin })).status, 200, 'other sessions untouched');
+});

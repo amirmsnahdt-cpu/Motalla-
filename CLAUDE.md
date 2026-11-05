@@ -111,6 +111,8 @@ Status frames (green/yellow/red row borders) are defined ONCE at the end of 08-v
 ## Server data safety
 - Staff may only ADD audit rows; on existing rows only `undone:true` is accepted (`auditEditOk`). Audit is never deleted.
 - Replacing/deleting an existing image needs edit/track/debt/del (`IMG_PERMS`); the previous copy goes to `imgs_old` (kept 90 days).
+- v78.9 delete-by-overwrite: without `del`, the server rejects replacing a customer with a copy that drops tx rows (soft `del:true` is fine), empties its name or changes `sys`, and replacing a deposit with an empty name/amount (`txGone`, `guardDoc`). Deleting a customer or removing its tx rows keeps the previous copy in `docs_old` (90 days). Deleting `trash` docs needs `del`.
+- v78.9 githack preview: raw.githack.com is ONE origin shared by every GitHub repo, so in the preview (`PVW`) all storage goes through `LS` = sessionStorage (01-core; old preview localStorage is moved there once, then removed), images stay out of IndexedDB, the boot swap reads only sessionStorage. Never use `localStorage` directly in src/js — use `LS`. Server: a login from the preview, or any token used from it, lasts at most 1 hour (`sessions.pv`, `previewExp`).
 - `/api/backups` returns `lastDl` (last backup download from any device) for the off-server backup reminder.
 - Android signing: ONLY from secrets `ANDROID_KEYSTORE_B64`, `ANDROID_KEY_PASS`, `ANDROID_KEY_ALIAS` (build fails without them).
   No key or password may ever be committed (`*.keystore`, `*.jks` are gitignored). Key generation 2 (v57.1): the APK reports

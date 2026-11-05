@@ -52,9 +52,9 @@ async function bioLoginEnroll(title){if(!bioLoginCap()||!ME||!TOKEN||navigator.o
   const r=await bioKeyCall('bioSeal',title,JSON.stringify({id:k.id,s:k.secret}));
   /* bioSeal کلید قبلی گوشی را همیشه کنار می‌گذارد؛ پس کلید قبلی روی سرور هم باطل می‌شود */
   if(old&&old.id&&old.u===ME.username)api('/api/bio/revoke',{id:old.id}).catch(()=>{});
-  if(!r.ok){try{localStorage.removeItem('m_biol')}catch(e){}api('/api/bio/revoke',{id:k.id}).catch(()=>{});return {ok:false,cancel:r.v==='cancel'}}
+  if(!r.ok){try{LS.removeItem('m_biol')}catch(e){}api('/api/bio/revoke',{id:k.id}).catch(()=>{});return {ok:false,cancel:r.v==='cancel'}}
   ls.set('m_biol',{u:ME.username,n:ME.name,id:k.id});return {ok:true}}
-async function bioLoginDrop(){const m=ls.get('m_biol',null);try{localStorage.removeItem('m_biol')}catch(e){}
+async function bioLoginDrop(){const m=ls.get('m_biol',null);try{LS.removeItem('m_biol')}catch(e){}
   try{if(window.AndroidBridge&&AndroidBridge.bioClear)AndroidBridge.bioClear()}catch(e){}
   if(m&&m.id&&TOKEN&&ME&&m.u===ME.username)try{await api('/api/bio/revoke',{id:m.id})}catch(e){}}
 /* چرا گزینه اثر انگشت روی این اندروید کار نمی‌کند؟ (null = کار می‌کند یا اندروید نیست) */
@@ -65,7 +65,7 @@ function bioWhyNot(){if(!/Android/i.test(navigator.userAgent)||isIOS())return nu
   if(st==='ok')return null;
   return {s:st==='old'?'اندروید این گوشی برای اثر انگشت قدیمی است':st==='nohw'?'این گوشی حسگر اثر انگشت ندارد':'اول در تنظیمات گوشی اثر انگشت ثبت کنید',act:''}}
 /* صفحه ورود: «ورود با اثر انگشت» */
-function bioLoginForget(){try{localStorage.removeItem('m_biol')}catch(e){}try{if(window.AndroidBridge&&AndroidBridge.bioClear)AndroidBridge.bioClear()}catch(e){}}
+function bioLoginForget(){try{LS.removeItem('m_biol')}catch(e){}try{if(window.AndroidBridge&&AndroidBridge.bioClear)AndroidBridge.bioClear()}catch(e){}}
 ACT.authBio=async()=>{if(!bioLoginMeta()){authForm('login');return}const b=$('abio');if(b){if(b.disabled)return;b.disabled=true;b.classList.add('wait')}const e0=$('aerr');if(e0)e0.innerHTML='';
   const free=()=>{const x=$('abio');if(x){x.disabled=false;x.classList.remove('wait')}};
   const r=await bioKeyCall('bioOpen','ورود به بده بستون');
@@ -184,7 +184,7 @@ function lockShake(){const S=lockUI;if(!S)return;const d=$('lock')&&$('lock').qu
 /* رمز حساب از فرم Face ID: هنگام وصل کردن با سرور بررسی می‌شود (ورود تازه)، هنگام باز کردن قفل با هش روی گوشی (بدون اینترنت هم) */
 async function lockPw(pw){const S=lockUI;if(!S)return false;
   if(S.m==='pwset'){let ok=await pwhOk(pw);
-    if(!ok){try{const r=await api('/api/login',{username:ME.username,password:pw});if(r&&r.token){TOKEN=r.token;try{localStorage.setItem('m_token',TOKEN)}catch(e){}ok=true}}catch(e){if(lockUI&&/اینترنت|سرور|fetch|network/i.test(e.message||''))S.err='برای وصل کردن Face ID اینترنت لازم است';ok=false}}
+    if(!ok){try{const r=await api('/api/login',{username:ME.username,password:pw});if(r&&r.token){TOKEN=r.token;try{LS.setItem('m_token',TOKEN)}catch(e){}ok=true}}catch(e){if(lockUI&&/اینترنت|سرور|fetch|network/i.test(e.message||''))S.err='برای وصل کردن Face ID اینترنت لازم است';ok=false}}
     if(!ok||!lockUI)return false;await pwhSet(pw);const c=lockCfg();c.bio={t:'pw'};ls.set('m_lock',c);const cb=S.cb;
     /* آیفون «ذخیره رمز» را وقتی پیشنهاد می‌دهد که فرمِ فرستاده‌شده از صفحه برداشته شود (فقط پنهان شدن کافی نیست)؛
        پس فرم همین حالا برداشته می‌شود و پیام «وصل شد» کمی می‌ماند تا پنجره Save Password آیفون بیاید */
@@ -197,11 +197,11 @@ async function lockPw(pw){const S=lockUI;if(!S)return false;
   return false}
 /* خروج امن: اول تغییرهای ثبت‌نشده به سرور فرستاده می‌شوند، بعد این گوشی خارج می‌شود */
 async function lockWipe(msg){try{if(typeof syncNow==='function'&&navigator.onLine){await Promise.race([syncNow(),new Promise(r=>setTimeout(r,8000))])}}catch(e){}
-  try{await api('/api/logout',{})}catch(e){}ls.set('m_lock',null);try{localStorage.removeItem('m_lock')}catch(e){}lockHide();forceLogout(msg)}
+  try{await api('/api/logout',{})}catch(e){}ls.set('m_lock',null);try{LS.removeItem('m_lock')}catch(e){}lockHide();forceLogout(msg)}
 
 /* ---- قفل خودکار بعد از ۲۰ دقیقه بیکاری ---- */
-function lockTouch(force){lockLast=Date.now();if(force||lockLast-lockSaved>15e3){lockSaved=lockLast;try{localStorage.setItem('m_lock_at',String(lockLast))}catch(e){}}}
-function lockDue(){if(!lockOn()||lockUI)return false;let t=lockLast;try{t=Math.max(t,+localStorage.getItem('m_lock_at')||0)}catch(e){}return Date.now()-t>=LOCK_IDLE}
+function lockTouch(force){lockLast=Date.now();if(force||lockLast-lockSaved>15e3){lockSaved=lockLast;try{LS.setItem('m_lock_at',String(lockLast))}catch(e){}}}
+function lockDue(){if(!lockOn()||lockUI)return false;let t=lockLast;try{t=Math.max(t,+LS.getItem('m_lock_at')||0)}catch(e){}return Date.now()-t>=LOCK_IDLE}
 function lockCheck(){if(lockDue())lockShow('unlock')}
 ['pointerdown','keydown','touchstart','wheel'].forEach(ev=>document.addEventListener(ev,()=>{if(!lockUI)lockTouch()},{passive:true,capture:true}));
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){if(!lockUI)lockTouch(true)}else lockCheck()});
@@ -210,7 +210,7 @@ setInterval(lockCheck,30e3);
 /* شروع برنامه: اجرای تازه (برنامه بسته و از برنامه‌های باز پاک شده) همیشه اول قفل؛
    sessionStorage با بستن کامل برنامه پاک می‌شود ولی با بارگذاری دوباره/به‌روزرسانی درون برنامه می‌ماند.
    در غیر این صورت مثل قبل: اگر از آخرین استفاده ۲۰ دقیقه گذشته، قفل */
-(()=>{let t=0,fresh=true;try{t=+localStorage.getItem('m_lock_at')||0}catch(e){}
+(()=>{let t=0,fresh=true;try{t=+LS.getItem('m_lock_at')||0}catch(e){}
   try{fresh=!sessionStorage.getItem('m_live');sessionStorage.setItem('m_live','1')}catch(e){}
   if(lockOn()&&(fresh||!t||Date.now()-t>=LOCK_IDLE))lockShow('unlock');else lockTouch(true)})();
 
@@ -227,7 +227,7 @@ ACT.lockSheet=()=>{if(!TOKEN){toast('اول وارد شوید');return}lockSheet
 ACT.lockSet=()=>{closeSheet();lockShow('set1',()=>{if(cur==='settings')render()})};
 ACT.lockChange=()=>{closeSheet();lockShow('verify',ok=>{if(ok)setTimeout(()=>lockShow('set1'),150)})};
 ACT.lockNow=()=>{closeSheet();lockShow('unlock')};
-ACT.lockOff=()=>{closeSheet();lockShow('verify',ok=>{if(!ok)return;ls.set('m_lock',null);bioLoginDrop();try{localStorage.removeItem('m_lock')}catch(e){}toast('قفل برنامه خاموش شد');if(cur==='settings')render()})};
+ACT.lockOff=()=>{closeSheet();lockShow('verify',ok=>{if(!ok)return;ls.set('m_lock',null);bioLoginDrop();try{LS.removeItem('m_lock')}catch(e){}toast('قفل برنامه خاموش شد');if(cur==='settings')render()})};
 /* v58.8: Face ID یک کلید روشن/خاموش است: کلید اول جابه‌جا می‌شود (دیده شود)، بعد
    خاموش کردن → پرسش تأیید در همین پنجره؛ روشن کردن → تأیید رمز ۶ رقمی و وصل کردن، و برگشت به همین پنجره با وضع تازه */
 const lockBack=()=>{if(cur==='settings')render();setTimeout(()=>{if(TOKEN&&lockCfg()&&!lockUI)lockSheet()},120)};
@@ -241,7 +241,7 @@ ACT.lockBio=async(d,el)=>{const c=lockCfg();if(!c)return;const sw=document.query
 ACT.lockBioOff=()=>{const c=lockCfg();if(!c)return;c.bio=null;ls.set('m_lock',c);bioLoginDrop();toast(bioName()+' خاموش شد؛ فقط رمز ۶ رقمی');if(cur==='settings')render();lockSheet()};
 /* بعد از ورود، یک بار روی هر گوشی پیشنهاد روشن کردن قفل */
 /* اپ اندروید قدیمی (کلید امضای قبلی) باید نصب دوباره شود؛ پیشنهاد قفل می‌ماند برای اپ جدید */
-function lockOffer(){if(!TOKEN||!ME||lockCfg()||ls.get('m_lock_ask','')===ME.username||lockUI||apkOldKey())return;if(!$('ov').classList.contains('hide')){setTimeout(lockOffer,20e3);return}
+function lockOffer(){/* v78.9: پیش‌نمایش در هر زبانه از نو وارد می‌شود و یک ساعت می‌ماند؛ پیشنهاد قفل آنجا مزاحم است */if(PVW||!TOKEN||!ME||lockCfg()||ls.get('m_lock_ask','')===ME.username||lockUI||apkOldKey())return;if(!$('ov').classList.contains('hide')){setTimeout(lockOffer,20e3);return}
   ls.set('m_lock_ask',ME.username);sheet(`<div class="sh-h"><b>قفل برنامه را روشن کنید</b><button class="x" data-act="close">×</button></div>
     <div class="muted" style="font-size:13.5px;line-height:1.9;margin:-4px 2px 14px">اطلاعات مشتری‌ها روی این گوشی است. با یک رمز ۶ رقمی${'PublicKeyCredential' in window||window.AndroidBridge?' (و '+bioName()+')':''}، اگر گوشی گم شود یا دست کس دیگری بیفتد، برنامه باز نمی‌شود.</div>
     <div class="row"><button class="btn sec" data-act="close">بعداً</button><button class="btn bkgo" data-act="lockSet">روشن کردن</button></div>`)}

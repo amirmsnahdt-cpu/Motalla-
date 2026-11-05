@@ -1,9 +1,13 @@
 /* ---------- عکس رسید (IndexedDB با پشتیبان) ---------- */
 let _db=null;
 function idb(){return _db||(_db=new Promise((res,rej)=>{try{const r=indexedDB.open('motalla',1);r.onupgradeneeded=()=>r.result.createObjectStore('img');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}}))}
-async function imgPut(k,v){try{const db=await idb();await new Promise((res,rej)=>{const t=db.transaction('img','readwrite');t.objectStore('img').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)});return true}catch(e){try{localStorage.setItem('m_img_'+k,v);return true}catch(x){return false}}}
-async function imgGet(k){let v=null;try{const db=await idb();v=await new Promise(res=>{const r=db.transaction('img').objectStore('img').get(k);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)})}catch(e){}if(!v){try{v=localStorage.getItem('m_img_'+k)}catch(e){}}return v}
-async function imgDel(k){try{const db=await idb();db.transaction('img','readwrite').objectStore('img').delete(k)}catch(e){}try{localStorage.removeItem('m_img_'+k)}catch(e){}}
+/* v78.9 امنیت: در پیش‌نمایش (githack، دامنه مشترک) عکس‌ها در IndexedDB نوشته نمی‌شوند؛ فقط در حافظه همین زبانه.
+   پایگاه قدیمی پیش‌نمایش فقط برای خواندن عکس‌های هنوز‌آپلودنشده می‌ماند و وقتی صف خالی شد پاک می‌شود */
+const IMEM=new Map();
+if(PVW){let n=0;const t=setInterval(()=>{n++;let q=[];try{q=JSON.parse(LS.getItem('m_imgq')||'[]')}catch(e){}if(!q.length){clearInterval(t);const d=_db;_db=null;Promise.resolve(d).then(x=>{try{x&&x.close()}catch(e){}}).catch(()=>{}).finally(()=>{try{indexedDB.deleteDatabase('motalla')}catch(e){}})}else if(n>120)clearInterval(t)},30e3)}
+async function imgPut(k,v){if(PVW){try{LS.setItem('m_img_'+k,v)}catch(e){IMEM.set(k,v)}return true}try{const db=await idb();await new Promise((res,rej)=>{const t=db.transaction('img','readwrite');t.objectStore('img').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)});return true}catch(e){try{LS.setItem('m_img_'+k,v);return true}catch(x){return false}}}
+async function imgGet(k){let v=null;if(PVW){v=IMEM.get(k)||null;if(!v){try{v=LS.getItem('m_img_'+k)}catch(e){}}if(v)return v}try{const db=await idb();v=await new Promise(res=>{const r=db.transaction('img').objectStore('img').get(k);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)})}catch(e){}if(!v){try{v=LS.getItem('m_img_'+k)}catch(e){}}return v}
+async function imgDel(k){IMEM.delete(k);try{const db=await idb();db.transaction('img','readwrite').objectStore('img').delete(k)}catch(e){}try{LS.removeItem('m_img_'+k)}catch(e){}}
 const ikey=(b,x)=>b.id+':'+x.id;
 function shrink(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{const m=1800,sc=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.82))};im.src=fr.result};fr.readAsDataURL(file)})}
 /* ---------- ارسال: واریزی‌ها از تقسیم خارج و وارد پیگیری می‌شوند ---------- */

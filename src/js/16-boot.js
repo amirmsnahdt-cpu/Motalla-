@@ -29,7 +29,7 @@ ACT.checkUpd=async()=>{if(UPD){applyUpd();return}
   if(location.protocol==='https:'){toast('در حال بررسی…');checkUpdate(true);setTimeout(()=>{if(!UPD)toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));else toast('نسخه جدید پیدا شد؛ دکمه طلایی پایین صفحه را بزنید')},6000);return}
   ACT.checkUpd0()};
 ACT.checkUpd0=()=>{if(location.hostname!=='raw.githack.com'){if(location.protocol!=='https:'){toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));return}toast('در حال دریافت آخرین نسخه…');const r=()=>location.reload();try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,500))}catch(e){setTimeout(r,500)}return}
-  toast('در حال بررسی…');const v0=APP_V;try{sessionStorage.removeItem('m_updchk')}catch(e){}checkUpdate(true);setTimeout(()=>{let nv=0;try{nv=+localStorage.getItem('m_app_next_v')||0}catch(e){}if(!(nv>v0))toast('برنامه به‌روز است ✓ نسخه '+toFa(v0))},6000)};
+  toast('در حال بررسی…');const v0=APP_V;try{sessionStorage.removeItem('m_updchk')}catch(e){}checkUpdate(true);setTimeout(()=>{let nv=0;try{nv=+LS.getItem('m_app_next_v')||0}catch(e){}if(!(nv>v0))toast('برنامه به‌روز است ✓ نسخه '+toFa(v0))},6000)};
 /* دانلود نسخه جدید اپ اندروید:
    - مرورگر: مستقیم دانلود
    - اپ جدید (version دارد): به مرورگر گوشی سپرده می‌شود

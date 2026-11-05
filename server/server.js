@@ -76,11 +76,14 @@ CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT);
 CREATE TABLE IF NOT EXISTS changes(n INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, user TEXT, coll TEXT NOT NULL, doc TEXT NOT NULL, label TEXT, field TEXT NOT NULL, old TEXT, new TEXT, alert INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS imgs(k TEXT PRIMARY KEY, data TEXT NOT NULL, updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS imgs_old(n INTEGER PRIMARY KEY AUTOINCREMENT, k TEXT NOT NULL, data TEXT NOT NULL, updated_at TEXT NOT NULL, removed_at TEXT NOT NULL, removed_by TEXT);
+/* v78.9: نسخه قبلی حساب مشتری پیش از حذف حساب یا حذف ردیفی از گردشش (۹۰ روز نگه داشته می‌شود) */
+CREATE TABLE IF NOT EXISTS docs_old(n INTEGER PRIMARY KEY AUTOINCREMENT, coll TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, removed_at TEXT NOT NULL, removed_by TEXT, why TEXT);
 `);
 
 // ستون دسترسی‌ها (برای پایگاه‌داده‌های قدیمی اضافه می‌شود)
 try { db.exec('ALTER TABLE users ADD COLUMN perms TEXT'); } catch (e) { /* از قبل هست */ }
 try { db.exec('ALTER TABLE users ADD COLUMN av TEXT'); } catch (e) { /* v76.1: کلید عکس پروفایل کاربر */ }
+try { db.exec('ALTER TABLE sessions ADD COLUMN pv INTEGER NOT NULL DEFAULT 0'); } catch (e) { /* v78.9: نشست لینک پیش‌نمایش */ }
 /* ---------- دسترسی‌ها: مدیر همه را دارد؛ کارمند فقط آنچه مدیر روشن کرده ---------- */
 const PERMS = ['add', 'edit', 'del', 'split', 'track', 'close', 'unsend', 'debt', 'src', 'undo', 'export'];
 const DEF_STAFF = ['add', 'edit', 'split', 'track', 'close', 'debt', 'export'];
@@ -99,8 +102,11 @@ const q = {
   userById: db.prepare('SELECT * FROM users WHERE id=?'),
   users: db.prepare('SELECT id,username,name,role,perms,active,created_at,last_login FROM users ORDER BY id'),
   addUser: db.prepare('INSERT INTO users(username,name,pass,role,active,created_at,perms) VALUES(?,?,?,?,1,?,?)'),
-  addSession: db.prepare('INSERT INTO sessions(token,user_id,created_at,expires_at,device) VALUES(?,?,?,?,?)'),
-  session: db.prepare('SELECT s.expires_at, u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?'),
+  addSession: db.prepare('INSERT INTO sessions(token,user_id,created_at,expires_at,device,pv) VALUES(?,?,?,?,?,?)'),
+  pvSession: db.prepare('UPDATE sessions SET pv=1, expires_at=MIN(expires_at, ?) WHERE token=?'),
+  keepOldDoc: db.prepare('INSERT INTO docs_old(coll,id,data,removed_at,removed_by,why) VALUES(?,?,?,?,?,?)'),
+  purgeOldDocs: db.prepare('DELETE FROM docs_old WHERE removed_at<?'),
+  session: db.prepare('SELECT s.expires_at, s.pv AS s_pv, u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?'),
   delSession: db.prepare('DELETE FROM sessions WHERE token=?'),
   delUserSessions: db.prepare('DELETE FROM sessions WHERE user_id=?'),
   addBioKey: db.prepare('INSERT INTO bio_keys(id,user_id,secret,created_at,device) VALUES(?,?,?,?,?)'),
@@ -187,6 +193,8 @@ function deny(user, coll, deleting, theirs) {
   if (!deleting && !theirs && coll === 'entries' && !P.has('add') && !P.has('undo')) return 'ثبت واریزی برای حساب شما مجاز نیست';
   if (!deleting && coll === 'creds' && !P.has('debt')) return 'تسویه بدهی برای حساب شما مجاز نیست';
   if (coll === 'custs') { if (deleting) return P.has('del') ? null : 'حذف برای حساب شما مجاز نیست'; return P.has('debt') ? null : 'حساب مشتریان برای حساب شما مجاز نیست'; }
+  // v78.9 امنیت: خالی کردن سطل زباله (حذف دائمی) هم مثل دکمه‌اش در برنامه مجوز «حذف» می‌خواهد
+  if (deleting && coll === 'trash') return P.has('del') ? null : 'حذف دائمی برای حساب شما مجاز نیست';
   return null;
 }
 
@@ -265,6 +273,8 @@ function readRaw(req, limit) {
 function auth(req) {
   const h = req.headers.authorization || ''; const m = h.match(/^Bearer\s+([a-f0-9]{64})$/i); if (!m) return null;
   const row = q.session.get(sha(m[1])); if (!row || !row.active || row.expires_at < now()) return null;
+  /* v78.9 امنیت: نشستی که از لینک پیش‌نمایش (دامنه مشترک githack) استفاده شود، از همان لحظه حداکثر یک ساعت اعتبار دارد */
+  if (fromPreview(req) && !row.s_pv) q.pvSession.run(previewExp(), sha(m[1]));
   return { user: row, tokenHash: sha(m[1]) };
 }
 /* نشست‌های قدیمی (۱۸۰ روزه) به حداکثر ۳۰ روز از همین حالا کوتاه می‌شوند؛ کسی همین الان بیرون نمی‌افتد */
@@ -274,9 +284,11 @@ function apkKey() { try { return +fs.readFileSync(path.join(ROOT, 'dist', 'apk-k
 /* لینک‌های پیش‌نمایش (githack) دامنه‌ای مشترک بین همه کاربران گیت‌هاب دارند؛ فقط مدیر می‌تواند از آنجا وارد شود */
 const PREVIEW_ORIGIN = 'https://raw.githack.com', fromPreview = req => req.headers.origin === PREVIEW_ORIGIN;
 const PREVIEW_MSG = 'لینک پیش‌نمایش فقط برای مدیر است؛ برنامه اصلی را باز کنید';
+/* v78.9 امنیت: raw.githack.com دامنه‌ای مشترک بین همه صفحه‌های گیت‌هاب است؛ ورود از پیش‌نمایش فقط یک ساعت می‌ماند */
+const PREVIEW_MIN = 60, previewExp = () => new Date(Date.now() + PREVIEW_MIN * 60e3).toISOString();
 function newSession(user, req) {
-  const tok = crypto.randomBytes(32).toString('hex'), exp = new Date(Date.now() + SESSION_DAYS * 864e5).toISOString();
-  q.addSession.run(sha(tok), user.id, now(), exp, String(req.headers['user-agent'] || '').slice(0, 200));
+  const pv = fromPreview(req), tok = crypto.randomBytes(32).toString('hex'), exp = pv ? previewExp() : new Date(Date.now() + SESSION_DAYS * 864e5).toISOString();
+  q.addSession.run(sha(tok), user.id, now(), exp, String(req.headers['user-agent'] || '').slice(0, 200), pv ? 1 : 0);
   db.prepare('UPDATE users SET last_login=? WHERE id=?').run(now(), user.id);
   return tok;
 }
@@ -297,12 +309,23 @@ function itemRemOk(it) {
   return +it.amount === Math.max(0, (+e.amount || 0) - st);
 }
 const itemDiff = (o, it) => diffFields(o, it, ITEM_FIELDS).filter(f => !(f === 'amount' && itemRemOk(it)));
+/* ردیف‌های گردش حساب (txs) که در نسخه تازه نیستند (حذف نرم با del:true حذف به حساب نمی‌آید؛ داده می‌ماند) */
+function txGone(a, b) { const keep = new Set((b && Array.isArray(b.txs) ? b.txs : []).filter(isObj).map(t => sv(t.id))); return (a && Array.isArray(a.txs) ? a.txs : []).filter(t => isObj(t) && !keep.has(sv(t.id))); }
 function guardDoc(user, P, coll, theirs, merged) {
   if (user.role === 'admin') return null;
   if (coll === 'entries' && theirs) {
     for (const f of diffFields(theirs, merged, CORE_FIELDS)) if (f === 'amount' ? !(P.has('edit') || P.has('split')) : !P.has('edit')) return 'ویرایش واریزی برای حساب شما مجاز نیست';
     // v78.8 امنیت: فیلدهای دیگر واریزی هم همان مجوزهایی را می‌خواهند که دکمه‌هایشان در برنامه دارند
     for (const [f, need] of ENTRY_FIELD_PERMS) if (sv(theirs[f]) !== sv(merged[f]) && !need.some(x => P.has(x))) return 'این تغییر واریزی برای حساب شما مجاز نیست';
+  }
+  /* v78.9 امنیت: «حذف از راه بازنویسی» — بدون مجوز حذف، سند را نمی‌شود با نسخه خالی یا ناقص جایگزین کرد */
+  if (theirs && !P.has('del')) {
+    if (coll === 'custs') {
+      if (sv(theirs.sys) !== sv(merged.sys)) return 'تغییر نوع حساب برای حساب شما مجاز نیست';
+      if (!theirs.sys && sv(theirs.name).trim() && !sv(merged.name).trim()) return 'پاک کردن نام حساب برای حساب شما مجاز نیست';
+      if (txGone(theirs, merged).length) return 'حذف ردیف گردش حساب برای حساب شما مجاز نیست';
+    }
+    if (coll === 'entries') for (const f of ['name', 'amount']) if (sv(theirs[f]).trim() && !sv(merged[f]).trim()) return 'پاک کردن واریزی برای حساب شما مجاز نیست';
   }
   if (coll === 'batches' && !P.has('edit')) {
     const old = new Map(((theirs && theirs.items) || []).map(x => [sv(x && x.id), x]));
@@ -345,6 +368,7 @@ function doSync(user, body) {
       if (deleting) {
         if (!cur || cur.deleted) continue;
         if (coll === 'audit') continue;                         // تاریخچه هرگز حذف نمی‌شود
+        if (coll === 'custs') q.keepOldDoc.run(coll, id, cur.data, now(), user.name, 'delete');
         q.putDoc.run(coll, id, null, 1, nextVer(), now(), user.name);
       } else {
         if (!isObj(ch.data)) continue;
@@ -357,6 +381,7 @@ function doSync(user, body) {
         if (cur && !cur.deleted && eq(merged, theirs)) { touched.add(coll + '\u0000' + id); continue; }
         const g = guardDoc(user, P, coll, theirs, merged); if (g) { rejected.push({ coll, id, why: g }); touched.add(coll + '\u0000' + id); continue; }
         logChanges(user, coll, id, theirs, merged, splitIds);
+        if (coll === 'custs' && theirs && txGone(theirs, merged).length) q.keepOldDoc.run(coll, id, cur.data, now(), user.name, 'tx-removed');
         q.putDoc.run(coll, id, JSON.stringify(merged), 0, nextVer(), now(), user.name);
       }
       touched.add(coll + '\u0000' + id);
@@ -757,7 +782,7 @@ function cleanUploads() { try { for (const f of fs.readdirSync(BK_DIR)) if (/^up
 const server = http.createServer((req, res) => {
   handle(req, res).catch(e => { const code = e && e.code >= 400 && e.code < 600 ? e.code : 500; if (code === 500) console.error(e); try { bad(res, code, code === 413 ? 'حجم درخواست زیاد است' : code === 400 ? 'درخواست نامعتبر' : 'خطای سرور'); } catch (_) { } });
 });
-setInterval(() => { try { q.purgeSessions.run(now()); q.purgeOldImgs.run(new Date(Date.now() - 90 * 864e5).toISOString()); } catch (e) { } }, 6 * 3600e3).unref();
+setInterval(() => { try { q.purgeSessions.run(now()); q.purgeOldImgs.run(new Date(Date.now() - 90 * 864e5).toISOString()); q.purgeOldDocs.run(new Date(Date.now() - 90 * 864e5).toISOString()); } catch (e) { } }, 6 * 3600e3).unref();
 try { fs.watch(path.join(ROOT, 'index.html'), () => setTimeout(appVersion, 200)).unref(); } catch (e) { }
 if (require.main === module) server.listen(PORT, process.env.HOST || '0.0.0.0', () => console.log('motalla server on :' + PORT + ' data=' + DATA_DIR + ' app=' + APP_VER));
 module.exports = { server, merge3, goldParse, db };

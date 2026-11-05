@@ -1,4 +1,12 @@
 /* به‌روزرسانی خودکار: آخرین نسخه را مستقیم از GitHub می‌گیرد (بدون تأخیر کش githack) */
+/* v78.9 امنیت: raw.githack.com دامنه‌ای مشترک بین همه صفحه‌های گیت‌هاب است؛ هر صفحه دیگری روی آن می‌تواند localStorage و
+   IndexedDB را بخواند و عوض کند. در پیش‌نمایش همه‌چیز (ورود، داده، نسخه بعدی) فقط در حافظه همین زبانه (sessionStorage) می‌ماند.
+   داده‌ای که از قبل در localStorage پیش‌نمایش مانده (از جمله تغییرهای همگام‌نشده) یک بار به این زبانه منتقل و بعد از آنجا پاک می‌شود. */
+const PVW=location.hostname==='raw.githack.com';
+const LS=(()=>{let L=null;try{L=window.localStorage}catch(e){}if(!PVW)return L;let S=null;try{S=window.sessionStorage;S.setItem('m_pvt','1');S.removeItem('m_pvt')}catch(e){S=null}if(!S)return L;
+  try{if(L){const ks=[];for(let i=0;i<L.length;i++){const k=L.key(i);if(k&&k.startsWith('m_')&&k!=='m_theme')ks.push(k)}
+    for(const k of ks){const v=L.getItem(k);if(/^m_app_next/.test(k)){L.removeItem(k);continue}let ok=false;try{if(S.getItem(k)===null)S.setItem(k,v);ok=true}catch(e){}if(ok)L.removeItem(k)}}}catch(e){}
+  try{if(window.caches)caches.delete('motalla-upd')}catch(e){}return S})();
 
 /* ---------- به‌روزرسانی: پیام داخل برنامه، با زدن به‌روز می‌شود ---------- */
 let UPD=null,updT=0;
@@ -8,10 +16,9 @@ function updBar(){const au=document.getElementById('auth'),onAuth=au&&!au.classL
   el.innerHTML=`<span class="ui">${ic('refresh')}</span><span class="tx"><b>نسخه جدید آماده است</b><small>برای به‌روزرسانی بزنید · نسخه ${toFa(UPD.v)}</small></span><span class="go">به‌روزرسانی</span>`}
 function updFound(v){if(!(v>APP_V)||(UPD&&UPD.v>=v))return;UPD={v};try{updBar()}catch(e){setTimeout(updBar,500)}}
 function stashUpdate(h,nv){
-  try{localStorage.removeItem('m_app_next');localStorage.setItem('m_app_next',h);localStorage.setItem('m_app_next_v',String(nv));localStorage.removeItem('m_app_next_c');return Promise.resolve(true)}
-  catch(e){try{localStorage.removeItem('m_app_next')}catch(_){}}
-  if(!window.caches)return Promise.resolve(false);
-  return caches.open('motalla-upd').then(c=>c.put('next.html',new Response(h,{headers:{'Content-Type':'text/html; charset=utf-8'}}))).then(()=>{localStorage.setItem('m_app_next_v',String(nv));localStorage.setItem('m_app_next_c','1');return true}).catch(()=>false)}
+  /* v78.9: فقط در حافظه همین زبانه (sessionStorage)؛ صفحه‌های دیگر githack نمی‌توانند نسخه بعدی را عوض کنند */
+  try{LS.removeItem('m_app_next');LS.setItem('m_app_next',h);LS.setItem('m_app_next_v',String(nv));return Promise.resolve(true)}
+  catch(e){try{LS.removeItem('m_app_next');LS.removeItem('m_app_next_v')}catch(_){}return Promise.resolve(false)}}
 function checkUpdate(force){if(!force&&Date.now()-updT<60e3)return;updT=Date.now();
   if(location.hostname==='raw.githack.com'){
     fetch('https://api.github.com/repos/'+REPO+'/commits/main',{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(r=>r.ok?r.json():null).then(j=>{const sha=j&&j.sha;if(!sha||!/^[0-9a-f]{40}$/.test(sha))return null;
@@ -26,7 +33,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 setInterval(()=>{if(document.visibilityState==='visible')checkUpdate(false)},60e3);
 window.addEventListener('pageshow',()=>checkUpdate(false));window.addEventListener('focus',()=>checkUpdate(false));window.addEventListener('online',()=>checkUpdate(true));
 /* بعد از به‌روز شدن، یک پیام کوتاه نشان بده تا کاربر بداند نسخه جدید آمده */
-setTimeout(()=>{try{const last=+localStorage.getItem('m_seen_v')||0;if(last&&APP_V>last)toast('برنامه به نسخه '+toFa(APP_V)+' به‌روز شد ✓');localStorage.setItem('m_seen_v',String(APP_V))}catch(e){}},1200);
+setTimeout(()=>{try{const last=+LS.getItem('m_seen_v')||0;if(last&&APP_V>last)toast('برنامه به نسخه '+toFa(APP_V)+' به‌روز شد ✓');LS.setItem('m_seen_v',String(APP_V))}catch(e){}},1200);
 (()=>{const V=()=>document.getElementById('view');const ws=window.scrollTo.bind(window);
   Object.defineProperty(window,'scrollY',{configurable:true,get:()=>{const v=V();return v?v.scrollTop:0}});
   window.scrollTo=function(a,b){const v=V();if(!v)return ws(a,b);if(typeof a==='object')v.scrollTo(a);else v.scrollTop=b||0}})();
@@ -98,7 +105,7 @@ document.addEventListener('click',async e=>{if(e.target.closest&&e.target.closes
 /* ============ ذخیره‌سازی ============ */
 let storeOK=true;
 let _vc=null,_vcE=null,_vcN=-1,_stm=null;const memoClear=()=>{_vc=null;_stm=null};
-const ls={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){storeOK=false;return d}},set(k,v){memoClear();try{localStorage.setItem(k,JSON.stringify(v))}catch(e){storeOK=false}}};
+const ls={get(k,d){try{const v=LS.getItem(k);return v?JSON.parse(v):d}catch(e){storeOK=false;return d}},set(k,v){memoClear();try{LS.setItem(k,JSON.stringify(v))}catch(e){storeOK=false}}};
 const isoAdd=(iso,n)=>{const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const JM=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
