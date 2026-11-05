@@ -17,7 +17,7 @@ function shinTry(){if(!SHIN)return;const au=$('auth');if(!TOKEN||(au&&!au.classL
 function shinList(){const q=clean(shinQ||''),qd=toEn(q).replace(/\D/g,''),qn=norm(q);
   return CU().filter(c=>!q||norm(cuName(c)).includes(qn)||(qd.length>=3&&String(c.phone||'').includes(qd))||(c.grp&&norm(c.grp).includes(qn)))
     .sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,40)}
-function shinRows(){const L=shinList();return L.length?L.map(c=>`<button class="acrow" data-act="shinPick" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(toFa(phShow(c.phone)))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="brv">${cuBalMini(c)}</span></button>`).join('')
+function shinRows(){cuWPRe();const L=shinList();return L.length?L.map(c=>`<button class="acrow" data-act="shinPick" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(toFa(phShow(c.phone)))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span><span class="brv">${cuBalMini(c,cuWP.get(String(c.id)))}</span></button>`).join('')
   :`<div class="spempty" style="padding:18px"><b>مشتری پیدا نشد</b><small>اول حساب مشتری را باز کنید، بعد دوباره رسید را بفرستید</small></div>`}
 function shinHTML(){const S=SHIN,n=S.keys.length;
   return `<div class="sh-h"><div><b>رسید به حساب کدام مشتری؟</b><small class="shsub">${toFa(n)} عکس رسید از برنامه دیگر</small></div><button class="x" data-act="shinNo" aria-label="بستن">×</button></div>

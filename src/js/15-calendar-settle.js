@@ -51,15 +51,15 @@ ACT.cuStl=()=>{cuStlQ='';sheet(cuStlHTML());const q=$('csq');if(q){q.oninput=()=
 ACT.cuStlPick=d=>{const c=curCu(),r=validated().find(z=>String(z.id)===String(d.id));if(!c||!r)return;entId=r.id;PX={step:2,q:'',sel:{k:'cu',id:c.id},amount:Math.min(r.amount,cuBal(c).R<0?-cuBal(c).R:r.amount),tn:'',note:'',imgD:'',bz:false,dir:1};sheet(pxHTML());pxBind()};
 /* v60.6: پرداخت‌کننده: همان جستجوی کامل صفحه مشتریان (همه مشخصات + افراد واریزی/خرید بدون حساب)، نتیجه زیر همان فیلد */
 let STP=[];
-function stlChips(){const z=stl,L=CU(),q0=(z.q||'').trim(),q=nzName(toEn(q0)),dOk=pDig(q0);
+function stlChips(){cuWPRe();const z=stl,L=CU(),q0=(z.q||'').trim(),q=nzName(toEn(q0)),dOk=pDig(q0);
   if(z.cuId||z.newName)return '';
   /* v61.93 (خواسته صاحب اپ): بدون چیپ‌های زیر جستجو؛ زدن اول = فهرست آخرین حساب‌ها با مانده (بدون کیبورد)، زدن دوم = تایپ */
   if(!q){if(!z.open)return '';const M=L.slice().sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,8);
-    return M.length?`<div class="stsug"><div class="stsh">آخرین حساب‌ها · برای جستجو دوباره بزنید</div>${M.map(c=>`<button class="stsr" data-act="stlCu" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join('، ')||'حساب مشتری'}</small></span>${cuBalMini(c)}</button>`).join('')}</div>`:''}
+    return M.length?`<div class="stsug"><div class="stsh">آخرین حساب‌ها · برای جستجو دوباره بزنید</div>${M.map(c=>`<button class="stsr" data-act="stlCu" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${[c.grp?esc(c.grp):'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join('، ')||'حساب مشتری'}</small></span>${cuBalMini(c,cuWP.get(String(c.id)))}</button>`).join('')}</div>`:''}
   const C=L.filter(c=>cuHit(c,q,dOk)).sort((a,b)=>nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q)).slice(0,6);STP=memPeople(q,dOk,6);
   const row=(act,data,av,m,name,sub,ex)=>`<button class="stsr" data-act="${act}" ${data}><span class="c6a${m?' m':''}">${esc(av)}</span><span class="tx"><b>${esc(name)}</b><small>${sub}</small></span>${ex||''}</button>`;
   const sub=o=>[o.phone?'<bdi dir="ltr">'+esc(toFa(o.phone))+'</bdi>':'',o.nid?'کد ملی <bdi dir="ltr">'+esc(toFa(o.nid))+'</bdi>':''].filter(Boolean).join('، ');
-  return `<div class="stsug">${C.map(c=>row('stlCu',`data-id="${c.id}"`,userInit(c.name),0,cuName(c),[c.grp?esc(c.grp):'',sub(c)].filter(Boolean).join('، ')||'حساب مشتری',cuBalMini(c))).join('')}
+  return `<div class="stsug">${C.map(c=>row('stlCu',`data-id="${c.id}"`,userInit(c.name),0,cuName(c),[c.grp?esc(c.grp):'',sub(c)].filter(Boolean).join('، ')||'حساب مشتری',cuBalMini(c,cuWP.get(String(c.id))))).join('')}
     ${STP.length?`<div class="stsh">از واریزی‌ها و خریدها</div>`+STP.map((p,i)=>row('stlMem',`data-i="${i}"`,userInit(p.name),1,p.name,[sub(p),p.n?fmt(p.n)+' واریزی':''].filter(Boolean).join('، ')||'بدون حساب')).join(''):''}
     ${!/^\d+$/.test(toEn(q0))&&!C.some(c=>nzName(c.name)===q)?`<button class="stsr nw" data-act="stlCu" data-id="new"><span class="c6a">+</span><span class="tx"><b>«${esc(q0)}»</b><small>نام تازه، بدون حساب</small></span></button>`:''}</div>`}
 ACT.stlMem=d=>{const p=STP[+d.i];if(!p)return;stlRead();stl.cuId='';stl.name=p.name;stl.q=p.name;stl.newName=true;if(!stl.phone)stl.phone=p.phone||'';stlRe(1)};

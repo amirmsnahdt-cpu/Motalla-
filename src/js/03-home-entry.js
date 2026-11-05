@@ -102,15 +102,15 @@ const updSet=()=>{const b=$('setbox');if(b)b.innerHTML=setboxHTML()};
 /* v63.5 (خواسته صاحب اپ): «واریز مستقیم مشتری» در فرم ویرایش واریزی هم مثل ثبت، فهرست حساب‌های مشتری (و افراد واریزی/خرید بدون حساب) را زیر نام نشان دهد؛
    انتخاب حساب، نام و تلفن را پر می‌کند و cuId روی تسویه می‌نشیند (همان فیلد فرم تسویه) */
 let SSP=[];
-function setSugHTML(){const I=$('sn2');if(!I)return '';const q0=(I.value||'').trim(),q=nzName(toEn(q0)),dOk=pDig(q0),L=CU();
+function setSugHTML(){const I=$('sn2');if(!I)return '';cuWPRe();const q0=(I.value||'').trim(),q=nzName(toEn(q0)),dOk=pDig(q0),L=CU();
   const row=(act,data,av,m,name,sub,ex)=>`<button class="stsr" data-act="${act}" ${data}><span class="c6a${m?' m':''}">${esc(av)}</span><span class="tx"><b>${esc(name)}</b><small>${sub}</small></span>${ex||''}</button>`;
   const sub=o=>[o.phone?'<bdi dir="ltr">'+esc(toFa(phShow(o.phone)))+'</bdi>':'',o.nid?'کد ملی <bdi dir="ltr">'+esc(toFa(o.nid))+'</bdi>':''].filter(Boolean).join('، ');
   if(window.__sCu){const c=custs.find(x=>String(x.id)===String(window.__sCu));return c?`<div class="stsel"><span class="c6a">${esc(userInit(cuName(c)))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>حساب مشتری</small></span>${cuMiniBal(c)}<button class="itx" data-act="setCu" data-id="" aria-label="برداشتن">×</button></div>`:''}
   if(!q){if(document.activeElement!==I)return '';const M=L.slice().sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,8);SSP=[];
-    return M.length?`<div class="stsug"><div class="stsh">آخرین حساب‌ها</div>${M.map(c=>row('setCu',`data-id="${c.id}"`,userInit(cuName(c)),0,cuName(c),[c.grp?esc(c.grp):'',sub(c)].filter(Boolean).join('، ')||'حساب مشتری',cuBalMini(c))).join('')}</div>`:''}
+    return M.length?`<div class="stsug"><div class="stsh">آخرین حساب‌ها</div>${M.map(c=>row('setCu',`data-id="${c.id}"`,userInit(cuName(c)),0,cuName(c),[c.grp?esc(c.grp):'',sub(c)].filter(Boolean).join('، ')||'حساب مشتری',cuBalMini(c,cuWP.get(String(c.id))))).join('')}</div>`:''}
   const C=L.filter(c=>cuHit(c,q,dOk)).sort((a,b)=>nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q)).slice(0,6);SSP=memPeople(q,dOk,6);
   if(!C.length&&!SSP.length)return '';
-  return `<div class="stsug">${C.map(c=>row('setCu',`data-id="${c.id}"`,userInit(cuName(c)),0,cuName(c),[c.grp?esc(c.grp):'',sub(c)].filter(Boolean).join('، ')||'حساب مشتری',cuBalMini(c))).join('')}
+  return `<div class="stsug">${C.map(c=>row('setCu',`data-id="${c.id}"`,userInit(cuName(c)),0,cuName(c),[c.grp?esc(c.grp):'',sub(c)].filter(Boolean).join('، ')||'حساب مشتری',cuBalMini(c,cuWP.get(String(c.id))))).join('')}
     ${SSP.length?`<div class="stsh">از واریزی‌ها و خریدها</div>`+SSP.map((p,i)=>row('setMem',`data-i="${i}"`,userInit(p.name),1,p.name,[sub(p),p.n?fmt(p.n)+' واریزی':''].filter(Boolean).join('، ')||'بدون حساب')).join(''):''}</div>`}
 const setSugRe=()=>{const b=$('ssg');if(b)b.innerHTML=setSugHTML()};
 function setSugBind(){const I=$('sn2');if(!I)return;I.oninput=()=>{window.__sCu='';setSugRe()};I.onfocus=setSugRe;I.onblur=()=>setTimeout(()=>{if(document.activeElement!==I)setSugRe()},250)}
