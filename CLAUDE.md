@@ -100,7 +100,7 @@ Status frames (green/yellow/red row borders) are defined ONCE at the end of 08-v
    until the owner asks again. (Liara also has a daily deployment cap — «CODE 428: Max deployment count in day».)
 
 ## Rules from the owner
-- BLUE FRAME RULE (v78.1): every search bar except the MAIN search (`.fwrap>.fsearch` on the «جستجو» page keeps its own grey frame) (`.fsearch`, `.sbox input`), label/value box (`.kvs`) and sheet amount box (`.pxam`, `.px8a`) uses `box-shadow:var(--bfr)` (focus `--bfr2`): 1.5px `--blu` line + 5px blue halo, radius 18–20. New searches/boxes must use these tokens. Allocation/payment sheets open with the intended amount (full remaining) prefilled.
+- BLUE FRAME RULE (v78.1): every search bar, including the main «جستجو» page (`.fsearch`, `.sbox input`), label/value box (`.kvs`) and sheet amount box (`.pxam`, `.px8a`) uses `box-shadow:var(--bfr)` (focus `--bfr2`): 1.5px `--blu` line + 5px blue halo, radius 18–20. New searches/boxes must use these tokens. Allocation/payment sheets open with the intended amount (full remaining) prefilled.
 - Root-cause fixes, no leftover bugs. Simple iOS-like blue UI, rounded cards, bold amounts.
 - Status frames: green settled, yellow pending, red unconfirmed — one clean rounded border, no halo.
 - Repo is public: never commit customer data, phone numbers or national IDs. Liara token lives only in GitHub secrets.
