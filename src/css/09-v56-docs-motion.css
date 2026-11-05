@@ -3561,3 +3561,22 @@ html.cdon .cdez{display:none}
 .py7add{border:0!important;border-radius:18px!important;box-shadow:var(--bfr)!important;margin-inline:3px;width:calc(100% - 6px)}
 /* v78.3 (خواسته صاحب اپ: «جستجوی اصلی قاب آبی نداشته باشد»): صفحه «جستجو» — قاب خاکستری ساده، حتی هنگام تایپ */
 .fwrap:not(.pxfw)>.fsearch.fsearch,.fwrap:not(.pxfw)>.fsearch.fsearch:focus-within{border:1.5px solid var(--fld)!important;box-shadow:none!important;transform:none!important}
+/* v78.5 (خواسته صاحب اپ): واریزی در لیست ولی بدون تخصیص = بنفش کم‌رنگ (جزو مانده آزاد)؛ تخصیص‌شده تا تأیید = زرد */
+:root{--vio:#7a4fd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--vio:#a98bff}}
+:root[data-theme="dark"]{--vio:#a98bff}
+.d6k.k-wf{background:color-mix(in srgb,var(--vio) 14%,var(--card));color:var(--vio)}
+.d6e.wdv.wf{background:color-mix(in srgb,var(--vio) 7%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--vio) 35%,transparent);color:var(--vio)}
+.d6e.wdv.wf small,.d6e.wdv.wf b{color:var(--vio)}
+.d6rows.d7 .d6r:has(.d6k.k-wf){background:color-mix(in srgb,var(--vio) 5%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,var(--vio) 35%,transparent)}
+.d6rows.d7 .d6r:has(.d6k.k-wf)::after{background:color-mix(in srgb,var(--vio) 55%,transparent)}
+.d6rows.d7 .d6r:has(.d6k.k-wf) .d6ti{background:color-mix(in srgb,var(--vio) 12%,var(--card));color:var(--vio)}
+.cbk.wf,:is(#cures,.cuLs) .cuL .cbk.wp.wf,.cub9 .cbk.wp.wf{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--vio) 45%,transparent)!important;background:color-mix(in srgb,var(--vio) 6%,var(--card))!important}
+:is(#cures,.cuLs) .cuL .cbk.wp.wf::after,.cub9 .cbk.wp.wf::after{border-color:var(--vio)}
+.cbk.wf .cbwp,.cbk.wf .cbwp b{color:var(--vio)}
+.cbwp .wfx,.wfx{color:var(--vio);font-weight:800}
+.stbl.wf{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--vio) 45%,transparent);background:color-mix(in srgb,var(--vio) 6%,var(--card))}
+.stbv.f b,.stbv.f em{color:var(--vio)}.stbv.f em{background:color-mix(in srgb,var(--vio) 14%,transparent)}
+.wdcr.wf{background:color-mix(in srgb,var(--vio) 6%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--vio) 35%,transparent)}
+.wdcr.wf .wdci{color:var(--vio);background:color-mix(in srgb,var(--vio) 12%,var(--card))}
+.txwd.wf{background:color-mix(in srgb,var(--vio) 12%,var(--card));color:var(--vio)}

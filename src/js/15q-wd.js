@@ -21,23 +21,28 @@ function wdState(e,F,BI){const ok=[],bi=BI||entBI;if(!F){try{F=famOf(e)}catch(_)
   const done=ok.reduce((s,o)=>s+o.a,0),amt=+(e.wd.amt)||+e.amount||0;return {ok,done,amt,pend:Math.max(0,Math.round(amt-done))}}
 /* v67.5 (خواسته صاحب اپ): مانده در انتظار یک واریزی به تفکیک — هر تسویه از مشتری (با سند دریافت خودش) و هر بخش بانکی جدا،
    تا در سند فروشنده هر بخش ردیف خودش را داشته باشد (نه یک ردیف کلی). جمع بخش‌ها = S.pend (اختلاف احتمالی در ردیف بانک). */
-function wdParts(e,S,A){S=S||wdState(e);if(!S.pend)return [];let F;try{F=famOf(e)}catch(_){F=[e]}if(!F.length)F=[e];const P=[];
+/* v78.5 (خواسته صاحب اپ): هر بخش بانکی که هنوز نه بانکی گرفته نه ارسال شده fr:1 دارد = «در لیست واریز · تخصیص نخورده» (بنفش کم‌رنگ، جزو مانده آزاد)؛
+   بقیه (بانک خورده، ارسال‌شده، تسویه از مشتری در انتظار) = تخصیص‌شده، زرد «در انتظار تأیید» تا تأیید واریزی */
+function wdParts(e,S,A){S=S||wdState(e);if(!S.pend)return [];A=A||allocMap();let F;try{F=famOf(e)}catch(_){F=[e]}if(!F.length)F=[e];const P=[];
   (e.settles||[]).forEach((z,i)=>{if(stlCounts(z)||!(+z.amount))return;const c=z.byInv&&custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);
     P.push({k:'s'+(z.id||i),t:'s',a:+z.amount,nm:z.name||'مشتری',doc:t?invTitle(t):'',cu:t?c.id:null,tx:t?t.id:null,tn:z.tn||''})});
   const sOf=p=>(p.settles||[]).reduce((s,z)=>s+(+z.amount||0),0);
   F.forEach(p=>{const b=entBI(p);if(b&&b.it.st==='ok')return;const a=Math.max(0,Math.round((+p.amount||0)-sOf(p)));if(!a)return;const al=A&&A.get(p.id);
-    P.push({k:'b'+p.id,t:'b',a,ent:p.id,src:(b&&b.it.src)||(al&&al.src)||'',st:b?(b.it.st==='fail'?'ناموفق در بانک':'ارسال‌شده به بانک · منتظر تأیید'):al&&al.src?'تخصیص خورده · هنوز ارسال نشده':'در لیست واریزی · هنوز تخصیص نخورده'})});
+    P.push({k:'b'+p.id,t:'b',a,ent:p.id,fr:!b&&!(al&&al.src)?1:0,src:(b&&b.it.src)||(al&&al.src)||'',st:b?(b.it.st==='fail'?'ناموفق در بانک':'ارسال‌شده به بانک · منتظر تأیید'):al&&al.src?'تخصیص خورده · هنوز ارسال نشده':'در لیست واریزی · هنوز تخصیص نخورده'})});
   const sum=P.reduce((s,o)=>s+o.a,0),d=S.pend-sum;
-  if(d){const b=P.find(o=>o.t==='b');if(b&&b.a+d>0)b.a+=d;else if(d>0)P.push({k:'r',t:'b',a:d,ent:e.id,src:'',st:'در لیست واریزی · هنوز تخصیص نخورده'})}
+  if(d){const b=P.find(o=>o.t==='b');if(b&&b.a+d>0)b.a+=d;else if(d>0)P.push({k:'r',t:'b',a:d,ent:e.id,fr:1,src:'',st:'در لیست واریزی · هنوز تخصیص نخورده'})}
   return P.filter(o=>o.a>0)}
 /* ردیف تأییدشده «تسویه از مشتری» در سند فروشنده: عنوان سند دریافت پرداخت‌کننده (wk = wds<واریزی>.<تسویه>) */
 function wdSetDoc(p){const m=/^wds(.+)\.([^.]+)$/.exec(String(p.wk||''));if(!m)return '';const e=entries.find(x=>String(x.id)===m[1]),z=e&&(e.settles||[]).find(q=>String(q.id)===m[2]);if(!z||!z.byInv)return '';
   const c=custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);return t?invTitle(t):''}
 /* مانده در انتظار واریز همه مشتری‌ها یک‌جا (فهرست مشتری‌ها و فیلتر): خانواده‌ها و ردیف‌های ارسال‌شده یک بار ساخته می‌شوند */
-function wdMap(){const M=new Map(),R=wdRoots();if(!R.length)return M;const V=validated(),FM=new Map(),IM=new Map();
+let wdAL=new Map(),wdFR=new Map();/* v78.5: تخصیص‌شده / تخصیص‌نخورده هر مشتری (همراه wdMap ساخته می‌شود) */
+function wdMap(){const M=new Map(),R=wdRoots();wdAL=new Map();wdFR=new Map();if(!R.length)return M;const AM=allocMap();const V=validated(),FM=new Map(),IM=new Map();
   V.forEach(r=>{const k=famRoot(r);(FM.get(k)||FM.set(k,[]).get(k)).push(r)});batches.forEach(b=>b.items.forEach((it,i)=>{if(!IM.has(it.id))IM.set(it.id,{b,i,it})}));
   const bi=x=>IM.get(x.id)||null;
-  R.forEach(e=>{const F=(FM.get(famRoot(e))||[e]).slice().sort((a,b)=>(a.id===e.id?-1:b.id===e.id?1:a.id-b.id)),S=wdState(e,F,bi);if(S.pend>0){const k=String(e.wd.cu);M.set(k,(M.get(k)||0)+S.pend)}});return M}
+  R.forEach(e=>{const F=(FM.get(famRoot(e))||[e]).slice().sort((a,b)=>(a.id===e.id?-1:b.id===e.id?1:a.id-b.id)),S=wdState(e,F,bi);if(S.pend>0){const k=String(e.wd.cu);M.set(k,(M.get(k)||0)+S.pend);let fr=0;wdParts(e,S,AM).forEach(o=>{if(o.fr)fr+=o.a});fr=Math.min(fr,S.pend);if(fr)wdFR.set(k,(wdFR.get(k)||0)+fr);if(S.pend-fr>0)wdAL.set(k,(wdAL.get(k)||0)+S.pend-fr)}});return M}
+/* v78.5: یک مشتری (یا یک سند): {fr: در لیست واریز بدون تخصیص, al: تخصیص‌شده در انتظار تأیید} */
+function wdSpl(c,no){const o={fr:0,al:0};if(!c)return o;const A=allocMap();wdPendL(c,no).forEach(({e,S})=>{let fr=0;wdParts(e,S,A).forEach(q=>{if(q.fr)fr+=q.a});fr=Math.min(fr,S.pend);o.fr+=fr;o.al+=S.pend-fr});return o}
 /* واریزی‌های در انتظار یک مشتری (یا یک سند) */
 function wdPendL(c,no){if(!c)return [];return wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&(no==null||String(e.wd.no)===String(no))).map(e=>({e,S:wdState(e)})).filter(o=>o.S.pend>0)}
 const wdPend=(c,no)=>wdPendL(c,no).reduce((s,o)=>s+o.S.pend,0);
@@ -64,11 +69,11 @@ function wdRowsHTML(c,no,txId){if(no==null||!c)return [];const A=allocMap(),view
       if(o.t==='s'){const sub=[o.doc?'تسویه با '+esc(o.doc)+' در حساب «'+esc(o.nm)+'»':'تسویه از مشتری · بدون سند دریافت','وضعیت: پرداخت مستقیم به فروشنده · منتظر تأیید',o.tn?'پیگیری '+esc(toFa(o.tn)):'','تاریخ واریز: '+esc(D.fa)].filter(Boolean).join(' · ');
         R.push(d6Row({ico:'swap',tag:'<em class="d6k k-wd">در انتظار تأیید</em>',b:esc(o.nm),sub,v,ex:view&&o.tx!=null?`<span class="d8eb d8lk" role="button" data-act="cuInv" data-cu="${esc(o.cu)}" data-tx="${esc(o.tx)}">${ic('inv')}<span>${esc(o.doc)}</span><small>${esc(o.nm)}</small></span>`:depL,key:'w'+e.id+o.k}));return}
       const sub=['وضعیت: '+o.st,'تاریخ واریز: '+esc(D.fa),o.src?'منبع: '+esc(o.src):'',e.iban?'بانک: '+esc((ibanBank(e.iban)||'')+' '+String(e.iban).slice(-4)):'شبا ندارد',e.holder?'صاحب حساب: '+esc(e.holder):''].filter(Boolean).join(' · ');
-      R.push(d6Row({ico:'clock',tag:'<em class="d6k k-wd">در انتظار واریز</em>',b:'واریز بانکی'+(o.src?' · '+esc(o.src):''),sub,v,ex:depL,key:'w'+e.id+o.k}))})});return R}
+      R.push(d6Row({ico:o.fr?'cal':'clock',tag:o.fr?'<em class="d6k k-wf">در لیست واریز</em>':'<em class="d6k k-wd">در انتظار تأیید</em>',b:'واریز بانکی'+(o.src?' · '+esc(o.src):''),sub,v:o.fr?v.replace('d6e wdv','d6e wdv wf').replace('رفته برای واریز','تخصیص نخورده · آزاد'):v.replace('رفته برای واریز','تخصیص‌شده'),ex:depL,key:'w'+e.id+o.k}))})});return R}
 /* صفحه مشتری: زیر کارت مانده حساب */
-function wdCuHTML(c){const L=wdPendL(c);if(!L.length)return '';const sum=L.reduce((s,o)=>s+o.S.pend,0),b=cuBal(c),free=Math.max(0,Math.round(b.R-sum));
-  return `<div class="wdcu">${L.map(({e,S})=>`<button type="button" class="wdcr" data-act="depGo" data-e="${e.id}"><span class="wdci">${ic('clock')}</span><span class="tx"><b>${fmt(S.pend)} <i>تومان</i> رفته برای واریز</b><small>سند ${toFa(e.wd.no)} · واریز ${esc(payLab(PD(e))||dates(PD(e)).fa)} · ${entBI(e)?'ارسال‌شده به بانک، منتظر تأیید':'در لیست واریزی'}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`).join('')}
-  ${b.R>0?`<div class="wdfree"><span>مانده آزاد برای تقسیم</span><b>${free?fmt(free)+' <i>تومان</i>':'ندارد'}</b></div>`:''}</div>`}
+function wdCuHTML(c){const L=wdPendL(c);if(!L.length)return '';const A=allocMap(),b=cuBal(c);let alT=0;L.forEach(o=>{let fr=0;wdParts(o.e,o.S,A).forEach(q=>{if(q.fr)fr+=q.a});o.fr=Math.min(fr,o.S.pend);o.al=o.S.pend-o.fr;alT+=o.al});const free=Math.max(0,Math.round(b.R-alT));
+  return `<div class="wdcu">${L.map(({e,S,fr,al})=>`<button type="button" class="wdcr${al?'':' wf'}" data-act="depGo" data-e="${e.id}"><span class="wdci">${ic(al?'clock':'cal')}</span><span class="tx"><b>${al?`${fmt(al)} <i>تومان</i> تخصیص‌شده · در انتظار تأیید`:`${fmt(fr)} <i>تومان</i> در لیست واریز · تخصیص نخورده`}</b><small>${al&&fr?`<span class="wfx">${fmt(fr)} تخصیص نخورده</span> · `:''}سند ${toFa(e.wd.no)} · واریز ${esc(payLab(PD(e))||dates(PD(e)).fa)}${entBI(e)?' · ارسال‌شده به بانک':''}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`).join('')}
+  ${b.R>0?`<div class="wdfree"><span>مانده آزاد (بعد از تخصیص‌ها)</span><b>${free?fmt(free)+' <i>تومان</i>':'ندارد'}</b></div>`:''}</div>`}
 /* پنجره تسویه: سطر «رفته برای واریز» زیر عدد مانده */
 function wdCkHTML(){const c=svCu();if(!c||!sv.edit)return '';const p=wdPend(c,sv.edit.no);return p?`<div class="wdck">${ic('clock')}<span>${fmt(p)} تومان از این مانده رفته برای واریز · <b>مانده آزاد ${fmt(Math.max(0,ckLeft()-p))}</b></span></div>`:''}
 const wdFree=()=>{const c=svCu();return Math.max(0,ckLeft()-(c&&sv.edit?wdPend(c,sv.edit.no):0))};

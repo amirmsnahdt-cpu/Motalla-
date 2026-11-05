@@ -12,8 +12,8 @@ function cuPendHTML(b,P,pw){const R2=(+b.R||0)+pw;/* تسویه = «دریافت
   <div class="cupdf"><small>مانده مبلغ بعد از تأیید</small><b class="${q8S(R2)}">${R2?balV('r',R2):'۰'} <i>تومان</i></b><em class="${q8S(R2)}">${ourLab(R2)}</em></div></div>`}
 /* مانده کوچک کنار نام در جستجوی پرداخت‌کننده: یک ردیف گرم، یک ردیف تومان (+ در انتظار تأیید، زرد) */
 /* v78.4 (خواسته صاحب اپ: «مبالغی که تخصیص داده شده مشخص باشه و زرد بشه»): wp = بخشی از مانده که به واریزی‌ها تخصیص خورده و هنوز واریز/تأیید نشده (wdMap)؛ با تسویه‌های در انتظار یک خط زرد «تخصیص‌شده» */
-function cuMiniBal(c,wp){const b=cuBal(c),pw=cuPendSum(c)+(+wp||0),row=(k,v)=>`<span class="stbv ${q8S(v)}"><b>${v?balV(k,v):'۰'}</b><i>${esc(balU(k))}</i><em>${ourLab(v)}</em></span>`;
-  return `<span class="stbl${pw?' pw':''}">${+b.G||!(+b.R)?row('g',+b.G||0):''}${+b.R?row('r',+b.R):''}${pw?`<span class="stbv p"><b>${fmt(pw)}</b><i>تومان</i><em>تخصیص‌شده</em></span>`:''}</span>`}
+function cuMiniBal(c,wp){const b=cuBal(c),wa=c?(cuWA.get(String(c.id))||0):0,wf=c?(cuWF.get(String(c.id))||0):0,pw=cuPendSum(c)+wa,row=(k,v)=>`<span class="stbv ${q8S(v)}"><b>${v?balV(k,v):'۰'}</b><i>${esc(balU(k))}</i><em>${ourLab(v)}</em></span>`;
+  return `<span class="stbl${pw?' pw':wf?' wf':''}">${+b.G||!(+b.R)?row('g',+b.G||0):''}${+b.R?row('r',+b.R):''}${pw?`<span class="stbv p"><b>${fmt(pw)}</b><i>تومان</i><em>تخصیص‌شده</em></span>`:''}${wf?`<span class="stbv f"><b>${fmt(wf)}</b><i>تومان</i><em>در لیست واریز</em></span>`:''}</span>`}
 
 /* v61.93: مانده کوچک در همه جستجوهای مشتری (سند، تسویه): تسویه = برچسب کوچک کم‌رنگ؛ وگرنه گرم و تومان */
 const cuBalMini=(c,wp)=>{const b=cuBal(c);return cuZero(b)&&!cuPendSum(c)&&!wp?cuZTag():cuMiniBal(c,wp)};
