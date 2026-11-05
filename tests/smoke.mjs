@@ -25,6 +25,8 @@ try {
   const s = await (await fetch(BASE + '/api/setup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'tester', name: 'آزمایش', password: 'secret123' }) })).json();
   browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: +(process.env.SMOKE_WIDTH || 390), height: 844 }, colorScheme: process.env.SMOKE_DARK ? 'dark' : 'light', locale: 'fa-IR', timezoneId: 'Asia/Tehran' });
+  // تست به اینترنت دست نمی‌زند (قیمت tgju، کتابخانه‌های cdn): هر درخواست بیرون از سرور آزمایشی قطع می‌شود تا نتیجه در CI و محلی یکی باشد
+  await page.route(u => !String(u).startsWith(BASE), r => r.abort());
   page.on('pageerror', e => fail.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::ERR/.test(m.text())) fail.push('console: ' + m.text()); });
   await page.addInitScript(([t, u]) => { if (!localStorage.getItem('m_token')) { localStorage.setItem('m_token', t); localStorage.setItem('m_me', JSON.stringify(u)); } }, [s.token, s.user]);
