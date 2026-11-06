@@ -49,7 +49,7 @@ function dkHTML(){const a=sv.qa,D=a.d&&DK.find(z=>z[0]===a.d);
 function dkList(){const a=sv.qa,q0=clean(a.q||''),q=nzName(toEn(q0)),hit=t=>!q||nzName(t).includes(q);
   /* v61.60: پولی سکه / پولی ارز — اول کدام سکه یا ارز */
   if(a.d&&a.pk){xaSync();const K=(a.pk==='c'?COINS():FXS()).filter(k=>hit(XA[k].t));return `<div class="bzsug cbl dkl"><button type="button" class="bzsr dkrw fix" data-act="dkPk0"><span class="av">${ic('back')}</span><span class="tx"><b>${a.pk==='c'?'پولی سکه':'پولی ارز'}</b><small>بازگشت به فهرست</small></span></button>${K.map(k=>`<button type="button" class="bzsr dkrw fix gd" data-act="dkPul" data-k="${esc(k)}"><span class="av">${ic(a.pk==='c'?'coin':'usd')}</span><span class="tx"><b>پولی ${esc(XA[k].t)}</b><small>نرخ هر ${esc(XA[k].u||'واحد')} · مبلغ به حساب</small></span></button>`).join('')||'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}</div>`}
-  const row=(act,data,ico,t,sub,cls)=>`<button type="button" class="bzsr dkrw${cls?' '+cls:''}" data-act="${act}"${Object.entries(data).map(([k,v])=>` data-${k}="${esc(v)}"`).join('')}><span class="av">${ic(ico)}</span><span class="tx"><b>${t}</b><small>${sub||''}</small></span>${/fix/.test(cls||'')?'<em class="dkfx">ثابت</em>':''}</button>`;
+  const row=(act,data,ico,t,sub,cls)=>`<button type="button" class="bzsr dkrw${cls?' '+cls:''}" data-act="${act}"${Object.entries(data).map(([k,v])=>` data-${k}="${esc(v)}"`).join('')}><span class="av">${ic(ico)}</span><span class="tx"><b>${t}</b><small>${sub||''}</small></span></button>`;
   if(!a.d){const R=DK.filter(([k,t])=>hit(t)).map(([k,t,i])=>row('dkD',{d:k},i,t,{sell:'آبشده، طلای ساخته، سکه، ارز',buy:'متفرقه، آبشده، سکه، ارز',swap:'طلای کهنه مشتری با نرخ روز',in:'حواله، نقد، طلا، سکه، ارز',out:'حواله، نقد، طلا، سکه، ارز',ret:'برگشت کالای فروخته'}[k],'top k-'+k+(dkRed(k)?' kr':' kb')));
     return R.length?`<div class="bzsug cbl dkl">${R.join('')}</div>`:'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}
   const F=dkFixed(a.d).filter(z=>hit(z.t+' '+z.sub)).map(z=>row('dkF',{id:z.id},z.ico,esc(z.t),esc(z.sub),'fix '+z.cls));
@@ -58,11 +58,23 @@ function dkList(){const a=sv.qa,q0=clean(a.q||''),q=nzName(toEn(q0)),hit=t=>!q||
   const known=q&&(dkFixed(a.d).some(z=>nzName(z.t)===q)||goodsList().some(k=>nzName(k)===q));
   let N='';if(q&&!known&&!/^\d+$/.test(q)&&a.d!=='in'&&a.d!=='out'||q&&!known&&(a.d==='in'||a.d==='out')&&!/^\d+$/.test(q)){
     N=a.nc?`<div class="dkcat"><small>«${esc(q0)}» در کدام دسته؟</small><div class="gks">${(a.d==='sell'?['ساخته','سایر','سکه','ارز']:['سکه','ارز']).map(c=>`<button class="tch" data-act="dkNew" data-c="${c}">${c}</button>`).join('')}</div></div>`
-      :row('dkNc',{},'plus','کالای تازه «'+esc(q0)+'»','دسته‌اش را انتخاب کنید','nw')}
+      :row('dkNc',{},'plus','کالای تازه «'+esc(q0)+'»','ساختن کالا: نوع و مشخصات','nw')}
   const out=F.join('')+(G.length?`<div class="stsh">کالاهای اضافه‌شده</div>`+G.join(''):'')+N;
   return out?`<div class="bzsug cbl dkl">${out}</div>`:'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}
-ACT.dkNc=()=>{qaRead();sv.qa.nc=1;const r=$('qKs');if(r)r.innerHTML=dkList()};
-ACT.dkNew=d=>{qaRead();const a=sv.qa,k=clean(a.q||''),c=d.c;if(!k)return;a.nc=0;const r=cfgRec(1);
+/* v78.9 (خواسته صاحب اپ: «معرفی کالای جدید یک پنجره جدا باز کند»): پنجره «کالای تازه» — نام و نوع کالا؛ مشخصات بیشتر (فی، اجرت…) بعداً همین‌جا */
+const GDT=[['ساخته','طلای ساخته','ring','وزن، عیار، اجرت و سود'],['سایر','غیر طلا','tag','فقط تعداد و مبلغ'],['سکه','سکه','coin','تعداد و نرخ هر سکه'],['ارز','ارز','usd','مقدار و نرخ هر واحد']];
+let GN=null;
+function gdNewHTML(){const T=GDT.filter(t=>GN.d==='sell'||t[0]==='سکه'||t[0]==='ارز');
+  return `<div class="gdn"><div class="sh-h"><div><b>کالای تازه</b><small class="shsub">بعد از ساختن، همین حالا در سند انتخاب می‌شود</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="ef"><label for="gdnN">نام کالا</label><input id="gdnN" value="${esc(GN.k)}" autocomplete="off" enterkeyhint="done" placeholder="مثلاً انگشتر رولکس"></div>
+  <div class="gdnl">نوع کالا</div><div class="gdnt">${T.map(([c,t,i,s])=>`<button type="button" class="gdnc${GN.c===c?' on':''}" data-act="gdnPick" data-c="${c}" aria-pressed="${GN.c===c}"><span class="gdni">${ic(i)}</span><b>${t}</b><small>${s}</small></button>`).join('')}</div>
+  <button class="xgo gdngo" data-act="gdnSave"${GN.c?'':' disabled'}>${ic('check')} ساختن کالا</button></div>`}
+ACT.dkNc=()=>{qaRead();const a=sv.qa;GN={k:clean(a.q||''),c:'',d:a.d};sheet(gdNewHTML());const n=$('gdnN');if(n)n.oninput=()=>{GN.k=n.value}};
+ACT.gdnPick=d=>{GN.c=d.c;document.querySelectorAll('#sheet .gdnc').forEach(b=>{const on=b.dataset.c===d.c;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});const g=document.querySelector('#sheet .gdngo');if(g)g.disabled=false};
+ACT.gdnSave=()=>{const n=$('gdnN'),k=clean(n?n.value:GN.k);if(!k){toast('نام کالا را بنویسید',true);n&&n.focus();return}if(!GN.c){toast('نوع کالا را انتخاب کنید',true);return}
+  if(goodsList().some(x=>nzName(x)===nzName(k))||(XA[k])){toast('«'+k+'» از قبل در فهرست هست',true);return}
+  const c=GN.c;GN=null;closeSheet();ACT.dkNew({c,k})};
+ACT.dkNew=d=>{qaRead();const a=sv.qa,k=clean(d.k||a.q||''),c=d.c;if(d.k)a.q=k;if(!k)return;a.nc=0;const r=cfgRec(1);
   if(c==='سکه'||c==='ارز'){r.xa=(r.xa||[]).filter(o=>o.k!==k).concat([{k,t:k,s:k,u:c==='ارز'?'واحد':'عدد',c:c==='ارز'?'f':'c'}]);saveCu();xaSync();toast('«'+k+'» به '+c+'‌ها اضافه شد');ACT.dkF({id:'a:'+k});return}
   r.gk={...(r.gk||{}),[k]:c};addGoods(k);saveCu();toast('«'+k+'» در دسته '+c+' اضافه شد');ACT.qaK({k})};
 /* v61.60 (خواسته صاحب اپ): کالاهای اضافه‌شده در همان فهرست ویرایش یا حذف می‌شوند (دکمه ⋯ کنار هر ردیف).

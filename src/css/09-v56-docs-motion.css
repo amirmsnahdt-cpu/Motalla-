@@ -3579,3 +3579,30 @@ html.cdon .cdez{display:none}
 /* v78.7: دکمه «حساب‌های دیگر» در پایان فهرست (خودکار هم با رسیدن به پایین باز می‌شود) */
 .cumore{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:10px 0 4px;min-height:46px;border:0;border-radius:16px;background:var(--blu2);color:var(--blu);font:inherit;font-size:14px;font-weight:800;cursor:pointer}
 .cumore svg{width:16px;height:16px;transform:rotate(90deg)}
+/* v78.9 (خواسته صاحب اپ: «فضای ورود ردیف سند مرتب‌تر و ساده‌تر»):
+   ۱) سرتیتر یکسان در همه سندها: برگشت = دکمه گرد فلش در ابتدا، عنوان کار، «انصراف» همیشه همان دکمه خاکستری انتها
+   ۲) فهرست کالاها بدون قاب سوم: ردیف‌ها مستقیم زیر جستجو با خط جداکننده نازک (فقط قاب کارت و قاب جستجو می‌ماند)
+   ۳) پنجره «کالای تازه» با کارت‌های نوع کالا */
+.sthd .sthb{width:38px;height:38px;padding:0;margin:0;justify-content:center;border-radius:50%;background:var(--seg);color:var(--ink)}
+.sthd .sthb svg{width:18px;height:18px}
+.sthd .sthb span{display:none}
+.sthd .sthk{flex:1 1 auto;min-width:0}
+.sthd .sthx,.stw .sthd .sthx{flex:none;margin-inline-start:auto;height:36px;padding:0 14px;border:0;border-radius:12px;background:var(--seg);color:var(--mut);font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;text-decoration:none}
+.stw .sthk.two~.sthx{margin-inline-start:auto}
+.sthd .sthok{flex:none}
+.dkbox.open:has(>.sthd) #qKs .dkl,.dkbox.open:has(>.sthd) #qKs>.bzsug{border:0!important;box-shadow:none!important;background:none!important;border-radius:0!important;margin:6px 0 0;padding:0}
+.dkbox.open:has(>.sthd) #qKs .dkrw{border-radius:0!important;box-shadow:none!important;border:0!important;border-bottom:1px solid var(--hair)!important;background:none!important;padding:11px 4px!important;min-height:0}
+.dkbox.open:has(>.sthd) #qKs .dkrw:last-child{border-bottom:0!important}
+.dkbox.open:has(>.sthd) #qKs .dkg{border-bottom:1px solid var(--hair)}
+.dkbox.open:has(>.sthd) #qKs .dkg .dkrw{border-bottom:0!important}
+.dkbox.open:has(>.sthd) #qKs .dkrw.nw{margin-top:4px;border-radius:14px!important;background:var(--blu2)!important;border:0!important;padding:10px 10px!important}
+.dkbox.open:has(>.sthd) #qKs .stsh{padding:12px 4px 2px;font-size:12px;font-weight:800;color:var(--mut)}
+.gdn .gdnl{font-size:13px;font-weight:800;color:var(--mut);margin:14px 2px 8px}
+.gdnt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gdnc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px 12px;border:0;border-radius:18px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);font:inherit;color:var(--ink);text-align:right;cursor:pointer;transition:box-shadow .18s,background .18s}
+.gdnc b{font-size:15px;font-weight:900}.gdnc small{font-size:12px;color:var(--mut);line-height:1.6}
+.gdni{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--seg);color:var(--mut)}.gdni svg{width:19px;height:19px}
+.gdnc.on{box-shadow:var(--bfr);background:color-mix(in srgb,var(--blu) 5%,var(--card))}
+.gdnc.on .gdni{background:var(--blu);color:#fff}
+.gdn .ef input{box-shadow:var(--bfr);border:0;border-radius:16px}
+.gdngo{margin-top:16px;width:100%}.gdngo:disabled{opacity:.45}
