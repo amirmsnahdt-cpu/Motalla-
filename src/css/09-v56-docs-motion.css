@@ -3617,3 +3617,18 @@ html.cdon .cdez{display:none}
 @keyframes offIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
 @media (prefers-reduced-motion:reduce){#offb{animation:none}}
 .tlq{font-style:normal;font-size:10.5px;font-weight:800;color:var(--warn);background:var(--warn2);border-radius:7px;padding:0 6px;margin-inline-end:4px}
+/* v79.5: ماه باز = یک کارت؛ روزها ردیف‌های فشرده یک‌خطی با خط جداکننده نازک */
+.armo .armi,.armo.open .armi{padding:0;border:0;margin:0}
+.armo.open .armh{border-radius:18px 18px 0 0;border-bottom-color:transparent;box-shadow:none}
+.armo.open .armb{background:var(--card);border:1.5px solid var(--pe);border-top:0;border-radius:0 0 18px 18px;box-shadow:0 10px 24px -18px #16213a40}
+.armo.open.ok .armb{border-color:var(--ok)}
+.armo.open .armi{padding:0 12px 4px}
+.armr{display:flex;align-items:center;gap:12px;width:100%;padding:10px 2px;border:0;border-top:1px solid var(--hair);background:none;color:var(--ink);font:inherit;text-align:right;cursor:pointer}
+.armr .armd{flex:none;width:42px;height:42px;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;background:color-mix(in srgb,var(--warn) 10%,var(--card));color:var(--warn)}
+.armr.ok .armd{background:color-mix(in srgb,var(--ok) 10%,var(--card));color:var(--ok)}
+.armr .armd b{font-size:16px;font-weight:900}.armr .armd small{font-size:9.5px;font-weight:700;opacity:.85}
+.armr .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}
+.armr .tx b{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.armr .tx small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.armr .ptbar{width:100%;margin-top:5px;height:3px}
+.armr .v{flex:none;display:flex;flex-direction:column;align-items:flex-end;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+.armr .v small{display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:var(--warn)}.armr.ok .v small{color:var(--ok)}.armr .v small svg{width:12px;height:12px}

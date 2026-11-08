@@ -40,7 +40,7 @@ ACT.arcMo=d=>{const k=+d.mo,box=document.querySelector(`.armo[data-mo="${k}"]`);
   if(arcMo.has(k)){arcMo.delete(k);box.classList.remove('open');h.setAttribute('aria-expanded','false');
     const r=h.getBoundingClientRect();if(r.top<70)h.scrollIntoView({block:'start',behavior:RM()?'auto':'smooth'});
     clearTimeout(box._t);box._t=setTimeout(()=>{if(!box.classList.contains('open'))inn.innerHTML=''},RM()?0:420)}
-  else{arcMo.add(k);clearTimeout(box._t);const L=listsData().filter(x=>arcMK(x.iso)===k);inn.innerHTML=L.map(listCard).join('');
+  else{arcMo.add(k);clearTimeout(box._t);const L=listsData().filter(x=>arcMK(x.iso)===k);inn.innerHTML=L.map(listRowM).join('');
     void box.offsetHeight;box.classList.add('open');h.setAttribute('aria-expanded','true');
     if(!RM())inn.querySelectorAll('.arcd').forEach((el,i)=>el.animate([{opacity:0,translate:'0 -10px'},{opacity:1,translate:'0 0'}],{duration:340,delay:Math.min(i,8)*35,easing:'cubic-bezier(.32,.72,0,1)',fill:'backwards'}))}};
 ACT.arcMore=()=>{arcN+=120;const r=$('arcRes');if(r)r.innerHTML=arcBody();else render()};
