@@ -569,7 +569,7 @@ ACT.svBal=d=>{if(d&&d.k==='g'){if(!svCu()){toast('مشتری سند را انت�
 let svAutoBusy=false;
 function svAuto(why){if(!sv||svAutoBusy)return false;svAutoBusy=true;try{
   try{svFlush()}catch(e){}
-  if(!svRows()){if(!sv.edit){sv=null;ls.set('m_svd',null)}else{toast('همه ردیف‌ها برداشته شده؛ سند قبلی دست نخورد. برای حذف، از صفحه سند «حذف» را بزنید',true);sv=null;ls.set('m_svd',null)}return false}
+  if(!svRows()){const c0=svCu(),t0=sv.edit&&c0&&(c0.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)),emp=t0&&!(t0.items||[]).length&&!(t0.xr||[]).length&&!(t0.pays||[]).length;if(!sv.edit||emp){sv=null;ls.set('m_svd',null)}else{toast('همه ردیف‌ها برداشته شده؛ سند قبلی دست نخورد. برای حذف، از صفحه سند «حذف» را بزنید',true);sv=null;ls.set('m_svd',null)}return false}
   if(sv.edit&&sv.sig0&&svSig()===sv.sig0){if(why!=='bg'){sv=null;ls.set('m_svd',null)}return false}
   const er=svErr();if(er){svKeep();if(why!=='bg')toast('سند ثبت نشد: '+er+' · پیش‌نویس در صفحه مشتری ماند',true);return false}
   const fromInv=PARENT.sell==='inv',{c,t}=svCommit();

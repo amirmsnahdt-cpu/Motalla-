@@ -110,7 +110,9 @@ ACT.wdSave=()=>{wdRead();const c=svCu();if(!c||!WD)return;const X=Math.round(+WD
   if(!X){toast('مبلغ واریز را بنویسید',true);$('wdA').focus();return}if(X>WD.max+1){toast('مبلغ از مانده آزاد ('+fmt(WD.max)+') بیشتر است',true);$('wdA').focus();return}
   if(WD.iban&&(WD.iban.length!==24||!ibanOk('IR'+WD.iban))){toast('شماره شبا درست نیست',true);$('wdI').focus();return}
   /* اول سند ثبت شود تا شماره‌اش قطعی باشد (اگر تغییر نکرده، همان نسخه ثبت‌شده) */
-  if(!sv.edit||svSig()!==sv.sig0){const er=svErr();if(er){toast('اول سند را کامل کنید: '+er,true);return}svAuto('bg')}
+  /* v81.6 رفع باگ (خواسته صاحب اپ: «واریز به حساب مشتری عمل نمی‌کند»): واریز مانده قبلی از سند خالی (بدون ردیف) رد می‌شد («سند ردیفی ندارد») و هیچ اتفاقی نمی‌افتاد.
+     حالا سند خالی به‌عنوان سند همین واریز ثبت می‌شود (بعد از تأیید بانک ردیف واریز در همین سند می‌نشیند) */
+  if(!sv.edit||svSig()!==sv.sig0){if(!svRows()&&!sv.edit){const R=svCommit();sv.edit={tx:R.t.id,no:R.t.no};sv.sig0=svSig();svKeep();TITLES.sell='ویرایش سند '+toFa(R.t.no)}else{const er=svErr();if(er){toast('اول سند را کامل کنید: '+er,true);return}svAuto('bg')}}
   if(!sv.edit){toast('سند ثبت نشد؛ دوباره امتحان کنید',true);return}
   const no=sv.edit.no,T=wdDocInfo(c),now=new Date().toISOString(),iban=WD.iban?'IR'+WD.iban:'',cn=clean(stripName(c.name||cuName(c)).replace(/[(（][^)）]*[)）]/g,' ')),holder=clean(WD.holder||''),name=holder||cn;/* v81.2 (خواسته صاحب اپ: «نام واریزی باید درست شود»): نام واریزی = صاحب حساب بانکی (کسی که پول به حسابش می‌رود)، وگرنه نام مشتری بدون توضیح داخل پرانتز؛ پیوند به مشتری در wd.cu می‌ماند */
   /* مشخصات بانکی مشتری: خودکار ذخیره می‌شود (دفعه بعد پر است) */
