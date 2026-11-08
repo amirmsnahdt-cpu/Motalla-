@@ -10,7 +10,10 @@ function hdGo(){const P=(act,ico,t,o)=>{o=o||{};return `<button type="button" cl
   if(cur==='backups'&&typeof bkBtn==='function')return bkBtn('bkFull','','ib0 hal hgo','down','دانلود کامل');
   if(cur==='users'&&isAdmin())return P('userNew','plus','همکار تازه');
   if(cur==='lday'){const d=hubData(ldKey);if(!d.rows.length)return '';
-    if(d.dr.length&&can('split'))return P('hubSendAll','copy','ارسال'+(d.dr.length>1?' '+toFa(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''),{al:'کپی و ارسال'});
+    /* v82.4 (خواسته صاحب اپ): «تخصیص خودکار» هم بالا، کنار «ارسال» */
+    const aa=can('split')&&typeof aPool==='function'&&aPool().length?P('aaOpen','split',d.dr.length?'':'خودکار',{sec:d.dr.length?1:0,al:'تخصیص خودکار'}):'';
+    if(d.dr.length&&can('split'))return aa+P('hubSendAll','copy','ارسال'+(d.dr.length>1?' '+toFa(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''),{al:'کپی و ارسال'});
+    if(aa)return aa;
     /* v81.6 (خواسته صاحب اپ): دکمه «بایگانی» لازم نیست — لیست تسویه‌شده در همین بخش می‌ماند */}
   return ''}
 function hdGoPut(){const B=$('bar');if(!B)return;B.querySelectorAll('.hgo').forEach(e=>e.remove());const h=hdGo();if(!h)return;let H=B.querySelector('.hbtns');if(!H){B.insertAdjacentHTML('beforeend','<span class="hbtns"></span>');H=B.querySelector('.hbtns')}H.insertAdjacentHTML('beforeend',h)}
