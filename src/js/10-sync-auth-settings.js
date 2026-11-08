@@ -41,7 +41,7 @@ const SYNC={
   sources:{get:()=>sources,set:v=>{sources=v},key:'m_sources',cmp:(a,b)=>a.id-b.id},
   batches:{get:()=>batches,set:v=>{batches=v},key:'m_batches',cmp:(a,b)=>b.id-a.id},
   creds:{get:()=>creds,set:v=>{creds=v},key:'m_creds',cmp:(a,b)=>a.id-b.id},
-  custs:{get:()=>custs,set:v=>{custs=v;/* v73.1: شماره مشتری برای حساب‌های تازه همکاران */if(typeof cuNoFix==='function'&&cuNoFix())setTimeout(()=>saveCu(),0)},key:'m_custs',cmp:(a,b)=>a.id-b.id},
+  custs:{get:()=>custs,set:v=>{custs=v;/* v73.1: شماره مشتری برای حساب‌های تازه همکاران */if(typeof cuNoFix==='function'&&cuNoFix())setTimeout(()=>audBg(saveCu),0)},key:'m_custs',cmp:(a,b)=>a.id-b.id},
   trash:{get:()=>trash,set:v=>{trash=v},key:'m_trash',cmp:(a,b)=>String(b.deletedAt||'').localeCompare(String(a.deletedAt||''))},
   /* v79.3: تاریخچه به ترتیب زمان واقعی فعالیت (ts)، نه شناسه — فعالیت‌های گوشی آفلاین بعد از اتصال سر جای زمانی خودشان می‌نشینند */audit:{get:()=>audit,set:v=>{audit=v.slice(0,400)},key:'m_audit',cmp:(a,b)=>String(b.ts||'').localeCompare(String(a.ts||''))||b.id-a.id,noDel:true},
   drafts:{get:()=>Object.keys(drafts).filter(k=>Array.isArray(drafts[k])&&drafts[k].length).map(k=>({id:k,parts:drafts[k]})),
@@ -57,7 +57,7 @@ function markDirty(c){const S=SYNC[c],B=SY.base[c]||(SY.base[c]=new Map()),seen=
     if(B.get(id)!==sj(r)){if(!(pk in SY.pend))SY.pend[pk]=B.has(id)?B.get(id):null}else delete SY.pend[pk]}
   if(!S.noDel)for(const [id,bj] of B){if(!seen.has(id)){const pk=c+'|'+id;if(!(pk in SY.pend))SY.pend[pk]=bj}}
   rawSet('m_pend',SY.pend)}
-{const _set=ls.set;ls.set=(k,v)=>{_set(k,v);const c=SYNCKEY.get(k);if(c&&TOKEN){markDirty(c);syncSoon()}}}
+{const _set=ls.set;ls.set=(k,v)=>{_set(k,v);const c=SYNCKEY.get(k);/* v79.8: تور ایمنی تاریخچه (15zl) */if(c&&typeof audNote==='function'){const a=AUDC;if(window.__audbg)AUDC=null;try{audNote(c)}catch(e){}AUDC=a}if(c&&TOKEN){markDirty(c);syncSoon()}}}
 function syncSoon(ms){clearTimeout(SY.t);SY.t=setTimeout(syncNow,ms==null?300:ms)}
 const pendN=()=>Object.keys(SY.pend).length;
 function setSync(s,err){SY.state=s;if(err!==undefined)SY.err=err;const L=syncLabel();document.querySelectorAll('.sdot').forEach(d=>{d.className='sdot '+s;d.title=L});document.querySelectorAll('.slbl').forEach(e=>{e.textContent=L});try{offPaint()}catch(e){}}
@@ -112,11 +112,11 @@ function applyRemote(res,sent){const touched=new Set(),byColl={},NEWAUD=[];
   for(const pk in sent){if(!(pk in SY.pend))continue;const i=pk.indexOf('|'),c=pk.slice(0,i),id=pk.slice(i+1),r=SYNC[c].get().find(x=>x&&String(x.id)===id),cj=r?sj(r):null;
     if(cj===sent[pk]){delete SY.pend[pk];const B=SY.base[c];if(cj===null)B.delete(id);else B.set(id,cj)}}
   SY.since=res.ver;rawSet('m_since',SY.since);rawSet('m_pend',SY.pend);
-  if(touched.size){alloc=null;remoteRefresh()}
+  if(touched.size){alloc=null;try{if(typeof audPrime==='function')audPrime([...touched].filter(c=>c!=='audit'))}catch(e){}remoteRefresh()}
   if(NEWAUD.length&&!res.full&&SY.scanned&&typeof tlNotify==='function')try{tlNotify(NEWAUD)}catch(e){}
   if(SY.scanned&&!SY.manual){const k=(SY.newN||0)-(SY.annN||0);if(k>0&&res.changes&&res.changes.length&&!res.full){SY.annN=SY.newN;if(!SY.quiet)toast(toFa(k)+' مورد تازه دریافت شد')}else SY.annN=SY.newN}}
 /* v71.8: فرم خرید دستی (buy) هم وسط پر کردن با داده همکارها دوباره ساخته نمی‌شود */const canRender=()=>!['entry','bulk','cwiz','pwiz','buy'].includes(cur)&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&!document.querySelector('.swr.on');
-function remoteRefresh(){try{entItSyncAll()}catch(e){}/* v72.0 */if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}
+function remoteRefresh(){window.__audbg=(window.__audbg||0)+1;try{entItSyncAll()}catch(e){}finally{window.__audbg--}/* v72.0 */if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}
 document.addEventListener('focusout',()=>setTimeout(()=>{if(SY.needRender&&canRender())remoteRefresh()},250));
 setInterval(()=>{if(TOKEN&&document.visibilityState==='visible')syncNow()},4000);
 setInterval(()=>{if(TOKEN&&document.visibilityState!=='visible')syncNow()},60000);

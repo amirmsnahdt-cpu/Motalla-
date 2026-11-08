@@ -68,7 +68,7 @@ function cuCount(sel){if(matchMedia('(prefers-reduced-motion: reduce)').matches)
   const st=n=>{const q=Math.min(1,(n-t0)/D),e=1-Math.pow(1-q,3);for(const el of E)el.textContent=f(el.dataset.k,+el.dataset.v*e);if(q<1)requestAnimationFrame(st)};requestAnimationFrame(st)}
 const curCu=()=>custs.find(c=>String(c.id)===String(custId))||null;
 /* ---- فهرست حساب‌ها: فقط جستجو و فهرست؛ مشتری تازه از همین جستجو ---- */
-function vCusts(){if(cuNoFix())setTimeout(()=>ls.set('m_custs',custs),0);const L=CU();
+function vCusts(){if(cuNoFix())setTimeout(()=>audBg(()=>ls.set('m_custs',custs)),0);const L=CU();
   if(!L.length&&!cuQ)return `<div class="c6s">${cuSearchHTML(0)}</div><div class="spempty"><div class="spill">${ic('users')}</div><b>هنوز حسابی باز نشده</b><span>نام مشتری را در جستجو بنویسید؛ اگر حسابی نداشته باشد، اول مشخصاتش را می‌گیریم و بعد وارد حساب و سند او می‌شوید.</span></div>`;
   cuAnim=1;cuCntId=null;return `<div class="c6s cusr"><div class="cusrow">${cuSearchHTML(L.length)}</div>${cuLastBtn()}</div>${shBanner()}<div class="cugw"><nav id="cug" class="cugr" aria-label="گروه‌ها">${cuRailHTML()}</nav><div class="cugm"><div id="cuf">${cuFiltHTML()}</div><div id="cures">${cuListHTML()}</div></div></div>`}
 /* v72.2 (خواسته صاحب اپ، مثل نرم‌افزار کیمیا): ستون گروه‌ها کنار فهرست (گوشی: نوار افقی بالای فهرست)؛ زدن = فیلتر گروه (همان cuF.g) */
