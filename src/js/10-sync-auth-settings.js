@@ -60,7 +60,7 @@ function markDirty(c){const S=SYNC[c],B=SY.base[c]||(SY.base[c]=new Map()),seen=
 {const _set=ls.set;ls.set=(k,v)=>{_set(k,v);const c=SYNCKEY.get(k);if(c&&TOKEN){markDirty(c);syncSoon()}}}
 function syncSoon(ms){clearTimeout(SY.t);SY.t=setTimeout(syncNow,ms==null?300:ms)}
 const pendN=()=>Object.keys(SY.pend).length;
-function setSync(s,err){SY.state=s;if(err!==undefined)SY.err=err;const L=syncLabel();document.querySelectorAll('.sdot').forEach(d=>{d.className='sdot '+s;d.title=L});document.querySelectorAll('.slbl').forEach(e=>{e.textContent=L})}
+function setSync(s,err){SY.state=s;if(err!==undefined)SY.err=err;const L=syncLabel();document.querySelectorAll('.sdot').forEach(d=>{d.className='sdot '+s;d.title=L});document.querySelectorAll('.slbl').forEach(e=>{e.textContent=L});try{offPaint()}catch(e){}}
 function syncLabel(){const n=pendN();return SY.state==='off'?(n?'بدون اینترنت — '+toFa(n)+' تغییر در صف ارسال':'اتصال به سرور برقرار نیست'):n?'در حال ارسال '+toFa(n)+' تغییر…':'همگام با سرور'+(SY.last?' — '+hm(new Date(SY.last).toISOString()):'')}
 async function api(path,body,method){let r;
   try{r=await fetch(API_BASE+path,{method:method||(body!==undefined?'POST':'GET'),headers:{'Content-Type':'application/json',...(TOKEN?{Authorization:'Bearer '+TOKEN}:{})},body:body!==undefined?JSON.stringify(body):undefined,cache:'no-store'})}

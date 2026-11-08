@@ -1,6 +1,9 @@
 /* سرویس ورکر مطلا: همیشه اول نسخه تازه از اینترنت؛ فقط وقتی اینترنت نیست از نسخه ذخیره‌شده */
 const CACHE = 'motalla-v2';
-self.addEventListener('install', e => { self.skipWaiting(); });
+/* v79.4 (خواسته صاحب اپ: «بدون اینترنت هم کار کند»): همان نصب اول، فایل‌های اصلی برنامه و فونت‌ها ذخیره می‌شوند تا حتی اولین بار
+   بعد از نصب هم بدون اینترنت باز شود. اگر یکی نیامد نصب شکست نمی‌خورد (هر فایل جدا). */
+const CORE = ['index.html', 'app.js', 'styles.css', 'manifest.json', 'icon-192.png', 'fonts/Vazirmatn-Regular.woff2', 'fonts/Vazirmatn-Medium.woff2', 'fonts/Vazirmatn-SemiBold.woff2', 'fonts/Vazirmatn-Bold.woff2', 'fonts/Vazirmatn-ExtraBold.woff2', 'fonts/Vazirmatn-Black.woff2'];
+self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => Promise.all(CORE.map(f => { const u = new URL(f, self.registration.scope).href; return fetch(u, { cache: 'no-cache' }).then(r => r.ok ? c.put(u, r) : 0).catch(() => 0); })))); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE && k !== 'motalla-share').map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 /* v63.5: «اشتراک‌گذاری» عکس رسید از برنامه‌های دیگر به برنامه نصب‌شده (اندروید/Chrome): عکس‌ها در کش موقت، بعد باز شدن برنامه با ?share=1 */
 self.addEventListener('fetch', e => {

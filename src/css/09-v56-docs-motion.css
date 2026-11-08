@@ -3610,3 +3610,10 @@ html.cdon .cdez{display:none}
    حساب می‌شد و رنگ محلی (مثلاً #qa قرمز در فروش/پرداخت) را نمی‌گرفت. روی خود عنصرهایی که قاب دارند دوباره تعریف می‌شود تا رنگ همان‌جا را بگیرد */
 :is(.fsearch,.sbox input,.kvs,.pxam,.px8a,.py7add,.gdnc,.gdn .ef input){--bfr:0 0 0 1.5px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 10%,transparent);--bfr2:0 0 0 2px var(--blu),0 0 0 6px color-mix(in srgb,var(--blu) 17%,transparent)}
 #qa.d6q:has(.sthd.k-sell) .fsearch svg,#qa.d6q:has(.sthd.k-out) .fsearch svg{color:var(--red)}
+/* v79.4: نوار «بدون اینترنت» (بالای صفحه، زیر نوار وضعیت گوشی) و برچسب «در صف ارسال» در تاریخچه */
+#offb{position:fixed;z-index:60;bottom:calc(env(safe-area-inset-bottom,0px) + 88px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;max-width:calc(100% - 24px);width:max-content;padding:8px 14px 8px 12px;border-radius:16px;background:color-mix(in srgb,var(--warn2) 92%,var(--card));color:var(--warn);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--pe,#b8862b) 55%,transparent),0 10px 24px -14px #0006;font-size:12.5px;line-height:1.5;animation:offIn .35s var(--spring,ease) both;pointer-events:none}
+#offb b{display:block;font-size:13.5px;font-weight:900}#offb small{display:block;color:var(--ink);opacity:.8}
+#offb .offi{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--pe,#b8862b) 18%,transparent)}#offb .offi svg{width:15px;height:15px}
+@keyframes offIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+@media (prefers-reduced-motion:reduce){#offb{animation:none}}
+.tlq{font-style:normal;font-size:10.5px;font-weight:800;color:var(--warn);background:var(--warn2);border-radius:7px;padding:0 6px;margin-inline-end:4px}
