@@ -206,7 +206,7 @@ const bpRise=(root,sel)=>{if(RM()||!root)return;root.querySelectorAll(sel).forEa
 const ourLab=v=>!v?'تسویه':v<0?'طلبکاریم':'بدهکاریم';
 /* عیار و عددها: با زدن روی کادر، کل عدد انتخاب می‌شود و با تایپ جایگزین */
 const selOnFocus=el=>{if(el&&!el.readOnly)el.addEventListener('focus',()=>setTimeout(()=>{try{el.select()}catch(e){}},0))};
-function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};
+function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};try{qfTop()}catch(e){}
   if($('qa')&&$('qa').querySelector('.stw')){stBind();return}
   if(a.p){pyBind();return}if(a.x){xrBind();return}
   /* v61.2: فهرست تشخیص/نوع با لمس فیلد باز و با ترک آن (اگر خالی است) بسته می‌شود */

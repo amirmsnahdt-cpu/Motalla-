@@ -66,7 +66,8 @@ function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><sm
     b=`<div class="ckg"><label class="ckf"><small>وزن طلای مشتری (گرم)</small><input id="ckW" class="ltr" inputmode="decimal" value="${esc(CK.w||'')}" placeholder="0.000" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="ckY" class="ltr" inputmode="numeric" value="${esc(String(CK.ay||x.ay))}" autocomplete="off"></label></div>
     <div class="ckx" id="ckX">${sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'}</div>`}
   const T=(ckOut()?CKO:CKT).find(z=>z[0]===m);
-  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><button class="lnk" data-act="ckM" data-m="">انصراف</button></div>${b}${(m==='dep'||m==='cust')&&!CK.sel||m==='hav'&&!CK.pk?'':stPhHTML(CK)}${(m==='dep'||m==='cust')&&!CK.sel||m==='hav'&&!CK.pk?'':`<button class="qago ckadd" data-act="ckAdd">${ic('plus')} افزودن به تسویه</button>`}</div>`}
+  const ok=!((m==='dep'||m==='cust')&&!CK.sel||m==='hav'&&!CK.pk);/* v80.9 (خواسته صاحب اپ): «افزودن» در سرتیتر همان فرم، کنار انصراف (نه دکمه بزرگ پایین) */
+  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><span class="ckfa"><button class="lnk" data-act="ckM" data-m="">انصراف</button>${ok?`<button type="button" class="ckok" data-act="ckAdd">${ic('check')} افزودن</button>`:''}</span></div>${b}${ok?stPhHTML(CK):''}</div>`}
 function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),R=ckRows(),A=ckAcct(),tg=ckTg(),gw=ckGold(),TL={p:'مانده قبلی',d:A?'این سند':'مانده این سند',f:'مانده نهایی'}[tg];
   /* ریز مانده‌ها (قبلی · سند · نهایی، مبلغ و طلا)؛ خانه انتخاب‌شده پررنگ و با زدن هر خانه هدف تسویه عوض می‌شود */
   const L=svBalL(),gr=L.find(z=>z[0]==='g'),rr=L.find(z=>z[0]==='r')||['r',0,0,0],ln=(k,v)=>`<span class="${ftCls(v)}${k==='r'?' r':''}"><b>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i></span>`;
@@ -157,7 +158,7 @@ function gkForm(r){const cv=GTK.m==='cv',ay=+GTK.ay||750,w=parseFloat(GTK.wt)||0
    :`<div class="ckg"><label class="ckf"><small>وزن (گرم)</small><input id="gkW" class="ltr" inputmode="decimal" value="${esc(GTK.wt||'')}" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="gkY" class="ltr" inputmode="numeric" value="${esc(String(ay))}" autocomplete="off"></label></div>
     <div class="ckx" id="gkX">${w?'معادل ۷۵۰: <b>'+wFmt(e)+'</b> گرم':'وزن را بزنید'}</div>`;
   const T=cv?['تبدیل به مبلغ','swap']:r>0?['دریافت طلا','dIn']:['پرداخت طلا','dOut'];
-  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[1])} ${T[0]}</b><button class="lnk" data-act="gkM" data-m="">انصراف</button></div>${body}<button class="qago ckadd" data-act="gkAdd">${ic('plus')} افزودن به سند</button></div>`}
+  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[1])} ${T[0]}</b><span class="ckfa"><button class="lnk" data-act="gkM" data-m="">انصراف</button><button type="button" class="ckok" data-act="gkAdd">${ic('check')} افزودن</button></span></div>${body}</div>`}
 function gkRead(){const g=id=>{const e=$(id);return e?e.value:undefined};if($('gkW'))GTK.wt=decIn(g('gkW'));if($('gkY'))GTK.ay=+toEn(g('gkY')).replace(/\D/g,'')||'';if($('gkP'))GTK.pg=num(g('gkP'))}
 function gkBind(){const W=$('gkW'),Y=$('gkY'),P=$('gkP'),up=()=>{gkRead();const el=$('gkX');if(!el)return;const r=gkRest(),w=parseFloat(GTK.wt)||0;
     if(GTK.m==='cv')el.innerHTML=w&&+GTK.pg?'مبلغ: <b>'+fmt(Math.round(w*GTK.pg))+'</b> تومان '+(r>0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'وزن و نرخ را بزنید';

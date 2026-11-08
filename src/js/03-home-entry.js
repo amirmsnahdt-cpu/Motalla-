@@ -133,7 +133,7 @@ const vBulk=()=>{if(!fPay||fPay<todayISO())fPay=payDef();return `<div class="bkw
   <div class="ef"><label>تاریخ واریز همه ردیف‌ها</label><button class="bzdate" data-act="bkCal">${ic('cal')}<span><b id="bkPayL">${esc(payLab(fPay))}</b><small id="bkPayS">${esc(dates(fPay).wd+' '+dates(fPay).fa)}</small></span>${ic('chev')}</button></div>
   <div class="ef"><label for="bulk">متن لیست</label><div class="bkta"><textarea id="bulk" placeholder="لیست را از تلگرام یا یادداشت کپی کنید و اینجا بچسبانید؛ نام و فاکتور، مبلغ، بانک و شبا خودکار تشخیص داده می‌شود."></textarea><button class="bkpaste" data-act="bkPaste">${ic('paste')} چسباندن</button></div></div>
   <div id="bkprev" class="bkprev"></div><div id="bm"></div></div>`};
-const aBulk=()=>'<button class="btn sec" data-act="resetBulk">پاک کردن</button><button class="btn gold" data-act="bulkAdd">افزودن به لیست</button>';
+const aBulk=()=>'';/* v80.9: «افزودن به لیست» و پاک کردن در سرتیتر، بالا سمت چپ (hdGo در 15zn) */
 function bkPrev(){const el=$('bkprev');if(!el)return;const t=($('bulk')||{}).value||'';if(!t.trim()){el.innerHTML='';return}const r=parse(t);
   if(!r.length){el.innerHTML='<div class="bknote">هنوز واریزی‌ای در متن پیدا نشد.</div>';return}
   const badN=r.filter(x=>!x.iban||!ibanOk(x.iban)||!x.amount||!x.name).length;

@@ -3703,8 +3703,16 @@ html.cdon .cdez{display:none}
 .bdfc.d{background:var(--red2)}.bdfc.d :is(b,em){color:var(--red)}
 .bdfc.c{background:var(--blu2)}.bdfc.c :is(b,em){color:var(--blu)}
 .bdfc.m{background:var(--blu);box-shadow:0 10px 24px -14px var(--blu)}.bdfc.m :is(small,b,em){color:#fff}.bdfc.m small,.bdfc.m em{opacity:.85}
-.bdgo{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border:0;border-radius:16px;background:var(--blu);color:#fff;font:inherit;font-size:16.5px;font-weight:900;box-shadow:0 10px 24px -12px var(--blu)}
-.bdgo .i{width:20px;height:20px}
-.bdgo i{font-style:normal;font-size:12px;font-weight:800;background:rgba(255,255,255,.2);border-radius:99px;padding:2px 9px}
-.bdgo:disabled{background:var(--seg);color:var(--mut);box-shadow:none}
 .bdft.empty .bdfg{display:none}
+
+/* v80.9 دکمه اصلی صفحه‌ها بالا سمت چپ سرتیتر (hdGo در 15zn) — مثل دکمه بالای پنجره‌ها */
+#bar .ib0.hal.hgo{height:40px;min-height:40px;border-radius:14px;padding:0 14px;white-space:nowrap;box-shadow:0 8px 18px -10px var(--blu)}
+#bar .ib0.hal.hgo span{max-width:34vw;overflow:hidden;text-overflow:ellipsis}
+#bar .ib0.hal.hgo.sec{background:var(--seg)!important;color:var(--ink)!important;border-color:transparent!important;box-shadow:none}
+#bar .ib0.hal.hgo:not(:has(span)){padding:0;width:40px;justify-content:center}
+#bar .ib0.hal.hgo:disabled{opacity:.45;box-shadow:none}/* v80.9 فرم روش تسویه: «افزودن» کنار «انصراف» در سرتیتر همان فرم */
+.ckfa{display:inline-flex;align-items:center;gap:6px}
+.ckok{display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 14px;border:0;border-radius:12px;background:var(--blu);color:#fff;font:inherit;font-size:13.5px;font-weight:900;box-shadow:0 8px 18px -10px var(--blu);white-space:nowrap}
+.ckok svg{width:15px;height:15px;stroke-width:2.6}
+#bar .ib0.hal.hgo.bkp{position:relative;overflow:hidden}
+#bar .ib0.hal.hgo.bkp .bkl{position:relative;display:inline-flex;align-items:center;gap:5px;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

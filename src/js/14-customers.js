@@ -470,7 +470,7 @@ function vBuy(){const d=bz.d,st=bz.step,T=['اطلاعات مشتری','وزن �
   /* v69.12 (خواسته صاحب اپ: «هر سه قسمت در یک صفحه، با تیک بعدی با انیمیشن باز شود»): سه بخش زیر هم؛ بخش فعلی باز،
      بخش‌های تمام‌شده یک کارت خلاصه (زدن = برگشت به همان بخش)، بخش‌های بعدی کم‌رنگ. باز شدن بخش تازه با انیمیشن. */
   const body=h.slice(h0),S2=bzSum2();const sm=[clean(d.name||'')?esc(clean(d.name))+(d.phone?' · <bdi dir="ltr">'+esc(toFa(toEn(d.phone)))+'</bdi>':''):'',S2,d.iban?'شبا '+esc(toFa(dg(d.iban).slice(-4)))+'… · '+esc(payLab(d.pay)):esc(payLab(d.pay))];
-  const secs=T.map((t,i)=>{const n=i+1;if(n===st)return `<section class="bzsec on${bz.anim?' ani':''}" data-s="${n}"><div class="bzsh"><span class="bzsn">${toFa(n)}</span><b>${t}</b></div>${body}<div class="bzft9"><button type="button" class="bzgo9 bzgo9b${st===3?' fin':''}" data-act="bzNext">${ic('check')}<span>${st<3?'تأیید و ادامه':'ثبت واریزی'}</span></button></div></section>`;
+  const secs=T.map((t,i)=>{const n=i+1;if(n===st)return `<section class="bzsec on${bz.anim?' ani':''}" data-s="${n}"><div class="bzsh"><span class="bzsn">${toFa(n)}</span><b>${t}</b></div>${body}</section>`;
     return `<button type="button" class="bzsec ${n<st?'dn':'fu'}" data-s="${n}" ${n<st?'data-act="bzGo" data-s="'+n+'"':'disabled'}><span class="bzsn">${n<st?ic('check'):toFa(n)}</span><span class="tx"><b>${t}</b><small>${n<st?(sm[i]||'—'):'بعد از «ادامه»'}</small></span>${n<st?'<span class="bzse">ویرایش</span>':''}</button>`}).join('');
   bz.anim=0;return `<div class="bzw bzw9">${h.slice(0,h0)}${secs}</div>`}
 ACT.bzGo=d=>{bzRead();const n=+d.s;if(!(n>=1&&n<bz.step))return;bz.step=n;bz.anim=1;render();$('view').scrollTop=0};

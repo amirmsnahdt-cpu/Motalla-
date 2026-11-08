@@ -171,7 +171,7 @@ function vUsers(){if(!isAdmin())return '<div class="card empty"><b>فقط مدی
   return `<div class="ingot"><div class="lb">کاربران سامانه</div><div class="v">${fmt(USERS.length)}<small>نفر</small></div><div class="row3"><div><small>فعال</small><b>${fmt(act)}</b></div><div><small>مدیر</small><b>${fmt(USERS.filter(u=>u.role==='admin').length)}</b></div><div><small>غیرفعال</small><b>${fmt(USERS.length-act)}</b></div></div></div>
   <div class="sec-h"><b>همکاران</b><small class="muted">برای ویرایش بزنید</small></div>
   ${USERS.map(u=>`<button class="lrow${u.active?'':' off'}" data-act="userEdit" data-id="${u.id}"><span class="ic gd">${esc(userInit(u.name))}</span><span class="tx"><b>${esc(u.name)}${u.id===ME.id?' <small class="muted">(شما)</small>':''}</b><small><bdi dir="ltr">@${esc(u.username)}</bdi> · ${u.last_login?'آخرین ورود '+relDay(isoOfTs(u.last_login)):'هنوز وارد نشده'}</small><span class="tags"><span class="pill ${u.role==='admin'?'gd':'g'}">${ROLE[u.role]}</span>${u.role==='admin'?'':`<span class="pill g">${fmt((u.perms||DEF_STAFF).length)} از ${fmt(PERMS.length)} دسترسی</span>`}${u.active?'':'<span class="pill rd">غیرفعال</span>'}</span></span>${fwd()}</button>`).join('')}`}
-const aUsers=()=>isAdmin()?`<button class="btn gold" data-act="userNew">${ic('plus')} افزودن همکار</button>`:'';
+const aUsers=()=>'';/* v80.9: «همکار تازه» در سرتیتر (hdGo) */
 function bindUsers(){if(!USERS&&!usersErr)loadUsers()}
 async function loadUsers(){usersErr='';try{const j=await api('/api/users');USERS=j.users}catch(e){if(e.status!==401)usersErr=e.message}if(cur==='users')render()}
 const genPass=()=>{const a='abcdefghjkmnpqrstuvwxyz23456789';let s='';const r=crypto.getRandomValues(new Uint32Array(8));for(const x of r)s+=a[x%a.length];return s};

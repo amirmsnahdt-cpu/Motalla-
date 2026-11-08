@@ -61,11 +61,7 @@ function bindLday(){const q=$('ldq');if(!q)return;q.onkeydown=e=>{if(e.key==='En
 function ldSwapKeep(inp){const V=$('view'),box=inp&&inp.closest('#view>*');if(!V||!box){render();return false}const y=V.scrollTop,T=document.createElement('div');T.innerHTML=vLday();
   const nb=T.querySelector('#'+inp.id);const nbox=nb&&nb.closest('div.fsearch');if(!nbox||nbox.parentNode!==T){render();return false}
   const K=[...T.children],i=K.indexOf(nbox),O=[...V.children],j=O.indexOf(box);O.forEach((e,k)=>{if(k!==j)e.remove()});K.slice(0,i).forEach(e=>V.insertBefore(e,box));K.slice(i+1).forEach(e=>V.appendChild(e));V.scrollTop=y;return true}
-const aLday=()=>{const d=hubData(ldKey);if(!d.rows.length)return '';const B=[];
-  /* v77.4 (خواسته صاحب اپ): «تخصیص به منبع» بالا سمت چپ سرتیتر؛ دکمه تنظیمات منابع از سرتیتر لیست برداشته شد */
-  if(d.dr.length&&can('split'))B.push(`<button class="btn gold" data-act="hubSendAll">${ic('copy')} کپی و ارسال${d.dr.length>1?' '+fmt(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''}</button>`);
-  if(!B.length&&d.sent&&!d.closed&&can('close'))B.push(`<button class="btn ${d.pend?'sec':'gold'}" data-act="hubArch">${ic('check')} بایگانی لیست</button>`);
-  return B.join('')};
+const aLday=()=>'';/* v80.9: «کپی و ارسال» / «بایگانی لیست» در سرتیتر، بالا سمت چپ (hdGo در 15zn) */
 const ST_ORD={ok:0,fail:1,pending:2,none:3};
 /* انتخاب خروجی: واریزی‌های تیک‌خورده (پیش‌فرض: همه واریزی‌های تخصیص‌داده‌شده به منبع) */
 const ldXDef=d=>new Set(d.G.filter(g=>g.name!=='تخصیص نیافته').flatMap(g=>g.rows.map(r=>r.id)));

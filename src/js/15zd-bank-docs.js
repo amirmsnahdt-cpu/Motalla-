@@ -100,10 +100,9 @@ function bdRowsHTML(){if(!BD.rows.length)return '';
   return `<div class="d6sh"><b>ردیف‌های سند</b><small>${toFa(R.length)} ردیف · بزنید = ویرایش، بکشید = حذف</small></div><div class="d6rows d7">${R.join('')}</div>`}
 /* ----- کارت پایین: این سند · مانده بعد از سند + ثبت ----- */
 function bdFtIn(){const s=bdS();if(!s||!BD.rows.length&&!BD.ed)return '';const pv=bdPrev(s),net=bdNet(),n=BD.rows.length,af=pv==null?null:pv+net;
-  return `<div class="bdft${n?'':' empty'}"><div class="bdfg"><span class="bdfc ${net>0?'d':net<0?'c':'z'}"><small>این سند</small><b>${fmt(Math.abs(net))}</b><em>${net>0?'به مانده اضافه':net<0?'از مانده کم':'—'}</em></span><span class="bdfc m"><small>مانده بعد از سند</small><b>${af==null?'—':fmt(Math.abs(af))}</b><em>${af==null?'مانده قبلی ثبت نشده':af<0?'منفی · تومان':'تومان'}</em></span></div>
-  <button type="button" class="bdgo" data-act="bdSave"${n?'':' disabled'}>${ic('check')}<span>${BD.ed?'ذخیره ویرایش':'ثبت سند'}</span>${n?`<i>${toFa(n)} ردیف</i>`:''}</button></div>`}
+  return `<div class="bdft${n?'':' empty'}"><div class="bdfg"><span class="bdfc ${net>0?'d':net<0?'c':'z'}"><small>این سند</small><b>${fmt(Math.abs(net))}</b><em>${net>0?'به مانده اضافه':net<0?'از مانده کم':'—'}</em></span><span class="bdfc m"><small>مانده بعد از سند</small><b>${af==null?'—':fmt(Math.abs(af))}</b><em>${af==null?'مانده قبلی ثبت نشده':af<0?'منفی · تومان':'تومان'}</em></span></div></div>`}
 /* ----- رسم دوباره و رویدادها ----- */
-function bdRe(o){o=o||{};if(cur!=='bdoc'||!BD)return;numMorph('#bdRows .d6e b,#bdFt .bdfc b,#bdPv .stam .fz>b',()=>{const set=(id,h)=>{const x=$(id);if(x)x.innerHTML=h};set('qa',bdQHTML());set('bdRows',bdRowsHTML());set('bdFt',bdFtIn())});BD.nw=-1;bdBind();if(o.f)bdFocus()}
+function bdRe(o){o=o||{};if(cur!=='bdoc'||!BD)return;numMorph('#bdRows .d6e b,#bdFt .bdfc b,#bdPv .stam .fz>b',()=>{const set=(id,h)=>{const x=$(id);if(x)x.innerHTML=h};set('qa',bdQHTML());set('bdRows',bdRowsHTML());set('bdFt',bdFtIn())});BD.nw=-1;bdBind();hdGoSync();if(o.f)bdFocus()}
 function bdFocus(){setTimeout(()=>{const I=$('bdI');if(!I||cur!=='bdoc')return;try{I.focus({preventScroll:true})}catch(_){I.focus()}try{const n=I.value.length;I.setSelectionRange(0,n)}catch(_){}const q=$('qa');if(q&&q.scrollIntoView)q.scrollIntoView({behavior:RM()?'auto':'smooth',block:'nearest'})},60)}
 function bdRead(){const e=BD&&BD.e,I=$('bdI');if(!e||!I)return;const k=bdSk(e);if(k==='a')e.a=num(I.value);else if(k==='cu')e.sq=I.value;else e.n=clean(I.value||'')}
 function bdBind(){if(cur!=='bdoc'||!BD)return;const K=$('qK');
