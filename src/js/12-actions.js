@@ -159,7 +159,7 @@ function moveTo(ids,fromP,src,toP){const P=parts(),sent=!!(fromP&&fromP.sent);le
   ids.forEach(id=>{if(fromP)fromP.ids=fromP.ids.filter(z=>z!==id);if(!to.ids.includes(id))to.ids.push(id);if(sent){const b=batches.find(x=>x.id===fromP.bid),it=b&&b.items.find(x=>x.id===id);if(it){it.src=src.name;it.pid=to.id}}});
   if(fromP&&!fromP.ids.length)delPart(fromP);saveD();saveB();alloc=null;logA('split',fromP?'انتقال به منبع دیگر':'تخصیص به منبع',fmt(ids.length)+' واریزی | '+(fromP?fromP.src.name+' ← ':'')+src.name);return to}
 let mvIds=[],mvFrom=null;
-function moveSheet(ids,title,fromP){mvIds=ids;mvFrom=fromP?fromP.id:null;const p=fromP,L=sources.filter(x=>!p||String(x.id)!==String(p.src.id));
+function moveSheet(ids,title,fromP){mvIds=ids;mvFrom=fromP?fromP.id:null;const p=fromP,L=DSRC().filter(x=>!p||String(x.id)!==String(p.src.id));
   /* v60.2: یک واریزی که هنوز ارسال نشده → همین‌جا «پرداخت از چند منبع» (بخشی از ملت، بخشی از ملی و…) */
   const one=ids.length===1?validated().find(r=>String(r.id)===String(ids[0])):null,F1=one?famOf(one):[],canPs=one&&can('split')&&!one.full&&one.level<2&&sources.length>1&&!F1.some(r=>r.sentBid);
   sheet(`<div class="sh-h"><div><b>${p?'انتقال به منبع دیگر':'تخصیص به منبع'}</b><small class="shsub">${esc(title)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>

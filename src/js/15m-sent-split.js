@@ -8,7 +8,7 @@ const ssLock=it=>it.st==='ok'||!!it.tn||!!it.img||!!(it.imgs||[]).length;
 function ssFam(x){const F=famOf(x);if(!F.length)return null;const L=F.map(r=>({r,e:entries.find(z=>z.id===r.id),q:entBI(r)}));if(L.some(o=>!o.e||!o.q||o.q.b.closed))return null;return L}
 const ssCan=x=>{if(!x||!x.sentBid||!can('split')||sources.length<2)return false;const L=ssFam(x);return !!L&&L.some(o=>!ssLock(o.q.it))};
 const ssLeft=()=>SS.R-SS.L.reduce((a,l)=>a+(+l.amount||0),0);
-function ssChips(l,i){return `<div class="pssc">${sources.map(z=>{const bk=acBank(z),on=String(z.id)===String(l.to);return `<button type="button" class="psch${on?' on':''}" data-act="ssSrc" data-i="${i}" data-s="${z.id}">${bk?bankBadge(bk):`<span class="bkb" style="--bc:#64748b">${esc(userInit(z.name))}</span>`}<span>${esc(z.name)}</span></button>`}).join('')}</div>`}
+function ssChips(l,i){return `<div class="pssc">${DSRC().map(z=>{const bk=acBank(z),on=String(z.id)===String(l.to);return `<button type="button" class="psch${on?' on':''}" data-act="ssSrc" data-i="${i}" data-s="${z.id}">${bk?bankBadge(bk):`<span class="bkb" style="--bc:#64748b">${esc(userInit(z.name))}</span>`}<span>${esc(z.name)}</span></button>`}).join('')}</div>`}
 function ssCard(l,i){const so=sources.find(z=>String(z.id)===String(l.to)),bk=so&&acBank(so),stx=l.st==='ok'?'تأیید شده':l.st==='fail'?'ناموفق':l.nw?'بخش تازه':'در انتظار تأیید';
   if(l.lock)return `<div class="psc sslk"><div class="psch0"><span class="psn">${toFa(i+1)}</span><b>${esc(so?so.name:l.src)}</b><em class="sstag k">${ic('check')} ${l.st==='ok'?'تأیید شده':'رسید/پیگیری دارد'} · قفل</em></div><div class="ssrow">${bk?bankBadge(bk):''}<span class="tx"><b>${fmt(l.amount)}<i>تومان</i></b></span></div></div>`;
   return `<div class="psc" data-i="${i}"><div class="psch0"><span class="psn">${toFa(i+1)}</span><b>${i===0?'بخش اصلی':'بخش '+toFa(i+1)}</b><em class="sstag ${l.st==='fail'?'f':l.nw?'n':'w'}">${stx}</em>${i>0?`<button type="button" class="itx" data-act="ssDel" data-i="${i}" aria-label="حذف بخش">×</button>`:''}</div>
@@ -38,9 +38,9 @@ ACT.sentSplit=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!s
   /* v69.7: از پنل «پرداخت از کجا؟» بانک انتخاب‌شده (d.to) می‌آید؛ اگر همان بانک بخشی دارد، همان بخش ویرایش می‌شود */
   const ex=d.to!=null&&L.find(l=>l.to===String(d.to)&&!l.lock);
   if(d.to!=null&&!ex)SS.L.push({nw:1,amount:0,to:String(d.to),st:'pending'});
-  else if(L.length===1){const o=sources.find(z=>String(z.id)!==L[0].to);SS.L.push({nw:1,amount:0,to:o?String(o.id):'',st:'pending'})}
+  else if(L.length===1){const o=DSRC().find(z=>String(z.id)!==L[0].to);SS.L.push({nw:1,amount:0,to:o?String(o.id):'',st:'pending'})}
   sheet(ssHTML());ssBind();setTimeout(()=>{const I=document.querySelector('#sheet .psc:last-child [data-sa]');if(I&&cur==='ent')I.focus()},360)};
-ACT.ssAdd=()=>{const used=new Set(SS.L.map(l=>String(l.to))),o=sources.find(z=>!used.has(String(z.id)));SS.L.push({nw:1,amount:0,to:o?String(o.id):'',st:'pending'});ssAuto(-1);ssRedraw();
+ACT.ssAdd=()=>{const used=new Set(SS.L.map(l=>String(l.to))),o=DSRC().find(z=>!used.has(String(z.id)));SS.L.push({nw:1,amount:0,to:o?String(o.id):'',st:'pending'});ssAuto(-1);ssRedraw();
   const c=document.querySelector('#sheet .psc:last-child');if(c){if(!RM()&&c.animate)c.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,.9,.25,1)'});const f=c.querySelector('[data-sa]');if(f)setTimeout(()=>f.focus(),60)}};
 ACT.ssDel=d=>{const i=+d.i;if(!i||!SS.L[i]||SS.L[i].lock)return;SS.L.splice(i,1);SS.L.forEach(l=>l.man=false);ssAuto(-1);ssRedraw()};
 ACT.ssSrc=d=>{const l=SS&&SS.L[+d.i];if(!l||l.lock)return;l.to=String(d.s);const c=document.querySelector(`#sheet .psc[data-i="${d.i}"]`);if(c)c.querySelectorAll('.psch').forEach(b=>b.classList.toggle('on',b.dataset.s===l.to));ssPaint()};

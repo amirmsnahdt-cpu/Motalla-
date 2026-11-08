@@ -13,7 +13,7 @@ let PS=null;
    هر بخش یک کارت: انتخاب منبع با دکمه‌های بانک (نه فهرست کشویی) + مبلغ؛ تایپ عدد بدون ساختن دوباره پنجره (مکان نشانگر و پاک کردن درست)،
    بخش آخر خودکار «بقیه» را می‌گیرد مگر دستی عوضش کنید؛ نوار پیشرفت و مانده زنده؛ دکمه ثبت همان لحظه فعال می‌شود. */
 const psSum=()=>PS.L.reduce((a,l)=>a+(+l.amount||0),0);
-function psSrcChips(l,i){return `<div class="pssc">${sources.map(z=>{const bk=acBank(z),on=String(z.id)===String(l.src);return `<button type="button" class="psch${on?' on':''}" data-act="psSrc" data-i="${i}" data-s="${z.id}">${bk?bankBadge(bk):`<span class="bkb" style="--bc:#64748b">${esc(userInit(z.name))}</span>`}<span>${esc(z.name)}</span></button>`}).join('')}</div>`}
+function psSrcChips(l,i){return `<div class="pssc">${DSRC().map(z=>{const bk=acBank(z),on=String(z.id)===String(l.src);return `<button type="button" class="psch${on?' on':''}" data-act="psSrc" data-i="${i}" data-s="${z.id}">${bk?bankBadge(bk):`<span class="bkb" style="--bc:#64748b">${esc(userInit(z.name))}</span>`}<span>${esc(z.name)}</span></button>`}).join('')}</div>`}
 function psCard(l,i){return `<div class="psc" data-i="${i}"><div class="psch0"><span class="psn">${toFa(i+1)}</span><b>بخش ${toFa(i+1)}</b>${PS.L.length>2?`<button type="button" class="itx" data-act="psDel" data-i="${i}" aria-label="حذف بخش">×</button>`:''}</div>
   ${psSrcChips(l,i)}
   <label class="psa"><input class="ltr" data-pa="${i}" inputmode="numeric" value="${l.amount?Number(l.amount).toLocaleString('en-US'):''}" placeholder="مبلغ این بخش" autocomplete="off"><i>تومان</i>${PS.L.length>1?`<button type="button" class="pshalf" data-act="psHalf" data-i="${i}">نصف</button><button type="button" class="pshalf" data-act="psRest" data-i="${i}">بقیه</button>`:''}</label></div>`}
@@ -39,7 +39,7 @@ function psBind(){const sh=$('sheet');sh.oninput=e=>{const t=e.target;if(t.datas
     let p=0,d=0;while(p<t.value.length&&d<before){if(/\d/.test(t.value[p]))d++;p++}try{t.setSelectionRange(p,p)}catch(_){}
     PS.L[i].amount=v;if(i===PS.L.length-1)PS.L[i].man=true;psAuto(i);psPaint(i)};
   sh.onchange=null;psPaint()}
-ACT.psAdd=()=>{const used=new Set(PS.L.map(l=>String(l.src))),o=sources.find(z=>!used.has(String(z.id)));PS.L.forEach(l=>l.man=true);PS.L.push({src:o?String(o.id):'',amount:0});psAuto(-1);psRedraw();const c=document.querySelector('#sheet .psc:last-child');if(c){if(!RM()&&c.animate)c.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,.9,.25,1)'});const f=c.querySelector('[data-pa]');if(f)setTimeout(()=>f.focus(),60)}};
+ACT.psAdd=()=>{const used=new Set(PS.L.map(l=>String(l.src))),o=DSRC().find(z=>!used.has(String(z.id)));PS.L.forEach(l=>l.man=true);PS.L.push({src:o?String(o.id):'',amount:0});psAuto(-1);psRedraw();const c=document.querySelector('#sheet .psc:last-child');if(c){if(!RM()&&c.animate)c.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,.9,.25,1)'});const f=c.querySelector('[data-pa]');if(f)setTimeout(()=>f.focus(),60)}};
 ACT.psDel=d=>{if(PS.L.length<=2)return;PS.L.splice(+d.i,1);PS.L[PS.L.length-1].man=false;psAuto(-1);psRedraw()};
 ACT.psSrc=d=>{const l=PS.L[+d.i];if(!l)return;l.src=String(d.s);const c=document.querySelector(`#sheet .psc[data-i="${d.i}"]`);if(c)c.querySelectorAll('.psch').forEach(b=>b.classList.toggle('on',b.dataset.s===String(d.s)))};
 ACT.psHalf=d=>{const i=+d.i;PS.L[i].amount=Math.round(PS.R/2);if(i===PS.L.length-1)PS.L[i].man=true;psAuto(i);psPaint()};

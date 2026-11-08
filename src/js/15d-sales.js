@@ -29,7 +29,7 @@ function chMoves(ch){const L=[];for(const c of custs){if(c.del||c.sys)continue;f
 const chBal=ch=>chMoves(ch).reduce((s,m)=>s+m.a,0);
 function chNew(name,kind){name=clean(name||'');if(!name)return null;const r={id:nid++,sys:'ch',kind,name,txs:[],createdAt:ns(),by:who()};custs.push(r);saveCu();logA('cust','تعریف '+CHK[kind],name);return r}
 /* حواله‌های سندها به حساب‌های بخش بانک (از آخرین تطبیق موجودی آن حساب) */
-function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{if(p.srcId!=null&&p.bdl==null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,t:(+p.amount<0?'حواله به ':'حواله از ')+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L.concat(pyMoves(s))}
+function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{const ca=s.cash&&p.m==='cash'&&p.srcId==null;if(ca||p.srcId!=null&&p.bdl==null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,t:(ca?(+p.amount<0?'نقد به ':'نقد از '):(+p.amount<0?'حواله به ':'حواله از '))+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L.concat(pyMoves(s))}
 const srcInvSum=s=>srcMoves(s).reduce((a,m)=>a+m.a,0);
 function srcQuick(name){name=clean(name||'');if(!name)return null;const ex=sources.find(s=>s.name===name);if(ex)return ex;if(!can('src')){toast('تعریف حساب بانکی برای حساب شما فعال نیست',true);return null}
   const s={id:nid++,name,bank:'',limit:0,count:0,iban:'',card:''};if(ownSet())s.own=1;sources.push(s);saveS();logA('src','حساب بانکی جدید',name);return s}
@@ -382,7 +382,7 @@ ACT.svRowDel=d=>{if(d.k==='pv'){pvDel(d.i);return}if(d.k==='py'&&sv.pays[+d.i]&&
 /* ----- ردیف‌های سند: مثل جدول کیمیا، هر ردیف با اثرش بر حساب مشتری (بدهکار / طلبکار) ----- */
 /* v61.6: برچسب تشخیص روی هر ردیف سند */
 const dkOfX=x=>x.cat==='تعویض'?'swap':x.cat==='مرجوعی'?'ret':x.t;
-const dkTag=id=>{const D=DK.find(z=>z[0]===id);return D?`<em class="d6k k-${id}">${D[1]}</em>`:''};
+const dkTag=id=>{const D=DKA().find(z=>z[0]===id)||DK.find(z=>z[0]===id);return D?`<em class="d6k k-${id}">${D[1]}</em>`:''};
 /* v61.47: ردیف سند فشرده و منظم (خواسته صاحب اپ): آیکون نوع کار، نام با برچسب، مشخصات به شکل تکه‌های کوچک مرتب (نه یک جمله بلند)،
    مبلغ پررنگ با رنگ اثرش — قرمز طلبکاریم، آبی بدهکاریم — و یک نوار باریک هم‌رنگ کنار ردیف */
 /* v61.56 (خواسته صاحب اپ): مشخصات ردیف سند منظم — هر مشخصه یک خانه: برچسب کوچک بالا (وزن، عیار، هر گرم خرید، اجرت، سود…)

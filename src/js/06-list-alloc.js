@@ -71,7 +71,7 @@ function vSplit1(){return vArch()}
 const aSplit1=()=>'';
 function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();render()}};q.oninput=()=>{const x=q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!q.value);clearTimeout(q._t);q._t=setTimeout(()=>{const was=arcQ;arcQ=q.value;arcN=120;if(arcQ===was)return;if(arcD){arcD='';const c=q.parentNode.querySelector('.fcal');if(c)c.classList.remove('on')}srchSwap('arcRes',arcBody())},250)}}
 /* ---------- پنجره تخصیص ---------- */
-function allocNew(){const s0=sources[0]||{};aSt={srcId:s0.id,method:s0.bank?'bank':'amount',amount:0,min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
+function allocNew(){const s0=DSRC()[0]||{};aSt={srcId:s0.id,method:s0.bank?'bank':'amount',amount:0,min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
 const aPool=()=>remainList().filter(r=>r.level<2);
 function recalc(){const P=aPool(),s=sources.find(x=>x.id==aSt.srcId)||{},m=aSt.method;let pick=[];
   const N=aSt.count||0;if(N>0&&m!=='manual'){
@@ -96,7 +96,7 @@ function paramHTML(){const m=aSt.method;
   if(m==='range')return `<div class="f2"><div class="f"><label>حداقل مبلغ</label>${numIn('pmin',aSt.min,'بدون حد')}</div><div class="f"><label>حداکثر مبلغ</label>${numIn('pmax',aSt.max,'بدون حد')}</div></div><div class="f" style="margin:0"><label>سقف مجموع <i class="opt">اختیاری</i></label>${numIn('pcap',aSt.cap,'بدون سقف')}</div>${cntHTML()}`;
   if(m==='bank')return `<div class="f"><label>بانک مقصد واریزی‌ها</label><select id="pbk"><option value="">انتخاب بانک</option>${BANKOPTS.map(b=>`<option${canon(b)===canon(aSt.bank)?' selected':''}>${b}</option>`).join('')}</select></div><div class="f" style="margin:0"><label>سقف مجموع <i class="opt">اختیاری</i></label>${numIn('pcap',aSt.cap,'بدون سقف')}</div>${cntHTML()}`;
   return ''}
-function allocSheet(){const S=sources,P=aPool();
+function allocSheet(){const S=DSRC(),P=aPool();
   sheet(`<div class="ash"><div class="sh-h"><div><b>${aSt.editPid?'ویرایش تخصیص':'تخصیص جدید'}</b><small class="shsub">${esc(pdHead(ldKey))}، مانده ${fmt(sum(P))} تومان (${fmt(P.length)} واریزی)</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="astep"><span class="n">۱</span><b>منبع پرداخت</b><button class="link" data-act="srcMgr">ویرایش منابع</button></div>
   <div class="srcs">${S.map(s=>`<button class="srcc${aSt.srcId==s.id?' on':''}" data-act="aSrc" data-id="${s.id}">${aSt.srcId==s.id?`<span class="ed" data-act="srcSet" data-id="${s.id}" role="button" aria-label="ویرایش نام منبع">${ic('edit')}</span>`:''}${acBank(s)?bankBadge(acBank(s),'lg av'):`<span class="av">${esc(userInit(s.name))}</span>`}<b>${esc(s.name)}</b><small class="${acFree(s,aSt.editPid)!=null&&acFree(s,aSt.editPid)<=0?'neg':''}">${acFree(s,aSt.editPid)==null?esc(acBank(s)?'بانک '+acBank(s):'بانک نامشخص'):shortAmt(Math.max(0,acFree(s,aSt.editPid))).replace(/\s*تومان$/,'')}</small></button>`).join('')}<button class="srcc add" data-act="aNewSrc"><span class="av">${ic('plus')}</span><b>منبع جدید</b><small>افزودن</small></button></div>

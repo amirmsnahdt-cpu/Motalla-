@@ -26,7 +26,7 @@ Object.assign(IC,{minus:'<path d="M5 12h14"/>'});
 const bdUp1=k=>bdK(k)[2]>0;/* به مانده اضافه می‌کند */
 const bdCls=k=>bdUp1(k)?'k-out':'k-in';/* همان کلاس‌های رنگ سند مشتری: k-out قرمز، k-in آبی */
 /* باز کردن سند: d.id حساب (خالی = اولین حساب مغازه، در سرتیتر عوض می‌شود)، d.k نوع ردیف اول (کادرش باز می‌شود)، d.l = ویرایش سندی که این ردیف در آن است */
-ACT.bdNew=d=>{d=d||{};if(!can('src'))return;const L=ownL();const s=d.id!=null&&d.id!==''?sources.find(x=>String(x.id)===String(d.id)):L[0];
+ACT.bdNew=d=>{d=d||{};if(!can('src'))return;const L=ownLC();const s=d.id!=null&&d.id!==''?sources.find(x=>String(x.id)===String(d.id)):L[0];
   if(!s){toast('اول یک حساب بانک مغازه بسازید',true);return}
   const x0=d.l!=null&&d.l!==''?(s.led||[]).find(z=>String(z.id)===String(d.l)&&!z.del):null;
   if(x0){const R=bdRows(s,x0);BD={sid:s.id,no:x0.no,date:x0.date||String(x0.at||'').slice(0,10)||todayISO(),ed:1,fix:1,rows:R.map(z=>({id:z.id,k:bdKOf(z),a:+z.amount||0,n:z.note||'',cu:z.cuId!=null?z.cuId:''})),q:'',e:null}}
@@ -53,9 +53,9 @@ function vBdoc(){const s=bdS();if(!s){setTimeout(()=>{if(cur==='bdoc')go(PARENT.
 </div>`}
 const aBdoc=()=>BD&&bdS()?`<div id="bdFt">${bdFtIn()}</div>`:'';
 /* سرتیتر: کارت حساب (مثل کارت مشتری در سند مشتری)؛ اگر حساب ثابت نیست، زدن = عوض کردن حساب */
-function bdHead(s){const bk=acBank(s),a=!BD.fix&&!BD.ed&&ownL().length>1,T=a?'button':'div',no=BD.no!=null?BD.no:invNext();
-  return `<${T} class="cuh9 bxh9"${a?' data-act="bdAccM" aria-label="عوض کردن حساب"':''}><span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):esc(userInit(s.name))}</span><span class="cuh9t"><span class="cuh9k">${BD.ed?'ویرایش سند بانکی '+toFa(no):'سند بانکی جدید'}</span><span class="cuh9n"><b>${esc(s.name)}</b></span><span class="cuh9m">${esc([bk?'بانک '+bk:'',s.iban?'شبا …'+toFa(s.iban.slice(-4)):''].filter(Boolean).join(' · '))}</span></span>${a?`<span class="c6ed">${ic('chev')}</span>`:''}</${T}>`}
-ACT.bdAccM=()=>{if(!BD||BD.fix||BD.ed)return;popMenu(document.querySelector('#bar .bxh9'),ownL().map(z=>['bdAccP',ic(String(z.id)===String(BD.sid)?'check':'bank'),z.name+(acFin(z)==null?'':' · '+fmt(acFin(z))),{id:z.id}]))};
+function bdHead(s){const bk=acBank(s),a=!BD.fix&&!BD.ed&&ownLC().length>1,T=a?'button':'div',no=BD.no!=null?BD.no:invNext();
+  return `<${T} class="cuh9 bxh9"${a?' data-act="bdAccM" aria-label="عوض کردن حساب"':''}><span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):s.cash?ic('cash'):esc(userInit(s.name))}</span><span class="cuh9t"><span class="cuh9k">${BD.ed?'ویرایش سند بانکی '+toFa(no):'سند بانکی جدید'}</span><span class="cuh9n"><b>${esc(s.name)}</b></span><span class="cuh9m">${esc([bk?'بانک '+bk:'',s.iban?'شبا …'+toFa(s.iban.slice(-4)):''].filter(Boolean).join(' · '))}</span></span>${a?`<span class="c6ed">${ic('chev')}</span>`:''}</${T}>`}
+ACT.bdAccM=()=>{if(!BD||BD.fix||BD.ed)return;popMenu(document.querySelector('#bar .bxh9'),ownLC().map(z=>['bdAccP',ic(String(z.id)===String(BD.sid)?'check':'bank'),z.name+(acFin(z)==null?'':' · '+fmt(acFin(z))),{id:z.id}]))};
 ACT.bdAccP=d=>{if(!BD)return;BD.sid=d.id;bkId=d.id;render()};
 ACT.bdCal=()=>{if(!BD)return;const B=BD;openCal(B.date||todayISO(),iso=>{BD=B;BD.date=iso;if(cur==='bdoc')render()})};
 /* ----- تشخیص (نوع ردیف) و کادر پله‌ای ----- */
