@@ -3660,7 +3660,9 @@ html.cdon .cdez{display:none}
 .cbl .stbv b{font-size:13.5px}
 .cbl .bzsr .tx{overflow:hidden}
 .cbl .bzsr .tx b{display:block!important}
-.cbl .bzsr .tx b .cuno{display:inline-block;vertical-align:middle;margin-inline-end:6px}
+/* v80.5 رفع باگ: عدد شماره مشتری در کادرش وسط نبود (inline-block به‌جای inline-flex) */
+.cbl .bzsr .tx b{line-height:1.6}
+.cbl .bzsr .tx b .cuno{display:inline-flex;align-items:center;justify-content:center;line-height:1;height:22px;vertical-align:middle;margin:0;margin-inline-end:6px}
 .cbl .bzsr:has(.cbv .stbl){flex-wrap:wrap;row-gap:4px}
 .cbl .bzsr .cbv:has(.stbl){flex:0 0 calc(100% - 56px);max-width:calc(100% - 56px);margin-inline-start:56px;display:flex;justify-content:flex-start;min-width:0}
 .cbl .bzsr .cbv .stbl{max-width:none;display:inline-grid}
