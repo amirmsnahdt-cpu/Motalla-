@@ -3838,3 +3838,21 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 #sheet .asave{padding-bottom:calc(4px + var(--sbp))}
 .topghost{display:flex;align-items:center;justify-content:center;gap:6px}
 .cpdone:disabled,#sheet .sh-h>.xgo.xtop.cpdone:disabled,#bar .ib0.hal.hgo.cpdone:disabled{opacity:1!important;filter:none!important;box-shadow:0 8px 18px -10px var(--ok)!important}
+/* v82.1 بانک ساده: کار روزانه زیر جستجو، برچسب «خودکار»، راهنمای کوچک، پنجره تطبیق همه حساب‌ها */
+.bkqa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
+.bkqb{display:flex;align-items:center;gap:9px;padding:9px 11px;border:0;border-radius:16px;background:var(--card);box-shadow:0 0 0 1px var(--line),0 8px 18px -14px #16213a55;font:inherit;text-align:start;color:var(--ink);animation:dkPop .4s cubic-bezier(.2,.9,.25,1.12) backwards}
+.bkqb+.bkqb{animation-delay:50ms}
+.bkqb>svg{flex:none;width:30px;height:30px;padding:7px;border-radius:10px;background:var(--blu2);color:var(--blu)}
+.bkqb span{display:grid;min-width:0}.bkqb b{font-size:13.5px;font-weight:900}.bkqb small{font-size:10.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.autg{display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:99px;background:var(--ok2);color:var(--ok);font-style:normal;font-size:10.5px;font-weight:800;vertical-align:middle}
+.bkhow{display:flex;align-items:flex-start;gap:8px;margin:2px 2px 12px;padding:9px 12px;border-radius:14px;background:color-mix(in srgb,var(--blu) 6%,var(--card));color:var(--mut);font-size:12px;line-height:1.7}
+.bkhow svg{flex:none;width:16px;height:16px;margin-top:3px;color:var(--blu)}.bkhow b{color:var(--ink)}
+.brcl{display:grid;gap:8px}
+.brcr{display:grid;grid-template-columns:auto 1fr 44%;align-items:center;gap:10px;padding:9px 10px;border-radius:16px;background:var(--seg)}
+.brca{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--card);overflow:hidden;color:var(--blu);font-weight:900}
+.brca svg{width:18px;height:18px}.brca img{width:100%;height:100%;object-fit:contain}
+.brct{display:grid;min-width:0}.brct b{font-size:13.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brct small{font-size:11px;color:var(--mut)}
+.brcd i{font-style:normal;font-size:11px;font-weight:800}.brcd .ok{color:var(--ok)}.brcd .up{color:var(--red)}.brcd .dn{color:var(--blu)}.brcd .nw{color:var(--warn)}
+.brcin{width:100%;height:42px;border:0;border-radius:12px;background:var(--card);padding:0 10px;font:inherit;font-size:15px;font-weight:800;color:var(--ink);box-shadow:var(--bfr)}
+.brcin:focus{outline:0;box-shadow:var(--bfr2)}
+.autg{margin-inline-start:0;margin-inline-end:6px}
