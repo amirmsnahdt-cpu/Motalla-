@@ -3734,3 +3734,24 @@ html.cdon .cdez{display:none}
 /* سرتیتر پنجره (و دکمه تأیید بالا سمت چپش) با پیمایش پایین ثابت می‌ماند */
 #sheet .sh-h{position:sticky;top:-10px;z-index:6;background:var(--card);margin-top:-10px;padding-top:10px;padding-bottom:8px;box-shadow:0 10px 12px -12px #0b142630}
 @media (prefers-reduced-motion:reduce){#qa .dkgrid .bzsr.dkrw.top,#sheet .ckti{animation:none}}
+/* v81.3 (خواسته صاحب اپ: «دکمه‌ها بزرگ است، خیلی کوچک‌تر و کم‌جا»): کاشی‌های تشخیص و روش‌های تسویه فشرده — آیکون کنار نام، یک خط */
+#qa .dkl.dkgrid{gap:8px;padding:4px 0}
+#qa .dkgrid .bzsr.dkrw.top{flex-direction:row;align-items:center;justify-content:flex-start;gap:9px;min-height:50px;padding:7px 10px!important;border-radius:15px!important}
+#qa .dkgrid .bzsr.dkrw.top .av{width:32px;height:32px;border-radius:10px}
+#qa .dkgrid .bzsr.dkrw.top .av svg{width:17px;height:17px}
+#qa .dkgrid .bzsr.dkrw.top .tx{gap:0}
+#qa .dkgrid .bzsr.dkrw.top .tx b{font-size:14.5px;line-height:1.35}
+#qa .dkgrid .bzsr.dkrw.top .tx small{font-size:10.5px;line-height:1.35;-webkit-line-clamp:1;white-space:nowrap;text-overflow:ellipsis;display:block}
+#sheet .ckt{gap:8px}
+#sheet .ckti{min-height:46px;padding:6px 10px!important;gap:8px;font-size:12.5px!important;border-radius:14px}
+#sheet .ckti i{width:30px;height:30px;border-radius:10px}
+#sheet .ckti i svg{width:16px;height:16px}
+#bar .ib0.hal.hgo{height:34px;min-height:34px;padding:0 11px;border-radius:12px;font-size:13px;gap:4px}
+#bar .ib0.hal.hgo svg{width:15px;height:15px}
+#bar .ib0.hal.hgo:not(:has(span)){width:34px}
+#sheet .sh-h>.xgo.xtop{height:34px;min-height:34px;padding:0 12px;border-radius:12px;font-size:13px}
+#sheet .sh-h>.xgo.xtop svg{width:14px;height:14px}
+.ckok{height:30px;padding:0 11px;border-radius:10px;font-size:12.5px}
+.ckw .ckh{padding:8px 12px;margin-bottom:10px;border-radius:16px}
+.ckw .ckh b{font-size:clamp(22px,7vw,28px)}
+#sheet .ckbl .ckbc{padding-block:6px}
