@@ -149,10 +149,10 @@ ACT.bdSave=()=>{if(!BD)return;if(BD.e&&+BD.e.a){bdRead();ACT.bdFin();if(BD.e)ret
    حواله از/به همین حساب بانک با همان شماره سند (t.bd = {sid,no,l}). ردیف حواله نشانه p.bdl دارد تا در مانده و گردش بانک دوباره شمرده نشود
    (اثر بانک همان ردیف s.led است). با هر ویرایش/حذف سند بانکی، سندهای متقابل قبلی کنار می‌روند و از روی ردیف‌های فعلی دوباره ساخته می‌شوند.
    در حساب مشتری این سند فقط دیده می‌شود؛ ویرایش و حذفش سند بانکی را باز می‌کند. */
-function bdMirror(s,no){const now=new Date().toISOString(),by=who();let ch=0,n=0;
-  for(const c of custs){if(c.sys)continue;for(const t of c.txs||[])if(!t.del&&t.bd&&String(t.bd.sid)===String(s.id)&&String(t.bd.no)===String(no)){t.del=true;t.delAt=now;t.delBy=by;ch=1}}
+function bdMirror(s,no){const now=new Date().toISOString(),by=who();let ch=0,n=0;const keep=new Map();/* v81.0: شماره سند مشتری با ویرایش سند بانکی عوض نشود */
+  for(const c of custs){if(c.sys)continue;for(const t of c.txs||[])if(!t.del&&t.bd&&String(t.bd.sid)===String(s.id)&&String(t.bd.no)===String(no)){keep.set(String(c.id)+'|'+t.bd.l,cnOf(c,t));t.del=true;t.delAt=now;t.delBy=by;ch=1}}
   for(const z of s.led||[]){if(z.del||z.no==null||String(z.no)!==String(no)||z.cuId==null||z.cuId==='')continue;const c=CU().find(q=>String(q.id)===String(z.cuId));if(!c)continue;const g=z.type==='in'?1:-1,a=+z.amount||0;
-    (c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:g>0?'in':'out',no,date:z.date,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:[{m:'hav',amount:g*a,srcId:s.id,bdl:z.id,tn:''}],note:[bdLab(z),z.note].filter(Boolean).join(' · '),at:z.edAt||z.at||now,by:z.by||by,bd:{sid:s.id,no,l:z.id}});c.lastAt=now;ch=1;n++}
+    (c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:g>0?'in':'out',no,date:z.date,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:[{m:'hav',amount:g*a,srcId:s.id,bdl:z.id,tn:''}],note:[bdLab(z),z.note].filter(Boolean).join(' · '),at:z.edAt||z.at||now,by:z.by||by,bd:{sid:s.id,no,l:z.id},cn:keep.get(String(c.id)+'|'+z.id)||cnNext(c)});c.lastAt=now;ch=1;n++}
   if(ch)saveCu();return n}
 /* سند متقابل در حساب مشتری → سند بانکی اصلی */
 const bdOfTx=t=>{if(!t||!t.bd)return null;const s=sources.find(x=>String(x.id)===String(t.bd.sid)),z=s&&(s.led||[]).find(q=>String(q.id)===String(t.bd.l)&&!q.del);return s&&z?{s,z}:null};

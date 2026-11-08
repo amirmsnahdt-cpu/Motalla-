@@ -39,9 +39,21 @@ function txLinked(c,t){const R=[],find=(cu,tx)=>{const C=custs.find(z=>String(z.
   if((t.type==='xf'||t.type==='cv')&&t.peer)find(t.peer.cu,t.peer.tx);
   if(t.type==='xf'&&t.inv)find(t.inv.cu,t.inv.tx);
   return R.filter(x=>x.t!==t)}
+/* v81.0 (خواسته صاحب اپ، مثل کیمیا): «شماره سند مشتری» — هر حساب سندهای خودش را ۱، ۲، ۳… می‌شمارد، کنار شماره کل سند (t.no).
+   سند تازه t.cn = بزرگ‌ترین شماره همان حساب + ۱ (svCommit)؛ ویرایش همان شماره نسخه قبلی را می‌گیرد (زنجیره edOf)؛ سندهای قبلی که t.cn ندارند
+   به ترتیب زمان ثبت (at0/at) شماره می‌گیرند — بدون تغییر داده، روی همه گوشی‌ها یکسان. سند حذف‌شده شماره‌اش را نگه می‌دارد (عوض شدن شماره‌های بعدی ممنوع) */
+const CNC=new Map();
+function cnNums(c){const k=(c.txs||[]).length+'|'+(c.lastAt||'')+'|'+(c.updatedAt||''),o=CNC.get(c);if(o&&o.k===k)return o.M;
+  const T=(c.txs||[]).filter(t=>t.type==='inv'),byId=new Map(T.map(t=>[String(t.id),t])),root=t=>{let x=t,i=0;while(x.edOf!=null&&byId.has(String(x.edOf))&&i++<60)x=byId.get(String(x.edOf));return x};
+  const R=[...new Set(T.map(root))],rn=new Map();R.filter(t=>t.cn==null).sort((a,b)=>String(a.at0||a.at||'').localeCompare(String(b.at0||b.at||''))||String(a.id).localeCompare(String(b.id))).forEach((t,i)=>rn.set(t,i+1));R.forEach(t=>{if(t.cn!=null)rn.set(t,+t.cn)});
+  const M=new Map();T.forEach(t=>M.set(String(t.id),t.cn!=null?+t.cn:rn.get(root(t))));CNC.set(c,{k,M});return M}
+const cnOf=(c,t)=>c&&t?cnNums(c).get(String(t.id))||null:null;
+const cnNext=c=>{let m=0;for(const v of cnNums(c).values())if(v>m)m=v;return m+1};
+const cnOfT=t=>{for(const c of custs){if(c.sys)continue;if((c.txs||[]).includes(t))return cnOf(c,t)}return null};
+const cnTag=n=>n?`<span class="cntg">سند ${toFa(n)} مشتری</span>`:'';
 const invTitle=t=>t.legacy?(t.dk==='out'?'سند پرداخت وجه':'سند دریافت وجه'):(t.dk==='buy'?'سند خرید ':t.dk==='in'&&t.auto==='stl'?'سند دریافت ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
 function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
-  let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t);ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
+  let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t)+(cnOf(c,t)?' · سند '+toFa(cnOf(c,t))+' مشتری':'');ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
   const vals=(d.r?v(d.r,'r'):'')+(d.g?v(d.g,'g'):'')+Object.keys(d.x||{}).filter(k=>+d.x[k]).map(k=>v(+d.x[k],k)).join('')||'<b>تسویه</b>';
   const wp=t.type==='inv'&&typeof wdPend==='function'?wdPend(c,t.no):0;/* v61.80: مانده رفته برای واریز */
@@ -530,7 +542,7 @@ function svCommit(){const c=svCu();let depOld=null;
   let OLD=null;if(sv.edit){const t0=(c.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)&&!x.del);if(t0){OLD=t0;const at=new Date().toISOString();t0.del=true;t0.delAt=at;t0.delBy=who();t0.edBy=1;txLinked(c,t0).forEach(x=>{x.t.del=true;x.t.delAt=at;x.t.delBy=who()});depOld=depKeep(t0);invDepOff(t0)}}
   const T=svTot(),now=ns(),no=sv.edit?sv.edit.no:sv.no0&&!invNoUsed(sv.no0)?sv.no0:invNext(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}});
   const xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e}});
-  const t={id:nid++,type:'inv',dk:sv.dk||undefined,no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>{const q={...p};delete q.xfId;return q}),at:now,by:who()};if(OLD){t.edOf=OLD.id;t.at0=OLD.at0||OLD.at}
+  const t={id:nid++,type:'inv',dk:sv.dk||undefined,no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>{const q={...p};delete q.xfId;return q}),at:now,by:who()};if(OLD){t.edOf=OLD.id;t.at0=OLD.at0||OLD.at;t.cn=cnOf(c,OLD)||undefined}else t.cn=cnNext(c)
   if(T.ge)t.ge=T.ge;if(Object.keys(T.xe).length)t.xe=T.xe;
   if(sv.gconv&&T.rest>0&&sv.rate)t.gc={r:T.rest,g:Math.round(T.rest/sv.rate*1000)/1000};
   for(const p of t.pays){if(p.m!=='cust')continue;const Y=custs.find(z=>String(z.id)===String(p.cuId)),x={id:nid++,type:'xf',r:-p.amount,g:0,note:'پرداخت سند '+toFa(no)+' «'+cuName(c)+'»',inv:{cu:c.id,tx:t.id},date:sv.date,at:now,by:who()};(Y.txs=Y.txs||[]).push(x);Y.lastAt=now;p.xfId=x.id}
@@ -604,7 +616,7 @@ function popMenu(btn,items){let m=$('pmenu');if(m){m.remove();return}if(!btn)ret
   const out=e=>{if(m.contains(e.target)||btn.contains(e.target))return;close();/* v72.6: زدن بیرون منو فقط منو را می‌بندد؛ همان زدن، ردیف یا دکمه زیرش را باز نمی‌کند */const eat=ev=>{ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation()},off=()=>window.removeEventListener('click',eat,true);window.addEventListener('click',eat,true);document.addEventListener('pointerup',()=>setTimeout(off,350),{once:true,capture:true});setTimeout(off,1500)},key=e=>{if(e.key==='Escape')close()},close=()=>{if(m._c)return;m._c=1;m.classList.add('out');btn.setAttribute('aria-expanded','false');document.removeEventListener('pointerdown',out,true);document.removeEventListener('keydown',key,true);setTimeout(()=>m.remove(),RM()?0:160)};
   setTimeout(()=>{document.addEventListener('pointerdown',out,true);document.addEventListener('keydown',key,true)},0);m.addEventListener('click',e=>{if(e.target.closest('.pmi'))setTimeout(close,0)});const f=m.querySelector('.pmi');if(f)f.focus({preventScroll:true})}
 /* v61.57 (خواسته صاحب اپ): تاریخ و مظنه سند بالای صفحه، زیر سرتیتر (پیش از کارت مانده حساب) */
-function ivMeta(t){const D=dates(t.date);return `<div class="iv8m"><span>${ic('cal')}<b>${esc(D.fa)}</b><small>${esc(D.wd)}</small></span>${t.rate?`<span>${ic('tag')}<small>${t.mz?'مظنه':'هر گرم'}</small><b>${fmt(t.mz||t.rate)}</b></span>`:''}${t.tax?`<span><small>با مالیات</small></span>`:''}</div>`}
+function ivMeta(t){const D=dates(t.date),n=t.draft?null:cnOfT(t);return `<div class="iv8m">${n?`<span>${ic('user')}<small>سند مشتری</small><b>${toFa(n)}</b></span>`:''}<span>${ic('cal')}<b>${esc(D.fa)}</b><small>${esc(D.wd)}</small></span>${t.rate?`<span>${ic('tag')}<small>${t.mz?'مظنه':'هر گرم'}</small><b>${fmt(t.mz||t.rate)}</b></span>`:''}${t.tax?`<span><small>با مالیات</small></span>`:''}</div>`}
 /* v61.6: باز کردن سند = جزئیات سند و ردیف‌ها (مثل صفحه سند)؛ فاکتور کاغذی فقط با «نمایش فاکتور» */
 function ivDet(c,t){const D=dates(t.date),eff=d6Eff,R=[];
   let n=0;const row=(ico,tag,b,sub,v,phs,ex)=>d6Row({ico,phs,tag:dkTag(tag),b,sub,v,ex,key:'v'+t.id+'.'+n,n:n++}),PG=pvGroups(t.pays||[],t.xr||[]);
