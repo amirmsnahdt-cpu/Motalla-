@@ -4,7 +4,12 @@
    - داده همان دفتر حساب s.led است (قالب قبلی نمی‌شکند): هر ردیف یک ردیف led با type in|out (اثر بر مانده)،
      k = کلید تشخیص، note = شرح، و همه ردیف‌های یک سند یک شماره no دارند (همان شمارنده سندها invNext).
    - سندهای قبلی واریز/برداشت دستی (بدون k) همین‌جا باز و ویرایش می‌شوند (تشخیص از type). */
-const BDK=[['out','برداشت',-1],['in','واریز',1],['buy','خرید',-1],['sell','فروش',1],['chq','در حساب',1],['pass','پاس شدن',-1],['vos','وصول',1]];
+const BDK=[['out','برداشت',-1],['in','واریز',1],['buy','خرید',-1],['sell','فروش',1],['chq','در حساب',1],['pass','پاس شدن',-1],['vos','وصول',1],['add','اضافه',1],['sub','کسر',-1]];
+/* v80.0 (خواسته صاحب اپ، مثل کیمیا): «اضافه» و «کسر» روی حساب بانک بدون طرف حساب، با علت از فهرست (تخفیف، مانده قبلی، هزینه بانکی،
+   یارانه، سرمایه اولیه) یا علت تازه که نوشته شود و برای دفعه بعد در فهرست می‌ماند (cfg.adj، همگام بین گوشی‌ها) */
+const BDR0=['تخفیف','مانده قبلی','هزینه بانکی','یارانه','سرمایه اولیه'];
+const bdAdj=k=>k==='add'||k==='sub';
+const bdReasons=()=>{const r=cfgRec();return [...new Set([...BDR0,...((r&&r.adj)||[])])]};
 const bdK=k=>BDK.find(x=>x[0]===k)||BDK[1];
 const bdKOf=x=>x.k&&BDK.some(z=>z[0]===x.k)?x.k:x.type==='out'?'out':'in';
 const bdLab=x=>bdK(bdKOf(x))[1];
@@ -23,11 +28,12 @@ function bdHTML(){const s=bdS();if(!s)return '';const no=BD.no!=null?BD.no:invNe
   const acc=BD.fix?`<div class="bdac one">${bk?bankBadge(bk):`<span class="bri">${ic('bank')}</span>`}<span class="tx"><b>${esc(s.name)}</b><small>${esc(bkSub(s))}</small></span></div>`
     :`<div class="bdacs">${(L.some(z=>String(z.id)===String(s.id))?L:[s,...L]).map(z=>{const b=acBank(z);return `<button type="button" class="bdac${String(z.id)===String(s.id)?' on':''}" data-act="bdAcc" data-id="${z.id}">${b?bankBadge(b):`<span class="bri">${ic('bank')}</span>`}<span class="tx"><b>${esc(z.name)}</b><small>${acFin(z)==null?'—':fmt(acFin(z))+' تومان'}</small></span></button>`}).join('')}</div>`;
   const opt=k=>BDK.map(([v,t,g])=>`<option value="${v}"${v===k?' selected':''}>${t}</option>`).join('');
-  const rows=BD.rows.map((r,i)=>`<div class="bdr ${bdK(r.k)[2]>0?'in':'out'}" data-i="${i}"><span class="bdn0">${toFa(i+1)}</span>
+  const rows=BD.rows.map((r,i)=>`<div class="bdr ${bdK(r.k)[2]>0?'in':'out'}${bdAdj(r.k)?' adj':''}" data-i="${i}"><span class="bdn0">${toFa(i+1)}</span>
     <label class="bdks"><select class="bdk" aria-label="تشخیص">${opt(r.k)}</select></label>
     <label class="bdam"><input class="bda ltr" inputmode="numeric" autocomplete="off" placeholder="مبلغ" aria-label="مبلغ" value="${r.a?Number(r.a).toLocaleString('en-US'):''}"><i>تومان</i></label>
     ${BD.rows.length>1?`<button type="button" class="bdx" data-act="bdDel" data-i="${i}" aria-label="حذف ردیف">×</button>`:''}
-    <input class="bdnt" autocomplete="off" placeholder="شرح (اختیاری)" aria-label="شرح" value="${esc(r.n||'')}"></div>`).join('');
+    <input class="bdnt" autocomplete="off" placeholder="${bdAdj(r.k)?'علت: از فهرست بزنید یا علت تازه بنویسید':'شرح (اختیاری)'}" aria-label="${bdAdj(r.k)?'علت':'شرح'}" value="${esc(r.n||'')}">
+    ${bdAdj(r.k)?`<div class="bdrs">${bdReasons().map(t=>`<button type="button" class="bdrc${r.n===t?' on':''}" data-act="bdRs" data-i="${i}" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>`:''}</div>`).join('');
   return `<div class="sh-h"><div><b>${BD.ed?'ویرایش ':''}سند بانکی ${toFa(no)}</b><small class="shsub">مستقیم روی حساب بانک، جدا از لیست‌های واریزی</small></div><button class="x" data-act="${BD.ed?'acLedOpen':'acBack'}" data-id="${s.id}"${BD.ed?` data-l="${BD.rows[0].id}"`:''} aria-label="بستن">×</button></div>
   <div class="bdtop"><button type="button" class="bddt" data-act="bdCal">${ic('cal')}<span>${esc(dates(BD.date).fa)}</span></button><span class="bdno">کد سند <b>${toFa(no)}</b></span></div>
   ${acc}<div class="bdl" id="bdL">${rows}</div>
@@ -42,14 +48,17 @@ function bdSumHTML(){const s=bdS();if(!s)return '';let i=0,o=0;for(const r of BD
 function bdRead(){document.querySelectorAll('#bdL .bdr').forEach(el=>{const r=BD.rows[+el.dataset.i];if(!r)return;r.k=el.querySelector('.bdk').value;r.a=num(el.querySelector('.bda').value);r.n=clean(el.querySelector('.bdnt').value||'')})}
 function bdBind(){const L=$('bdL');if(!L)return;L.querySelectorAll('.bdr').forEach(el=>{const a=el.querySelector('.bda'),k=el.querySelector('.bdk'),n=el.querySelector('.bdnt');
   a.oninput=()=>{const v=num(a.value);a.value=v?v.toLocaleString('en-US'):'';bdRead();const S=$('bdSum');if(S)S.innerHTML=bdSumHTML()};
-  k.onchange=()=>{bdRead();el.classList.toggle('in',bdK(k.value)[2]>0);el.classList.toggle('out',bdK(k.value)[2]<0);const S=$('bdSum');if(S)S.innerHTML=bdSumHTML();if(!RM()&&el.animate)el.animate([{transform:'scale(.98)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.3,1.4,.5,1)'})};
+  k.onchange=()=>{bdRead();if(bdAdj(k.value)!==el.classList.contains('adj')){bdRe();return}el.classList.toggle('in',bdK(k.value)[2]>0);el.classList.toggle('out',bdK(k.value)[2]<0);const S=$('bdSum');if(S)S.innerHTML=bdSumHTML();if(!RM()&&el.animate)el.animate([{transform:'scale(.98)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.3,1.4,.5,1)'})};
   a.onkeydown=n.onkeydown=ev=>{if(ev.key!=='Enter')return;ev.preventDefault();if(ev.target===a)n.focus();else ACT.bdAdd()}})}
 const bdRe=f=>{sheetKeep(bdHTML());bdBind();if(f)f()};
 ACT.bdAdd=()=>{if(!BD)return;bdRead();const last=BD.rows[BD.rows.length-1];BD.rows.push({k:last?last.k:'out',a:0,n:''});bdRe(()=>{const R=document.querySelectorAll('#bdL .bdr'),el=R[R.length-1];if(!el)return;if(!RM()&&el.animate)el.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:280,easing:'cubic-bezier(.2,.9,.25,1)'});const a=el.querySelector('.bda');if(a)a.focus()})};
 ACT.bdDel=d=>{if(!BD||BD.rows.length<2)return;bdRead();BD.rows.splice(+d.i,1);bdRe()};
 ACT.bdAcc=d=>{if(!BD||BD.fix)return;bdRead();BD.sid=d.id;bdRe()};
 ACT.bdCal=()=>{if(!BD)return;bdRead();const B=BD;openCal(B.date||todayISO(),iso=>{BD=B;BD.date=iso;sheet(bdHTML());bdBind()})};
+ACT.bdRs=d=>{if(!BD)return;bdRead();const r=BD.rows[+d.i];if(!r)return;r.n=r.n===d.v?'':d.v;bdRe()};
 ACT.bdSave=()=>{if(!BD)return;bdRead();const s=bdS();if(!s)return;const R=BD.rows.filter(r=>+r.a>0);if(!R.length){toast('مبلغ حداقل یک ردیف را وارد کنید',true);return}
+  if(R.some(r=>bdAdj(r.k)&&!clean(r.n||''))){toast('برای «اضافه» و «کسر» علت را انتخاب کنید یا بنویسید',true);return}
+  {const nw=[...new Set(R.filter(r=>bdAdj(r.k)).map(r=>clean(r.n)))].filter(t=>t&&!bdReasons().includes(t));if(nw.length){const c=cfgRec(1);c.adj=[...(c.adj||[]),...nw];saveCu()}}
   const now=new Date().toISOString(),by=who(),L=(s.led=s.led||[]);let no=BD.no;
   if(BD.ed){const keep=new Set(R.filter(r=>r.id!=null).map(r=>String(r.id))),old=L.filter(z=>!z.del&&z.no!=null&&String(z.no)===String(no));const at0=(old[0]&&old[0].at)||now;
     for(const z of old)if(!keep.has(String(z.id))){z.del=true;z.delAt=now;z.delBy=by}

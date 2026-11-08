@@ -3664,3 +3664,9 @@ html.cdon .cdez{display:none}
 .cbl .bzsr:has(.cbv .stbl){flex-wrap:wrap;row-gap:4px}
 .cbl .bzsr .cbv:has(.stbl){flex:0 0 calc(100% - 56px);max-width:calc(100% - 56px);margin-inline-start:56px;display:flex;justify-content:flex-start;min-width:0}
 .cbl .bzsr .cbv .stbl{max-width:none;display:inline-grid}
+/* v80.0: «اضافه / کسر» در سند بانکی — فهرست علت‌ها به شکل چیپ زیر ردیف */
+.bdr.adj .bdrs{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.bdrc{border:0;border-radius:10px;padding:6px 11px;background:var(--seg);color:var(--ink);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
+.bdrc.on{background:var(--blu);color:#fff}
+.bdr.adj.out .bdrc.on{background:var(--red)}
+.bdr.adj.in .bdrc.on{background:var(--ok)}
