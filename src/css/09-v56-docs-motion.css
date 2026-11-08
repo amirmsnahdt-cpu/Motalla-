@@ -3685,3 +3685,26 @@ html.cdon .cdez{display:none}
 #sheet .sh-h>.xgo.xtop small{display:none}
 .ckw .ckh{padding-block:12px}
 .ckw .ckh b{font-size:clamp(28px,9vw,38px)}
+/* v80.6 سند بانکی به شکل سند مشتری (صفحه bdoc) */
+.bdoc .d6hd .bdpv{flex:1;min-width:0;display:grid;align-content:center;gap:1px;padding:6px 12px;border-radius:12px}
+.bdpv small{font-size:11.5px;color:var(--mut);font-weight:700}
+.bdpv b{font-size:19px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bdpv b i{font-style:normal;font-size:11px;color:var(--mut);font-weight:700;margin-inline-start:4px}
+.bdpv em{font-style:normal;font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bdoc .bdrs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 2px 2px}
+.bdoc .stam em b{color:inherit;font-weight:900}
+#act #bdFt{display:block;width:100%}
+.bdft{display:grid;gap:8px;padding:10px;border-radius:22px;background:var(--card);box-shadow:0 0 0 1px var(--line),var(--lift)}
+.bdfg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bdfc{display:grid;gap:1px;padding:8px 12px;border-radius:16px;background:var(--seg);min-width:0}
+.bdfc small{font-size:11.5px;font-weight:800;color:var(--mut)}
+.bdfc b{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.bdfc em{font-style:normal;font-size:11px;font-weight:700;color:var(--mut)}
+.bdfc.d{background:var(--red2)}.bdfc.d :is(b,em){color:var(--red)}
+.bdfc.c{background:var(--blu2)}.bdfc.c :is(b,em){color:var(--blu)}
+.bdfc.m{background:var(--blu);box-shadow:0 10px 24px -14px var(--blu)}.bdfc.m :is(small,b,em){color:#fff}.bdfc.m small,.bdfc.m em{opacity:.85}
+.bdgo{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border:0;border-radius:16px;background:var(--blu);color:#fff;font:inherit;font-size:16.5px;font-weight:900;box-shadow:0 10px 24px -12px var(--blu)}
+.bdgo .i{width:20px;height:20px}
+.bdgo i{font-style:normal;font-size:12px;font-weight:800;background:rgba(255,255,255,.2);border-radius:99px;padding:2px 9px}
+.bdgo:disabled{background:var(--seg);color:var(--mut);box-shadow:none}
+.bdft.empty .bdfg{display:none}
