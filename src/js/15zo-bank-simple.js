@@ -16,6 +16,8 @@ function bkRecBind(){document.querySelectorAll('#sheet .brcin').forEach(I=>{I.on
   I.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const A=[...document.querySelectorAll('#sheet .brcin')],k=A.indexOf(I);if(A[k+1])A[k+1].focus();else I.blur()}})}
 ACT.bkRecSave=()=>{if(!BRC)return;const now=new Date().toISOString(),by=who(),done=[];
   for(const [id,v] of Object.entries(BRC)){const s=sources.find(z=>String(z.id)===String(id));if(!s||!v)continue;const first=s.bal==null,old=first?null:acEst(s);
+    /* v82.5: حساب با موجودی معلوم = فقط سند «اصلاح حساب» با اختلاف (موجودی از اول شروع نمی‌شود) */
+    if(!first){const df=bkFix(s,v);done.push(s.name+' '+fmt(v)+(df?' (اصلاح '+(df>0?'+':'−')+fmt(Math.abs(df))+')':' ✓'));continue}
     if(!first)(s.balH=s.balH||[]).push({bal:s.bal,balAt:s.balAt,by:s.balBy||''});s.bal=v;s.balAt=now;s.balBy=by;delete s.balEd;s.updatedAt=now;done.push(s.name+' '+fmt(v)+(old!=null&&old!==v?' (برنامه '+fmt(old)+')':''))}
   if(!done.length){toast('موجودی هیچ حسابی نوشته نشده',true);const i=document.querySelector('#sheet .brcin');if(i)i.focus();return}
   saveS();logA('src','تطبیق موجودی حساب‌ها',done.join(' | '));BRC=null;closeSheet();render();toast(toFa(done.length)+' حساب تطبیق داده شد')};
