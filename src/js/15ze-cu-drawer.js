@@ -49,7 +49,10 @@ ACT.cdMe=()=>{const w=cdEl();if(!w||!CD.open)return;CD.k='me';CD.W=cdW();w.datas
 ACT.cdG=d=>{cuF.g=d.g||'';cuFRe();const w=cdEl();if(w)w.querySelectorAll('.cdi[data-g]').forEach(b=>b.classList.toggle('on',(b.dataset.g||'')===cuF.g));setTimeout(()=>cdClose(),RM()?0:120)};
 ACT.cdCu=d=>{cdClose(1);ACT.cuOpen({id:d.id})};
 /* v75.0 (خواسته صاحب اپ): «+ حساب تازه» بالای کشوی حساب‌ها، کنار جستجو (نه کنار جستجوی صفحه) */
-ACT.cdNew=()=>{cdClose(1);ACT.cuNewQ()};
+/* v81.9 رفع باگ (خواسته صاحب اپ: «از پنجره کناری مشتری اضافه کنم این‌جوری می‌شود»): پنجره «نوع حساب تازه» جایش را از نوار جستجو می‌گیرد؛
+   وقتی همان لحظه باز می‌شد صفحه هنوز ۳۲۸ پیکسل کنار رفته بود و پنجره بیرون از صفحه (سمت چپ) می‌نشست و فقط پس‌زمینه تار دیده می‌شد.
+   حالا اول کشو کامل بسته و صفحه سر جایش برمی‌گردد، بعد پنجره باز می‌شود */
+ACT.cdNew=()=>{cdClose();const go2=()=>{const ap=$('app');if(ap&&ap.style.transform&&!/\(0px/.test(ap.style.transform)){setTimeout(go2,60);return}ACT.cuNewQ()};setTimeout(go2,RM()?0:340)};
 ACT.cdFind=()=>{cdClose();setTimeout(()=>{const q=$('cuq');if(q)q.focus()},RM()?0:300)};
 /* لبه کشیدن فقط در صفحه حساب‌ها و وقتی پنجره‌ای باز نیست */
 /* v73.0: محتوای کشو بعد از هر ساخت صفحه حساب‌ها در وقت آزاد آماده می‌شود تا باز شدن همان فریم اول راه بیفتد */
