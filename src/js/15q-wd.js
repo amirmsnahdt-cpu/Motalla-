@@ -112,11 +112,11 @@ ACT.wdSave=()=>{wdRead();const c=svCu();if(!c||!WD)return;const X=Math.round(+WD
   /* اول سند ثبت شود تا شماره‌اش قطعی باشد (اگر تغییر نکرده، همان نسخه ثبت‌شده) */
   if(!sv.edit||svSig()!==sv.sig0){const er=svErr();if(er){toast('اول سند را کامل کنید: '+er,true);return}svAuto('bg')}
   if(!sv.edit){toast('سند ثبت نشد؛ دوباره امتحان کنید',true);return}
-  const no=sv.edit.no,T=wdDocInfo(c),now=new Date().toISOString(),iban=WD.iban?'IR'+WD.iban:'',name=stripName(c.name||cuName(c)),holder=clean(WD.holder||'');
+  const no=sv.edit.no,T=wdDocInfo(c),now=new Date().toISOString(),iban=WD.iban?'IR'+WD.iban:'',cn=clean(stripName(c.name||cuName(c)).replace(/[(（][^)）]*[)）]/g,' ')),holder=clean(WD.holder||''),name=holder||cn;/* v81.2 (خواسته صاحب اپ: «نام واریزی باید درست شود»): نام واریزی = صاحب حساب بانکی (کسی که پول به حسابش می‌رود)، وگرنه نام مشتری بدون توضیح داخل پرانتز؛ پیوند به مشتری در wd.cu می‌ماند */
   /* مشخصات بانکی مشتری: خودکار ذخیره می‌شود (دفعه بعد پر است) */
-  if(iban||WD.card){c.bk={iban,card:WD.card||'',holder:holder||name,at:now};c.updatedAt=now;saveCu()}
+  if(iban||WD.card){c.bk={iban,card:WD.card||'',holder:holder||cn,at:now};c.updatedAt=now;saveCu()}
   if(dateVal!==todayISO()){dateVal=todayISO();ls.set('m_date',dateVal)}
-  const ne={id:nid++,name,title:c.title||'',phone:toEn(c.phone||''),nid:toEn(c.nid||''),code:String(no),weight:T.w?String(T.w):'',amount:X,ppg:T.ppg,items:T.items.map(x=>({...x})),iban,card:WD.card||'',bank:'',holder:holder&&holder!==name?holder:'',payDate:WD.pay||payDef(),kind:'buy',settles:[],wd:{cu:c.id,no,amt:X},entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
+  const ne={id:nid++,name,title:c.title||'',phone:toEn(c.phone||''),nid:toEn(c.nid||''),code:String(no),weight:T.w?String(T.w):'',amount:X,ppg:T.ppg,items:T.items.map(x=>({...x})),iban,card:WD.card||'',bank:'',holder:'',payDate:WD.pay||payDef(),kind:'buy',settles:[],wd:{cu:c.id,no,amt:X},entryDate:todayISO(),createdBy:who(),updatedBy:who(),updatedAt:now};
   entries.push(ne);saveE();alloc=null;logA('add','ثبت واریزی (مانده سند)',name+' | سند '+toFa(no)+' | '+fmt(X)+' تومان | واریز '+dates(ne.payDate).fa,{ids:[ne.id],after:pick(ne)});
   const tg=WD.tg;WD=null;render();ckOpen(tg);toast(fmt(X)+' تومان رفت به لیست واریزی '+(payLab(ne.payDate)||dates(ne.payDate).fa)+(iban?'':' (بدون شبا؛ خطادار)'),!iban,'دیدن واریزی',()=>ACT.depGo({e:ne.id}))};
 ACT.svWdRow=()=>toast('این ردیف از تأیید واریزی در بانک ساخته شده؛ برای تغییر، خود واریزی را عوض کنید')

@@ -3716,3 +3716,21 @@ html.cdon .cdez{display:none}
 .ckok svg{width:15px;height:15px;stroke-width:2.6}
 #bar .ib0.hal.hgo.bkp{position:relative;overflow:hidden}
 #bar .ib0.hal.hgo.bkp .bkl{position:relative;display:inline-flex;align-items:center;gap:5px;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* v81.2 (خواسته صاحب اپ): تشخیص سند دو ستونی — فروش | خرید، پرداخت | دریافت، تعویض | مرجوعی؛ کاشی‌ها پشت هم با فنر بالا می‌آیند */
+@keyframes dkPop{from{opacity:0;transform:translateY(12px) scale(.94)}}
+#qa .dkl.dkgrid{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;padding:6px 2px}
+#qa .dkgrid .bzsr.dkrw.top{flex-direction:column;align-items:flex-start;justify-content:space-between;gap:10px;min-height:108px;padding:12px 13px!important;border-radius:20px!important;margin:0!important;animation:dkPop .44s cubic-bezier(.2,.9,.25,1.12) backwards;animation-delay:calc(var(--i,0) * 45ms)}
+#qa .dkgrid .bzsr.dkrw.top .av{width:42px;height:42px;border-radius:14px;margin:0}
+#qa .dkgrid .bzsr.dkrw.top .av svg{width:22px;height:22px}
+#qa .dkgrid .bzsr.dkrw.top .tx{display:grid;gap:3px;width:100%;min-width:0}
+#qa .dkgrid .bzsr.dkrw.top .tx b{font-size:17px;font-weight:900}
+#qa .dkgrid .bzsr.dkrw.top .tx small{font-size:11px;line-height:1.55;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* پنجره تسویه: روش‌ها هم دو ستونی، آیکون کنار نام، با همان حرکت */
+#sheet .ckt{grid-template-columns:1fr 1fr!important;gap:10px}
+#sheet .ckti{flex-direction:row!important;justify-content:flex-start;gap:10px;padding:11px 12px!important;min-height:62px;font-size:13.5px!important;text-align:start;animation:dkPop .4s cubic-bezier(.2,.9,.25,1.12) backwards}
+#sheet .ckti span{flex:1;min-width:0;line-height:1.45}
+#sheet .ckti i{flex:none}
+#sheet .ckti:nth-child(2){animation-delay:40ms}#sheet .ckti:nth-child(3){animation-delay:80ms}#sheet .ckti:nth-child(4){animation-delay:120ms}#sheet .ckti:nth-child(5){animation-delay:160ms}#sheet .ckti:nth-child(6){animation-delay:200ms}#sheet .ckti:nth-child(7){animation-delay:240ms}#sheet .ckti:nth-child(8){animation-delay:280ms}#sheet .ckti:nth-child(n+9){animation-delay:320ms}
+/* سرتیتر پنجره (و دکمه تأیید بالا سمت چپش) با پیمایش پایین ثابت می‌ماند */
+#sheet .sh-h{position:sticky;top:-10px;z-index:6;background:var(--card);margin-top:-10px;padding-top:10px;padding-bottom:8px;box-shadow:0 10px 12px -12px #0b142630}
+@media (prefers-reduced-motion:reduce){#qa .dkgrid .bzsr.dkrw.top,#sheet .ckti{animation:none}}
