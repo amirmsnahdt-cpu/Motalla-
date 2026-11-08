@@ -134,7 +134,7 @@ const rateX=()=>sv.rate?(rtK()==='mz'?'هر گرم <b>'+fmt(sv.rate)+'</b>':'م�
 ACT.svTax=()=>{sv.tax=!sv.tax;ls.set('m_tax',sv.tax);svKeep();const b=$('svTx');if(b){b.classList.toggle('on',sv.tax);b.setAttribute('aria-pressed',sv.tax);if(!RM()&&b.animate)b.animate([{transform:'scale(1)'},{transform:'scale(.9)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:420,easing:'cubic-bezier(.3,1.4,.5,1)'})}svRe();const t=svTot();toast(sv.tax?'مالیات ۱۰٪ روی اجرت و سود'+(t.tax?' · '+fmt(t.tax)+' تومان':''):'مالیات برداشته شد')};
 const aSell=()=>`<div id="svFt" class="svgo">${svFtIn()}</div>`;
 /* ----- مشتری ----- */
-function svCuHTML(){const c=svCu();if(c&&sv.fixCu)return `<div id="svCuB">${svCuBHTML()}</div>`;/* v61.5: صاحب سند در نوار بالا؛ v68.3: مانده قبلی جمع‌وجور همان اول سند */if(c){const B=svCuBHTML();return `<div class="d6cuw${B?' wb':''}"><div class="d6cu">${cuAvH(c)}<span class="tx">${honTag(c.name)}<b>${esc(cuName(c))}</b><small>${[c.grp?'<em>'+esc(c.grp)+'</em>':'',c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':''].filter(Boolean).join(' · ')||'حساب مشتری'}</small></span>${sv.fixCu?"":`<button class="lnk" data-act="svCuX">تغییر</button>`}</div><div id="svCuB">${B}</div></div>`}
+function svCuHTML(){const c=svCu();/* v80.2 (خواسته صاحب اپ): بعد از انتخاب مشتری کارت نام بالای جستجو برداشته شد (نام در سرتیتر هست)؛ «تغییر مشتری» در منوی سرتیتر (svCuMenu). مانده قبلی جمع‌وجور می‌ماند */if(c)return `<div id="svCuB">${svCuBHTML()}</div>`;
   return `<div class="d6pick cbx"><div class="fsearch">${ic('search')}<input id="svQ" type="search" value="${esc(sv.q||'')}" placeholder="مشتری: نام، شماره، کد ملی یا گروه…" autocomplete="off" enterkeyhint="search"></div><div id="svCr">${svCrHTML()}</div></div>`}
 /* v61.93 (خواسته صاحب اپ): تا سند ردیفی ندارد، «مانده حساب» داخل کارت مشتری است (نه نوار پایین)؛ با اولین ردیف، نوار پایین برمی‌گردد.
    هر قاب = تسویه همان مانده (مثل نوار پایین) */
@@ -155,7 +155,8 @@ function svPick(id,o){o=o||{};svQO=0;sv.cuId=id;sv.q='';svKeep();if(cur!=='sell'
   const dk=()=>{if(cur!=='sell'||!sv||!svCu()||svRows())return;const q=$('qa');if(q&&typeof qaRe==='function'&&!document.querySelector('.dkbox'))qaRe();setTimeout(()=>{if(typeof dkShow==='function')dkShow()},60)};
   if(o.form&&can('debt')){setTimeout(()=>{if(cur!=='sell')return;sheetAfter=dk;ACT.cuEdit({id})},140)}else if(o.dk)setTimeout(dk,160);const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
 ACT.svCu=d=>svPick(d.id,{form:1});
-ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();$('svCu').innerHTML=svCuHTML();svBindCu();svQO=1;srchSwap('svCr',svCrHTML());phPaint($('svCr'));svRe()};
+ACT.svCuMenu=(d,e)=>{const c=svCu();if(!c)return;const b=e&&e.target.closest('[data-act]');popMenu(b,[['cuEdit',ic('edit'),'ویرایش مشخصات مشتری',{id:c.id}],...(sv.fixCu?[]:[['svCuX',ic('users'),'تغییر مشتری سند',{}]])])};
+ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();svQO=1;render();/* سرتیتر هم بی‌مشتری شود */setTimeout(()=>{const q=$('svQ');if(q)q.focus()},120)};
 ACT.svCuNew=()=>{cuRet='sell';cuTypeOpen({name:clean(sv.q||'')},sv.q?'cuP':'cuN')};/* v75.4: اول نوع حساب */
 ACT.svCal=()=>openCal(sv.date,iso=>{sv.date=iso;svKeep();closeSheet();render()});
 /* ----- ردیف تازه: یک جستجو برای همه چیز (مثل «شرح» در کیمیا) ----- */
