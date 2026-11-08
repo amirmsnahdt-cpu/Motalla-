@@ -23,7 +23,7 @@ function vAudit(){
   /* v76.5: خط زمانی همه فعالیت‌ها با علامت «وارد سیستم حسابداری شد» (15zg-timeline) */
   h+=tlHead();
   h+=`<div class="seg hseg2 tlseg">${Object.entries(TLF).map(([a,[b]])=>`<button class="${tlF===a?'on':''}" data-act="tlF" data-f="${a}">${b}${a==='todo'&&tlTodo()?` <i>${fmt(tlTodo())}</i>`:''}</button>`).join('')}</div>`;
-  const L=audit.filter(a=>a.type!=='acc'&&TLF[tlF][1](a));
+  const L=audit.filter(a=>a.type!=='acc'&&TLF[tlF][1](a)).sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||''))||b.id-a.id);
   if(!L.length)return h+`<div class="card empty">${ic('clock')}<b>${tlF==='todo'?'همه فعالیت‌ها وارد سیستم شده ✓':'فعالیتی برای نمایش نیست'}</b>هر سند، واریزی، حواله و تغییر بانک اینجا به ترتیب زمان می‌آید.</div>`;
   let last='',open=false;
   /* v78.7 رفع باگ: فقط ۲۰۰ فعالیت آخر دیده می‌شد و قدیمی‌ترها راهی نداشتند → دکمه «فعالیت‌های قبلی»؛ شمارش هر روز یک بار (نه فیلتر کل فهرست برای هر روز) */const DC=new Map();L.forEach(z=>{const k=z.ts?isoOfTs(z.ts):'old',o=DC.get(k)||{n:0,t:0};o.n++;if(!tlDone(z)&&!z.undone)o.t++;DC.set(k,o)});

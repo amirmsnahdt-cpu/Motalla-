@@ -138,6 +138,9 @@ let entries=ls.get('m_entries',[]).map(e=>({...e,entryDate:e.entryDate||dateVal,
 let sources=ls.get('m_sources',[{id:1,name:'بانک سینا',bank:'سینا',limit:0,count:0},{id:2,name:'بانک ملی',bank:'ملی',limit:0,count:0},{id:3,name:'سینا فلاح',bank:'',limit:0,count:0},{id:4,name:'بلو بانک',bank:'بلو',limit:0,count:0}]);
 let trash=ls.get('m_trash',[]);
 let audit=ls.get('m_audit',[]),user=ls.get('m_user',''),nid=Date.now()*1000+Math.floor(Math.random()*1000),editId=null,alloc=null;
+/* v79.3 رفع باگ (خواسته صاحب اپ: «ترتیب تاریخچه بعد از وصل شدن»): nid فقط از لحظه باز شدن برنامه شمرده می‌شد؛ گوشی‌ای که ساعت‌ها باز
+   (یا آفلاین) مانده بود شناسه‌های «قدیمی» می‌ساخت و ردیف‌هایش جای اشتباه می‌نشستند. شمارنده همیشه با ساعت جلو می‌رود (یکتا و صعودی می‌ماند) */
+const nidSync=()=>{const t=Date.now()*1000+Math.floor(Math.random()*1000);if(t>nid)nid=t};setInterval(nidSync,1000);document.addEventListener('visibilitychange',nidSync);
 let listMode='all',listQ='',listSort=ls.get('m_sort','seq'),listFilter='all',openGroups=new Set(),lastList=[],histTab='ev',histFilter='all';
 const saveE=()=>ls.set('m_entries',entries),saveS=()=>ls.set('m_sources',sources),saveAud=()=>ls.set('m_audit',audit),saveT=()=>ls.set('m_trash',trash);
 /* پاکسازی خودکار سطل بازیابی بعد از ۶۰ روز */

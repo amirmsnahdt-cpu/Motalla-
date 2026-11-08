@@ -43,7 +43,7 @@ const SYNC={
   creds:{get:()=>creds,set:v=>{creds=v},key:'m_creds',cmp:(a,b)=>a.id-b.id},
   custs:{get:()=>custs,set:v=>{custs=v;/* v73.1: شماره مشتری برای حساب‌های تازه همکاران */if(typeof cuNoFix==='function'&&cuNoFix())setTimeout(()=>saveCu(),0)},key:'m_custs',cmp:(a,b)=>a.id-b.id},
   trash:{get:()=>trash,set:v=>{trash=v},key:'m_trash',cmp:(a,b)=>String(b.deletedAt||'').localeCompare(String(a.deletedAt||''))},
-  audit:{get:()=>audit,set:v=>{audit=v.slice(0,400)},key:'m_audit',cmp:(a,b)=>b.id-a.id,noDel:true},
+  /* v79.3: تاریخچه به ترتیب زمان واقعی فعالیت (ts)، نه شناسه — فعالیت‌های گوشی آفلاین بعد از اتصال سر جای زمانی خودشان می‌نشینند */audit:{get:()=>audit,set:v=>{audit=v.slice(0,400)},key:'m_audit',cmp:(a,b)=>String(b.ts||'').localeCompare(String(a.ts||''))||b.id-a.id,noDel:true},
   drafts:{get:()=>Object.keys(drafts).filter(k=>Array.isArray(drafts[k])&&drafts[k].length).map(k=>({id:k,parts:drafts[k]})),
     set:v=>{const o={};v.forEach(r=>{if(r&&r.id)o[r.id]=r.parts||[]});drafts=o},key:'m_drafts',cache:()=>drafts}
 };
