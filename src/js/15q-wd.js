@@ -84,7 +84,7 @@ function wdOpen(){const c=svCu();if(!c)return;const free=wdFree();if(!free){toas
   WD={amount:free,max:free,iban:dg(B.iban||'').slice(0,24),card:dg(B.card||'').slice(0,16),holder:B.holder||clean(c.name||''),from:B.from||'',pay:payDef(),tg:CK&&CK.tg};wdShow()}
 function wdRead(){if(!WD)return;const g=id=>{const e=$(id);return e?e.value:undefined};if($('wdA'))WD.amount=num(g('wdA'));if($('wdI'))WD.iban=dg(g('wdI')).slice(0,24);if($('wdK'))WD.card=dg(g('wdK')).slice(0,16);if($('wdH'))WD.holder=clean(g('wdH')||'')}
 function wdShow(){const c=svCu();if(!c||!WD)return;const no=sv.edit?sv.edit.no:invNext(),T=wdDocInfo(c);
-  sheet(`<div class="wdw"><div class="sh-h"><div><b>واریز به حساب مشتری</b><small class="shsub">${esc(cuName(c))} · مانده به لیست واریزی می‌رود</small></div><button class="x" data-act="wdBack" aria-label="بازگشت">×</button></div>
+  sheet(`<div class="wdw"><div class="sh-h"><div><b>واریز به مشتری</b><small class="shsub">${esc(cuName(c))} · مانده به لیست واریزی می‌رود</small></div><button class="x" data-act="wdBack" aria-label="بازگشت">×</button></div>
   <div class="px8a wdam2"><small>مبلغ واریز</small><label class="px8i"><input id="wdA" class="ltr" inputmode="numeric" value="${WD.amount?Number(WD.amount).toLocaleString('en-US'):''}" autocomplete="off" aria-label="مبلغ واریز"><i>تومان</i></label><div class="px8l">مانده آزاد <b class="n">${fmt(WD.max)}</b> تومان</div></div>
   <div class="f6 bzf6 wdf6">${(()=>{const sec=(ico,t,x)=>`<div class="c9h"><span class="c9hi">${ic(ico)}</span><b>${t}</b>${x||''}</div>`;/* v76.2 (خواسته صاحب اپ): مثل فرم خرید دستی — بخش‌های عنوان‌دار با ردیف‌های یک‌خطی در کارت */
     return sec('bank','حساب بانکی مشتری',WD.from==='c'?'<i>از مشخصات مشتری</i>':WD.from==='e'?'<i>از واریزی قبلی</i>':'')
@@ -92,7 +92,7 @@ function wdShow(){const c=svCu();if(!c||!WD)return;const no=sv.edit?sv.edit.no:i
     ${f6Row('wdK','کارت',grp4(WD.card),{ltr:1,im:'numeric',ph:'۱۶ رقم · اختیاری',hint:1})}${f6Row('wdH','صاحب حساب',WD.holder,{ph:'نام صاحب حساب',hint:1,last:1})}</div>`
     +sec('cal','تاریخ واریز')+`<div class="f6g"><button class="bzdate wdd" data-act="wdCal">${ic('cal')}<span><b>${esc(payLab(WD.pay))}</b><small>${esc(dates(WD.pay).wd+' '+dates(WD.pay).fa)}</small></span>${ic('chev')}</button></div>`})()}</div>
   <div class="bzrev wdrev"><div><small>شماره فاکتور</small><b>${toFa(no)}</b></div>${T.w?`<div><small>وزن طلا</small><b>${wFmt(T.w)} <i>گرم</i></b></div>`:''}${T.ppg?`<div><small>هر گرم تمام‌شده</small><b>${fmt(T.ppg)} <i>تومان</i></b></div>`:''}${T.items.filter(x=>x.k!=='طلا').map(x=>`<div><small>${esc(x.k+(x.t?' '+x.t:''))}</small><b>${x.q?esc(toFa(x.q))+' · ':''}${fmt(x.amt)}</b></div>`).join('')}</div>
-  <button class="xgo wdgo" data-act="wdSave">${ic('check')} ارسال برای واریز</button>
+  <button class="xgo wdgo" data-act="wdSave">${ic('check')} ارسال</button>
   <button class="lnk ckback" data-act="wdBack">بازگشت به تسویه</button></div>`);wdBind()}
 function wdBind(){const A=$('wdA'),I=$('wdI'),K=$('wdK'),h=(id,t,c)=>{const o=$(id);if(o){o.textContent=t;o.className='eh'+(c?' '+c:'')}};
   if(A){selOnFocus(A);A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''}}
