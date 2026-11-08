@@ -3856,3 +3856,18 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .brcin{width:100%;height:42px;border:0;border-radius:12px;background:var(--card);padding:0 10px;font:inherit;font-size:15px;font-weight:800;color:var(--ink);box-shadow:var(--bfr)}
 .brcin:focus{outline:0;box-shadow:var(--bfr2)}
 .autg{margin-inline-start:0;margin-inline-end:6px}
+/* v82.2 تخصیص خودکار */
+.spsec.hubs:has(.aago){display:flex;align-items:center;justify-content:space-between;gap:8px}
+.aago{flex:none;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:0;border-radius:12px;background:var(--blu);color:#fff;font:inherit;font-size:13px;font-weight:900;box-shadow:0 8px 18px -10px var(--blu)}
+.aago svg{width:16px;height:16px}
+.aac{margin:0 0 10px;padding:8px 10px;border-radius:18px;background:var(--card);box-shadow:0 0 0 1px var(--line);animation:dkPop .4s cubic-bezier(.2,.9,.25,1.12) backwards}
+.aac.aal{background:color-mix(in srgb,var(--warn2) 50%,var(--card));box-shadow:0 0 0 1px var(--pe,var(--warn))}
+.aah{display:flex;align-items:center;gap:10px;padding:2px 0 6px;border-bottom:1px solid var(--hair)}
+.aat{flex:1;display:grid;min-width:0}.aat b{font-size:14px;font-weight:900}.aat small{font-size:11px;color:var(--mut)}
+.aas{font-size:16px;font-weight:900;color:var(--blu);white-space:nowrap}
+.aar{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--hair)}.aar:last-child{border-bottom:0}
+.aan{flex:1;display:grid;min-width:0}.aan b{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.aan small{font-size:10.5px;color:var(--mut)}
+.aaa{font-size:13.5px;font-weight:900;white-space:nowrap}
+.aamv{flex:none;width:32px;height:32px;border:0;border-radius:10px;background:var(--seg);color:var(--blu);display:grid;place-items:center}.aamv svg{width:15px;height:15px}
+.aae{margin:6px 2px 10px;padding:9px 12px;border-radius:14px;background:var(--seg);color:var(--mut);font-size:12px;line-height:1.7}
+.aaneg{font-style:normal;color:var(--red);font-weight:800}

@@ -34,7 +34,7 @@ function vLday(){const d=hubData(ldKey);ldX=null;
   const B=d.bad.filter(r=>hit(r));hits+=B.length;
   if(B.length)h+=`<div class="spsec bad"><div><b>${fmt(B.length)} واریزی خطادار</b><small>تا اصلاح نشوند تخصیص داده نمی‌شوند؛ برای اصلاح بزنید</small></div></div><div class="blist fcard">${rowsHTML(B)}</div>`;
   const U=d.un.filter(r=>hit(r));hits+=U.length;
-  if(U.length)h+=`<div class="spsec hubs"><div><b>تخصیص‌نیافته</b><small>${fmt(U.length)} واریزی · ${fmt(sum(U))} تومان · کشیدن به چپ: انتقال به یک منبع</small></div></div><div class="blist fcard">${rowsHTML(U)}</div>`;
+  if(U.length)h+=`<div class="spsec hubs"><div><b>تخصیص‌نیافته</b><small>${fmt(U.length)} واریزی · ${fmt(sum(U))} تومان · کشیدن به چپ: انتقال به یک منبع</small></div>${can('split')?`<button type="button" class="aago" data-act="aaOpen">${ic('split')}<span>تخصیص خودکار</span></button>`:''}</div><div class="blist fcard">${rowsHTML(U)}</div>`;
   if(d.G.length)h+=`<div class="spsec"><div><b>منبع‌ها</b><small>برای باز و بسته شدن بزنید · «⋯» خروجی همان منبع</small></div></div>`;
   /* منبع‌هایی که هنوز کار دارند بالا، منبع‌های کاملاً تسویه‌شده پایین؛ داخل هر منبع هم تسویه‌شده‌ها پایین */
   const gDone=g=>g.c.ok===g.rows.length,RO={fail:0,pending:1,none:2,ok:3};
