@@ -3670,3 +3670,5 @@ html.cdon .cdez{display:none}
 .bdrc.on{background:var(--blu);color:#fff}
 .bdr.adj.out .bdrc.on{background:var(--red)}
 .bdr.adj.in .bdrc.on{background:var(--ok)}
+/* v80.1: نوع‌های ثابت حساب — اگر تعداد فرد بود آخری تمام‌عرض */
+.cntg>.cntc:last-child:nth-child(odd){grid-column:1/-1}

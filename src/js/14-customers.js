@@ -291,7 +291,7 @@ function cuTypeOpen(o,fid){const G=groupsList();if(!G.length){sheet(cuFormHTML(o
   const A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,anc=(cur==='sell'?$('svQ'):$('cuq'));const box=anc&&anc.closest('.fsearch');
   const chip=(g,lab,ico,sub,cl)=>`<button type="button" class="cntc${cl?' '+cl:''}" data-act="cuNT" data-g="${esc(g)}"><span class="cnti">${ic(ico)}</span><span class="tx"><b>${lab}</b><small>${sub}</small></span></button>`;
   const h=`<div class="cnth"><span class="cnthi">${ic('plus')}</span><span class="tx"><b>نوع حساب تازه</b><small>${o.name?'«'+esc(o.name)+'»':'گروه را انتخاب کنید'}</small></span><button type="button" class="cntx" data-act="cuTypeX" aria-label="بستن">${ic('x')}</button></div>
-  <div class="cntg">${G.map(g=>chip(g,esc(g),'users',fmt(n(g))+' حساب')).join('')}${chip('','بدون گروه','user','بعداً هم می‌شود','ng')}</div>`;
+  <div class="cntg">${CUTY.map(([g,i])=>chip(g,esc(g),i,n(g)?fmt(n(g))+' حساب':'هنوز حسابی نیست')).join('')}</div>`;
   if(!box){sheet(`<div class="cntsh">${h}</div>`);return}
   const bd=document.createElement('div');bd.className='cntbd';bd.id='cntbd';bd.onclick=()=>cuTypeClose();document.body.appendChild(bd);
   const P=document.createElement('div');P.className='cntp';P.id='cntp';P.setAttribute('role','dialog');P.innerHTML=h;document.body.appendChild(P);

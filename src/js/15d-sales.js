@@ -14,7 +14,9 @@ function cfgRec(make){let r=custs.find(c=>c.sys==='cfg'&&!c.del);if(!r&&make){r=
 const GOODS0=['انگشتر','النگو','دستبند','گردنبند','زنجیر','گوشواره','سرویس','نیم‌ست','پلاک','آویز','سکه','شمش','آبشده'];
 /* v61.60: کالای پیش‌فرض حذف‌شده در r.ghide پنهان می‌ماند */
 const goodsList=()=>{const r=cfgRec(),H=(r&&r.ghide)||[];return [...new Set([...((r&&r.goods)||[]),...GOODS0])].filter(k=>!H.includes(k))};
-const groupsList=()=>{const r=cfgRec();return [...new Set([...((r&&r.groups)||[]),...CU().map(c=>c.grp).filter(Boolean)])]};
+/* v80.1 (خواسته صاحب اپ، مثل کیمیا): نوع‌های ثابت حساب — همیشه هستند و اول می‌آیند؛ گروه‌های قدیمی حساب‌ها بعد از آن‌ها می‌مانند */
+const CUTY=[['مشتری','user'],['همکار','users'],['بانک','bank'],['هزینه','tag'],['سرمایه','coin'],['ذوب','ring'],['حساب داخلی','swap']];
+const groupsList=()=>{const r=cfgRec();return [...new Set([...CUTY.map(x=>x[0]),...((r&&r.groups)||[]),...CU().map(c=>c.grp).filter(Boolean)])]};
 function addGroup(g){g=clean(g||'');if(!g)return;const r=cfgRec(1);r.groups=r.groups||[];if(!r.groups.includes(g)){r.groups.push(g);saveCu()}}
 function addGoods(k){k=clean(k||'');if(!k)return;const r0=cfgRec();if(r0&&(r0.ghide||[]).includes(k)){r0.ghide=r0.ghide.filter(x=>x!==k);saveCu()}if(GOODS0.includes(k))return;const r=cfgRec(1);r.goods=r.goods||[];if(!r.goods.includes(k)){r.goods.unshift(k);saveCu()}}
 /* ---------- کارتخوان‌ها (و حساب‌های بانکی قدیمی خودمان) ---------- */
