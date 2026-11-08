@@ -149,11 +149,11 @@ function authBusy(){const b=$('abtn');if(b){b.disabled=true;b.classList.add('wai
 function loggedIn(r){TOKEN=r.token;try{LS.setItem('m_token',TOKEN)}catch(e){}ME=r.user;rawSet('m_me',ME);user=ME.name;applyPerms();$('auth').classList.add('hide');$('auth').innerHTML='';try{lockTouch(true);setTimeout(lockOffer,2500)}catch(e){}
   const hasLocal=entries.length||batches.length||creds.length||Object.values(drafts).some(v=>v&&v.length);
   if(hasLocal&&!ls.get('m_srv',0)&&isAdmin()){render(true);sheet(`<div class="sh-h"><b>انتقال اطلاعات این گوشی به سرور</b></div><div class="muted" style="font-size:13.5px;line-height:1.9;margin:-4px 2px 12px">این گوشی ${fmt(entries.length)} واریزی، ${fmt(batches.length)} لیست پیگیری و ${fmt(creds.length)} حساب بدهی دارد که قبل از اتصال به سرور ثبت شده‌اند. منتقل شوند تا همه همکاران ببینند؟</div><div class="row"><button class="btn sec" data-act="migNo">نه، فقط اطلاعات سرور</button><button class="btn gold" data-act="migYes">انتقال به سرور</button></div>`);return}
-  startFresh(false)}
+  startFresh(false);setTimeout(()=>{try{heldOffer()}catch(e){}},1800)}
 function startFresh(upload){SY.pend={};SY.since=0;if(upload){for(const c in SYNC)for(const r of SYNC[c].get())if(r&&r.id!=null)SY.pend[c+'|'+r.id]=null}rawSet('m_pend',SY.pend);syncInit();if(upload)for(const k in SY.pend){const c=k.slice(0,k.indexOf('|'));SY.base[c].delete(k.slice(k.indexOf('|')+1))}
   render(true);toast(upload?'در حال انتقال اطلاعات به سرور…':'خوش آمدید '+ME.name);syncNow().then(()=>{if(upload&&!pendN())toast('اطلاعات این گوشی به سرور منتقل شد ✓')})}
 function clearLocal(){entries=[];sources=[];batches=[];creds=[];trash=[];audit=[];drafts={};for(const c in SYNC){const S=SYNC[c];rawSet(S.key,S.cache?S.cache():S.get())}SY.pend={};SY.since=0;SY.base={};['m_pend','m_since','m_srv','m_imgq'].forEach(k=>{try{LS.removeItem(k)}catch(e){}})}
-function forceLogout(msg){TOKEN='';ME=null;try{LS.removeItem('m_token');LS.removeItem('m_me')}catch(e){}clearLocal();closeSheet();cur='home';render();showAuth(msg)}
+function forceLogout(msg){/* v79.2: تغییرهای ارسال‌نشده پیش از پاک شدن نگه داشته می‌شوند (15zj) */try{heldSave()}catch(e){}TOKEN='';ME=null;try{LS.removeItem('m_token');LS.removeItem('m_me')}catch(e){}clearLocal();closeSheet();cur='home';render();showAuth(msg)}
 /* ---------- حساب کاربری ---------- */
 const ROLE={admin:'مدیر',staff:'کارمند'};
 function pwSheet(){sheet(`<div class="sh-h"><b>تغییر رمز عبور</b><button class="x" data-act="close" aria-label="بستن">×</button></div>

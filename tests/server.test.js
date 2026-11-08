@@ -308,3 +308,14 @@ test('امنیت v78.9: ورود از پیش‌نمایش githack فقط یک س
   assert.ok(exp(main) <= Date.now() + 3600e3 + 5e3, 'a token used from the preview is cut to one hour');
   assert.equal((await api('/api/me', { token: admin })).status, 200, 'other sessions untouched');
 });
+
+test('حذف کاربر: اطلاعاتی که ثبت کرده می‌ماند، فقط ورودش بسته می‌شود', async () => {
+  assert.equal((await api('/api/users', { method: 'POST', token: admin, body: { username: 'gone', name: 'رفتنی', password: 'secret123', perms: ['add', 'edit', 'debt'] } })).status, 200);
+  const t = (await api('/api/login', { method: 'POST', body: { username: 'gone', password: 'secret123' } })).j.token;
+  await api('/api/sync', { method: 'POST', token: t, body: { since: 0, changes: [{ coll: 'entries', id: 'g1', data: { id: 'g1', name: 'ثبت رفتنی', amount: 100 } }, { coll: 'custs', id: 'gc1', data: { id: 'gc1', name: 'مشتری رفتنی', txs: [{ id: 1, type: 'inv', total: -5 }] } }, { coll: 'audit', id: 'ga1', data: { id: 'ga1', type: 'add', user: 'x', summary: 'ثبت' } }] } });
+  const id = (await api('/api/users', { token: admin })).j.users.find(u => u.username === 'gone').id;
+  assert.equal((await api('/api/users/' + id, { method: 'DELETE', token: admin })).status, 200);
+  assert.equal((await api('/api/sync', { method: 'POST', token: t, body: { since: 0, changes: [] } })).status, 401, 'login of the deleted user is closed');
+  const all = (await api('/api/sync', { method: 'POST', token: admin, body: { since: 0, changes: [] } })).j.changes;
+  for (const [c, i] of [['entries', 'g1'], ['custs', 'gc1'], ['audit', 'ga1']]) assert.ok(all.some(r => r.coll === c && r.id === i && r.data), c + ' kept');
+});
