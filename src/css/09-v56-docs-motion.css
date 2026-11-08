@@ -3632,3 +3632,15 @@ html.cdon .cdez{display:none}
 .armr .ptbar{width:100%;margin-top:5px;height:3px}
 .armr .v{flex:none;display:flex;flex-direction:column;align-items:flex-end;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
 .armr .v small{display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:var(--warn)}.armr.ok .v small{color:var(--ok)}.armr .v small svg{width:12px;height:12px}
+/* v79.6 (خواسته صاحب اپ: «بنفش با آبی فرق کند»): بنفش پررنگ‌تر و مایل به ارغوانی، قاب کامل بنفش (نه کم‌رنگ) و زمینه بنفش واضح‌تر */
+:root{--vio:#9333ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--vio:#c084fc}}
+:root[data-theme="dark"]{--vio:#c084fc}
+.cbk.wf,:is(#cures,.cuLs) .cuL .cbk.wp.wf,.cub9 .cbk.wp.wf{box-shadow:inset 0 0 0 2px var(--vio)!important;background:color-mix(in srgb,var(--vio) 13%,var(--card))!important}
+.cbk.wf .cbh small,.cbk.wf .cbh small *{color:var(--vio)!important}
+.stbl.wf{box-shadow:inset 0 0 0 2px var(--vio);background:color-mix(in srgb,var(--vio) 12%,var(--card))}
+.wdcr.wf{box-shadow:inset 0 0 0 2px var(--vio);background:color-mix(in srgb,var(--vio) 11%,var(--card))}
+.d6e.wdv.wf{box-shadow:inset 0 0 0 2px var(--vio);background:color-mix(in srgb,var(--vio) 11%,var(--card))}
+.d6rows.d7 .d6r:has(.d6k.k-wf){box-shadow:0 0 0 2px var(--vio);background:color-mix(in srgb,var(--vio) 7%,var(--card))}
+.d6rows.d7 .d6r:has(.d6k.k-wf)::after{background:var(--vio)}
+.d6k.k-wf,.txwd.wf,.stbv.f em{background:color-mix(in srgb,var(--vio) 18%,var(--card));color:var(--vio)}
