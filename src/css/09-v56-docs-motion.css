@@ -3679,3 +3679,7 @@ html.cdon .cdez{display:none}
 #sheet .sh-h>.xgo.xtop svg{width:16px;height:16px;flex:none}
 #sheet .sh-h>.xgo.xtop:disabled{opacity:.45;box-shadow:none}
 #sheet .xtop-empty{display:none!important}
+/* v80.4: پنجره تسویه — دکمه بالا یک‌خطی (مانده همان زیر بزرگ نوشته شده)، کارت مانده جمع‌وجورتر */
+#sheet .sh-h>.xgo.xtop small{display:none}
+.ckw .ckh{padding-block:12px}
+.ckw .ckh b{font-size:clamp(28px,9vw,38px)}
