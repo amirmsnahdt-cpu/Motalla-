@@ -16,9 +16,6 @@ function paySave(){const c=curC();if(!c)return;const name=stripName($('pn').valu
   c.updatedAt=new Date().toISOString();saveC();syncLink(c);logA('debt',(old?'ویرایش':'ثبت')+' واریز به '+c.name,ttlName(o)+' | فاکتور '+inv+' | '+fmt(amount)+' تومان'+(o.st==='wait'?' | در انتظار':''));
   closeSheet();render();$('dock').innerHTML=dockHTML();
   if(!wasDone&&cDone(c))toast('حساب '+c.name+' کامل تسویه شد ✓');else toast('ثبت شد — مانده: '+fmt(cRem(c))+' تومان')}
-/* ---------- متن‌ها ---------- */
-function credCopyText(amount,buyer){const c=curC();let t=Bo('◆ واریز به حساب '+ttlName(c))+'\n';if(buyer)t+='واریزکننده: '+buyer+'\n';t+='مبلغ: '+Bo(N(amount)+' تومان')+'\n';
-  if(c.iban)t+='شماره شبا:\n'+Mo(ibanSp(c.iban))+(ibanBank(c.iban)?'\nبانک: '+ibanBank(c.iban):'')+'\n';t+='صاحب حساب: '+ttlName(c)+'\n';return t}
 function credStmt(c){const P=c.pays||[];let t=Bo('مطلا | صورت‌حساب تسویه بدهی')+'\nصاحب حساب: '+Bo(ttlName(c))+(c.iban?'\nشبا: '+Mo(ibanSp(c.iban)):'')+'\nکل بدهی: '+N(c.debt)+' تومان\n'+LINE+'\n';
   P.forEach((x,i)=>{t+=toFa(i+1)+'. '+ttlName(x)+' — فاکتور '+toEn(x.inv)+'\n   '+dates(x.date).fa+(x.time?' ساعت '+x.time:'')+' — '+Bo(N(x.amount)+' تومان')+(x.st==='wait'?' (در انتظار)':'')+(x.tn?'\n   پیگیری: '+x.tn:'')+'\n'});
   return t+LINE+'\nواریز شده: '+Bo(N(cPaid(c))+' تومان')+(cWait(c)?'\nدر انتظار: '+N(cWait(c))+' تومان':'')+'\n'+Bo(cDone(c)?'✓ کامل تسویه شد':'مانده: '+N(cRem(c))+' تومان')+'\n'}

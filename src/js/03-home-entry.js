@@ -86,8 +86,6 @@ function vHome(){AM=allocMap();const lo=isoAdd(dateVal,-HOME_DAYS),L0=validated(
   h+=`<button class="ball" data-act="spLists">همه لیست‌ها${ic('back').replace('class="i"','class="i flip"')}</button>`;
   return h+`<div class="ver">مطلا · نسخه ${toFa(APP_V)}</div></div>`}
 const HOME_N=30,HOME_DAYS=7;
-/* ============ ثبت واریزی ============ */
-const FLD=['fn','fc','fa','fi','fk'];
 let fSet=[],fTitle='',fPay=null;
 /* تاریخ واریز: برای هر ثبت پرسیده می‌شود (لیست همیشه تاریخ روز ثبت را می‌خورد) */
 /* پیش‌فرض تاریخ واریز همیشه «فردا»؛ تغییر تاریخ فقط برای همان ثبت است و ثبت بعدی دوباره فردا می‌شود */
@@ -123,8 +121,6 @@ function openSettle(){const T=num($('fa').value||0),S=fSet.reduce((s,x)=>s+(+x.a
   <div class="row"><button class="btn gold" data-act="setSave">افزودن</button></div>`);
   window.__sTitle='';window.__sCu='';setTimeout(()=>{setSugBind();$('sn2')&&$('sn2').focus();$('sa2').oninput=()=>{const n=num($('sa2').value);$('sa2').value=n?n.toLocaleString('en-US'):''}},60)}
 
-function recentHTML(){const L=dayList();if(!L.length)return '';const Rr=[...L].reverse();
-  return `<div class="sec-h"><b>ثبت‌شده در این لیست: ${fmt(L.length)} مورد، ${fmt(sum(L))} تومان</b><button class="link" data-act="tab" data-n="list">لیست کامل</button></div><div class="muted" style="font-size:12px;margin:-4px 2px 8px">برای ویرایش، روی هر ردیف بزنید</div><div class="card rlist">${Rr.map(x=>`<button class="mini mb${x.level===2?' bad':''}" data-act="edit" data-id="${x.id}"><span class="idx">${fmt(x.seq)}</span><span class="nm">${esc(x.name||'—')}<small>${esc(x.bankShow||'بانک نامشخص')}${x.code?'، فاکتور '+esc(toEn(x.code)):''}</small></span><b>${fmt(x.amount)}</b>${ic('edit')}</button>`).join('')}</div>`}
 function ibanLive(){const el=$('fi'),raw=el.value,caret=el.selectionStart==null?raw.length:el.selectionStart,before=dg(raw.slice(0,caret)).length,v=dg(raw).slice(0,24);
   el.value=ibanGroups(v);if(document.activeElement===el){let pos=0,c=0;while(pos<el.value.length&&c<before){if(/\d/.test(el.value[pos]))c++;pos++}if(pos<el.value.length&&el.value[pos]===' ')pos++;try{el.setSelectionRange(pos,pos)}catch(e){}}
   const o=$('fiv'),inf=$('finfo');inf.innerHTML='';if(!v){o.textContent='';return}const f='IR'+v;
@@ -132,21 +128,6 @@ function ibanLive(){const el=$('fi'),raw=el.value,caret=el.selectionStart==null?
   if(!ibanOk(f)){o.style.color='var(--red)';o.textContent='شماره شبا اشتباه است';return}
   o.style.color='var(--ok)';o.textContent='شماره شبا معتبر است';const b=ibanBank(f),a=acctOf(f);
   inf.innerHTML=`<span class="pill">${b?'بانک: '+esc(b):'بانک تشخیص داده نشد'}</span>${a?`<span class="pill g">حساب: ${cpPlain(a)}</span>`:''}`}
-function fillEntry(x){fSet=(x.settles||[]).map(z=>({...z}));fTitle=x.title||'';fPay=x.payDate||x.entryDate||fPay;updPay();const tl=$('ftl');if(tl)tl.innerHTML=titleChips();$('fn').value=x.name;$('fc').value=x.code;$('fa').value=x.amount.toLocaleString('en-US');$('fk').value=x.card||'';$('fk').oninput();$('fi').value=(x.iban||'').replace(/^IR/,'');ibanLive()}
-function resetForm(){const x=editId&&entries.find(y=>y.id===editId);fSet=[];fTitle='';$('ftl').innerHTML=titleChips();FLD.forEach(i=>$(i).value='');$('fkv').textContent='';$('fiv').textContent='';$('finfo').innerHTML='';$('fm').innerHTML='';if(x)fillEntry(x);updSet();$('fn').focus();toast(x?'مقادیر اولیه برگشت':'فرم پاک شد')}
-function saveEntry(){const m=$('fm'),dgI=dg($('fi').value).slice(0,24);
-  const e={name:stripName($('fn').value),code:toEn($('fc').value).trim(),amount:num($('fa').value),card:dg($('fk').value).slice(0,16),bank:'',iban:dgI?'IR'+dgI:'',title:fTitle,settles:fSet.map(z=>({...z})),payDate:fPay||payDef()};
-  if(!e.name||!e.amount){m.innerHTML='<div class="msg bad">نام و مبلغ را وارد کنید.</div>';$(e.name?'fa':'fn').focus();return}
-  if(e.settles.reduce((a,x)=>a+x.amount,0)>e.amount){m.innerHTML='<div class="msg bad">مجموع واریز مشتری از مبلغ کل بیشتر است.</div>';return}
-  const now=new Date().toISOString(),bad=!ibanOk(e.iban);
-  if(editId){const i=entries.findIndex(x=>x.id===editId);if(i>=0){const before=pick(entries[i]);entries[i]={...entries[i],...e,updatedBy:who(),updatedAt:now};
-      logA('edit','ویرایش واریزی',e.name+' | '+fmt(e.amount)+' تومان',{ids:[editId],before,after:pick(entries[i])})}
-    depDocFix(entries.find(x=>x.id===editId)||{});saveE();entItSync(entries.find(x=>x.id===editId),true)/* v72.0 */;alloc=null;editId=null;toast(bad?'ذخیره شد، اما شماره شبا اشتباه است':'تغییرات ذخیره شد',bad);go(editBack||'list');editBack=null;return}
-  const ne={...e,id:nid++,entryDate:dateVal,createdBy:who(),updatedBy:who(),updatedAt:now,settles:[]};entries.push(ne);saveE();alloc=null;depLink(ne,{settles:e.settles});
-  logA('add','ثبت واریزی',e.name+' | '+fmt(e.amount)+' تومان | '+dates(dateVal).fa,{ids:[ne.id],after:pick(ne)});
-  FLD.forEach(i=>$(i).value='');fSet=[];fTitle='';$('ftl').innerHTML=titleChips();updSet();fPay=payDef();updPay();$('fiv').textContent='';$('fkv').textContent='';$('finfo').innerHTML='';$('rn').textContent=fmt(dayEntries().length+1);$('recent').innerHTML=recentHTML();$('dock').innerHTML=dockHTML();$('act').innerHTML=aEntry();{const fb=document.querySelector('#view .flow');if(fb)fb.outerHTML=flowBar(1)}
-  m.innerHTML=bad?'<div class="msg bad"><b>شماره شبا اشتباه است.</b> واریزی ذخیره شد و در لیست قرمز علامت خورد؛ بعداً اصلاحش کنید.</div>':'<div class="msg ok">ذخیره شد ✓ — واریز '+payLab(ne.payDate)+'، '+fmt(dayEntries().length)+' واریزی در لیست امروز</div>';
-  if(bad)toast('شماره شبا اشتباه است',true);$('fn').focus()}
 /* ============ چسباندن گروهی ============ */
 const vBulk=()=>{if(!fPay||fPay<todayISO())fPay=payDef();return `<div class="bkw bzw"><div class="bzh"><small>چند واریزی یکجا · لیست امروز ${esc(dates(todayISO()).fa)}</small><b>چسباندن لیست</b></div>
   <div class="ef"><label>تاریخ واریز همه ردیف‌ها</label><button class="bzdate" data-act="bkCal">${ic('cal')}<span><b id="bkPayL">${esc(payLab(fPay))}</b><small id="bkPayS">${esc(dates(fPay).wd+' '+dates(fPay).fa)}</small></span>${ic('chev')}</button></div>

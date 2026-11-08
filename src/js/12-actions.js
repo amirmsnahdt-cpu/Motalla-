@@ -1,5 +1,5 @@
 const ACT={
-  back,close:()=>{if(typeof cuAutoClose==='function'&&cuAutoClose())return;aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>go(d.n),date:openDate,user:()=>ACT.acct(),resetForm,resetBulk,saveEntry,bulkAdd,
+  back,close:()=>{if(typeof cuAutoClose==='function'&&cuAutoClose())return;aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>go(d.n),date:openDate,user:()=>ACT.acct(),resetBulk,bulkAdd,
   toastAct:()=>{const f=toastAct;toastHide();f&&f()},
   /* v78.8: صفحه‌های قدیمی (ثبت واریزی، لیست‌ها، پیگیری، تسویه بدهی) حذف شدند؛ دکمه‌های قدیمی به جای تازه‌شان می‌روند */
   tab:d=>{const n={custs:'custs',banks:'banks',home:'home',entry:'buy',list:'split1',split:'split1',audit:'audit',track:'split1',debt:'custs',settings:'settings'}[d&&d.n];if(!n)return;if(n==='audit'&&cur!=='audit')histTab='ev';go(n)},
@@ -43,7 +43,6 @@ const ACT={
   trackNow:()=>{const b=commitAlloc(alloc,true);if(b){ACT.openBatch({id:b.id});toast(fmt(b.items.length)+' واریزی به پیگیری رفت','','برگرداندن',()=>undoCommit(b.id))}},
   undoCommit:d=>askConfirm('واریزی‌های این لیست به تقسیم برگردند؟','برگردان',()=>undoCommit(+d.id)),
   toSplit:()=>{const k=fPay||todayISO();ACT.arcDay({iso:k});const n=validated().filter(r=>PD(r)===k&&r.level===2&&!r.sentBid).length;if(n)toast(fmt(n)+' واریزی خطادار است؛ بالای صفحه اصلاحشان کنید',true)},
-  flowGo:d=>{const s=d.s;if(s==='entry'){editId=null;go('entry')}else if(s==='split')go('split1');else if(s==='track'){const b=openB().find(x=>x.date===dateVal);if(b){ACT.openBatch({id:b.id})}else{trTab='open';go('split1')}}else{if(dayBatches(dateVal).length){ldKey=dateVal;ldX=null;ldOpen=new Set();ldQ='';go('lday')}else{trTab='arch';go('split1')}}},
   archive:()=>go('split1'),
   trTab:d=>{trTab=d.t;render()},
   dTab:d=>{dTab=d.t;render()},credNew:()=>startCW(null),credSave:()=>credSave(),
@@ -51,9 +50,6 @@ const ACT={
   payDel:()=>askConfirm('این واریز حذف شود؟ مانده دوباره زیاد می‌شود.','حذف',()=>{const c=curC();if(!c)return;const x=c.pays.find(p=>p.id===dTmp.pid);c.pays=c.pays.filter(p=>p.id!==dTmp.pid);c.updatedAt=new Date().toISOString();saveC();syncLink(c);logA('debt','حذف واریز از حساب '+c.name,x?ttlName(x)+' | '+fmt(x.amount):'');if(cur==='pwiz'){wz=null;cur='debt';go('cred')}else render();toast('حذف شد — مانده: '+fmt(cRem(c)))}),
   credDel:()=>askConfirm('حساب بدهی و همه واریزهایش حذف شود؟','حذف',()=>{const c=curC();if(!c)return;c.pays=[];syncLink(c);creds=creds.filter(x=>x.id!==c.id);saveC();logA('debt','حذف حساب بدهی',c.name);go('debt')}),
   wzPrev:()=>{if(wz.ret){wz.step=wz.ret;wz.ret=null;render();return}const S=wzSteps(),i=S.indexOf(wz.step);if(i>0&&!(wz.id&&wz.step===4)){wz.step=S[i-1];render();window.scrollTo(0,0)}else{const k=wz.kind,hadId=wz.id;wz=null;go(k==='c'&&!hadId?'debt':'cred')}},
-  credCopyGo:async d=>{const c=curC(),a=num($('ka').value),b=clean($('kb').value),inv=toEn($('ki').value).trim();if(!a){toast('مبلغ را بنویسید',true);return}
-    if(d.w){if(!b||!inv){toast('برای ثبت «در انتظار»، نام خریدار و فاکتور لازم است',true);return}c.pays=c.pays||[];c.pays.push({id:nid++,date:todayISO(),by:who(),at:new Date().toISOString(),title:'',name:b,inv,amount:a,st:'wait'});c.updatedAt=new Date().toISOString();saveC();logA('debt','تخصیص به خریدار',b+' → '+c.name+' | '+fmt(a))}
-    const t=credCopyText(a,b);closeSheet();render();(await copyText(t))?toast(d.w?'کپی شد و «در انتظار» ثبت شد':'متن حساب کپی شد'):sheet(`<div class="sh-h"><b>متن حساب</b><button class="x" data-act="close">×</button></div><textarea readonly style="min-height:30vh">${esc(t)}</textarea>`)},
   credStmt:async()=>{const c=curC();if(!c)return;const t=credStmt(c);(await copyText(t))?toast('صورت‌حساب کپی شد'):sheet(`<div class="sh-h"><b>صورت‌حساب</b><button class="x" data-act="close">×</button></div><textarea readonly style="min-height:40vh">${esc(t)}</textarea>`)},
   credPdf:()=>credPdf(),
   gFilter:d=>{gF=d.f;$('gres').innerHTML=gHTML()},/* v62.3: بایگانی قدیمی → لیست واریز همان روز */
@@ -184,3 +180,7 @@ ACT.mvGo=d=>{const p=mvFrom!=null?findPart(mvFrom):null,src=sources.find(x=>Stri
   if(p&&!p.ids.length)partId=to.id;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;
   toast(fmt(ids.length)+' واریزی '+(p?'به «'+src.name+'» منتقل شد':'به «'+src.name+'» تخصیص یافت'+(to.sent?'':' · آماده ارسال')),'', 'برگرداندن',()=>{if(p){if(!allParts().includes(p))addPart(p,p.pay||ldKey);moveTo(ids,to,p.src,p);partId=p.id}else{to.ids=to.ids.filter(z=>!ids.includes(z));if(!to.ids.length)delPart(to);saveD()}render()})};
 ACT.entTkQ=d=>{const e=entries.find(y=>String(y.id)===String(d.id));if(!e)return;const q=entBI(e);if(!q||q.b.closed){toast('لیست این واریزی بسته شده است',true);return}q.it.st=q.it.st===d.st?'pending':d.st;q.it.at=new Date().toISOString();saveB();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;if(!bStat(q.b).pending)toast('همه واریزی‌های این لیست بررسی شد؛ می‌توانید بایگانی کنید')};
+
+/* v79.1 رفع باگ (پاک‌سازی v78.8): این دو هنوز صدا زده می‌شوند — openBatch بعد از «کپی و ارسال»/بایگانی به لیست واریز همان روز می‌رود؛ delSrcGo تأیید حذف منبع */
+ACT.openBatch=d=>{const b=batches.find(x=>String(x.id)===String(d.id));if(!b){go('split1');return}const e=b.items.map(it=>entries.find(z=>z.id===it.id)).find(Boolean);ldKey=e?PD(e):b.date;ldX=null;ldOpen=new Set();ldQ='';go('lday')};
+ACT.delSrcGo=d=>{const s=sources.find(x=>x.id==d.id);sources=sources.filter(x=>x.id!=d.id);saveS();if(aSt&&aSt.srcId==d.id)aSt.srcId=(sources[0]||{}).id;if(s)logA('undo','حذف منبع',s.name);srcBack();toast('منبع حذف شد')};

@@ -3606,3 +3606,7 @@ html.cdon .cdez{display:none}
 .gdnc.on .gdni{background:var(--blu);color:#fff}
 .gdn .ef input{box-shadow:var(--bfr);border:0;border-radius:16px}
 .gdngo{margin-top:16px;width:100%}.gdngo:disabled{opacity:.45}
+/* v79.1 رفع باگ (خواسته صاحب اپ: «حلقه دور جستجوی تشخیص وقتی کار قرمز است قرمز شود»): --bfr روی :root یک بار با آبیِ ریشه
+   حساب می‌شد و رنگ محلی (مثلاً #qa قرمز در فروش/پرداخت) را نمی‌گرفت. روی خود عنصرهایی که قاب دارند دوباره تعریف می‌شود تا رنگ همان‌جا را بگیرد */
+:is(.fsearch,.sbox input,.kvs,.pxam,.px8a,.py7add,.gdnc,.gdn .ef input){--bfr:0 0 0 1.5px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 10%,transparent);--bfr2:0 0 0 2px var(--blu),0 0 0 6px color-mix(in srgb,var(--blu) 17%,transparent)}
+#qa.d6q:has(.sthd.k-sell) .fsearch svg,#qa.d6q:has(.sthd.k-out) .fsearch svg{color:var(--red)}

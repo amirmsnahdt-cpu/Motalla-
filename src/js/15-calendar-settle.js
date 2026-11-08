@@ -161,6 +161,12 @@ ACT.ldExp=()=>{const d=ldData(ldKey);if(!d.rows.length){toast('این لیست �
 ACT.ldXR=d=>{const id=+d.id||d.id;[...ldX].some(x=>String(x)===String(id))?[...ldX].forEach(x=>{if(String(x)===String(id))ldX.delete(x)}):ldX.add(id);ldXRe()};
 ACT.ldXG=d=>{const D=ldData(ldKey),rows=d.k==='__full'?D.FS:((D.G.find(g=>g.name===d.k)||{}).rows||[]),on=rows.every(r=>ldX.has(r.id));rows.forEach(r=>on?ldX.delete(r.id):ldX.add(r.id));ldXRe()};
 ACT.ldXAll=()=>{const D=ldData(ldKey),all=[...D.G.flatMap(g=>g.rows),...D.FS];ldX=all.every(r=>ldX.has(r.id))?new Set():new Set(all.map(r=>r.id));ldXRe()};
+/* v79.1 (خواسته صاحب اپ: «سه نقطه هر منبع کار نمی‌کند؛ برای خروجی همان منبع باشد، دکمه بالا خروجی کل لیست»):
+   «⋯» هر منبع = منوی خروجی فقط واریزی‌های همان منبع (متن، PDF، Excel، رسیدها) یا انتخاب دقیق‌تر در همان پنجره خروجی */
+ACT.ldSrc=(d,e)=>{const b=e&&e.target.closest('[data-act]'),D=ldData(ldKey),g=D.G.find(x=>x.name===d.k);if(!g||!g.rows.length){toast('این منبع واریزی ندارد',true);return}
+  const k=d.k,X=typeof XLSX!=='undefined';popMenu(b,[['ldSrcGo',ic('copy'),'متن برای تلگرام و واتس‌اپ',{k,x:'t'}],['ldSrcGo',ic('paste'),'PDF',{k,x:'p'}],...(X?[['ldSrcGo',ic('list'),'Excel',{k,x:'x'}]]:[]),['ldSrcGo',ic('cam'),'رسیدها',{k,x:'r'}],['ldSrcGo',ic('check'),'انتخاب واریزی‌ها…',{k,x:'s'}]])};
+ACT.ldSrcGo=d=>{const D=ldData(ldKey),g=D.G.find(x=>x.name===d.k);if(!g)return;ldX=new Set(g.rows.map(r=>r.id));
+  if(d.x==='t')ACT.ldText();else if(d.x==='p')ACT.ldPdf();else if(d.x==='x')ACT.ldXls();else if(d.x==='r')ACT.ldRc();else sheet(ldXHTML())};
 ACT.ldText=()=>{const P=ldPick();txtGen=()=>dayTxt(ldKey,P.G,P.FS,P.T);txtName=fileBase(ldKey);openText()};
 ACT.ldPdf=()=>{const P=ldPick();closeSheet();openPrint(()=>dayReport(ldKey,P.G,P.FS,P.T,P.reg))};
 ACT.ldXls=()=>{if(typeof XLSX==='undefined')return;const P=ldPick();closeSheet();save(fileBase(ldKey)+'.xlsx',dayXlsx(ldKey,P.G,P.FS),'فایل Excel آماده شد')};

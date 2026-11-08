@@ -19,7 +19,7 @@ function commitAlloc(A,quiet){if(!A||!A.res)return null;let b=A.bid&&batches.fin
   sources.forEach(s=>{if(used[s.id]!=null)s.limit=Math.max(0,(+s.limit||0)-used[s.id])});saveS();saveB();
   logA('batch','ارسال و انتقال به پیگیری',dates(b.date).fa+' | '+fmt(items.length)+' واریزی | '+fmt(sum(items))+' تومان',{bid:b.id});
   if(!quiet)toast(fmt(items.length)+' واریزی به پیگیری رفت','','برگرداندن',()=>undoCommit(b.id));
-  if(cur==='split3'){$('act').innerHTML=aSplit3();const v=$('view');if(v)v.innerHTML=vSplit3()}$('dock').innerHTML=dockHTML();return b}
+  $('dock').innerHTML=dockHTML();return b}
 function undoCommit(bid){const b=batches.find(x=>x.id===bid);if(!b)return;
   entries.forEach(e=>{if(e.sentBid===bid)delete e.sentBid});(b.limSnap||[]).forEach(o=>{const s=sources.find(x=>x.id===o.id);if(s)s.limit=o.limit});
   batches=batches.filter(x=>x.id!==bid);if(alloc&&alloc.bid===bid)delete alloc.bid;saveE();saveS();saveB();
@@ -29,9 +29,6 @@ const autoTrack=()=>{if(txtGen||!expCtx||!expCtx.track)return;if(expCtx.parts)co
 /* ---------- گام‌ها: ثبت ← تقسیم ← پیگیری ← بایگانی ---------- */
 function flowState(d){d=d||dateVal;const has=entries.some(e=>e.entryDate===d),un=entries.filter(e=>e.entryDate===d&&!e.sentBid).length,bs=batches.filter(b=>b.date===d),op=bs.filter(b=>!b.closed).length,cl=bs.filter(b=>b.closed).length;
   const step=!has?1:un&&!bs.length?(cur==='split1'||cur==='split3'?2:1):op?3:un?2:cl?4:1;return{has,un,bs:bs.length,op,cl,step}}
-function flowBar(at){const f=flowState(),S=[['entry','ثبت لیست'],['split','تقسیم'],['track','پیگیری'],['day','بایگانی']];
-  const done=[f.has,f.bs>0&&!f.un,f.bs>0&&!f.op,f.cl>0&&!f.op&&!f.un];
-  return `<div class="flow">${S.map(([k,t],i)=>`<button class="fs${at===i+1?' on':''}${done[i]?' done':''}" data-act="flowGo" data-s="${k}"><i>${done[i]?ic('check'):toFa(i+1)}</i><span>${t}</span></button>`).join('<b></b>')}</div>`}
 function ring(c,size){const p=c.all?c.ok/c.all*100:0,f=c.all?c.fail/c.all*100:0;return `<div class="ring" style="--s:${size||64}px;background:conic-gradient(var(--ok) 0 ${p}%,var(--red) ${p}% ${p+f}%,var(--ringbg) ${p+f}% 100%)"><span><b>${toFa(Math.round(p))}٪</b></span></div>`}
 /* ---------- صفحه پیگیری ---------- */
 let gQ='',gF='all';
