@@ -3672,3 +3672,10 @@ html.cdon .cdez{display:none}
 .bdr.adj.in .bdrc.on{background:var(--ok)}
 /* v80.1: نوع‌های ثابت حساب — اگر تعداد فرد بود آخری تمام‌عرض */
 .cntg>.cntc:last-child:nth-child(odd){grid-column:1/-1}
+/* v80.3: دکمه اصلی پنجره در سرتیتر، بالا سمت چپ (کنار ×) — قانون طراحی همه پنجره‌ها */
+#sheet .sh-h{gap:8px}
+#sheet .sh-h>:first-child{flex:1;min-width:0}
+#sheet .sh-h>.xgo.xtop{flex:0 1 auto;width:auto;max-width:58%;min-height:40px;height:40px;margin:0;padding:0 16px;border-radius:14px;font-size:14px;font-weight:900;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 18px -10px color-mix(in srgb,var(--blu) 70%,transparent)}
+#sheet .sh-h>.xgo.xtop svg{width:16px;height:16px;flex:none}
+#sheet .sh-h>.xgo.xtop:disabled{opacity:.45;box-shadow:none}
+#sheet .xtop-empty{display:none!important}
