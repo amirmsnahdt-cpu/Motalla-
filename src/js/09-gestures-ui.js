@@ -64,7 +64,7 @@ window.addEventListener('resize',()=>requestAnimationFrame(segFx));
     if(z.lk!=='h')return;
     const P=EP(),clr=()=>P.forEach(el=>{el.style.transition='';el.style.transform='';el.style.opacity=''});
     if(z.dx>innerWidth*.28){/* صفحه قبلی همان لحظه زیر ساخته می‌شود و این صفحه از جای انگشت کنار می‌رود (بدون سفیدی) */
-      if(cur==='entry'&&editId){clr();ACT.cancelEdit()}else if(FULLP.has(cur))pageLeave((cur==='ent'?PARENT.ent:PARENT[cur])||'home',{side:1,dx:z.dx});else{clr();back()}}
+      if(cur==='entry'&&editId){clr();ACT.cancelEdit()}else if(FULLP.has(cur))leaveTo({side:1,dx:z.dx});else{clr();back()}}
     else{P.forEach(el=>{el.style.transition='transform .26s cubic-bezier(.2,.9,.3,1)';el.style.transform=''});setTimeout(()=>P.forEach(el=>{el.style.transition=''}),280)}};
   Z.addEventListener('touchend',fin,{passive:false});Z.addEventListener('touchcancel',()=>fin(),{passive:true});
 })();
