@@ -3644,3 +3644,23 @@ html.cdon .cdez{display:none}
 .d6rows.d7 .d6r:has(.d6k.k-wf){box-shadow:0 0 0 2px var(--vio);background:color-mix(in srgb,var(--vio) 7%,var(--card))}
 .d6rows.d7 .d6r:has(.d6k.k-wf)::after{background:var(--vio)}
 .d6k.k-wf,.txwd.wf,.stbv.f em{background:color-mix(in srgb,var(--vio) 18%,var(--card));color:var(--vio)}
+/* v79.9 (خواسته صاحب اپ: «پنل جستجوی مشتری درست شود»): جستجو و فهرست نتیجه یک کارت با یک قاب آبی؛ نام مشتری یک خط؛
+   مانده بدون قاب سنگین (فقط عدد و برچسب رنگی؛ زرد/بنفش با برچسب و یک خط رنگی کنار) */
+.d6pick:has(#svCr .bzsug){border-radius:20px;background:var(--card);box-shadow:var(--bfr);overflow:hidden}
+.d6pick:has(#svCr .bzsug) .fsearch.fsearch.fsearch{box-shadow:none!important;border-radius:0!important;border-bottom:1px solid var(--hair)!important;background:var(--card)!important}
+.d6pick #svCr .bzsug,.d6pick #svCr .cbl{border:0!important;box-shadow:none!important;border-radius:0!important;margin:0!important;background:none!important}
+.cbl .bzsr{gap:10px}
+.cbl .bzsr .tx{flex:1;min-width:0}
+.cbl .bzsr .tx b{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:normal!important;display:flex;align-items:center;gap:6px}
+.cbl .bzsr .tx small{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.cbl .bzsr .cbv{max-width:52%}
+.cbl .stbl,.cbl .stbl.pw,.cbl .stbl.wf{background:none!important;box-shadow:none!important;padding:2px 0!important;border-radius:0;row-gap:3px}
+.cbl .stbl.pw{border-inline-end:3px solid var(--pe);padding-inline-end:8px!important}
+.cbl .stbl.wf{border-inline-end:3px solid var(--vio);padding-inline-end:8px!important}
+.cbl .stbv b{font-size:13.5px}
+.cbl .bzsr .tx{overflow:hidden}
+.cbl .bzsr .tx b{display:block!important}
+.cbl .bzsr .tx b .cuno{display:inline-block;vertical-align:middle;margin-inline-end:6px}
+.cbl .bzsr:has(.cbv .stbl){flex-wrap:wrap;row-gap:4px}
+.cbl .bzsr .cbv:has(.stbl){flex:0 0 calc(100% - 56px);max-width:calc(100% - 56px);margin-inline-start:56px;display:flex;justify-content:flex-start;min-width:0}
+.cbl .bzsr .cbv .stbl{max-width:none;display:inline-grid}
