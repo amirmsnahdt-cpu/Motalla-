@@ -3833,3 +3833,8 @@ html.iosbr #sheet{--sbp:calc(52px + env(safe-area-inset-bottom,0px));padding-bot
 #sheet .asave{bottom:calc(-1 * var(--sbp));margin-bottom:0}
 #sheet .asave{padding:10px 18px calc(6px + var(--sbp));gap:6px}
 #sheet .asave>:empty{display:none}
+/* v81.7: در سافاری آیفون فاصله امن پایین (env) خودش جای نوار سافاری را دارد؛ فاصله اضافه برداشته شد */
+html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
+#sheet .asave{padding-bottom:calc(4px + var(--sbp))}
+.topghost{display:flex;align-items:center;justify-content:center;gap:6px}
+.cpdone:disabled,#sheet .sh-h>.xgo.xtop.cpdone:disabled,#bar .ib0.hal.hgo.cpdone:disabled{opacity:1!important;filter:none!important;box-shadow:0 8px 18px -10px var(--ok)!important}

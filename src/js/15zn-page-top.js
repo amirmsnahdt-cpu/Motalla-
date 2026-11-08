@@ -26,10 +26,21 @@ function qfTop(){const q=$('qa');if(!q)return;const f=q.querySelector('.d6qf'),h
 let TOPCX=null;
 const okWord=t=>{t=String(t||'');return /ارسال/.test(t)?'ارسال شد':/ذخیره/.test(t)?'ذخیره شد':/افزودن|اضافه/.test(t)?'اضافه شد':/ثبت|پایان/.test(t)?'ثبت شد':/کپی/.test(t)?'کپی شد':/ساخت/.test(t)?'ساخته شد':/دانلود/.test(t)?'آماده شد':'انجام شد'};
 {const T0=toast;toast=function(m,bad){if(TOPCX){if(bad)TOPCX.bad=1;else TOPCX.ok=1}return T0.apply(this,arguments)}}
-document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('#sheet .sh-h .xtop,#bar .hgo:not(.sec),.ckok,#auth .agob');if(!b||b.disabled||b.closest('#auth'))return;
-  const r=b.getBoundingClientRect(),cx={b,r,t:b.textContent.trim(),ok:0,bad:0};TOPCX=cx;
-  setTimeout(()=>{if(TOPCX===cx)TOPCX=null;if(cx.bad){if(cx.b.isConnected&&!RM()&&cx.b.animate)cx.b.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(5px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}],{duration:360,easing:'ease-out'});return}
-    if(!cx.ok)return;topOk(cx.r,okWord(cx.t))},450)},true);
-function topOk(r,w){if(RM())return;const g=document.createElement('div');g.className='topok';g.innerHTML=ic('check')+'<span>'+esc(w)+'</span>';g.style.cssText=`top:${r.top}px;left:${r.left}px;min-width:${r.width}px;height:${r.height}px`;document.body.appendChild(g);
-  try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}
-  const a=g.animate([{opacity:0,transform:'scale(.7)'},{opacity:1,transform:'scale(1.06)',offset:.35},{opacity:1,transform:'scale(1)',offset:.55},{opacity:1,transform:'scale(1)',offset:.8},{opacity:0,transform:'translateY(-10px) scale(.96)'}],{duration:1300,easing:'cubic-bezier(.2,.9,.25,1)'});a.onfinish=()=>g.remove();setTimeout(()=>g.remove(),1600)}
+/* v81.7 (خواسته صاحب اپ: «مثل کپی، انیمیشن درون خود دکمه و بعد برگردد؛ دو بار زدن دو بار ثبت نکند»):
+   - بازخورد داخل همان دکمه: سبز + «✓ … شد» و بعد ۱٫۳ ثانیه به حالت اول برمی‌گردد (btnOk). اگر پنجره همان لحظه عوض شد، دکمه‌ای با همان کار
+     در همان صفحه پیدا می‌شود؛ وگرنه یک کپی از خود دکمه سر جای قبلی‌اش سبز می‌شود و محو می‌شود (نه قرص جدا).
+   - قفل دو بار زدن: تا ۹۰۰ میلی‌ثانیه بعد از زدن یک دکمه اصلی، زدن دوباره هیچ دکمه اصلی‌ای اجرا نمی‌شود (زدن دوم روی دکمه تازه پنجره بعدی هم نه). */
+const TOPSEL='#sheet .sh-h .xtop,#bar .hgo:not(.sec),.ckok,#sheet .xgo';let TOPLK=0;
+function btnOk(el,w){if(!el||!el.isConnected)return;if(el._okH==null)el._okH=el.innerHTML;clearTimeout(el._okT);el.classList.add('cpdone');el.disabled=true;el.innerHTML=ic('check')+'<span>'+esc(w)+'</span>';
+  try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}el._okT=setTimeout(()=>{if(el._okH!=null){el.innerHTML=el._okH;el._okH=null}el.classList.remove('cpdone');el.disabled=false},1300)}
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest(TOPSEL);if(!b||b.closest('#auth'))return;
+  if(Date.now()<TOPLK||b.disabled){e.preventDefault();e.stopImmediatePropagation();return}TOPLK=Date.now()+900;
+  const r=b.getBoundingClientRect(),cx={b,r,act:b.dataset.act,cl:b.cloneNode(true),t:b.textContent.trim(),ok:0,bad:0};TOPCX=cx;
+  const fin=()=>{if(TOPCX===cx)TOPCX=null;if(cx.done)return;if(cx.bad){cx.done=1;if(cx.b.isConnected&&!RM()&&cx.b.animate)cx.b.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(5px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}],{duration:360,easing:'ease-out'});TOPLK=0;return}
+    if(!cx.ok)return;cx.done=1;const w=okWord(cx.t);if(cx.b.isConnected){btnOk(cx.b,w);return}
+    const same=[...document.querySelectorAll(TOPSEL)].find(z=>z.dataset.act===cx.act&&z.offsetParent);if(same){btnOk(same,w);return}topOk(cx,w)};
+  setTimeout(fin,40);setTimeout(fin,650)},true);
+/* دکمه دیگر نیست (پنجره بسته یا عوض شد): کپی همان دکمه سر جای قبلی‌اش سبز می‌شود و محو */
+function topOk(cx,w){if(RM())return;const g=cx.cl,r=cx.r;g.removeAttribute('data-act');g.classList.add('cpdone','topghost');g.innerHTML=ic('check')+'<span>'+esc(w)+'</span>';
+  g.style.cssText=`position:fixed;z-index:200;margin:0;top:${r.top}px;left:${r.left}px;width:${r.width}px;height:${r.height}px;pointer-events:none`;document.body.appendChild(g);
+  try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}const a=g.animate([{opacity:1,transform:'scale(.96)'},{opacity:1,transform:'scale(1.04)',offset:.25},{opacity:1,transform:'scale(1)',offset:.45},{opacity:1,offset:.8},{opacity:0}],{duration:1200,easing:'ease-out'});a.onfinish=()=>g.remove();setTimeout(()=>g.remove(),1500)}
