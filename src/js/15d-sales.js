@@ -29,7 +29,7 @@ function chMoves(ch){const L=[];for(const c of custs){if(c.del||c.sys)continue;f
 const chBal=ch=>chMoves(ch).reduce((s,m)=>s+m.a,0);
 function chNew(name,kind){name=clean(name||'');if(!name)return null;const r={id:nid++,sys:'ch',kind,name,txs:[],createdAt:ns(),by:who()};custs.push(r);saveCu();logA('cust','تعریف '+CHK[kind],name);return r}
 /* حواله‌های سندها به حساب‌های بخش بانک (از آخرین تطبیق موجودی آن حساب) */
-function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{if(p.srcId!=null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,t:(+p.amount<0?'حواله به ':'حواله از ')+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L.concat(pyMoves(s))}
+function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{if(p.srcId!=null&&p.bdl==null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,t:(+p.amount<0?'حواله به ':'حواله از ')+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L.concat(pyMoves(s))}
 const srcInvSum=s=>srcMoves(s).reduce((a,m)=>a+m.a,0);
 function srcQuick(name){name=clean(name||'');if(!name)return null;const ex=sources.find(s=>s.name===name);if(ex)return ex;if(!can('src')){toast('تعریف حساب بانکی برای حساب شما فعال نیست',true);return null}
   const s={id:nid++,name,bank:'',limit:0,count:0,iban:'',card:''};if(ownSet())s.own=1;sources.push(s);saveS();logA('src','حساب بانکی جدید',name);return s}
@@ -153,7 +153,7 @@ let svQO=0;const cuAvI=c=>c&&c.av?`<img data-ik="${esc(c.av)}" alt="">`:esc(user
    (بستن = ذخیره خودکار) و بعد فهرست «تشخیص» برای ردیف اول باز می‌شود. حساب تازه: فرم مشخصات قبلاً پر شده، مستقیم «تشخیص». */
 function svPick(id,o){o=o||{};svQO=0;sv.cuId=id;sv.q='';svKeep();if(cur!=='sell')go('sell');else{$('svCu').innerHTML=svCuHTML();svRe()}
   const dk=()=>{if(cur!=='sell'||!sv||!svCu()||svRows())return;const q=$('qa');if(q&&typeof qaRe==='function'&&!document.querySelector('.dkbox'))qaRe();setTimeout(()=>{if(typeof dkShow==='function')dkShow()},60)};
-  if(o.form&&can('debt')){setTimeout(()=>{if(cur!=='sell')return;sheetAfter=dk;ACT.cuEdit({id})},140)}else if(o.dk)setTimeout(dk,160);const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
+  if(o.form&&can('debt')){setTimeout(()=>{if(cur!=='sell')return;sheetAfter=dk;ACT.cuEdit({id})},140)}else if(o.dk)setTimeout(dk,160);const e=document.querySelector('.d6cu');if(e)e.classList.add('pop');setTimeout(()=>{const f=sv&&!sv.rate&&svHasG()?$('svM'):null;if(f&&cur==='sell'&&$('ov').classList.contains('hide'))f.focus()},60)}
 ACT.svCu=d=>svPick(d.id,{form:1});
 ACT.svCuMenu=(d,e)=>{const c=svCu();if(!c)return;const b=e&&e.target.closest('[data-act]');popMenu(b,[['cuEdit',ic('edit'),'ویرایش مشخصات مشتری',{id:c.id}],...(sv.fixCu?[]:[['svCuX',ic('users'),'تغییر مشتری سند',{}]])])};
 ACT.svCuX=()=>{sv.cuId='';sv.pays=sv.pays.filter(p=>p.m!=='cust');svKeep();svQO=1;render();/* سرتیتر هم بی‌مشتری شود */setTimeout(()=>{const q=$('svQ');if(q)q.focus()},120)};
@@ -658,10 +658,10 @@ function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','
   const keep=sv;sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:false,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();const r=sv;sv=keep;return r}
 /* v61.56 (خواسته صاحب اپ): در صفحه سند ثبت‌شده هم نگه داشتن روی مانده‌های پایین = جزئیات فاکتور (همان پنجره صفحه سند) */
 function invDetHTML(){const X=invGet();if(!X)return '';const keep=sv;try{sv=invSv(X.c,X.t);return svDetHTML({inv:1})}finally{sv=keep}}
-ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
+ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'ویرایش');return}if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
   sv=invSv(c,t);sv.sig0=svSig();svKeep();TITLES.sell='ویرایش سند '+toFa(t.no);PARENT.sell='inv';go('sell')};
 const aInv=()=>{const X=invGet();return X?ivBalP(X.c,X.t):''};
-ACT.invDel=()=>{const X=invGet();if(!X)return;askConfirm(invTitle(X.t)+' حذف شود؟ اثرش از حساب مشتری'+(txLinked(X.c,X.t).length?' و مشتری پرداخت‌کننده':'')+' برداشته می‌شود.','حذف',()=>{custId=X.c.id;cur='cust';ACT.txDel({id:X.t.id});go('cust',true)})};
+ACT.invDel=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'حذف');return}askConfirm(invTitle(X.t)+' حذف شود؟ اثرش از حساب مشتری'+(txLinked(X.c,X.t).length?' و مشتری پرداخت‌کننده':'')+' برداشته می‌شود.','حذف',()=>{custId=X.c.id;cur='cust';ACT.txDel({id:X.t.id});go('cust',true)})};
 /* v61.33: برگه سند (چاپ / PDF) — خواسته صاحب اپ: هر ردیف فقط مشخصات (کالا، وزن، عیار، مظنه، اجرت ٪، سود ٪) و مبلغ نهایی؛
    بعد جمع کالاها، ردیف‌های دریافت و پرداخت که اعمال می‌شوند و جمعشان، و در آخر مانده قبلی، این سند و نهایی (تومان، طلا، سکه).
    برچسب‌ها از دید مشتری: «بدهکار» = مشتری باید بپردازد، «طلبکار» = ما باید بپردازیم. */
