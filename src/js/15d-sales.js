@@ -29,7 +29,7 @@ function chMoves(ch){const L=[];for(const c of custs){if(c.del||c.sys)continue;f
 const chBal=ch=>chMoves(ch).reduce((s,m)=>s+m.a,0);
 function chNew(name,kind){name=clean(name||'');if(!name)return null;const r={id:nid++,sys:'ch',kind,name,txs:[],createdAt:ns(),by:who()};custs.push(r);saveCu();logA('cust','تعریف '+CHK[kind],name);return r}
 /* حواله‌های سندها به حساب‌های بخش بانک (از آخرین تطبیق موجودی آن حساب) */
-function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{const ca=s.cash&&p.m==='cash'&&p.srcId==null;if(ca||p.srcId!=null&&p.bdl==null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,t:(ca?(+p.amount<0?'نقد به ':'نقد از '):(+p.amount<0?'حواله به ':'حواله از '))+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L.concat(pyMoves(s))}
+function srcMoves(s){const L=[];for(const c of custs){if(c.del||c.sys)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||(s.balAt&&String(t.at||'')<s.balAt))continue;(t.pays||[]).forEach(p=>{const ca=s.cash&&p.m==='cash'&&p.srcId==null;if(ca||p.srcId!=null&&p.bdl==null&&String(p.srcId)===String(s.id))L.push({at:t.at,date:t.date,a:+p.amount||0,pos:p.m==='pos',t:(p.m==='pos'?'کارتخوان · ':ca?(+p.amount<0?'نقد به ':'نقد از '):(+p.amount<0?'حواله به ':'حواله از '))+cuName(c),sub:'سند '+toFa(t.no)+(p.tn?' · پیگیری '+p.tn:'')})})}}return L.concat(pyMoves(s))}
 const srcInvSum=s=>srcMoves(s).reduce((a,m)=>a+m.a,0);
 function srcQuick(name){name=clean(name||'');if(!name)return null;const ex=sources.find(s=>s.name===name);if(ex)return ex;if(!can('src')){toast('تعریف حساب بانکی برای حساب شما فعال نیست',true);return null}
   const s={id:nid++,name,bank:'',limit:0,count:0,iban:'',card:''};if(ownSet())s.own=1;sources.push(s);saveS();logA('src','حساب بانکی جدید',name);return s}
@@ -319,11 +319,13 @@ function offBind(){const I=$('offA');if(!I)return;selOnFocus(I);I.oninput=()=>{c
 ACT.offPick=d=>{OFF.a=+d.v;const I=$('offA');if(I){I.value=OFF.a.toLocaleString('en-US');I.oninput()}};
 ACT.offOk=()=>{const I=$('offA');if(I)OFF.a=num(I.value);svOffApply(OFF.a)};
 /* حساب پیش‌فرض: آخرین کارتخوان یا حساب استفاده‌شده */
-function pyAcc(p){if(p.m==='pos'&&!p.chId){const L=CH('pos'),last=ls.get('m_ch_pos','');p.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
+/* v83.1 (خواسته صاحب اپ: «تعریف کارتخوان پیچیده می‌کند»، مثل کیمیا): کارتخوان سند = خود حساب بانک (srcId)، همان لحظه در گردش آن حساب؛
+   ردیف‌های قدیمی با chId (کارتخوان تعریف‌شده) همان‌طور می‌مانند */
+function pyAcc(p){if(p.m==='pos'&&(p.srcId==null||p.srcId==='')&&!p.chId){const L=ownL(),last=ls.get('m_src_pos','');const z=L.find(c=>String(c.id)===String(last))||L[0];if(z)p.srcId=z.id}
   if(p.m==='hav'&&p.srcId==null&&!p.chId){const last=ls.get('m_src_hav',''),O=ownL();const s=O.find(z=>String(z.id)===String(last))||O[0];if(s)p.srcId=s.id;else{const B=CH('bank');if(B[0])p.chId=B[0].id}}}
 function pyCuCap(p){const c=CU().find(z=>String(z.id)===String(p.cuId));if(!c)return;p.cuName=cuName(c);if(p.dir==='in'){/* v71.2: فقط طلب آزاد (بدون بخشی که پشتش واریزی است) */const cr=cuFree(c,p.i);if(cr)p.amount=Math.min(pyLeft(p)||cr,cr)}}
 /* v66.0: حساب (یا کارتخوان) خودکار انتخاب‌شده → از همان اول پله «مبلغ»؛ حساب در نوار پله‌ها با یک لمس عوض می‌شود */
-const pyStart=p=>{qaRead();sv.qa.p=p;sv.qa.x=null;sv.qa.q='';sv.qa.sq='';const pre=(p.m==='hav'&&p.srcId!=null&&p.srcId!=='')||(p.m==='pos'&&!!p.chId);sv.qa.st=pre?1:0;sv.qa.stMax=sv.qa.st;svKeep();qaRe()};
+const pyStart=p=>{qaRead();sv.qa.p=p;sv.qa.x=null;sv.qa.q='';sv.qa.sq='';const pre=(p.m==='hav'&&p.srcId!=null&&p.srcId!=='')||(p.m==='pos'&&(!!p.chId||p.srcId!=null&&p.srcId!==''));sv.qa.st=pre?1:0;sv.qa.stMax=sv.qa.st;svKeep();qaRe()};
 ACT.qaX=()=>{sv.qa.p=null;sv.qa.x=null;sv.qa.i=null;sv.qa.k='';svKeep();qaRe('qK')};
 function pyHTML(){const p=sv.qa.p,ed=p.i!=null;let b='';
   if(p.m==='disc')return `<div class="d6qh"><b><span class="d6ti pm-disc">${ic('tag')}</span>تخفیف</b><button class="lnk" data-act="qaX">${ed||sv.disc?'بستن':'انصراف'}</button></div>
@@ -332,13 +334,11 @@ function pyHTML(){const p=sv.qa.p,ed=p.i!=null;let b='';
   const out=p.dir==='out';
   if(!p.fl)b+=`<div class="seg2 d6seg"><button class="${!out?'on':''}" data-act="pyD" data-d="in">دریافت از مشتری</button><button class="${out?'on':''}" data-act="pyD" data-d="out"${p.m==='pos'?' disabled':''}>پرداخت به مشتری</button></div>
   <div class="d6pm">${['cash','pos','hav','cust'].map(m=>`<button class="${p.m===m?'on':''}" data-act="pyM" data-m="${m}"${m==='pos'&&out?' disabled':''}>${ic(PM[m].i)}<span>${PM[m].t}</span></button>`).join('')}</div>`;
-  if(p.m==='pos'){const L=CH('pos');b+=`<div class="d6l"><small>کدام کارتخوان</small><div class="chps">${L.map(c=>`<button class="chp${String(p.chId)===String(c.id)?' on':''}" data-act="pyCh" data-id="${c.id}">${ic('card')}<span><b>${esc(c.name)}</b><small>مانده ${fmt(chBal(c))}</small></span></button>`).join('')}</div>
-    <div class="fsearch sm chadd">${ic('plus')}<input id="pyCn" placeholder="نام کارتخوان تازه" autocomplete="off" enterkeyhint="done"><button class="lnk" data-act="pyChAdd">افزودن</button></div></div>`}
-  if(p.m==='hav'){const B=CH('bank');b+=`<div class="d6l"><small>${out?'از کدام حساب ما':'به کدام حساب ما'}</small><div class="chps">${ownL(p.srcId).map(s=>{const bk=acBank(s);return `<button class="chp${p.srcId!=null&&String(p.srcId)===String(s.id)?' on':''}" data-act="pySrc" data-id="${s.id}">${bk?bankBadge(bk):ic('bank')}<span><b>${esc(s.name)}</b><small>${esc(bkSub(s))}</small></span></button>`}).join('')}${B.map(c=>`<button class="chp${p.srcId==null&&String(p.chId)===String(c.id)?' on':''}" data-act="pyCh" data-id="${c.id}">${ic('bank')}<span><b>${esc(c.name)}</b><small>مانده ${fmt(chBal(c))}</small></span></button>`).join('')}</div>
+  if(p.m==='hav'||p.m==='pos'){const B=p.m==='pos'?[]:CH('bank');b+=`<div class="d6l"><small>${p.m==='pos'?'کارتخوان کدام حساب':out?'از کدام حساب ما':'به کدام حساب ما'}</small><div class="chps">${ownL(p.srcId).map(s=>{const bk=acBank(s);return `<button class="chp${p.srcId!=null&&String(p.srcId)===String(s.id)?' on':''}" data-act="pySrc" data-id="${s.id}">${bk?bankBadge(bk):ic('bank')}<span><b>${esc(s.name)}</b><small>${esc(bkSub(s))}</small></span></button>`}).join('')}${B.map(c=>`<button class="chp${p.srcId==null&&String(p.chId)===String(c.id)?' on':''}" data-act="pyCh" data-id="${c.id}">${ic('bank')}<span><b>${esc(c.name)}</b><small>مانده ${fmt(chBal(c))}</small></span></button>`).join('')}</div>
     ${can('src')?`<div class="fsearch sm chadd">${ic('plus')}<input id="pyCn" placeholder="نام حساب تازه ما" autocomplete="off" enterkeyhint="done"><button class="lnk" data-act="pyChAdd">افزودن</button></div>`:''}</div>`}
   if(p.m==='cust'){const C=CU().find(c=>String(c.id)===String(p.cuId));b+=`<div class="d6l"><small>${out?'به حساب کدام مشتری':'از طلب کدام مشتری'}</small>${C?`<div class="d6cu sm">${cuAvH(C)}<span class="tx"><b>${esc(cuName(C))}</b><small>${cuLab(cuBal(C).R)} ${cuBal(C).R?fmt(Math.abs(cuBal(C).R))+' تومان':''}</small></span><button class="lnk" data-act="pyCu" data-id="">تغییر</button></div>`
       :`<div class="cbx"><div class="fsearch sm">${ic('search')}<input id="pyQ" value="${esc(p.q||'')}" placeholder="نام مشتری…" autocomplete="off"></div><div id="pyCr">${pyCrHTML()}</div></div>`}</div>`}
-  b+=`<div class="d6g ${p.m==='pos'||p.m==='hav'?'':'g1'}">${cell('pyA','مبلغ (تومان)',numV(p.amount),{im:'numeric',cls:'w'})}${p.m==='pos'||p.m==='hav'?cell('pyT','پیگیری (اختیاری)',esc(p.tn||''),{im:'numeric'}):''}</div>`;
+  b+=`<div class="d6g ${p.m==='hav'?'':'g1'}">${cell('pyA','مبلغ (تومان)',numV(p.amount),{im:'numeric',cls:'w'})}${p.m==='hav'?cell('pyT','پیگیری (اختیاری)',esc(p.tn||''),{im:'numeric'}):''}</div>`;
   return `<div class="d6qh"><b><span class="d6ti ${out?'pm-out':'pm-in'}">${ic(out?'share':'down')}</span>${p.fl?(out?'پرداخت':'دریافت')+' › '+esc(dkST(out?'out':'in',p.m)||PM[p.m].t):out?'پرداخت وجه':'دریافت وجه'}</b><button class="lnk" data-act="qaX">${ed?'بستن':'انصراف'}</button></div>${b}
   <div class="d6br" id="qB"></div>
   <div class="d6qf">${ed?`<button class="qago red" data-act="pyDel" aria-label="حذف">${ic('trash')}</button>`:''}<button class="qago" data-act="pySave">${ic('check')} ${ed?'ذخیره':'افزودن'}</button></div>`}
@@ -361,14 +361,14 @@ ACT.pySrc=d=>{pyRead();const p=sv.qa.p;p.srcId=+d.id||d.id;p.chId='';svKeep();qa
 ACT.pyCu=d=>{pyRead();const p=sv.qa.p;if(d.id){if(!svCu()){toast('اول مشتری سند را انتخاب کنید',true);return}p.m='cust';p.cuId=d.id;p.chId='';delete p.srcId;p.amount=pyLeft(p);pyCuCap(p)}else{p.cuId='';p.q=''}svKeep();qaRe(d.id?'':'pyQ')};
 ACT.pyAll=()=>{pyRead();const p=sv.qa.p;p.amount=pyLeft(p);svKeep();qaRe()};
 ACT.pyChAdd=()=>{pyRead();const p=sv.qa.p,n=$('pyCn'),name=clean((n&&n.value)||'');if(!name){toast(p.m==='pos'?'نام کارتخوان را بنویسید':'نام حساب را بنویسید',true);if(n)n.focus();return}
-  if(p.m==='pos'){const r=chNew(name,'pos');if(r){p.chId=r.id;svKeep();qaRe();toast('«'+name+'» اضافه شد')}return}const s=srcQuick(name);if(s){p.srcId=s.id;p.chId='';svKeep();qaRe();toast('حساب «'+name+'» اضافه شد')}};
+const s=srcQuick(name);if(s){p.srcId=s.id;p.chId='';svKeep();qaRe();toast('حساب «'+name+'» اضافه شد')}};
 ACT.pySave=()=>{pyRead();const p=sv.qa.p;if(!p)return;const amt=+p.amount||0;
   if(p.m==='disc'){sv.disc=amt;if(amt)toast('تخفیف '+fmt(amt)+' تومان ثبت شد');qaDone();return}
-  if(p.m==='pos'&&!p.chId){toast('کارتخوان را انتخاب یا اضافه کنید',true);return}if(p.m==='hav'&&p.srcId==null&&!p.chId){toast('حساب را انتخاب یا اضافه کنید',true);return}
+  if(p.m==='pos'&&!p.chId&&(p.srcId==null||p.srcId==='')){toast('حساب کارتخوان را انتخاب کنید',true);return}if(p.m==='hav'&&p.srcId==null&&!p.chId){toast('حساب را انتخاب یا اضافه کنید',true);return}
   if(p.m==='cust'&&!p.cuId){toast('حساب مشتری را انتخاب کنید',true);return}if(p.m==='adj'&&!clean(p.why||'')){toast('علت را انتخاب کنید یا بنویسید',true);return}if(p.m==='nm'&&!clean(p.cuName||'')){toast('نام طرف حواله را بنویسید',true);return}
   if(!(amt>0)){toast('مبلغ را وارد کنید',true);const a=$('pyA');if(a)a.focus();return}
   const sg=p.dir==='out'&&p.m!=='pos'?-1:1,o={m:p.m,amount:sg*amt};
-  if(p.m==='pos'){o.chId=p.chId;o.tn=p.tn||'';ls.set('m_ch_pos',p.chId)}
+  if(p.m==='pos'){if(p.srcId!=null&&p.srcId!==''){o.srcId=p.srcId;ls.set('m_src_pos',p.srcId)}else o.chId=p.chId}
   if(p.m==='hav'){if(p.srcId!=null){o.srcId=p.srcId;ls.set('m_src_hav',p.srcId)}else o.chId=p.chId;o.tn=p.tn||''}
   const pk=xrPh(p);if(pk.length&&!PHNO.includes(p.m)){o.imgs=pk;o.img=pk[0]}
   if(p.m==='cust')Object.assign(o,{cuId:p.cuId,cuName:p.cuName||''});if(p.m==='adj'){o.why=clean(p.why);if(!bdReasons().includes(o.why)){const c=cfgRec(1);c.adj=[...(c.adj||[]),o.why];saveCu()}}if(p.m==='nm')o.cuName=clean(p.cuName||'');

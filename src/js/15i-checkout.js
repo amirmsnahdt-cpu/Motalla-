@@ -43,11 +43,11 @@ function ckSel(){const s=CK.sel;if(!s)return '';if(s.k==='nm')return `<div class
   const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return '';const r=depAvail(x)-ckUsedDep(x.id);return `<div class="stsel"><span class="c6a m">${esc(userInit(fullName(x)))}</span><span class="tx"><b>${esc(fullName(x))}</b><small>واریزی ${esc(payLab(PD(x)))} · مانده ${fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>${depBar(x.id,'ck')}`}
 /* v61.30: کارتخوان و حساب ما مثل بقیه فهرست‌ها: جستجو بالا، فهرست زیرش */
 function ckPick(){const m=CK.m,q=nzName(toEn(clean(CK.sq||''))),pos=m==='pos';
-  const L=(pos?CH('pos').map(c=>({id:c.id,on:String(CK.chId)===String(c.id),t:c.name,sub:'مانده '+fmt(chBal(c)),av:ic('card')})):ownL(CK.srcId).map(z=>{const bk=acBank(z);return {id:z.id,on:String(CK.srcId)===String(z.id),t:z.name,sub:bkSub(z),av:bk?bankBadge(bk):ic('bank')}})).filter(o=>!q||nzName(toEn(o.t+' '+o.sub)).includes(q));
+  const L=(ownL(CK.srcId).map(z=>{const bk=acBank(z);return {id:z.id,on:String(CK.srcId)===String(z.id),t:z.name,sub:bkSub(z),av:bk?bankBadge(bk):ic('bank')}})).filter(o=>!q||nzName(toEn(o.t+' '+o.sub)).includes(q));
   const q0=clean(CK.sq||''),ex=q&&L.some(o=>nzName(toEn(o.t))===q);
-  return `<div class="bzsug cbl dkl">${L.map(o=>`<button type="button" class="bzsr dkrw${o.on?' on':''}" data-act="${pos?'ckCh':'ckSrc'}" data-id="${esc(o.id)}"><span class="av">${o.av}</span><span class="tx"><b>${esc(o.t)}</b><small>${esc(o.sub)}</small></span></button>`).join('')}${ex?'':pkAddRow(pos?'کارتخوان':'حساب',q0,'ckPkAdd')}</div>`}
+  return `<div class="bzsug cbl dkl">${L.map(o=>`<button type="button" class="bzsr dkrw${o.on?' on':''}" data-act="ckSrc" data-id="${esc(o.id)}"><span class="av">${o.av}</span><span class="tx"><b>${esc(o.t)}</b><small>${esc(o.sub)}</small></span></button>`).join('')}${ex?'':pkAddRow('حساب',q0,'ckPkAdd')}</div>`}
 ACT.ckPkAdd=()=>{ckRead();const n=clean(CK.sq||''),pos=CK.m==='pos';if(!n){toast('نام '+(pos?'کارتخوان':'حساب')+' را در جستجو بنویسید',true);const I=$('ckS');if(I)I.focus();return}
-  if(pos){const r=chNew(n,'pos');if(!r)return;CK.chId=r.id;ls.set('m_ch_pos',r.id)}else{const z=srcQuick(n);if(!z)return;CK.srcId=z.id;CK.pk=1;ls.set('m_src_hav',z.id)}CK.sq='';ckRe('ckA');toast('«'+n+'» اضافه شد')};
+  {const z=srcQuick(n);if(!z)return;CK.srcId=z.id;CK.pk=1;ls.set(pos?'m_src_pos':'m_src_hav',z.id)}CK.sq='';ckRe('ckA');toast('«'+n+'» اضافه شد')};
 /* v61.72: عکس رسید در فرم تسویه (همان پنجره عکس ردیف‌ها، GAL.ck)؛ بستن پنجره عکس = برگشت به همین فرم */
 ACT.ckGal=()=>{ckRead();openGal({k:'row',ck:1})};
 ACT.ckPhV=d=>{ckRead();GAL={k:'row',ck:1};zvOpen(+d.i||0)};
@@ -60,7 +60,7 @@ function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><sm
   /* v63.3 (خواسته صاحب اپ): حواله به بانک دو مرحله‌ای مثل حواله به مشتری — اول حساب ما از فهرست، با زدن روی آن مبلغ و تأیید */
   if(m==='hav'&&CK.pk){const z=sources.find(o=>String(o.id)===String(CK.srcId));if(!z)CK.pk=0;else{const bk=acBank(z);b=`<div class="stsel">${bk?bankBadge(bk,'ckbb'):`<span class="c6a">${ic('bank')}</span>`}<span class="tx"><b>${esc(z.name)}</b><small>${bk?'بانک '+esc(bk):'حساب ما'}</small></span><button class="itx" data-act="ckSrcX" aria-label="تغییر حساب">×</button></div><div class="ckg">${amt}${tn}</div>`}}
   if(m==='hav'&&!CK.pk)b=`<div class="fsearch sm">${ic('search')}<input id="ckS" type="search" value="${esc(CK.sq||'')}" placeholder="جستجوی حساب ما…" autocomplete="off" enterkeyhint="search"></div><div id="ckPl">${ckPick()}</div>`;
-  if(m==='pos')b=`<div class="fsearch sm">${ic('search')}<input id="ckS" type="search" value="${esc(CK.sq||'')}" placeholder="${m==='pos'?'جستجوی کارتخوان…':'جستجوی حساب ما…'}" autocomplete="off" enterkeyhint="search"></div><div id="ckPl">${ckPick()}</div><div class="ckg ckg1">${amt}</div>`;/* v82.9 (خواسته صاحب اپ): کارتخوان شماره پیگیری نمی‌خواهد، فقط عکس */
+  if(m==='pos')b=`<div class="fsearch sm">${ic('search')}<input id="ckS" type="search" value="${esc(CK.sq||'')}" placeholder="${m==='pos'?'حساب کارتخوان…':'جستجوی حساب ما…'}" autocomplete="off" enterkeyhint="search"></div><div id="ckPl">${ckPick()}</div><div class="ckg ckg1">${amt}</div>`;/* v82.9 (خواسته صاحب اپ): کارتخوان شماره پیگیری نمی‌خواهد، فقط عکس */
   if(m==='dep'||(m==='cust'&&ckOut()))b=CK.sel?`${ckSel()}${amt}`:`<div class="fsearch sm">${ic('search')}<input id="ckQ" value="${esc(CK.q||'')}" placeholder="نام، تلفن، شبا یا فاکتور…" autocomplete="off"></div><div id="ckL">${ckList()}</div>`;
   if(m==='gx'){const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate);
     b=`<div class="ckg"><label class="ckf"><small>وزن طلای مشتری (گرم)</small><input id="ckW" class="ltr" inputmode="decimal" value="${esc(CK.w||'')}" placeholder="0.000" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="ckY" class="ltr" inputmode="numeric" value="${esc(String(CK.ay||x.ay))}" autocomplete="off"></label></div>
@@ -90,7 +90,7 @@ const ckLeft=()=>Math.abs(ckRest());
 ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حساب مشتری از لیست واریزی (15q) */if(m==='wd'){wdOpen();return}/* v61.39: تخفیف از پنجره تسویه — روی مانده همین سند */if(m==='off'){svOffOpen(true);return}
   if(m==='gp'){if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}gkOpen(ckTg());ACT.gkM({m:'cv'});return}
   if(m==='rg'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}
-  const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'){const L=CH('pos'),last=ls.get('m_ch_pos','');CK.chId=(L.find(c=>String(c.id)===String(last))||L[0]||{}).id||''}
+  const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'){const L=ownL(),last=ls.get('m_src_pos','');CK.srcId=((L.find(c=>String(c.id)===String(last))||L[0]||{}).id);if(CK.srcId==null)CK.srcId=''}
   if(m==='hav'){const last=ls.get('m_src_hav','');const O=ownL(),s0=O.find(z=>String(z.id)===String(last)),s=s0||O[0];CK.srcId=s?s.id:'';/* v80.4 (خواسته صاحب اپ: «پنجره تسویه راحت‌تر»): حساب همیشگی (آخرین حساب استفاده‌شده) از پیش انتخاب است؛ مستقیم مبلغ — با × عوض می‌شود */if(s0)CK.pk=1}
   ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
@@ -110,7 +110,7 @@ ACT.ckAdd=()=>{ckRead();const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0,n0=sv.pay
   if(m==='gx'){const w=parseFloat(CK.w)||0;if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}if(!(w>0)){toast('وزن طلا را بزنید',true);return}const x=xrNew('buy','gold',{cat:'تعویض'});x.w=String(CK.w);x.ay=+CK.ay||x.ay;sv.xr.push(x);ckPhPut(n0,x);CK={m:''};ckBackToDoc();return}
   else{if(!(a>0)){toast('مبلغ را وارد کنید',true);const A=$('ckA');if(A)A.focus();return}
     if(m==='cash')sv.pays.push({m:'cash',amount:a});
-    if(m==='pos'){if(!CK.chId){toast('کارتخوان را انتخاب کنید',true);return}sv.pays.push({m:'pos',amount:a,chId:CK.chId,tn:CK.tn||''});ls.set('m_ch_pos',CK.chId)}
+    if(m==='pos'){if(CK.srcId===''||CK.srcId==null||!sources.some(z=>String(z.id)===String(CK.srcId))){toast('حساب کارتخوان را انتخاب کنید',true);return}sv.pays.push({m:'pos',amount:a,srcId:CK.srcId});ls.set('m_src_pos',CK.srcId)}
     if(m==='hav'){/* v80.7 رفع باگ: وقتی فهرست حساب‌ها باز بود و حسابی زده نشده بود، «پایان و ثبت» حواله را بی‌صدا روی اولین حساب می‌نشاند */if(!CK.pk||CK.srcId===''||CK.srcId==null||!sources.some(z=>String(z.id)===String(CK.srcId))){toast('اول حساب ما را از فهرست انتخاب کنید',true);const S=$('ckS');if(S)S.focus();return}sv.pays.push({m:'hav',amount:a,srcId:CK.srcId,tn:CK.tn||''});ls.set('m_src_hav',CK.srcId)}
     if(m==='dep'){const s=CK.sel;if(!s){toast('یکی از فهرست را انتخاب کنید',true);return}
       if(s.k==='nm')sv.pays.push({m:'nm',amount:a,cuName:s.n});else if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return;const S=oweSplit(c,a);if(S.rest>0){toast('بیشتر از بدهی ما به «'+cuName(c)+'» است ('+fmt(a-S.rest)+')'+(cuDepPend(c)?'؛ بخشی از طلبش واریزی ارسال‌شده به بانک است':''),true);return}S.R.forEach(p=>sv.pays.push(p));if(S.R.length>1||S.R[0].m==='dep')toast('حواله '+(S.R.some(p=>p.m==='cust')?'اول از طلب آزاد، بقیه ':'')+'روی واریزی «'+cuName(c)+'» نشست تا دوباره از بانک پرداخت نشود')}
