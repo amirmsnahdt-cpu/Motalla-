@@ -114,15 +114,14 @@ const aSrcLogo=s=>{const c=srcBk(s);if(c&&bkAvH(c))return bkAvH(c);return acBank
 function aSrcCard(s){const on=aSt.srcId==s.id,f=acFree(s,aSt.editPid);
   return `<button type="button" class="asc${on?' on':''}" data-act="aSrc" data-id="${s.id}" style="--bk:${aSrcClr(s)}"><span class="asl">${aSrcLogo(s)}</span>${on?`<span class="asck">${ic('check')}</span>`:''}<b>${esc(s.name)}</b><em class="${f!=null&&f<=0?'neg':''}">${f==null?'به بانک وصل نیست':shortAmt(Math.max(0,f)).replace(/\s*تومان$/,'')}</em></button>`}
 function aSrcBig(so,f,s){const c=srcBk(so),mv=v=>`${v<0?'−':''}${fmt(Math.abs(v))}`;
-  return `<div class="bkc lg abk${f!=null&&s>f?' over':''}" style="--bk:${aSrcClr(so)}">${c?bkWmH(c):''}<i class="bkcg" aria-hidden="true"></i>
-  <span class="bkch"><span class="bkcl">${aSrcLogo(so)}</span><span class="bkcn"><b>${esc(so.name)}</b><small>${c?'موجودی از حساب «'+esc(cuName(c))+'»':'به حساب بانکی وصل نیست'}</small></span>${can('src')?`<span class="bkip ed" data-act="srcSet" data-id="${so.id}" role="button">${ic('edit')}</span>`:''}</span>
-  ${f==null?`<span class="abk0">موجودی این منبع معلوم نیست؛ در زبانه بانک، حساب «${esc(so.name)}» را بسازید تا خودکار وصل شود</span>`:`<span class="abkr"><span><small>قابل تخصیص</small><b>${mv(f)}</b></span><span><small>این تخصیص</small><b>${s?'−'+fmt(s):'۰'}</b></span></span>
-  <span class="bkcb"><small>بعد از این تخصیص</small><span class="bkcv"><b data-v="${Math.abs(f-s)}">${mv(f-s)}</b><i>تومان</i></span><em class="${f-s<0?'kr':'kz'}">${f-s<0?'بیشتر از موجودی':'کافی است'}</em></span>
-  ${f>0&&aSt.method==='amount'?`<button type="button" class="abkq" data-act="aQuick" data-v="bal">تا سقف موجودی</button>`:''}`}</div>`}
+  /* v86.9 (خواسته صاحب اپ: «کادر بانک خیلی بزرگ است»): کارت فشرده — سرتیتر یک خط، یک ردیف سه‌تایی */
+  return `<div class="bkc abk abk2${f!=null&&s>f?' over':''}" style="--bk:${aSrcClr(so)}">${c?bkWmH(c):''}
+  <span class="bkch"><span class="bkcl">${aSrcLogo(so)}</span><span class="bkcn"><b>${esc(so.name)}</b><small>${c?'موجودی از «'+esc(cuName(c))+'»':'به حساب بانکی وصل نیست'}</small></span>${c?(f>0&&aSt.method==='amount'?`<button type="button" class="abkq" data-act="aQuick" data-v="bal">تا سقف</button>`:''):`<button type="button" class="abkq" data-act="aSrcLink" data-id="${so.id}">${ic('bank')} وصل به بانک</button>`}</span>
+  ${f==null?'':`<span class="abkr3"><span><small>قابل تخصیص</small><b>${mv(f)}</b></span><span><small>این تخصیص</small><b>${s?'−'+fmt(s):'۰'}</b></span><span class="${f-s<0?'neg':''}"><small>بعد از تخصیص</small><b data-v="${Math.abs(f-s)}">${mv(f-s)}</b></span></span>`}</div>`}
 function allocSheet(){const S=DSRC(),P=aPool();
   sheet(`<div class="ash"><div class="sh-h"><div><b>${aSt.editPid?'ویرایش تخصیص':'تخصیص جدید'}</b><small class="shsub">${esc(pdHead(ldKey))}، مانده ${fmt(sum(P))} تومان (${fmt(P.length)} واریزی)</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="astep"><span class="n">۱</span><b>منبع پرداخت</b><button class="link" data-act="srcMgr">ویرایش منابع</button></div>
-  <div class="srcs asrcs">${S.map(s=>aSrcCard(s)).join('')}<button class="srcc add asc0" data-act="aNewSrc"><span class="av">${ic('plus')}</span><b>منبع جدید</b><small>افزودن</small></button></div>
+  <div class="srcs asrcs">${S.filter(x=>srcBk(x)).map(s=>aSrcCard(s)).join('')}${S.some(x=>!srcBk(x))?`<span class="asdv"><i>بدون بانک</i></span>`:''}${S.filter(x=>!srcBk(x)).map(s=>aSrcCard(s)).join('')}<button class="srcc add asc0" data-act="aNewSrc"><span class="av">${ic('plus')}</span><b>منبع جدید</b><small>افزودن</small></button></div>
   <div id="abal"></div>
   <div class="astep"><span class="n">۲</span><b>روش انتخاب</b></div>
   <div class="mseg">${Object.keys(MNAME).filter(k=>k!=='bank'||aSt.method==='bank')/* v86.6 (خواسته صاحب اپ): «هم‌بانک» جدا لازم نیست — کلید «اول واریزی‌های هم‌بانک» در روش مبلغ */.map(k=>`<button class="${aSt.method===k?'on':''}" data-act="aMeth" data-m="${k}">${MIC[k]}<span>${MNAME[k]}</span></button>`).join('')}</div>
@@ -131,6 +130,7 @@ function allocSheet(){const S=DSRC(),P=aPool();
   <div class="sbox asq">${ic('search')}<input id="aq" type="search" placeholder="جست‌وجو در مانده لیست…" value="${esc(aSt.q)}" autocomplete="off"></div>
   <div id="aprev"></div>
   <div class="asave"><div class="atot"><small>جمع انتخاب</small><b id="atot">۰</b><small id="arem"></small></div><button class="btn gold xgo" data-act="aSave" id="asv">${aSt.editPid?'ذخیره تغییرات':'ثبت تخصیص'}</button></div></div>`);
+  {const on=document.querySelector('#sheet .asc.on');if(on)requestAnimationFrame(()=>{try{on.scrollIntoView({inline:'center',block:'nearest'})}catch(_){}})}
   const sh=$('sheet');sh.oninput=e=>{const t=e.target;if(t.classList.contains('num')){const n=num(t.value);t.value=n?n.toLocaleString('en-US'):''}
     if(t.id==='aq'){aSt.q=t.value;renderPrev(true);return}
     if(t.id==='pa'){const w=$('pwords');if(w)w.textContent=num(t.value)?shortAmt(num(t.value)):''}

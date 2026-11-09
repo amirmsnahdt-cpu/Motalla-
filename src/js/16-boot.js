@@ -65,3 +65,7 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||/^(127\.0\.0\.1|
 /* v67.1: صفحه بارگذاری (مهر مطلا در index.html) بعد از آماده شدن قفل/ورود/خانه محو می‌شود؛ دست‌کم ۰٫۶۵ ثانیه تا چشمک نزند */
 (()=>{const s=$('splash');if(!s)return;let w=650;try{w=Math.max(0,650-performance.now())}catch(e){}
   setTimeout(()=>{s.classList.add('out');setTimeout(()=>{try{s.remove()}catch(e){}},450)},w)})();
+
+/* v86.9 (خواسته صاحب اپ: «هر جا مبلغ یا نامی در کادر نوشته شده، با زدن روی آن همه انتخاب شود»): انتخاب کامل محتوای هر کادر متنی/عددی با فوکوس */
+document.addEventListener('focusin',e=>{const t=e.target;if(!t||t.tagName!=='INPUT'||t.readOnly||!t.value)return;const ty=(t.type||'text').toLowerCase();if(!['text','search','tel','number','email','url',''].includes(ty))return;
+  setTimeout(()=>{try{if(document.activeElement===t)t.select()}catch(_){}},0)},true);

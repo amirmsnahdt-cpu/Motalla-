@@ -100,3 +100,12 @@ function bkCardH(c,sz,attr){const v=bkCuBal(c),t=sz==='sm'?'button':'div';
   return `<${t} ${t==='button'?'type="button" ':''}class="bkc ${sz||'lg'}${v<0?' neg':''}" style="--bk:${bkClr(c)}"${attr||''}>${bkWmH(c)}<i class="bkcg" aria-hidden="true"></i>
   <span class="bkch"><span class="bkcl">${bkAvH(c)||ic('bank')}</span><span class="bkcn"><b>${esc(cuName(c))}</b>${c.cno?`<small>حساب ${toFa(c.cno)}</small>`:''}</span>${sz==='sm'?ic('back').replace('class="i"','class="i flip bkcx"'):''}</span>
   <span class="bkcb"><small>مانده حساب</small><span class="bkcv"><b data-v="${Math.abs(v)}">${v<0?'−':''}${fmt(Math.abs(v))}</b><i>تومان</i></span><em class="${v>0?'kr':v<0?'kb':'kz'}">${v>0?'طلبکاریم':v<0?'بدهکاریم':'تسویه'}</em></span></${t}>`}
+
+/* v86.9 (خواسته صاحب اپ: «منابعی که بانک نیستند را از همین‌جا با افزودن نام بانک به بانک تبدیل کنم»): وصل منبع به حساب بانکی
+   موجود (بدون منبع) یا ساخت حساب بانکی تازه با نام همین منبع → c.srcId = منبع؛ موجودی از آن حساب می‌آید */
+ACT.aSrcLink=(d,e)=>{const so=sources.find(x=>String(x.id)===String(d.id));if(!so)return;const T=e&&e.target&&e.target.closest('button');
+  const free=bkCus().filter(c=>c.srcId==null);
+  popMenu(T,[['aSrcLinkGo',ic('plus'),'حساب بانکی تازه «'+so.name+'»',{id:so.id,cu:''}],...free.map(c=>['aSrcLinkGo',ic('bank'),cuName(c)+' · '+bfxMv(bkCuBal(c)),{id:so.id,cu:c.id}])])};
+ACT.aSrcLinkGo=d=>{const so=sources.find(x=>String(x.id)===String(d.id));if(!so)return;let c=d.cu?custs.find(z=>String(z.id)===String(d.cu)):null;
+  if(!c){const id=bkCuNew(so.name);c=custs.find(z=>String(z.id)===String(id))}if(!c)return;c.srcId=so.id;c.srcAt=c.srcAt||'';delete c.srcNo;if(!c.bank&&so.bank)c.bank=so.bank;c.updatedAt=new Date().toISOString();
+  bkDepSync(c,1);saveCu();logA('cust','اتصال منبع به حساب بانک',so.name+' ← '+cuName(c));aSt.srcId=so.id;if(aSt.method==='amount'&&aSt.amtAuto!==0)aSt.amount=aFill(so);allocSheet();recalc();toast('«'+so.name+'» به حساب بانکی وصل شد')};
