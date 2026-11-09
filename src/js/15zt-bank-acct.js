@@ -28,14 +28,19 @@ ACT.bkLinkS=d=>{const c=custs.find(z=>String(z.id)===String(d.cu));if(!c)return;
     if(String(c.srcId)!==String(s.id)){c.srcId=s.id;c.srcAt=now}}
   c.updatedAt=now;bkDepSync(c,1);saveCu();logA('cust','اتصال حساب بانک به لیست‌های واریز',cuName(c)+' ← '+((bkSrcOf(c)||{}).name||'قطع'));render();toast(bkSrcOf(c)?'وصل شد':'اتصال قطع شد')};
 /* لیست‌های ارسال‌شده از بانک وصل‌شده → سند «لیست واریز» در حساب بانک (یکی برای هر بچ) */
+/* v84.3 (خواسته صاحب اپ: «بانک خودش ریلود می‌شود و مانده درست نمی‌دهد»): مقایسه پایدار (ترتیب کلیدها مهم نیست) — قبلاً بعد از برگشت داده از سرور
+   ترتیب کلیدها فرق می‌کرد، هر بار «تغییر» دیده می‌شد، ذخیره و دوباره رسم می‌شد (چرخه). و اگر دو گوشی هم‌زمان سند روز/لیست را ساخته باشند، فقط یکی می‌ماند (bkDup) */
+const stj=v=>Array.isArray(v)?'['+v.map(stj).join(',')+']':v&&typeof v==='object'?'{'+Object.keys(v).filter(k=>v[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+stj(v[k])).join(',')+'}':JSON.stringify(v===undefined?null:v);
+function bkDup(c,f,now){const seen=new Map();let ch=0;for(const t of (c.txs||[]).slice().sort((a,b)=>String(a.id).localeCompare(String(b.id),'en',{numeric:true}))){if(t.del||!t[f])continue;const k=String(t[f]);if(seen.has(k)){t.del=true;t.delAt=now;t.delBy='خودکار';ch=1}else seen.set(k,t)}return ch}
 function bkDepSync(c,noSave){const s=bkSrcOf(c),now=new Date().toISOString();let ch=0;const want=new Map();
   /* v84.1 (خواسته صاحب اپ: «لیست واریزی‌ها با عکس‌هایشان»): هر واریزی لیست یک ردیف سند با رسیدهایش؛ همه لیست‌های ارسال‌شده همان بانک (نه فقط از زمان اتصال) */
   if(s){for(const b of batches)for(const x of b.items||[]){if(x.src!==s.name||x.st==='fail')continue;const at=x.sAt||b.createdAt||'';
       const k=String(b.id),o=want.get(k)||{R:[],date:b.pay||b.date||String(at).slice(0,10),at};const K=itImgs(b,x);
       o.R.push({m:'dls',amount:Math.round(+x.amount||0),nm:x.name||'',eid:x.id,src:s.name,...(x.tn?{tn:x.tn}:{}),...(K.length?{imgs:K,img:K[0]}:{})});want.set(k,o)}}
+  bkDup(c,'bl',now)&&(ch=1);
   for(const t of c.txs||[]){if(t.del||!t.bl)continue;const w=want.get(String(t.bl));
     if(!w||!w.R.length){t.del=true;t.delAt=now;t.delBy='خودکار';ch=1;continue}
-    if(JSON.stringify(t.pays)!==JSON.stringify(w.R)){t.pays=w.R;t.edAt=now;ch=1}want.delete(String(t.bl))}
+    if(stj(t.pays)!==stj(w.R)){t.pays=w.R;t.edAt=now;ch=1}want.delete(String(t.bl))}
   for(const [k,w] of want){if(!w.R.length)continue;(c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:w.date,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,
     pays:w.R,note:'',bl:k,at:w.at||now,by:'خودکار',cn:cnNext(c)});ch=1}
   if(ch){c.lastAt=now;if(!noSave)audBg(()=>saveCu())}return ch}
@@ -55,16 +60,18 @@ function posDaySync(c){const now=new Date().toISOString();let ch=0;const D=new M
   for(const C of CU()){if(C===c)continue;for(const T of C.txs||[]){if(T.del||T.type!=='inv')continue;for(const p of T.pays||[]){if(p.m!=='pos'||!p.bk||String(p.cuId)!==String(c.id))continue;
       if(p.xfId!=null){const o=(c.txs||[]).find(z=>String(z.id)===String(p.xfId));if(o&&!o.del){o.del=true;o.delAt=now;o.delBy='خودکار'}delete p.xfId;ch=1}
       const k=T.date||String(T.at||now).slice(0,10);if(!D.has(k))D.set(k,[]);D.get(k).push({m:'lnk',lm:'pos',amount:-(+p.amount||0),cuId:C.id,cuName:cuName(C),lcu:C.id,ltx:T.id,no:T.no,...(p.imgs&&p.imgs.length?{imgs:p.imgs.slice(),img:p.imgs[0]}:{})})}}}
+  bkDup(c,'pd',now)&&(ch=1);
   for(const t of c.txs||[]){if(t.del||!t.pd)continue;const R=D.get(t.pd);if(!R||!R.length){t.del=true;t.delAt=now;t.delBy='خودکار';ch=1;continue}
-    if(JSON.stringify(t.pays)!==JSON.stringify(R)){t.pays=R;t.edAt=now;ch=1}D.delete(t.pd)}
+    if(stj(t.pays)!==stj(R)){t.pays=R;t.edAt=now;ch=1}D.delete(t.pd)}
   for(const [k,R] of D){(c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:k,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:R,note:'',pd:k,at:k+'T23:00:00.000Z',by:'خودکار',cn:cnNext(c)});ch=1}
   if(ch){c.lastAt=now}return ch}
 function posDaySyncAll(noSave){let ch=0;for(const c of bkCus())ch+=posDaySync(c);if(ch&&!noSave)audBg(()=>saveCu());return ch}
 /* ===== v84.2 (خواسته صاحب اپ: «لوگوی هر بانک خودکار در پروفایل حساب ذخیره شود و پس‌زمینه کم‌رنگ لوگوی بانک») =====
    بانک حساب نوع «بانک» از نام، شبا یا کارت تشخیص داده می‌شود و یک بار در c.bank ذخیره می‌شود؛ آواتار = لوگوی بانک، و پشت کارت لوگوی کم‌رنگ */
 /* تشخیص بانک از نام با کلمه کامل (مهدی ≠ بانک دی) */
-const bkNameBank=n=>{const W=nzName(toEn(n||'')).replace(/[()«»\-_,،.]/g,' ').split(/\s+/).filter(w=>w&&w!=='بانک');return BK_PICK.slice().sort((a,b)=>b.split(' ').length-a.split(' ').length||b.length-a.length).find(b=>{const B=nzName(b).split(/\s+/);for(let i=0;i+B.length<=W.length;i++)if(B.every((x,j)=>W[i+j]===x))return true;return false})||''};
-const bkOfCu=c=>c?(c.bank||ibanBank(c.iban||'')||bankOfCard(c.card)||bkNameBank(c.name||'')||''):'';
-function bkLogoFix(){let ch=0;for(const c of bkCus()){if(c.bank)continue;const b=ibanBank(c.iban||'')||bankOfCard(c.card)||bkNameBank(c.name||'');if(b){c.bank=b;c.updatedAt=new Date().toISOString();ch=1}}if(ch)audBg(()=>saveCu());return ch}
-const bkAvH=c=>{const b=bkOfCu(c);return b?`<span class="c6a cul bxlogo bkav">${bankBadge(b,'lg')}</span>`:''};
+const bkNameBank=n=>{const W=nzName(toEn(n||'')).replace(/(^|\s)مهر(?=\s|$)/g,'$1مهر ایران').replace(/[()«»\-_,،.]/g,' ').split(/\s+/).filter(w=>w&&w!=='بانک');return BK_PICK.slice().sort((a,b)=>b.split(' ').length-a.split(' ').length||b.length-a.length).find(b=>{const B=nzName(b).split(/\s+/);for(let i=0;i+B.length<=W.length;i++)if(B.every((x,j)=>W[i+j]===x))return true;return false})||''};
+const bkOfCu=c=>c?(bkNameBank(c.name||'')||c.bank||ibanBank(c.iban||'')||bankOfCard(c.card)||''):'';
+function bkLogoFix(){let ch=0;for(const c of bkCus()){const b=bkNameBank(c.name||'')||ibanBank(c.iban||'')||bankOfCard(c.card)||'';if(b&&c.bank!==b){c.bank=b;c.updatedAt=new Date().toISOString();ch=1}}if(ch)audBg(()=>saveCu());return ch}
+const bkLogo=b=>!!(b&&BKL[Object.keys(BKL).find(n=>canon(n)===canon(b))]);
+const bkAvH=c=>{const b=bkOfCu(c);return bkLogo(b)?`<span class="c6a cul bxlogo bkav">${bankBadge(b,'lg')}</span>`:''};
 const bkWmH=c=>{const b=c&&c.grp==='بانک'&&bkOfCu(c);return b&&BKL[Object.keys(BKL).find(n=>canon(n)===canon(b))]?`<span class="bkwm" aria-hidden="true">${bankBadge(b,'wm')}</span>`:''};
