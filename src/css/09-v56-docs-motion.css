@@ -3969,3 +3969,6 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .ckg.ckg1{grid-template-columns:1fr}
 .cuLs .bkl .c6r.bkr>.tx{display:grid!important;gap:2px;justify-items:start}
 .cuLs .bkl .c6r.bkr>.tx>b{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* v83.3 حساب نوع بانک: رنگ سرتیتر نوع‌های بانکی (زیاد شدن موجودی بانک = قرمز طلبکاریم، کم شدن = آبی) */
+.sthd.k-chq .sthi,.sthd.k-vos .sthi{background:var(--red)!important;color:#fff!important}.sthd.k-pass .sthi{background:var(--blu)!important;color:#fff!important}
+.d6k.k-chq,.d6k.k-vos{background:var(--red2);color:var(--red)}.d6k.k-pass{background:var(--blu2);color:var(--blu)}
