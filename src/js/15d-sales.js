@@ -301,9 +301,9 @@ const off6=b=>{b=Math.abs(Math.round(b||0));return b%1000000||Math.min(b,1000000
 const offLeft=p=>{const b=svRBal(p.i),v=p.dir==='out'?Math.max(0,b):Math.max(0,-b);return v?off6(v):0};
 /* a = مبلغ تخفیف (مثبت)؛ جهتش از علامت مانده: طلبکاریم → دریافت، بدهکاریم → پرداخت */
 function svOffApply(a){const v=offBal();if(!v){toast('مانده مبلغ صفر است');return}a=Math.round(+a||0);if(!(a>0)){toast('مبلغ تخفیف را بزنید',true);return}if(a>Math.abs(v)){toast('تخفیف بیشتر از مانده است',true);return}
-  const sg=v<0?1:-1,i=sv.pays.findIndex(p=>p.m==='off'),old=i>=0?{...sv.pays[i]}:null,na=(old?pAmt(old):0)+sg*a;
-  if(i>=0){if(na)sv.pays[i].amount=na;else sv.pays.splice(i,1)}else sv.pays.push({m:'off',amount:na});svKeep();closeSheet();svRe();const r=Math.abs(v)-a;
-  toast((v<0?'دریافت تخفیف ':'پرداخت تخفیف ')+fmt(a)+(r?' · مانده '+fmt(r):' · مانده صفر شد'),'','بازگردانی',()=>{const j=sv.pays.findIndex(p=>p.m==='off');if(old){if(j>=0)sv.pays[j]=old;else sv.pays.push(old)}else if(j>=0)sv.pays.splice(j,1);svKeep();svRe()})}
+  const sg=v<0?1:-1,i=sv.pays.findIndex(p=>p.m==='adj'&&p.why==='تخفیف'),old=i>=0?{...sv.pays[i]}:null,na=(old?pAmt(old):0)+sg*a;
+  if(i>=0){if(na)sv.pays[i].amount=na;else sv.pays.splice(i,1)}else sv.pays.push({m:'adj',why:'تخفیف',amount:na});svKeep();closeSheet();svRe();const r=Math.abs(v)-a;
+  toast((v<0?'اضافه · تخفیف ':'کسر · تخفیف ')+fmt(a)+(r?' · مانده '+fmt(r):' · مانده صفر شد'),'','بازگردانی',()=>{const j=sv.pays.findIndex(p=>p.m==='adj'&&p.why==='تخفیف');if(old){if(j>=0)sv.pays[j]=old;else sv.pays.push(old)}else if(j>=0)sv.pays.splice(j,1);svKeep();svRe()})}
 let OFF=null;
 /* مانده هدف تخفیف: از پنجره تسویه = مانده همین سند؛ از خانه مبلغ پایین سند = مانده حساب (منفی = طلبکاریم) */
 const offBal=()=>OFF&&OFF.doc?-ckRest():svRBal();
@@ -381,7 +381,7 @@ ACT.pySave=()=>{pyRead();const p=sv.qa.p;if(!p)return;const amt=+p.amount||0;
   /* v61.75: ویرایش ردیف «حواله به فروشنده واریزی» پیوند واریزی را نگه می‌دارد (قبلاً entId پاک می‌شد → سند ثبت نمی‌شد و موقت می‌ماند) */if(p.m==='dep'){if(!p.entId){toast('واریزی این حواله پیدا نشد؛ ردیف را حذف و دوباره اضافه کنید',true);return}Object.assign(o,{entId:p.entId,entName:p.entName||depName(p),...(p.stlId?{stlId:p.stlId}:{})})}
   if(p.i!=null)sv.pays[p.i]=o;else sv.pays.push(o);qaDone()};
 ACT.pyDel=()=>{const p=sv.qa.p;if(!p||p.i==null)return;const o=sv.pays.splice(p.i,1)[0];qaDone();toast('ردیف حذف شد','', 'بازگردانی',()=>{if(o){sv.pays.push(o);svKeep();svRe()}})};
-ACT.svPayEdit=d=>{const o=sv.pays[+d.i];if(!o)return;qaRead();if(o.m==='adj')sv.qa.d=pAmt(o)<0?'sub':'add';if(o.m==='bkx')sv.qa.d=(BKX[o.k]||[])[1]?o.k:pAmt(o)<0?'out':'in';const p={...o,i:+d.i,dir:pAmt(o)<0?'out':'in',amount:Math.abs(pAmt(o)),q:''};pyStart(p);const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
+ACT.svPayEdit=d=>{const o=sv.pays[+d.i];if(!o)return;qaRead();if(o.m==='adj')sv.qa.d=pAmt(o)<0?'out':'in';if(o.m==='bkx')sv.qa.d=(BKX[o.k]||[])[1]?o.k:pAmt(o)<0?'out':'in';const p={...o,i:+d.i,dir:pAmt(o)<0?'out':'in',amount:Math.abs(pAmt(o)),q:''};pyStart(p);const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
 ACT.svDisc=()=>{qaRead();pyStart(pyNew('disc'));const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
 ACT.svRowDel=d=>{if(d.k==='pv'){pvDel(d.i);return}if(d.k==='py'&&sv.pays[+d.i]&&sv.pays[+d.i].m==='wd'){ACT.svWdRow();svRe();return}const L=d.k==='it'?sv.items:d.k==='xr'?sv.xr:d.k==='py'?sv.pays:null;let o;if(d.k==='dc'){o=sv.disc;sv.disc=0}else if(L)o=L.splice(+d.i,1)[0];if(sv.qa.i!=null||(sv.qa.p&&sv.qa.p.i!=null)||(sv.qa.x&&sv.qa.x.i!=null))sv.qa=qaBlank();svKeep();qaRe();svRe();
   toast('ردیف حذف شد','', 'بازگردانی',()=>{if(d.k==='dc')sv.disc=o;else if(L&&o)L.splice(+d.i,0,o);svKeep();svRe()})};
@@ -389,7 +389,7 @@ ACT.svRowDel=d=>{if(d.k==='pv'){pvDel(d.i);return}if(d.k==='py'&&sv.pays[+d.i]&&
 /* v61.6: برچسب تشخیص روی هر ردیف سند */
 const dkOfX=x=>x.cat==='تعویض'?'swap':x.cat==='مرجوعی'?'ret':x.t;
 /* v83.3: نوع ردیف پرداخت (در حساب، پاس شدن، اضافه/کسر…)؛ bk = حساب نوع بانک (واریز/برداشت به‌جای دریافت/پرداخت) */
-const pyTagK=p=>p.m==='bkx'&&(BKX[p.k]||[])[1]?p.k:p.m==='adj'?(pAmt(p)<0?'sub':'add'):pAmt(p)<0?'out':'in';
+const pyTagK=p=>p.m==='bkx'&&(BKX[p.k]||[])[1]?p.k:pAmt(p)<0?'out':'in';
 const dkTag=(id,bk)=>{const D=(bk?DKBK.find(z=>z[0]===id):null)||DKA().find(z=>z[0]===id)||DK.find(z=>z[0]===id)||DKBK.find(z=>z[0]===id);return D?`<em class="d6k k-${id}">${D[1]}</em>`:''};
 /* v61.47: ردیف سند فشرده و منظم (خواسته صاحب اپ): آیکون نوع کار، نام با برچسب، مشخصات به شکل تکه‌های کوچک مرتب (نه یک جمله بلند)،
    مبلغ پررنگ با رنگ اثرش — قرمز طلبکاریم، آبی بدهکاریم — و یک نوار باریک هم‌رنگ کنار ردیف */

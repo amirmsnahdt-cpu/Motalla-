@@ -11,7 +11,9 @@ Object.assign(IC,{dSell:'<path d="M20.2 12.6l-7.6 7.6a1.6 1.6 0 01-2.2 0L4 13.8V
   dIn:'<path d="M12 3v11M7.5 9.5L12 14l4.5-4.5"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>',
   dOut:'<path d="M12 14V3M7.5 7.5L12 3l4.5 4.5"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>',
   dRet:'<path d="M9 15l-5-5 5-5"/><path d="M4 10h10.5a5.5 5.5 0 010 11H11"/>'});
-const DK=[['sell','فروش','dSell'],['buy','خرید','dBuy'],['swap','تعویض','dSwap'],['in','دریافت','dIn'],['out','پرداخت','dOut'],['ret','مرجوعی','dRet'],['add','اضافه','plus'],['sub','کسر','minus']];
+const DK=[['sell','فروش','dSell'],['buy','خرید','dBuy'],['swap','تعویض','dSwap'],['in','دریافت','dIn'],['out','پرداخت','dOut'],['ret','مرجوعی','dRet']];
+/* v83.6 (خواسته صاحب اپ، ویدیوی کیمیا): «اضافه» و «کسر» دیگر کاشی جدا نیستند — مثل کیمیا داخل «دریافت» (اضافه) و «پرداخت» (کسر)
+   کنار نقد و حواله؛ با زدن، فهرست علت (تخفیف، مانده قبلی، هزینه بانکی…). تخفیف‌ها هم همین‌طور سند می‌خورند (m:'adj' why:'تخفیف') */
 /* v82.8 (خواسته صاحب اپ: «در سندهای اصلی کسر و اضافه در ردیف سند باشد؛ با زدن اضافه، مانده قبلی، تخفیف و … انتخاب شود»):
    «اضافه» = به نفع مشتری (مثل دریافت، مبلغ مثبت)، «کسر» = به ضرر مشتری (مثل پرداخت، منفی)؛ ردیف پرداخت m:'adj' با علت why از همان فهرست علت‌های سند بانکی (bdReasons) */
 const dkRed=k=>dkBk()?(k==='out'||!!(BKX[k]&&BKX[k][1]>0)):k==='sell'||k==='out'||k==='sub';
@@ -45,7 +47,7 @@ const COINS=()=>Object.keys(XA).filter(k=>XA[k].k==='c'),FXS=()=>Object.keys(XA)
 function xaSync(){const r=cfgRec();((r&&r.xa)||[]).forEach(o=>{if(o&&o.k&&!XA[o.k])XA[o.k]={t:o.t||o.k,s:o.s||o.k,u:o.u||(o.c==='f'?'واحد':'عدد'),k:o.c==='f'?'f':'c',x:1}})}
 const gCat=k=>{const r=cfgRec();return (r&&r.gk&&r.gk[k])||'ساخته'};
 function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls)=>R.push({id,t,ico,sub,cls:cls||''});
-  if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله به مشتری':'حواله از مشتری','swap','از حساب مشتری دیگر');fx('m:hav',d==='in'?'حواله به بانک':'حواله از بانک','bank',d==='in'?'به حساب‌های ما':'از حساب‌های ما');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه');fx('m:cash','نقد','cash','پول نقد');fx('m:off','تخفیف','tag',d==='in'?'دریافت تخفیف · صفر کردن مانده طلب':'پرداخت تخفیف · صفر کردن مانده بدهی')}
+  if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله به مشتری':'حواله از مشتری','swap','از حساب مشتری دیگر');fx('m:hav',d==='in'?'حواله به بانک':'حواله از بانک','bank',d==='in'?'به حساب‌های ما':'از حساب‌های ما');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه');fx('m:cash','نقد','cash','پول نقد');fx('j:adj',d==='in'?'اضافه':'کسر','tag','تخفیف، مانده قبلی، هزینه بانکی، یارانه…')}
   fx('g:ab','آبشده','coin',d==='sell'?'وزن، عیار، انگ، سود':'وزن و عیار','gd');
   /* v61.62 (خواسته صاحب اپ): آبشده شرطی — عیارش هنوز درنیامده؛ با ۷۵۰ حساب می‌شود و عیار واقعی بعداً از «تنظیمات › آبشده شرطی» در همه سندها می‌نشیند */
   fx('g:abs','آبشده شرطی','coin','عیار درنیامده · فعلاً ۷۵۰ · انگ را بزنید','gd');fx('g:misc','متفرقه','coin',d==='sell'?'طلای دست‌دوم با اجرت و سود':'طلای دست‌دوم','gd');
@@ -69,7 +71,7 @@ function dkList(){const a=sv.qa,q0=clean(a.q||''),q=nzName(toEn(q0)),hit=t=>!q||
   /* v61.60: پولی سکه / پولی ارز — اول کدام سکه یا ارز */
   if(a.d&&a.pk){xaSync();const K=(a.pk==='c'?COINS():FXS()).filter(k=>hit(XA[k].t));return `<div class="bzsug cbl dkl"><button type="button" class="bzsr dkrw fix" data-act="dkPk0"><span class="av">${ic('back')}</span><span class="tx"><b>${a.pk==='c'?'پولی سکه':'پولی ارز'}</b><small>بازگشت به فهرست</small></span></button>${K.map(k=>`<button type="button" class="bzsr dkrw fix gd" data-act="dkPul" data-k="${esc(k)}"><span class="av">${ic(a.pk==='c'?'coin':'usd')}</span><span class="tx"><b>پولی ${esc(XA[k].t)}</b><small>نرخ هر ${esc(XA[k].u||'واحد')} · مبلغ به حساب</small></span></button>`).join('')||'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}</div>`}
   const row=(act,data,ico,t,sub,cls)=>`<button type="button" class="bzsr dkrw${cls?' '+cls:''}" data-act="${act}"${Object.entries(data).map(([k,v])=>` data-${k}="${esc(v)}"`).join('')}><span class="av">${ic(ico)}</span><span class="tx"><b>${t}</b><small>${sub||''}</small></span></button>`;
-  if(!a.d){/* v81.2 (خواسته صاحب اپ): دو ستون — فروش | خرید، پرداخت | دریافت، تعویض | مرجوعی؛ کاشی‌ها با حرکت پشت هم بالا می‌آیند */const ORD=dkBk()?['out','in','chq','pass','vos']:dkIO()?['in','out']:['sell','buy','out','in','swap','ret','sub','add'],R=DKA().slice().sort((x,y)=>ORD.indexOf(x[0])-ORD.indexOf(y[0])).filter(([k,t])=>hit(t)).map(([k,t,i],n)=>row('dkD',{d:k},i,t,(dkBk()?{out:'نقدی، چک، حواله، کسر',in:'نقدی، چک، حواله، اضافه',chq:'چک به حساب گذاشته شد',pass:'چک ما از این حساب پاس شد',vos:'چک وصول شد و به حساب آمد'}:{sell:'آبشده، طلای ساخته، سکه، ارز',buy:'متفرقه، آبشده، سکه، ارز',swap:'طلای کهنه مشتری با نرخ روز',in:'حواله، نقد، طلا، سکه، ارز',out:'حواله، نقد، طلا، سکه، ارز',ret:'برگشت کالای فروخته',add:'مانده قبلی، تخفیف، … به نفع مشتری',sub:'هزینه، کارمزد، … از حساب مشتری'})[k],'top k-'+k+(dkRed(k)?' kr':' kb')).replace('class="bzsr','style="--i:'+n+'" class="bzsr'));
+  if(!a.d){/* v81.2 (خواسته صاحب اپ): دو ستون — فروش | خرید، پرداخت | دریافت، تعویض | مرجوعی؛ کاشی‌ها با حرکت پشت هم بالا می‌آیند */const ORD=dkBk()?['out','in','chq','pass','vos']:dkIO()?['in','out']:['sell','buy','out','in','swap','ret'],R=DKA().slice().sort((x,y)=>ORD.indexOf(x[0])-ORD.indexOf(y[0])).filter(([k,t])=>hit(t)).map(([k,t,i],n)=>row('dkD',{d:k},i,t,(dkBk()?{out:'نقدی، چک، حواله، کسر',in:'نقدی، چک، حواله، اضافه',chq:'چک به حساب گذاشته شد',pass:'چک ما از این حساب پاس شد',vos:'چک وصول شد و به حساب آمد'}:{sell:'آبشده، طلای ساخته، سکه، ارز',buy:'متفرقه، آبشده، سکه، ارز',swap:'طلای کهنه مشتری با نرخ روز',in:'حواله، نقد، طلا، سکه، ارز',out:'حواله، نقد، طلا، سکه، ارز',ret:'برگشت کالای فروخته'})[k],'top k-'+k+(dkRed(k)?' kr':' kb')).replace('class="bzsr','style="--i:'+n+'" class="bzsr'));
     return R.length?`<div class="bzsug cbl dkl dkgrid">${R.join('')}</div>`:'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}
   const o=a.d==='out',BKL=[['m:cash','نقدی','cash',o?'از صندوق به این بانک':'از این بانک به صندوق'],['b:chk','چک','inv',o?'چک به این حساب':'چک از این حساب'],['m:cust','حواله','swap',o?'از هر حساب (مشتری، بانک، هزینه…)':'به هر حساب (مشتری، بانک، هزینه…)'],['b:adj',o?'کسر':'اضافه','tag','تخفیف، مانده قبلی، هزینه بانکی، یارانه…'],['v:prev','مانده قبلی','clock','افتتاح حساب']];
   const F=(dkBk()&&(a.d==='in'||a.d==='out')?BKL.map(([id,t,ico,sub])=>({id,t,ico,sub,cls:''})).filter(z=>hit(z.t+' '+z.sub)):dkFixed(a.d).filter(z=>hit(z.t+' '+z.sub))).map(z=>row('dkF',{id:z.id},z.ico,esc(z.t),esc(z.sub),'fix '+z.cls));
@@ -123,6 +125,7 @@ ACT.dkF=d=>{qaRead();const a=sv.qa,D=a.d,[ty,v]=String(d.id).split(':');a.q='';a
   if(ty==='m'&&v==='prev'){pyStart(pyNew('prev',{dir:PO,fl:1}));return}
   if(ty==='g'&&v==='prev'){xrStart(xrNew(PO,'gold',{cat:'مانده قبلی',pul:true,ay:750,fl:'gold',fd:D}));return}
   if(ty==='p'){a.pk=v;svKeep();const r=$('qKs');if(r)r.innerHTML=dkList();return}
+  if(ty==='j'){pyStart(pyNew('adj',{dir:D==='out'?'out':'in',fl:1}));return}
   if(ty==='b'){pyStart(pyNew('bkx',{k:v,dir:D==='out'?'out':'in',fl:1}));return}
   if(ty==='m'){if(v==='cust'&&!svCu()){toast('اول مشتری سند را انتخاب کنید',true);return}pyStart(pyNew(v,{dir:D,fl:1}));return}
   if(ty==='a'){const t=D==='sell'||D==='buy'?D:D;xrStart(xrNew(t,v,{fl:'one',fd:D}));return}
