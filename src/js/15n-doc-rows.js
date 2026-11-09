@@ -120,10 +120,14 @@ const depLeft=(x,skip)=>Math.max(0,Math.round(depAvail(x)-(sv?sv.pays.filter((p,
    بدون سقف تعداد؛ قابل حواله = طلب آزاد + مانده واریزی‌های ارسال‌نشده خودش (واریزی ارسال‌شده به بانک دیگر تخصیص خورده و حساب نمی‌شود).
    واریزی‌ای که حساب مشتری ندارد جدا زیر «واریزی‌های ارسال‌نشده» می‌آید. oweSplit مبلغ را اول از طلب آزاد (حواله به حساب)،
    بعد از واریزی‌ها (حواله به واریزی، m:'dep') برمی‌دارد تا هیچ مبلغی دو بار پرداخت نشود. */
-const cuDeps=(c,skip)=>validated().filter(x=>!x.sentBid&&x.wd&&String(x.wd.cu)===String(c.id)).map(x=>[x,depLeft(x,skip)]).filter(z=>z[1]>0);
+/* v82.9 (خواسته صاحب اپ: «فقط مشتری‌هایی که واریزی‌شان تخصیص داده نشده و فقط در لیست واریزی هستند، یا مانده دارند و در لیست نیستند»):
+   واریزی‌ای که به منبعی تخصیص خورده (در یکی از تخصیص‌های ارسال‌نشده) دیگر قابل حواله نیست — depFreeOk */
+const depAllocSet=()=>{const S=new Set();Object.values(drafts||{}).forEach(L=>(L||[]).forEach(p=>{if(!p.sent)(p.ids||[]).forEach(id=>S.add(String(id)))}));return S};
+const depFreeOk=(x,A)=>!A.has(String(x.id))&&!entries.some(z=>!z.del&&z.splitOf!=null&&String(z.splitOf)===String(x.id)&&A.has(String(z.id)));
+const cuDeps=(c,skip)=>{const A=depAllocSet();return validated().filter(x=>!x.sentBid&&depFreeOk(x,A)&&x.wd&&String(x.wd.cu)===String(c.id)).map(x=>[x,depLeft(x,skip)]).filter(z=>z[1]>0)};
 function oweAccts(q,skip){const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId);
   return CU().filter(c=>String(c.id)!==me&&(!nq||cuHit(c,nq,dOk))).map(c=>{const f=cuFree(c,skip),D=cuDeps(c,skip);return {c,f,D,a:f+D.reduce((s,z)=>s+z[1],0)}}).filter(o=>o.a>0).sort((x,y)=>y.a-x.a)}
-const oweDeps=(q,skip)=>{const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId);return validated().filter(x=>!x.sentBid&&!(x.wd&&CU().some(c=>String(c.id)===String(x.wd.cu)))&&!(x.wd&&String(x.wd.cu)===me)).map(x=>[x,depLeft(x,skip)]).filter(([x,r])=>r>0&&(!nq||nzName(fullName(x)+' '+(x.holder||'')).includes(nq)||dOk([x.phone,x.iban,x.code,x.card].join(' ')))).sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0]))))};
+const oweDeps=(q,skip)=>{const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId),A=depAllocSet();return validated().filter(x=>!x.sentBid&&depFreeOk(x,A)&&!(x.wd&&CU().some(c=>String(c.id)===String(x.wd.cu)))&&!(x.wd&&String(x.wd.cu)===me)).map(x=>[x,depLeft(x,skip)]).filter(([x,r])=>r>0&&(!nq||nzName(fullName(x)+' '+(x.holder||'')).includes(nq)||dOk([x.phone,x.iban,x.code,x.card].join(' ')))).sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0]))))};
 const oweSub=o=>[o.c.grp?esc(o.c.grp):'',o.D.length?(o.f?'آزاد '+fmt(o.f)+' · ':'')+'واریزی '+fmt(o.D.reduce((s,z)=>s+z[1],0)):'',o.c.phone?'<bdi dir="ltr">'+esc(toFa(o.c.phone))+'</bdi>':''].filter(Boolean).join('، ')||'حساب مشتری';
 /* مبلغ a از حساب c: ردیف‌های پرداخت (اول طلب آزاد، بعد هر واریزی ارسال‌نشده) */
 function oweSplit(c,a,skip){const R=[];let r=Math.round(a);const f=Math.min(r,cuFree(c,skip));if(f>0){R.push({m:'cust',amount:f,cuId:c.id,cuName:cuName(c)});r-=f}

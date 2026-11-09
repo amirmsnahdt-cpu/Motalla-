@@ -10,6 +10,7 @@ function hdGo(){const P=(act,ico,t,o)=>{o=o||{};return `<button type="button" cl
   if(cur==='backups'&&typeof bkBtn==='function')return bkBtn('bkFull','','ib0 hal hgo','down','دانلود کامل');
   if(cur==='users'&&isAdmin())return P('userNew','plus','همکار تازه');
   /* v82.5 (خواسته صاحب اپ: «خیلی راحت حواله زد»): v82.8: پنجره جدای حواله برداشته شد — حواله و انتقال در خود «سند بانکی» (طرف حساب = همه حساب‌ها) */
+  if(cur==='posa'&&can('src')&&CH('pos').length)return P('posNight','plus','کارتخوان امشب');
   if(cur==='banks'&&can('src')&&ownLC().length)return P('bdNew','plus','سند بانکی');
   if(cur==='lday'){const d=hubData(ldKey);if(!d.rows.length)return '';
     /* v82.4 (خواسته صاحب اپ): «تخصیص خودکار» هم بالا، کنار «ارسال» */

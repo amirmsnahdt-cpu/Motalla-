@@ -3954,3 +3954,18 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .bkd .bkdh b{font-size:13px}
 .bkpv{display:flex;align-items:baseline;justify-content:flex-end;gap:4px}
 .bkpl{margin:2px 4px 0;height:28px}
+/* ===== v82.9 حساب کارتخوان‌ها (posa) + فرم کارتخوان تسویه ===== */
+.bkpl0{margin-top:8px}
+.bkpi{display:grid;place-items:center;background:color-mix(in srgb,var(--ok) 12%,var(--card))!important;color:var(--ok)}.bkpi svg{width:20px;height:20px}
+.bkpn{font-style:normal;color:var(--red);font-weight:800}
+.fday.pnd{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.fday.pnd b{font-size:13px;font-weight:900;color:var(--ok)}.fday.pnd b i{font-style:normal;font-size:10.5px;color:var(--mut);font-weight:700}
+.c6l.pnl{padding:4px 6px;border-radius:16px;background:var(--card);box-shadow:0 0 0 1px var(--line),0 2px 6px -3px rgba(20,40,90,.10)}
+.pnr2{display:flex;align-items:center;gap:10px;padding:8px 6px;border-top:1px solid var(--line)}.pnr2:first-child{border-top:0}
+.pnr2 .bkdi{background:var(--ok2);color:var(--ok)}
+.pnr2 .tx{flex:1;display:grid;min-width:0}.pnr2 .tx b{font-size:13px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pnr2 .tx small{font-size:11px;color:var(--mut)}
+.pnv{flex:none;font-size:14.5px;font-weight:900;color:var(--ok)}
+/* فهرست کارتخوان‌ها و حساب‌ها در فرم‌های تسویه: قاب آبی (قاعده قاب آبی) */
+#sheet #ckPl>.dkl{box-shadow:var(--bfr)!important;border:0!important;border-radius:18px;overflow:hidden}
+.ckg.ckg1{grid-template-columns:1fr}
+.cuLs .bkl .c6r.bkr>.tx{display:grid!important;gap:2px;justify-items:start}
+.cuLs .bkl .c6r.bkr>.tx>b{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
