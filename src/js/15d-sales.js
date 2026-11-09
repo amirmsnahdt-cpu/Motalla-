@@ -328,7 +328,7 @@ ACT.offOk=()=>{const I=$('offA');if(I)OFF.a=num(I.value);svOffApply(OFF.a)};
 const bkCus=()=>CU().filter(c=>c.grp==='بانک');
 const bkCuBal=c=>-Math.round(cuBal(c).R||0);
 function bkCuOpts(q){const nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId);return bkCus().filter(c=>String(c.id)!==me&&(!nq||nzName(toEn(cuName(c))).includes(nq))).map(c=>{const b=bkCuBal(c);return {v:c.id,t:cuName(c),sub:'حساب بانک',ico:'bank',amt:(b<0?'−':'')+fmt(Math.abs(b)),lab:'مانده',cls:'bkm'}})}
-function bkCuNew(n){n=clean(n||'');if(!n)return null;const ex=bkCus().find(c=>cuName(c)===n);if(ex)return ex.id;const c=cuMakeBy({name:n},'سند');c.grp='بانک';saveCu();toast('حساب بانک «'+n+'» ساخته شد');return c.id}
+function bkCuNew(n){n=clean(n||'');if(!n)return null;const ex=bkCus().find(c=>cuName(c)===n);if(ex)return ex.id;const c=cuMakeBy({name:n},'سند');c.grp='بانک';{const b=bkNameBank(n);if(b)c.bank=b}saveCu();toast('حساب بانک «'+n+'» ساخته شد');return c.id}
 function pyAcc(p){if((p.m==='pos'||p.m==='hav')&&!p.cuId&&(p.srcId==null||p.srcId==='')&&!p.chId){const L=bkCus().filter(c=>String(c.id)!==String(sv&&sv.cuId)),last=ls.get('m_bk_cu','');const z=L.find(c=>String(c.id)===String(last))||L[0];if(z){p.cuId=z.id;p.cuName=cuName(z);p.bk=1}}
   if(p.m==='hav'&&p.srcId==null&&!p.chId){const last=ls.get('m_src_hav',''),O=ownL();const s=O.find(z=>String(z.id)===String(last))||O[0];if(s)p.srcId=s.id;else{const B=CH('bank');if(B[0])p.chId=B[0].id}}}
 function pyCuCap(p){const c=CU().find(z=>String(z.id)===String(p.cuId));if(!c)return;p.cuName=cuName(c);if(p.dir==='in'){/* v71.2: فقط طلب آزاد (بدون بخشی که پشتش واریزی است) */const cr=cuFree(c,p.i);if(cr)p.amount=Math.min(pyLeft(p)||cr,cr)}}

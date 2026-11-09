@@ -3978,3 +3978,10 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .bklk .tx{flex:1;display:grid;min-width:0}.bklk .tx b{font-size:13px;font-weight:850}.bklk .tx small{font-size:11px;color:var(--mut)}
 .bklk .bkdi{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}.bklk .bkdi svg{width:17px;height:17px}
 .bklkb{flex:none;height:34px;padding:0 13px;border:0;border-radius:12px;background:var(--blu);color:#fff;font:inherit;font-size:12.5px;font-weight:900}
+/* v84.2 حساب نوع بانک: لوگو به‌جای حرف اول + لوگوی کم‌رنگ در پس‌زمینه کارت */
+.c6r.bkrw,.cub9{position:relative;overflow:hidden}
+.bkwm{position:absolute;inset-inline-end:-14px;top:50%;width:132px;height:132px;transform:translateY(-50%) rotate(-12deg);opacity:.09;pointer-events:none;z-index:0;display:grid;place-items:center}
+.bkwm img,.bkwm .bkb{width:100%!important;height:100%!important;max-width:none;border-radius:0;background:none!important;box-shadow:none!important;filter:saturate(.9)}
+.c6r.bkrw>*:not(.bkwm),.cub9>*:not(.bkwm){position:relative;z-index:1}
+.c6a.bkav{background:#fff!important;display:grid;place-items:center;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.c6a.bkav img{width:82%;height:82%;object-fit:contain}

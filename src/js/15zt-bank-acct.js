@@ -60,3 +60,11 @@ function posDaySync(c){const now=new Date().toISOString();let ch=0;const D=new M
   for(const [k,R] of D){(c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:k,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:R,note:'',pd:k,at:k+'T23:00:00.000Z',by:'خودکار',cn:cnNext(c)});ch=1}
   if(ch){c.lastAt=now}return ch}
 function posDaySyncAll(noSave){let ch=0;for(const c of bkCus())ch+=posDaySync(c);if(ch&&!noSave)audBg(()=>saveCu());return ch}
+/* ===== v84.2 (خواسته صاحب اپ: «لوگوی هر بانک خودکار در پروفایل حساب ذخیره شود و پس‌زمینه کم‌رنگ لوگوی بانک») =====
+   بانک حساب نوع «بانک» از نام، شبا یا کارت تشخیص داده می‌شود و یک بار در c.bank ذخیره می‌شود؛ آواتار = لوگوی بانک، و پشت کارت لوگوی کم‌رنگ */
+/* تشخیص بانک از نام با کلمه کامل (مهدی ≠ بانک دی) */
+const bkNameBank=n=>{const W=nzName(toEn(n||'')).replace(/[()«»\-_,،.]/g,' ').split(/\s+/).filter(w=>w&&w!=='بانک');return BK_PICK.slice().sort((a,b)=>b.split(' ').length-a.split(' ').length||b.length-a.length).find(b=>{const B=nzName(b).split(/\s+/);for(let i=0;i+B.length<=W.length;i++)if(B.every((x,j)=>W[i+j]===x))return true;return false})||''};
+const bkOfCu=c=>c?(c.bank||ibanBank(c.iban||'')||bankOfCard(c.card)||bkNameBank(c.name||'')||''):'';
+function bkLogoFix(){let ch=0;for(const c of bkCus()){if(c.bank)continue;const b=ibanBank(c.iban||'')||bankOfCard(c.card)||bkNameBank(c.name||'');if(b){c.bank=b;c.updatedAt=new Date().toISOString();ch=1}}if(ch)audBg(()=>saveCu());return ch}
+const bkAvH=c=>{const b=bkOfCu(c);return b?`<span class="c6a cul bxlogo bkav">${bankBadge(b,'lg')}</span>`:''};
+const bkWmH=c=>{const b=c&&c.grp==='بانک'&&bkOfCu(c);return b&&BKL[Object.keys(BKL).find(n=>canon(n)===canon(b))]?`<span class="bkwm" aria-hidden="true">${bankBadge(b,'wm')}</span>`:''};
