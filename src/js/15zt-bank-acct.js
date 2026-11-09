@@ -73,9 +73,9 @@ function posDaySyncAll(noSave){let ch=lnkOrph();for(const c of bkCus())ch+=posDa
 const bkNameBank=n=>{const W=nzName(toEn(n||'')).replace(/(^|\s)مهر(?=\s|$)/g,'$1مهر ایران').replace(/[()«»\-_,،.]/g,' ').split(/\s+/).filter(w=>w&&w!=='بانک');return BK_PICK.slice().sort((a,b)=>b.split(' ').length-a.split(' ').length||b.length-a.length).find(b=>{const B=nzName(b).split(/\s+/);for(let i=0;i+B.length<=W.length;i++)if(B.every((x,j)=>W[i+j]===x))return true;return false})||''};
 const bkOfCu=c=>c?(bkNameBank(c.name||'')||c.bank||ibanBank(c.iban||'')||bankOfCard(c.card)||''):'';
 function bkLogoFix(){let ch=0;for(const c of bkCus()){const b=bkNameBank(c.name||'')||ibanBank(c.iban||'')||bankOfCard(c.card)||'';if(b&&c.bank!==b){c.bank=b;c.updatedAt=new Date().toISOString();ch=1}}if(ch)audBg(()=>saveCu());return ch}
-const bkLogo=b=>!!(b&&BKL[Object.keys(BKL).find(n=>canon(n)===canon(b))]);
+const bkLogo=b=>!!(b&&(BKL[b]||BKL[Object.keys(BKL).find(n=>canon(n)===canon(b))]));
 const bkAvH=c=>{const b=bkOfCu(c);return bkLogo(b)?`<span class="c6a cul bxlogo bkav">${bankBadge(b,'lg')}</span>`:''};
-const bkWmH=c=>{const b=c&&c.grp==='بانک'&&bkOfCu(c);return b&&BKL[Object.keys(BKL).find(n=>canon(n)===canon(b))]?`<span class="bkwm" aria-hidden="true">${bankBadge(b,'wm')}</span>`:''};
+const bkWmH=c=>{const b=c&&c.grp==='بانک'&&bkOfCu(c);return b&&bkLogo(b)?`<span class="bkwm" aria-hidden="true">${bankBadge(b,'wm')}</span>`:''};
 
 /* v84.9 (خواسته صاحب اپ: «مشتری تستی را حذف کردم، حواله‌ها و کارتخوان‌هایش در بانک‌ها مانده‌اند»): سند آینه (t.lk یا xf با peer/inv)
    که حساب یا سند اصلی‌اش حذف شده، خودکار حذف (نرم) می‌شود با نشان delSrc؛ اگر حساب/سند اصلی برگردد (بازگردانی)، آینه هم برمی‌گردد.

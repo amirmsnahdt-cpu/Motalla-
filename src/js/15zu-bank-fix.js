@@ -41,7 +41,7 @@ const bfxMv=v=>`${v<0?'−':''}${fmt(Math.abs(v))}`,bfxCl=v=>v>0?'r':v<0?'b':'z'
    «+ کارتخوان امروز» باز می‌شود؛ بی دفتر طولانی */
 /* v85.8 (خواسته صاحب اپ: «به‌روزتر، شبیه سیستم‌های قدیمی نباشد»): کارت رنگی همان بانک (مانده در برنامه)، ورود مبلغ بزرگ بی‌کادر
    (مثل Apple Cash) با سوئیچ «مثبت / منفی»، یک کارت اختلاف با فلش، کارتخوان به‌صورت چیپ */
-const bkClr=c=>{const b=bkOfCu(c),k=b&&Object.keys(BKC).find(n=>canon(n)===canon(b));return k?BKC[k]:'#2563eb'};
+const bkClr=c=>{const b=bkOfCu(c),k=b&&(BKC[b]?b:Object.keys(BKC).find(n=>canon(n)===canon(b)));return k?BKC[k]:'#2563eb'};
 function bfxRes(){const c=custs.find(z=>String(z.id)===String(BFX.cu));const z=bfxZ(bkCuBal(c),BFX.bt,BFX.bp,BFX.neg);
   if(!z.ok)return `<div class="bf3d n"><span class="bf3di">${ic('edit')}</span><span class="tx"><b>موجودی بانک را بزنید</b><small>اختلاف خودش حساب می‌شود</small></span></div>`;
   if(!z.d)return `<div class="bf3d ok"><span class="bf3di">${ic('check')}</span><span class="tx"><b>برنامه با بانک یکی است</b><small>${z.p?'فقط کارتخوان سند می‌خورد · مانده '+bfxMv(z.F):'سندی لازم نیست'}</small></span></div>`;
