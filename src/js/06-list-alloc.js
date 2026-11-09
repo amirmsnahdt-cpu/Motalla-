@@ -22,12 +22,16 @@ function hubData(k){AM=allocMap();const M=vMap(),rows=validated().filter(r=>PD(r
 const hubOpen=new Map();
 /* منبع‌ها بسته باز می‌شوند (حتی اگر هنوز تسویه نشده باشند)؛ با زدن روی منبع باز و بسته می‌شود */
 const hubIsOpen=g=>hubOpen.has(g.name)?hubOpen.get(g.name):false;
+/* v86.3: دو کاشی کنار هم زیر کارت آبی (مثل صفحه بانک): تخصیص (آبی) و تخصیص خودکار (بنفش، بر اساس موجودی بانک‌ها) */
+function ldActs(d){if(!d.un.length||!can('split'))return '';const U=d.un.length+d.bad.length;
+  return `<div class="bkfx2 ldfx"><button type="button" class="bkq b" data-act="allocNew"><span class="bkqi">${ic('plus')}</span><span class="bkqt"><strong>تخصیص</strong><em>${toFa(U)} واریزی منتظر منبع</em></span></button><button type="button" class="bkq v" data-act="aaOpen"><span class="bkqi">${ic('split')}</span><span class="bkqt"><strong>تخصیص خودکار</strong><em>بر اساس موجودی بانک‌ها</em></span></button></div>`}
 function vLday(){const d=hubData(ldKey);ldX=null;
   if(!d.rows.length)return `<div class="spempty"><div class="spill">${ic('list')}</div><b>این لیست خالی است</b><span>برای ${esc(pdHead(ldKey))} واریزی‌ای ثبت نشده.</span></div>`;
   const all=d.rows.length,pc=d.tot?d.okS/d.tot*100:0,done=d.ok===all;
   let h=`<div class="ldtop"><span class="ldic">${ic('cal')}</span><div><b>${esc(pdHead(ldKey))}</b><small>${d.eds.length&&!(d.eds.length===1&&d.eds[0]===ldKey)?'ثبت '+d.eds.map(e=>esc(relDay(e))).join('، ')+' · ':''}${fmt(all)} واریزی${d.closed?' · بایگانی شده':''}</small></div></div>
   <div class="ldhero${done?' ok':''}"><small>${done?'لیست کامل تسویه شد ✓':'تسویه شده تا الان'}</small><b>${fmt(d.okS)}<i>تومان</i></b><em>از کل ${fmt(d.tot)} تومان</em><span class="ldbar"><i style="width:${pc}%"></i></span>
   <div class="ldst"><div><small>تخصیص‌نیافته</small><b>${fmt(d.un.length+d.bad.length)}</b></div><div><small>آماده ارسال</small><b>${fmt(d.none)}</b></div><div><small>در انتظار</small><b>${fmt(d.pend)}</b></div><div><small>تسویه شده</small><b>${fmt(d.ok)}</b></div></div></div>
+  ${ldActs(d)}
   <div class="fsearch ldq">${ic('search')}<input id="ldq" type="search" value="${esc(ldQ)}" placeholder="جستجو: نام، فاکتور، مبلغ، پیگیری" autocomplete="off" enterkeyhint="search">${ldQ?'<button class="x" data-act="ldQClr" aria-label="پاک کردن">×</button>':''}</div>`;
   const lq=toEn(ldQ.trim()).toLowerCase(),lqd=lq.replace(/\D/g,''),hit=(r,z)=>!lq||[fullName(r),toEn(r.code||''),z&&z.bi?z.bi.x.src:''].join(' ').toLowerCase().includes(lq)||(lqd.length>=2&&/^[\d\s,.\-\/+]+$/.test(lq)&&[String(r.amount),z&&z.bi?z.bi.x.tn:'',r.iban].some(v=>v&&String(v).includes(lqd)));let hits=0;
   const rowsHTML=L=>{ROWDATE=false;ROWSRC=false;ROWTRK=true;ROWMOVE=can('split');try{return L.map(homeRow).join('')}finally{ROWSRC=true;ROWTRK=false;ROWMOVE=false}};
@@ -71,7 +75,7 @@ function vSplit1(){return vArch()}
 const aSplit1=()=>'';
 function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();render()}};q.oninput=()=>{const x=q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!q.value);clearTimeout(q._t);q._t=setTimeout(()=>{const was=arcQ;arcQ=q.value;arcN=120;if(arcQ===was)return;if(arcD){arcD='';const c=q.parentNode.querySelector('.fcal');if(c)c.classList.remove('on')}srchSwap('arcRes',arcBody())},250)}}
 /* ---------- پنجره تخصیص ---------- */
-function allocNew(){const s0=DSRC()[0]||{};aSt={srcId:s0.id,method:s0.bank?'bank':'amount',amount:0,min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
+function allocNew(){bkAllocSync();const D=DSRC(),s0=D.slice().sort((a,b)=>(acFree(b)??-1e18)-(acFree(a)??-1e18))[0]||{};/* v86.3: پیش‌فرض = منبعی که بیشترین موجودی آزاد را دارد */aSt={srcId:s0.id,method:s0.bank?'bank':'amount',amount:0,min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
 const aPool=()=>remainList().filter(r=>r.level<2);
 function recalc(){const P=aPool(),s=sources.find(x=>x.id==aSt.srcId)||{},m=aSt.method;let pick=[];
   const N=aSt.count||0;if(N>0&&m!=='manual'){
@@ -96,10 +100,22 @@ function paramHTML(){const m=aSt.method;
   if(m==='range')return `<div class="f2"><div class="f"><label>حداقل مبلغ</label>${numIn('pmin',aSt.min,'بدون حد')}</div><div class="f"><label>حداکثر مبلغ</label>${numIn('pmax',aSt.max,'بدون حد')}</div></div><div class="f" style="margin:0"><label>سقف مجموع <i class="opt">اختیاری</i></label>${numIn('pcap',aSt.cap,'بدون سقف')}</div>${cntHTML()}`;
   if(m==='bank')return `<div class="f"><label>بانک مقصد واریزی‌ها</label><select id="pbk"><option value="">انتخاب بانک</option>${BANKOPTS.map(b=>`<option${canon(b)===canon(aSt.bank)?' selected':''}>${b}</option>`).join('')}</select></div><div class="f" style="margin:0"><label>سقف مجموع <i class="opt">اختیاری</i></label>${numIn('pcap',aSt.cap,'بدون سقف')}</div>${cntHTML()}`;
   return ''}
+/* v86.3 (خواسته صاحب اپ: «طراحی درست و شیک تخصیص؛ موجودی بانک‌ها یکپارچه»): هر منبع = کارت کوچک به رنگ بانکش با موجودی آزاد
+   (از حساب بانک وصل‌شده، srcBk/acFree)؛ منبع انتخاب‌شده = کارت بانکی بزرگ: قابل تخصیص · این تخصیص · بعد از تخصیص */
+const aSrcClr=s=>{const c=srcBk(s);if(c)return bkClr(c);const b=acBank(s),k=b&&Object.keys(BKC).find(n=>canon(n)===canon(b));return k?BKC[k]:'#64748b'};
+const aSrcLogo=s=>{const c=srcBk(s);if(c&&bkAvH(c))return bkAvH(c);return acBank(s)&&bkLogo(acBank(s))?`<span class="c6a cul bxlogo bkav">${bankBadge(acBank(s),'lg')}</span>`:`<span class="asi">${esc(userInit(s.name))}</span>`};
+function aSrcCard(s){const on=aSt.srcId==s.id,f=acFree(s,aSt.editPid);
+  return `<button type="button" class="asc${on?' on':''}" data-act="aSrc" data-id="${s.id}" style="--bk:${aSrcClr(s)}"><span class="asl">${aSrcLogo(s)}</span>${on?`<span class="asck">${ic('check')}</span>`:''}<b>${esc(s.name)}</b><em class="${f!=null&&f<=0?'neg':''}">${f==null?'به بانک وصل نیست':shortAmt(Math.max(0,f)).replace(/\s*تومان$/,'')}</em></button>`}
+function aSrcBig(so,f,s){const c=srcBk(so),mv=v=>`${v<0?'−':''}${fmt(Math.abs(v))}`;
+  return `<div class="bkc lg abk${f!=null&&s>f?' over':''}" style="--bk:${aSrcClr(so)}">${c?bkWmH(c):''}<i class="bkcg" aria-hidden="true"></i>
+  <span class="bkch"><span class="bkcl">${aSrcLogo(so)}</span><span class="bkcn"><b>${esc(so.name)}</b><small>${c?'موجودی از حساب «'+esc(cuName(c))+'»':'به حساب بانکی وصل نیست'}</small></span>${can('src')?`<span class="bkip ed" data-act="srcSet" data-id="${so.id}" role="button">${ic('edit')}</span>`:''}</span>
+  ${f==null?`<span class="abk0">موجودی این منبع معلوم نیست؛ در زبانه بانک، حساب «${esc(so.name)}» را بسازید تا خودکار وصل شود</span>`:`<span class="abkr"><span><small>قابل تخصیص</small><b>${mv(f)}</b></span><span><small>این تخصیص</small><b>${s?'−'+fmt(s):'۰'}</b></span></span>
+  <span class="bkcb"><small>بعد از این تخصیص</small><span class="bkcv"><b data-v="${Math.abs(f-s)}">${mv(f-s)}</b><i>تومان</i></span><em class="${f-s<0?'kr':'kz'}">${f-s<0?'بیشتر از موجودی':'کافی است'}</em></span>
+  ${f>0&&aSt.method==='amount'?`<button type="button" class="abkq" data-act="aQuick" data-v="bal">تا سقف موجودی</button>`:''}`}</div>`}
 function allocSheet(){const S=DSRC(),P=aPool();
   sheet(`<div class="ash"><div class="sh-h"><div><b>${aSt.editPid?'ویرایش تخصیص':'تخصیص جدید'}</b><small class="shsub">${esc(pdHead(ldKey))}، مانده ${fmt(sum(P))} تومان (${fmt(P.length)} واریزی)</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="astep"><span class="n">۱</span><b>منبع پرداخت</b><button class="link" data-act="srcMgr">ویرایش منابع</button></div>
-  <div class="srcs">${S.map(s=>`<button class="srcc${aSt.srcId==s.id?' on':''}" data-act="aSrc" data-id="${s.id}">${aSt.srcId==s.id?`<span class="ed" data-act="srcSet" data-id="${s.id}" role="button" aria-label="ویرایش نام منبع">${ic('edit')}</span>`:''}${acBank(s)?bankBadge(acBank(s),'lg av'):`<span class="av">${esc(userInit(s.name))}</span>`}<b>${esc(s.name)}</b><small class="${acFree(s,aSt.editPid)!=null&&acFree(s,aSt.editPid)<=0?'neg':''}">${acFree(s,aSt.editPid)==null?esc(acBank(s)?'بانک '+acBank(s):'بانک نامشخص'):shortAmt(Math.max(0,acFree(s,aSt.editPid))).replace(/\s*تومان$/,'')}</small></button>`).join('')}<button class="srcc add" data-act="aNewSrc"><span class="av">${ic('plus')}</span><b>منبع جدید</b><small>افزودن</small></button></div>
+  <div class="srcs asrcs">${S.map(s=>aSrcCard(s)).join('')}<button class="srcc add asc0" data-act="aNewSrc"><span class="av">${ic('plus')}</span><b>منبع جدید</b><small>افزودن</small></button></div>
   <div id="abal"></div>
   <div class="astep"><span class="n">۲</span><b>روش انتخاب</b></div>
   <div class="mseg">${Object.keys(MNAME).map(k=>`<button class="${aSt.method===k?'on':''}" data-act="aMeth" data-m="${k}">${MIC[k]}<span>${MNAME[k]}</span></button>`).join('')}</div>
@@ -122,7 +138,7 @@ function renderPrev(fx){const P=aPool(),q=aSt.q.trim(),sel=P.filter(x=>aSt.sel.h
   const el=$('aprev');if(el){if(fx)srchSwap(el,h);else el.innerHTML=h}const s=sum(sel),a=$('asum');if(a)a.textContent=sel.length?fmt(sel.length)+' واریزی، '+fmt(s):'';
   const tgt=aSt.method==='amount'?aSt.amount:0,base=tgt||sum(P),pc=base?Math.min(100,s/base*100):0,m=$('ameter');
   if(m)m.innerHTML=(sel.length||tgt)?`<div class="meter"><div class="mt"><span>${tgt?'از هدف '+fmt(tgt):'از کل مانده '+fmt(sum(P))}</span><b>${toFa(String(Math.round(pc)))}٪</b></div><div class="bar"><i style="width:${pc}%"></i></div>${tgt?`<div class="mn">${s===tgt?'<span class="okc">✓ دقیقاً برابر هدف</span>':s<tgt?'کمتر از هدف: <b>'+fmt(tgt-s)+'</b>':'بیشتر از هدف: <b>'+fmt(s-tgt)+'</b>'}</div>`:''}${aSt.count&&aSt.method!=='manual'?`<div class="mn">تعداد: <b>${fmt(sel.length)}</b> از ${fmt(aSt.count)} ${sel.length===aSt.count?'<span class="okc">✓</span>':sel.length<aSt.count?'— ترکیبی با این تعداد زیر هدف پیدا نشد':''}</div>`:''}</div>`:'';
-  const tt=$('atot');if(tt)tt.textContent=fmt(s);{const ab=$('abal'),so=sources.find(x=>x.id==aSt.srcId),f=so?acFree(so,aSt.editPid):null;if(ab)ab.innerHTML=f==null?'':`<div class="abal${s>f?' over':''}"><div><small>موجودی قابل تخصیص «${esc(so.name)}»</small><b>${fmt(f)}</b></div><div><small>بعد از این تخصیص</small><b>${fmt(f-s)}</b></div>${f>0&&aSt.method==='amount'?`<button data-act="aQuick" data-v="bal">تا سقف موجودی</button>`:''}</div>${s>f?'<div class="abw">مبلغ انتخاب‌شده از موجودی این حساب بیشتر است</div>':''}`}
+  const tt=$('atot');if(tt)tt.textContent=fmt(s);{const ab=$('abal'),so=sources.find(x=>x.id==aSt.srcId),f=so?acFree(so,aSt.editPid):null;if(ab)ab.innerHTML=so?aSrcBig(so,f,s):''}
   const b=$('asv');if(b){b.disabled=!sel.length;b.textContent=sel.length?(aSt.editPid?'ذخیره — ':'ثبت ')+fmt(sel.length)+' واریزی':'ثبت تخصیص'}const rm=$('arem');if(rm){const r=sum(P)-s;rm.innerHTML=r?'مانده بعد: '+fmt(r):'<span style="color:var(--ok)">بدون مانده ✓</span>'}}
 function allocSave(){const s=sources.find(x=>x.id==aSt.srcId);if(!s){toast('منبع را انتخاب کنید',true);return}const ids=aPool().filter(x=>aSt.sel.has(x.id)).map(x=>x.id);if(!ids.length)return;
   if(aSt.editPid){const p=parts().find(z=>z.id===aSt.editPid);if(p){Object.assign(p,{src:{id:s.id,name:s.name,bank:s.bank||''},method:aSt.method,param:{amount:aSt.amount,min:aSt.min,max:aSt.max,cap:aSt.cap,bank:aSt.bank,count:aSt.count||0},ids,at:new Date().toISOString()});saveD();logA('alloc','ویرایش تخصیص '+s.name,methLabel(p)+' | '+fmt(ids.length)+' واریزی | '+fmt(sum(partRows(p)))+' تومان');aSt=null;closeSheet();render();toast('تخصیص «'+s.name+'» ویرایش شد');return}}

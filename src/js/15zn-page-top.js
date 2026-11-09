@@ -11,7 +11,7 @@ function hdGo(){const P=(act,ico,t,o)=>{o=o||{};return `<button type="button" cl
   if(cur==='users'&&isAdmin())return P('userNew','plus','همکار تازه');
   if(cur==='lday'){const d=hubData(ldKey);if(!d.rows.length)return '';
     /* v82.4 (خواسته صاحب اپ): «تخصیص خودکار» هم بالا، کنار «ارسال» */
-    const aa=can('split')&&typeof aPool==='function'&&aPool().length?P('aaOpen','split',d.dr.length?'':'خودکار',{sec:d.dr.length?1:0,al:'تخصیص خودکار'}):'';
+    const aa='';/* v86.3 (خواسته صاحب اپ): «تخصیص» و «خودکار» از سرتیتر به کاشی‌های داخل صفحه رفتند (ldActs) */
     if(d.dr.length&&can('split'))return aa+P('hubSendAll','copy','ارسال'+(d.dr.length>1?' '+toFa(new Set(d.dr.map(p=>p.src.name)).size)+' منبع':''),{al:'کپی و ارسال'});
     if(aa)return aa;
     /* v81.6 (خواسته صاحب اپ): دکمه «بایگانی» لازم نیست — لیست تسویه‌شده در همین بخش می‌ماند */}

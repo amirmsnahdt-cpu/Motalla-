@@ -14,7 +14,12 @@ const LT={pos:{t:'کارتخوان',sg:1,c:'g',i:'down'},in:{t:'واریز به 
 const acLed=s=>(s.led||[]).filter(x=>!x.del&&(!s.balAt||(x.at||'')>=s.balAt));
 const acLedSum=s=>acLed(s).reduce((a,x)=>a+(LT[x.type]?LT[x.type].sg:0)*(+x.amount||0),0);
 /* حواله‌های سندهای مشتری به این حساب (srcInvSum) هم در موجودی می‌آید */
-const acEst=s=>s.bal==null?null:(+s.bal||0)+acLedSum(s)+srcInvSum(s)-acSent(s);
+/* v86.3 (خواسته صاحب اپ: «موجودی بانک‌ها در تخصیص یکپارچه»): منبعی که به حساب نوع بانک وصل است (c.srcId) موجودی‌اش را
+   از همان حساب می‌گیرد (bkCuBal = عدد کارت بانکی؛ لیست‌های ارسال‌شده آنجا سند خورده‌اند)؛ بقیه همان حساب قدیمی */
+const srcBk=s=>s&&typeof bkCus==='function'?bkCus().find(c=>c.srcId!=null&&String(c.srcId)===String(s.id))||null:null;
+const acEst=s=>{const c=srcBk(s);if(c)return bkCuBal(c);return s.bal==null?null:(+s.bal||0)+acLedSum(s)+srcInvSum(s)-acSent(s)};
+/* پیش از تخصیص: پیوند خودکار هم‌نام‌ها و سند خوردن لیست‌های ارسال‌شده در حساب‌های بانک */
+function bkAllocSync(){try{let ch=0;bkCus().forEach(c=>{ch+=bkAutoLink(c)});if(ch)audBg(()=>saveCu());bkDepSyncAll()}catch(_){}}
 /* تخصیص‌های ارسال‌نشده = رزرو */
 function acRes(s,exPid){let t=0;Object.values(drafts||{}).forEach(L=>(L||[]).forEach(p=>{if(p.sent||p.id===exPid||!p.src||String(p.src.id)!==String(s.id))return;t+=sum(partRows(p))}));return t}
 const acFree=(s,exPid)=>{const e=acEst(s);return e==null?null:e-acRes(s,exPid)};

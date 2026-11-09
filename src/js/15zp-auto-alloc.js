@@ -11,7 +11,7 @@ function aaPlan(){const P=aPool(),A=ownL().map(s=>({s,cap:aaCap(s),ids:[]})).fil
   for(const a of A){const bk=canon(acBank(a.s));if(!bk)continue;const L=[...left.values()].filter(x=>bankKey(x)===bk),pick=best(L,rest(a),0);pick.forEach(x=>{a.ids.push(x.id);left.delete(x.id)})}
   [...A].sort((x,y)=>rest(y)-rest(x)).forEach(a=>{const pick=best([...left.values()],rest(a),0);pick.forEach(x=>{a.ids.push(x.id);left.delete(x.id)})});
   return {A,P,left:[...left.keys()],unk:ownL().filter(s=>aaCap(s)==null)}}
-ACT.aaOpen=()=>{if(!can('split'))return;if(!aPool().length){toast('واریزی تخصیص‌نیافته‌ای در این لیست نیست');return}AA=aaPlan();sheet(aaHTML())};
+ACT.aaOpen=()=>{if(!can('split'))return;bkAllocSync();if(!aPool().length){toast('واریزی تخصیص‌نیافته‌ای در این لیست نیست');return}AA=aaPlan();sheet(aaHTML())};
 function aaHTML(){const {A,P,left,unk}=AA,byId=new Map(P.map(x=>[x.id,x])),am=ids=>ids.reduce((t,id)=>t+(+(byId.get(id)||{}).amount||0),0);
   const row=(id,ai)=>{const x=byId.get(id);if(!x)return '';const bk=bankKey(x);return `<div class="aar"><span class="aan"><b>${esc(fullName(x))}</b><small>${bk?esc(bk):'بانک نامعلوم'}</small></span><b class="aaa">${fmt(+x.amount||0)}</b><button type="button" class="aamv" data-act="aaMv" data-id="${esc(id)}" data-a="${ai}" aria-label="جابه‌جا">${ic('swap')}</button></div>`};
   const used=A.filter(a=>a.ids.length),tot=used.reduce((t,a)=>t+am(a.ids),0);
