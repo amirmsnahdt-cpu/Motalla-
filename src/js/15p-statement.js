@@ -37,7 +37,7 @@ const stmtFile=(c,F)=>('صورتحساب '+cuName(c)+' ('+(F&&(F.f||F.t)?stmPer(
    ریز سند: برچسب رنگی (فروش/پرداخت/تحویل قرمز، خرید/دریافت سبز). پایین: جمع هر ستون و مانده نهایی. */
 const stU=k=>k==='r'?'تومان':k==='g'?'گرم':((XA[k]||{}).u||'');
 const stNm=k=>k==='r'?'ریالی · تومان':k==='g'?'طلا · گرم ۱۸ عیار':esc((XA[k]||{t:k}).t)+' · '+esc(stU(k));
-const stV=(k,v)=>k==='r'?fmt(Math.abs(v)):k==='g'?toFa((Math.round(Math.abs(+v||0)*1000)/1000).toLocaleString('en-US',{minimumFractionDigits:3,maximumFractionDigits:3})):qFmt(Math.abs(v));
+const stV=(k,v)=>k==='r'?fmt(Math.abs(v)):k==='g'?wPdf(v):qFmt(Math.abs(v));
 const stL=v=>!v?'تسویه':v<0?'طلبکاریم':'بدهکاریم';
 function stmtPdfHTML(c,F){const S=stmtData(c,F),D=dates(),b=S.bal,ks=['g','r',...S.XK],land=S.XK.length>0;
   const mv=(o,k)=>k==='r'?o.r:k==='g'?o.g:+(o.x[k]||0),bl=(o,k)=>k==='r'?o.R:k==='g'?o.G:+((o.X||{})[k]||0);
