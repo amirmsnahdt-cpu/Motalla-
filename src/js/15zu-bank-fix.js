@@ -57,8 +57,9 @@ ACT.bfxSave=()=>{bfxSRead();const c=custs.find(z=>String(z.id)===String(BFX.cu))
   if(!z.ok){toast('موجودی واقعی بانک را بزنید',true);const e=$('bxT');if(e)e.focus();return}const P=bfxRows(z);if(!P.length){toast('مانده برنامه با بانک یکی است؛ سندی لازم نیست');closeSheet();return}
   const now=ns(),no=invNext(),t={id:nid++,type:'inv',no,cn:cnNext(c),date:todayISO(),rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:P,at:now,by:who(),fix:1};
   (c.txs=c.txs||[]).push(t);c.lastAt=now;saveCu();logA('cust','اصلاح موجودی بانک',cuName(c)+' | سند '+toFa(no)+' | مانده '+bfxMv(z.T),{cu:c.id,tx:t.id});BFX=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('سند اصلاحی '+toFa(no)+' ثبت شد · مانده '+bfxMv(z.T))};
-/* رنگ ردیف‌های گردش حساب بانک: کارتخوان سبز، واریز (پول به بانک) قرمز، برداشت آبی */
-function bkRowCls(t,d){if(t.type==='inv'){const P=(t.pays||[]).filter(p=>+p.amount);if(t.pd||(P.length&&P.every(p=>p.m==='pos'||p.lm==='pos'||(p.m==='bkx'&&p.k==='bpos'))))return 'tg'}const r=d?d.r:0;return r<0?'trd':r>0?'tbl':''}
+/* رنگ ردیف‌های گردش حساب: بانک — کارتخوان سبز، واریز (پول به بانک) قرمز، برداشت آبی؛ v85.3 همه حساب‌ها — قرمز طلبکاریم، آبی بدهکاریم
+   (اثر تومان، اگر نبود طلا، بعد سکه/ارز) */
+function bkRowCls(t,d,bk){if(bk!==false&&t.type==='inv'){const P=(t.pays||[]).filter(p=>+p.amount);if(t.pd||(P.length&&P.every(p=>p.m==='pos'||p.lm==='pos'||(p.m==='bkx'&&p.k==='bpos'))))return 'tg'}const r=d?(Math.round(d.r||0)||Math.round((d.g||0)*1000)||Object.values(d.x||{}).find(v=>Math.round(v*100))||0):0;return r<0?'trd':r>0?'tbl':''}
 /* v85.2 (خواسته صاحب اپ: «از صفحه خانه هم») — «ورود حساب» › «اصلاح موجودی بانک»: فهرست حساب‌های بانک با لوگو و مانده (جستجو) → همان پنجره bkFix */
 let BFQ='';
 function bfxPickL(){const nq=nzName(toEn(BFQ||''));return bkCus().filter(c=>!nq||nzName(cuName(c)).includes(nq)).map(c=>{const v=bkCuBal(c);return `<button type="button" class="bfpr" data-act="bkFix" data-cu="${c.id}">${bkAvH(c)||`<span class="c6a cul">${esc(userInit(cuName(c)))}</span>`}<span class="tx"><b>${esc(cuName(c))}</b><small>${v>0?'طلبکاریم':v<0?'بدهکاریم':'تسویه'}</small></span><b class="${bfxCl(v)}">${bfxMv(v)}</b></button>`}).join('')||'<div class="bfl0">حسابی پیدا نشد</div>'}
