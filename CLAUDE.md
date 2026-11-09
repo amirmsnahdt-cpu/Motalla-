@@ -107,6 +107,7 @@ change the existing definition instead of adding a later redefinition). Section 
 | (v84.4 manual POS) | owner: «تا همه به نرم‌افزار دسترسی ندارند کارتخوان را دستی در حساب بانک سند بزنم». Bank-type account docs get a top tile «کارتخوان» (`DKBK` id `bpos`, `BKX.bpos` = raises bank money, ORD third) → `m:'bkx' k:'bpos'` with amount + optional شرح; independent of the automatic «کارتخوان روز» doc (`posDaySync`) |
 | (v84.5 adj frames) | «کسر»/«اضافه» rows in the doc search list (`j:adj` in `dkFixed`, `b:adj` in bank `BKL`) carry class `adjf kr|kb` (by `dkRed(d)` of the job) → red/blue framed card (CSS end of 09, also beats the `.dkbox.open #qKs .dkrw` hairline rule) |
 | 15zu-bank-fix (v84.6) | owner: «سند اصلاحی با وارد کردن مانده واقعی؛ کارتخوان مغازه هم خودکار سند بخورد». Checkout of a bank-type account doc has «اصلاح مانده با موجودی واقعی» (`bfxTile` → `CK.m='bfix'`, form `bfxForm`: موجودی واقعی `CK.bt` (+ negative toggle `bfxNeg`) and کارتخوان مغازه `CK.bp`, live preview `bfxX`). `bfxApply` adds to the open doc a `bkx k:'bpos'` row (POS) and a `bkx k:'adj'` row with `why:'مانده قبلی'` = target − (current `-svRBal()` + POS); `ckSave` applies a filled form first |
+| (v84.7 blu) | «بلو بانک» detected by name (`BK_PICK`/`BKC`/`BKL` key «بلو» → `banks/Blu.svg`, simple blue round «blu» mark) |
 | 16-boot | startup: initial render, listeners |
 
 CSS files are split by version era (01-base, 02-v21-v22 … 08-v52-list-photos), not by topic — grep the selector.
