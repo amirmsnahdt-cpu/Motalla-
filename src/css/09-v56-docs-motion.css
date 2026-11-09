@@ -4180,3 +4180,15 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 #sheet .ash label.sw.sbf{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:18px;background:color-mix(in srgb,var(--ok) 6%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 30%,transparent);margin:0}
 #sheet .ash label.sw.sbf .sbt{flex:1;display:flex;flex-direction:column;gap:1px}#sheet .ash label.sw.sbf .sbt b{font-size:14px}#sheet .ash label.sw.sbf .sbt small{font-size:11.5px;color:var(--mut)}
 #sheet .ash label.sw.sbf .sbl .bkb{width:32px;height:32px}
+/* v86.7 (خواسته صاحب اپ: «دکمه‌های بالای همه صفحه‌ها مثل لیست واریز»): همه دکمه‌های سرتیتر (به‌جز خانه) در یک سینی سفید گرد،
+   هم‌قد ۳۸px؛ آیکون‌ها بی‌قاب، دکمه اصلی (ثبت، +، تخصیص، ارسال) قرص آبی */
+#app:not(.home) #bar .hbtns{display:inline-flex;align-items:center;gap:4px;padding:4px;border-radius:18px;background:var(--card);box-shadow:inset 0 0 0 1px var(--hair),0 4px 14px -10px rgba(0,0,0,.35)}
+#app:not(.home) #bar .hbtns:empty{display:none}
+#app:not(.home) #bar .hbtns .ldhb{display:contents}
+#app:not(.home) #bar .hbtns .ib0,#app:not(.home) #bar .hbtns .ldb0{height:38px!important;min-width:38px!important;width:auto!important;padding:0 9px!important;border:0!important;border-radius:14px!important;background:none!important;box-shadow:none!important;color:var(--ink)!important;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+#app:not(.home) #bar .hbtns .ib0 svg{width:19px;height:19px}
+#app:not(.home) #bar .hbtns .ib0.hpl,#app:not(.home) #bar .hbtns .ib0.hgo:not(.sec),#app:not(.home) #bar .hbtns .ldb1,#app:not(.home) #bar .hbtns .ib0.hal:not(.sec){background:var(--blu)!important;color:#fff!important;box-shadow:0 6px 14px -8px var(--blu)!important}
+#app:not(.home) #bar .hbtns .ib0.hal span,#app:not(.home) #bar .hbtns .ib0.hgo span{font-size:14px;font-weight:900;color:inherit}
+#app:not(.home) #bar .hbtns .ib0.hal,#app:not(.home) #bar .hbtns .ib0.hgo{padding:0 14px 0 12px!important}
+#app:not(.home) #bar .hbtns .ib0.hgo.sec{background:color-mix(in srgb,var(--blu) 10%,var(--card))!important;color:var(--blu)!important}
+#app:not(.home) #bar .hbtns .ldb0.v{background:color-mix(in srgb,#7c3aed 12%,var(--card))!important;color:#7c3aed!important}
