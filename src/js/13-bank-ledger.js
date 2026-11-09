@@ -140,7 +140,7 @@ const bxTime=at=>{if(!at)return '';const d=new Date(at);return isNaN(d)?'':toFa(
    چون در مانده ثبت‌شده حساب شده‌اند و دیگر در مانده جمع نمی‌شوند (acSum همان قبلی است). کارت‌های کارتخوانِ روزهای قبل «نشسته ✓». */
 const AC_OLD=200;
 /* v80.8: ردیف سند بانکی با طرف حساب: «به/از نام حساب · شرح» */
-const bdRowT=(x,d)=>{const c=x.cuId!=null&&x.cuId!==''&&CU().find(z=>String(z.id)===String(x.cuId)),p=c?(x.type==='in'?'از ':'به ')+cuName(c):'';return esc((x.k==='fxa'||x.k==='fxs')?'اصلاح حساب':[p,x.note].filter(Boolean).join(' · ')||d)};
+const bdRowT=(x,d)=>{const id=x.cuId!=null&&x.cuId!==''?x.cuId:x.xs!=null?'b'+x.xs:'',c=bdCu(id),p=c?(x.type==='in'?'از ':'به ')+(bdIsB(id)?'«'+c.name+'»':cuName(c)):'';return esc((x.k==='fxa'||x.k==='fxs')?'اصلاح حساب':[p,x.note].filter(Boolean).join(' · ')||d)};
 function acRows(s){const R=[],L=(s.led||[]).filter(x=>!x.del),ba=s.balAt||'',add=(f,o)=>{const old=!!(ba&&!o.res&&!o.way&&String(o.oat||o.at||'')<ba);if(old)o.h=o.h.replace('class="txr bxtx','class="txr bxtx old');R.push({f,old,...o})},td=todayISO();
   const ico=(K,i,cl)=>`<span class="bri bxbi ${cl}">${K.length?`<img data-ik="${esc(K[0])}" alt="">`:ic(i)}${K.length>1?`<em>${toFa(K.length)}</em>`:''}</span>`;
   const val=(a,lab,cl)=>`<span class="txv txv2"><b class="${cl||(a<0?'r':'b')}"><span><bdi dir="ltr">${a<0?'−':'+'}${fmt(Math.abs(a))}</bdi> <i>تومان</i></span><small>${lab}</small></b></span>`;
@@ -170,7 +170,7 @@ function acListHTML(s,R){R=bkFilt(s,R);const f=acV.f,L0=f==='all'?R:R.filter(r=>
   if(!L.some(r=>r.f!=='mark'))return (mk?mk.h:'')+`<div class="stmno">${ic(f==='pos'?'card':f==='out'?'share':'swap')}<b>${f==='all'?'گردشی ثبت نشده':f==='hv'?'حواله‌ای نخورده':f==='pos'?'کارتخوانی نیست':'برداشتی نیست'}</b><small>${s.balAt?'از تطبیق '+esc(dates(s.balAt.slice(0,10)).fa):'حواله‌های سندها اینجا می‌آیند'}</small></div>`;
   let g=null;return L.map(r=>{let d='';if(r.f==='mark'){g=null;return r.h}const k=r.res?'res':r.d||'';if(k!==g){g=k;if(r.res)d='<div class="fday">در صف ارسال · هنوز از حساب کم نشده</div>';else{const t=relDay(k);d=`<div class="fday">${['امروز','دیروز','فردا'].includes(t)?t+'، ':''}${esc(dates(k).fa)}</div>`}}return d+r.h}).join('')}
 /* صفحه حساب: کارت «مانده حساب» (مانده نهایی + مانده قبلی)، سه کاشی جمع که فیلتر فهرست هم هستند، بعد گردش حساب */
-function vBank(){const s=curBk();if(!s){setTimeout(()=>{if(cur==='bank')go('banks',true)},0);return ''}const m=acSum(s),R=acRows(s),an=bkCnt!==String(s.id),c=can('src'),n=R.filter(r=>!r.res&&!r.old).length;acV.f='all';
+function vBank(){const s=curBk();if(!s){setTimeout(()=>{if(cur==='bank')go('banks',true)},0);return ''}const m=acSum(s),R=acRows(s),an=bkCnt!==String(s.id),c=can('src'),n=R.filter(r=>!r.res&&!r.old).length;if(String(acV.id)!==String(s.id))acV={id:s.id,f:'all'};
   /* v82.6 (خواسته صاحب اپ: «هر حساب بانک مثل حساب مشتری، شبیه خودش»): همان چیدمان صفحه حساب مشتری — کارت سفید «مانده حساب» با کاشی‌ها
      (مانده نهایی، کارتخوان در راه / الان در بانک)، «اصلاح حساب ›» کنار عنوان کارت (= سند بانکی با نوع «اصلاح حساب»)، بعد «گردش حساب» با جستجو، بازه، PDF و Excel.
      کادر آبی، خط راهنما و کاشی‌های فیلتر برداشته شد. */
@@ -178,6 +178,7 @@ function vBank(){const s=curBk();if(!s){setTimeout(()=>{if(cur==='bank')go('bank
     :`<div class="c6l c6lb cub9"><span class="cub9h"><b>مانده حساب</b></span><div class="bkfz"><span>${ic('edit')}</span><span class="tx"><b>مانده قبلی ثبت نشده</b><small>موجودی امروز را از اپ بانک بزنید؛ از این به بعد همه‌چیز خودکار حساب می‌شود</small></span>${c?`<button type="button" class="bkfz1" data-act="acSetBal" data-id="${s.id}">ثبت مانده قبلی</button>`:''}</div></div>`;
   return `${card}
   ${m.res?`<div class="bxres">${ic('clock')}<span>رزرو واریزهای ارسال‌نشده <b>${fmt(m.res)}</b> تومان · بعد از ارسال از مانده کم می‌شود</span></div>`:''}
+  ${bkDayHTML(s,R)}${s.cash?'':bkPosCard(s)}
   <div class="spsec stmh"><div><b>گردش حساب</b><small>${n?fmt(n)+' ردیف · جستجو، بازه تاریخ و صورتحساب PDF / Excel':'هنوز گردشی ثبت نشده · برای سند تازه + بالا را بزنید'}</small></div></div>
   <div id="bkSB">${bkSBar(s)}</div><div id="acLW">${acListHTML(s,R)}</div>`}
 const aBank=()=>'';
@@ -185,11 +186,11 @@ const bindBank=()=>{const s=curBk();if(!s)return;phPaint($('view'));const k=Stri
 /* سرتیتر صفحه حساب: کارت بانک (لوگو، نام، شبا)؛ زدن = ویرایش حساب */
 const bkHead=s=>{const bk=acBank(s);return `<button class="cuh9 bxh9" data-act="acEdit" data-id="${s.id}" aria-label="ویرایش ${esc(s.name)}"><span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):s.cash?ic('cash'):esc(userInit(s.name))}</span><span class="cuh9t"><span class="cuh9k">${s.cash?'صندوق':'حساب بانک'}</span><span class="cuh9n"><b>${esc(s.name)}</b></span><span class="cuh9m">${esc([bk?'بانک '+bk:'',s.iban?'شبا …'+toFa(s.iban.slice(-4)):''].filter(Boolean).join(' · '))}</span></span><span class="c6ed">${ic('edit')}</span></button>`};
 /* v82.0 (خواسته صاحب اپ): «+» مستقیم سند بانکی تازه؛ بقیه کارها در «⋯» */
-ACT.bkMenu=()=>{const s=curBk();if(!s)return;const k=s.bal!=null,c=can('src');popMenu(document.querySelector('#bar .hmo'),[c&&!s.cash&&ownL().length>1||c&&!s.cash&&CU().length?['hvNew',ic('swap'),'حواله از این حساب',{id:s.id}]:null,c&&k?['acLedNew',ic('down'),'کارتخوان به حساب نشست',{id:s.id,t:'pos'}]:null,c?['bdNew',ic('plus'),'اضافه و کسر (هزینه بانکی، یارانه…)',{id:s.id,k:'add'}]:null,c?['acSetBal',ic('edit'),k?'اصلاح حساب (سند)':'ثبت مانده قبلی',{id:s.id}]:null,c&&CH('pos').length?['acLink',ic('card'),'کارتخوان‌های این حساب',{id:s.id}]:null,c?['acEdit',ic('bank'),'ویرایش اطلاعات حساب',{id:s.id}]:null].filter(Boolean))};
+ACT.bkMenu=()=>{const s=curBk();if(!s)return;const k=s.bal!=null,c=can('src');popMenu(document.querySelector('#bar .hmo'),[c&&k?['acLedNew',ic('down'),'کارتخوان به حساب نشست',{id:s.id,t:'pos'}]:null,c?['bdNew',ic('plus'),'اضافه و کسر (هزینه بانکی، یارانه…)',{id:s.id,k:'add'}]:null,c?['acSetBal',ic('edit'),k?'اصلاح حساب (سند)':'ثبت مانده قبلی',{id:s.id}]:null,c&&CH('pos').length?['acLink',ic('card'),'کارتخوان‌های این حساب',{id:s.id}]:null,c?['acEdit',ic('bank'),'ویرایش اطلاعات حساب',{id:s.id}]:null].filter(Boolean))};
 ACT.acOpen=d=>{const s=sources.find(x=>String(x.id)===String(d.id));if(!s)return;closeSheet();if(String(acV.id)!==String(s.id))acV={id:s.id,f:'all'};bkId=s.id;if(cur==='bank'){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;return}go('bank')};
 /* زدن کاشی جمع = همان دسته؛ زدن دوباره = همه؛ فهرست با جهت می‌لغزد */
 ACT.acF=d=>{const s=curBk();if(!s)return;const o=acV.f;acV.f=d.f===o&&d.f!=='all'?'all':d.f;const W=$('acLW');
-  document.querySelectorAll('#view .bxft').forEach(b=>{const on=b.dataset.f===acV.f;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
+  document.querySelectorAll('#view .bxft,#view .bkd').forEach(b=>{const on=b.dataset.f===acV.f;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
   if(W){const m=flipSnap(W);W.innerHTML=acListHTML(s,acRows(s));flipPlay(W,m);phPaint(W);if(!RM()&&W.animate)W.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'})}};
 /* وصل کارتخوان‌ها به این حساب */
 ACT.acLink=d=>{const s=sources.find(x=>String(x.id)===String(d.id));if(!s)return;const P=CH('pos');

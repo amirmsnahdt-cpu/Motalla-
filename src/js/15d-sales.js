@@ -68,7 +68,7 @@ function xfShow(c,t){const d=txD(t),kv=(l,v)=>v?`<div class="kv"><small>${l}</sm
 let sv=null,svAdd=-1;
 /* مظنه (هر مثقال ۷۰۵) = نرخ هر گرم ۱۸ عیار × ۴٫۳۳۱۸ */
 const MZK=4.3318,mzOf=r=>Math.round((+r||0)*MZK),rOfMz=m=>Math.round((+m||0)/MZK);
-const PM={off:{t:'تخفیف',i:'tag'},prev:{t:'مانده قبلی',i:'clock'},dep:{t:'حواله به فروشنده واریزی',i:'swap'},cash:{t:'نقد',i:'cash'},pos:{t:'کارتخوان',i:'card'},hav:{t:'حواله',i:'bank'},cust:{t:'حساب مشتری',i:'swap'},nm:{t:'حواله دستی',i:'swap'},gold:{t:'طلای مشتری',i:'coin'},disc:{t:'تخفیف',i:'tag'},wd:{t:'واریز بانکی',i:'bank'}};
+const PM={adj:{t:'اضافه و کسر',i:'tag'},off:{t:'تخفیف',i:'tag'},prev:{t:'مانده قبلی',i:'clock'},dep:{t:'حواله به فروشنده واریزی',i:'swap'},cash:{t:'نقد',i:'cash'},pos:{t:'کارتخوان',i:'card'},hav:{t:'حواله',i:'bank'},cust:{t:'حساب مشتری',i:'swap'},nm:{t:'حواله دستی',i:'swap'},gold:{t:'طلای مشتری',i:'coin'},disc:{t:'تخفیف',i:'tag'},wd:{t:'واریز بانکی',i:'bank'}};
 /* v71.0 (خواسته صاحب اپ): یک شمارنده برای همه — فاکتور فروش، سند خرید، شماره سیستمی خرید دستی (sno) و سند واریز/برداشت دستی بانک؛
    شماره بعدی = بزرگ‌ترین شماره صادرشده در هر کدام + ۱ (شماره‌های قبلی دست نمی‌خورند) */
 function docNoMax(){let m=1000;const up=v=>{v=+v||0;if(v>m)m=v};for(const c of custs)for(const t of c.txs||[])if(t.type==='inv')up(t.no);
@@ -180,7 +180,7 @@ const pAmt=p=>+p.amount||0,svPaid=skip=>sv.pays.reduce((s,p,i)=>i===skip?s:s+pAm
 const srcName=id=>{const s=sources.find(z=>String(z.id)===String(id));return s?s.name:''};
 function pyLab(p,long){const ch=p.chId&&custs.find(z=>String(z.id)===String(p.chId)),acc=p.srcId!=null?srcName(p.srcId):ch?ch.name:'',out=pAmt(p)<0,nm=p.cuName||((p.cuId&&custs.find(z=>String(z.id)===String(p.cuId)))||{}).name||'';
   switch(p.m){case 'cash':return out?'پرداخت نقد':'دریافت نقد';case 'pos':return 'کارتخوان'+(acc?' · '+acc:'');case 'hav':return (out?'پرداخت حواله':'دریافت حواله')+(acc?' · '+acc:'');
-    case 'gold':return 'طلای مشتری · '+wFmt(p.w)+' گرم'+(long?' عیار '+toFa(p.ay||750):'');case 'dep':return long?'حواله به «'+depName(p)+'»':'حواله · '+depName(p);case 'cust':return long?(out?'حواله به حساب «'+nm+'»':'حواله از حساب «'+nm+'»'):'حواله · '+nm;/* v75.1: در ردیف کوتاه — جهت را برچسب دریافت/پرداخت و رنگ می‌گوید، نام کامل دیده شود */case 'nm':return (out?'حواله از «':'حواله به «')+(p.cuName||'')+'» · دستی';case 'off':return out?'پرداخت تخفیف':'دریافت تخفیف';case 'prev':return 'مانده قبلی تومان · '+(out?'طلبکاریم':'بدهکاریم');case 'wd':return p.nm?'تسویه از «'+p.nm+'» · '+(wdSetDoc(p)||'روی واریزی')+(p.w?' · در انتظار تأیید':''):(out?'پرداخت حواله از «':'دریافت حواله از «')+(p.src||'بانک')+'»';default:return (PM[p.m]||{}).t||''}}
+    case 'gold':return 'طلای مشتری · '+wFmt(p.w)+' گرم'+(long?' عیار '+toFa(p.ay||750):'');case 'dep':return long?'حواله به «'+depName(p)+'»':'حواله · '+depName(p);case 'cust':return long?(out?'حواله به حساب «'+nm+'»':'حواله از حساب «'+nm+'»'):'حواله · '+nm;/* v75.1: در ردیف کوتاه — جهت را برچسب دریافت/پرداخت و رنگ می‌گوید، نام کامل دیده شود */case 'nm':return (out?'حواله از «':'حواله به «')+(p.cuName||'')+'» · دستی';case 'off':return out?'پرداخت تخفیف':'دریافت تخفیف';case 'adj':return (out?'کسر':'اضافه')+(p.why?' · '+p.why:'');case 'prev':return 'مانده قبلی تومان · '+(out?'طلبکاریم':'بدهکاریم');case 'wd':return p.nm?'تسویه از «'+p.nm+'» · '+(wdSetDoc(p)||'روی واریزی')+(p.w?' · در انتظار تأیید':''):(out?'پرداخت حواله از «':'دریافت حواله از «')+(p.src||'بانک')+'»';default:return (PM[p.m]||{}).t||''}}
 const numV=(v,dec)=>v===''||v==null||(!dec&&!+v)?'':dec?esc(v):Number(v).toLocaleString('en-US');
 const cell=(id,lab,val,o={})=>`<label class="d6c${o.cls?' '+o.cls:''}"><small>${lab}</small><input id="${id}" class="ltr" inputmode="${o.im||'decimal'}" value="${val}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="done"${o.ro?' readonly':''}></label>`;
 function qaHTML(){const a=sv.qa;/* v70.2: تا مشتری انتخاب نشده، «تشخیص» بسته است (سند بدون مشتری ثبت نمی‌شود) */if(!svCu()&&!svRows()&&!a.pv&&!a.p&&!a.x&&!a.k)return `<div class="dkwait">${ic('user')}<span><b>اول مشتری سند را انتخاب کنید</b><small>بعد از انتخاب، فهرست «تشخیص» برای ردیف اول باز می‌شود</small></span></div>`;if(a.pv)return stHTML();if(a.p&&a.p.m!=='disc'&&a.p.m!=='gold'||a.x||a.k)return stHTML();/* v61.6: همه ردیف‌ها پله‌به‌پله */if(a.p)return pyHTML();if(a.x)return xrHTML();
@@ -292,7 +292,7 @@ ACT.svXrEdit=d=>{const o=sv.xr[+d.i];if(!o)return;qaRead();xrStart({...o,w:o.w?S
 /* ----- ردیف پول: دریافت یا پرداخت · نقد، کارتخوان، حواله (حساب‌های ما) یا حساب مشتری دیگر ----- */
 function pyLeft(p){const T=svTot(),r=T.total-svPaid(p.i),c=svCu();if(!r&&c&&!sv.items.length&&!(sv.xr||[]).length){const b=svCuBal(c).R-svPaid(p.i);return p.dir==='out'?Math.max(0,b):Math.max(0,-b)}return p.dir==='out'?Math.max(0,-r):Math.max(0,r)}
 function pyNew(m,o){const p={m,dir:'in',amount:0,q:'',tn:'',...(o||{})};if(m==='pos')p.dir='in';pyAcc(p);
-  if(m==='disc')p.amount=+sv.disc||0;else if(m==='off')p.amount=offLeft(p);else if(m==='prev')p.amount='';else{p.amount=pyLeft(p);if(m==='cust')pyCuCap(p)}return p}
+  if(m==='disc')p.amount=+sv.disc||0;else if(m==='off')p.amount=offLeft(p);else if(m==='prev'||m==='adj')p.amount='';else{p.amount=pyLeft(p);if(m==='cust')pyCuCap(p)}return p}
 /* v61.29: تخفیف = یک ردیف دریافت/پرداخت (m:'off') که فقط مانده مبلغ را صفر می‌کند (هیچ حساب بانک، کارتخوان یا نقدی را جابه‌جا نمی‌کند).
    طلبکاریم (مشتری بدهکار) → «دریافت تخفیف»؛ بدهکاریم → «پرداخت تخفیف». مانده همان خانه «مبلغ» پایین سند است (حساب مشتری یا این سند). */
 const svRBal=skip=>{const L=svBalL(),r=L.find(z=>z[0]==='r');if(!r)return 0;const v=svCu()?r[3]:r[2];return v-(skip!=null&&sv.pays[skip]?pAmt(sv.pays[skip]):0)};
@@ -365,17 +365,17 @@ ACT.pyChAdd=()=>{pyRead();const p=sv.qa.p,n=$('pyCn'),name=clean((n&&n.value)||'
 ACT.pySave=()=>{pyRead();const p=sv.qa.p;if(!p)return;const amt=+p.amount||0;
   if(p.m==='disc'){sv.disc=amt;if(amt)toast('تخفیف '+fmt(amt)+' تومان ثبت شد');qaDone();return}
   if(p.m==='pos'&&!p.chId){toast('کارتخوان را انتخاب یا اضافه کنید',true);return}if(p.m==='hav'&&p.srcId==null&&!p.chId){toast('حساب را انتخاب یا اضافه کنید',true);return}
-  if(p.m==='cust'&&!p.cuId){toast('حساب مشتری را انتخاب کنید',true);return}if(p.m==='nm'&&!clean(p.cuName||'')){toast('نام طرف حواله را بنویسید',true);return}
+  if(p.m==='cust'&&!p.cuId){toast('حساب مشتری را انتخاب کنید',true);return}if(p.m==='adj'&&!clean(p.why||'')){toast('علت را انتخاب کنید یا بنویسید',true);return}if(p.m==='nm'&&!clean(p.cuName||'')){toast('نام طرف حواله را بنویسید',true);return}
   if(!(amt>0)){toast('مبلغ را وارد کنید',true);const a=$('pyA');if(a)a.focus();return}
   const sg=p.dir==='out'&&p.m!=='pos'?-1:1,o={m:p.m,amount:sg*amt};
   if(p.m==='pos'){o.chId=p.chId;o.tn=p.tn||'';ls.set('m_ch_pos',p.chId)}
   if(p.m==='hav'){if(p.srcId!=null){o.srcId=p.srcId;ls.set('m_src_hav',p.srcId)}else o.chId=p.chId;o.tn=p.tn||''}
   const pk=xrPh(p);if(pk.length&&!PHNO.includes(p.m)){o.imgs=pk;o.img=pk[0]}
-  if(p.m==='cust')Object.assign(o,{cuId:p.cuId,cuName:p.cuName||''});if(p.m==='nm')o.cuName=clean(p.cuName||'');
+  if(p.m==='cust')Object.assign(o,{cuId:p.cuId,cuName:p.cuName||''});if(p.m==='adj'){o.why=clean(p.why);if(!bdReasons().includes(o.why)){const c=cfgRec(1);c.adj=[...(c.adj||[]),o.why];saveCu()}}if(p.m==='nm')o.cuName=clean(p.cuName||'');
   /* v61.75: ویرایش ردیف «حواله به فروشنده واریزی» پیوند واریزی را نگه می‌دارد (قبلاً entId پاک می‌شد → سند ثبت نمی‌شد و موقت می‌ماند) */if(p.m==='dep'){if(!p.entId){toast('واریزی این حواله پیدا نشد؛ ردیف را حذف و دوباره اضافه کنید',true);return}Object.assign(o,{entId:p.entId,entName:p.entName||depName(p),...(p.stlId?{stlId:p.stlId}:{})})}
   if(p.i!=null)sv.pays[p.i]=o;else sv.pays.push(o);qaDone()};
 ACT.pyDel=()=>{const p=sv.qa.p;if(!p||p.i==null)return;const o=sv.pays.splice(p.i,1)[0];qaDone();toast('ردیف حذف شد','', 'بازگردانی',()=>{if(o){sv.pays.push(o);svKeep();svRe()}})};
-ACT.svPayEdit=d=>{const o=sv.pays[+d.i];if(!o)return;qaRead();const p={...o,i:+d.i,dir:pAmt(o)<0?'out':'in',amount:Math.abs(pAmt(o)),q:''};pyStart(p);const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
+ACT.svPayEdit=d=>{const o=sv.pays[+d.i];if(!o)return;qaRead();if(o.m==='adj')sv.qa.d=pAmt(o)<0?'sub':'add';const p={...o,i:+d.i,dir:pAmt(o)<0?'out':'in',amount:Math.abs(pAmt(o)),q:''};pyStart(p);const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
 ACT.svDisc=()=>{qaRead();pyStart(pyNew('disc'));const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
 ACT.svRowDel=d=>{if(d.k==='pv'){pvDel(d.i);return}if(d.k==='py'&&sv.pays[+d.i]&&sv.pays[+d.i].m==='wd'){ACT.svWdRow();svRe();return}const L=d.k==='it'?sv.items:d.k==='xr'?sv.xr:d.k==='py'?sv.pays:null;let o;if(d.k==='dc'){o=sv.disc;sv.disc=0}else if(L)o=L.splice(+d.i,1)[0];if(sv.qa.i!=null||(sv.qa.p&&sv.qa.p.i!=null)||(sv.qa.x&&sv.qa.x.i!=null))sv.qa=qaBlank();svKeep();qaRe();svRe();
   toast('ردیف حذف شد','', 'بازگردانی',()=>{if(d.k==='dc')sv.disc=o;else if(L&&o)L.splice(+d.i,0,o);svKeep();svRe()})};

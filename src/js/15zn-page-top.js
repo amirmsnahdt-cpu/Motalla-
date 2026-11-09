@@ -9,8 +9,8 @@ function hdGo(){const P=(act,ico,t,o)=>{o=o||{};return `<button type="button" cl
   if(cur==='bulk')return P('resetBulk','trash','',{sec:1,al:'پاک کردن'})+P('bulkAdd','plus','افزودن به لیست');
   if(cur==='backups'&&typeof bkBtn==='function')return bkBtn('bkFull','','ib0 hal hgo','down','دانلود کامل');
   if(cur==='users'&&isAdmin())return P('userNew','plus','همکار تازه');
-  /* v82.5 (خواسته صاحب اپ: «خیلی راحت حواله زد»): حواله از بالای صفحه بانک‌ها؛ در هر حساب از «⋯» و کشیدن ردیف حساب */
-  if(cur==='banks'&&can('src')&&ownL().length)return P('hvNew','swap','حواله');
+  /* v82.5 (خواسته صاحب اپ: «خیلی راحت حواله زد»): v82.8: پنجره جدای حواله برداشته شد — حواله و انتقال در خود «سند بانکی» (طرف حساب = همه حساب‌ها) */
+  if(cur==='banks'&&can('src')&&ownLC().length)return P('bdNew','plus','سند بانکی');
   if(cur==='lday'){const d=hubData(ldKey);if(!d.rows.length)return '';
     /* v82.4 (خواسته صاحب اپ): «تخصیص خودکار» هم بالا، کنار «ارسال» */
     const aa=can('split')&&typeof aPool==='function'&&aPool().length?P('aaOpen','split',d.dr.length?'':'خودکار',{sec:d.dr.length?1:0,al:'تخصیص خودکار'}):'';

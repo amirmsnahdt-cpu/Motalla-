@@ -34,7 +34,7 @@ const bdCls=k=>bdUp1(k)&&k!=='fix'?'k-out':'k-in';/* همان کلاس‌های 
 ACT.bdNew=d=>{d=d||{};if(!can('src'))return;const L=ownLC();const s=d.id!=null&&d.id!==''?sources.find(x=>String(x.id)===String(d.id)):L[0];
   if(!s){toast('اول یک حساب بانک مغازه بسازید',true);return}
   const x0=d.l!=null&&d.l!==''?(s.led||[]).find(z=>String(z.id)===String(d.l)&&!z.del):null;
-  if(x0){const R=bdRows(s,x0);BD={sid:s.id,no:x0.no,date:x0.date||String(x0.at||'').slice(0,10)||todayISO(),ed:1,fix:1,rows:R.map(z=>({id:z.id,k:bdKOf(z),a:+z.amount||0,n:z.note||'',cu:z.cuId!=null?z.cuId:''})),q:'',e:null}}
+  if(x0){const R=bdRows(s,x0);BD={sid:s.id,no:x0.no,date:x0.date||String(x0.at||'').slice(0,10)||todayISO(),ed:1,fix:1,rows:R.map(z=>({id:z.id,k:bdKOf(z),a:+z.amount||0,n:z.note||'',cu:z.cuId!=null&&z.cuId!==''?z.cuId:z.xs!=null?'b'+z.xs:''})),q:'',e:null}}
   else BD={sid:s.id,no:null,date:todayISO(),ed:0,fix:d.id!=null&&d.id!=='',rows:[],q:'',e:null};
   BD.h0=bdSig();
   if(!x0&&d.k&&BDK.some(z=>z[0]===d.k))BD.e={i:null,k:d.k,a:0,n:'',cu:'',st:0};
@@ -81,17 +81,22 @@ const bdSteps=e=>{if(e.k==='fix')return [{k:'a',lab:'موجودی واقعی ب�
   /* v80.8 (خواسته صاحب اپ: «همه سندها به هم ارتباط داشته باشند»): طرف حساب ردیف (هزینه، مشتری، همکار…) — سند متقابل خودکار در همان حساب می‌خورد */
   if(!bdAdj(e.k))S.push({k:'cu',lab:'طرف حساب',opt:1,ph:'جستجوی حساب: هزینه، مشتری، همکار…',v:()=>bdCuN(e.cu)});
   S.push(bdAdj(e.k)?{k:'n',lab:'علت',ph:'علت: از فهرست بزنید یا بنویسید',v:()=>e.n||''}:{k:'n',lab:'شرح',opt:1,ph:'شرح (اختیاری): شماره چک، پیگیری…',v:()=>e.n||''});return S};
-const bdCu=id=>id!=null&&id!==''?CU().find(z=>String(z.id)===String(id))||null:null;
-const bdCuN=id=>{const c=bdCu(id);return c?cuName(c):''};
+/* v82.8 (خواسته صاحب اپ: «جستجوی حساب همه حساب‌ها، مثل سند مشتری با مانده‌هایشان»): طرف حساب می‌تواند حساب دیگر مغازه هم باشد
+   ('b'+شناسه منبع) = انتقال بین دو حساب ما؛ ردیف مقابل در آن حساب خودکار ساخته و هم‌گام می‌شود (bdXfer) */
+const bdIsB=id=>String(id||'')[0]==='b';
+const bdCu=id=>id==null||id===''?null:bdIsB(id)?sources.find(z=>String(z.id)===String(id).slice(1))||null:CU().find(z=>String(z.id)===String(id))||null;
+const bdCuN=id=>{const c=bdCu(id);return c?(bdIsB(id)?'حساب «'+c.name+'»':cuName(c)):''};
 const bdSk=e=>{const S=bdSteps(e);return (S[Math.min(e.st||0,S.length-1)]||S[0]).k};
-function bdCuList(){const e=BD.e,q0=clean(e.sq||''),q=nzName(toEn(q0)),out=bdK(e.k)[2]<0;
-  let L=CU().filter(c=>!q||nzName(toEn(cuName(c)+' '+(c.grp||'')+' '+(c.cno||''))).includes(q));
+function bdCuList(){const e=BD.e,q0=clean(e.sq||''),q=nzName(toEn(q0)),out=bdK(e.k)[2]<0,dOk=pDig(q0);
+  let L=CU().filter(c=>!q||cuHit(c,q,dOk));
   L.sort((a,b)=>(String(b.id)===String(e.cu))-(String(a.id)===String(e.cu))||(out?(b.grp==='هزینه')-(a.grp==='هزینه'):0)||String(b.lastAt||'').localeCompare(String(a.lastAt||'')));
-  const ex=q&&L.some(c=>nzName(toEn(cuName(c)))===q);L=L.slice(0,q?20:12);
-  const row=c=>{const B=cuBal(c);return `<button type="button" class="bzsr dkrw${String(c.id)===String(e.cu)?' on':''}" data-act="bdCuP" data-id="${esc(c.id)}"><span class="av">${esc(userInit(cuName(c)))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${esc([c.grp||'مشتری',B.R?fmt(Math.abs(B.R))+' تومان '+ourLab(B.R):''].filter(Boolean).join(' · '))}</small></span></button>`};
+  const ex=q&&L.some(c=>nzName(toEn(cuName(c)))===q);L=L.slice(0,q?25:12);
+  const B=ownLC().filter(z=>String(z.id)!==String(BD.sid)&&(!q||bkHit(z,q0)));
+  const row=c=>`<button type="button" class="bzsr dkrw bdcr${String(c.id)===String(e.cu)?' on':''}" data-act="bdCuP" data-id="${esc(c.id)}"><span class="av cul" style="--h:${cuHue(c)}">${esc(userInit(cuName(c)))}</span><span class="tx"><b>${esc(cuName(c))}</b><small>${esc(c.grp||'مشتری')}</small></span>${cuBalMini(c)}</button>`;
+  const brow=z=>{const bk=acBank(z),f=acFin(z),id='b'+z.id;return `<button type="button" class="bzsr dkrw bdcr${id===String(e.cu)?' on':''}" data-act="bdCuP" data-id="${esc(id)}"><span class="av bxlogo">${bk?bankBadge(bk):z.cash?ic('cash'):esc(userInit(z.name))}</span><span class="tx"><b>${esc(z.name)}</b><small>${out?'انتقال به این حساب مغازه':'انتقال از این حساب مغازه'}</small></span><span class="stbl"><span class="stbv c"><b>${f==null?'—':(f<0?'−':'')+fmt(Math.abs(f))}</b><i>تومان</i><em>مانده</em></span></span></button>`};
   const none=e.cu!==''&&e.cu!=null?`<button type="button" class="bzsr dkrw fix" data-act="bdCuP" data-id=""><span class="av">${ic('x')}</span><span class="tx"><b>بدون طرف حساب</b><small>فقط روی حساب بانک</small></span></button>`:'';
   const nw=ex||!can('debt')?'':`<button type="button" class="bzsr dkrw nw" data-act="bdCuNew"><span class="av">${ic('plus')}</span><span class="tx"><b>${q?'حساب تازه «'+esc(q0)+'»':'حساب تازه'}</b><small>${q?(out?'نوع هزینه (در فرم حساب عوض می‌شود)':'نوع مشتری'):'نامش را در جستجو بنویسید'}</small></span></button>`;
-  return `<div class="bzsug cbl dkl">${none}${L.map(row).join('')}${nw}</div>`}
+  return `<div class="bzsug cbl dkl bdcl">${none}${L.length?`<div class="bdcg">حساب‌ها</div>${L.map(row).join('')}`:''}${B.length?`<div class="bdcg">حساب‌های دیگر مغازه</div>${B.map(brow).join('')}`:''}${nw}</div>`}
 function bdKList(){const q=nzName(toEn(clean(BD.q||''))),ORD=['out','in','buy','sell','pass','chq','sub','add','vos','fix'],R=BDK.filter(x=>!bdFx(x[0])).sort((x,y)=>ORD.indexOf(x[0])-ORD.indexOf(y[0])).filter(([k,t])=>!q||nzName(t+' '+((BDKI[k]||[])[1]||'')).includes(q));
   if(!R.length)return '<div class="eh" style="padding:8px">چیزی پیدا نشد</div>';
   return `<div class="bzsug cbl dkl dkgrid">${R.map(([k,t,g],i)=>`<button type="button" style="--i:${i}" class="bzsr dkrw top ${bdCls(k)} ${g>0?'kr':'kb'}" data-act="bdD" data-k="${k}"><span class="av">${ic((BDKI[k]||['bank'])[0])}</span><span class="tx"><b>${t}</b><small>${esc((BDKI[k]||[])[1]||'')}${k==='fix'?'':' · '+(g>0?'مانده زیاد می‌شود':'مانده کم می‌شود')}</small></span></button>`).join('')}</div>`}

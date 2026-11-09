@@ -3892,20 +3892,6 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .bkv b{font-size:15.5px;font-weight:900;color:var(--blu);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}.bkv small{font-size:10.5px;color:var(--mut)}
 .bkv.n{background:color-mix(in srgb,var(--red,#d23c48) 9%,var(--card))}.bkv.n b{color:var(--red,#d23c48)}
 .bkv.z{background:var(--seg)}.bkv.z b{color:var(--mut);font-size:13px}
-.hvseg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:0 0 12px;border-radius:14px;background:var(--seg)}
-.hvseg button{display:flex;align-items:center;justify-content:center;gap:6px;height:38px;border:0;border-radius:11px;background:none;color:var(--mut);font:inherit;font-size:13px;font-weight:800}
-.hvseg button svg{width:16px;height:16px}.hvseg button.on{background:var(--card);color:var(--blu);box-shadow:0 1px 3px #0000001a}
-.hvgh{margin:4px 6px 6px;font-size:12.5px;font-weight:900;color:var(--mut)}
-.hvacs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;margin:0 -2px 6px;scrollbar-width:none}.hvacs::-webkit-scrollbar{display:none}
-.hvac{flex:none;display:flex;align-items:center;gap:8px;max-width:210px;padding:8px 12px 8px 10px;border:0;border-radius:16px;background:var(--seg);color:var(--ink);font:inherit;text-align:start}
-.hvac .tx{display:grid;min-width:0}.hvac b{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hvac small{font-size:11px;color:var(--mut);white-space:nowrap}
-.hvac.on{background:var(--card);box-shadow:var(--bfr)}.hvac.on b{color:var(--blu)}
-.hvl{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:var(--card);font-weight:900}
-.hvs{margin:0 0 8px}
-#hvres .c6l{margin:0 0 8px}#hvres .hvr{display:flex;align-items:center;gap:10px;width:100%}#hvres .hvr .tx{flex:1;min-width:0}
-.hvto{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:18px;background:var(--card);box-shadow:var(--bfr);animation:dkPop .35s cubic-bezier(.2,.9,.25,1.08) both}
-.hvto .tx{flex:1;display:grid;min-width:0}.hvto b{font-size:14.5px;font-weight:900}.hvto small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hvto .x{flex:none;position:static;width:32px;height:32px}
 /* ===== v82.6 صفحه حساب بانک مثل صفحه حساب مشتری ===== */
 .bxmk>b{font-feature-settings:normal}
 .bkfx{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 11px;border:0;border-radius:99px;background:var(--blu2);color:var(--blu);font:inherit;font-size:12.5px;font-weight:850}
@@ -3929,3 +3915,42 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .cuLs .bkl .c6r.bkr>.bkv{height:46px;min-height:0;padding-block:0}
 .cuLs .bkv.z small{display:none}
 .cuLs .bkl .c6r.bkr>.bkv.z{flex-direction:row;align-items:center!important;justify-content:flex-end}
+/* ===== v82.8 حساب بانک: سه کادر امروز (هم‌اندازه) + کارتخوان‌های وصل ===== */
+.bkdw{margin:12px 0 4px}
+.bkdt{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 6px 8px}.bkdt b{font-size:14px;font-weight:900}.bkdt small{font-size:11px;color:var(--mut)}
+.bkd3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bkd{display:grid;gap:8px;min-width:0;height:84px;align-content:space-between;padding:10px 10px 11px;border:0;border-radius:16px;background:var(--card);color:var(--ink);font:inherit;text-align:start;box-shadow:0 0 0 1px var(--line),0 2px 6px -3px rgba(20,40,90,.10);container-type:inline-size}
+.bkd.on{box-shadow:0 0 0 2px var(--blu),0 6px 14px -8px var(--blu)}
+.bkdh{display:flex;align-items:center;gap:6px;min-width:0}.bkdh b{flex:1;min-width:0;font-size:12.5px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bkdh em{flex:none;font-style:normal;font-size:10.5px;font-weight:800;min-width:18px;height:18px;padding:0 5px;border-radius:99px;display:grid;place-items:center;background:var(--seg);color:var(--mut)}
+.bkdi{flex:none;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}.bkdi svg{width:15px;height:15px}
+.bkd.o .bkdi{background:var(--red2);color:var(--red)}.bkd.p .bkdi{background:var(--ok2);color:var(--ok)}
+.bkdv{display:flex;align-items:baseline;gap:3px;min-width:0}.bkdv b{font-size:clamp(11px,13cqi,16px);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--blu)}.bkd.o .bkdv b{color:var(--red)}.bkdv i{font-style:normal;font-size:10px;color:var(--mut)}
+.bkpc{margin:12px 0 4px;padding:8px;border-radius:18px;background:var(--card);box-shadow:0 0 0 1px var(--line),0 2px 6px -3px rgba(20,40,90,.10)}
+.bkph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 6px 6px}.bkph>b{font-size:13.5px;font-weight:900}
+.bkpb,.bkpl{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 11px;border:0;border-radius:99px;background:var(--blu2);color:var(--blu);font:inherit;font-size:12px;font-weight:850}.bkpb svg,.bkpl svg{width:14px;height:14px}
+.bkpl{margin:6px 4px 2px;background:transparent}
+.bkpr{display:flex;align-items:center;gap:10px;width:100%;padding:9px 8px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;text-align:start}.bkph+.bkpr{border-top:0}
+.bkpr .tx{flex:1;display:grid;min-width:0}.bkpr .tx b{font-size:13.5px;font-weight:850}.bkpr .tx small{font-size:11px;color:var(--mut)}
+.bkpr .bkdi{width:34px;height:34px;border-radius:11px}
+.bkpv{flex:none;display:grid;justify-items:end;width:clamp(110px,34%,150px);padding:5px 10px;border-radius:12px;background:color-mix(in srgb,var(--ok) 9%,var(--card))}.bkpv b{font-size:14.5px;font-weight:900;color:var(--ok)}.bkpv i{font-style:normal;font-size:10px;color:var(--mut)}.bkpv.z{background:var(--seg)}.bkpv.z b{color:var(--mut)}
+/* سند مشتری: اضافه و کسر */
+.sthd.k-sub .sthi{background:var(--red)!important;color:#fff!important}.sthd.k-add .sthi{background:var(--blu)!important;color:#fff!important}
+.d6k.k-sub{background:var(--red2);color:var(--red)}.d6k.k-add{background:var(--blu2);color:var(--blu)}
+/* جستجوی طرف حساب سند بانکی: مثل جستجوی سند مشتری با مانده */
+.bdcg{position:sticky;top:0;z-index:1;padding:8px 10px 4px;font-size:11.5px;font-weight:900;color:var(--mut);background:var(--card)}
+.bdcl .bdcr{align-items:center}.bdcl .bdcr .tx{flex:1;min-width:0}.bdcl .bdcr .av.cul{background:hsl(var(--h,220) 70% 94%);color:hsl(var(--h,220) 55% 40%)}
+.bdcl .bdcr .stbl{flex:none}
+/* v82.8 (خواسته صاحب اپ): وزن و فی خرید در ردیف لیست واریزی */
+.brh .tx small.rwf{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:#9a6b12}.brh .tx small.rwf svg{width:13px;height:13px;flex:none}
+/* v82.8 (خواسته صاحب اپ: «کادرهای آبی سند زدن نباید توی هم برود»): فاصله کادر باز ردیف از کارت بالای سند (هاله آبی روی کارت نمی‌افتد)؛
+   فهرست طرف حساب داخل کادر قاب جدا ندارد و مانده‌ها در عرض کادر جا می‌شوند */
+.bdoc #qa,.d6 #qa:has(.dkbox.open){margin-top:16px}
+#bdPk .dkl{box-shadow:none!important;border:0!important;outline:0!important;border-radius:14px;background:transparent;margin:6px 0 0;padding:0}
+#bdPk .bdcr{gap:8px;padding-inline:6px}
+#bdPk .bdcr .stbl{max-width:50%;min-width:0;overflow:hidden;flex-wrap:wrap;justify-content:flex-end}
+#bdPk .bdcr .stbv{min-width:0;max-width:100%}#bdPk .bdcr .stbv b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bdPk .bdcr .stbv b{font-feature-settings:normal;letter-spacing:-.2px;font-size:13px}#bdPk .bdcr .stbl{max-width:56%}
+.bkd{border-top:3px solid var(--blu)}.bkd.p{border-top-color:var(--ok)}.bkd.o{border-top-color:var(--red)}
+.bkd .bkdh b{font-size:13px}
+.bkpv{display:flex;align-items:baseline;justify-content:flex-end;gap:4px}
+.bkpl{margin:2px 4px 0;height:28px}
