@@ -50,9 +50,7 @@ function bfxRes(){const c=custs.find(z=>String(z.id)===String(BFX.cu));const z=b
 function bfxHTML(){const c=custs.find(z=>String(z.id)===String(BFX.cu));if(!c)return '';const cur=bkCuBal(c),v=x=>x?Number(x).toLocaleString('en-US'):'';
   return `<div class="sh-h"><div><b>اصلاح موجودی</b><small class="shsub">موجودی واقعی را با برنامه یکی کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="bf3">
-  <div class="bf3k" style="--bk:${bkClr(c)}">${bkWmH(c)}<div class="bf3kh"><span class="bf3kl">${bkAvH(c)||ic('bank')}</span><b>${esc(cuName(c))}</b></div><small>مانده در برنامه</small><div class="bf3ka">${bfxMv(cur)}<i>تومان</i></div></div>
-  <div class="bf3e"><small>موجودی واقعی بانک</small><input id="bxT" class="ltr" inputmode="numeric" value="${v(BFX.bt)}" placeholder="0" autocomplete="off" enterkeyhint="done"><i>تومان</i>
-    <div class="bf3s" role="tablist"><button type="button" class="${BFX.neg?'':'on'}" data-act="bfxSNeg" data-v="0">مثبت</button><button type="button" class="${BFX.neg?'on n':''}" data-act="bfxSNeg" data-v="1">منفی</button></div></div>
+  ${bkInCard(c,{label:'موجودی واقعی بانک',id:'bxT',val:v(BFX.bt),ph:fmt(Math.abs(cur)),cur,top:`<div class="bkis" role="tablist"><button type="button" class="${BFX.neg?'':'on'}" data-act="bfxSNeg" data-v="0">مثبت</button><button type="button" class="${BFX.neg?'on':''}" data-act="bfxSNeg" data-v="1">منفی</button></div>`,neg:BFX.neg})}
   <div id="bxL">${bfxRes()}</div>
   ${BFX.pos?`<label class="bf3p"><span class="bf3pi">${ic('card')}</span><span class="tx"><b>کارتخوان امروز</b><small>سند نخورده</small></span><input id="bxP" class="ltr" inputmode="numeric" value="${v(BFX.bp)}" placeholder="0" autocomplete="off" enterkeyhint="done"></label>`:`<button type="button" class="bf3c" data-act="bfxPos">${ic('card')} افزودن کارتخوان امروز</button>`}
   <button type="button" class="xgo" data-act="bfxSave">${ic('check')} ثبت</button></div>`}
@@ -75,7 +73,7 @@ let BPS=null;
 function bpsHTML(){const c=custs.find(z=>String(z.id)===String(BPS.cu));if(!c)return '';const cur=bkCuBal(c),a=+BPS.a||0,v=x=>x?Number(x).toLocaleString('en-US'):'';
   return `<div class="sh-h"><div><b>سند کارتخوان</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="bf3">
-  <div class="bf3e bpse"><span class="bpsi">${ic('card')}</span><small>مبلغ کارتخوان</small><input id="bpA" class="ltr" inputmode="numeric" value="${v(BPS.a)}" placeholder="0" autocomplete="off" enterkeyhint="next"><i>تومان</i></div>
+  ${bkInCard(c,{label:'مبلغ کارتخوان',id:'bpA',val:v(BPS.a),ph:'0',cur,top:`<span class="bkip">${ic('card')} کارتخوان</span>`,plus:1})}
   <label class="bpsn"><span>${ic('edit')}</span><input id="bpN" value="${esc(BPS.why||'')}" placeholder="شرح (اختیاری): شماره پایانه، تاریخ تراکنش…" autocomplete="off" enterkeyhint="done"></label>
   <div id="bpL">${bpsRes(cur,a)}</div>
   <button type="button" class="xgo" data-act="bpsSave">${ic('check')} ثبت</button></div>`}
@@ -87,6 +85,12 @@ ACT.bpsSave=()=>{const c=BPS&&custs.find(z=>String(z.id)===String(BPS.cu));if(!c
   const now=ns(),no=invNext(),w=clean(BPS.why||''),t={id:nid++,type:'inv',no,cn:cnNext(c),date:todayISO(),rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:[{m:'bkx',k:'bpos',amount:-a,dir:'out',...(w?{why:w}:{})}],at:now,by:who(),posm:1};
   (c.txs=c.txs||[]).push(t);c.lastAt=now;saveCu();logA('cust','سند کارتخوان',cuName(c)+' | سند '+toFa(no)+' | '+fmt(a)+' تومان',{cu:c.id,tx:t.id});BPS=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('سند کارتخوان '+toFa(no)+' ثبت شد · '+fmt(a)+' تومان')};
 
+/* v86.1 (خواسته صاحب اپ: «برای اصلاح موجودی هم هر موجودی مطابق کارت بانکی»): کارت بانکی با کادر ورود مبلغ داخلش —
+   سرتیتر لوگو/نام + دکمه شیشه‌ای (مثبت/منفی یا برچسب)، نوار شیشه‌ای «مانده در برنامه»، برچسب و عدد بزرگ سفید قابل تایپ */
+function bkInCard(c,o){return `<div class="bkc lg bkin" style="--bk:${bkClr(c)}">${bkWmH(c)}<i class="bkcg" aria-hidden="true"></i>
+  <span class="bkch"><span class="bkcl">${bkAvH(c)||ic('bank')}</span><span class="bkcn"><b>${esc(cuName(c))}</b>${c.cno?`<small>حساب ${toFa(c.cno)}</small>`:''}</span>${o.top||''}</span>
+  <span class="bkic"><small>مانده در برنامه</small><b>${bfxMv(o.cur)}<i> تومان</i></b></span>
+  <label class="bkii"><small>${o.label}</small><span class="bkiv">${o.plus?'<em>+</em>':o.neg?'<em>−</em>':''}<input id="${o.id}" class="ltr" inputmode="numeric" value="${o.val}" placeholder="${o.ph}" autocomplete="off" enterkeyhint="done"><i>تومان</i></span></label></div>`}
 /* v86.0 (خواسته صاحب اپ: «هر کادر مانده شبیه کارت بانکی خودش؛ این طراحی را همه‌جا به کار ببر»): کارت بانکی bkCardH
    = گرادیان رنگ همان بانک (bkClr)، لوگوی سفید، نام و شماره حساب، «مانده حساب»، عدد بزرگ سفید + برچسب طلبکاریم/بدهکاریم، نقش کم‌رنگ لوگو.
    lg = کارت مانده صفحه حساب بانک؛ sm = هر ردیف زبانه بانک (زدن = باز کردن حساب) */
