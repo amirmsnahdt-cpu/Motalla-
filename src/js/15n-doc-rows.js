@@ -123,7 +123,8 @@ const depLeft=(x,skip)=>Math.max(0,Math.round(depAvail(x)-(sv?sv.pays.filter((p,
 /* v82.9 (خواسته صاحب اپ: «فقط مشتری‌هایی که واریزی‌شان تخصیص داده نشده و فقط در لیست واریزی هستند، یا مانده دارند و در لیست نیستند»):
    واریزی‌ای که به منبعی تخصیص خورده (در یکی از تخصیص‌های ارسال‌نشده) دیگر قابل حواله نیست — depFreeOk */
 const depAllocSet=()=>{const S=new Set();Object.values(drafts||{}).forEach(L=>(L||[]).forEach(p=>{if(!p.sent)(p.ids||[]).forEach(id=>S.add(String(id)))}));return S};
-const depFreeOk=(x,A)=>!A.has(String(x.id))&&!entries.some(z=>!z.del&&z.splitOf!=null&&String(z.splitOf)===String(x.id)&&A.has(String(z.id)));
+/* v84.8: بخشی از همان واریزی که ارسال شده (sentBid) هم یعنی تخصیص خورده */
+const depFreeOk=(x,A)=>!A.has(String(x.id))&&!entries.some(z=>!z.del&&z.splitOf!=null&&String(z.splitOf)===String(x.id)&&(A.has(String(z.id))||z.sentBid!=null));
 const cuDeps=(c,skip)=>{const A=depAllocSet();return validated().filter(x=>!x.sentBid&&depFreeOk(x,A)&&x.wd&&String(x.wd.cu)===String(c.id)).map(x=>[x,depLeft(x,skip)]).filter(z=>z[1]>0)};
 function oweAccts(q,skip){const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId);
   return CU().filter(c=>String(c.id)!==me&&(!nq||cuHit(c,nq,dOk))).map(c=>{const f=cuFree(c,skip),D=cuDeps(c,skip);return {c,f,D,a:f+D.reduce((s,z)=>s+z[1],0)}}).filter(o=>o.a>0).sort((x,y)=>y.a-x.a)}

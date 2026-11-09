@@ -109,7 +109,13 @@ function entItSync(e,info){if(!e||!e.sentBid)return false;const st=(e.settles||[
     if(info){const bk=ibanBank(e.iban||'')||e.bank||'',V={name:e.name,title:e.title||'',code:e.code||'',iban:e.iban||'',bank:bk};for(const f in V)if((it[f]||'')!==V[f]){it[f]=V[f];ch=true}}}));
   if(ch)saveB();return ch}
 /* همه ردیف‌های کهنه (از قبل از این نسخه، یا رسیده از گوشی دیگر) یکجا؛ بعد از هر همگام‌سازی. مثال واقعی: ردیف هنوز «بهاره جعفری · ۸٬۰۰۰٬۰۰۰» بود */
-function entItSyncAll(){let n=0;const B=batches;for(const e of entries)if(e.sentBid&&B.some(b=>b.id===e.sentBid))try{if(entItSync(e,true))n++}catch(_){}return n}
+/* v84.8 (خواسته صاحب اپ: «از ریشه، دیگر چنین مشکلی نباشد»): واریزی‌ای که در یک لیست ارسال (batch) هست ولی نشانه ارسالش (sentBid)
+   در همگام‌سازی گم شده، در لیست «تخصیص‌نیافته» دیده می‌شد و می‌شد دوباره فرستاد. نشانه از روی خود batch برگردانده می‌شود
+   (فقط این جهت: حذف ارسال همیشه اول ردیف batch را برمی‌دارد، پس batch مرجع است). واریزی پاک‌شده دست نمی‌خورد */
+function sentBidFix(){const IM=new Map();for(const b of batches)for(const x of b.items||[])if(!IM.has(x.id))IM.set(x.id,b.id);let n=0;
+  for(const e of entries){if(e.del)continue;const bid=IM.get(e.id);if(bid!=null&&e.sentBid!==bid&&!(e.sentBid!=null&&batches.some(b=>b.id===e.sentBid&&(b.items||[]).some(x=>x.id===e.id)))){e.sentBid=bid;n++}}
+  if(n)saveE();return n}
+function entItSyncAll(){try{sentBidFix()}catch(_){}let n=0;const B=batches;for(const e of entries)if(e.sentBid&&B.some(b=>b.id===e.sentBid))try{if(entItSync(e,true))n++}catch(_){}return n}
 function stlSync(e){const st=(e.settles||[]).reduce((s,z)=>s+(+z.amount||0),0),rem=Math.max(0,(+e.amount||0)-st);batches.forEach(b=>b.items.forEach(it=>{if(it.id===e.id){it.amount=rem;it.settled=st;it.settles=e.settles;it.total=+e.amount||0}}));saveB()}
 ACT.stlOpen=d=>{const x=stlE();if(!x)return;const z=(x.settles||[])[+d.i];if(!z)return;stl={...z,i:+d.i,q:z.cuId?'':z.name,newName:!z.cuId&&!!z.name};sheet(stlHTML());stlBind();phPaint($('sheet'))};
 ACT.stlCu=d=>{stlRead();const clr=!d.id;if(d.id==='new'){stl.cuId='';stl.name=clean(stl.q||'');stl.newName=true}else if(clr){stl.cuId='';stl.name='';stl.q='';stl.newName=false}else{const c=custs.find(z=>String(z.id)===String(d.id));if(c){stl.cuId=c.id;stl.name=cuName(c);stl.newName=false;if(!stl.phone)stl.phone=c.phone||''}}stlRe(clr?-1:1);if(clr)setTimeout(()=>{const Q=$('stQ');if(Q){stl.open=1;const c2=$('stCs');if(c2){c2.innerHTML=stlChips();phPaint(c2)}}},60)};

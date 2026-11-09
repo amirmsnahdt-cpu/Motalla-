@@ -23,11 +23,16 @@ function wdState(e,F,BI){const ok=[],bi=BI||entBI;if(!F){try{F=famOf(e)}catch(_)
    تا در سند فروشنده هر بخش ردیف خودش را داشته باشد (نه یک ردیف کلی). جمع بخش‌ها = S.pend (اختلاف احتمالی در ردیف بانک). */
 /* v78.5 (خواسته صاحب اپ): هر بخش بانکی که هنوز نه بانکی گرفته نه ارسال شده fr:1 دارد = «در لیست واریز · تخصیص نخورده» (بنفش کم‌رنگ، جزو مانده آزاد)؛
    بقیه (بانک خورده، ارسال‌شده، تسویه از مشتری در انتظار) = تخصیص‌شده، زرد «در انتظار تأیید» تا تأیید واریزی */
+/* مبلغ بانکی خالص یک واریزی از رکورد ذخیره‌شده (نه ردیف validated که خالص است) */
+function depNet(p){const e=(p&&entries.find(z=>z.id===p.id))||p;if(!e)return 0;return Math.max(0,Math.round((+e.amount||0)-(e.settles||[]).reduce((s,z)=>s+(+z.amount||0),0)))}
 function wdParts(e,S,A){S=S||wdState(e);if(!S.pend)return [];A=A||allocMap();let F;try{F=famOf(e)}catch(_){F=[e]}if(!F.length)F=[e];const P=[];
   (e.settles||[]).forEach((z,i)=>{if(stlCounts(z)||!(+z.amount))return;const c=z.byInv&&custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);
     P.push({k:'s'+(z.id||i),t:'s',a:+z.amount,nm:z.name||'مشتری',doc:t?invTitle(t):'',cu:t?c.id:null,tx:t?t.id:null,tn:z.tn||''})});
-  const sOf=p=>(p.settles||[]).reduce((s,z)=>s+(+z.amount||0),0);
-  F.forEach(p=>{const b=entBI(p);if(b&&b.it.st==='ok')return;const a=Math.max(0,Math.round((+p.amount||0)-sOf(p)));if(!a)return;const al=A&&A.get(p.id);
+  /* v84.8 رفع باگ از ریشه (خواسته صاحب اپ: «واریزی برای سپه ارسال شده ولی در حساب مشتری «تخصیص نخورده» است»):
+     famOf ردیف‌های validated() را می‌دهد که amount آن‌ها خالص است (کل − تسویه از مشتری). اینجا تسویه دوباره کم می‌شد → بخش بانکیِ
+     ارسال‌شده صفر و همه مانده «در لیست واریزی · هنوز تخصیص نخورده» (بنفش) دیده می‌شد. حالا مبلغ بانکی همیشه از خود واریزی ذخیره‌شده (entries)
+     حساب می‌شود: مبلغ کل − جمع تسویه‌ها (depNet)، هر نوع ردیفی که برسد */
+  F.forEach(p=>{const b=entBI(p);if(b&&b.it.st==='ok')return;const a=depNet(p);if(!a)return;const al=A&&A.get(p.id);
     P.push({k:'b'+p.id,t:'b',a,ent:p.id,fr:!b&&!(al&&al.src)?1:0,src:(b&&b.it.src)||(al&&al.src)||'',st:b?(b.it.st==='fail'?'ناموفق در بانک':'ارسال‌شده به بانک · منتظر تأیید'):al&&al.src?'تخصیص خورده · هنوز ارسال نشده':'در لیست واریزی · هنوز تخصیص نخورده'})});
   const sum=P.reduce((s,o)=>s+o.a,0),d=S.pend-sum;
   if(d){const b=P.find(o=>o.t==='b');if(b&&b.a+d>0)b.a+=d;else if(d>0)P.push({k:'r',t:'b',a:d,ent:e.id,fr:1,src:'',st:'در لیست واریزی · هنوز تخصیص نخورده'})}
