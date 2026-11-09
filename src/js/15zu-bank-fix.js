@@ -34,7 +34,8 @@ ACT.bfxAdd=()=>{bfxApply()};
 let BFX=null;
 function bfxZ(cur,bt,bp,neg){const t=+bt||0,p=+bp||0,T=neg?-t:t;return {cur,p,T,d:T-(cur+p),ok:bt!==''&&bt!=null}}
 const bfxRows=z=>z.ok?[...(z.p?[{m:'bkx',k:'bpos',amount:-z.p,dir:'out',why:'کارتخوان مغازه'}]:[]),...(z.d?[{m:'bkx',k:'adj',amount:-z.d,dir:z.d>0?'out':'in',why:'اصلاح حساب'}]:[])]:[];
-const bkFixBtn=c=>c&&c.grp==='بانک'&&can('debt')?`<button type="button" class="bkfx" data-act="bkFix" data-cu="${c.id}"><span class="bkdi">${ic('tag')}</span><span class="bkft"><strong>اصلاح موجودی</strong><em>موجودی واقعی بانک و کارتخوان امروز → سند اصلاحی خودکار</em></span><span class="bkfa">${ic('chev')}</span></button>`:'';
+/* v85.9 (خواسته صاحب اپ: «سند کارتخوان هم مجزا کنار اصلاح موجودی»): دو کاشی کنار هم زیر کارت مانده — اصلاح موجودی (آبی) و کارتخوان (سبز) */
+const bkFixBtn=c=>c&&c.grp==='بانک'&&can('debt')?`<div class="bkfx2"><button type="button" class="bkq b" data-act="bkFix" data-cu="${c.id}"><span class="bkqi">${ic('tag')}</span><span class="bkqt"><strong>اصلاح موجودی</strong><em>با موجودی واقعی بانک</em></span></button><button type="button" class="bkq g" data-act="bkPos" data-cu="${c.id}"><span class="bkqi">${ic('card')}</span><span class="bkqt"><strong>کارتخوان</strong><em>سند کارتخوان این بانک</em></span></button></div>`:'';
 const bfxMv=v=>`${v<0?'−':''}${fmt(Math.abs(v))}`,bfxCl=v=>v>0?'r':v<0?'b':'z';
 /* v85.6 (خواسته صاحب اپ: «پنجره اصلاح موجودی جالب نیست — راحت، کاربردی، ساده و شکیل»): یک کادر بزرگ وسط برای موجودی واقعی بانک
    (دکمه کوچک «−» برای منفی)، مانده برنامه زیرش برای مقایسه، یک خط نتیجه رنگی (کسر/اضافه یا «برابر است»)، کارتخوان امروز فقط با
@@ -68,3 +69,20 @@ ACT.bfxSave=()=>{bfxSRead();const c=custs.find(z=>String(z.id)===String(BFX.cu))
 /* رنگ ردیف‌های گردش حساب: بانک — کارتخوان سبز، واریز (پول به بانک) قرمز، برداشت آبی؛ v85.3 همه حساب‌ها — قرمز طلبکاریم، آبی بدهکاریم
    (اثر تومان، اگر نبود طلا، بعد سکه/ارز) */
 function bkRowCls(t,d,bk){if(bk!==false&&t.type==='inv'){const P=(t.pays||[]).filter(p=>+p.amount);if(t.pd||(P.length&&P.every(p=>p.m==='pos'||p.lm==='pos'||(p.m==='bkx'&&p.k==='bpos'))))return 'tg'}const r=d?(Math.round(d.r||0)||Math.round((d.g||0)*1000)||Object.values(d.x||{}).find(v=>Math.round(v*100))||0):0;return r<0?'trd':r>0?'tbl':''}
+
+/* v85.9 سند کارتخوان مستقیم از صفحه حساب بانک: مبلغ (+ شرح اختیاری) → یک سند با ردیف bkx bpos (موجودی بانک زیاد) */
+let BPS=null;
+function bpsHTML(){const c=custs.find(z=>String(z.id)===String(BPS.cu));if(!c)return '';const cur=bkCuBal(c),a=+BPS.a||0,v=x=>x?Number(x).toLocaleString('en-US'):'';
+  return `<div class="sh-h"><div><b>سند کارتخوان</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="bf3">
+  <div class="bf3e bpse"><span class="bpsi">${ic('card')}</span><small>مبلغ کارتخوان</small><input id="bpA" class="ltr" inputmode="numeric" value="${v(BPS.a)}" placeholder="0" autocomplete="off" enterkeyhint="next"><i>تومان</i></div>
+  <label class="bpsn"><span>${ic('edit')}</span><input id="bpN" value="${esc(BPS.why||'')}" placeholder="شرح (اختیاری): شماره پایانه، تاریخ تراکنش…" autocomplete="off" enterkeyhint="done"></label>
+  <div id="bpL">${bpsRes(cur,a)}</div>
+  <button type="button" class="xgo" data-act="bpsSave">${ic('check')} ثبت</button></div>`}
+const bpsRes=(cur,a)=>a?`<div class="bf3d g"><span class="bf3di">${ic('dIn')}</span><span class="tx"><b>به موجودی اضافه می‌شود</b><small>مانده بعد از سند ${bfxMv(cur+a)}</small></span><em>+${fmt(a)}</em></div>`:`<div class="bf3d n"><span class="bf3di">${ic('card')}</span><span class="tx"><b>مبلغ کارتخوان را بزنید</b><small>مانده فعلی ${bfxMv(cur)} تومان</small></span></div>`;
+function bpsBind(f){const A=$('bpA'),N=$('bpN');if(!A)return;selOnFocus(A);A.oninput=()=>{const n=num(A.value);A.value=n?n.toLocaleString('en-US'):'';BPS.a=n||'';const c=custs.find(z=>String(z.id)===String(BPS.cu)),L=$('bpL');if(c&&L)numMorph('#bpL em',()=>{L.innerHTML=bpsRes(bkCuBal(c),+BPS.a||0)})};
+  A.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();N&&N.focus()}};if(N){N.oninput=()=>{BPS.why=N.value};N.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();N.blur()}}}const el=f&&$(f);if(el)sheetFocus(el)}
+ACT.bkPos=d=>{if(!can('debt'))return;BPS={cu:d.cu,a:'',why:''};sheet(bpsHTML());bpsBind('bpA')};
+ACT.bpsSave=()=>{const c=BPS&&custs.find(z=>String(z.id)===String(BPS.cu));if(!c)return;const a=+BPS.a||0;if(!(a>0)){toast('مبلغ کارتخوان را بزنید',true);const e=$('bpA');if(e)e.focus();return}
+  const now=ns(),no=invNext(),w=clean(BPS.why||''),t={id:nid++,type:'inv',no,cn:cnNext(c),date:todayISO(),rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:[{m:'bkx',k:'bpos',amount:-a,dir:'out',...(w?{why:w}:{})}],at:now,by:who(),posm:1};
+  (c.txs=c.txs||[]).push(t);c.lastAt=now;saveCu();logA('cust','سند کارتخوان',cuName(c)+' | سند '+toFa(no)+' | '+fmt(a)+' تومان',{cu:c.id,tx:t.id});BPS=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('سند کارتخوان '+toFa(no)+' ثبت شد · '+fmt(a)+' تومان')};

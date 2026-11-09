@@ -4057,3 +4057,16 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .bf3p .tx{display:flex;flex-direction:column;gap:1px}.bf3p .tx b{font-size:13.5px;color:var(--ok)}.bf3p .tx small{font-size:11.5px;color:var(--mut)}
 #sheet .bf3p input{flex:1;min-width:0;border:0!important;box-shadow:none!important;background:none!important;padding:0!important;height:auto!important;min-height:0!important;text-align:left;font-family:inherit!important;font-size:21px!important;font-weight:900!important;color:var(--ink)}
 @keyframes bf3Up{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+/* v85.9 دو کاشی زیر کارت مانده بانک + پنجره سند کارتخوان */
+.bkfx2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 4px}
+#view .bkq{display:flex;align-items:center;gap:10px;padding:12px;border:0;border-radius:20px;font:inherit;text-align:start;color:var(--ink);background:var(--card);box-shadow:inset 0 0 0 1.5px var(--fc);min-height:64px}
+#view .bkq.b{--fc:color-mix(in srgb,var(--blu) 38%,transparent);--ic:var(--blu);--ib:var(--blu2)}
+#view .bkq.g{--fc:color-mix(in srgb,var(--ok) 42%,transparent);--ic:var(--ok);--ib:var(--ok2)}
+.bkq .bkqi{flex:0 0 38px;height:38px;border-radius:13px;display:grid;place-items:center;background:var(--ib);color:var(--ic)}.bkq .bkqi svg{width:19px;height:19px}
+.bkq .bkqt{display:flex;flex-direction:column;gap:2px;min-width:0}.bkq .bkqt strong{font-size:14.5px;font-weight:900;color:var(--ic)}.bkq .bkqt em{font-style:normal;font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bpse .bpsi{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;background:var(--ok2);color:var(--ok);margin-bottom:6px;animation:bf3Up .4s ease both}.bpse .bpsi svg{width:26px;height:26px}
+.bpse{caret-color:var(--ok)}#sheet .bpse input{caret-color:var(--ok)}
+.bpsn{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:18px;background:color-mix(in srgb,var(--mut) 8%,transparent)}
+.bpsn>span{color:var(--mut);display:grid}.bpsn>span svg{width:17px;height:17px}
+#sheet .bpsn input{flex:1;min-width:0;border:0!important;box-shadow:none!important;background:none!important;padding:0!important;height:auto!important;min-height:0!important;font:inherit;font-size:14px!important;color:var(--ink)}
+.bf3d.g .bf3di{background:var(--ok2);color:var(--ok)}.bf3d.g em,.bf3d.g .tx b{color:var(--ok)}
