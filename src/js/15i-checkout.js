@@ -77,7 +77,7 @@ function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),wp=c&&sv.edit&&typeof wdPe
   ${mini}<div class="ckh ${r>0?'d':r<0?'c':'z'}${wp&&r&&wp>=Math.abs(r)-1?' w':''}"><small>${r?(wp&&wp>=Math.abs(r)-1?'رفت برای واریز · در انتظار تأیید بانک':TL+' · '+(r>0?'طلبکاریم':'بدهکاریم')):TL+' تسویه است ✓'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b><em>${tg==='d'&&!A?'جمع سند '+fmt(Math.abs(T.total)):'جمع این سند '+fmt(Math.abs(T.total))}${T.paid?(T.paid<0?' · پرداخت‌شده ':' · دریافت‌شده ')+fmt(Math.abs(T.paid)):''}${gr&&gr[3]?' · طلا '+wFmt(Math.abs(gr[3]))+' گرم '+ourLab(gr[3]):''}</em></div>
   ${wdCkHTML()}
   ${R.length?`<div class="ckrs">${R.map(z=>`<div class="ckr"><span class="d6ti pm-in">${ic(z.ico)}</span><span class="tx"><b>${esc(z.lab)}</b>${z.sub?`<small>${z.sub}</small>`:''}</span><b class="ckam">${fmt(z.amt)}</b>${z.lock?`<span class="d6x ckl0" aria-hidden="true">${ic('check')}</span>`:`<button class="d6x" data-act="ckDel" data-k="${z.k}" data-i="${z.i}" aria-label="حذف">${ic('x')}</button>`}</div>`).join('')}</div>`:''}
-  ${CK.m?ckForm():!r&&!gw?'':`<div class="ckt${r<0?' out':''}">${[...(r?(r<0?CKO:CKT):[]),...(gw?[['gp','پولی کردن طلا · '+wFmt(Math.abs(gw))+' گرم','swap']]:[])].map(([k,t,i])=>`<button class="ckti q-${k}" data-act="ckM" data-m="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div>`}
+  ${!CK.m&&c&&c.grp==='بانک'?bfxTile():''}${CK.m==='bfix'?bfxForm():CK.m?ckForm():!r&&!gw?'':`<div class="ckt${r<0?' out':''}">${[...(r?(r<0?CKO:CKT):[]),...(gw?[['gp','پولی کردن طلا · '+wFmt(Math.abs(gw))+' گرم','swap']]:[])].map(([k,t,i])=>`<button class="ckti q-${k}" data-act="ckM" data-m="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div>`}
   <button class="xgo cksave" data-act="ckSave">${ic('check')} پایان و ثبت سند${r>0?`<small>مانده ${fmt(r)} به حساب مشتری</small>`:''}</button></div>`}
 function ckRead(){const g=id=>{const e=$(id);return e?e.value:undefined};if($('ckA'))CK.amount=num(g('ckA'));if($('ckT'))CK.tn=toEn(g('ckT')||'').trim();if($('ckW'))CK.w=decIn(g('ckW'));if($('ckY'))CK.ay=+toEn(g('ckY')).replace(/\D/g,'')||'';if($('ckQ'))CK.q=g('ckQ');if($('ckS'))CK.sq=g('ckS');if($('ckP'))CK.pg=num(g('ckP'))}
 function ckBind(f){phPaint($('sheet'));const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=$('ckY');const PS=$('ckS');if(PS)PS.oninput=()=>{CK.sq=PS.value;const P=$('ckPl');if(P)P.innerHTML=ckPick()};
@@ -86,13 +86,13 @@ function ckBind(f){phPaint($('sheet'));const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=
   const gx=()=>{ckRead();const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate),el=$('ckX');if(el)el.innerHTML=sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'};
   if(W)W.oninput=gx;if(Y)Y.oninput=gx;
   const P=$('ckP'),rg=()=>{ckRead();const el=$('ckX');if(el)el.innerHTML=ckRgX()};if(P){selOnFocus(P);P.oninput=()=>{const v=num(P.value);P.value=v?v.toLocaleString('en-US'):'';rg()}}if(A&&CK.m==='rg'){const o=A.oninput;A.oninput=()=>{o();rg()}}
-  const el=f&&$(f);if(el)sheetFocus(el)}
+  bfxBind();const el=f&&$(f);if(el)sheetFocus(el)}
 const ckLeft=()=>Math.abs(ckRest());
 ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حساب مشتری از لیست واریزی (15q) */if(m==='wd'){wdOpen();return}/* v61.39: تخفیف از پنجره تسویه — روی مانده همین سند */if(m==='off'){svOffOpen(true);return}
   if(m==='gp'){if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}gkOpen(ckTg());ACT.gkM({m:'cv'});return}
   if(m==='rg'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}
-  const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
-  ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m?'ckA':'')};
+  const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
+  ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m==='bfix'?'bfT':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
 ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';ckRe('ckA')};
 ACT.ckSrcX=()=>{ckRead();CK.pk=0;ckRe('ckS')};
@@ -124,7 +124,7 @@ ACT.ckDel=d=>{const L=d.k==='xr'?sv.xr:sv.pays;if(d.k!=='xr'&&L[+d.i]&&L[+d.i].m
 /* v80.4 رفع باگ: اگر فرم یک روش (حواله، نقد، کارتخوان…) باز و مبلغ پر بود و «پایان و ثبت» زده می‌شد، آن ردیف بی‌صدا دور ریخته
    می‌شد. حالا اول همان ردیف (با همان بررسی‌ها) اضافه می‌شود و بعد سند ثبت؛ اگر چیزی کم باشد پیام می‌دهد و پنجره می‌ماند */
 let ckFin=0;
-ACT.ckSave=()=>{ckRead();if(CK&&CK.m&&(+CK.amount>0||+CK.w>0)){ckFin=1;try{ACT.ckAdd()}finally{ckFin=0}return}closeSheet();setTimeout(()=>{if(cur==='sell')back()},60)};
+ACT.ckSave=()=>{ckRead();if(CK&&CK.m==='bfix'){bfxRead();if(CK.bt!==''&&CK.bt!=null){ckFin=1;try{bfxApply()}finally{ckFin=0}return}}if(CK&&CK.m&&(+CK.amount>0||+CK.w>0)){ckFin=1;try{ACT.ckAdd()}finally{ckFin=0}return}closeSheet();setTimeout(()=>{if(cur==='sell')back()},60)};
 /* ثبت تسویه‌های «حواله به فروشنده واریزی» روی همان واریزی‌ها (بعد از ساخته شدن سند) */
 /* v61.75 (خواسته صاحب اپ): حواله دوطرفه — تسویه روی واریزی به حساب همین مشتری پیوند دارد (cuId، مثل ثبت دستی با انتخاب مشتری؛
    اثرش فقط در سند است، byInv)، عکس‌های ردیف سند همان عکس‌های تسویه‌اند، و با ویرایش سند وضعیت/عکس/پیگیری تسویه قبلی می‌ماند (old) */
