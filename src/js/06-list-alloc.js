@@ -22,16 +22,16 @@ function hubData(k){AM=allocMap();const M=vMap(),rows=validated().filter(r=>PD(r
 const hubOpen=new Map();
 /* منبع‌ها بسته باز می‌شوند (حتی اگر هنوز تسویه نشده باشند)؛ با زدن روی منبع باز و بسته می‌شود */
 const hubIsOpen=g=>hubOpen.has(g.name)?hubOpen.get(g.name):false;
-/* v86.3: دو کاشی کنار هم زیر کارت آبی (مثل صفحه بانک): تخصیص (آبی) و تخصیص خودکار (بنفش، بر اساس موجودی بانک‌ها) */
-function ldActs(d){if(!d.un.length||!can('split'))return '';const U=d.un.length+d.bad.length;
-  return `<div class="bkfx2 ldfx"><button type="button" class="bkq b" data-act="allocNew"><span class="bkqi">${ic('plus')}</span><span class="bkqt"><strong>تخصیص</strong><em>${toFa(U)} واریزی منتظر منبع</em></span></button><button type="button" class="bkq v" data-act="aaOpen"><span class="bkqi">${ic('split')}</span><span class="bkqt"><strong>تخصیص خودکار</strong><em>بر اساس موجودی بانک‌ها</em></span></button></div>`}
+/* v86.4 (خواسته صاحب اپ: «دکمه‌ها بالا باشد ولی جای‌گذاری منظم‌تر»): یک گروه مرتب در سرتیتر — خروجی (آیکون)، خودکار (آیکون بنفش)،
+   «+ تخصیص» (قرص آبی)؛ هم‌قد و هم‌تراز. «ارسال» (hdGo) جدا کنارش می‌آید */
+function ldHdr(){const d=hubData(ldKey);if(!d.rows.length)return '';const al=d.un.length&&can('split');
+  return `<span class="ldhb">${can('export')?`<button class="ldb0" data-act="ldExp" aria-label="خروجی" title="خروجی">${ic('open')}</button>`:''}${al?`<button class="ldb0 v" data-act="aaOpen" aria-label="تخصیص خودکار" title="تخصیص خودکار">${ic('split')}</button><button class="ldb1" data-act="allocNew" aria-label="تخصیص به منبع">${ic('plus')}<span>تخصیص</span></button>`:''}</span>`}
 function vLday(){const d=hubData(ldKey);ldX=null;
   if(!d.rows.length)return `<div class="spempty"><div class="spill">${ic('list')}</div><b>این لیست خالی است</b><span>برای ${esc(pdHead(ldKey))} واریزی‌ای ثبت نشده.</span></div>`;
   const all=d.rows.length,pc=d.tot?d.okS/d.tot*100:0,done=d.ok===all;
   let h=`<div class="ldtop"><span class="ldic">${ic('cal')}</span><div><b>${esc(pdHead(ldKey))}</b><small>${d.eds.length&&!(d.eds.length===1&&d.eds[0]===ldKey)?'ثبت '+d.eds.map(e=>esc(relDay(e))).join('، ')+' · ':''}${fmt(all)} واریزی${d.closed?' · بایگانی شده':''}</small></div></div>
   <div class="ldhero${done?' ok':''}"><small>${done?'لیست کامل تسویه شد ✓':'تسویه شده تا الان'}</small><b>${fmt(d.okS)}<i>تومان</i></b><em>از کل ${fmt(d.tot)} تومان</em><span class="ldbar"><i style="width:${pc}%"></i></span>
   <div class="ldst"><div><small>تخصیص‌نیافته</small><b>${fmt(d.un.length+d.bad.length)}</b></div><div><small>آماده ارسال</small><b>${fmt(d.none)}</b></div><div><small>در انتظار</small><b>${fmt(d.pend)}</b></div><div><small>تسویه شده</small><b>${fmt(d.ok)}</b></div></div></div>
-  ${ldActs(d)}
   <div class="fsearch ldq">${ic('search')}<input id="ldq" type="search" value="${esc(ldQ)}" placeholder="جستجو: نام، فاکتور، مبلغ، پیگیری" autocomplete="off" enterkeyhint="search">${ldQ?'<button class="x" data-act="ldQClr" aria-label="پاک کردن">×</button>':''}</div>`;
   const lq=toEn(ldQ.trim()).toLowerCase(),lqd=lq.replace(/\D/g,''),hit=(r,z)=>!lq||[fullName(r),toEn(r.code||''),z&&z.bi?z.bi.x.src:''].join(' ').toLowerCase().includes(lq)||(lqd.length>=2&&/^[\d\s,.\-\/+]+$/.test(lq)&&[String(r.amount),z&&z.bi?z.bi.x.tn:'',r.iban].some(v=>v&&String(v).includes(lqd)));let hits=0;
   const rowsHTML=L=>{ROWDATE=false;ROWSRC=false;ROWTRK=true;ROWMOVE=can('split');try{return L.map(homeRow).join('')}finally{ROWSRC=true;ROWTRK=false;ROWMOVE=false}};
