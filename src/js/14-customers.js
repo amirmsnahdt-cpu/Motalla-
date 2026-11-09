@@ -335,7 +335,8 @@ ACT.entryMenu=()=>{if(!can('add')){toast('دسترسی «ثبت واریزی ج�
   <div class="edoc" id="edoc"><button class="opt big" data-act="edocT" aria-expanded="false">${ic('inv')}<span><b>سند خرید و فروش</b><small>بزنید تا فروش، خرید، دریافت و پرداخت باز شود؛ تعویض، مرجوعی و بقیه کارها داخل سند هست</small></span></button>
   <div class="edkw"><div class="edk edk4">${['sell','buy','out','in'].map(k=>DK.find(z=>z[0]===k)).map(([k,t,i])=>`<button type="button" class="edkb ${dkRed(k)?'r':'b'}" data-act="docDk" data-d="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div></div></div>
   <button class="opt big ecd" data-act="buyNew">${ic('plus')}<span><b>خرید دستی</b><small>اطلاعات مشتری، اقلام و حساب در یک صفحه، کادر به کادر</small></span></button>
-  <button class="opt big ecd" data-act="go" data-n="bulk">${ic('paste')}<span><b>چسباندن لیست</b><small>چند واریزی یکجا از متن تلگرام یا یادداشت</small></span></button>`)};
+  <button class="opt big ecd" data-act="go" data-n="bulk">${ic('paste')}<span><b>چسباندن لیست</b><small>چند واریزی یکجا از متن تلگرام یا یادداشت</small></span></button>
+  ${can('debt')&&bkCus().length?`<button class="opt big ecd" data-act="bkFixPick">${ic('tag')}<span><b>اصلاح موجودی بانک</b><small>بانک را انتخاب کنید، موجودی واقعی و کارتخوان امروز را بزنید؛ سند اصلاحی خودکار</small></span></button>`:''}`)};
 /* v71.7 (خواسته صاحب اپ): «سند خرید» و «فروش» یکی شدند — «سند خرید و فروش» با کارهای سند (فروش، خرید، تعویض، دریافت، پرداخت، مرجوعی)؛
    زدن هر کار = سند تازه با همان کار باز (مثل «سند جدید» حساب مشتری)، مشتری از جستجوی بالای سند انتخاب می‌شود */
 /* v73.8 (خواسته صاحب اپ): کارت «سند خرید و فروش» اول بسته است؛ زدن = کارت با انیمیشن پایین باز می‌شود و چهار کار دیده می‌شود */
