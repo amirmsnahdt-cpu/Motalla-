@@ -10,7 +10,8 @@ function lnkMirror(c,t,p,no,now){const Y=custs.find(z=>String(z.id)===String(p.c
   (Y.txs=Y.txs||[]).push(x);Y.lastAt=now;return x}
 const lnkLab=p=>{const out=pAmt(p)<0,bk=p.lm==='pos'?'کارتخوان':p.lm==='hav'?(out?'حواله به بانک':'حواله از بانک'):(out?'حواله به':'حواله از');return bk+' «'+(p.cuName||'')+'»'};
 /* سند طرف مقابل → سند اصلی (ویرایش و حذف فقط از همان‌جا، تا دو طرف همیشه یکی باشند) */
-function lkGoTx(t,why){if(t.bl){toast('این سند از «لیست واریز» آمده؛ '+why+' از خود لیست واریز',true);ldKey=t.date;go('lday');return}
+function lkGoTx(t,why){if(t.pd){toast('«کارتخوان روز» خودکار از کارتخوان سندهای همان روز ساخته می‌شود؛ '+why+' از خود سند مشتری (روی هر ردیف بزنید)',true);return}
+  if(t.bl){toast('این سند از «لیست واریز» آمده؛ '+why+' از خود لیست واریز',true);ldKey=t.date;go('lday');return}
   const C=custs.find(z=>String(z.id)===String(t.lk.cu)),T=C&&(C.txs||[]).find(z=>String(z.id)===String(t.lk.tx)&&!z.del);
   toast('این سند طرف مقابل «'+(C?cuName(C):'')+'» است؛ '+why+' از سند اصلی',true);if(T)invOpen(C.id,T.id)}
 /* ----- حساب بانک ↔ بانک واریزی‌ها ----- */
@@ -36,7 +37,7 @@ function bkDepSync(c,noSave){const s=bkSrcOf(c),now=new Date().toISOString();let
   for(const [k,w] of want){if(!w.a)continue;(c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:w.date,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,
     pays:[{m:'dls',amount:Math.round(w.a),n:w.n,bid:k,src:s.name}],note:'',bl:k,at:w.at||now,by:'خودکار',cn:cnNext(c)});ch=1}
   if(ch){c.lastAt=now;if(!noSave)audBg(()=>saveCu())}return ch}
-function bkDepSyncAll(){let ch=0;for(const c of bkCus())if(bkSrcOf(c)||(c.txs||[]).some(t=>t.bl&&!t.del))ch+=bkDepSync(c,1);if(ch)audBg(()=>saveCu());return ch}
+function bkDepSyncAll(){let ch=0;for(const c of bkCus()){if(bkSrcOf(c)||(c.txs||[]).some(t=>t.bl&&!t.del))ch+=bkDepSync(c,1);ch+=posDaySync(c)}if(ch)audBg(()=>saveCu());return ch}
 /* ردیف‌های «انتقال» قدیمی که طرف مقابل یک سند بودند (xf با inv) در جا به سند طرف مقابل تبدیل می‌شوند (همان شناسه و همان اثر) */
 function lnkUpgrade(c){let ch=0;for(const t of c.txs||[]){if(t.del||t.type!=='xf'||!t.inv||t.peer)continue;const C=custs.find(z=>String(z.id)===String(t.inv.cu)),T=C&&(C.txs||[]).find(z=>String(z.id)===String(t.inv.tx));
     const p=T&&(T.pays||[]).find(q=>String(q.xfId)===String(t.id));if(!p)continue;const r=+t.r||0;
@@ -72,3 +73,16 @@ ACT.bkMig=()=>{const L=bkMigL();if(!L.length)return;askConfirm('بانک‌ها�
   const R=L.map(bkMigOne);saveCu();saveS();const bad=R.filter(r=>r.old!=null&&r.old!==r.nw);
   logA('cust','انتقال بانک‌های قبلی به حساب‌های بانک',R.map(r=>r.s.name+' → '+cuName(r.c)+' · مانده '+fmt(r.nw)+(r.old!=null&&r.old!==r.nw?' (قبلی '+fmt(r.old)+')':'')).join(' | '));
   render();toast(toFa(R.length)+' بانک منتقل شد'+(bad.length?' · مانده '+bad.map(r=>r.s.name).join('، ')+' با قبلی فرق دارد؛ «اصلاح» بزنید':' · مانده‌ها با قبل یکی است ✓'),!!bad.length)})};
+/* ===== v84.0 (خواسته صاحب اپ: «کارتخوان: در طول روز یک سند کارتخوان برای بانک ثبت شود و همه کارتخوان‌های آن روز در همان سند بخورد») =====
+   کارتخوانِ سندهای مشتری (pay m:'pos' با bk و cuId = حساب بانک) دیگر هر کدام سند جدا در بانک نمی‌سازد؛ برای هر حساب بانک و هر روز یک سند
+   «کارتخوان روز» (t.pd = تاریخ) با یک ردیف برای هر کارتخوان کشیده‌شده (m:'lnk' lm:'pos'، lcu/ltx = سند اصلی). با هر ثبت/ویرایش/حذف سند
+   دوباره از روی سندها ساخته می‌شود (posDaySync)؛ شماره و شناسه سند روز ثابت می‌ماند. سندهای جدای قبلی کارتخوان در همین سند جمع می‌شوند. */
+function posDaySync(c){const now=new Date().toISOString();let ch=0;const D=new Map();
+  for(const C of CU()){if(C===c)continue;for(const T of C.txs||[]){if(T.del||T.type!=='inv')continue;for(const p of T.pays||[]){if(p.m!=='pos'||!p.bk||String(p.cuId)!==String(c.id))continue;
+      if(p.xfId!=null){const o=(c.txs||[]).find(z=>String(z.id)===String(p.xfId));if(o&&!o.del){o.del=true;o.delAt=now;o.delBy='خودکار'}delete p.xfId;ch=1}
+      const k=T.date||String(T.at||now).slice(0,10);if(!D.has(k))D.set(k,[]);D.get(k).push({m:'lnk',lm:'pos',amount:-(+p.amount||0),cuId:C.id,cuName:cuName(C),lcu:C.id,ltx:T.id,no:T.no,...(p.imgs&&p.imgs.length?{imgs:p.imgs.slice(),img:p.imgs[0]}:{})})}}}
+  for(const t of c.txs||[]){if(t.del||!t.pd)continue;const R=D.get(t.pd);if(!R||!R.length){t.del=true;t.delAt=now;t.delBy='خودکار';ch=1;continue}
+    if(JSON.stringify(t.pays)!==JSON.stringify(R)){t.pays=R;t.edAt=now;ch=1}D.delete(t.pd)}
+  for(const [k,R] of D){(c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:k,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:R,note:'',pd:k,at:k+'T23:00:00.000Z',by:'خودکار',cn:cnNext(c)});ch=1}
+  if(ch){c.lastAt=now}return ch}
+function posDaySyncAll(noSave){let ch=0;for(const c of bkCus())ch+=posDaySync(c);if(ch&&!noSave)audBg(()=>saveCu());return ch}

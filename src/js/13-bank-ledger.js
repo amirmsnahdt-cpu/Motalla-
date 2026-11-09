@@ -83,7 +83,7 @@ const aBanksBind=()=>{const I=$('bkq');if(I&&!I._b){I._b=1;I.onkeydown=e=>{if(e.
 ACT.bkQClr=()=>{bkQ='';const I=$('bkq');if(I){I.value='';I.focus()}const x=document.querySelector('.c6q0 .x');if(x)x.classList.add('hide');srchSwap('bkres',bkListHTML())};
 /* منوی سه‌نقطه سمت چپ سرتیتر بانک‌ها */
 ACT.bkOld=()=>{sheet(`<div class="sh-h"><div><b>بانک‌های قبلی</b><small class="shsub">حساب‌های بانکی نسخه قبل با مانده و گردششان · دست‌نخورده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>${bkListHTML()}`)};
-ACT.bkMore=()=>{const c=can('src'),P=CH('pos');popMenu(document.querySelector('#bar .hmo'),[['bkOld',ic('bank'),'بانک‌های قبلی'],c&&ownL().length?['bdNew',ic('inv'),'سند بانکی جدید',{}]:null,c?['posNight',ic('down'),'ثبت واریز کارتخوان امشب']:null,c?['acOwn',ic('check'),ownSet()?'انتخاب حساب‌های مغازه':'حساب‌های مغازه را مشخص کنید']:null,['chOpenAll',ic('card'),P.length?'کارتخوان‌ها':'تعریف کارتخوان'],['bkStock',ic('coin'),'موجودی طلا و سکه مغازه']].filter(Boolean))};
+ACT.bkMore=()=>{const c=can('src'),P=CH('pos');popMenu(document.querySelector('#bar .hmo'),[c?['posNight',ic('down'),'ثبت واریز کارتخوان امشب']:null].filter(Boolean))};/* v84.0 (خواسته صاحب اپ): بقیه گزینه‌ها برداشته شد */
 /* انتخاب حساب‌های مغازه (یک‌بار؛ بعد از «انتخاب حساب‌ها» قابل تغییر) */
 let ownTmp=null;
 ACT.acOwn=()=>{if(!can('src'))return;const any=ownSet();ownTmp=new Set(sources.filter(s=>any?s.own:(s.bal!=null||srcMoves(s).length||acPOS(s).length||(s.led||[]).length)).map(s=>String(s.id)));acOwnRe(true)};

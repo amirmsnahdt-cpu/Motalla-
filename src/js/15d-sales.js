@@ -56,7 +56,7 @@ const invTitle=t=>t.legacy?(t.dk==='out'?'سند پرداخت وجه':'سند د
 function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t)+(cnOf(c,t)?' · سند '+toFa(cnOf(c,t))+' مشتری':'');ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ');
     /* v83.7: سند طرف مقابل، لیست واریز و سندهای منتقل‌شده بانک: عنوان = خود ردیف، زیرش شماره سند (v83.9 رفع باگ: داخل همان شاخه inv، نه بعد از آن) */
-    if((t.lk||t.bl||t.mig)&&(t.pays||[])[0]){const p0=t.pays[0];sub=T;T=pyLab(p0);ico=p0.m==='dls'?'list':'swap'}}
+    if(t.pd){sub=T;T='کارتخوان روز · '+toFa((t.pays||[]).length)+' کارتخوان';ico='card'}else if((t.lk||t.bl||t.mig)&&(t.pays||[])[0]){const p0=t.pays[0];sub=T;T=pyLab(p0);ico=p0.m==='dls'?'list':'swap'}}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
   const vals=(d.r?v(d.r,'r'):'')+(d.g?v(d.g,'g'):'')+Object.keys(d.x||{}).filter(k=>+d.x[k]).map(k=>v(+d.x[k],k)).join('')||'<b>تسویه</b>';
   const wp=t.type==='inv'&&typeof wdPend==='function'?wdPend(c,t.no):0;/* v61.80: مانده رفته برای واریز */
@@ -556,8 +556,8 @@ function svCommit(){const c=svCu();let depOld=null;
   const t={id:nid++,type:'inv',dk:sv.dk||undefined,no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>{const q={...p};delete q.xfId;return q}),at:now,by:who()};if(OLD){t.edOf=OLD.id;t.at0=OLD.at0||OLD.at;t.cn=cnOf(c,OLD)||undefined}else t.cn=cnNext(c)
   if(T.ge)t.ge=T.ge;if(Object.keys(T.xe).length)t.xe=T.xe;
   if(sv.gconv&&T.rest>0&&sv.rate)t.gc={r:T.rest,g:Math.round(T.rest/sv.rate*1000)/1000};
-  for(const p of t.pays){if(p.m!=='cust'&&!p.bk)continue;/* v83.7: طرف مقابل = سند واقعی (15zt lnkMirror) */const x=lnkMirror(c,t,p,no,now);if(x)p.xfId=x.id}
-  (c.txs=c.txs||[]).push(t);c.lastAt=now;saveCu();if(t.pays.some(p=>p.srcId!=null))saveS();ckDepApply(c,t,now,depOld);
+  for(const p of t.pays){if(p.m!=='cust'&&!p.bk||p.m==='pos')continue;/* v83.7: طرف مقابل = سند واقعی (15zt lnkMirror) */const x=lnkMirror(c,t,p,no,now);if(x)p.xfId=x.id}
+  (c.txs=c.txs||[]).push(t);c.lastAt=now;posDaySyncAll(1);saveCu();if(t.pays.some(p=>p.srcId!=null))saveS();ckDepApply(c,t,now,depOld);
   logA('cust',(OLD?'ویرایش ':'')+invTitle(t),cuName(c)+(items.length?' | '+items.map(i=>i.k+' '+wFmt(i.w)+' گرم').join('، '):'')+(xr.length?' | '+xr.map(xrLab).join('، '):'')+' | جمع '+fmt(T.total)+' تومان'+(T.paid?' | دریافت/پرداخت '+fmt(T.paid):''),{cu:c.id,tx:t.id});
   return {c,t}}
 /* v61.96 (خواسته صاحب اپ): فاکتور / PDF از داخل خود سند (پیش از ثبت) — همان برگه فاکتور با ردیف‌های فعلی، بدون ثبت و بدون تغییر حساب‌ها */
@@ -681,10 +681,10 @@ function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','
   const keep=sv;sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:false,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();const r=sv;sv=keep;return r}
 /* v61.56 (خواسته صاحب اپ): در صفحه سند ثبت‌شده هم نگه داشتن روی مانده‌های پایین = جزئیات فاکتور (همان پنجره صفحه سند) */
 function invDetHTML(){const X=invGet();if(!X)return '';const keep=sv;try{sv=invSv(X.c,X.t);return svDetHTML({inv:1})}finally{sv=keep}}
-ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'ویرایش');return}if(X.t.lk||X.t.bl){lkGoTx(X.t,'ویرایش');return}if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
+ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'ویرایش');return}if(X.t.lk||X.t.bl||X.t.pd){lkGoTx(X.t,'ویرایش');return}if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
   sv=invSv(c,t);sv.sig0=svSig();svKeep();TITLES.sell='ویرایش سند '+toFa(t.no);PARENT.sell='inv';go('sell')};
 const aInv=()=>{const X=invGet();return X?ivBalP(X.c,X.t):''};
-ACT.invDel=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'حذف');return}if(X.t.lk||X.t.bl){lkGoTx(X.t,'حذف');return}askConfirm(invTitle(X.t)+' حذف شود؟ اثرش از حساب مشتری'+(txLinked(X.c,X.t).length?' و مشتری پرداخت‌کننده':'')+' برداشته می‌شود.','حذف',()=>{custId=X.c.id;cur='cust';ACT.txDel({id:X.t.id});go('cust',true)})};
+ACT.invDel=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'حذف');return}if(X.t.lk||X.t.bl||X.t.pd){lkGoTx(X.t,'حذف');return}askConfirm(invTitle(X.t)+' حذف شود؟ اثرش از حساب مشتری'+(txLinked(X.c,X.t).length?' و مشتری پرداخت‌کننده':'')+' برداشته می‌شود.','حذف',()=>{custId=X.c.id;cur='cust';ACT.txDel({id:X.t.id});go('cust',true)})};
 /* v61.33: برگه سند (چاپ / PDF) — خواسته صاحب اپ: هر ردیف فقط مشخصات (کالا، وزن، عیار، مظنه، اجرت ٪، سود ٪) و مبلغ نهایی؛
    بعد جمع کالاها، ردیف‌های دریافت و پرداخت که اعمال می‌شوند و جمعشان، و در آخر مانده قبلی، این سند و نهایی (تومان، طلا، سکه).
    برچسب‌ها از دید مشتری: «بدهکار» = مشتری باید بپردازد، «طلبکار» = ما باید بپردازیم. */
