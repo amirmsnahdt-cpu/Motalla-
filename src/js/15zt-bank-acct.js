@@ -44,7 +44,7 @@ function bkDepSync(c,noSave){const s=bkSrcOf(c),now=new Date().toISOString();let
   for(const [k,w] of want){if(!w.R.length)continue;(c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:w.date,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,
     pays:w.R,note:'',bl:k,at:w.at||now,by:'خودکار',cn:cnNext(c)});ch=1}
   if(ch){c.lastAt=now;if(!noSave)audBg(()=>saveCu())}return ch}
-function bkDepSyncAll(){let ch=0;for(const c of bkCus()){if(bkSrcOf(c)||(c.txs||[]).some(t=>t.bl&&!t.del))ch+=bkDepSync(c,1);ch+=posDaySync(c)}if(ch)audBg(()=>saveCu());return ch}
+function bkDepSyncAll(){let ch=lnkOrph();for(const c of bkCus()){if(bkSrcOf(c)||(c.txs||[]).some(t=>t.bl&&!t.del))ch+=bkDepSync(c,1);ch+=posDaySync(c)}if(ch)audBg(()=>saveCu());return ch}
 /* ردیف‌های «انتقال» قدیمی که طرف مقابل یک سند بودند (xf با inv) در جا به سند طرف مقابل تبدیل می‌شوند (همان شناسه و همان اثر) */
 function lnkUpgrade(c){let ch=0;for(const t of c.txs||[]){if(t.del||t.type!=='xf'||!t.inv||t.peer)continue;const C=custs.find(z=>String(z.id)===String(t.inv.cu)),T=C&&(C.txs||[]).find(z=>String(z.id)===String(t.inv.tx));
     const p=T&&(T.pays||[]).find(q=>String(q.xfId)===String(t.id));if(!p)continue;const r=+t.r||0;
@@ -65,7 +65,7 @@ function posDaySync(c){const now=new Date().toISOString();let ch=0;const D=new M
     if(stj(t.pays)!==stj(R)){t.pays=R;t.edAt=now;ch=1}D.delete(t.pd)}
   for(const [k,R] of D){(c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:k,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:R,note:'',pd:k,at:k+'T23:00:00.000Z',by:'خودکار',cn:cnNext(c)});ch=1}
   if(ch){c.lastAt=now}return ch}
-function posDaySyncAll(noSave){let ch=0;for(const c of bkCus())ch+=posDaySync(c);if(ch&&!noSave)audBg(()=>saveCu());return ch}
+function posDaySyncAll(noSave){let ch=lnkOrph();for(const c of bkCus())ch+=posDaySync(c);if(ch&&!noSave)audBg(()=>saveCu());return ch}
 /* ===== v84.2 (خواسته صاحب اپ: «لوگوی هر بانک خودکار در پروفایل حساب ذخیره شود و پس‌زمینه کم‌رنگ لوگوی بانک») =====
    بانک حساب نوع «بانک» از نام، شبا یا کارت تشخیص داده می‌شود و یک بار در c.bank ذخیره می‌شود؛ آواتار = لوگوی بانک، و پشت کارت لوگوی کم‌رنگ */
 /* تشخیص بانک از نام با کلمه کامل (مهدی ≠ بانک دی) */
@@ -75,3 +75,13 @@ function bkLogoFix(){let ch=0;for(const c of bkCus()){const b=bkNameBank(c.name|
 const bkLogo=b=>!!(b&&BKL[Object.keys(BKL).find(n=>canon(n)===canon(b))]);
 const bkAvH=c=>{const b=bkOfCu(c);return bkLogo(b)?`<span class="c6a cul bxlogo bkav">${bankBadge(b,'lg')}</span>`:''};
 const bkWmH=c=>{const b=c&&c.grp==='بانک'&&bkOfCu(c);return b&&BKL[Object.keys(BKL).find(n=>canon(n)===canon(b))]?`<span class="bkwm" aria-hidden="true">${bankBadge(b,'wm')}</span>`:''};
+
+/* v84.9 (خواسته صاحب اپ: «مشتری تستی را حذف کردم، حواله‌ها و کارتخوان‌هایش در بانک‌ها مانده‌اند»): سند آینه (t.lk یا xf با peer/inv)
+   که حساب یا سند اصلی‌اش حذف شده، خودکار حذف (نرم) می‌شود با نشان delSrc؛ اگر حساب/سند اصلی برگردد (بازگردانی)، آینه هم برمی‌گردد.
+   کارتخوان‌ها در سند «کارتخوان روز» هم با posDaySync (فقط CU() زنده) خودشان کم/زیاد می‌شوند. */
+function lnkOrph(){const now=new Date().toISOString(),CI=new Map(custs.map(c=>[String(c.id),c]));let ch=0;
+  const live=(cu,tx)=>{const C=CI.get(String(cu));if(!C||C.del)return false;const T=(C.txs||[]).find(z=>String(z.id)===String(tx));return !!(T&&!T.del)};
+  for(const c of custs){if(c.sys)continue;for(const t of c.txs||[]){const src=t.type==='inv'&&t.lk?t.lk:t.type==='xf'&&t.inv?t.inv:null;if(!src)continue;const ok=live(src.cu,src.tx);
+    if(!t.del&&!ok){t.del=true;t.delAt=now;t.delBy='خودکار';t.delSrc=1;ch++}
+    else if(t.del&&t.delSrc&&ok){t.del=false;delete t.delSrc;delete t.delAt;delete t.delBy;ch++}}}
+  return ch}
