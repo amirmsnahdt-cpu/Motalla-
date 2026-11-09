@@ -75,16 +75,23 @@ function vSplit1(){return vArch()}
 const aSplit1=()=>'';
 function bindSplit1(){const q=$('arq');if(!q)return;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(q._t);arcQ=q.value;arcD='';q.blur();render()}};q.oninput=()=>{const x=q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!q.value);clearTimeout(q._t);q._t=setTimeout(()=>{const was=arcQ;arcQ=q.value;arcN=120;if(arcQ===was)return;if(arcD){arcD='';const c=q.parentNode.querySelector('.fcal');if(c)c.classList.remove('on')}srchSwap('arcRes',arcBody())},250)}}
 /* ---------- پنجره تخصیص ---------- */
-function allocNew(){bkAllocSync();const D=DSRC(),s0=D.slice().sort((a,b)=>(acFree(b)??-1e18)-(acFree(a)??-1e18))[0]||{};/* v86.3: پیش‌فرض = منبعی که بیشترین موجودی آزاد را دارد */aSt={srcId:s0.id,method:s0.bank?'bank':'amount',amount:0,min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
+function allocNew(){aSt=null;bkAllocSync();const D=DSRC(),s0=D.slice().sort((a,b)=>(acFree(b)??-1e18)-(acFree(a)??-1e18))[0]||{};/* v86.3: پیش‌فرض = منبعی که بیشترین موجودی آزاد را دارد */aSt={srcId:s0.id,method:'amount',amtAuto:1,amount:aFill(s0),min:0,max:0,cap:0,bank:s0.bank||'',sameFirst:true,count:0,sel:new Set(),q:''};allocSheet();recalc()}
 const aPool=()=>remainList().filter(r=>r.level<2);
+/* v86.5 (خواسته صاحب اپ: «در روش مبلغ کل مانده را در نظر بگیرد و هم‌بانک‌ها اولویت؛ اگر هم‌بانک نبود از بقیه به اندازه تعداد اعلام‌شده»):
+   مبلغ پیش‌فرض = کل موجودی آزاد منبع (حداکثر کل مانده لیست)؛ با عوض شدن منبع هم (تا وقتی کاربر خودش مبلغ نزده، amtAuto) */
+function aFill(s){const P=aPool(),tot=sum(P),f=s&&s.id!=null?acFree(s,aSt&&aSt.editPid):null;return Math.max(0,f==null?tot:Math.min(tot,f))}
+/* هم‌بانک‌ها اول، بعد بقیه؛ با تعداد N: اول تا N هم‌بانک، باقی تعداد و مبلغ از بقیه */
+function amtPick(P,s,amt,N){const bk=canon((s&&s.bank)||''),SB=bk&&aSt.sameFirst?P.filter(x=>bankKey(x)===bk):[],sbI=new Set(SB.map(x=>x.id)),OT=P.filter(x=>!sbI.has(x.id));
+  if(N>0){const a=SB.length?bestN(SB,amt,Math.min(N,SB.length)):[],r=N-a.length,rest=amt-sum(a);return a.concat(r>0&&rest>0?bestN(OT,rest,r):[])}
+  const a=SB.length?best(SB,amt,0):[],rest=amt-sum(a);return a.concat(rest>0?best(OT,rest,0):[])}
 function recalc(){const P=aPool(),s=sources.find(x=>x.id==aSt.srcId)||{},m=aSt.method;let pick=[];
   const N=aSt.count||0;if(N>0&&m!=='manual'){
-    if(m==='amount')pick=bestN(P,aSt.amount,N);
+    if(m==='amount')pick=aSt.amount>0?amtPick(P,s,aSt.amount,N):[];
     else if(m==='range'){const L=P.filter(x=>(!aSt.min||x.amount>=aSt.min)&&(!aSt.max||x.amount<=aSt.max));pick=(aSt.min||aSt.max)?bestN(L,aSt.cap,N):[]}
     else if(m==='bank'){const bk=canon(aSt.bank),L=bk?P.filter(x=>bankKey(x)===bk):[];pick=bestN(L,aSt.cap,N)}
     aSt.sel=new Set(pick.map(x=>x.id));renderPrev();return}
   if(m==='manual'){renderPrev();return}
-  if(m==='amount'){if(aSt.amount>0){const bk=canon(s.bank);if(aSt.sameFirst&&bk){const a=best(P.filter(x=>bankKey(x)===bk),aSt.amount,0);const rest=aSt.amount-sum(a),ids=new Set(a.map(x=>x.id));pick=a.concat(rest>0?best(P.filter(x=>!ids.has(x.id)),rest,0):[])}else pick=best(P,aSt.amount,0)}}
+  if(m==='amount'){if(aSt.amount>0)pick=amtPick(P,s,aSt.amount,0)}
   else if(m==='range'){const L=P.filter(x=>(!aSt.min||x.amount>=aSt.min)&&(!aSt.max||x.amount<=aSt.max));pick=(aSt.min||aSt.max)?(aSt.cap?best(L,aSt.cap,0):L):[]}
   else if(m==='bank'){const bk=canon(aSt.bank),L=bk?P.filter(x=>bankKey(x)===bk):[];pick=aSt.cap?best(L,aSt.cap,0):L}
   aSt.sel=new Set(pick.map(x=>x.id));renderPrev()}
@@ -96,7 +103,7 @@ const MIC={amount:'<svg class="i" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx
 function paramHTML(){const m=aSt.method;
   if(m==='amount'){const s=sources.find(x=>x.id==aSt.srcId)||{};return `<div class="bigin"><input id="pa" class="ltr num" inputmode="numeric" placeholder="0" value="${aSt.amount?Number(aSt.amount).toLocaleString('en-US'):''}"><span>تومان</span></div><div class="pwords" id="pwords">${aSt.amount?shortAmt(aSt.amount):''}</div>
     <div class="qchips"><button data-act="aQuick" data-v="all">کل مانده</button><button data-act="aQuick" data-v="half">نصف مانده</button><button data-act="aQuick" data-v="500000000">۵۰۰ میلیون</button><button data-act="aQuick" data-v="1000000000">۱ میلیارد</button><button data-act="aQuick" data-v="2000000000">۲ میلیارد</button></div>
-    ${cntHTML()}${s.bank?`<label class="sw"${aSt.count?' style="display:none"':''}><input type="checkbox" id="psf"${aSt.sameFirst?' checked':''}><span class="tr"></span><span>اول واریزی‌های هم‌بانک (${esc(s.bank)})</span></label>`:''}`}
+    ${cntHTML()}${s.bank?`<label class="sw"><input type="checkbox" id="psf"${aSt.sameFirst?' checked':''}><span class="tr"></span><span>اول واریزی‌های هم‌بانک (${esc(s.bank)})</span></label>`:''}`}
   if(m==='range')return `<div class="f2"><div class="f"><label>حداقل مبلغ</label>${numIn('pmin',aSt.min,'بدون حد')}</div><div class="f"><label>حداکثر مبلغ</label>${numIn('pmax',aSt.max,'بدون حد')}</div></div><div class="f" style="margin:0"><label>سقف مجموع <i class="opt">اختیاری</i></label>${numIn('pcap',aSt.cap,'بدون سقف')}</div>${cntHTML()}`;
   if(m==='bank')return `<div class="f"><label>بانک مقصد واریزی‌ها</label><select id="pbk"><option value="">انتخاب بانک</option>${BANKOPTS.map(b=>`<option${canon(b)===canon(aSt.bank)?' selected':''}>${b}</option>`).join('')}</select></div><div class="f" style="margin:0"><label>سقف مجموع <i class="opt">اختیاری</i></label>${numIn('pcap',aSt.cap,'بدون سقف')}</div>${cntHTML()}`;
   return ''}
@@ -128,9 +135,9 @@ function allocSheet(){const S=DSRC(),P=aPool();
     if(t.id==='aq'){aSt.q=t.value;renderPrev(true);return}
     if(t.id==='pa'){const w=$('pwords');if(w)w.textContent=num(t.value)?shortAmt(num(t.value)):''}
     if(t.id==='pcnt'){const v=num(t.value);setCnt(v);t.value=v?toFa(v):'';clearTimeout(sh._t);sh._t=setTimeout(()=>{paramRefresh();recalc()},250);return}
-    const map={pa:'amount',pmin:'min',pmax:'max',pcap:'cap'};if(map[t.id]){aSt[map[t.id]]=num(t.value);clearTimeout(sh._t);sh._t=setTimeout(recalc,200)}};
+    const map={pa:'amount',pmin:'min',pmax:'max',pcap:'cap'};if(t.id==='pa')aSt.amtAuto=0;if(map[t.id]){aSt[map[t.id]]=num(t.value);clearTimeout(sh._t);sh._t=setTimeout(recalc,200)}};
   sh.onchange=e=>{const t=e.target;if(t.id==='pbk'){aSt.bank=t.value;recalc()}if(t.id==='psf'){aSt.sameFirst=t.checked;recalc()}if(t.dataset.sel){const id=+t.dataset.sel;t.checked?aSt.sel.add(id):aSt.sel.delete(id);renderPrev()}}}
-function aQuick(v){const P=aPool(),tot=sum(P),so=sources.find(x=>x.id==aSt.srcId),fr=so?acFree(so,aSt.editPid)||0:0;aSt.amount=v==='bal'?Math.min(tot,Math.max(0,fr)):v==='all'?tot:v==='half'?Math.round(tot/2):+v;const i=$('pa');if(i)i.value=aSt.amount.toLocaleString('en-US');const w=$('pwords');if(w)w.textContent=shortAmt(aSt.amount);recalc()}
+function aQuick(v){aSt.amtAuto=v==='bal'?1:0;const P=aPool(),tot=sum(P),so=sources.find(x=>x.id==aSt.srcId),fr=so?acFree(so,aSt.editPid)||0:0;aSt.amount=v==='bal'?Math.min(tot,Math.max(0,fr)):v==='all'?tot:v==='half'?Math.round(tot/2):+v;const i=$('pa');if(i)i.value=aSt.amount.toLocaleString('en-US');const w=$('pwords');if(w)w.textContent=shortAmt(aSt.amount);recalc()}
 function renderPrev(fx){const P=aPool(),q=aSt.q.trim(),sel=P.filter(x=>aSt.sel.has(x.id)),un=P.filter(x=>!aSt.sel.has(x.id)).filter(x=>!q||match(x,q)),sb=canon((sources.find(x=>x.id==aSt.srcId)||{}).bank||'');
   const row=x=>`<label class="arow${aSt.sel.has(x.id)?' on':''}"><input type="checkbox" data-sel="${x.id}"${aSt.sel.has(x.id)?' checked':''}><span class="tx"><b>${esc(x.name)}</b><small>${sb&&bankKey(x)===sb?'<span class="sbk">هم‌بانک</span>':''}${esc(x.bankShow||'—')}${x.code?'، فاکتور '+esc(toEn(x.code)):''}</small></span><span class="am">${fmt(x.amount)}</span></label>`;
   let h=sel.length?`<div class="albl2"><span>${fmt(sel.length)} انتخاب‌شده</span><button class="link" data-act="aNone">برداشتن همه</button></div><div class="agrp on">${sel.map(row).join('')}</div>`:`<div class="aempty">${aSt.method==='manual'?'از لیست پایین، واریزی‌ها را تیک بزنید.':'با پر کردن بخش ۲، واریزی‌ها خودشان انتخاب می‌شوند.'}</div>`;
