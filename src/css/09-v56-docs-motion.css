@@ -4026,28 +4026,34 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .swr:has(.txr.tg,.txr.trd,.txr.tbl) .swc{background:transparent!important;border-radius:16px}
 .fcard:has(.txr.tg,.txr.trd,.txr.tbl) .swr+.swr{border-top:0!important}
 .fcard:has(.txr.tg,.txr.trd,.txr.tbl)>*{border-top:0!important}
-/* v85.6 پنجره اصلاح موجودی — ساده: یک کادر بزرگ، یک خط نتیجه */
-.bf2{display:flex;flex-direction:column;gap:10px;padding:2px 0 10px}
-.bf2c{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 16px 14px;border-radius:22px;background:var(--card);box-shadow:var(--bfr)}
-.bf2c:focus-within{box-shadow:var(--bfr2)}
-.bf2c .bkav{width:40px;height:40px;margin:0 0 -2px}
-.bf2c>small{font-size:13px;font-weight:800;color:var(--blu)}
-.bf2i{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;direction:ltr}
-#sheet .bf2i input{flex:1;min-width:0;max-width:100%;border:0!important;box-shadow:none!important;background:none!important;padding:0!important;height:auto!important;border-radius:0!important;text-align:center;font-family:inherit!important;font-size:34px!important;font-weight:900!important;line-height:1.25!important;min-height:0!important;color:var(--ink);letter-spacing:.3px}
-#sheet .bf2i input::placeholder{color:color-mix(in srgb,var(--mut) 45%,transparent);font-weight:800}
-.bf2n{flex:0 0 34px;height:34px;border-radius:50%;border:1.5px solid var(--hair);background:var(--bg,var(--card));color:var(--mut);font:900 20px/1 inherit;display:grid;place-items:center;padding:0}
-.bf2i::after{content:'';flex:0 0 34px}
-.bf2n.on{border-color:var(--red);background:var(--red2);color:var(--red)}
-.bf2c>em{font-style:normal;font-size:12.5px;color:var(--mut)}.bf2c>em b{direction:ltr;unicode-bidi:isolate;font-weight:800}.bf2c>em b.r{color:var(--red)}.bf2c>em b.b{color:var(--blu)}
-.bf2l{display:flex;flex-direction:column;gap:6px}
-.bf2r{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-radius:16px;font-size:13.5px;font-weight:700;animation:bf2In .32s cubic-bezier(.2,.9,.3,1.2) both}
-@keyframes bf2In{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
-.bf2r b{direction:ltr;unicode-bidi:isolate;font-size:17px;font-weight:900}
-.bf2r.r{background:var(--red2);color:var(--red)}.bf2r.b{background:var(--blu2);color:var(--blu)}.bf2r.g{background:var(--ok2);color:var(--ok)}
-.bf2r.n{justify-content:center;background:none;color:var(--mut);font-weight:600;padding:6px}
-.bf2r.ok{justify-content:center;background:var(--ok2);color:var(--ok)}.bf2r.ok svg{width:18px;height:18px}
-.bf2a{align-self:center;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:0;border-radius:999px;background:none;color:var(--blu);font:inherit;font-size:13.5px;font-weight:800}
-.bf2a svg{width:16px;height:16px}.bf2a small{color:var(--mut);font-weight:600;font-size:12px}
-.bf2p{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:18px;background:var(--card);box-shadow:var(--bfr)}
-.bf2p:focus-within{box-shadow:var(--bfr2)}.bf2p span{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--ok);white-space:nowrap}.bf2p span svg{width:17px;height:17px}
-#sheet .bf2p input{flex:1;min-width:0;border:0!important;box-shadow:none!important;background:none!important;padding:0!important;height:auto!important;text-align:left;font-family:inherit!important;font-size:20px!important;font-weight:900!important;line-height:1.3!important;min-height:0!important;color:var(--ink)}
+/* v85.8 پنجره اصلاح موجودی — کارت رنگی بانک، ورود مبلغ بزرگ بی‌کادر، کارت اختلاف */
+.bf3{display:flex;flex-direction:column;gap:14px;padding:2px 0 12px}
+.bf3k{position:relative;overflow:hidden;border-radius:24px;padding:16px 18px 18px;color:#fff;background:linear-gradient(135deg,var(--bk),color-mix(in srgb,var(--bk) 55%,#0b1220));box-shadow:0 14px 30px -14px color-mix(in srgb,var(--bk) 70%,transparent);animation:bf3Up .45s cubic-bezier(.2,.9,.3,1.15) both}
+.bf3k .bkwm{opacity:.13;filter:brightness(0) invert(1)}
+.bf3k>*:not(.bkwm){position:relative;z-index:1}
+.bf3kh{display:flex;align-items:center;gap:10px;margin-bottom:14px}.bf3kh b{font-size:15px;font-weight:800}
+.bf3kl{width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden;color:var(--bk)}.bf3kl .bkav{width:34px;height:34px;margin:0;box-shadow:none}.bf3kl svg{width:18px;height:18px}
+.bf3k small{font-size:12px;opacity:.82;font-weight:600}
+.bf3ka{direction:ltr;text-align:right;font-size:28px;font-weight:900;letter-spacing:.3px;display:flex;align-items:baseline;justify-content:flex-end;gap:6px}.bf3ka i{font-style:normal;font-size:12px;opacity:.8;font-weight:600}
+.bf3e{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0 2px}
+.bf3e>small{font-size:13px;color:var(--mut);font-weight:700}
+#sheet .bf3e input{width:100%;border:0!important;box-shadow:none!important;background:none!important;padding:0!important;height:auto!important;min-height:0!important;border-radius:0!important;text-align:center;font-family:inherit!important;font-size:42px!important;font-weight:900!important;line-height:1.2!important;color:var(--ink);caret-color:var(--blu);letter-spacing:.5px}
+#sheet .bf3e input::placeholder{color:color-mix(in srgb,var(--mut) 35%,transparent)}
+.bf3e>i{font-style:normal;font-size:12.5px;color:var(--mut);margin-top:-2px}
+.bf3s{display:inline-flex;gap:2px;margin-top:10px;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--mut) 12%,transparent)}
+.bf3s button{border:0;background:none;padding:6px 16px;border-radius:999px;font:inherit;font-size:12.5px;font-weight:800;color:var(--mut);transition:background .2s,color .2s}
+.bf3s button.on{background:var(--card);color:var(--blu);box-shadow:0 2px 8px -3px rgba(0,0,0,.25)}.bf3s button.on.n{color:var(--red)}
+.bf3d{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;background:var(--card);box-shadow:inset 0 0 0 1px var(--hair);animation:bf3Up .35s cubic-bezier(.2,.9,.3,1.15) both}
+.bf3di{flex:0 0 40px;height:40px;border-radius:14px;display:grid;place-items:center}.bf3di svg{width:20px;height:20px}
+.bf3d .tx{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}.bf3d .tx b{font-size:14.5px;font-weight:800}.bf3d .tx small{font-size:12px;color:var(--mut)}
+.bf3d em{font-style:normal;direction:ltr;unicode-bidi:isolate;font-size:19px;font-weight:900;white-space:nowrap}
+.bf3d.r .bf3di{background:var(--red2);color:var(--red)}.bf3d.r em,.bf3d.r .tx b{color:var(--red)}
+.bf3d.b .bf3di{background:var(--blu2);color:var(--blu)}.bf3d.b em,.bf3d.b .tx b{color:var(--blu)}
+.bf3d.ok .bf3di{background:var(--ok2);color:var(--ok)}.bf3d.ok .tx b{color:var(--ok)}
+.bf3d.n{box-shadow:none;background:color-mix(in srgb,var(--mut) 7%,transparent)}.bf3d.n .bf3di{background:var(--card);color:var(--mut)}.bf3d.n .tx b{color:var(--mut)}
+.bf3c{align-self:center;display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;border:1px dashed color-mix(in srgb,var(--ok) 55%,transparent);background:none;color:var(--ok);font:inherit;font-size:13px;font-weight:800}.bf3c svg{width:17px;height:17px}
+.bf3p{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:20px;background:color-mix(in srgb,var(--ok) 7%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ok) 40%,transparent);animation:bf3Up .35s ease both}
+.bf3pi{flex:0 0 36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--ok2);color:var(--ok)}.bf3pi svg{width:18px;height:18px}
+.bf3p .tx{display:flex;flex-direction:column;gap:1px}.bf3p .tx b{font-size:13.5px;color:var(--ok)}.bf3p .tx small{font-size:11.5px;color:var(--mut)}
+#sheet .bf3p input{flex:1;min-width:0;border:0!important;box-shadow:none!important;background:none!important;padding:0!important;height:auto!important;min-height:0!important;text-align:left;font-family:inherit!important;font-size:21px!important;font-weight:900!important;color:var(--ink)}
+@keyframes bf3Up{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
