@@ -802,8 +802,8 @@ function chAllHTML(){const P=CH('pos'),B=CH('bank'),tot=P.reduce((a,c)=>a+Math.m
   ${P.length?`<div class="c6l bxlist">${P.map(row).join('')}</div>`:'<div class="stmno">'+ic('card')+'<b>هنوز کارتخوانی تعریف نشده</b></div>'}
   ${B.length?`<div class="spsec"><b>حساب‌های قدیمی</b><small>حساب‌های بانکی تازه در بخش بانک تعریف می‌شوند</small></div><div class="c6l bxlist">${B.map(row).join('')}</div>`:''}
   ${can('src')?`<div class="fsearch sm chadd" style="margin-top:14px">${ic('plus')}<input id="chN" placeholder="نام کارتخوان تازه" autocomplete="off" enterkeyhint="done"><button class="lnk" data-act="chAdd" data-k="pos">افزودن</button></div>`:''}`}
-ACT.chOpenAll=()=>{/* v82.9: حساب کارتخوان‌ها یک صفحه کامل است (15zr vPosA) */closeSheet();go('posa');return;sheet(chAllHTML());const n=$('chN');if(n)n.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.chAdd({k:'pos'})}}};
-ACT.chAdd=d=>{const n=$('chN'),name=clean((n&&n.value)||'');if(!name){toast('نام را بنویسید',true);if(n)n.focus();return}if(CH().some(c=>c.name===name)){toast('این نام قبلاً تعریف شده',true);return}chNew(name,d.k||'pos');if(cur==='posa'){render()}else ACT.chOpenAll();toast(CHK[d.k||'pos']+' «'+name+'» اضافه شد');bkRe()};
+ACT.chOpenAll=()=>{sheet(chAllHTML());const n=$('chN');if(n)n.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.chAdd({k:'pos'})}}};
+ACT.chAdd=d=>{const n=$('chN'),name=clean((n&&n.value)||'');if(!name){toast('نام را بنویسید',true);if(n)n.focus();return}if(CH().some(c=>c.name===name)){toast('این نام قبلاً تعریف شده',true);return}chNew(name,d.k||'pos');ACT.chOpenAll();toast(CHK[d.k||'pos']+' «'+name+'» اضافه شد');bkRe()};
 let chId=null,chMv=null;
 ACT.chOpen=d=>{chId=d.id;const c=custs.find(z=>String(z.id)===String(d.id));if(!c)return;const M=chMoves(c),bal=M.reduce((s2,m)=>s2+m.a,0),pos=c.kind==='pos',z=pos&&chSrc(c);
   let g=null;const rows=M.map(m=>{let h='';if(m.d!==g){g=m.d;const r=relDay(m.d);h=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(m.d).fa)}</div>`}const act=m.cu?` data-act="cuInv" data-cu="${m.cu}" data-tx="${m.tx}"`:'';
@@ -812,7 +812,7 @@ ACT.chOpen=d=>{chId=d.id;const c=custs.find(z=>String(z.id)===String(d.id));if(!
   ${bxBlue({t:pos?'کارت کشیده و هنوز به حساب نرفته':'مانده',v:bal,sub:toFa(M.length)+' گردش',btn:bal>0&&can('src')?`<button class="bxfix" data-act="${pos?'posDep':'chMvNew'}">${ic(pos?'down':'swap')} ${pos?'واریز به حساب بانکی':'انتقال مانده با یک حواله'}</button>`:''})}
   ${M.length?`<div class="spsec stmh"><div><b>گردش</b><small>زدن هر ردیف = همان سند</small></div></div>${rows}`:'<div class="stmno">'+ic('card')+'<b>هنوز گردشی ندارد</b></div>'}
   ${!M.length&&(can('del')||isAdmin())?`<button class="edel" data-act="chDel">${ic('trash')} حذف این ${CHK[c.kind]}</button>`:''}`);phPaint($('sheet'));requestAnimationFrame(()=>cuCount('#sheet .bxblue .cbn'))};
-ACT.chDel=()=>{const c=custs.find(z=>String(z.id)===String(chId));if(!c)return;c.del=true;c.delAt=ns();saveCu();logA('cust','حذف '+CHK[c.kind],c.name);closeSheet();if(cur==='posa')render();else ACT.chOpenAll();bkRe()};
+ACT.chDel=()=>{const c=custs.find(z=>String(z.id)===String(chId));if(!c)return;c.del=true;c.delAt=ns();saveCu();logA('cust','حذف '+CHK[c.kind],c.name);ACT.chOpenAll();bkRe()};
 /* واریز مانده کارتخوان به یکی از حساب‌های بخش بانک: از کارتخوان کم و به دفتر آن حساب (کارتخوان) اضافه می‌شود */
 let posD=null;
 function pdHTML(){const c=custs.find(z=>String(z.id)===String(chId)),bal=chBal(c),a=+posD.a||0,to=sources.find(z=>String(z.id)===String(posD.to));
