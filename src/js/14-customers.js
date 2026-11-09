@@ -179,9 +179,9 @@ ACT.cuQClr=()=>{cuQ='';const q=$('cuq');if(q){q.value='';const x=q.parentNode.qu
 Object.assign(IC,{hold:'<circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="8" stroke-dasharray="2.5 3"/>',more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',tel:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>'});
 /* v61.54 (خواسته صاحب اپ، انتخاب از بین مدل‌ها): صفحه حساب مشتری = مدل v61.47 (کارت پروفایل، کاشی‌های مانده)، گردش حساب مدل v61.46؛
    «سند جدید» فقط دکمه + در سرتیتر */
-function vCust(){xaSync();const c=curCu();if(c){lnkUpgrade(c);if(c.grp==='بانک'){bkLogoFix();bkDepSync(c);if(lnkOrph()+posDaySync(c))audBg(()=>saveCu())}}if(!c){setTimeout(()=>{if(cur==='cust')go('custs',true)},0);return ''}const b=cuBal(c),T=(c.txs||[]).filter(t=>!t.del).slice().sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
+function vCust(){xaSync();const c=curCu();if(c){lnkUpgrade(c);if(c.grp==='بانک'){bkLogoFix();const al=bkAutoLink(c);bkDepSync(c);if(al+lnkOrph()+posDaySync(c))audBg(()=>saveCu())}}if(!c){setTimeout(()=>{if(cur==='cust')go('custs',true)},0);return ''}const b=cuBal(c),T=(c.txs||[]).filter(t=>!t.del).slice().sort((x,y)=>String(y.date+y.at).localeCompare(String(x.date+x.at)));
   /* v60.5: کارت مشخصات مشتری برجسته؛ زدن روی کارت = ویرایش مشخصات */
-  let h=`${cuBalCard(b,cuCntId!==custId,null,c)}${c.grp==='بانک'?bkLinkHTML(c):bxConvHTML(c)}${wdCuHTML(c)}
+  let h=`${cuBalCard(b,cuCntId!==custId,null,c)}${c.grp==='بانک'?bkFixBtn(c):bxConvHTML(c)}${wdCuHTML(c)}
   ${can('debt')?`${svDraftHTML(c)}
   `:''}
   ${shBanner(c.id)}
@@ -222,6 +222,7 @@ function cuFormHTML(c){const isNew=!c.id;CUF={av:c.av||'',ids:Array.isArray(c.id
   ${fr('cuBH','صاحب حساب',c.bk?c.bk.holder:'',{ph:'اگر با نام مشتری فرق دارد'})}</div>
   ${sec('edit','یادداشت',1)}
   <div class="f6g">${fr('cuA','آدرس / توضیح',c.note,{ph:'آدرس، معرف، …',last:1})}</div>
+  ${bkLinkRow(c)}
   ${!isNew&&can('del')?`<button class="edel" data-act="cuDel" data-id="${c.id}">${ic('trash')} حذف این حساب</button>`:''}
   </div>
 `}/* v74.7 (خواسته صاحب اپ): دکمه ثبت حساب تازه بالا، مثل «ذخیره» مشخصات؛ پایین فرم دکمه ندارد */

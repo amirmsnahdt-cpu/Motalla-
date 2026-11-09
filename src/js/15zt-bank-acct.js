@@ -16,17 +16,18 @@ function lkGoTx(t,why){if(t.pd){toast('«کارتخوان روز» خودکار 
   toast('این سند طرف مقابل «'+(C?cuName(C):'')+'» است؛ '+why+' از سند اصلی',true);if(T)invOpen(C.id,T.id)}
 /* ----- حساب بانک ↔ بانک واریزی‌ها ----- */
 const bkSrcOf=c=>c&&c.srcId!=null&&c.srcId!==''?sources.find(s=>String(s.id)===String(c.srcId))||null:null;
-function bkLinkHTML(c){if(!c||c.grp!=='بانک'||!can('src'))return '';const s=bkSrcOf(c);
-  if(s)return `<div class="bklk on"><span class="bkdi">${ic('list')}</span><span class="tx"><b>لیست‌های واریز «${esc(s.name)}» اینجا سند می‌خورد</b><small>همه لیست‌های ارسال‌شده، هر واریزی با رسیدش</small></span><button type="button" class="lnk" data-act="bkLinkM" data-cu="${c.id}">تغییر</button></div>`;
-  const L=ownL();if(!L.length)return '';const m=L.find(z=>canon(z.name)===canon(c.name));
-  return `<div class="bklk"><span class="bkdi">${ic('list')}</span><span class="tx"><b>واریزی‌های لیست از کدام بانک ارسال می‌شود؟</b><small>هر لیست واریزِ همان بانک (قبلی و بعدی) با رسیدهایش اینجا خودکار سند می‌خورد</small></span><button type="button" class="bklkb" data-act="bkLinkM" data-cu="${c.id}">${m?esc(m.name):'انتخاب'}</button></div>`}
+/* v85.1 (خواسته صاحب اپ: «اعلان بالای حساب بانک را نمی‌خواهم»): کارت پیوند لیست‌های واریز از صفحه حساب برداشته شد.
+   پیوند خودکار با هم‌نامی (bkAutoLink، فقط وقتی دقیقاً یک بانک قدیمی هم‌نام است) و تغییر دستی در فرم ویرایش حساب (bkLinkRow) */
+function bkLinkHTML(){return ''}
+function bkAutoLink(c){if(!c||c.grp!=='بانک'||c.srcId!=null||c.srcNo)return 0;const M=ownL().filter(z=>canon(z.name)===canon(c.name)&&!bkCus().some(o=>o!==c&&String(o.srcId)===String(z.id)));if(M.length!==1)return 0;c.srcId=M[0].id;c.srcAt=c.srcAt||'';return 1}
+function bkLinkRow(c){if(!c||!c.id||c.grp!=='بانک'||!can('src'))return '';const s=bkSrcOf(c);return `<button type="button" class="bklr" data-act="bkLinkM" data-cu="${c.id}"><span class="bkdi">${ic('list')}</span><span class="tx"><b>لیست‌های واریز</b><small>${s?'از «'+esc(s.name)+'» اینجا سند می‌خورد':'به هیچ بانکی وصل نیست'}</small></span><em>${s?'تغییر':'انتخاب'}</em></button>`}
 ACT.bkLinkM=(d,e)=>{const c=custs.find(z=>String(z.id)===String(d.cu));if(!c)return;const T=e&&e.target&&e.target.closest('button');
   popMenu(T,[...ownL().map(s=>['bkLinkS',ic(bkSrcOf(c)&&String(c.srcId)===String(s.id)?'check':'bank'),s.name,{cu:c.id,s:s.id}]),bkSrcOf(c)?['bkLinkS',ic('x'),'قطع اتصال',{cu:c.id,s:''}]:null].filter(Boolean))};
 ACT.bkLinkS=d=>{const c=custs.find(z=>String(z.id)===String(d.cu));if(!c)return;const now=new Date().toISOString();
-  if(d.s===''||d.s==null){delete c.srcId;delete c.srcAt}else{const s=sources.find(z=>String(z.id)===String(d.s));if(!s)return;
+  if(d.s===''||d.s==null){delete c.srcId;delete c.srcAt;c.srcNo=1}else{delete c.srcNo;const s=sources.find(z=>String(z.id)===String(d.s));if(!s)return;
     const other=bkCus().find(z=>z!==c&&String(z.srcId)===String(s.id));if(other){toast('«'+s.name+'» به حساب «'+cuName(other)+'» وصل است',true);return}
     if(String(c.srcId)!==String(s.id)){c.srcId=s.id;c.srcAt=now}}
-  c.updatedAt=now;bkDepSync(c,1);saveCu();logA('cust','اتصال حساب بانک به لیست‌های واریز',cuName(c)+' ← '+((bkSrcOf(c)||{}).name||'قطع'));render();toast(bkSrcOf(c)?'وصل شد':'اتصال قطع شد')};
+  c.updatedAt=now;bkDepSync(c,1);saveCu();logA('cust','اتصال حساب بانک به لیست‌های واریز',cuName(c)+' ← '+((bkSrcOf(c)||{}).name||'قطع'));render();const lr=document.querySelector('#sheet .bklr');if(lr)lr.outerHTML=bkLinkRow(c);toast(bkSrcOf(c)?'وصل شد':'اتصال قطع شد')};
 /* لیست‌های ارسال‌شده از بانک وصل‌شده → سند «لیست واریز» در حساب بانک (یکی برای هر بچ) */
 /* v84.3 (خواسته صاحب اپ: «بانک خودش ریلود می‌شود و مانده درست نمی‌دهد»): مقایسه پایدار (ترتیب کلیدها مهم نیست) — قبلاً بعد از برگشت داده از سرور
    ترتیب کلیدها فرق می‌کرد، هر بار «تغییر» دیده می‌شد، ذخیره و دوباره رسم می‌شد (چرخه). و اگر دو گوشی هم‌زمان سند روز/لیست را ساخته باشند، فقط یکی می‌ماند (bkDup) */

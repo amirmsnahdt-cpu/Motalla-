@@ -3999,3 +3999,41 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .bfxn{margin:8px 0 0;padding:7px 12px;border-radius:999px;border:1px solid var(--hair);background:var(--card);color:var(--mut);font-size:12.5px}.bfxn.on{border-color:var(--red);color:var(--red);background:var(--red2)}
 .bfxx{display:flex;flex-direction:column;gap:5px}.bfxx span{display:flex;justify-content:space-between;gap:8px}.bfxx b.ar{color:var(--red)}.bfxx b.ab{color:var(--blu)}
 .bfxx b{direction:ltr;unicode-bidi:isolate}
+/* v85.1 گردش حساب بانک: کارتخوان سبز، واریز (پول به بانک) قرمز، برداشت آبی — قاب نازک + پس‌زمینه کم‌رنگ + آیکون هم‌رنگ */
+.txr.tg,.txr.trd,.txr.tbl{border-radius:16px!important;box-shadow:inset 0 0 0 1.5px var(--fc)!important;background:var(--fb)!important}
+.txr.tg{--fc:color-mix(in srgb,var(--ok) 45%,transparent);--fb:color-mix(in srgb,var(--ok) 7%,var(--card))}
+.txr.trd{--fc:color-mix(in srgb,var(--red) 40%,transparent);--fb:color-mix(in srgb,var(--red) 5%,var(--card))}
+.txr.tbl{--fc:color-mix(in srgb,var(--blu) 40%,transparent);--fb:color-mix(in srgb,var(--blu) 5%,var(--card))}
+.txr.tg .bri{background:var(--ok2)!important;color:var(--ok)!important}.txr.trd .bri{background:var(--red2)!important;color:var(--red)!important}.txr.tbl .bri{background:var(--blu2)!important;color:var(--blu)!important}
+.txr.tg>b.r,.txr.tg>b.b,.txr.tg b.r span,.txr.tg b.b span{color:var(--ok)!important}
+/* دکمه اصلاح موجودی زیر کارت مانده */
+.bkfx{display:flex;align-items:center;gap:10px;width:100%;margin:12px 0 4px;padding:11px 12px;border:0;border-radius:18px;background:var(--card);box-shadow:var(--bfr);color:var(--ink);font:inherit;text-align:start}
+.bkfx .bkdi{flex:0 0 38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}.bkfx .bkdi svg{width:19px;height:19px}
+.bkfx .tx{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}.bkfx .tx b{font-size:15px;color:var(--blu)}.bkfx .tx small{font-size:11.5px;color:var(--mut);line-height:1.5}.bkfx>svg{width:18px;height:18px;color:var(--mut)}
+.bklr{display:flex;align-items:center;gap:10px;width:100%;margin:14px 0 4px;padding:11px 12px;border:0;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--hair);color:var(--ink);font:inherit;text-align:start}
+.bklr .bkdi{flex:0 0 36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}.bklr .tx{flex:1;display:flex;flex-direction:column;gap:2px}.bklr .tx small{color:var(--mut);font-size:12px}.bklr em{font-style:normal;color:var(--blu);font-weight:800;font-size:13px}
+/* پنجره اصلاح موجودی */
+.bfxw{display:flex;flex-direction:column;gap:12px;padding:4px 0 8px}
+.bfcur{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px;border-radius:20px;background:var(--bg2,var(--card));box-shadow:inset 0 0 0 1.5px var(--hair)}
+.bfcur small{font-size:12.5px;color:var(--mut);font-weight:700}.bfcur b{font-size:26px;font-weight:900;direction:ltr;display:flex;align-items:baseline;gap:6px}.bfcur b i{font-style:normal;font-size:12px;color:var(--mut);font-weight:600}
+.bfcur.r b{color:var(--red)}.bfcur.b b{color:var(--blu)}
+.bfin{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:20px;background:var(--card);box-shadow:var(--bfr)}
+.bfin:focus-within{box-shadow:var(--bfr2)}.bfin small{font-size:12.5px;color:var(--blu);font-weight:800}.bfin small i{font-style:normal;color:var(--mut);font-weight:600}
+.bfin span{display:flex;align-items:baseline;gap:8px}.bfin input{flex:1;min-width:0;border:0;outline:0;background:none;font:900 26px/1.2 inherit;font-family:inherit;color:var(--ink);text-align:left;padding:0}
+.bfin.sm input{font-size:20px}.bfin span i{font-style:normal;color:var(--mut);font-size:12px}
+.bfch{display:flex;gap:8px;flex-wrap:wrap;margin-top:-4px}.bfc{padding:7px 12px;border-radius:999px;border:1px solid var(--hair);background:var(--card);color:var(--mut);font:inherit;font-size:12.5px;font-weight:700}.bfc.on{border-color:var(--red);color:var(--red);background:var(--red2)}
+.bfl{display:flex;flex-direction:column;gap:7px;padding:12px 14px;border-radius:18px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--hair)}
+.bflr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13.5px;color:var(--mut)}.bflr b{direction:ltr;unicode-bidi:isolate;font-weight:800;color:var(--ink)}.bflr b.r{color:var(--red)}.bflr b.b{color:var(--blu)}
+.bflr.fin{font-size:15px;color:var(--ink);font-weight:800}.bflr.fin b{font-size:19px;font-weight:900}.bflh{height:1px;background:var(--hair);margin:2px 0}
+.bfl0{font-size:12.5px;color:var(--mut);text-align:center}.bfl0.ok{color:var(--ok);font-weight:800}
+#view .bkfx{display:flex!important;flex-direction:row!important;align-items:center;min-height:62px}
+#view .bkfx .bkft{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;position:static}
+#view .bkfx .bkft strong{font-size:15px;font-weight:900;color:var(--blu);line-height:1.3}#view .bkfx .bkft em{font-style:normal;font-size:12px;color:var(--mut);line-height:1.5;font-weight:600}
+#view .bkfx .bkfa{flex:0 0 auto;color:var(--mut);display:grid;place-items:center}#view .bkfx .bkfa svg{width:18px;height:18px;transform:rotate(90deg)}
+#sheet .bfin input{border:0!important;box-shadow:none!important;background:none!important;height:auto!important;min-height:0!important;padding:2px 0!important;border-radius:0!important;font-size:26px!important;font-weight:900!important}
+#sheet .bfin.sm input{font-size:20px!important}
+.txr.tg b small{color:var(--ok)!important}
+.sw:has(>.txr.tg,>.txr.trd,>.txr.tbl),.sw:has(>.txr.tg) .swb,.sw:has(>.txr.trd) .swb,.sw:has(>.txr.tbl) .swb{background:transparent!important;border-radius:16px}
+.fcard:has(.txr.tg,.txr.trd,.txr.tbl){background:transparent!important;box-shadow:none!important}
+.fcard .sw:has(>.txr.tg,>.txr.trd,>.txr.tbl)+.sw{margin-top:8px}
+.swr:has(.txr.tg,.txr.trd,.txr.tbl){background:transparent!important;border-radius:16px}
