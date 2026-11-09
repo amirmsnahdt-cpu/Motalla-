@@ -9,9 +9,9 @@
 const bfxCur=()=>-svRBal();
 const bfxIs=()=>{const c=svCu();return !!(c&&c.grp==='بانک')};
 function bfxCalc(){const t=+CK.bt||0,p=+CK.bp||0,cur=bfxCur(),neg=!!CK.bneg,T=neg?-t:t;return {cur,p,T,d:T-(cur+p),ok:CK.bt!==''&&CK.bt!=null}}
-const bfxTile=()=>`<button type="button" class="bfxt" data-act="ckM" data-m="bfix"><i>${ic('tag')}</i><span><b>اصلاح مانده با موجودی واقعی</b><small>موجودی بانک + کارتخوان مغازه → سند کارتخوان و کسر/اضافه «مانده قبلی»</small></span></button>`;
+const bfxTile=()=>`<button type="button" class="bfxt" data-act="ckM" data-m="bfix"><i>${ic('tag')}</i><span><b>اصلاح مانده با موجودی واقعی</b><small>موجودی بانک + کارتخوان مغازه → سند کارتخوان و کسر/اضافه «اصلاح حساب»</small></span></button>`;
 function bfxX(){const z=bfxCalc(),mv=v=>`${v<0?'−':''}${fmt(Math.abs(v))}`;if(!z.ok)return 'موجودی واقعی بانک را بزنید';
-  return `<span>مانده فعلی در برنامه <b>${mv(z.cur)}</b></span>${z.p?`<span>کارتخوان <b class="ar">+${fmt(z.p)}</b></span>`:''}<span>${z.d>0?'کسر':z.d<0?'اضافه':'کسر/اضافه'} · مانده قبلی <b class="${z.d>0?'ar':z.d<0?'ab':''}">${z.d?(z.d>0?'+':'−')+fmt(Math.abs(z.d)):'لازم نیست'}</b></span><span>مانده بعد از سند <b>${mv(z.T)}</b></span>`}
+  return `<span>مانده فعلی در برنامه <b>${mv(z.cur)}</b></span>${z.p?`<span>کارتخوان <b class="ar">+${fmt(z.p)}</b></span>`:''}<span>${z.d>0?'کسر':z.d<0?'اضافه':'کسر/اضافه'} · اصلاح حساب <b class="${z.d>0?'ar':z.d<0?'ab':''}">${z.d?(z.d>0?'+':'−')+fmt(Math.abs(z.d)):'لازم نیست'}</b></span><span>مانده بعد از سند <b>${mv(z.T)}</b></span>`}
 function bfxForm(){const v=x=>x?Number(x).toLocaleString('en-US'):'';
   return `<div class="ckfm bfxf"><div class="ckfh"><b>${ic('tag')} اصلاح مانده بانک</b><span class="ckfa"><button class="lnk" data-act="ckM" data-m="">انصراف</button><button type="button" class="ckok" data-act="bfxAdd">${ic('check')} افزودن</button></span></div>
   <div class="ckg"><label class="ckf"><small>موجودی واقعی بانک (تومان)</small><input id="bfT" class="ltr" inputmode="numeric" value="${v(CK.bt)}" autocomplete="off" enterkeyhint="next"></label><label class="ckf"><small>کارتخوان مغازه <i>(سند نخورده)</i></small><input id="bfP" class="ltr" inputmode="numeric" value="${v(CK.bp)}" autocomplete="off" enterkeyhint="done"></label></div>
@@ -24,7 +24,7 @@ ACT.bfxNeg=()=>{bfxRead();CK.bneg=CK.bneg?0:1;ckRe()};
 /* ردیف‌ها را به همین سند اضافه می‌کند؛ ثبت با «پایان و ثبت سند» (یا «ثبت» بالای سند) */
 function bfxApply(){bfxRead();const z=bfxCalc();if(!z.ok){toast('موجودی واقعی بانک را بزنید',true);const e=$('bfT');if(e)e.focus();return false}
   if(z.p)sv.pays.push({m:'bkx',k:'bpos',amount:-z.p,dir:'out',why:'کارتخوان مغازه'});
-  if(z.d)sv.pays.push({m:'bkx',k:'adj',amount:-z.d,dir:z.d>0?'out':'in',why:'مانده قبلی'});
+  if(z.d)sv.pays.push({m:'bkx',k:'adj',amount:-z.d,dir:z.d>0?'out':'in',why:'اصلاح حساب'});
   if(!z.p&&!z.d)toast('مانده همین است؛ ردیفی لازم نبود');else toast('ردیف اصلاحی اضافه شد');CK={m:''};ckBackToDoc();return true}
 ACT.bfxAdd=()=>{bfxApply()};
 /* ---- v85.1 «اصلاح موجودی» از خود صفحه حساب بانک (خواسته صاحب اپ: «اصلاح موجودی بهتر شود و از صفحه اول حساب هم بشود») ----
@@ -33,7 +33,7 @@ ACT.bfxAdd=()=>{bfxApply()};
    (همان ردیف‌های bkx bpos / adj پنجره تسویه؛ بی‌نیاز از باز کردن صفحه سند). حساب = همان محاسبه bfxZ */
 let BFX=null;
 function bfxZ(cur,bt,bp,neg){const t=+bt||0,p=+bp||0,T=neg?-t:t;return {cur,p,T,d:T-(cur+p),ok:bt!==''&&bt!=null}}
-const bfxRows=z=>z.ok?[...(z.p?[{m:'bkx',k:'bpos',amount:-z.p,dir:'out',why:'کارتخوان مغازه'}]:[]),...(z.d?[{m:'bkx',k:'adj',amount:-z.d,dir:z.d>0?'out':'in',why:'مانده قبلی'}]:[])]:[];
+const bfxRows=z=>z.ok?[...(z.p?[{m:'bkx',k:'bpos',amount:-z.p,dir:'out',why:'کارتخوان مغازه'}]:[]),...(z.d?[{m:'bkx',k:'adj',amount:-z.d,dir:z.d>0?'out':'in',why:'اصلاح حساب'}]:[])]:[];
 const bkFixBtn=c=>c&&c.grp==='بانک'&&can('debt')?`<button type="button" class="bkfx" data-act="bkFix" data-cu="${c.id}"><span class="bkdi">${ic('tag')}</span><span class="bkft"><strong>اصلاح موجودی</strong><em>موجودی واقعی بانک و کارتخوان امروز → سند اصلاحی خودکار</em></span><span class="bkfa">${ic('chev')}</span></button>`:'';
 const bfxMv=v=>`${v<0?'−':''}${fmt(Math.abs(v))}`,bfxCl=v=>v>0?'r':v<0?'b':'z';
 /* v85.6 (خواسته صاحب اپ: «پنجره اصلاح موجودی جالب نیست — راحت، کاربردی، ساده و شکیل»): یک کادر بزرگ وسط برای موجودی واقعی بانک
@@ -42,7 +42,7 @@ const bfxMv=v=>`${v<0?'−':''}${fmt(Math.abs(v))}`,bfxCl=v=>v>0?'r':v<0?'b':'z'
 function bfxRes(){const c=custs.find(z=>String(z.id)===String(BFX.cu));const z=bfxZ(bkCuBal(c),BFX.bt,BFX.bp,BFX.neg);
   if(!z.ok)return `<div class="bf2r n">موجودی بانک را بزنید</div>`;
   if(!z.d)return `<div class="bf2r ok">${ic('check')}<span>${z.p?'بدون اختلاف · فقط کارتخوان سند می‌خورد':'برابر است · سندی لازم نیست'}</span></div>`;
-  return `<div class="bf2r ${z.d>0?'r':z.d<0?'b':'n'}"><span>${z.d?(z.d>0?'کسر':'اضافه')+' «مانده قبلی»':'بدون اختلاف'}</span><b data-v="${Math.abs(z.d)}">${z.d?(z.d>0?'+':'−')+fmt(Math.abs(z.d)):'۰'}</b></div>`}
+  return `<div class="bf2r ${z.d>0?'r':z.d<0?'b':'n'}"><span>${z.d?(z.d>0?'کسر':'اضافه')+' «اصلاح حساب»':'بدون اختلاف'}</span><b data-v="${Math.abs(z.d)}">${z.d?(z.d>0?'+':'−')+fmt(Math.abs(z.d)):'۰'}</b></div>`}
 function bfxHTML(){const c=custs.find(z=>String(z.id)===String(BFX.cu));if(!c)return '';const cur=bkCuBal(c),v=x=>x?Number(x).toLocaleString('en-US'):'';
   return `<div class="sh-h"><div><b>اصلاح موجودی</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="bf2">
