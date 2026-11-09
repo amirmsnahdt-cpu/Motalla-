@@ -3922,3 +3922,10 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .cuLs .bkl .c6r.bkr>.c6a{flex:none;width:42px;height:42px;margin:0!important}
 .cuLs .bkl .c6r.bkr>.tx{flex:1 1 auto!important;min-width:0;text-align:start!important;align-items:flex-start}
 .cuLs .bkl .c6r.bkr>.bkv{flex:none!important;margin:0!important;align-self:center}
+/* v82.7 (خواسته صاحب اپ: «قالب‌های مبلغ یک اندازه») — قاب مانده همه ردیف‌های بانک یک عرض و یک ارتفاع */
+.cuLs .bkl .c6r.bkr>.bkv{box-sizing:border-box;width:clamp(128px,40%,178px);min-height:44px;justify-content:flex-end;align-items:center!important;align-content:center}
+.cuLs .bkv b{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.cuLs .bkv.z{display:flex;flex-direction:column;justify-content:center;align-items:flex-end!important;gap:0}
+.cuLs .bkl .c6r.bkr>.bkv{height:46px;min-height:0;padding-block:0}
+.cuLs .bkv.z small{display:none}
+.cuLs .bkl .c6r.bkr>.bkv.z{flex-direction:row;align-items:center!important;justify-content:flex-end}
