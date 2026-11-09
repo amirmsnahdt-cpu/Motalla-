@@ -4,7 +4,6 @@
      جایش یک خط راهنمای کوچک (bkHowHTML).
    - صفحه بانک‌ها: دو دکمه کار روزانه زیر جستجو — «تطبیق موجودی‌ها» (همه حساب‌ها در یک پنجره: موجودی اپ بانک را بنویسید،
      اختلاف همان لحظه، «ثبت همه») و «کارتخوان امشب» (posNight). */
-function bkHowHTML(s){return can('src')?`<div class="bkhow">${ic('swap')}<span>${s.cash?'دریافت و پرداخت نقد سندها':'حواله‌های سندها، کارتخوان و واریزی‌های ارسال‌شده'} <b>خودکار</b> اینجا می‌نشیند · برای برداشت یا واریز دستی <b>+</b> بالا را بزنید</span></div>`:''}
 let BRC=null;
 ACT.bkRec=()=>{if(!can('src'))return;BRC={};sheet(bkRecHTML());bkRecBind();const i=document.querySelector('#sheet .brcin');if(i)sheetFocus(i)};
 function bkRecHTML(){const L=ownLC();

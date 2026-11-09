@@ -4,8 +4,11 @@
    - داده همان دفتر حساب s.led است (قالب قبلی نمی‌شکند): هر ردیف یک ردیف led با type in|out (اثر بر مانده)،
      k = کلید تشخیص، note = شرح، و همه ردیف‌های یک سند یک شماره no دارند (همان شمارنده سندها invNext).
    - سندهای قبلی واریز/برداشت دستی (بدون k) همین‌جا باز و ویرایش می‌شوند (تشخیص از type). */
-const BDK=[['out','برداشت',-1],['in','واریز',1],['buy','خرید',-1],['sell','فروش',1],['chq','در حساب',1],['pass','پاس شدن',-1],['vos','وصول',1],['add','اضافه',1],['sub','کسر',-1],['fxa','اصلاح حساب',1],['fxs','اصلاح حساب',-1]];
-/* v82.5: «اصلاح حساب» = اختلاف موجودی بانک با برنامه، یک ردیف سند (fxa بیشتر، fxs کمتر)؛ در فهرست انتخاب نوع سند نیست (bkFix می‌سازد) */
+const BDK=[['out','برداشت',-1],['in','واریز',1],['buy','خرید',-1],['sell','فروش',1],['chq','در حساب',1],['pass','پاس شدن',-1],['vos','وصول',1],['add','اضافه',1],['sub','کسر',-1],['fxa','اصلاح حساب',1],['fxs','اصلاح حساب',-1],['fix','اصلاح حساب',1]];
+/* v82.5: «اصلاح حساب» = اختلاف موجودی بانک با برنامه، یک ردیف سند (fxa بیشتر، fxs کمتر).
+   v82.6 (خواسته صاحب اپ: «اصلاح حساب‌ها با سند زدن رقم بخورد»): در سند بانکی نوع «اصلاح حساب» (fix) هست: موجودی واقعی بانک را می‌زنید،
+   برنامه اختلاف را با مانده همان لحظه سند (مانده قبل + ردیف‌های دیگر سند) حساب می‌کند و ردیف fxa/fxs می‌سازد (bdFixRow). */
+const bdFixK=k=>k==='fix'||k==='fxa'||k==='fxs';
 const bdFx=k=>k==='fxa'||k==='fxs';
 /* v80.0 (خواسته صاحب اپ، مثل کیمیا): «اضافه» و «کسر» روی حساب بانک بدون طرف حساب، با علت از فهرست (تخفیف، مانده قبلی، هزینه بانکی،
    یارانه، سرمایه اولیه) یا علت تازه که نوشته شود و برای دفعه بعد در فهرست می‌ماند (cfg.adj، همگام بین گوشی‌ها) */
@@ -23,10 +26,10 @@ let BD=null;
    انتخاب نوع = کادر پله‌ای (مبلغ ← شرح/علت) با همان سرتیتر برگشت/انصراف/✓، ردیف‌های سند (زدن = ویرایش، کشیدن = حذف)،
    و کارت پایین: این سند · مانده بعد از سند + «ثبت سند». داده همان s.led قبلی است (هر ردیف یک ردیف led با شماره مشترک no).
    رنگ‌ها طبق قاعده صاحب اپ: آنچه به مانده حساب اضافه می‌کند (طلب ما از بانک بیشتر) قرمز، آنچه کم می‌کند آبی */
-const BDKI={out:['dOut','پول از حساب برداشته شد'],in:['dIn','پول به حساب واریز شد'],buy:['card','خرید با کارت یا درگاه این حساب'],sell:['tag','پول فروش به این حساب آمد'],chq:['inv','چک به حساب گذاشته شد'],pass:['check','چک ما از این حساب پاس شد'],vos:['down','چک وصول شد و به حساب آمد'],add:['plus','تخفیف، مانده قبلی، یارانه، سرمایه…'],sub:['minus','هزینه بانکی، کارمزد…'],fxa:['edit','موجودی با اپ بانک یکی شد'],fxs:['edit','موجودی با اپ بانک یکی شد']};
+const BDKI={out:['dOut','پول از حساب برداشته شد'],in:['dIn','پول به حساب واریز شد'],buy:['card','خرید با کارت یا درگاه این حساب'],sell:['tag','پول فروش به این حساب آمد'],chq:['inv','چک به حساب گذاشته شد'],pass:['check','چک ما از این حساب پاس شد'],vos:['down','چک وصول شد و به حساب آمد'],add:['plus','تخفیف، مانده قبلی، یارانه، سرمایه…'],sub:['minus','هزینه بانکی، کارمزد…'],fxa:['edit','موجودی با اپ بانک یکی شد'],fxs:['edit','موجودی با اپ بانک یکی شد'],fix:['edit','موجودی واقعی بانک را بزنید؛ اختلاف خودش ثبت می‌شود']};
 Object.assign(IC,{minus:'<path d="M5 12h14"/>'});
 const bdUp1=k=>bdK(k)[2]>0;/* به مانده اضافه می‌کند */
-const bdCls=k=>bdUp1(k)?'k-out':'k-in';/* همان کلاس‌های رنگ سند مشتری: k-out قرمز، k-in آبی */
+const bdCls=k=>bdUp1(k)&&k!=='fix'?'k-out':'k-in';/* همان کلاس‌های رنگ سند مشتری: k-out قرمز، k-in آبی */
 /* باز کردن سند: d.id حساب (خالی = اولین حساب مغازه، در سرتیتر عوض می‌شود)، d.k نوع ردیف اول (کادرش باز می‌شود)، d.l = ویرایش سندی که این ردیف در آن است */
 ACT.bdNew=d=>{d=d||{};if(!can('src'))return;const L=ownLC();const s=d.id!=null&&d.id!==''?sources.find(x=>String(x.id)===String(d.id)):L[0];
   if(!s){toast('اول یک حساب بانک مغازه بسازید',true);return}
@@ -73,7 +76,8 @@ function bdQHTML(){const e=BD.e;
     <div class="stlv" id="bdPv">${bdLive()}</div>
     ${ed?`<div class="stft"><button type="button" class="stdel" data-act="bdRowDel" data-i="${e.i}" aria-label="حذف ردیف">${ic('trash')}<span>حذف</span></button></div>`:''}
   </div></div>`}
-const bdSteps=e=>{const S=[{k:'a',lab:'مبلغ',ph:'مبلغ (تومان)',v:()=>+e.a?fmt(+e.a):''}];
+const bdSteps=e=>{if(e.k==='fix')return [{k:'a',lab:'موجودی واقعی بانک',ph:'موجودی اپ بانک (تومان)',v:()=>+e.a?fmt(+e.a):''},{k:'n',lab:'شرح',opt:1,ph:'شرح (اختیاری)',v:()=>e.n||''}];
+  const S=[{k:'a',lab:'مبلغ',ph:'مبلغ (تومان)',v:()=>+e.a?fmt(+e.a):''}];
   /* v80.8 (خواسته صاحب اپ: «همه سندها به هم ارتباط داشته باشند»): طرف حساب ردیف (هزینه، مشتری، همکار…) — سند متقابل خودکار در همان حساب می‌خورد */
   if(!bdAdj(e.k))S.push({k:'cu',lab:'طرف حساب',opt:1,ph:'جستجوی حساب: هزینه، مشتری، همکار…',v:()=>bdCuN(e.cu)});
   S.push(bdAdj(e.k)?{k:'n',lab:'علت',ph:'علت: از فهرست بزنید یا بنویسید',v:()=>e.n||''}:{k:'n',lab:'شرح',opt:1,ph:'شرح (اختیاری): شماره چک، پیگیری…',v:()=>e.n||''});return S};
@@ -88,11 +92,15 @@ function bdCuList(){const e=BD.e,q0=clean(e.sq||''),q=nzName(toEn(q0)),out=bdK(e
   const none=e.cu!==''&&e.cu!=null?`<button type="button" class="bzsr dkrw fix" data-act="bdCuP" data-id=""><span class="av">${ic('x')}</span><span class="tx"><b>بدون طرف حساب</b><small>فقط روی حساب بانک</small></span></button>`:'';
   const nw=ex||!can('debt')?'':`<button type="button" class="bzsr dkrw nw" data-act="bdCuNew"><span class="av">${ic('plus')}</span><span class="tx"><b>${q?'حساب تازه «'+esc(q0)+'»':'حساب تازه'}</b><small>${q?(out?'نوع هزینه (در فرم حساب عوض می‌شود)':'نوع مشتری'):'نامش را در جستجو بنویسید'}</small></span></button>`;
   return `<div class="bzsug cbl dkl">${none}${L.map(row).join('')}${nw}</div>`}
-function bdKList(){const q=nzName(toEn(clean(BD.q||''))),ORD=['out','in','buy','sell','pass','chq','sub','add','vos'],R=BDK.filter(x=>!bdFx(x[0])).sort((x,y)=>ORD.indexOf(x[0])-ORD.indexOf(y[0])).filter(([k,t])=>!q||nzName(t+' '+((BDKI[k]||[])[1]||'')).includes(q));
+function bdKList(){const q=nzName(toEn(clean(BD.q||''))),ORD=['out','in','buy','sell','pass','chq','sub','add','vos','fix'],R=BDK.filter(x=>!bdFx(x[0])).sort((x,y)=>ORD.indexOf(x[0])-ORD.indexOf(y[0])).filter(([k,t])=>!q||nzName(t+' '+((BDKI[k]||[])[1]||'')).includes(q));
   if(!R.length)return '<div class="eh" style="padding:8px">چیزی پیدا نشد</div>';
-  return `<div class="bzsug cbl dkl dkgrid">${R.map(([k,t,g],i)=>`<button type="button" style="--i:${i}" class="bzsr dkrw top ${bdCls(k)} ${g>0?'kr':'kb'}" data-act="bdD" data-k="${k}"><span class="av">${ic((BDKI[k]||['bank'])[0])}</span><span class="tx"><b>${t}</b><small>${esc((BDKI[k]||[])[1]||'')} · ${g>0?'مانده زیاد می‌شود':'مانده کم می‌شود'}</small></span></button>`).join('')}</div>`}
+  return `<div class="bzsug cbl dkl dkgrid">${R.map(([k,t,g],i)=>`<button type="button" style="--i:${i}" class="bzsr dkrw top ${bdCls(k)} ${g>0?'kr':'kb'}" data-act="bdD" data-k="${k}"><span class="av">${ic((BDKI[k]||['bank'])[0])}</span><span class="tx"><b>${t}</b><small>${esc((BDKI[k]||[])[1]||'')}${k==='fix'?'':' · '+(g>0?'مانده زیاد می‌شود':'مانده کم می‌شود')}</small></span></button>`).join('')}</div>`}
 /* مبلغ زنده ردیف + مانده بعد از آن (مثل کادر مبلغ سند مشتری) */
-function bdLive(){const e=BD.e,s=bdS();if(!e||!s)return '';const a=+e.a||0,g=bdK(e.k)[2],pv=bdPrev(s),old=e.i!=null&&BD.rows[e.i]?bdK(BD.rows[e.i].k)[2]*(+BD.rows[e.i].a||0):0,af=pv==null?null:pv+bdNet()-old+g*a;
+/* مانده‌ای که ردیف اصلاح با آن مقایسه می‌شود: مانده قبل از سند + ردیف‌های دیگر همین سند */
+function bdFixBase(e){const s=bdS(),pv=s&&bdPrev(s);if(pv==null)return null;const o=e.i!=null&&BD.rows[e.i]?bdK(BD.rows[e.i].k)[2]*(+BD.rows[e.i].a||0):0;return pv+bdNet()-o}
+function bdLive(){const e=BD.e,s=bdS();if(!e||!s)return '';
+  if(e.k==='fix'){const b=bdFixBase(e),a=+e.a||0;if(b==null)return `<div class="stam z"><small>مانده قبلی این حساب ثبت نشده</small><em>اول از «⋯» حساب «ثبت مانده قبلی» را بزنید</em></div>`;const d=a?a-b:0;
+    return `<div class="stam ${!a||!d?'z':d>0?'d':'c'}"><small>${!a?'برنامه الان '+bdMon(b)+' تومان نشان می‌دهد':!d?'با برنامه یکی است ✓':d>0?'بیشتر از برنامه · به مانده اضافه می‌شود':'کمتر از برنامه · از مانده کم می‌شود'}</small><span class="fz"><b${fitS((a&&d?fmt(Math.abs(d)):'—')+' تومان')}>${a&&d?fmt(Math.abs(d)):'—'}<i>تومان</i></b></span>${a?`<em>برنامه ${bdMon(b)} · بانک ${fmt(a)}</em>`:''}</div>`}const a=+e.a||0,g=bdK(e.k)[2],pv=bdPrev(s),old=e.i!=null&&BD.rows[e.i]?bdK(BD.rows[e.i].k)[2]*(+BD.rows[e.i].a||0):0,af=pv==null?null:pv+bdNet()-old+g*a;
   return `<div class="stam ${a?(g>0?'d':'c'):'z'}"><small>${a?(g>0?'به مانده حساب اضافه می‌شود':'از مانده حساب کم می‌شود'):'مبلغ این ردیف'}</small><span class="fz"><b${fitS((a?fmt(a):'—')+' تومان')}>${a?fmt(a):'—'}<i>تومان</i></b></span>${a&&af!=null?`<em>مانده حساب بعد از این ردیف <b>${bdMon(af)}</b> تومان</em>`:''}</div>`}
 /* ----- ردیف‌های سند ----- */
 function bdRowsHTML(){if(!BD.rows.length)return '';
@@ -129,9 +137,15 @@ ACT.bdCancel=()=>{if(!BD)return;BD.e=null;BD.q='';BD.ko=0;bdRe()};
 ACT.bdFin=()=>{if(!BD||!BD.e)return;bdRead();const e=BD.e;
   if(!(+e.a>0)){e.st=0;bdRe({f:1});toast('مبلغ را بزنید',true);return}
   if(bdAdj(e.k)&&!clean(e.n||'')){e.st=bdSteps(e).length-1;bdRe({f:1});toast('برای «'+bdK(e.k)[1]+'» علت را انتخاب کنید یا بنویسید',true);return}
+  if(e.k==='fix'){const b=bdFixBase(e);if(b==null){toast('مانده قبلی این حساب ثبت نشده؛ اول «ثبت مانده قبلی»',true);return}const df=Math.round(+e.a-b),un=clean(e.n||'');
+    if(!df){if(e.i!=null)BD.rows.splice(e.i,1);BD.e=null;BD.q='';BD.ko=0;bdRe();toast('موجودی با برنامه یکی است ✓ اصلاح لازم نیست');return}
+    const r={k:df>0?'fxa':'fxs',a:Math.abs(df),n:['بانک '+fmt(+e.a)+' · برنامه '+bdMon(b),un].filter(Boolean).join(' · '),un,cu:''};if(e.i!=null&&BD.rows[e.i]){const o=BD.rows[e.i];if(o.id!=null)r.id=o.id;BD.rows[e.i]=r}else{BD.rows.push(r);BD.nw=BD.rows.length-1}
+    BD.e=null;BD.q='';BD.ko=0;bdRe();toast('اصلاح حساب '+(df>0?'+':'−')+fmt(Math.abs(df))+' تومان به سند اضافه شد');return}
   const r={k:e.k,a:+e.a,n:clean(e.n||''),cu:bdAdj(e.k)||!bdCu(e.cu)?'':e.cu};if(e.i!=null&&BD.rows[e.i]){const o=BD.rows[e.i];if(o.id!=null)r.id=o.id;BD.rows[e.i]=r}else{BD.rows.push(r);BD.nw=BD.rows.length-1}
   BD.e=null;BD.q='';BD.ko=0;bdRe();toast(bdK(r.k)[1]+' '+fmt(r.a)+' تومان '+(e.i!=null?'ویرایش شد':'به سند اضافه شد'))};
-ACT.bdRowEd=d=>{if(!BD)return;const r=BD.rows[+d.i];if(!r)return;BD.e={i:+d.i,k:r.k,a:r.a,n:r.n||'',cu:r.cu||'',st:0,mx:2};bdRe({f:1})};
+ACT.bdRowEd=d=>{if(!BD)return;const r=BD.rows[+d.i];if(!r)return;
+  if(bdFx(r.k)){const e={i:+d.i,k:'fix',a:0,n:r.un||'',cu:'',st:0,mx:1},b=bdFixBase(e);e.a=b==null?0:b+bdK(r.k)[2]*(+r.a||0);BD.e=e;bdRe({f:1});return}
+  BD.e={i:+d.i,k:r.k,a:r.a,n:r.n||'',cu:r.cu||'',st:0,mx:2};bdRe({f:1})};
 ACT.bdRowDel=d=>{if(!BD)return;const i=+d.i,r=BD.rows[i];if(!r)return;BD.rows.splice(i,1);if(BD.e&&BD.e.i!=null)BD.e=null;bdRe();toast('ردیف '+bdK(r.k)[1]+' '+fmt(+r.a||0)+' حذف شد')};
 ACT.bdSave=()=>{if(!BD)return;if(BD.e&&+BD.e.a){bdRead();ACT.bdFin();if(BD.e)return}const s=bdS();if(!s)return;const R=BD.rows.filter(r=>+r.a>0);if(!R.length){toast('اول یک ردیف (برداشت، واریز…) به سند اضافه کنید',true);return}
   if(R.some(r=>bdAdj(r.k)&&!clean(r.n||''))){toast('برای «اضافه» و «کسر» علت را انتخاب کنید یا بنویسید',true);return}

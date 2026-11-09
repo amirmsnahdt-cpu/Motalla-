@@ -3906,3 +3906,19 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .hvto{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:18px;background:var(--card);box-shadow:var(--bfr);animation:dkPop .35s cubic-bezier(.2,.9,.25,1.08) both}
 .hvto .tx{flex:1;display:grid;min-width:0}.hvto b{font-size:14.5px;font-weight:900}.hvto small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hvto .x{flex:none;position:static;width:32px;height:32px}
+/* ===== v82.6 صفحه حساب بانک مثل صفحه حساب مشتری ===== */
+.bxmk>b{font-feature-settings:normal}
+.bkfx{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 11px;border:0;border-radius:99px;background:var(--blu2);color:var(--blu);font:inherit;font-size:12.5px;font-weight:850}
+.bkfx svg{width:14px;height:14px}
+.bkfz{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:15px;background:var(--seg)}
+.bkfz>span:first-child{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--card);color:var(--blu)}.bkfz>span:first-child svg{width:17px;height:17px}
+.bkfz .tx{flex:1;display:grid;min-width:0}.bkfz .tx b{font-size:13.5px;font-weight:900}.bkfz .tx small{font-size:11.5px;color:var(--mut);line-height:1.6}
+.bkfz1{flex:none;height:34px;padding:0 13px;border:0;border-radius:12px;background:var(--blu);color:#fff;font:inherit;font-size:12.5px;font-weight:900}
+/* v82.6 فهرست بانک‌ها: هر حساب کارت جدا (همان قاب فهرست مشتری‌ها، .cuLs)، مانده در یک خط */
+.cuLs .bkl .c6r.bkr{padding:11px 12px}
+.cuLs .bkv{display:flex;align-items:baseline;gap:4px;padding:6px 11px;border-radius:12px}
+.cuLs .bkv b{font-size:15px}.cuLs .bkv.z{display:grid;justify-items:end;gap:0}.cuLs .bkv.z b{font-size:12.5px}
+.cuLs .bkl .c6r.bkr{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;text-align:start!important;gap:10px!important}
+.cuLs .bkl .c6r.bkr>.c6a{flex:none;width:42px;height:42px;margin:0!important}
+.cuLs .bkl .c6r.bkr>.tx{flex:1 1 auto!important;min-width:0;text-align:start!important;align-items:flex-start}
+.cuLs .bkl .c6r.bkr>.bkv{flex:none!important;margin:0!important;align-self:center}
