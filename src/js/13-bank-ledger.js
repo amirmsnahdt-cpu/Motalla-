@@ -68,7 +68,7 @@ function bxBlue(o){return `<div class="bxblue${o.an?' anim':''}"><small>${o.t}</
 /* v83.5 (خواسته صاحب اپ: «قسمت بانک‌ها دقیقاً مثل حساب مشتری‌ها؛ مانده، فهرست، جستجو… از حساب‌های نوع بانک»): زبانه بانک = همان فهرست
    حساب مشتریان در «حالت بانک» (cuBkM: فقط حساب‌های نوع «بانک»، همان جستجو، کارت جمع و ردیف‌ها؛ حساب تازه = نوع بانک).
    بانک‌های قبلی (sources) دست‌نخورده از «⋯» › «بانک‌های قبلی» (vBanksOld در پنجره). */
-function vBanks(){const L=bkCus();cuAnim=1;cuCntId=null;
+function vBanks(){bkDepSyncAll();const L=bkCus();cuAnim=1;cuCntId=null;
   return `<div class="c6s cusr"><div class="cusrow"><div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${L.length?'جستجو در '+toFa(L.length)+' حساب بانک، سند، مبلغ…':'نام بانک تازه، مثل «ملت مغازه»…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button><button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button></div></div></div>
   <div id="cures">${L.length||cuQ?cuListHTML():`<div class="spempty"><div class="spill">${ic('bank')}</div><b>هنوز حساب بانکی نساخته‌اید</b><span>نام بانک را در جستجو بنویسید؛ حساب نوع «بانک» ساخته می‌شود و سندهایش مثل حساب مشتری است (واریز، برداشت، چک…).</span></div>`}</div>`}
 function vBanksOld(){cashEnsure();bxWas=!!document.querySelector('#view .bxblue');const L=ownLC(),K=L.filter(s=>s.bal!=null),P=CH('pos'),un=P.filter(c=>!chSrc(c));

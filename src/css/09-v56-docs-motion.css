@@ -3972,3 +3972,9 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 /* v83.3 حساب نوع بانک: رنگ سرتیتر نوع‌های بانکی (زیاد شدن موجودی بانک = قرمز طلبکاریم، کم شدن = آبی) */
 .sthd.k-chq .sthi,.sthd.k-vos .sthi{background:var(--red)!important;color:#fff!important}.sthd.k-pass .sthi{background:var(--blu)!important;color:#fff!important}
 .d6k.k-chq,.d6k.k-vos{background:var(--red2);color:var(--red)}.d6k.k-pass{background:var(--blu2);color:var(--blu)}
+/* v83.7 حساب بانک: اتصال به لیست‌های واریز */
+.bklk{display:flex;align-items:center;gap:10px;margin:12px 0 4px;padding:10px 12px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--blu2)}
+.bklk.on{box-shadow:0 0 0 1px var(--line)}
+.bklk .tx{flex:1;display:grid;min-width:0}.bklk .tx b{font-size:13px;font-weight:850}.bklk .tx small{font-size:11px;color:var(--mut)}
+.bklk .bkdi{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--blu2);color:var(--blu)}.bklk .bkdi svg{width:17px;height:17px}
+.bklkb{flex:none;height:34px;padding:0 13px;border:0;border-radius:12px;background:var(--blu);color:#fff;font:inherit;font-size:12.5px;font-weight:900}

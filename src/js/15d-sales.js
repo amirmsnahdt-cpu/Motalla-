@@ -38,6 +38,7 @@ function txLinked(c,t){const R=[],find=(cu,tx)=>{const C=custs.find(z=>String(z.
   if(t.type==='inv')(t.pays||[]).forEach(p=>{if((p.m==='cust'||p.bk)&&p.xfId)find(p.cuId,p.xfId)});
   if((t.type==='xf'||t.type==='cv')&&t.peer)find(t.peer.cu,t.peer.tx);
   if(t.type==='xf'&&t.inv)find(t.inv.cu,t.inv.tx);
+  if(t.type==='inv'&&t.lk)find(t.lk.cu,t.lk.tx);
   return R.filter(x=>x.t!==t)}
 /* v81.0 (خواسته صاحب اپ، مثل کیمیا): «شماره سند مشتری» — هر حساب سندهای خودش را ۱، ۲، ۳… می‌شمارد، کنار شماره کل سند (t.no).
    سند تازه t.cn = بزرگ‌ترین شماره همان حساب + ۱ (svCommit)؛ ویرایش همان شماره نسخه قبلی را می‌گیرد (زنجیره edOf)؛ سندهای قبلی که t.cn ندارند
@@ -54,6 +55,8 @@ const cnTag=n=>n?`<span class="cntg">سند ${toFa(n)} مشتری</span>`:'';
 const invTitle=t=>t.legacy?(t.dk==='out'?'سند پرداخت وجه':'سند دریافت وجه'):(t.dk==='buy'?'سند خرید ':t.dk==='in'&&t.auto==='stl'?'سند دریافت ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
 function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t)+(cnOf(c,t)?' · سند '+toFa(cnOf(c,t))+' مشتری':'');ico='inv';sub=[(t.items||[]).map(i=>i.k).join('، '),...(t.xr||[]).map(xrLab),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ')}
+    /* v83.7: سند طرف مقابل و سند لیست واریز: عنوان = خود ردیف (کارتخوان «…»، لیست واریز «…»)، زیرش شماره سند */
+    if((t.lk||t.bl)&&(t.pays||[])[0]){const p0=t.pays[0];sub=T;T=pyLab(p0);ico=p0.m==='dls'?'list':'swap'}
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
   const vals=(d.r?v(d.r,'r'):'')+(d.g?v(d.g,'g'):'')+Object.keys(d.x||{}).filter(k=>+d.x[k]).map(k=>v(+d.x[k],k)).join('')||'<b>تسویه</b>';
   const wp=t.type==='inv'&&typeof wdPend==='function'?wdPend(c,t.no):0;/* v61.80: مانده رفته برای واریز */
@@ -68,7 +71,7 @@ function xfShow(c,t){const d=txD(t),kv=(l,v)=>v?`<div class="kv"><small>${l}</sm
 let sv=null,svAdd=-1;
 /* مظنه (هر مثقال ۷۰۵) = نرخ هر گرم ۱۸ عیار × ۴٫۳۳۱۸ */
 const MZK=4.3318,mzOf=r=>Math.round((+r||0)*MZK),rOfMz=m=>Math.round((+m||0)/MZK);
-const PM={bkx:{t:'سند بانکی',i:'bank'},adj:{t:'اضافه و کسر',i:'tag'},off:{t:'تخفیف',i:'tag'},prev:{t:'مانده قبلی',i:'clock'},dep:{t:'حواله به فروشنده واریزی',i:'swap'},cash:{t:'نقد',i:'cash'},pos:{t:'کارتخوان',i:'card'},hav:{t:'حواله',i:'bank'},cust:{t:'حساب مشتری',i:'swap'},nm:{t:'حواله دستی',i:'swap'},gold:{t:'طلای مشتری',i:'coin'},disc:{t:'تخفیف',i:'tag'},wd:{t:'واریز بانکی',i:'bank'}};
+const PM={lnk:{t:'حواله دوطرفه',i:'swap'},dls:{t:'لیست واریز',i:'list'},bkx:{t:'سند بانکی',i:'bank'},adj:{t:'اضافه و کسر',i:'tag'},off:{t:'تخفیف',i:'tag'},prev:{t:'مانده قبلی',i:'clock'},dep:{t:'حواله به فروشنده واریزی',i:'swap'},cash:{t:'نقد',i:'cash'},pos:{t:'کارتخوان',i:'card'},hav:{t:'حواله',i:'bank'},cust:{t:'حساب مشتری',i:'swap'},nm:{t:'حواله دستی',i:'swap'},gold:{t:'طلای مشتری',i:'coin'},disc:{t:'تخفیف',i:'tag'},wd:{t:'واریز بانکی',i:'bank'}};
 /* v71.0 (خواسته صاحب اپ): یک شمارنده برای همه — فاکتور فروش، سند خرید، شماره سیستمی خرید دستی (sno) و سند واریز/برداشت دستی بانک؛
    شماره بعدی = بزرگ‌ترین شماره صادرشده در هر کدام + ۱ (شماره‌های قبلی دست نمی‌خورند) */
 function docNoMax(){let m=1000;const up=v=>{v=+v||0;if(v>m)m=v};for(const c of custs)for(const t of c.txs||[])if(t.type==='inv')up(t.no);
@@ -180,7 +183,7 @@ const pAmt=p=>+p.amount||0,svPaid=skip=>sv.pays.reduce((s,p,i)=>i===skip?s:s+pAm
 const srcName=id=>{const s=sources.find(z=>String(z.id)===String(id));return s?s.name:''};
 function pyLab(p,long){const ch=p.chId&&custs.find(z=>String(z.id)===String(p.chId)),acc=p.bk?(p.cuName||((CU().find(z=>String(z.id)===String(p.cuId))||{}).name)||''):p.srcId!=null?srcName(p.srcId):ch?ch.name:'',out=pAmt(p)<0,nm=p.cuName||((p.cuId&&custs.find(z=>String(z.id)===String(p.cuId)))||{}).name||'';
   switch(p.m){case 'cash':return out?'پرداخت نقد':'دریافت نقد';case 'pos':return 'کارتخوان'+(acc?' · '+acc:'');case 'hav':return (out?'پرداخت حواله':'دریافت حواله')+(acc?' · '+acc:'');
-    case 'gold':return 'طلای مشتری · '+wFmt(p.w)+' گرم'+(long?' عیار '+toFa(p.ay||750):'');case 'dep':return long?'حواله به «'+depName(p)+'»':'حواله · '+depName(p);case 'cust':return long?(out?'حواله به حساب «'+nm+'»':'حواله از حساب «'+nm+'»'):'حواله · '+nm;/* v75.1: در ردیف کوتاه — جهت را برچسب دریافت/پرداخت و رنگ می‌گوید، نام کامل دیده شود */case 'nm':return (out?'حواله از «':'حواله به «')+(p.cuName||'')+'» · دستی';case 'off':return out?'پرداخت تخفیف':'دریافت تخفیف';case 'adj':return (out?'کسر':'اضافه')+(p.why?' · '+p.why:'');case 'bkx':return bkxLab(p)+(p.why?' · '+p.why:'');case 'prev':return 'مانده قبلی تومان · '+(out?'طلبکاریم':'بدهکاریم');case 'wd':return p.nm?'تسویه از «'+p.nm+'» · '+(wdSetDoc(p)||'روی واریزی')+(p.w?' · در انتظار تأیید':''):(out?'پرداخت حواله از «':'دریافت حواله از «')+(p.src||'بانک')+'»';default:return (PM[p.m]||{}).t||''}}
+    case 'gold':return 'طلای مشتری · '+wFmt(p.w)+' گرم'+(long?' عیار '+toFa(p.ay||750):'');case 'dep':return long?'حواله به «'+depName(p)+'»':'حواله · '+depName(p);case 'cust':return long?(out?'حواله به حساب «'+nm+'»':'حواله از حساب «'+nm+'»'):'حواله · '+nm;/* v75.1: در ردیف کوتاه — جهت را برچسب دریافت/پرداخت و رنگ می‌گوید، نام کامل دیده شود */case 'nm':return (out?'حواله از «':'حواله به «')+(p.cuName||'')+'» · دستی';case 'off':return out?'پرداخت تخفیف':'دریافت تخفیف';case 'adj':return (out?'کسر':'اضافه')+(p.why?' · '+p.why:'');case 'bkx':return bkxLab(p)+(p.why?' · '+p.why:'');case 'lnk':return lnkLab(p)+(p.why?' · '+p.why:'');case 'dls':return 'لیست واریز «'+(p.src||'')+'» · '+toFa(p.n||0)+' واریزی';case 'prev':return 'مانده قبلی تومان · '+(out?'طلبکاریم':'بدهکاریم');case 'wd':return p.nm?'تسویه از «'+p.nm+'» · '+(wdSetDoc(p)||'روی واریزی')+(p.w?' · در انتظار تأیید':''):(out?'پرداخت حواله از «':'دریافت حواله از «')+(p.src||'بانک')+'»';default:return (PM[p.m]||{}).t||''}}
 const numV=(v,dec)=>v===''||v==null||(!dec&&!+v)?'':dec?esc(v):Number(v).toLocaleString('en-US');
 const cell=(id,lab,val,o={})=>`<label class="d6c${o.cls?' '+o.cls:''}"><small>${lab}</small><input id="${id}" class="ltr" inputmode="${o.im||'decimal'}" value="${val}" placeholder="${o.ph||''}" autocomplete="off" enterkeyhint="done"${o.ro?' readonly':''}></label>`;
 function qaHTML(){const a=sv.qa;/* v70.2: تا مشتری انتخاب نشده، «تشخیص» بسته است (سند بدون مشتری ثبت نمی‌شود) */if(!svCu()&&!svRows()&&!a.pv&&!a.p&&!a.x&&!a.k)return `<div class="dkwait">${ic('user')}<span><b>اول مشتری سند را انتخاب کنید</b><small>بعد از انتخاب، فهرست «تشخیص» برای ردیف اول باز می‌شود</small></span></div>`;if(a.pv)return stHTML();if(a.p&&a.p.m!=='disc'&&a.p.m!=='gold'||a.x||a.k)return stHTML();/* v61.6: همه ردیف‌ها پله‌به‌پله */if(a.p)return pyHTML();if(a.x)return xrHTML();
@@ -553,7 +556,7 @@ function svCommit(){const c=svCu();let depOld=null;
   const t={id:nid++,type:'inv',dk:sv.dk||undefined,no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>{const q={...p};delete q.xfId;return q}),at:now,by:who()};if(OLD){t.edOf=OLD.id;t.at0=OLD.at0||OLD.at;t.cn=cnOf(c,OLD)||undefined}else t.cn=cnNext(c)
   if(T.ge)t.ge=T.ge;if(Object.keys(T.xe).length)t.xe=T.xe;
   if(sv.gconv&&T.rest>0&&sv.rate)t.gc={r:T.rest,g:Math.round(T.rest/sv.rate*1000)/1000};
-  for(const p of t.pays){if(p.m!=='cust'&&!p.bk)continue;const Y=custs.find(z=>String(z.id)===String(p.cuId));if(!Y)continue;const x={id:nid++,type:'xf',r:-p.amount,g:0,note:(p.bk?(p.m==='pos'?'کارتخوان':'حواله')+' سند ':'پرداخت سند ')+toFa(no)+' «'+cuName(c)+'»',inv:{cu:c.id,tx:t.id},date:sv.date,at:now,by:who()};(Y.txs=Y.txs||[]).push(x);Y.lastAt=now;p.xfId=x.id}
+  for(const p of t.pays){if(p.m!=='cust'&&!p.bk)continue;/* v83.7: طرف مقابل = سند واقعی (15zt lnkMirror) */const x=lnkMirror(c,t,p,no,now);if(x)p.xfId=x.id}
   (c.txs=c.txs||[]).push(t);c.lastAt=now;saveCu();if(t.pays.some(p=>p.srcId!=null))saveS();ckDepApply(c,t,now,depOld);
   logA('cust',(OLD?'ویرایش ':'')+invTitle(t),cuName(c)+(items.length?' | '+items.map(i=>i.k+' '+wFmt(i.w)+' گرم').join('، '):'')+(xr.length?' | '+xr.map(xrLab).join('، '):'')+' | جمع '+fmt(T.total)+' تومان'+(T.paid?' | دریافت/پرداخت '+fmt(T.paid):''),{cu:c.id,tx:t.id});
   return {c,t}}
@@ -678,10 +681,10 @@ function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','
   const keep=sv;sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:false,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();const r=sv;sv=keep;return r}
 /* v61.56 (خواسته صاحب اپ): در صفحه سند ثبت‌شده هم نگه داشتن روی مانده‌های پایین = جزئیات فاکتور (همان پنجره صفحه سند) */
 function invDetHTML(){const X=invGet();if(!X)return '';const keep=sv;try{sv=invSv(X.c,X.t);return svDetHTML({inv:1})}finally{sv=keep}}
-ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'ویرایش');return}if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
+ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'ویرایش');return}if(X.t.lk||X.t.bl){lkGoTx(X.t,'ویرایش');return}if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
   sv=invSv(c,t);sv.sig0=svSig();svKeep();TITLES.sell='ویرایش سند '+toFa(t.no);PARENT.sell='inv';go('sell')};
 const aInv=()=>{const X=invGet();return X?ivBalP(X.c,X.t):''};
-ACT.invDel=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'حذف');return}askConfirm(invTitle(X.t)+' حذف شود؟ اثرش از حساب مشتری'+(txLinked(X.c,X.t).length?' و مشتری پرداخت‌کننده':'')+' برداشته می‌شود.','حذف',()=>{custId=X.c.id;cur='cust';ACT.txDel({id:X.t.id});go('cust',true)})};
+ACT.invDel=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'حذف');return}if(X.t.lk||X.t.bl){lkGoTx(X.t,'حذف');return}askConfirm(invTitle(X.t)+' حذف شود؟ اثرش از حساب مشتری'+(txLinked(X.c,X.t).length?' و مشتری پرداخت‌کننده':'')+' برداشته می‌شود.','حذف',()=>{custId=X.c.id;cur='cust';ACT.txDel({id:X.t.id});go('cust',true)})};
 /* v61.33: برگه سند (چاپ / PDF) — خواسته صاحب اپ: هر ردیف فقط مشخصات (کالا، وزن، عیار، مظنه، اجرت ٪، سود ٪) و مبلغ نهایی؛
    بعد جمع کالاها، ردیف‌های دریافت و پرداخت که اعمال می‌شوند و جمعشان، و در آخر مانده قبلی، این سند و نهایی (تومان، طلا، سکه).
    برچسب‌ها از دید مشتری: «بدهکار» = مشتری باید بپردازد، «طلبکار» = ما باید بپردازیم. */
