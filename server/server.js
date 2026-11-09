@@ -227,7 +227,7 @@ function cspBuild(html) {
   const h = x => "'sha256-" + crypto.createHash('sha256').update(x, 'utf8').digest('base64') + "'";
   const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(m => h(m[1]));
   const attrs = [...html.matchAll(/\son[a-z]+="([^"]*)"/g)].map(m => h(m[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')));
-  CSP = CSP_BASE + "; script-src 'self' https://cdnjs.cloudflare.com 'unsafe-hashes' " + [...new Set([...scripts, ...attrs, ...INLINE_HANDLERS.map(h)])].join(' ');
+  CSP = CSP_BASE + "; script-src 'self' https://cdnjs.cloudflare.com 'wasm-unsafe-eval' 'unsafe-hashes' " + [...new Set([...scripts, ...attrs, ...INLINE_HANDLERS.map(h)])].join(' ');
 }
 function appVersion() { try { const t = fs.readFileSync(path.join(ROOT, 'index.html')); APP_VER = sha(t).slice(0, 12); try { cspBuild(String(t)); } catch (e) { CSP = CSP_BASE; } const m = String(t).match(/const APP_V=(\d+(?:\.\d+)?)/); APP_V = m ? +m[1] : 0; } catch (e) { APP_VER = 'dev'; } return APP_VER; }
 appVersion();
@@ -418,6 +418,15 @@ function serveStatic(req, res, p) {
     fs.readFile(path.join(ROOT, 'banks', bm[1]), (err, buf) => {
       if (err) { res.writeHead(404); res.end(); return; }
       res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=2592000' }); res.end(buf);
+    });
+    return true;
+  }
+  /* v85.0: خواندن مبلغ از عکس رسید کارتخوان (tesseract.js، روی خود گوشی) — فایل‌های موتور و زبان از همین سرور، نه CDN */
+  const om = /^\/ocr\/(tesseract\.min\.js|worker\.min\.js|tesseract-core-lstm\.wasm\.js|(?:eng|fas)\.traineddata\.gz)$/.exec(p);
+  if (om) {
+    fs.readFile(path.join(ROOT, 'ocr', om[1]), (err, buf) => {
+      if (err) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200, { 'Content-Type': om[1].endsWith('.gz') ? 'application/gzip' : 'application/javascript; charset=utf-8', 'Cache-Control': 'public, max-age=2592000' }); res.end(buf);
     });
     return true;
   }
