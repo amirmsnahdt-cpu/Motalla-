@@ -65,7 +65,13 @@ function bkListHTML(){const q=clean(bkQ||''),L=ownLC(),S=new Map(L.map(s=>[s.id,
     return swW(`<button class="c6r bxrow" data-act="acOpen" data-id="${s.id}" style="--r:${Math.min(ri,8)}"><span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):s.cash?ic('cash'):esc(userInit(s.name))}</span><span class="tx"><b>${esc(s.name)}</b><small>${esc(sub||'حساب مغازه')}</small></span><span class="bxv"><small>مانده نهایی</small>${bxV(m)}</span>${ic('back').replace('class="i"','class="i flip bxch"')}</button>`,{r:[['acEdit','ویرایش','edit','#3b6fd6']],l:[],data:{id:s.id}})}).join('')}</div>${xh}${bkAddRow(q)}`}
 /* کادر آبی مانده: صفحه بانک‌ها (جمع همه) و صفحه هر حساب */
 function bxBlue(o){return `<div class="bxblue${o.an?' anim':''}"><small>${o.t}</small>${o.v==null?'<b class="z">—</b>':`<b><span class="cbn" data-k="r" data-v="${Math.abs(Math.round(o.v))}">${o.v<0?'−':''}${fmt(Math.abs(Math.round(o.v)))}</span><i>تومان</i></b>`}${o.sub?`<span>${o.sub}</span>`:''}${o.btn||''}</div>`}
-function vBanks(){cashEnsure();bxWas=!!document.querySelector('#view .bxblue');const L=ownLC(),K=L.filter(s=>s.bal!=null),P=CH('pos'),un=P.filter(c=>!chSrc(c));
+/* v83.5 (خواسته صاحب اپ: «قسمت بانک‌ها دقیقاً مثل حساب مشتری‌ها؛ مانده، فهرست، جستجو… از حساب‌های نوع بانک»): زبانه بانک = همان فهرست
+   حساب مشتریان در «حالت بانک» (cuBkM: فقط حساب‌های نوع «بانک»، همان جستجو، کارت جمع و ردیف‌ها؛ حساب تازه = نوع بانک).
+   بانک‌های قبلی (sources) دست‌نخورده از «⋯» › «بانک‌های قبلی» (vBanksOld در پنجره). */
+function vBanks(){const L=bkCus();cuAnim=1;cuCntId=null;
+  return `<div class="c6s cusr"><div class="cusrow"><div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${L.length?'جستجو در '+toFa(L.length)+' حساب بانک، سند، مبلغ…':'نام بانک تازه، مثل «ملت مغازه»…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button><button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button></div></div></div>
+  <div id="cures">${L.length||cuQ?cuListHTML():`<div class="spempty"><div class="spill">${ic('bank')}</div><b>هنوز حساب بانکی نساخته‌اید</b><span>نام بانک را در جستجو بنویسید؛ حساب نوع «بانک» ساخته می‌شود و سندهایش مثل حساب مشتری است (واریز، برداشت، چک…).</span></div>`}</div>`}
+function vBanksOld(){cashEnsure();bxWas=!!document.querySelector('#view .bxblue');const L=ownLC(),K=L.filter(s=>s.bal!=null),P=CH('pos'),un=P.filter(c=>!chSrc(c));
   const fin=K.reduce((a,s)=>a+acSum(s).fin,0),miss=L.length-K.length;
   return `<div class="c6s"><div class="fsearch c6q0">${ic('search')}<input id="bkq" type="search" placeholder="${L.length?'جستجو در '+toFa(L.length)+' حساب، یا نام حساب تازه…':'نام حساب تازه، مثل «ملی مغازه»…'}" value="${esc(bkQ)}" autocomplete="off" enterkeyhint="search"><button class="x${bkQ?'':' hide'}" data-act="bkQClr" aria-label="پاک کردن">×</button></div></div>
   <div id="bkres">${bkListHTML()}</div>
@@ -76,7 +82,8 @@ const aBanksBind=()=>{const I=$('bkq');if(I&&!I._b){I._b=1;I.onkeydown=e=>{if(e.
   if(cur==='banks'&&!bxWas)requestAnimationFrame(()=>cuCount('#view .bxblue.anim .cbn'))};
 ACT.bkQClr=()=>{bkQ='';const I=$('bkq');if(I){I.value='';I.focus()}const x=document.querySelector('.c6q0 .x');if(x)x.classList.add('hide');srchSwap('bkres',bkListHTML())};
 /* منوی سه‌نقطه سمت چپ سرتیتر بانک‌ها */
-ACT.bkMore=()=>{const c=can('src'),P=CH('pos');popMenu(document.querySelector('#bar .hmo'),[c&&ownL().length?['bdNew',ic('inv'),'سند بانکی جدید',{}]:null,c?['posNight',ic('down'),'ثبت واریز کارتخوان امشب']:null,c?['acOwn',ic('check'),ownSet()?'انتخاب حساب‌های مغازه':'حساب‌های مغازه را مشخص کنید']:null,['chOpenAll',ic('card'),P.length?'کارتخوان‌ها':'تعریف کارتخوان'],['bkStock',ic('coin'),'موجودی طلا و سکه مغازه']].filter(Boolean))};
+ACT.bkOld=()=>{sheet(`<div class="sh-h"><div><b>بانک‌های قبلی</b><small class="shsub">حساب‌های بانکی نسخه قبل با مانده و گردششان · دست‌نخورده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>${bkListHTML()}`)};
+ACT.bkMore=()=>{const c=can('src'),P=CH('pos');popMenu(document.querySelector('#bar .hmo'),[['bkOld',ic('bank'),'بانک‌های قبلی'],c&&ownL().length?['bdNew',ic('inv'),'سند بانکی جدید',{}]:null,c?['posNight',ic('down'),'ثبت واریز کارتخوان امشب']:null,c?['acOwn',ic('check'),ownSet()?'انتخاب حساب‌های مغازه':'حساب‌های مغازه را مشخص کنید']:null,['chOpenAll',ic('card'),P.length?'کارتخوان‌ها':'تعریف کارتخوان'],['bkStock',ic('coin'),'موجودی طلا و سکه مغازه']].filter(Boolean))};
 /* انتخاب حساب‌های مغازه (یک‌بار؛ بعد از «انتخاب حساب‌ها» قابل تغییر) */
 let ownTmp=null;
 ACT.acOwn=()=>{if(!can('src'))return;const any=ownSet();ownTmp=new Set(sources.filter(s=>any?s.own:(s.bal!=null||srcMoves(s).length||acPOS(s).length||(s.led||[]).length)).map(s=>String(s.id)));acOwnRe(true)};

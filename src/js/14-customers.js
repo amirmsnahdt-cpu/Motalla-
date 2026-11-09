@@ -120,34 +120,35 @@ function cuFSheetHTML(){cuWPRe();const A=CU().map(c=>[c,cuBal(c)]),G=groupsList(
 ACT.cuFOpen=()=>{sheet(cuFSheetHTML())};
 ACT.cuFS=d=>{if(d.b!=null)cuF.b=d.b;if(d.g!=null)cuF.g=d.g;cuFRe();const S=$('sheet');if(S&&S.querySelector('.cufs')){sheetKeep(cuFSheetHTML());const o=S.querySelector(`.cufr.on[data-${d.b!=null?'b':'g'}]`);if(o&&!RM()&&o.animate)o.animate([{transform:'scale(.97)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.3,1.4,.5,1)'})}};
 /* جمع مانده‌های حساب‌های فیلترشده: تومان و طلا، جدا طلب ما (قرمز) و بدهی ما (آبی) */
-function cuSumHTML(B){if(!cuF.b&&!cuF.g)return '';let rd=0,rc=0,gd=0,gc=0;for(const [,b] of B){if(b.R<0)rd+=-b.R;else rc+=b.R;if(b.G<0)gd+=-b.G;else gc+=b.G}
+function cuSumHTML(B){if(!cuF.b&&!cuF.g&&!cuBkM())return '';let rd=0,rc=0,gd=0,gc=0;for(const [,b] of B){if(b.R<0)rd+=-b.R;else rc+=b.R;if(b.G<0)gd+=-b.G;else gc+=b.G}
   const showR=cuF.b!=='gd'&&cuF.b!=='gc',showG=cuF.b!=='rd'&&cuF.b!=='rc',cell=(l,k,v,cl)=>v?`<span class="cusc ${cl}"><small>${l}</small><b${fitS(balV(k,v)+' '+balU(k))}><span class="cbn" data-k="${k}" data-v="${v}">${balV(k,v)}</span><i>${balU(k)}</i></b></span>`:'';
   const wpT=cuF.b==='wp'?B.reduce((a,[c])=>a+(cuWP.get(String(c.id))||0),0):0,C=[wpT?cell('در انتظار واریز','r',wpT,'w'):'',showR?cell('طلبکاریم','r',rd,'d'):'',showR?cell('بدهکاریم','r',rc,'c'):'',showG?cell('طلبکاریم','g',Math.round(gd*1000)/1000,'d'):'',showG?cell('بدهکاریم','g',Math.round(gc*1000)/1000,'c'):''].filter(Boolean);
-  return `<div class="cusum"><div class="cush"><b>${fmt(B.length)} حساب</b><small>${esc([cuF.g?(cuF.g==='-'?'بدون گروه':'گروه '+cuF.g):'',cuF.b?(CUFB.find(x=>x[0]===cuF.b)||[])[1]||'':''].filter(Boolean).join(' · '))}</small></div>${C.length?`<div class="cusg">${C.join('')}</div>`:''}</div>`}
+  return `<div class="cusum"><div class="cush"><b>${fmt(B.length)} حساب</b><small>${cuBkM()?'حساب‌های بانکی · طلبکاریم = پول ما در بانک':esc([cuF.g?(cuF.g==='-'?'بدون گروه':'گروه '+cuF.g):'',cuF.b?(CUFB.find(x=>x[0]===cuF.b)||[])[1]||'':''].filter(Boolean).join(' · '))}</small></div>${C.length?`<div class="cusg">${C.join('')}</div>`:''}</div>`}
 function cuFRe(){ls.set('m_cuf',cuF);const f=$('cuf');if(f)f.innerHTML=cuFiltHTML();const gr=$('cug');if(gr)gr.innerHTML=cuRailHTML();const gb=$('cuGb');if(gb)gb.outerHTML=cuGBtn();const fb=$('cuFb');if(fb)fb.outerHTML=cuFBtn();const r=$('cures');cuAnim=1;if(r)srchSwap(r,cuListHTML());requestAnimationFrame(()=>cuCount('#cures .cusum .cbn'));
   document.querySelectorAll('#cuf .cufp').forEach(o=>{if(!RM()&&o.animate)o.animate([{transform:'scale(.9)',opacity:.4},{transform:'none',opacity:1}],{duration:300,easing:'cubic-bezier(.3,1.4,.5,1)'})})}
 ACT.cuFB=d=>{cuF.b=cuF.b===d.k?'':d.k;cuFRe()};
-function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?'':nzName(toEn(q0)),A=CU();let B=A.map(c=>[c,cuBal(c)]);
+const cuBkM=()=>cur==='banks';
+function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?'':nzName(toEn(q0)),bm=cuBkM(),A=bm?bkCus():CU();let B=A.map(c=>[c,cuBal(c)]);
   /* v60.3: جستجو در همه مشخصات حساب (نام، تلفن، کد ملی، گروه، یادداشت، کارت، شبا…)؛ عدد با و بدون فاصله/صفر اول */
   const dOk=qd?(()=>false):pDig(q0);
   /* v67.6: ردیف‌های گردش همه حساب‌ها (مبلغ، وزن، شرح، فاکتور، پیگیری، کالا) و تاریخ (تقویم یا «۱۰ آبان») */
-  const TX=cuTxHits(dq,q,dOk);
+  const TX=cuTxHits(dq,q,dOk).filter(([c])=>!bm||c.grp==='بانک');
   if(dq){const S=new Set(TX.map(([c])=>String(c.id)));B=B.filter(([c])=>S.has(String(c.id)))}
   else if(q)B=B.filter(([c])=>cuHit(c,q,dOk));
-  cuWPRe();B=B.filter(([c,b])=>cuGOk(cuF.g,c)&&cuFOk(cuF.b,b,c));
+  cuWPRe();if(!bm)B=B.filter(([c,b])=>cuGOk(cuF.g,c)&&cuFOk(cuF.b,b,c));
   /* v73.2: عدد خالی = شماره مشتری → همان حساب اول از همه (جدا، بالای سندها)، حتی اگر فیلتر گروه دیگری روشن باشد */
   const nq=toEn(q0).replace(/[\s#]/g,''),NH=!dq&&/^\d{1,7}$/.test(nq)?A.find(c=>String(c.cno)===String(+nq)):null;if(NH)B=B.filter(([c])=>c!==NH);
   /* v68.1 (خواسته صاحب اپ): حساب‌های مانده‌دار (و در انتظار) بالا، تسویه‌شده‌ها پایین؛ داخل هر دسته ترتیب قبلی */
   const PW=pendMap(),zOf=([c,b])=>cuZero(b)&&!PW.get(String(c.id))&&!(cuWP.get(String(c.id))||0)?1:0;
   B.sort((a,b)=>(zOf(a)-zOf(b))||(q?(nzName(b[0].name).startsWith(q)-nzName(a[0].name).startsWith(q)):0)||String(b[0].lastAt||b[0].createdAt||'').localeCompare(String(a[0].lastAt||a[0].createdAt||'')));
   const canAdd=q0&&!dq&&can('debt')&&!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0))&&!groupsList().some(g=>nzName(g)===q);
-  const add=canAdd?`<button class="c6add" data-act="cuNewQ">${ic('plus')}<span><b>حساب تازه برای «${esc(q0)}»</b><small>${B.length?'اگر هیچ‌کدام از این‌ها نیست':'این نام حسابی ندارد'} · اول مشخصات، بعد ورود به حساب</small></span></button>`:'';
+  const add=canAdd&&bm?`<button class="c6add" data-act="bkCuAdd">${ic('plus')}<span><b>حساب بانک تازه «${esc(q0)}»</b><small>نوع بانک · بعد ورود به حساب</small></span></button>`:canAdd?`<button class="c6add" data-act="cuNewQ">${ic('plus')}<span><b>حساب تازه برای «${esc(q0)}»</b><small>${B.length?'اگر هیچ‌کدام از این‌ها نیست':'این نام حسابی ندارد'} · اول مشخصات، بعد ورود به حساب</small></span></button>`:'';
   /* افراد واریزی‌ها و خریدها که هنوز حساب ندارند (از حافظه برنامه): با زدن، حساب با همان مشخصات باز می‌شود */
-  const P=q&&!dq?memPeople(q,dOk,12):[];
+  const P=q&&!dq&&!bm?memPeople(q,dOk,12):[];
   CUP=P;
   const mem=P.length?`<div class="c6gh">از واریزی‌ها و خریدها · بدون حساب</div><div class="c6l c6mem">${P.map((p,i)=>`<button class="c6r" data-act="cuNewP" data-i="${i}"><span class="tx"><b>${esc(p.name)}</b><small>${[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.nid?'کد ملی <bdi dir="ltr">'+esc(toFa(p.nid))+'</bdi>':'',p.n?fmt(p.n)+' واریزی':'',p.last?esc(dates(p.last).fa):''].filter(Boolean).join('، ')}</small></span><span class="c6go">${ic('plus')} حساب</span></button>`).join('')}</div>`:'';
   /* v61.33: شماره سند (فاکتور فروش، خرید و…) هم جستجو می‌شود؛ زدن = باز شدن همان سند */
-  const IV=dq?[]:cuInvHits(q0),ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
+  const IV=dq?[]:cuInvHits(q0).filter(([c])=>!bm||c.grp==='بانک'),ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
   const IVS=new Set(IV.map(([,t])=>String(t.id))),txh=cuTxHTML(TX.filter(([,t])=>!IVS.has(String(t.id)))),dch=cuDtChip(qd);
   const nhh=NH?`<div class="c6gh">شماره مشتری ${toFa(NH.cno)}</div><div class="c6l c6lb cuL cunoh">${cuRowH(NH,cuBal(NH),0,PW)}</div>`:'';
   if(!B.length&&nhh)return dch+nhh+ivh+txh;
@@ -280,9 +281,10 @@ ACT.cuSave=d=>{const name=clean($('cuN').value),phone=toEn($('cuP').value).repla
 ACT.cuDel=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;const b=cuBal(c);askConfirm('حساب «'+cuName(c)+'» حذف شود؟'+(b.R||b.G||Object.keys(b.X).length?' (ته حساب صفر نیست)':''),'حذف',()=>{c.del=true;c.delAt=new Date().toISOString();saveCu();logA('cust','حذف حساب مشتری',cuName(c));if(cur==='cust')go('custs');else render();closeSheet();toast('حساب حذف شد','', 'بازگردانی',()=>{c.del=false;saveCu();render()})})};
 ACT.cuWpFlip=(d,e)=>{const el=e&&e.target.closest('.cbk');if(!el||el._fl)return;const sw=()=>el.classList.toggle('fl');if(RM()||!el.animate){sw();return}el._fl=1;
   el.animate([{transform:'perspective(600px) rotateX(0)'},{transform:'perspective(600px) rotateX(90deg)'}],{duration:150,easing:'cubic-bezier(.5,0,1,.6)'}).onfinish=()=>{sw();el.animate([{transform:'perspective(600px) rotateX(-90deg)'},{transform:'perspective(600px) rotateX(0)'}],{duration:240,easing:'cubic-bezier(.2,.9,.3,1.15)'}).onfinish=()=>{el._fl=0}}};
-ACT.cuOpen=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(isPy(c)){toast('«'+cuName(c)+'» پرداخت‌کننده تسویه است، حساب مشتری ندارد'+(c.src!=null?'؛ مانده‌اش در صفحه بانک است':''));return}custId=d.id;go('cust')};
+ACT.cuOpen=d=>{const c=custs.find(x=>String(x.id)===String(d.id));if(cur==='banks'||cur==='custs')PARENT.cust=cur;if(isPy(c)){toast('«'+cuName(c)+'» پرداخت‌کننده تسویه است، حساب مشتری ندارد'+(c.src!=null?'؛ مانده‌اش در صفحه بانک است':''));return}custId=d.id;go('cust')};
 let CUP=[];
 ACT.cuNewP=d=>{const p=CUP[+d.i];if(!p||!can('debt'))return;cuRet='';sheet(cuFormHTML({name:p.name,phone:p.phone,nid:p.nid}));cuBind()};
+ACT.bkCuAdd=()=>{if(!can('debt'))return;const id=bkCuNew(cuQ);if(id==null)return;cuQ='';ACT.cuOpen({id})};
 ACT.cuNewQ=()=>{cuRet='';const q=clean(cuQ||'');cuTypeOpen({name:q},q?'cuP':'cuN')};
 /* v75.4 (خواسته صاحب اپ): حساب تازه اول «نوع حساب» (گروه) را می‌پرسد؛ با زدن یکی، پنجره «مشخصات مشتری» با همان گروه باز می‌شود. بی‌گروه‌ها مستقیم فرم */
 let CUNT=null;
