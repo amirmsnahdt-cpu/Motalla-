@@ -4070,3 +4070,27 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .bpsn>span{color:var(--mut);display:grid}.bpsn>span svg{width:17px;height:17px}
 #sheet .bpsn input{flex:1;min-width:0;border:0!important;box-shadow:none!important;background:none!important;padding:0!important;height:auto!important;min-height:0!important;font:inherit;font-size:14px!important;color:var(--ink)}
 .bf3d.g .bf3di{background:var(--ok2);color:var(--ok)}.bf3d.g em,.bf3d.g .tx b{color:var(--ok)}
+/* v86.0 کارت بانکی (bkCardH) — قانون طراحی: کادر مانده هر بانک = کارت به رنگ همان بانک */
+.bkc{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:14px;width:100%;border:0;border-radius:24px;padding:16px 18px 18px;color:#fff;font:inherit;text-align:start;background:linear-gradient(135deg,var(--bk),color-mix(in srgb,var(--bk) 52%,#0b1220));box-shadow:0 16px 32px -18px color-mix(in srgb,var(--bk) 80%,transparent),inset 0 1px 0 rgba(255,255,255,.18);animation:bf3Up .45s cubic-bezier(.2,.9,.3,1.15) both}
+.bkc .bkwm{opacity:.12;filter:brightness(0) invert(1)}
+.bkc>*:not(.bkwm):not(.bkcg){position:relative;z-index:1}
+.bkcg{position:absolute;inset:auto -40px -60px auto;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 65%);pointer-events:none}
+.bkch{display:flex;align-items:center;gap:10px}
+.bkcl{flex:0 0 38px;width:38px;height:38px;border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden;color:var(--bk);box-shadow:0 2px 8px rgba(0,0,0,.18)}.bkcl .bkav{width:38px;height:38px;margin:0;box-shadow:none}.bkcl svg{width:19px;height:19px}
+.bkcn{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}.bkcn b{font-size:15.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bkcn small{font-size:11.5px;opacity:.78}
+.bkch .bkcx{width:18px;height:18px;opacity:.8}
+.bkcb{display:grid;grid-template-columns:1fr auto;align-items:end;gap:2px 10px}
+.bkcb>small{grid-column:1/-1;font-size:12px;opacity:.82;font-weight:600}
+.bkcv{direction:ltr;display:flex;align-items:baseline;justify-content:flex-end;gap:6px;grid-column:1;grid-row:2;justify-self:end}
+.bkcv b{font-size:28px;font-weight:900;letter-spacing:.3px}.bkcv i{font-style:normal;font-size:12px;opacity:.8}
+.bkcb em{grid-column:2;grid-row:2;align-self:center;font-style:normal;font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.2);backdrop-filter:blur(6px)}
+.bkc.sm{padding:14px 16px 14px;gap:10px;border-radius:22px}.bkc.sm .bkcv b{font-size:22px}.bkc.sm .bkcl{flex-basis:34px;width:34px;height:34px}.bkc.sm .bkcl .bkav{width:34px;height:34px}
+.swr:has(>.swc>.bkc){border-radius:22px!important;overflow:hidden;background:transparent!important;margin-bottom:10px}
+.swr:has(.bkc) .swc{background:transparent!important}
+.fcard:has(.bkc){background:transparent!important;box-shadow:none!important}.fcard:has(.bkc)>*{border-top:0!important}
+#view .bkc,#sheet .bkc{background:linear-gradient(135deg,var(--bk),color-mix(in srgb,var(--bk) 52%,#0b1220))!important;color:#fff!important;border:0!important}
+.bkc .bkcn b,.bkc .bkcn small,.bkc .bkcb>small,.bkc .bkcv b,.bkc .bkcv i,.bkc .bkcb em{color:#fff!important}
+.swr:has(.bkc),.swr:has(.bkc)>.swc,.sw:has(.bkc){background:transparent!important;box-shadow:none!important;border:0!important}
+.swr:has(.bkc){border-radius:22px!important}
+#view .swr:has(.bkc),#view .c6l .swr:has(.bkc){box-shadow:none!important;background:transparent!important}
+#view .bkc,#sheet .bkc{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;width:100%}

@@ -86,3 +86,11 @@ ACT.bkPos=d=>{if(!can('debt'))return;BPS={cu:d.cu,a:'',why:''};sheet(bpsHTML());
 ACT.bpsSave=()=>{const c=BPS&&custs.find(z=>String(z.id)===String(BPS.cu));if(!c)return;const a=+BPS.a||0;if(!(a>0)){toast('مبلغ کارتخوان را بزنید',true);const e=$('bpA');if(e)e.focus();return}
   const now=ns(),no=invNext(),w=clean(BPS.why||''),t={id:nid++,type:'inv',no,cn:cnNext(c),date:todayISO(),rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:[{m:'bkx',k:'bpos',amount:-a,dir:'out',...(w?{why:w}:{})}],at:now,by:who(),posm:1};
   (c.txs=c.txs||[]).push(t);c.lastAt=now;saveCu();logA('cust','سند کارتخوان',cuName(c)+' | سند '+toFa(no)+' | '+fmt(a)+' تومان',{cu:c.id,tx:t.id});BPS=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast('سند کارتخوان '+toFa(no)+' ثبت شد · '+fmt(a)+' تومان')};
+
+/* v86.0 (خواسته صاحب اپ: «هر کادر مانده شبیه کارت بانکی خودش؛ این طراحی را همه‌جا به کار ببر»): کارت بانکی bkCardH
+   = گرادیان رنگ همان بانک (bkClr)، لوگوی سفید، نام و شماره حساب، «مانده حساب»، عدد بزرگ سفید + برچسب طلبکاریم/بدهکاریم، نقش کم‌رنگ لوگو.
+   lg = کارت مانده صفحه حساب بانک؛ sm = هر ردیف زبانه بانک (زدن = باز کردن حساب) */
+function bkCardH(c,sz,attr){const v=bkCuBal(c),t=sz==='sm'?'button':'div';
+  return `<${t} ${t==='button'?'type="button" ':''}class="bkc ${sz||'lg'}${v<0?' neg':''}" style="--bk:${bkClr(c)}"${attr||''}>${bkWmH(c)}<i class="bkcg" aria-hidden="true"></i>
+  <span class="bkch"><span class="bkcl">${bkAvH(c)||ic('bank')}</span><span class="bkcn"><b>${esc(cuName(c))}</b>${c.cno?`<small>حساب ${toFa(c.cno)}</small>`:''}</span>${sz==='sm'?ic('back').replace('class="i"','class="i flip bkcx"'):''}</span>
+  <span class="bkcb"><small>مانده حساب</small><span class="bkcv"><b data-v="${Math.abs(v)}">${v<0?'−':''}${fmt(Math.abs(v))}</b><i>تومان</i></span><em>${v>0?'طلبکاریم':v<0?'بدهکاریم':'تسویه'}</em></span></${t}>`}
