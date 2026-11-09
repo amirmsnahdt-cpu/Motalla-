@@ -53,7 +53,7 @@ function stSteps(){const a=sv.qa,K=stKind();
     else if(p.m==='cust')R.push(stS('cuId',dkBk()?'حساب':'مشتری','','pick',()=>p.cuId,v=>{p.cuId=v;const c=CU().find(z=>String(z.id)===String(v));p.cuName=c?cuName(c):'';if(c){p.amount=pyLeft(p);if(dkBk()){}else if(p.dir==='in')pyCuCap(p);else if(!+p.amount)p.amount=Math.abs(cuBal(c).R)||0}},{search:1,opts:q=>{const dOk=pDig(q),nq=nzName(toEn(q||''));/* v71.2: حواله از مشتری دیگر — اول کسانی که از آنها طلبکاریم (بیشترین طلب بالا) */const L=CU().filter(c=>String(c.id)!==String(sv.cuId)&&(!nq||cuHit(c,nq,dOk))).map(c=>[c,cuBal(c).R]),D=L.filter(z=>z[1]<0).sort((a,b)=>a[1]-b[1]),O=L.filter(z=>z[1]>=0);return (dkBk()?[...D,...O].slice(0,nq?25:30):(nq||!D.length?[...D,...O]:D).slice(0,8)).map(z=>z[0]).map(c=>{const r=cuBal(c).R;return {v:c.id,t:cuName(c),sub:[c.grp||'',c.phone?toFa(c.phone):''].filter(Boolean).join('، ')||'حساب مشتری',amt:r?fmt(Math.abs(r)):'۰',lab:ourLab(r),ico:c.grp==='بانک'?'bank':'user',cls:r<0?'d':r>0?'c':'z'}})},lab0:v=>((CU().find(c=>String(c.id)===String(v))||{}).name),add:{t:'مشتری',form:1}}));
     if(p.m==='nm')R.push(stS('cuName',p.dir==='out'?'حواله از':'حواله به','','text',()=>p.cuName,v=>p.cuName=v));
     R.push(stS('amount','مبلغ','تومان','num',()=>p.amount,v=>p.amount=v));
-    if(p.m==='bkx'&&!(BKX[p.k]||[])[2])R.push(stS('why','شرح','','text',()=>p.why,v=>p.why=v,{opt:1,ph:'شرح (اختیاری): شماره چک، پیگیری…'}));
+    if(p.m==='bkx'&&!(BKX[p.k]||[])[2])R.push(stS('why','شرح','','text',()=>p.why,v=>p.why=v,{opt:1,ph:p.k==='bpos'?'شرح (اختیاری): نام مشتری، شماره پایانه…':'شرح (اختیاری): شماره چک، پیگیری…'}));
     if(p.m==='hav')R.push(stS('tn','پیگیری','','text',()=>p.tn,v=>p.tn=v,{opt:1}));
     return R}
   return []}
