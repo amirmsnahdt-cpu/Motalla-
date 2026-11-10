@@ -19,7 +19,10 @@ const bkSrcOf=c=>c&&c.srcId!=null&&c.srcId!==''?sources.find(s=>String(s.id)===S
 /* v85.1 (خواسته صاحب اپ: «اعلان بالای حساب بانک را نمی‌خواهم»): کارت پیوند لیست‌های واریز از صفحه حساب برداشته شد.
    پیوند خودکار با هم‌نامی (bkAutoLink، فقط وقتی دقیقاً یک بانک قدیمی هم‌نام است) و تغییر دستی در فرم ویرایش حساب (bkLinkRow) */
 function bkLinkHTML(){return ''}
-function bkAutoLink(c){if(!c||c.grp!=='بانک'||c.srcId!=null||c.srcNo)return 0;const M=ownL().filter(z=>canon(z.name)===canon(c.name)&&!bkCus().some(o=>o!==c&&String(o.srcId)===String(z.id)));if(M.length!==1)return 0;c.srcId=M[0].id;c.srcAt=c.srcAt||'';return 1}
+/* v87.0 (خواسته صاحب اپ: «موجودی بانک در تخصیص با قسمت بانک یکی نیست»): هم‌نامی با نام ساده — بی «بانک»، پرانتز، فاصله و نیم‌فاصله
+   («بانک سپه ( داداشی )» = «سپه داداشی»)؛ قبلاً فقط نام عیناً یکسان وصل می‌شد و منبع موجودی قدیمی خودش را نشان می‌داد */
+const bkSimNm=n=>canon(nzName(toEn(String(n||''))).replace(/(^|\s)بانک(?=\s|$)/g,' ').replace(/[()（）«»\-_،,.\u200c]/g,' ').replace(/\s+/g,''));
+function bkAutoLink(c){if(!c||c.grp!=='بانک'||c.srcId!=null||c.srcNo)return 0;const M=ownL().filter(z=>bkSimNm(z.name)===bkSimNm(c.name)&&!bkCus().some(o=>o!==c&&String(o.srcId)===String(z.id)));if(M.length!==1)return 0;c.srcId=M[0].id;c.srcAt=c.srcAt||'';return 1}
 function bkLinkRow(c){if(!c||!c.id||c.grp!=='بانک'||!can('src'))return '';const s=bkSrcOf(c);return `<button type="button" class="bklr" data-act="bkLinkM" data-cu="${c.id}"><span class="bkdi">${ic('list')}</span><span class="tx"><b>لیست‌های واریز</b><small>${s?'از «'+esc(s.name)+'» اینجا سند می‌خورد':'به هیچ بانکی وصل نیست'}</small></span><em>${s?'تغییر':'انتخاب'}</em></button>`}
 ACT.bkLinkM=(d,e)=>{const c=custs.find(z=>String(z.id)===String(d.cu));if(!c)return;const T=e&&e.target&&e.target.closest('button');
   popMenu(T,[...ownL().map(s=>['bkLinkS',ic(bkSrcOf(c)&&String(c.srcId)===String(s.id)?'check':'bank'),s.name,{cu:c.id,s:s.id}]),bkSrcOf(c)?['bkLinkS',ic('x'),'قطع اتصال',{cu:c.id,s:''}]:null].filter(Boolean))};
