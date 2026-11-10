@@ -4220,3 +4220,8 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .abkr3>span:last-child{background:rgba(255,255,255,.26)}.abkr3>span.neg{background:rgba(220,38,38,.55)}
 #sheet .asrcs .asdv{flex:0 0 auto;display:flex;align-items:center;padding:0 2px}
 #sheet .asrcs .asdv i{font-style:normal;writing-mode:vertical-rl;font-size:11px;font-weight:800;color:var(--mut);padding:8px 4px;border-inline-start:1.5px dashed var(--hair)}
+/* v87.2 (خواسته صاحب اپ: «مبلغ هم در کادر سفید با رنگ قرمز و آبی»): مبلغ کارت بانکی در قرص سفید، رنگ = طلبکاریم قرمز / بدهکاریم آبی */
+.bkc .bkcv{background:#fff;border-radius:16px;padding:6px 14px;box-shadow:0 4px 14px rgba(0,0,0,.18);align-items:baseline}
+.bkc .bkcv b{color:var(--red)!important;letter-spacing:.2px}.bkc .bkcv i{color:#64748b!important;opacity:1!important}
+.bkc .bkcv.kb b{color:#2563eb!important}.bkc .bkcv.kz b{color:var(--ok)!important}
+.bkc.sm .bkcv{padding:5px 12px}
