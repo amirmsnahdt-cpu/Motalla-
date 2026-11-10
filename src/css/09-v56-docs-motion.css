@@ -4225,3 +4225,9 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .bkc .bkcv b{color:var(--red)!important;letter-spacing:.2px}.bkc .bkcv i{color:#64748b!important;opacity:1!important}
 .bkc .bkcv.kb b{color:#2563eb!important}.bkc .bkcv.kz b{color:var(--ok)!important}
 .bkc.sm .bkcv{padding:5px 12px}
+/* v87.4 (خواسته صاحب اپ: «کادر عدد عریض‌تر و کوتاه‌تر، نزدیک اندازه طلبکاریم») */
+.bkc .bkcb{align-items:center!important}
+.bkc .bkcv{justify-self:stretch!important;justify-content:space-between!important;padding:0 14px!important;height:38px;border-radius:999px!important;line-height:1;align-items:center!important}
+.bkc .bkcv b{font-size:21px!important;line-height:1}
+.bkc.sm .bkcv{height:34px}.bkc.sm .bkcv b{font-size:18px!important}
+.bkc .bkcb em{height:38px;box-sizing:border-box;display:inline-flex;align-items:center}.bkc.sm .bkcb em{height:34px}
