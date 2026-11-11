@@ -96,8 +96,14 @@ function wdSumHTML(c,no,tot){const E=wdRoots().filter(e=>String(e.wd.cu)===Strin
    دیگر عوض نمی‌شود (قبلاً مبلغ «واریز شد» بی‌صدا کم و زیاد می‌شد) */
 const stlBkLock=e=>{const bi=e&&entBI(e);return !!(bi&&bi.it&&bi.it.st==='ok')};
 const STLLK='واریز بانکی این واریزی تأیید شده؛ برای تغییر تسویه، اول تأیید بانک را در لیست واریز بردارید';
-function docDelLock(c,t){if(!c||!t||t.del||t.type!=='inv'||t.lk||t.pd||t.bl||t.bd)return '';const n=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&String(e.wd.no)===String(t.no)).length;
-  if(n)return 'این سند '+toFa(n)+' واریزی در لیست واریز دارد؛ اول واریزی‌ها را از لیست حذف کنید، بعد سند را';
+/* v88.8 (خواسته صاحب اپ: «با حذف سند، واریزی‌اش هم از لیست واریز حذف شود»): docWdL = واریزی‌های همین سند (با بخش‌های چندمنبعی)؛
+   اگر هیچ‌کدام به بانک ارسال نشده و تسویه مشتری ندارد، با حذف سند به سطل بازیابی می‌روند (و با «بازگردانی» برمی‌گردند)؛
+   اگر ارسال شده یا تسویه دارد، حذف سند بسته می‌ماند (پول در راه است) */
+function docWdL(c,t){if(!c||!t||t.type!=='inv'||t.lk||t.pd||t.bl||t.bd)return [];const W=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&String(e.wd.no)===String(t.no)),S=new Map();
+  W.forEach(e=>{let F;try{F=famOf(e)}catch(_){F=[e]}[e,...F].forEach(x=>{const z=entries.find(q=>q.id===x.id);if(z)S.set(z.id,z)})});return [...S.values()]}
+function docDelLock(c,t){if(!c||!t||t.del||t.type!=='inv'||t.lk||t.pd||t.bl||t.bd)return '';const W=docWdL(c,t);
+  if(W.some(e=>entBI(e)||e.sentBid))return 'واریزی این سند به بانک ارسال شده؛ اول ارسال را در لیست واریز برگردانید، بعد سند را حذف کنید';
+  if(W.some(e=>(e.settles||[]).length))return 'واریزی این سند تسویه از مشتری دارد؛ اول آن تسویه را بردارید، بعد سند را حذف کنید';
   for(const p of t.pays||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(e&&stlBkLock(e))return 'این سند واریزی «'+(e.name||'')+'» را پرداخت کرده و واریز بانکی آن تأیید شده؛ اول تأیید بانک را در لیست واریز بردارید'}return ''}
 /* صفحه مشتری: زیر کارت مانده حساب — کارت مسیر پرداخت + واریزی‌های در راه (هر کدام = باز کردن واریزی) */
 function wdCuHTML(c){const L=wdPendL(c);if(!L.length)return '';const A=allocMap(),b=cuBal(c);let fr=0,al=0;L.forEach(o=>{let f=0;wdParts(o.e,o.S,A).forEach(q=>{if(q.fr)f+=q.a});o.fr=Math.min(f,o.S.pend);o.al=o.S.pend-o.fr;fr+=o.fr;al+=o.al});
