@@ -94,7 +94,21 @@ function edDupFix(){const now=new Date().toISOString();let ch=0;
     for(const L of G.values()){if(L.length<2)continue;L.sort((a,b)=>String(b.at||'').localeCompare(String(a.at||''))||String(b.id).localeCompare(String(a.id),'en',{numeric:true}));
       L.slice(1).forEach(t=>{t.del=true;t.delAt=now;t.delBy='خودکار';t.dupOf=L[0].id;try{txLinked(c,t).forEach(x=>{if(!x.t.del){x.t.del=true;x.t.delAt=now;x.t.delBy='خودکار'}})}catch(_){}try{invDepOff(t)}catch(_){}ch++})}}
   return ch}
-function lnkOrph(){const now=new Date().toISOString(),CI=new Map(custs.map(c=>[String(c.id),c]));let ch=0;try{ch+=edDupFix()}catch(_){}
+/* v89.0 (خواسته صاحب اپ: «شماره تکراری خودکار عوض شود»): دو گوشی در چند ثانیه (یا بی‌اینترنت) سند تازه می‌زنند و هر دو یک شماره می‌گیرند.
+   noDupFix: بین سندهای زنده (نه آینه‌ها که عمداً شماره سند اصلی را دارند)، هر شماره فقط برای یک سند می‌ماند — قدیمی‌ترین (at0/at، بعد شناسه؛ سند خودکار واریزی مقدم)؛
+   بقیه به ترتیب شماره تازه (بزرگ‌ترین + ۱) می‌گیرند، با آینه‌ها، واریزی‌های همان سند (wd.no، کد فاکتور، ردیف لیست) و تسویه‌هایی که از آن سند ساخته شده. t.no0 = شماره قبلی. */
+function noDupFix(){const G=new Map();let ch=0,eCh=0,bCh=0;
+  for(const c of custs){if(c.sys||c.del)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||t.lk||t.bd||t.no==null)continue;const k=String(t.no);(G.get(k)||G.set(k,[]).get(k)).push({c,t})}}
+  const key=o=>String(o.t.at0||o.t.at||''),L=[...G.values()].filter(z=>z.length>1).sort((a,b)=>(+a[0].t.no||0)-(+b[0].t.no||0));if(!L.length)return 0;
+  let nx=docNoMax();
+  for(const Z of L){Z.sort((a,b)=>(b.t.auto?1:0)-(a.t.auto?1:0)||key(a).localeCompare(key(b))||String(a.t.id).localeCompare(String(b.t.id),'en',{numeric:true}));
+    Z.slice(1).forEach(({c,t})=>{if(t.auto)return;const old=t.no,nw=++nx;t.no0=old;t.no=nw;ch++;
+      for(const y of custs)for(const m of y.txs||[])if(m.lk&&String(m.lk.tx)===String(t.id)&&String(m.lk.cu)===String(c.id))m.no=nw;
+      if(!Z.some(o=>o.t!==t&&o.c===c)){const ids=new Set();for(const e of entries){if(e.wd&&String(e.wd.cu)===String(c.id)&&String(e.wd.no)===String(old)){e.wd.no=nw;if(String(e.code)===String(old))e.code=String(nw);ids.add(e.id);eCh++}}
+        if(ids.size){for(const e of entries)if(e.splitOf!=null&&ids.has(e.splitOf)){if(String(e.code)===String(old))e.code=String(nw);ids.add(e.id)}for(const b of batches)for(const x of b.items||[])if(ids.has(x.id)&&String(x.code)===String(old)){x.code=String(nw);bCh++}}}
+      for(const e of entries)for(const z of e.settles||[])if(z.byInv&&String(z.byInv.tx)===String(t.id)&&String(z.byInv.cu)===String(c.id)&&String(z.inv)===String(old)){z.inv=String(nw);if(z.note)z.note=String(z.note).replace(toFa(old),toFa(nw));eCh++}})}
+  if(eCh)audBg(()=>saveE());if(bCh)audBg(()=>ls.set('m_batches',batches));return ch}
+function lnkOrph(){const now=new Date().toISOString(),CI=new Map(custs.map(c=>[String(c.id),c]));let ch=0;try{ch+=edDupFix()}catch(_){}try{ch+=noDupFix()}catch(_){}
   const live=(cu,tx)=>{const C=CI.get(String(cu));if(!C||C.del)return false;const T=(C.txs||[]).find(z=>String(z.id)===String(tx));return !!(T&&!T.del)};
   for(const c of custs){if(c.sys)continue;for(const t of c.txs||[]){const src=t.type==='inv'&&t.lk?t.lk:t.type==='xf'&&t.inv?t.inv:null;if(!src)continue;const ok=live(src.cu,src.tx);
     if(!t.del&&!ok){t.del=true;t.delAt=now;t.delBy='خودکار';t.delSrc=1;ch++}
