@@ -722,77 +722,25 @@ function invDoc(c,t){const nl=v=>String(v).replace(/ · (طلبکاریم|بده
   const sold=its.reduce((s,i)=>s+(+i.tot||0),0)+xs.reduce((s,x)=>s+(x.t==='sell'?+x.amount||0:0),0),bought=xs.reduce((s,x)=>s+(x.t==='buy'?+x.amount||0:0),0),W=its.reduce((s,i)=>s+(+i.w||0),0);
   const pays=t.pays||[],paid=pays.reduce((s,p)=>s+pAmt(p),0);
   const line=(l,v,cl,sub)=>`<div class="l${cl?' '+cl:''}"><span>${l}${sub?'<small>'+sub+'</small>':''}</span><b>${v}</b></div>`;
-  /* ===== v89.6 برگه سند — کانسپت تازه «برگ طلا» (خواسته صاحب اپ: «کل کانسپت فاکتور و PDFها عوض شود؛ جدید، شیک و قشنگ») =====
-     برگه سفید و سبک، بدون نوار پُر: لوگو + عنوان و مشتری بالای یک خط دوتایی طلایی. صفحه دو بخش دارد:
-     راست = اقلام (هر ردیف نام پررنگ + یک خط مشخصات، وزن و مبلغ درشت)، چپ = ستون خلاصه (شماره/تاریخ، مظنه، حساب این سند با
-     نقطه‌چین تا عدد، و کارت طلایی «مانده نهایی حساب» با جمله ساده). عددها همان عددهای ذخیره‌شده سندند. */
-  const who2=v=>!v?'حساب تسویه است':v<0?'مشتری باید بپردازد':'مطلا باید بپردازد',side=v=>!v?'تسویه':v<0?'طلبکاریم':'بدهکاریم',cls=v=>v<0?'vd':v>0?'vc':'vz';
-  const flip=t.total<0?-1:1,sgn=x=>x*flip>0?'+':'−';
-  const taxS=t.tax?its.reduce((s,i)=>s+(+i.taxv||0),0):0,OL=[];
-  if(sold)OL.push([1,'جمع فروش',mo(sold),'',taxS?'شامل مالیات ارزش افزوده '+fmt(taxS):'']);if(bought)OL.push([-1,'خرید از مشتری',mo(bought),'by']);if(+t.disc)OL.push([-1,'تخفیف',mo(+t.disc),'']);
+  /* ===== v89.7 برگه سند روی «قالب ثابت» (08: pdfDoc/pdfCSS/pdfTop/pdfInf/pdfBB) — خواسته صاحب اپ: «یک پلتفرم ثابت»؛ تمام‌عرض و یک‌ستونه:
+     سربرگ → نوار مشخصات → اقلام → حساب این سند (ردیف‌های جمع و تفریق) → نوار مانده (قبلی + این سند = نهایی، برای هر جنس یک نوار) → امضا */
+  const who2=v=>!v?'':v<0?'مشتری باید بپردازد':'مطلا باید بپردازد',side=v=>!v?'تسویه':v<0?'طلبکاریم':'بدهکاریم',cls=v=>v<0?'vd':v>0?'vc':'vz';
+  const flip=t.total<0?-1:1,sgn=x=>x*flip>0?'+':'−',taxS=t.tax?its.reduce((s,i)=>s+(+i.taxv||0),0):0,OL=[];
+  if(sold)OL.push([1,'جمع فروش',mo(sold),'',taxS?'شامل مالیات ارزش افزوده '+fmt(taxS)+' تومان':'']);if(bought)OL.push([-1,'خرید از مشتری',mo(bought),'by']);if(+t.disc)OL.push([-1,'تخفیف',mo(+t.disc),'']);
   if(OL.length>1)OL.push(['=',t.total<0?'خالص خرید':'جمع سند',mo(Math.abs(t.total)),'t']);
   pays.forEach((p,pi)=>{if(pvP.has(pi))return;const a=pAmt(p);OL.push([a>0?-1:1,(a>0?'دریافت · ':'پرداخت · ')+esc(nl(pyLab(p,1)).replace(/^(دریافت|پرداخت)\s*/,'')),mo(Math.abs(a)),a>0?'p':'o',p.tn?'پیگیری '+esc(p.tn):''])});
-  const ln=(sg,l,v,cl,sub)=>`<div class="ln${cl?' '+cl:''}"><span class="lb"><i class="s">${sg}</i>${l}</span><i class="dots"></i><b>${v}</b>${sub?'<small class="sb">'+sub+'</small>':''}</div>`;
-  const OPS=OL.map(([x,l,v,cl,sub],k)=>ln(x==='='?'=':k===0?'':sgn(x),l,v,cl,sub)).join('')+pvLine();
-  const kv=(k,o,f,u)=>{const v=val(k,o);return `<b class="${cls(v)}"><bdi dir="ltr">${v?f(v):'۰'}</bdi><u>${esc(u)}</u><em>${side(v)}</em></b>`};
-  const eqs=col.map(([k,h,f,u])=>`<div class="eqk">${col.length>1?`<div class="eqh">${esc(String(h).split(' · ')[0])}</div>`:''}<div class="ln"><span class="lb"><i class="s"></i>مانده قبلی</span><i class="dots"></i>${kv(k,PB,f,u)}</div><div class="ln"><span class="lb"><i class="s">+</i>این سند</span><i class="dots"></i>${kv(k,DB,f,u)}</div></div>`).join('');
-  const finK=col.map(([k,h,f,u])=>{const v=val(k,FB);return `<div class="fk"><span class="fl">${esc(String(h).split(' · ')[0])}</span><b><bdi dir="ltr">${v?f(v):'۰'}</bdi><u>${esc(u)}</u></b><em>${side(v)}${v?' · '+who2(v):''}</em></div>`}).join('');
-  const sp=a=>a.filter(Boolean).map(z=>'<span>'+z+'</span>').join('');let rn=0;const RW=[];
-  its.forEach(it=>{const J=it.ab?'':ajLab(it);RW.push(`<tr><td class="k"><i>${toFa(++rn)}</i></td><td class="d"><b>${esc(it.k)}${it.sh===1?' <em>شرطی</em>':''}</b>${it.n?'<small class="nt">'+esc(it.n)+'</small>':''}<div class="sp">${sp(['عیار '+toFa(it.ay||750),J&&J!=='۰'?'اجرت '+esc(J):'',+it.pp?'سود '+toFa(String(+it.pp))+'٪':'',+it.mz?'مظنه '+fmt(it.mz):'',it.pz&&+it.cnt?qFmt(it.cnt)+' عدد':'',it.lab?'آزمایشگاه '+esc(it.lab):'',it.ang?'انگ '+esc(toFa(it.ang)):''])}</div></td><td class="q"><b>${wFmt(it.w)}</b><u>گرم</u></td><td class="a">${mo(it.tot)}${+it.taxv?'<small>با مالیات '+fmt(it.taxv)+'</small>':''}</td></tr>`)});
-  xs.forEach((x,xi)=>{if(PG.sx.has(xi))return;const g=g0(x),m=x.t==='sell'||x.t==='buy',u=un(x),q=g?(x.n!=null?x.n:x.w):(x.n!=null?x.n:x.q),w75=g?(+x.q750||+x.e||Math.round((+q||0)*(+x.ay||750)/750*1000)/1000):0,s75=g&&!x.pul&&(x.t==='in'||x.t==='out'||x.t==='buy'||x.cat==='آبشده');
-    const rate=g&&m?(x.t==='buy'&&!x.pul&&x.cat!=='آبشده'?'مظنه خرید '+fmt(Math.round(mzOf2(x)*(+x.ay||750)/750)):+x.mz?'مظنه '+fmt(x.mz):''):m&&x.pg?'هر '+esc(u||'واحد')+' '+fmt(x.pg):'';
-    RW.push(`<tr class="${x.t==='buy'?'by':''}"><td class="k"><i>${toFa(++rn)}</i></td><td class="d"><b>${esc(nl(xrLab(x)))}${x.sh===1?' <em>شرطی</em>':''}</b><div class="sp">${sp([g?'عیار '+toFa(x.ay||750):'',rate,s75?'وزن ۷۵۰: '+wFmt(Math.abs(w75))+' گرم':'',x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',x.lab?'آزمایشگاه '+esc(x.lab):'',x.ang?'انگ '+esc(toFa(x.ang)):''])}</div></td><td class="q"><b>${g?wFmt(q):qFmt(q)}</b><u>${esc(u)}</u></td><td class="a">${m?(x.t==='buy'?ng(x.amount):mo(x.amount)):`<span class="io ${x.t==='in'?'gi':'go'}">${x.t==='in'?'دریافت شد':'تحویل شد'}</span>`}</td></tr>`)});
+  const cl=(sg,l,v,c2,sub,em)=>`<div class="cl${c2?' '+c2:''}"><i class="sg">${sg}</i><span class="lb">${l}${sub?'<small>'+sub+'</small>':''}</span><b>${v}${em?'<em>'+em+'</em>':''}</b></div>`;
+  const CALC=OL.map(([x,l,v,c2,sub],k)=>cl(x==='='?'=':k===0?'':sgn(x),l,v,c2,sub)).join('')+PG.L.map(G=>{const P=[...G.p.map(i=>mo(pAmt(t.pays[i]))),...G.x.map(i=>xs[i]).map(x=>g0(x)?wFmt(parseFloat(x.w)||0)+' گرم':qFmt(parseFloat(x.q)||0)+' '+esc(un(x)))];return cl('','مانده قبلی',P.join(' · '),G.dir==='out'?'o':'p',G.dir==='out'?'بدهی قبلی مشتری':'طلب قبلی مشتری')}).join('')
+    +cl('=','مانده این سند','<span class="'+cls(d.r)+'">'+mo(Math.abs(d.r))+'</span>','r','','<span class="'+cls(d.r)+'">'+side(d.r)+(d.r?' · '+who2(d.r):'')+'</span>');
+  const BB=col.map(([k,h,f,u])=>{const a=val(k,PB),b2=val(k,DB),c3=val(k,FB),cell=(l,v,op,fin)=>[l,v?f(v):'۰',u,side(v)+(fin&&v?' · '+who2(v):''),cls(v),op,fin];return pdfBB(col.length>1?String(h).split(' · ')[0]:'',[cell('مانده قبلی',a,''),cell('این سند',b2,'+'),cell('مانده نهایی',c3,'=',1)])}).join('');
   const kind=t.total<0&&!hasI?'سند خرید':hasI?'فاکتور فروش':'سند';
-  return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(invTitle(t))} · ${esc(cuName(c))}</title>${PDF_FONT}<style>@page{size:A5 landscape;margin:7mm 8mm}html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}*{box-sizing:border-box}
-  body{font-family:Vazirmatn,Tahoma,sans-serif;color:#111a2e;font-size:8.4pt;line-height:1.55;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff;font-feature-settings:"tnum"}
-  u{text-decoration:none}small{display:block}
-  .hd{display:flex;align-items:center;gap:12px}.lg{flex:none;width:29mm;aspect-ratio:477/202;background:url(logo-stamp.png) center/contain no-repeat}
-  .ti{flex:1;min-width:0}.ti b{display:block;font-size:17pt;font-weight:900;letter-spacing:-.4px;line-height:1.25;color:#111a2e}.ti small{font-size:7pt;color:#8a6410;font-weight:700;letter-spacing:.3px}
-  .cu{text-align:left;max-width:46%}.cu small{font-size:6.6pt;color:#9a8a5c;font-weight:700}.cu b{display:block;font-size:11.5pt;font-weight:900;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cu span{font-size:7.4pt;color:#5b6577;direction:ltr;unicode-bidi:isolate}.cu a{color:inherit;text-decoration:none}
-  .rule{height:5px;margin:7px 0 9px;border-top:1.6px solid #c9992e;border-bottom:.6px solid #c9992e;position:relative}.rule:after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;transform:translate(-50%,-50%) rotate(45deg);background:#fff;border:1.2px solid #c9992e}
-  .rail{float:left;width:36.5%}.main{margin-left:39.5%}.cols:after{content:"";display:block;clear:both}
-  .tk{display:grid;grid-template-columns:auto 1fr;border:1px solid #eadfc4;border-radius:10px;overflow:hidden;background:#fffdf7}.tk>div{padding:5px 11px 6px}.tk>div+div{border-inline-start:1px dashed #dccb9a}
-  .tk small{font-size:6.4pt;color:#9a8a5c;font-weight:700}.tk b{display:block;font-weight:900;line-height:1.35}.tk .n b{font-size:14pt;color:#8a6410}.tk .d b{font-size:9.6pt}.tk span{font-size:6.8pt;color:#7a8294}
-  .mz{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:5px;padding:4px 11px;border-radius:9px;background:#faf6ec;font-size:7pt;color:#6b5a2a}.mz b{font-size:9.4pt;font-weight:900;color:#111a2e}
-  .cap{margin:9px 2px 3px;font-size:6.9pt;font-weight:900;color:#8a6410;letter-spacing:.2px;display:flex;align-items:center;gap:6px}.cap:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#e3d3a2)}
-  .ln{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 5px;padding:2.6px 3px;font-size:8.2pt}.ln .lb{flex:none;max-width:66%}.ln small.sb{flex-basis:100%;font-size:6.3pt;color:#8a91a1;padding-inline-start:13px;margin-top:-1px}.ln i.s{display:inline-block;width:11px;font-style:normal;font-weight:900;color:#b8a56b;text-align:center;margin-inline-end:2px}
-  .ln .dots{flex:1;min-width:8px;border-bottom:1px dotted #cfc39d;transform:translateY(-2px)}.ln>b{flex:none;font-weight:800;white-space:nowrap}
-  .ln.t{font-weight:900;border-top:1px solid #eadfc4;margin-top:2px;padding-top:4px}.ln.t i.s{color:#111a2e}.ln.by>b{color:#1d3f9c}.ln.p>b{color:#0f7a4a}.ln.o>b{color:#a3123f}
-  .mo{display:inline-flex;align-items:baseline;gap:3px;white-space:nowrap}.mo bdi{unicode-bidi:isolate}.mo u{font-size:.74em;font-weight:600;color:#8a91a1}
-  .res{margin-top:4px;padding:5px 9px 6px;border-radius:9px;background:#faf6ec;border:1px solid #eadfc4;display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:0 8px}.res span{font-size:8.6pt;font-weight:900}.res>b{font-size:11pt;font-weight:900}.res em{grid-column:1/-1;font-style:normal;font-size:6.8pt;font-weight:800;text-align:left}
-  .vd,.vd *{color:#a3123f}.vc,.vc *{color:#1d3f9c}.vz,.vz *{color:#0f7a4a}.res span{color:#111a2e!important}
-  .eqk+.eqk{margin-top:3px;padding-top:3px;border-top:1px dashed #eadfc4}.eqh{font-size:6.6pt;font-weight:800;color:#6b7280;padding:0 3px}
-  .ln>b bdi{unicode-bidi:isolate}.ln>b u{font-size:6.2pt;font-weight:600;opacity:.7;margin-inline-start:2px}.ln>b em{font-style:normal;font-size:6.2pt;font-weight:800;margin-inline-start:5px;padding:0 5px;border-radius:99px;background:rgba(0,0,0,.05)}
-  .gold{margin-top:6px;border-radius:13px;padding:8px 12px 9px;background:linear-gradient(135deg,#fbefc4 0%,#eccf7c 38%,#d8ae4a 72%,#c2912a 100%);border:1px solid #b0852a;box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 0 0 3px rgba(255,255,255,.14);color:#2a1e04;position:relative;overflow:hidden;break-inside:avoid}
-  .gold:before{content:"";position:absolute;left:-12mm;top:-30%;width:34mm;aspect-ratio:477/202;background:url(logo-stamp.png) center/contain no-repeat;opacity:.13;transform:rotate(-12deg)}
-  .gold>small{font-size:7pt;font-weight:900;letter-spacing:.3px;color:#5a4208;position:relative}.fks{display:flex;flex-direction:column;gap:3px;position:relative}
-  .fk{display:grid;grid-template-columns:auto 1fr;align-items:baseline;gap:0 8px}.fk .fl{font-size:7pt;font-weight:800;color:#5a4208}.fk b{font-size:16pt;font-weight:900;text-align:left;line-height:1.3;white-space:nowrap;letter-spacing:-.2px}.fk b u{font-size:7pt;font-weight:700;color:#5a4208;margin-inline-start:3px}
-  .fk em{grid-column:1/-1;justify-self:end;font-style:normal;font-size:7pt;font-weight:900;padding:1px 9px;border-radius:99px;background:rgba(42,30,4,.86);color:#fbefc4}.fks .fk:only-child .fl{display:none}.fks .fk:only-child{grid-template-columns:1fr}
-  table.it{width:100%;border-collapse:collapse}.it th{font-size:6.6pt;font-weight:800;color:#9a8a5c;text-align:right;padding:0 5px 4px;border-bottom:1.4px solid #111a2e;white-space:nowrap}.it th.q,.it th.a{text-align:left}
-  .it td{padding:6px 5px 5px;border-bottom:1px solid #f0ead8;vertical-align:top}.it tr{break-inside:avoid;page-break-inside:avoid}.it thead{display:table-header-group}
-  .it td.k{width:20px;padding-inline:0 4px}.it td.k i{display:grid;place-items:center;width:15px;height:15px;border-radius:50%;border:1px solid #d8c48a;color:#8a6410;font-style:normal;font-size:6.8pt;font-weight:800;margin-top:1px}
-  .it td.d b{font-size:9.4pt;font-weight:900}.it td.d b em{font-style:normal;font-size:6.2pt;font-weight:800;color:#8a6410;background:#faf1d6;border-radius:5px;padding:0 5px;vertical-align:1px}.it .nt{font-size:6.8pt;color:#6b7280}
-  .sp{display:flex;flex-wrap:wrap;gap:0 9px;font-size:6.9pt;color:#6b7280;margin-top:1px}.sp span+span{position:relative}.sp span+span:before{content:"";position:absolute;right:-5.5px;top:50%;width:2px;height:2px;border-radius:50%;background:#c9bb8f}
-  .it td.q{text-align:left;white-space:nowrap;width:1%}.it td.q b{font-size:9.2pt;font-weight:800}.it td.q u{font-size:6.4pt;color:#8a91a1;margin-inline-start:3px}
-  .it td.a{text-align:left;white-space:nowrap;width:1%;font-size:9.6pt;font-weight:900}.it td.a small{font-size:6.2pt;font-weight:500;color:#8a91a1}.it tr.by td.a,.it tr.by td.a *{color:#1d3f9c}.mn{margin-inline-end:2px}
-  .io{font-size:7.2pt;font-weight:900;padding:1px 8px;border-radius:99px}.io.gi{background:#e6f4ec;color:#0f7a4a}.io.go{background:#fbe9ec;color:#a3123f}
-  .wt{display:flex;justify-content:space-between;align-items:baseline;margin-top:5px;padding:4px 9px;border-radius:9px;background:#faf6ec;font-size:7.6pt;font-weight:800;color:#6b5a2a}.wt b{font-size:9.6pt;color:#111a2e}.wt u{font-size:6.6pt;color:#8a91a1;margin-inline-start:3px}
-  .ed{clear:both;break-inside:avoid;page-break-inside:avoid;padding-top:14px}.sg{display:flex;justify-content:space-between;gap:30px;font-size:7pt;color:#7a8294}.sg span{flex:1;border-top:1px solid #d9d2bc;padding-top:4px;text-align:center;max-width:34%}
-  .ft{margin-top:7px;display:flex;align-items:center;gap:8px;font-size:6.6pt;color:#9a9484}.ft:before,.ft:after{content:"";flex:1;height:1px;background:#eadfc4}.ft b{color:#8a6410;font-weight:900;letter-spacing:.3px}.ft i{font-style:normal;color:#c9992e}
-  .pvs{display:flex;flex-direction:column;align-items:flex-end;gap:1px}.l{display:flex;justify-content:space-between;gap:8px;padding:2.6px 3px;font-size:8.2pt}.l small{font-size:6.3pt;color:#8a91a1}
-  </style></head><body><div class="pg">
-  <div class="hd"><span class="lg" role="img" aria-label="طلای مطلا"></span><div class="ti"><b>${kind}</b><small>طلا و جواهر مطلا</small></div><div class="cu"><small>مشتری</small><b>${esc((c.title?c.title+' ':'')+cuName(c))}</b>${c.phone?`<span>${telA(c.phone,esc(toFa(c.phone)))}</span>`:''}</div></div><div class="rule"></div>
-  <div class="cols"><div class="rail">
-    <div class="tk"><div class="n"><small>شماره</small><b>${toFa(t.no)}</b></div><div class="d"><small>تاریخ</small><b>${esc(D.fa)}</b><span>${esc(D.wd)}</span></div></div>
-    ${t.rate?`<div class="mz"><span>مظنه روز <b>${fmt(t.mz||Math.round(t.rate*MZK))}</b></span><span>هر گرم ۱۸ عیار <b>${fmt(t.rate)}</b></span></div>`:''}
-    <div class="cap">حساب این سند</div>${OPS}
-    <div class="res ${cls(d.r)}"><span>مانده این سند</span><b>${mo(Math.abs(d.r))}</b><em>${side(d.r)}${d.r?' · '+who2(d.r):''}</em></div>
-    <div class="cap">حساب مشتری</div>${eqs}
-    <div class="gold"><small>مانده نهایی حساب</small><div class="fks">${finK}</div></div>
-  </div><div class="main">
-    ${RW.length?`<table class="it"><thead><tr><th></th><th>شرح</th><th class="q">مقدار</th><th class="a">مبلغ</th></tr></thead><tbody>${RW.join('')}</tbody></table>${hasI?`<div class="wt"><span>جمع وزن کالا</span><span><b>${wFmt(W)}</b><u>گرم</u></span></div>`:''}`:'<div class="wt"><span>این سند ردیف کالا ندارد</span></div>'}
-  </div></div>
-  <div class="ed"><div class="sg"><span>امضای مشتری</span><span>مهر و امضای فروشنده</span></div><div class="ft"><span>صادرکننده: ${esc(t.by||'')}</span><i>◆</i><b>طلای مطلا</b></div></div></div></body></html>`}
+  const body=`<section class="pg">${pdfTop(kind,D,t.no)}
+  ${pdfInf([['مشتری',esc((c.title?c.title+' ':'')+cuName(c)),'',1],c.phone?['تلفن','<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>','']:null,['تاریخ',esc(D.fa),esc(D.wd)],t.rate?['مظنه روز',fmt(t.mz||Math.round(t.rate*MZK)),'هر گرم ۱۸ عیار '+fmt(t.rate)]:null])}
+  ${R.length?`<h2>اقلام سند</h2><table class="it"><thead><tr><th>#</th><th>کالا</th><th>مقدار</th><th>عیار</th><th>نرخ</th><th>اجرت</th><th>سود</th><th class="n">مبلغ</th></tr></thead><tbody>${R.join('')}</tbody>${hasI?`<tfoot><tr><td></td><td>جمع وزن کالا</td><td>${wFmt(W)} <u>گرم</u></td><td colspan="5"></td></tr></tfoot>`:''}</table>`:''}
+  <h2>حساب این سند</h2><div class="calc">${CALC}</div>
+  <h2>مانده حساب مشتری</h2>${BB}
+  <div class="sign"><div>امضای مشتری</div><div>مهر و امضای فروشنده</div></div>${pdfFoot()}</section>`;
+  return pdfDoc(invTitle(t)+' · '+cuName(c),body).replace(/@page\{size:A5 landscape;[^}]*\}/,'@page{size:A5 landscape;margin:7mm 8mm}')}
 ACT.invPrint=()=>{const X=invGet();if(!X)return;openPrint(()=>invDoc(X.c,X.t))};
 
 /* ================= انتقال مانده بین مشتری‌ها ================= */
