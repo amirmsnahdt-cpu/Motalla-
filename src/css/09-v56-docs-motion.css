@@ -4246,7 +4246,7 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .cbk .cbsp i{font-style:normal;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
 .cbk .cbsp i.a{background:color-mix(in srgb,#7c3aed 14%,var(--card));color:#7c3aed}.cbk .cbsp i.f{background:var(--red2);color:var(--red)}
 /* v87.7 «مسیر پرداخت»: قرمز = نرفته به لیست، بنفش = در لیست بی‌تخصیص، زرد = تخصیص‌شده منتظر واریز */
-.ppb,.ppc,.ppl,.ppd{--ppf:var(--red);--ppv:#d97706;--ppa:#15803d}
+.ppb,.ppc,.ppl,.ppd{--ppf:var(--red);--ppv:#ea580c;--ppa:#7c3aed}
 .ppb{display:flex;gap:2px;height:5px;margin-top:6px;border-radius:99px;overflow:hidden;direction:rtl}
 .ppb i{display:block;flex:1 1 0;min-width:5px;border-radius:99px;background:var(--ppf)}.ppb i.pl{background:var(--ppv)}.ppb i.pa{background:var(--ppa)}
 .ppl{display:flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;font-weight:800;line-height:1.5;color:var(--ppf);min-width:0}
@@ -4273,3 +4273,6 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 :is(#cures,.cuLs,.cub9,#view) .cbk.pp>.ppl{display:flex;align-items:center;line-height:1.5;gap:8px;margin:2px 0 0!important;font-size:10.5px;font-weight:800;color:inherit;overflow:hidden;white-space:nowrap}
 .cbk.pp .ppl>span{display:flex;margin:0!important;line-height:1.5;align-items:center;gap:3px;color:var(--ppf);flex:none}.cbk.pp .ppl>span.l{color:var(--ppv)}.cbk.pp .ppl>span.a{color:var(--ppa)}
 .cbk.pp .ppl>span i{width:5px;height:5px;border-radius:50%;background:currentColor}
+.cbk.pp>.ppl{gap:4px!important;margin-top:3px!important}
+.cbk.pp .ppl>span{padding:1px 7px;border-radius:99px;background:var(--card);font-size:10.5px;gap:4px}
+.cbk.pp .ppl>span.n{padding:1px 6px;gap:3px}

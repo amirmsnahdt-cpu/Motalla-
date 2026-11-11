@@ -83,9 +83,10 @@ const PPS=[['free','f','نرفته به لیست','هنوز واریزی برا�
 function ppParts(R,wp,wa){wp=Math.max(0,Math.round(+wp||0));wa=Math.min(wp,Math.max(0,Math.round(+wa||0)));const tot=Math.max(Math.round(+R||0),wp);return {tot,free:tot-wp,wf:wp-wa,wa}}
 function ppBar(p,big){return `<span class="ppb${big?' big':''}" aria-hidden="true">${PPS.map(([k,c])=>p[k]>0?`<i class="p${c}" style="flex-grow:${Math.max(p[k]/p.tot,.06).toFixed(3)}"></i>`:'').join('')}</span>`}
 /* v88.0 (خواسته صاحب اپ: «فشرده‌تر با همه داده‌ها»): در فهرست فقط یک خط — هر مرحله یک کلمه + عدد به میلیون؛ نوار = لبه پایین کاشی (بدون ارتفاع) */
-const PPL={f:'نرفته',l:'لیست',a:'بانک'},ppM=n=>{n=Math.round(+n||0);return n>=1e6?fmt(Math.round(n/1e5)/10).replace('.','٫')+'م':fmt(n)};
-function ppLine(p){return `<span class="ppl">${PPS.filter(([k])=>p[k]>0).map(([k,c])=>`<span class="${c}"><i></i>${PPL[c]} ${ppM(p[k])}</span>`).join('')}</span>`}
-const PPC={f:'نرفته به لیست',l:'در لیست',a:'منتظر واریز'};/* v87.8 (خواسته صاحب اپ: «فضای زیادی نگیرد»): کارت فشرده — یک خط عنوان، نوار، سه خانه کنار هم */
+const PPL={f:'نرفته',l:'در لیست',a:'تخصیص‌شده'},PPF={l:'در لیست · منتظر تخصیص',a:'تخصیص‌شده · منتظر واریز'},ppM=n=>{n=Math.round(+n||0);return n>=1e6?fmt(Math.round(n/1e5)/10).replace('.','٫')+'م':fmt(n)};
+/* v88.1 (خواسته صاحب اپ: «هنوز کمی گیج‌کننده»): همه مانده در یک مرحله = یک جمله کامل بدون عدد؛ چند مرحله = «عدد + کلمه» در قرص‌های سفید */
+function ppLine(p){const S=PPS.filter(([k])=>p[k]>0);return `<span class="ppl">${S.length===1&&PPF[S[0][1]]?`<span class="${S[0][1]}"><i></i>${PPF[S[0][1]]}</span>`:S.map(([k,c])=>S.length>2?`<span class="${c} n"><i></i>${ppM(p[k])}</span>`:`<span class="${c}">${ppM(p[k])} ${PPL[c]}</span>`).join('')}</span>`}
+const PPC={f:'نرفته به لیست',l:'در لیست',a:'تخصیص‌شده'};/* v87.8 (خواسته صاحب اپ: «فضای زیادی نگیرد»): کارت فشرده — یک خط عنوان، نوار، سه خانه کنار هم */
 function ppCard(p,title,extra,cls){return `<div class="ppc${cls?' '+cls:''}"><div class="pph"><b>${title}</b><small>از ${fmt(p.tot)}</small></div>${ppBar(p,1)}<div class="pps">${PPS.map(([k,c])=>`<span class="ppr ${c}${p[k]>0?'':' z'}"><small><i></i>${PPC[c]}</small><b>${p[k]>0?fmt(p[k]):'—'}</b></span>`).join('')}</div>${extra||''}</div>`}
 function wdSumHTML(c,no,tot){const E=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&(no==null||String(e.wd.no)===String(no)));const s=wdSpl(c,no),sent=s.fr+s.al;if(!sent&&!E.length)return '';
   return ppCard(ppParts(tot,sent,s.al),'مسیر پرداخت این سند')}
