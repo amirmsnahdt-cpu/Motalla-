@@ -84,7 +84,17 @@ const bkWmH=c=>{const b=c&&c.grp==='بانک'&&bkOfCu(c);return b&&bkLogo(b)?`<s
 /* v84.9 (خواسته صاحب اپ: «مشتری تستی را حذف کردم، حواله‌ها و کارتخوان‌هایش در بانک‌ها مانده‌اند»): سند آینه (t.lk یا xf با peer/inv)
    که حساب یا سند اصلی‌اش حذف شده، خودکار حذف (نرم) می‌شود با نشان delSrc؛ اگر حساب/سند اصلی برگردد (بازگردانی)، آینه هم برمی‌گردد.
    کارتخوان‌ها در سند «کارتخوان روز» هم با posDaySync (فقط CU() زنده) خودشان کم/زیاد می‌شوند. */
-function lnkOrph(){const now=new Date().toISOString(),CI=new Map(custs.map(c=>[String(c.id),c]));let ch=0;
+/* v88.9 (بازبینی دو گوشی): دو نفر هم‌زمان یک سند را ویرایش می‌کنند → هر گوشی نسخه قبلی را کنار می‌گذارد و نسخه خودش را می‌سازد؛ بعد از همگام‌سازی
+   هر دو نسخه زنده می‌ماند و فروش دو بار حساب می‌شود. edDupFix: سندهای زنده‌ای که ریشه زنجیره ویرایششان (edOf) یکی است = یک سند؛ تازه‌ترین (at، بعد شناسه)
+   می‌ماند و بقیه با آینه‌ها و تسویه واریزی‌شان خودکار کنار می‌روند (dupOf). روی همه گوشی‌ها همان نتیجه. */
+function edDupFix(){const now=new Date().toISOString();let ch=0;
+  for(const c of custs){if(c.sys||c.del||!(c.txs||[]).some(t=>t.edOf!=null&&!t.del))continue;const I=new Map((c.txs||[]).map(t=>[String(t.id),t]));
+    const root=t=>{let g=0;while(t.edOf!=null&&I.has(String(t.edOf))&&g++<200)t=I.get(String(t.edOf));return String(t.id)};const G=new Map();
+    for(const t of c.txs||[]){if(t.del||t.type!=='inv'||t.lk||t.pd||t.bl||t.bd)continue;const k=root(t);(G.get(k)||G.set(k,[]).get(k)).push(t)}
+    for(const L of G.values()){if(L.length<2)continue;L.sort((a,b)=>String(b.at||'').localeCompare(String(a.at||''))||String(b.id).localeCompare(String(a.id),'en',{numeric:true}));
+      L.slice(1).forEach(t=>{t.del=true;t.delAt=now;t.delBy='خودکار';t.dupOf=L[0].id;try{txLinked(c,t).forEach(x=>{if(!x.t.del){x.t.del=true;x.t.delAt=now;x.t.delBy='خودکار'}})}catch(_){}try{invDepOff(t)}catch(_){}ch++})}}
+  return ch}
+function lnkOrph(){const now=new Date().toISOString(),CI=new Map(custs.map(c=>[String(c.id),c]));let ch=0;try{ch+=edDupFix()}catch(_){}
   const live=(cu,tx)=>{const C=CI.get(String(cu));if(!C||C.del)return false;const T=(C.txs||[]).find(z=>String(z.id)===String(tx));return !!(T&&!T.del)};
   for(const c of custs){if(c.sys)continue;for(const t of c.txs||[]){const src=t.type==='inv'&&t.lk?t.lk:t.type==='xf'&&t.inv?t.inv:null;if(!src)continue;const ok=live(src.cu,src.tx);
     if(!t.del&&!ok){t.del=true;t.delAt=now;t.delBy='خودکار';t.delSrc=1;ch++}
