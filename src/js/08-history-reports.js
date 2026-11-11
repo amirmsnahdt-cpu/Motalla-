@@ -126,7 +126,17 @@ tr.stlr td{padding:0 6px 11px}
 .stk{font-weight:800;color:#16213a;white-space:nowrap}.std{flex:1;color:#6b7385;font-size:7.6pt}.stbr b{font-weight:800;white-space:nowrap;color:#16213a}
 .stw{display:inline-block;font-size:6.8pt;font-weight:700;color:#946200;background:#fbf4e1;border-radius:6px;padding:0 5px}
 .stbr.bk .stk{color:#2a4fb8}.stbr.bk i{background:#2a4fb8;color:#fff}.stbr.bk b{color:#2a4fb8}
-.pb{position:fixed;top:10px;left:10px;padding:9px 16px;background:#13284f;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}@media print{.pb{display:none}}`}
+.pb{position:fixed;top:10px;left:10px;padding:9px 16px;background:#13284f;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}@media print{.pb{display:none}}
+/* v89.4 (خواسته صاحب اپ: «طراحی شکیل‌تر گزارش‌ها»): جدول قاب‌دار با سرستون سرمه‌ای/طلایی و ردیف یک‌درمیان، وضعیت و نوع واریز در یک خط، خلاصه فشرده */
+h1{font-size:12.5pt;margin:8px 0 0}.bar{margin:6px 0 10px}
+.kp{margin-bottom:12px;background:#f8f9fc;border-color:#e3e6ee;border-radius:12px}.kp div{padding:7px 12px;border-color:#e3e6ee}.kp b{font-size:12pt}
+h2{margin:14px 0 6px;font-size:11pt}
+table{border:1px solid #e3e6ee;border-radius:10px;overflow:hidden;border-collapse:separate;border-spacing:0}
+th{background:#13284f;color:#f3d892;border-bottom:0;padding:5px 8px}td{padding:6px 8px}
+tbody.en:nth-of-type(even) td,tbody:not(.en) tr:nth-child(even) td{background:#f8f9fc}
+tr.tot td{background:#fbf6e8!important;border-top:1px solid #ecd9a6;color:#7a5a17;padding:7px 8px}
+.st+br{display:none}.sty{margin:0 5px 0 0;vertical-align:middle}.st{vertical-align:middle}
+.sign{margin-top:20px}.foot{margin-top:12px}`}
 /* v61.64 (خواسته صاحب اپ): همه PDFها با تم تازه — سرتیتر سرمه‌ای با لوگوی «طلای مطلا»، نوار طلایی و نقش کم‌رنگ لوگو پشت برگه (مثل فاکتور) */
 function pdfTop(kind,D){return `<div class="top"><div class="brand"><span class="lg" role="img" aria-label="طلای مطلا"></span><span><b>${esc(kind)}</b><small>طلا و جواهر مطلا</small></span></div><div class="doc">تاریخ<b>${D.fa}</b></div></div>`}
 const pdfFoot=()=>`<div class="foot"><span style="color:#b8862b;font-weight:800">طلای مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;

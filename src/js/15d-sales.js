@@ -748,17 +748,30 @@ function invDoc(c,t){const nl=v=>String(v).replace(/ · (طلبکاریم|بده
   .it td small.w75{color:#7a5a17;font-weight:600}.it td small.w75 b{font-weight:800}
   .bv{display:grid;grid-template-columns:42px 1fr;align-items:center;gap:6px}.bv i{margin:0;text-align:center}.bv bdi{text-align:right;font-weight:800;unicode-bidi:isolate}.bl td{width:auto}.bl thead th{text-align:right}
   /* v61.84: A5 افقی با همان طراحی پیش‌نمایش (یک ستون) */.sg{margin-top:16px}
-  .mt{break-inside:avoid}.it tr,.sm,.bl{break-inside:avoid;page-break-inside:avoid}.it thead{display:table-header-group}.it tfoot{display:table-row-group}.hd,.mt,h4{break-after:avoid;page-break-after:avoid}/* v61.71: همان طراحی A5؛ فهرست بلند به صفحه بعد با سرستون تکرارشده، ردیف نصف نمی‌شود */</style></head><body><div class="pg">
+  .mt{break-inside:avoid}.it tr,.sm,.bl{break-inside:avoid;page-break-inside:avoid}.it thead{display:table-header-group}.it tfoot{display:table-row-group}.hd,.mt,h4{break-after:avoid;page-break-after:avoid}/* v61.71: همان طراحی A5؛ فهرست بلند به صفحه بعد با سرستون تکرارشده، ردیف نصف نمی‌شود */
+  /* v89.4 (خواسته صاحب اپ: «طراحی درست‌تر و شکیل‌تر برگه‌ها»): نوار مشخصات یک‌تکه، جدول اقلام با ردیف‌های یک‌درمیان، پایین برگه دو ستون
+     (حساب این سند | مانده حساب مشتری) به‌جای دو کادر زیر هم با نیمه خالی؛ دریافت/پرداخت بی علامت منفی (برچسب خودش می‌گوید) */
+  .mt{gap:0;border:1px solid #e3e6ee;border-radius:10px;overflow:hidden;background:#f8f9fc}.mt div{border:0;border-radius:0;padding:5px 10px}.mt div+div{border-inline-start:1px solid #e3e6ee}.mt b{font-size:9.4pt}
+  h4{margin:8px 0 4px;font-size:7.4pt;color:#13284f;font-weight:900}
+  .it{border:1px solid #e3e6ee;border-radius:10px;overflow:hidden;border-collapse:separate;border-spacing:0}.it th{background:#13284f;color:#f3d892;border-bottom:0;padding:5px 6px;font-size:7pt}.it td{padding:4px 6px}.it tbody tr:nth-child(even) td{background:#f8f9fc}.it tbody tr:last-child td{border-bottom:0}.it tfoot td{border-top:1px solid #e3e6ee;background:#fbf6e8;color:#7a5a17;padding:4px 6px}
+  .bt{display:grid;grid-template-columns:1.15fr 1fr;gap:8px;margin-top:8px;align-items:start;break-inside:avoid}.bt.st{grid-template-columns:1fr}
+  .bt .sm{width:auto;margin:0;padding:0 0 4px;border:1px solid #e3e6ee;border-radius:10px;overflow:hidden}.bt .sm .l{padding:2.5px 10px}.bt .bl{margin:0;border-color:#e3e6ee;border-radius:10px}
+  .sh{background:#f1f3f8;color:#13284f;font-size:7pt;font-weight:900;padding:3px 10px;letter-spacing:.1px}.sm .sh+.l{margin-top:2px}.sm .l+.sh{margin-top:4px}
+  .sm .l.t{border-top:1px dashed #d5d9e3;margin:3px 10px 0;padding:4px 0 2px}.sm .l.g{margin:5px 0 -4px;padding:6px 10px;border-top:1px solid #ecd9a6;background:#fbf6e8;color:#13284f;font-size:9.6pt}
+  .sm .l>b{flex:0 0 auto;text-align:left}.l.p b,.l.o b{font-weight:800}
+  .bl thead th{background:#fff;color:#7a8294;border-bottom:1px solid #e3e6ee}.bl table th,.bl table td{border-bottom:1px solid #eef0f4;padding:4.5px 10px}.bl tbody th{color:#4a5263}
+  .lgd{margin-top:6px;justify-content:center;font-size:6.6pt}.sg{margin-top:18px}
+</style></head><body><div class="pg">
   <div class="hd"><span class="lg" role="img" aria-label="طلای مطلا"></span><span class="br"><b>${t.total<0&&!hasI?'سند خرید':hasI?'فاکتور فروش':'سند'}</b><small>طلا و جواهر مطلا</small></span><span class="no"><small>شماره</small><b>${toFa(t.no)}</b></span></div>
   <div class="mt"><div><small>مشتری</small><b>${esc((c.title?c.title+' ':'')+cuName(c))}</b>${c.phone?`<span dir="ltr" style="text-align:right">${telA(c.phone,esc(toFa(c.phone)))}</span>`:''}</div><div><small>تاریخ</small><b>${esc(D.fa)}</b><span>${esc(D.wd)}</span></div><div><small>مظنه روز</small><b>${t.rate?fmt(t.mz||Math.round(t.rate*MZK)):'—'}</b><span>${t.rate?'هر گرم ۱۸: '+fmt(t.rate):''}</span></div></div>
   ${R.length?`<h4>اقلام سند</h4><table class="it"><thead><tr><th>#</th><th>کالا</th><th>مقدار</th><th>عیار</th><th>نرخ</th><th>اجرت</th><th>سود</th><th class="n">مبلغ</th></tr></thead><tbody>${R.join('')}</tbody>${hasI?`<tfoot><tr><td></td><td>جمع وزن کالا</td><td>${wFmt(W)} <u>گرم</u></td><td colspan="5"></td></tr></tfoot>`:''}</table>`:''}
-  <div class="sm">${sold?line('جمع فروش',mo(sold)):''}${bought?line('خرید از مشتری',ng(bought)):''}${t.tax&&its.some(i=>+i.taxv)?line('مالیات بر ارزش افزوده <small>در مبلغ ردیف‌ها</small>',mo(its.reduce((s,i)=>s+(+i.taxv||0),0))):''}${+t.disc?line('تخفیف',ng(t.disc)):''}
+  <div class="bt${col.length>2?' st':''}"><div class="sm"><div class="sh">حساب این سند</div>${sold?line('جمع فروش',mo(sold)):''}${bought?line('خرید از مشتری',ng(bought)):''}${t.tax&&its.some(i=>+i.taxv)?line('مالیات بر ارزش افزوده <small>در مبلغ ردیف‌ها</small>',mo(its.reduce((s,i)=>s+(+i.taxv||0),0))):''}${+t.disc?line('تخفیف',ng(t.disc)):''}
     ${line(t.total<0?'خالص خرید (به نفع مشتری)':'جمع سند',mo(t.total),sold||bought?'t':'')}
-    ${pvLine()}${pays.map((p,pi)=>pvP.has(pi)?'':line('<em class="pt '+(pAmt(p)>0?'p':'o')+'">'+(pAmt(p)>0?'دریافت':'پرداخت')+'</em>'+esc(nl(pyLab(p,1)).replace(/^(دریافت|پرداخت)\s*/,'')),ng(pAmt(p),pAmt(p)<0),pAmt(p)>0?'p':'o',p.tn?'پیگیری '+esc(p.tn):'')).join('')}
-    ${pays.length>1?line('جمع دریافت و پرداخت',ng(paid,paid<0),'t'):''}
+    ${pays.length||PG.L.length?'<div class="sh">دریافت و پرداخت</div>':''}${pvLine()}${pays.map((p,pi)=>pvP.has(pi)?'':line('<em class="pt '+(pAmt(p)>0?'p':'o')+'">'+(pAmt(p)>0?'دریافت':'پرداخت')+'</em>'+esc(nl(pyLab(p,1)).replace(/^(دریافت|پرداخت)\s*/,'')),mo(Math.abs(pAmt(p))),pAmt(p)>0?'p':'o',p.tn?'پیگیری '+esc(p.tn):'')).join('')}
+    ${pays.length>1?line(paid<0?'جمع پرداختی':'جمع دریافتی',mo(Math.abs(paid)),'t'):''}
     ${line('مانده این سند '+lab(d.r),d.r?mo(d.r):'<span class="mo"><bdi>۰</bdi><u>تومان</u></span>','g')}</div>
-  <div class="bl"><table><thead><tr><th></th>${col.map(([,h])=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${balRow('مانده قبلی',PB)}${balRow('این سند',DB)}${balRow('مانده نهایی',FB,'f')}</tbody></table></div>
-  <div class="lgd"><span><i class="d">طلبکاریم</i> مشتری به مطلا بدهکار است</span><span><i class="c">بدهکاریم</i> مطلا به مشتری بدهکار است</span><span><em class="pt p">دریافت</em> از مشتری</span><span><em class="pt o">پرداخت</em> به مشتری</span></div>
+  <div class="bl"><div class="sh">مانده حساب مشتری</div><table><thead><tr><th></th>${col.map(([,h])=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${balRow('مانده قبلی',PB)}${balRow('این سند',DB)}${balRow('مانده نهایی',FB,'f')}</tbody></table></div></div>
+  <div class="lgd"><span><i class="d">طلبکاریم</i> مشتری به مطلا بدهکار است</span><span><i class="c">بدهکاریم</i> مطلا به مشتری بدهکار است</span></div>
   <div class="ed"><div class="sg"><span>امضای مشتری</span><span>مهر و امضای فروشنده</span></div><div class="ft"><span>صادرکننده: ${esc(t.by||'')}</span><b>طلای مطلا</b></div></div></div></body></html>`}
 ACT.invPrint=()=>{const X=invGet();if(!X)return;openPrint(()=>invDoc(X.c,X.t))};
 
