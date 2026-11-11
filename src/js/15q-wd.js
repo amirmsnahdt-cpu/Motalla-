@@ -84,12 +84,13 @@ function ppParts(R,wp,wa){wp=Math.max(0,Math.round(+wp||0));wa=Math.min(wp,Math.
 function ppBar(p,big){return `<span class="ppb${big?' big':''}" aria-hidden="true">${PPS.map(([k,c])=>p[k]>0?`<i class="p${c}" style="flex-grow:${Math.max(p[k]/p.tot,.06).toFixed(3)}"></i>`:'').join('')}</span>`}
 const PPL={f:'نرفته به لیست',l:'در لیست، تخصیص نخورده',a:'منتظر واریز بانک'};
 function ppLine(p){const s=PPS.find(([k])=>p[k]>0);return s?`<span class="ppl ${s[1]}"><i></i><span>${fmtShort(p[s[0]])} ${PPL[s[1]]}</span></span>`:''}
-function ppCard(p,title,extra,cls){return `<div class="ppc${cls?' '+cls:''}"><div class="pph"><span class="ppi">${ic('cal')}</span><span class="tx"><b>${title}</b><small>از ${fmt(p.tot)} تومان بدهی ما</small></span></div>${ppBar(p,1)}<div class="pps">${PPS.map(([k,c,t,d],n)=>`<div class="ppr ${c}${p[k]>0?'':' z'}"><em>${toFa(n+1)}</em><span class="tx"><b>${t}</b><small>${d}</small></span><strong>${p[k]>0?fmt(p[k]):'ندارد'}</strong></div>`).join('')}</div>${extra||''}</div>`}
+const PPC={f:'نرفته به لیست',l:'در لیست',a:'منتظر واریز'};/* v87.8 (خواسته صاحب اپ: «فضای زیادی نگیرد»): کارت فشرده — یک خط عنوان، نوار، سه خانه کنار هم */
+function ppCard(p,title,extra,cls){return `<div class="ppc${cls?' '+cls:''}"><div class="pph"><b>${title}</b><small>از ${fmt(p.tot)}</small></div>${ppBar(p,1)}<div class="pps">${PPS.map(([k,c])=>`<span class="ppr ${c}${p[k]>0?'':' z'}"><small><i></i>${PPC[c]}</small><b>${p[k]>0?fmt(p[k]):'—'}</b></span>`).join('')}</div>${extra||''}</div>`}
 function wdSumHTML(c,no,tot){const E=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&(no==null||String(e.wd.no)===String(no)));const s=wdSpl(c,no),sent=s.fr+s.al;if(!sent&&!E.length)return '';
-  return ppCard(ppParts(tot,sent,s.al),'مسیر پرداخت این سند','','wdsum')}
+  return ppCard(ppParts(tot,sent,s.al),'مسیر پرداخت این سند')}
 /* صفحه مشتری: زیر کارت مانده حساب — کارت مسیر پرداخت + واریزی‌های در راه (هر کدام = باز کردن واریزی) */
 function wdCuHTML(c){const L=wdPendL(c);if(!L.length)return '';const A=allocMap(),b=cuBal(c);let fr=0,al=0;L.forEach(o=>{let f=0;wdParts(o.e,o.S,A).forEach(q=>{if(q.fr)f+=q.a});o.fr=Math.min(f,o.S.pend);o.al=o.S.pend-o.fr;fr+=o.fr;al+=o.al});
-  const rows=`<div class="ppdh">واریزی‌های در راه · ${toFa(L.length)}</div>${L.map(({e,S,fr,al})=>`<button type="button" class="ppd ${al&&!fr?'a':'l'}" data-act="depGo" data-e="${e.id}"><i></i><span class="tx"><b>${fmt(S.pend)} <small>تومان</small></b><small>سند ${toFa(e.wd.no)} · واریز ${esc(payLab(PD(e))||dates(PD(e)).fa)}</small></span><em>${al&&fr?'بخشی تخصیص‌شده':al?'تخصیص‌شده':'تخصیص نخورده'}</em>${ic('back').replace('class="i"','class="i flip"')}</button>`).join('')}`;
+  const rows=L.map(({e,S,fr,al})=>`<button type="button" class="ppd ${al&&!fr?'a':'l'}" data-act="depGo" data-e="${e.id}"><i></i><b>${fmt(S.pend)}</b><small>سند ${toFa(e.wd.no)} · ${esc(payLab(PD(e))||dates(PD(e)).fa)}</small><em>${al&&fr?'بخشی تخصیص‌شده':al?'تخصیص‌شده':'تخصیص نخورده'}</em>${ic('back').replace('class="i"','class="i flip"')}</button>`).join('');
   return ppCard(ppParts(b.R,fr+al,al),'مسیر پرداخت بدهی',rows)}
 /* پنجره تسویه: سطر «رفته برای واریز» زیر عدد مانده */
 /* v87.6 (خواسته صاحب اپ): در زمان ارسال به لیست — مانده کل · رفته به لیست · نرفته به لیست */
