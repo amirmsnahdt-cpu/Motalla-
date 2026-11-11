@@ -4291,3 +4291,9 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .d6k.k-wf,.txwd.wf,.stbv.f em{background:linear-gradient(135deg,#ecd08a,#c9992e)!important;color:#4a3305!important}
 .wfx{color:#8a6410!important}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .txwd:not(.wf){color:#c4b5fd!important;background:color-mix(in srgb,#7c3aed 22%,var(--card))!important}}
+/* v89.1: مسیر پرداخت در حالت تیره — عدد و برچسب بنفش/طلایی/یاقوتی روشن‌تر (روی زمینه تیره خوانا نبود) */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.ppb,.ppc,.ppl,.ppd){--ppf:#fb7196;--ppv:#e9c873;--ppa:#b9a2ff}
+  :root:not([data-theme="light"]) .ppd.a em{background:color-mix(in srgb,#7c3aed 30%,var(--card));color:#d6c8ff}}
+:root[data-theme="dark"] :is(.ppb,.ppc,.ppl,.ppd){--ppf:#fb7196;--ppv:#e9c873;--ppa:#b9a2ff}
+:root[data-theme="dark"] .ppd.a em{background:color-mix(in srgb,#7c3aed 30%,var(--card));color:#d6c8ff}
+:root[data-theme="dark"] .txwd:not(.wf){color:#c4b5fd!important;background:color-mix(in srgb,#7c3aed 22%,var(--card))!important}
