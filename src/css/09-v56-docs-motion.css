@@ -4286,3 +4286,8 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .cbk.pp .ppl>span.l{background:linear-gradient(135deg,#ecd08a,#c9992e)!important;color:#4a3305!important;box-shadow:0 1px 2px rgba(90,60,5,.25)}
 .cbk.pp .ppl>span.a{background:linear-gradient(135deg,#6d3fc4,#3b1680)!important;color:#fff!important;box-shadow:0 1px 2px rgba(30,10,70,.25)}
 .ppd.l em{background:linear-gradient(135deg,#ecd08a,#c9992e)!important;color:#4a3305!important}
+/* v88.4: برچسب‌های قدیمی هم‌رنگ «مسیر پرداخت» — تخصیص نخورده = طلایی، تخصیص‌شده = بنفش سلطنتی */
+.txwd{background:color-mix(in srgb,#4c1d95 12%,var(--card))!important;color:#4c1d95!important}
+.d6k.k-wf,.txwd.wf,.stbv.f em{background:linear-gradient(135deg,#ecd08a,#c9992e)!important;color:#4a3305!important}
+.wfx{color:#8a6410!important}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .txwd:not(.wf){color:#c4b5fd!important;background:color-mix(in srgb,#7c3aed 22%,var(--card))!important}}
