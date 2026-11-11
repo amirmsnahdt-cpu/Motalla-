@@ -81,7 +81,7 @@ function invNext(){return docNoMax()+1}
 const invNoUsed=n=>custs.some(c=>(c.txs||[]).some(t=>t.type==='inv'&&!t.del&&String(t.no)===String(n)));
 const svKeep=()=>ls.set('m_svd',sv);
 function svBlank(cu){const r=+ls.get('m_rate',0)||0;return{v:2,cuId:cu||'',date:todayISO(),rate:r,mz:+ls.get('m_mz',0)||mzOf(r),items:[],xr:[],tax:!!ls.get('m_tax',false),disc:0,pays:[],gconv:false,q:'',live:1}}
-const svFix=()=>{if(sv.gconv)sv.gconv=false;/* v60.9: «مانده ریالی طلایی ثبت شود» فعلاً برداشته شده */if(!sv.xr)sv.xr=[];if(!sv.items)sv.items=[];if(!sv.pays)sv.pays=[];if(sv.mz==null)sv.mz=mzOf(sv.rate);if(!sv.qa)sv.qa=qaBlank();
+const svFix=()=>{if(sv.gconv&&!sv.gcOld)sv.gconv=false;/* v88.7: سند قدیمی که مانده‌اش «به طلا» ثبت شده (t.gc) در ویرایش همان‌طور می‌ماند (gcOld) — قبلاً با اولین ویرایش تبدیل بی‌صدا حذف می‌شد و مانده مبلغ و طلا می‌پرید *//* v60.9: «مانده ریالی طلایی ثبت شود» فعلاً برداشته شده */if(!sv.xr)sv.xr=[];if(!sv.items)sv.items=[];if(!sv.pays)sv.pays=[];if(sv.mz==null)sv.mz=mzOf(sv.rate);if(!sv.qa)sv.qa=qaBlank();
   /* v61.46: مبلغ دستی قدیمی (با مالیات داخلش) یک بار به «پیش از مالیات» برگردانده می‌شود؛ جمع همان می‌ماند */
   sv.items.forEach(it=>{if(+it.amT>0&&!it.amN){const c=itCalc(it,sv.rate,sv.tax);if(c.fx){it.amT=c.gold+c.aj+c.pr;it.amN=1}}});};
 ACT.svNew=d=>{if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}closeSheet();svQO=0;/* v70.6: ورود به سند تازه = فهرست مشتری بسته */const cu=d&&d.cu?d.cu:'',old=ls.get('m_svd',null);
@@ -143,7 +143,9 @@ function vSell(){xaSync();if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();g
 /* v61.5: نرخ طلا یک فیلد کوچک بدون کلید: برنامه خودش تشخیص می‌دهد عدد «مظنه» است یا «هر گرم ۱۸» (نسبت ۴٫۳۳۱۸)،
    با مقایسه با نرخ قبلی (یا اگر نرخی نبود، بالای ۶۰ میلیون = مظنه) و دیگری را کوچک زیرش می‌نویسد */
 const rtK=()=>sv&&sv.rk?sv.rk:(ls.get('m_rtk','mz')==='g'?'g':'mz');
-const rtDetect=(v,ref)=>!v?rtK():ref?(Math.abs(v-ref*MZK)<Math.abs(v-ref)?'mz':'g'):(v>=6e7?'mz':'g');
+/* v88.7: وقتی نرخ قبلی نیست (اولین سند روی این گوشی)، قیمت لحظه‌ای بازار مرجع تشخیص است؛ مرز ثابت ۶۰ میلیون فقط وقتی هیچ‌کدام نباشد */
+const rtRef0=()=>{try{return (GL&&+GL.g18)||0}catch(_){return 0}};
+const rtDetect=(v,ref)=>{if(!v)return rtK();ref=+ref||rtRef0();return ref?(Math.abs(v-ref*MZK)<Math.abs(v-ref)?'mz':'g'):(v>=6e7?'mz':'g')};
 function rateHTML(){const k=rtK(),v=k==='mz'?sv.mz:sv.rate;
   return `<label class="d6rate2${sv.rate?'':' need'}" id="svRate"><small id="svRl">${sv.rate?(k==='mz'?'مظنه':'هر گرم ۱۸'):'مظنه یا هر گرم'}</small><input id="svM" class="ltr" inputmode="numeric" value="${v?Number(v).toLocaleString('en-US'):''}" placeholder="" autocomplete="off" enterkeyhint="next"><span class="d6rx" id="svRx">${rateX()}</span>${glRateHTML()}</label>`}
 const rateX=()=>sv.rate?(rtK()==='mz'?'هر گرم <b>'+fmt(sv.rate)+'</b>':'مظنه <b>'+fmt(sv.mz)+'</b>'):'دیگری خودکار';
@@ -679,7 +681,7 @@ function ivBalP(c,t){const P=cuBalBefore(c,t),d=txD(t),K=q8Keys(P,d);
 ACT.invBal=d=>{if(!invGet())return;ACT.invEdit();setTimeout(()=>{if(cur==='sell'&&sv&&sv.edit)ACT.svBal(d)},420)};
 /* سند ثبت‌شده به شکل «سند در حال ویرایش» (برای ویرایش و برای پنجره جزئیات فاکتور) */
 function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','ajv','prv','taxv','tot'].forEach(k=>delete o[k]);return o}),xr=(t.xr||[]).map(x=>{const o={...x};['n','q750','amount','e'].forEach(k=>delete o[k]);if(o.a==='gold'&&!o.pgM)o.pg=0;return o}),pays=(t.pays||[]).map(p=>{const o={...p};delete o.xfId;return o});
-  const keep=sv;sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:false,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();const r=sv;sv=keep;return r}
+  const keep=sv;sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:!!t.gc,gcOld:!!t.gc,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();const r=sv;sv=keep;return r}
 /* v61.56 (خواسته صاحب اپ): در صفحه سند ثبت‌شده هم نگه داشتن روی مانده‌های پایین = جزئیات فاکتور (همان پنجره صفحه سند) */
 function invDetHTML(){const X=invGet();if(!X)return '';const keep=sv;try{sv=invSv(X.c,X.t);return svDetHTML({inv:1})}finally{sv=keep}}
 ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'ویرایش');return}if(X.t.lk||X.t.bl||X.t.pd){lkGoTx(X.t,'ویرایش');return}if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
