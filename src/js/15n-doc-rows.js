@@ -113,7 +113,9 @@ const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&Stri
    - طلب آزاد مشتری = مانده − همان بخش؛ فقط این مقدار با حواله به حساب خودش پرداخت می‌شود و بقیه فقط روی واریزی (m:'dep')
    - فهرست طرف حواله (پله‌ها و پنجره تسویه): واریزی‌های ارسال‌نشده + مشتری‌هایی که طلب آزاد دارند، مثل همان پنجره تسویه سند */
 const cuDepPend=c=>{let a=0;for(const e of entries){if(e.del||!e.wd||String(e.wd.cu)!==String(c.id))continue;if(e.splitOf!=null&&entries.some(z=>z.id===e.splitOf&&z.wd))continue;a+=wdState(e).pend}return a};
-const cuFree=(c,skip)=>Math.max(0,Math.round(cuBal(c).R-cuDepPend(c)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='cust'&&String(p.cuId)===String(c.id)).reduce((s,p)=>s+pAmt(p),0):0)));
+/* v88.5: در ویرایش سند، حواله ثبت‌شده همین سند (سند آینه در حساب طرف مقابل) دوباره به طلب آزاد برمی‌گردد — قبلاً دو بار کم می‌شد */
+const cuOwnLk=c=>sv&&sv.edit?(c.txs||[]).filter(t=>!t.del&&t.lk&&String(t.lk.tx)===String(sv.edit.tx)).reduce((s,t)=>s-(t.pays||[]).reduce((a,p)=>a+pAmt(p),0),0):0;
+const cuFree=(c,skip)=>Math.max(0,Math.round(cuBal(c).R+cuOwnLk(c)-cuDepPend(c)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='cust'&&String(p.cuId)===String(c.id)).reduce((s,p)=>s+pAmt(p),0):0)));
 const depLeft=(x,skip)=>Math.max(0,Math.round(depAvail(x)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='dep'&&String(p.entId)===String(x.id)).reduce((s,p)=>s+pAmt(p),0):0)));
 /* v71.3 (خواسته صاحب اپ: «هر حسابی که مانده دارد و تخصیص داده نشده باید در فهرست بدهکاریم باشد»):
    یک فهرست برای همه جا (پنجره تسویه سند، پنجره مانده صفحه مشتری، پله‌های ردیف): هر حساب مشتری که به او بدهکاریم یک ردیف،

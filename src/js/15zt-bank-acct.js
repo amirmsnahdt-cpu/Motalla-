@@ -67,7 +67,8 @@ function posDaySync(c){const now=new Date().toISOString();let ch=0;const D=new M
   bkDup(c,'pd',now)&&(ch=1);
   for(const t of c.txs||[]){if(t.del||!t.pd)continue;const R=D.get(t.pd);if(!R||!R.length){t.del=true;t.delAt=now;t.delBy='خودکار';ch=1;continue}
     if(stj(t.pays)!==stj(R)){t.pays=R;t.edAt=now;ch=1}D.delete(t.pd)}
-  for(const [k,R] of D){(c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:k,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:R,note:'',pd:k,at:k+'T23:00:00.000Z',by:'خودکار',cn:cnNext(c)});ch=1}
+  for(const [k,R] of D){/* v88.5: سند روزی که خودکار حذف شده بود (حذف و بازگردانی سند/حساب) با همان شماره برمی‌گردد */const od=(c.txs||[]).filter(z=>z.del&&z.pd===k&&z.delBy==='خودکار').pop();if(od){od.del=false;delete od.delAt;delete od.delBy;od.pays=R;od.edAt=now;ch=1;continue}
+    (c.txs=c.txs||[]).push({id:nid++,type:'inv',dk:'in',no:invNext(),date:k,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,pays:R,note:'',pd:k,at:k+'T23:00:00.000Z',by:'خودکار',cn:cnNext(c)});ch=1}
   if(ch){c.lastAt=now}return ch}
 function posDaySyncAll(noSave){let ch=lnkOrph();for(const c of bkCus())ch+=posDaySync(c);if(ch&&!noSave)audBg(()=>saveCu());return ch}
 /* ===== v84.2 (خواسته صاحب اپ: «لوگوی هر بانک خودکار در پروفایل حساب ذخیره شود و پس‌زمینه کم‌رنگ لوگوی بانک») =====

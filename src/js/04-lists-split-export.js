@@ -161,7 +161,8 @@ function blockedHelp(){sheet(`<div class="sh-h"><b>این برنامه اجاز�
 
 /* ============ پیگیری واریز و لیست‌های روزانه ============ */
 let batches=ls.get('m_batches',[]).map(b=>({...b,items:(b.items||[]).map(x=>({...x,name:stripName(x.name)}))})),batchId=null,tkFilter='all',tkQ='',trTab='open',dayIso=null,itemIdx=null,txtGen=null,txtName=null,tmpSt=null,tmpImg;
-const saveB=()=>ls.set('m_batches',batches);
+let BKDIRTY=0;/* v88.5: هر تغییر لیست‌های ارسالی (ارسال، برگشت، تأیید، ناموفق) → سند «لیست واریز» حساب بانک در همان رسم بعدی به‌روز می‌شود (render) */
+const saveB=()=>{BKDIRTY=1;ls.set('m_batches',batches)};
 /* ورژن‌های قبلی: واریزی‌های داخل لیست پیگیری را «ارسال‌شده» علامت بزن */
 (()=>{let ch=0;batches.forEach(b=>b.items.forEach(x=>{const e=entries.find(z=>z.id===x.id);if(e&&!e.sentBid){e.sentBid=b.id;ch=1}}));if(ch)saveE()})();
 /* مانده برای تخصیص در لیست جاری (همه واریزی‌های این تاریخ واریز، از هر روز ثبت) */

@@ -90,6 +90,15 @@ const PPC={f:'نرفته به لیست',l:'در لیست',a:'تخصیص‌شده
 function ppCard(p,title,extra,cls){return `<div class="ppc${cls?' '+cls:''}"><div class="pph"><b>${title}</b><small>از ${fmt(p.tot)}</small></div>${ppBar(p,1)}<div class="pps">${PPS.map(([k,c])=>`<span class="ppr ${c}${p[k]>0?'':' z'}"><small><i></i>${PPC[c]}</small><b>${p[k]>0?fmt(p[k]):'—'}</b></span>`).join('')}</div>${extra||''}</div>`}
 function wdSumHTML(c,no,tot){const E=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&(no==null||String(e.wd.no)===String(no)));const s=wdSpl(c,no),sent=s.fr+s.al;if(!sent&&!E.length)return '';
   return ppCard(ppParts(tot,sent,s.al),'مسیر پرداخت این سند')}
+/* v88.5 قفل‌های ایمنی (بازبینی مسیرها):
+   docDelLock = سندی که واریزی در لیست واریز دارد حذف نمی‌شود (قبلاً سند می‌رفت، واریزی در لیست می‌ماند و پول بدون طلب از بانک پرداخت می‌شد)،
+   و سندی که با «حواله از واریزی» (m:'dep') یک واریزیِ تأییدشده بانک را پرداخت کرده هم؛ stlBkLock = واریز بانکی این واریزی تأیید شده، پس تسویه‌های مشتری‌اش
+   دیگر عوض نمی‌شود (قبلاً مبلغ «واریز شد» بی‌صدا کم و زیاد می‌شد) */
+const stlBkLock=e=>{const bi=e&&entBI(e);return !!(bi&&bi.it&&bi.it.st==='ok')};
+const STLLK='واریز بانکی این واریزی تأیید شده؛ برای تغییر تسویه، اول تأیید بانک را در لیست واریز بردارید';
+function docDelLock(c,t){if(!c||!t||t.del||t.type!=='inv'||t.lk||t.pd||t.bl||t.bd)return '';const n=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&String(e.wd.no)===String(t.no)).length;
+  if(n)return 'این سند '+toFa(n)+' واریزی در لیست واریز دارد؛ اول واریزی‌ها را از لیست حذف کنید، بعد سند را';
+  for(const p of t.pays||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(e&&stlBkLock(e))return 'این سند واریزی «'+(e.name||'')+'» را پرداخت کرده و واریز بانکی آن تأیید شده؛ اول تأیید بانک را در لیست واریز بردارید'}return ''}
 /* صفحه مشتری: زیر کارت مانده حساب — کارت مسیر پرداخت + واریزی‌های در راه (هر کدام = باز کردن واریزی) */
 function wdCuHTML(c){const L=wdPendL(c);if(!L.length)return '';const A=allocMap(),b=cuBal(c);let fr=0,al=0;L.forEach(o=>{let f=0;wdParts(o.e,o.S,A).forEach(q=>{if(q.fr)f+=q.a});o.fr=Math.min(f,o.S.pend);o.al=o.S.pend-o.fr;fr+=o.fr;al+=o.al});
   const rows=L.map(({e,S,fr,al})=>`<button type="button" class="ppd ${al&&!fr?'a':'l'}" data-act="depGo" data-e="${e.id}"><i></i><b>${fmt(S.pend)}</b><small>سند ${toFa(e.wd.no)} · ${esc(payLab(PD(e))||dates(PD(e)).fa)}</small><em>${al&&fr?'بخشی تخصیص‌شده':al?'تخصیص‌شده':'تخصیص نخورده'}</em>${ic('back').replace('class="i"','class="i flip"')}</button>`).join('');
