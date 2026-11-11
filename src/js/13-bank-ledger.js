@@ -83,19 +83,10 @@ function vBanksOld(){cashEnsure();bxWas=!!document.querySelector('#view .bxblue'
   ${!L.length?'':bxBlue({t:'مانده کل بانک‌ها',v:K.length?fin:null,an:!bxWas,sub:toFa(L.length)+' حساب مغازه'+(miss?' · '+toFa(miss)+' حساب بدون مانده قبلی (در جمع نیست)':'')})}
   ${un.length?bkExtraHTML(un):''}`}
 let bxWas=false;
-const aBanksBind=()=>{const I=$('bkq');if(I&&!I._b){I._b=1;I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();bkQ=I.value;const r=$('bkres'),b=r&&r.querySelector('.c6r,.c6add');if(b&&r.querySelectorAll('.c6r,.c6add').length===1)b.click();else I.blur()}};I.oninput=()=>{clearTimeout(I._t);I._t=setTimeout(()=>{bkQ=I.value;const x=document.querySelector('.c6q0 .x');if(x)x.classList.toggle('hide',!bkQ);srchSwap('bkres',bkListHTML())},90)}}
-  if(cur==='banks'&&!bxWas)requestAnimationFrame(()=>cuCount('#view .bxblue.anim .cbn'))};
 ACT.bkQClr=()=>{bkQ='';const I=$('bkq');if(I){I.value='';I.focus()}const x=document.querySelector('.c6q0 .x');if(x)x.classList.add('hide');srchSwap('bkres',bkListHTML())};
 /* منوی سه‌نقطه سمت چپ سرتیتر بانک‌ها */
-ACT.bkOld=()=>{sheet(`<div class="sh-h"><div><b>بانک‌های قبلی</b><small class="shsub">حساب‌های بانکی نسخه قبل با مانده و گردششان · دست‌نخورده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>${bkListHTML()}`)};
-ACT.bkMore=()=>{const c=can('src'),P=CH('pos');popMenu(document.querySelector('#bar .hmo'),[c?['posNight',ic('down'),'ثبت واریز کارتخوان امشب']:null].filter(Boolean))};/* v84.0 (خواسته صاحب اپ): بقیه گزینه‌ها برداشته شد */
 /* انتخاب حساب‌های مغازه (یک‌بار؛ بعد از «انتخاب حساب‌ها» قابل تغییر) */
 let ownTmp=null;
-ACT.acOwn=()=>{if(!can('src'))return;const any=ownSet();ownTmp=new Set(sources.filter(s=>any?s.own:(s.bal!=null||srcMoves(s).length||acPOS(s).length||(s.led||[]).length)).map(s=>String(s.id)));acOwnRe(true)};
-function acOwnRe(first){const h=`<div class="sh-h"><div><b>حساب‌های مغازه</b><small class="shsub">فقط حساب‌های روشن در صفحه بانک و انتخاب حواله سندها می‌آیند؛ منبع‌های واریزی دست نمی‌خورند</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="fcard blist bxol">${sources.map(s=>{const bk=acBank(s),on=ownTmp.has(String(s.id)),m=acSum(s);return `<button class="pmi aclk${on?' on':''}" data-act="acOwnT" data-id="${s.id}"><span class="bxoa">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(s.name))}</span>`}</span><span class="tx"><b>${esc(s.name)}</b><small>${esc(bk?'بانک '+bk:'بانک نامشخص')}${m.known?' · مانده '+fmt(m.fin):m.nIn+m.nOut?' · '+toFa(m.nIn+m.nOut)+' حواله':''}</small></span><i class="tg"></i></button>`}).join('')}</div>
-  <div class="acown-n"><span class="acown-ok">${ic('check')}</span><span>زدن هر حساب همان لحظه ذخیره می‌شود · <b id="acOwnN">${toFa(ownTmp.size)}</b> حساب روشن</span></div>`;
-  if(first)sheet(h);else $('sheet').innerHTML=h}
 /* v69.5 (خواسته صاحب اپ): بدون دکمه ذخیره — هر روشن/خاموش همان لحظه ذخیره می‌شود و صفحه بانک پشت پنجره تازه می‌شود؛
    آخرین حساب روشن خاموش نمی‌شود (وگرنه صفحه بانک خالی می‌ماند). تاریخچه یک بار بعد از آخرین تغییر (۱٫۵ ثانیه) */
 ACT.acOwnT=d=>{if(!ownTmp||!can('src'))return;const k=String(d.id);if(ownTmp.has(k)&&ownTmp.size===1){toast('دست‌کم یک حساب باید روشن بماند',true);return}
@@ -107,7 +98,6 @@ function bkExtraHTML(un){const P=CH('pos');let h='';un=un||P.filter(c=>!chSrc(c)
   if(un.length)h+=`<div class="spsec"><b>کارتخوان‌های وصل‌نشده</b><small>بگویید پول هر کارتخوان به کدام حساب می‌نشیند تا در همان حساب جمع شود</small></div><div class="fcard blist">${un.map(c=>{const v=chBal(c);return `<div class="posw"><button class="chrow" data-act="chOpen" data-id="${c.id}"><span class="bri pos">${ic('card')}</span><span class="tx"><b>${esc(c.name)}</b><small>${v?'در راه '+fmt(v)+' تومان':'همه واریز شده'}</small></span></button>${can('src')&&sources.length?`<button class="posdep" data-act="chLinkPick" data-id="${c.id}">${ic('bank')}<span>وصل کن</span></button>`:''}</div>`}).join('')}</div>`;
   return h}
 /* موجودی طلا و سکه مغازه (از منوی سه‌نقطه بانک) */
-ACT.bkStock=()=>{const st=goldStock(),gk=Object.keys(st).filter(k=>st[k]),as=assetStock(),ak=Object.keys(as);sheet(`<div class="sh-h"><div><b>موجودی مغازه</b><small class="shsub">از خریدها، فروش‌ها، دریافت و تحویل‌های ثبت‌شده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>${gk.length||ak.length?`<div class="stks">${gk.map(k=>`<div class="${st[k]<0?'neg':''}"><small>${esc(k)}</small><b>${wFmt(st[k])}<i>گرم</i></b></div>`).join('')}${ak.map(k=>`<div class="${as[k]<0?'neg':''}"><small>${esc((XA[k]||{t:k}).t)}</small><b>${qFmt(as[k])}<i>${esc((XA[k]||{u:''}).u)}</i></b></div>`).join('')}</div>`:'<div class="stmno"><b>موجودی ثبت نشده</b></div>'}`)};
 const aBanks=()=>'';
 let acTmp={};
 function acFormHTML(s){const isNew=!s.id,bk=acTmp.bank;

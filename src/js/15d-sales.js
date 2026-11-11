@@ -144,7 +144,9 @@ function vSell(){xaSync();if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();g
    با مقایسه با نرخ قبلی (یا اگر نرخی نبود، بالای ۶۰ میلیون = مظنه) و دیگری را کوچک زیرش می‌نویسد */
 const rtK=()=>sv&&sv.rk?sv.rk:(ls.get('m_rtk','mz')==='g'?'g':'mz');
 /* v88.7: وقتی نرخ قبلی نیست (اولین سند روی این گوشی)، قیمت لحظه‌ای بازار مرجع تشخیص است؛ مرز ثابت ۶۰ میلیون فقط وقتی هیچ‌کدام نباشد */
-const rtRef0=()=>{try{return (GL&&+GL.g18)||0}catch(_){return 0}};
+/* v89.2: بی‌اینترنت و بی‌نرخ قبلی روی همین گوشی → نرخ تازه‌ترین سند ثبت‌شده (از همگام‌سازی) مرجع است */
+const rtDocRef=()=>{let at='',r=0;for(const c of custs){if(c.del)continue;for(const t of c.txs||[]){if(t.del||t.type!=='inv'||!(+t.rate>0))continue;const k=String(t.at||'');if(k>at){at=k;r=+t.rate}}}return r};
+const rtRef0=()=>{try{if(GL&&+GL.g18)return +GL.g18}catch(_){}try{return rtDocRef()}catch(_){return 0}};
 const rtDetect=(v,ref)=>{if(!v)return rtK();ref=+ref||rtRef0();return ref?(Math.abs(v-ref*MZK)<Math.abs(v-ref)?'mz':'g'):(v>=6e7?'mz':'g')};
 function rateHTML(){const k=rtK(),v=k==='mz'?sv.mz:sv.rate;
   return `<label class="d6rate2${sv.rate?'':' need'}" id="svRate"><small id="svRl">${sv.rate?(k==='mz'?'مظنه':'هر گرم ۱۸'):'مظنه یا هر گرم'}</small><input id="svM" class="ltr" inputmode="numeric" value="${v?Number(v).toLocaleString('en-US'):''}" placeholder="" autocomplete="off" enterkeyhint="next"><span class="d6rx" id="svRx">${rateX()}</span>${glRateHTML()}</label>`}
