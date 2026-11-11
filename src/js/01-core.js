@@ -165,7 +165,8 @@ function validated0(){
     if(!r.bank&&!ibanBank(r.iban)&&ibanFmt(r.iban))warn('بانک مقصد از روی شبا تشخیص داده نشد');
     else if(r.bank&&ibanFmt(r.iban)&&ibanBank(r.iban)&&canon(r.bank)!==canon(ibanBank(r.iban)))warn('بانک واردشده ('+r.bank+') با بانک شبا ('+ibanBank(r.iban)+') نمی‌خواند');
     const k=r.entryDate+'|'+r.iban+'|'+r.amount;if(!r.splitOf)(keys[k]=keys[k]||[]).push(r)}
-  for(const c in codes)if(codes[c].length>1)codes[c].forEach(r=>{r.issues.push('شماره فاکتور تکراری');r.level=2});
+  /* v87.5 (خواسته صاحب اپ: «سند را به دو حساب واریز دادم، خطادار شد»): چند واریزی از یک سند (wd با همان مشتری و شماره سند) فاکتور مشترک دارند و تکراری نیستند */
+  for(const c in codes){const G=codes[c];if(G.length<2)continue;const w0=G[0].wd;if(w0&&G.every(r=>r.wd&&String(r.wd.cu)===String(w0.cu)&&String(r.wd.no)===String(w0.no)))continue;G.forEach(r=>{r.issues.push('شماره فاکتور تکراری');r.level=2})}
   for(const k in keys)if(keys[k].length>1)keys[k].forEach(r=>{r.issues.push('شبا و مبلغ تکراری');r.level=Math.max(r.level,1)});
   const PC={};L.forEach(r=>{if(r.splitOf!=null)PC[r.splitOf]=(PC[r.splitOf]||1)+1});
   L.forEach(r=>{r.bankShow=ibanBank(r.iban)||r.bank;r.acct=acctOf(r.iban);r.card=r.card||'';const pk=r.splitOf!=null?r.splitOf:r.id;if(PC[pk])r.pcs=PC[pk]});return L}
