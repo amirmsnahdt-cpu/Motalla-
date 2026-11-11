@@ -127,16 +127,22 @@ tr.stlr td{padding:0 6px 11px}
 .stw{display:inline-block;font-size:6.8pt;font-weight:700;color:#946200;background:#fbf4e1;border-radius:6px;padding:0 5px}
 .stbr.bk .stk{color:#2a4fb8}.stbr.bk i{background:#2a4fb8;color:#fff}.stbr.bk b{color:#2a4fb8}
 .pb{position:fixed;top:10px;left:10px;padding:9px 16px;background:#13284f;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}@media print{.pb{display:none}}
-/* v89.5 (خواسته صاحب اپ: «نوارها و همه چیز شیک‌تر»): همان زبان برگه سند — سرتیتر سرمه‌ای با خط طلایی نازک، سرستون کرم با خط طلایی، خلاصه فشرده، وضعیت در یک خط */
-.top{background:linear-gradient(120deg,#0d1a38,#152c5a 65%,#1b3870);border-radius:13px;padding:9px 14px 11px;box-shadow:inset 0 0 0 1px rgba(236,200,116,.28)}.top:after{inset:auto 14px 4px 14px;height:1px;background:linear-gradient(90deg,transparent,#ecc874 20%,#f6e2a6 50%,#ecc874 80%,transparent)}
-.doc{background:rgba(255,255,255,.05);border-color:rgba(236,200,116,.45);border-radius:9px}.doc b{color:#fff}
-h1{font-size:12.5pt;margin:8px 0 0}.bar{display:none}.sub{margin:2px 0 9px;padding-bottom:7px;border-bottom:1px solid #e6dcc0}
-.kp{margin-bottom:12px;border:0;border-radius:0;gap:6px;overflow:visible}.kp div{padding:6px 11px;border:1px solid #e9ecf3!important;border-radius:10px;background:#fff}.kp div.g{border-color:#c9a24a!important;background:linear-gradient(180deg,#fdf9ec,#f8efd3)}.kp b{font-size:12.5pt}
-h2{margin:14px 0 5px;font-size:10.5pt;align-items:center;justify-content:flex-start}h2:before{content:"";flex:none;width:3px;height:12px;border-radius:2px;background:linear-gradient(#ecc874,#b8862b);margin-inline-end:6px}h2 small{margin-inline-start:auto}
-table{border-collapse:collapse}th{background:#f6f1e1;color:#0f1f3f;font-weight:900;border-top:1px solid #e6dcc0;border-bottom:1.5px solid #c9a24a;padding:5px 8px}td{padding:6px 8px;border-bottom:1px solid #edf0f5}
-tr.tot td{background:#fbf8ee;border-top:1.5px solid #c9a24a;color:#7a5a17;padding:6px 8px}
-.st+br{display:none}.sty{margin:0 5px 0 0;vertical-align:middle}.st{vertical-align:middle}
-.sign{margin-top:20px}.foot{margin-top:12px}.pg:before{opacity:.03}`}
+/* ===== v89.6 کانسپت تازه «برگ طلا» برای همه گزارش‌ها (همان زبان برگه سند): برگه سفید و سبک، سرتیتر بی‌نوار (لوگو + عنوان + برگه تاریخ) روی خط دوتایی طلایی،
+   خانه‌های خلاصه شنی، جدول با سرستون ساده و خط مشکی نازک، ردیف جمع شنی، عنوان بخش با خط طلایی محو ===== */
+body{color:#111a2e;font-size:9pt}.pg:before{display:none}
+.top{background:none;color:#111a2e;border-radius:0;padding:0 0 9px;margin-bottom:11px;overflow:visible;box-shadow:none;border-bottom:1.6px solid #c9992e}.top:after{content:"";position:absolute;inset:auto 0 -5px 0;height:0;border-bottom:.6px solid #c9992e;background:none}
+.top:before{content:"";position:absolute;left:50%;bottom:-7px;width:9px;height:9px;transform:translateX(-50%) rotate(45deg);background:#fff;border:1.2px solid #c9992e;z-index:1}
+.lg{width:30mm;filter:none}.brand b{font-size:16pt;font-weight:900;letter-spacing:-.4px;color:#111a2e}.brand small{color:#8a6410;font-weight:700;font-size:7pt;letter-spacing:.3px}.brand>span:last-child{border:0;padding-inline-start:0}
+.doc{background:#fffdf7;border:1px solid #eadfc4;border-radius:10px;color:#9a8a5c;font-weight:700;font-size:6.6pt;padding:4px 12px 5px;text-align:right}.doc b{color:#111a2e;font-size:9.6pt;font-weight:900}
+h1{font-size:13pt;font-weight:900;margin:0;letter-spacing:-.2px}.bar{display:none}.sub{margin:2px 0 10px;padding:0;border:0}.sub .pdl{background:#faf1d6;color:#8a6410}.sub .pdv{color:#111a2e}
+.kp{margin-bottom:12px;border:0;border-radius:0;gap:7px;overflow:visible}.kp div{padding:6px 12px 7px;border:1px solid #eadfc4!important;border-radius:11px;background:#fffdf7}.kp small{color:#9a8a5c;font-weight:700;font-size:6.8pt}.kp b{font-size:13pt;font-weight:900;color:#111a2e}
+.kp div.g{border:1px solid #b0852a!important;background:linear-gradient(135deg,#fbefc4,#eccf7c 45%,#d2a640);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}.kp .g small{color:#5a4208}.kp .g b{color:#2a1e04}.kp .g b em{color:#5a4208}.kp .ok b{color:#0f7a4a}.kp .rd b{color:#a3123f}
+h2{margin:14px 0 5px;font-size:10pt;font-weight:900;color:#111a2e;align-items:center;justify-content:flex-start;gap:8px}h2:after{content:"";order:1;flex:1;height:1px;background:linear-gradient(90deg,transparent,#e3d3a2)}h2 small{order:2;margin:0;font-size:7.6pt;color:#6b5a2a;font-weight:700;background:#faf6ec;border-radius:99px;padding:1px 10px}
+table{border-collapse:collapse}th{background:none;color:#9a8a5c;font-size:6.8pt;font-weight:800;border:0;border-bottom:1.4px solid #111a2e;padding:0 7px 4px}td{padding:6px 7px;border-bottom:1px solid #f0ead8}
+td.n{color:#8a6410;font-weight:800}.nm{font-weight:900;font-size:9.6pt}.s{color:#8a91a1}.ib{color:#2a3550}td.am{font-size:10pt;font-weight:900}
+tr.tot td{background:#faf6ec;border-top:0;border-bottom:0;color:#6b5a2a;padding:6px 7px;font-size:9.6pt}tr.tot td:first-child{border-radius:0 9px 9px 0}tr.tot td:last-child{border-radius:9px 0 0 9px;color:#111a2e}
+.st{border-radius:99px;padding:1px 9px}.st.ok{background:#e6f4ec;color:#0f7a4a}.st.fail{background:#fbe9ec;color:#a3123f}.st.pending{background:#faf1d6;color:#8a6410}.st+br{display:none}.sty{margin:0 5px 0 0;vertical-align:middle;background:#eef2fb;color:#1d3f9c;border-radius:99px;padding:1px 8px}.st{vertical-align:middle}
+.sign{margin-top:22px;gap:60px}.sign div{border-top:1px solid #d9d2bc;color:#7a8294}.foot{margin-top:12px;border-top:1px solid #eadfc4;color:#9a9484}`}
 /* v61.64 (خواسته صاحب اپ): همه PDFها با تم تازه — سرتیتر سرمه‌ای با لوگوی «طلای مطلا»، نوار طلایی و نقش کم‌رنگ لوگو پشت برگه (مثل فاکتور) */
 function pdfTop(kind,D){return `<div class="top"><div class="brand"><span class="lg" role="img" aria-label="طلای مطلا"></span><span><b>${esc(kind)}</b><small>طلا و جواهر مطلا</small></span></div><div class="doc">تاریخ<b>${D.fa}</b></div></div>`}
 const pdfFoot=()=>`<div class="foot"><span style="color:#b8862b;font-weight:800">طلای مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
@@ -171,7 +177,7 @@ function reportHTML(sc){const D=DP(),RG=alloc.reg||'',G=groups(sc).filter(g=>g.r
 /* لیست روزانه با وضعیت، شماره پیگیری و رسیدها */
 async function dayReport(iso,G0,FS0,T0,R0){const G=G0||dayGroups(iso),D=dates(iso),it=G.flatMap(g=>g.rows),c=bStat({items:it}),imgs={};
   const RI=[];for(const x of it){const b=batches.find(z=>z.id===x.bid);if(!b)continue;for(const k of itImgs(b,x)){const v=await imgGet(k);if(v)RI.push({x,v})}}
-  const TT=T0||'لیست روزانه واریز';let h=`<section class="pg">${pdfTop(TT,D)}<h1>${esc(TT)}</h1>${pdfSub(D,R0||'')}<div class="bar"></div>
+  const TT=T0||'لیست روزانه واریز';let h=`<section class="pg">${pdfTop(TT,D)}${pdfSub(D,R0||'')}<div class="bar"></div>
   <div class="kp"><div><small>کل واریزی‌ها</small><b>${fmt(c.all)}</b></div><div class="ok"><small>انجام شد</small><b>${fmt(c.ok)}</b></div><div class="rd"><small>انجام نشد</small><b>${fmt(c.fail)}</b></div><div class="g"><small>واریز شده</small><b>${fmt(c.okSum)}<em>تومان</em></b></div></div>`;
   G.forEach(g=>{const s=sum(g.rows),gc=bStat({items:g.rows});h+=`<h2>${esc(g.name)}<small>${fmt(g.rows.length)} واریزی — ${fmt(s)} تومان${gc.fail?' — '+fmt(gc.fail)+' ناموفق':''}</small></h2>
     <table><thead><tr><th>#</th><th>نام و فاکتور</th><th>شبا و بانک</th><th>وضعیت و پیگیری</th><th class="am">مبلغ (تومان)</th></tr></thead>
@@ -180,7 +186,7 @@ async function dayReport(iso,G0,FS0,T0,R0){const G=G0||dayGroups(iso),D=dates(is
   const FS=FS0||fullSettled(iso);if(FS.length)h+=`<h2>تسویه کامل از طریق مشتری<small>${fmt(FS.length)} مورد — ${fmt(FS.reduce((s,r)=>s+r.total,0))} تومان</small></h2><table><thead><tr><th>#</th><th>نام و فاکتور</th><th>نوع تسویه</th><th class="am">مبلغ کل (تومان)</th></tr></thead>${FS.map((r,i)=>`<tbody class="en"><tr class="hs"><td class="n">${fmt(i+1)}</td><td><span class="nm">${esc(fullName(r))}</span>${r.code?`<span class="s">فاکتور ${esc(toEn(r.code))}</span>`:''}</td><td><span class="sty">${esc(setType(r))}</span></td><td class="am">${fmt(r.total)}</td></tr>${stlBox(r,4)}</tbody>`).join('')}</table>`;
   h+=`<div class="sign"><div>تهیه‌کننده</div><div>تأیید مدیر</div></div>${pdfFoot()}</section>`;
   const ri=RI;
-  if(ri.length)h+=`<section class="pg">${pdfTop('رسیدهای واریز',D)}<h1>رسیدهای واریز</h1>${pdfSub(D)}<div class="bar"></div><div class="rc">${ri.map(({x,v})=>`<figure><img src="${v}" alt=""><figcaption><b>${esc(x.name)}</b>${fmt(x.amount)} تومان${x.tn?'<br>پیگیری <span class="tn">'+esc(x.tn)+'</span>':''}</figcaption></figure>`).join('')}</div>${pdfFoot()}</section>`;
+  if(ri.length)h+=`<section class="pg">${pdfTop('رسیدهای واریز',D)}${pdfSub(D)}<div class="bar"></div><div class="rc">${ri.map(({x,v})=>`<figure><img src="${v}" alt=""><figcaption><b>${esc(x.name)}</b>${fmt(x.amount)} تومان${x.tn?'<br>پیگیری <span class="tn">'+esc(x.tn)+'</span>':''}</figcaption></figure>`).join('')}</div>${pdfFoot()}</section>`;
   return pdfDoc(fileBase(iso),h)}
 /* چاپ داخل همین صفحه (بدون دانلود) */
 /* v61.33: آیفون/آیپد — چاپ داخل صفحه برنامه (پشت پنجره پیش‌نمایش) در Safari گاهی هیچ کاری نمی‌کند یا برگه سفید می‌دهد؛
