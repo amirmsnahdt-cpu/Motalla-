@@ -4246,7 +4246,7 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .cbk .cbsp i{font-style:normal;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
 .cbk .cbsp i.a{background:color-mix(in srgb,#7c3aed 14%,var(--card));color:#7c3aed}.cbk .cbsp i.f{background:var(--red2);color:var(--red)}
 /* v87.7 «مسیر پرداخت»: قرمز = نرفته به لیست، بنفش = در لیست بی‌تخصیص، زرد = تخصیص‌شده منتظر واریز */
-.ppb,.ppc,.ppl,.ppd{--ppf:var(--red);--ppv:#ea580c;--ppa:#7c3aed}
+.ppb,.ppc,.ppl,.ppd{--ppf:var(--red);--ppv:#a16207;--ppa:#7c3aed;--ppvb:#facc15}
 .ppb{display:flex;gap:2px;height:5px;margin-top:6px;border-radius:99px;overflow:hidden;direction:rtl}
 .ppb i{display:block;flex:1 1 0;min-width:5px;border-radius:99px;background:var(--ppf)}.ppb i.pl{background:var(--ppv)}.ppb i.pa{background:var(--ppa)}
 .ppl{display:flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;font-weight:800;line-height:1.5;color:var(--ppf);min-width:0}
@@ -4276,3 +4276,7 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .cbk.pp>.ppl{gap:4px!important;margin-top:3px!important}
 .cbk.pp .ppl>span{padding:1px 7px;border-radius:99px;background:var(--card);font-size:10.5px;gap:4px}
 .cbk.pp .ppl>span.n{padding:1px 6px;gap:3px}
+/* v88.2: فاصله رنگی زیاد — قرمز · زرد · بنفش؛ قرص‌ها رنگ پس‌زمینه خودشان را دارند */
+.ppb i.pl{background:var(--ppvb)!important}.ppr.l small i,.ppd.l>i{background:var(--ppvb)}
+.cbk.pp .ppl>span{background:#dc2626;color:#fff}.cbk.pp .ppl>span.l{background:#fde047;color:#713f12}.cbk.pp .ppl>span.a{background:#7c3aed;color:#fff}
+.ppd.l em{background:#fde047;color:#713f12}
