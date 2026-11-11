@@ -127,16 +127,16 @@ tr.stlr td{padding:0 6px 11px}
 .stw{display:inline-block;font-size:6.8pt;font-weight:700;color:#946200;background:#fbf4e1;border-radius:6px;padding:0 5px}
 .stbr.bk .stk{color:#2a4fb8}.stbr.bk i{background:#2a4fb8;color:#fff}.stbr.bk b{color:#2a4fb8}
 .pb{position:fixed;top:10px;left:10px;padding:9px 16px;background:#13284f;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}@media print{.pb{display:none}}
-/* v89.4 (خواسته صاحب اپ: «طراحی شکیل‌تر گزارش‌ها»): جدول قاب‌دار با سرستون سرمه‌ای/طلایی و ردیف یک‌درمیان، وضعیت و نوع واریز در یک خط، خلاصه فشرده */
-h1{font-size:12.5pt;margin:8px 0 0}.bar{margin:6px 0 10px}
-.kp{margin-bottom:12px;background:#f8f9fc;border-color:#e3e6ee;border-radius:12px}.kp div{padding:7px 12px;border-color:#e3e6ee}.kp b{font-size:12pt}
-h2{margin:14px 0 6px;font-size:11pt}
-table{border:1px solid #e3e6ee;border-radius:10px;overflow:hidden;border-collapse:separate;border-spacing:0}
-th{background:#13284f;color:#f3d892;border-bottom:0;padding:5px 8px}td{padding:6px 8px}
-tbody.en:nth-of-type(even) td,tbody:not(.en) tr:nth-child(even) td{background:#f8f9fc}
-tr.tot td{background:#fbf6e8!important;border-top:1px solid #ecd9a6;color:#7a5a17;padding:7px 8px}
+/* v89.5 (خواسته صاحب اپ: «نوارها و همه چیز شیک‌تر»): همان زبان برگه سند — سرتیتر سرمه‌ای با خط طلایی نازک، سرستون کرم با خط طلایی، خلاصه فشرده، وضعیت در یک خط */
+.top{background:linear-gradient(120deg,#0d1a38,#152c5a 65%,#1b3870);border-radius:13px;padding:9px 14px 11px;box-shadow:inset 0 0 0 1px rgba(236,200,116,.28)}.top:after{inset:auto 14px 4px 14px;height:1px;background:linear-gradient(90deg,transparent,#ecc874 20%,#f6e2a6 50%,#ecc874 80%,transparent)}
+.doc{background:rgba(255,255,255,.05);border-color:rgba(236,200,116,.45);border-radius:9px}.doc b{color:#fff}
+h1{font-size:12.5pt;margin:8px 0 0}.bar{display:none}.sub{margin:2px 0 9px;padding-bottom:7px;border-bottom:1px solid #e6dcc0}
+.kp{margin-bottom:12px;border:0;border-radius:0;gap:6px;overflow:visible}.kp div{padding:6px 11px;border:1px solid #e9ecf3!important;border-radius:10px;background:#fff}.kp div.g{border-color:#c9a24a!important;background:linear-gradient(180deg,#fdf9ec,#f8efd3)}.kp b{font-size:12.5pt}
+h2{margin:14px 0 5px;font-size:10.5pt;align-items:center;justify-content:flex-start}h2:before{content:"";flex:none;width:3px;height:12px;border-radius:2px;background:linear-gradient(#ecc874,#b8862b);margin-inline-end:6px}h2 small{margin-inline-start:auto}
+table{border-collapse:collapse}th{background:#f6f1e1;color:#0f1f3f;font-weight:900;border-top:1px solid #e6dcc0;border-bottom:1.5px solid #c9a24a;padding:5px 8px}td{padding:6px 8px;border-bottom:1px solid #edf0f5}
+tr.tot td{background:#fbf8ee;border-top:1.5px solid #c9a24a;color:#7a5a17;padding:6px 8px}
 .st+br{display:none}.sty{margin:0 5px 0 0;vertical-align:middle}.st{vertical-align:middle}
-.sign{margin-top:20px}.foot{margin-top:12px}`}
+.sign{margin-top:20px}.foot{margin-top:12px}.pg:before{opacity:.03}`}
 /* v61.64 (خواسته صاحب اپ): همه PDFها با تم تازه — سرتیتر سرمه‌ای با لوگوی «طلای مطلا»، نوار طلایی و نقش کم‌رنگ لوگو پشت برگه (مثل فاکتور) */
 function pdfTop(kind,D){return `<div class="top"><div class="brand"><span class="lg" role="img" aria-label="طلای مطلا"></span><span><b>${esc(kind)}</b><small>طلا و جواهر مطلا</small></span></div><div class="doc">تاریخ<b>${D.fa}</b></div></div>`}
 const pdfFoot=()=>`<div class="foot"><span style="color:#b8862b;font-weight:800">طلای مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
