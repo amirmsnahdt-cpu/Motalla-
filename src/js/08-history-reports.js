@@ -164,10 +164,29 @@ tr.tot td{background:#fbf6e8!important;border-top:1px solid #ecd9a6;border-botto
 .bb>.c .op{position:absolute;inset-inline-start:-7px;top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;background:#fff;border:1px solid #d5d9e3;display:grid;place-items:center;font-size:8pt;font-weight:900;color:#6b7385;font-style:normal;line-height:1;z-index:1}
 .bb>.c.f{flex:1.5;background:linear-gradient(120deg,#0d1a38,#152c5a 65%,#1b3870);border-color:#13284f}.bb>.c.f small{color:#f3d892}.bb>.c.f b{color:#fff;font-size:13.5pt;line-height:1.3}.bb>.c.f b u{color:#cdd5e6}.bb>.c.f em{display:inline-block;margin-top:1px;padding:0 9px;border-radius:99px;background:rgba(255,255,255,.14);color:#fff}
 .vd b,.vd em{color:#c2414b}.vc b,.vc em{color:#1d4ed8}.vz b,.vz em{color:#15803d}.bb>.c.f.vd em{color:#ffc9cf}.bb>.c.f.vc em{color:#c9dcff}.bb>.c.f.vz em{color:#bfecd0}
-.sign{display:flex;gap:46px;margin-top:20px}.sign div{flex:1;border-top:1px solid #d5d9e1;padding-top:6px;font-size:7.8pt;color:#6b7385;text-align:center}.foot{margin-top:10px;padding-top:6px;border-top:1px solid #eef0f4}`}
+.sign{display:flex;gap:46px;margin-top:20px}.sign div{flex:1;border-top:1px solid #d5d9e1;padding-top:6px;font-size:7.8pt;color:#6b7385;text-align:center}.foot{margin-top:10px;padding-top:6px;border-top:1px solid #eef0f4}
+/* ===== v89.9 «کرم و طلایی» برای همه برگه‌ها (خواسته صاحب اپ با نمونه عکس: «همه رو با این شکل»): لوگو و عنوان وسط با خط طلایی،
+   سرستون‌ها متن طلایی روی زمینه روشن با خط طلایی زیرش، ردیف‌ها با خط نازک کرم، جمع با خط طلایی، مانده نهایی عدد درشت (بدون نوار سرمه‌ای) */
+body{color:#2b2520;background:#fff}.pg:before{display:none}
+.top{display:flex;flex-direction:column;align-items:center;text-align:center;background:none;color:#2b2520;border:0;box-shadow:none;border-radius:0;padding:0 0 4px;margin:0 0 6px}.top:after{display:none}
+.top .lg{width:30mm;filter:none}.top .shop{display:block;font-size:7pt;color:#a07b33;font-weight:600;margin-top:2px}.top .ttl{display:block;font-size:20pt;font-weight:400;color:#2b2520;line-height:1.3;margin-top:1px}.top .ru{display:block;width:26mm;height:1.6px;border-radius:2px;background:#b8893a;margin:4px 0 6px}
+.docs{display:flex;gap:18px;justify-content:center}.doc{background:none;border:0;border-radius:0;color:#a07b33;font-size:7pt;font-weight:700;padding:0;line-height:1.5}.doc b{display:inline;color:#2b2520;font-size:9pt;font-weight:800;margin-inline-start:5px}.doc.no b{color:#8a6410;font-size:10pt;font-weight:900}
+h1{font-size:13pt;font-weight:800;color:#2b2520;text-align:center;margin:2px 0 0}.sub{justify-content:center}.sub .pdl{background:none;color:#a07b33;padding:0}.sub .pdv{color:#2b2520}
+.inf{background:none;border:0;border-top:1.5px solid #b8893a;border-bottom:1px solid #ece0c8;border-radius:0}.inf>div+div{border-inline-start:1px solid #ece0c8}.inf small{color:#a07b33;font-weight:800}
+.kp{gap:0;border-top:1.5px solid #b8893a;border-bottom:1px solid #ece0c8}.kp div{background:none;border:0!important;border-radius:0}.kp div+div{border-inline-start:1px solid #ece0c8!important}.kp small{color:#a07b33;font-weight:800}.kp b{color:#2b2520}
+.kp div.g{background:none;border:0!important;border-inline-start:1px solid #ece0c8!important}.kp .g small{color:#a07b33}.kp .g b{color:#8a6410;font-size:14pt}.kp .g b em{color:#a59a8e}
+h2{color:#2b2520}h2:before{background:#b8893a;width:2px}h2 small{color:#8b8178}
+table{border:0;border-radius:0}th{background:none;color:#a07b33;font-weight:800;border-bottom:1.5px solid #b8893a}td{border-bottom:1px solid #f0e6d2}
+tbody tr:nth-child(even) td,tbody.en:nth-of-type(even) td{background:none}tbody:last-of-type tr:last-child td{border-bottom:1.5px solid #b8893a}
+tr.tot td{background:none!important;border-top:1.5px solid #b8893a;color:#8a6410}
+.calc{border:0;border-radius:0;border-top:1.5px solid #b8893a}.calc .cl{background:none!important;border-bottom:1px solid #f0e6d2}.calc .cl.t{border-top:1px solid #d9c39a}.calc .cl.r{border-top:1.5px solid #b8893a;color:#8a6410}
+.bb{border:0;border-radius:0;border-top:1.5px solid #b8893a;border-bottom:1px solid #ece0c8}.bb>.kd{background:none;color:#a07b33}.bb>.c+.c{border-inline-start:1px solid #ece0c8}.bb>.c small{color:#a07b33}
+.bb>.c.f{background:none;border-color:#ece0c8}.bb>.c.f small{color:#a07b33}.bb>.c.f b{color:#8a6410;font-size:15pt}.bb>.c.f b u{color:#a59a8e}.bb>.c.f em{background:none;padding:0}.bb>.c.f.vd b,.bb>.c.f.vd em{color:#a3123f}.bb>.c.f.vc b,.bb>.c.f.vc em{color:#1d3f9c}.bb>.c.f.vz b,.bb>.c.f.vz em{color:#0f7a4a}
+.vd b,.vd em{color:#a3123f}.vc b,.vc em{color:#1d3f9c}
+.sign div{border-top-color:#cdb98f;color:#8b8178}.foot{border-top:0;justify-content:center;gap:12px}.pb{background:#8a6410}`}
 /* v61.64 (خواسته صاحب اپ): همه PDFها با تم تازه — سرتیتر سرمه‌ای با لوگوی «طلای مطلا»، نوار طلایی و نقش کم‌رنگ لوگو پشت برگه (مثل فاکتور) */
 /* v89.7 قالب ثابت — تکه‌های مشترک: سربرگ (با شماره اختیاری)، نوار مشخصات، نوار مانده */
-function pdfTop(kind,D,no){return `<div class="top"><div class="brand"><span class="lg" role="img" aria-label="طلای مطلا"></span><span><b>${esc(kind)}</b><small>طلا و جواهر مطلا</small></span></div><div class="docs"><div class="doc">تاریخ<b>${D.fa}</b></div>${no!=null&&no!==''?`<div class="doc no">شماره<b>${toFa(no)}</b></div>`:''}</div></div>`}
+function pdfTop(kind,D,no){return `<div class="top"><span class="lg" role="img" aria-label="طلای مطلا"></span><small class="shop">طلا و جواهر مطلا</small><b class="ttl">${esc(kind)}</b><i class="ru"></i><div class="docs"><div class="doc">تاریخ<b>${D.fa}</b></div>${no!=null&&no!==''?`<div class="doc no">شماره<b>${toFa(no)}</b></div>`:''}</div></div>`}
 const pdfInf=C=>`<div class="inf">${C.filter(Boolean).map(([l,v,x,w])=>`<div${w?' class="w"':''}><small>${l}</small><b>${v}</b>${x?`<span>${x}</span>`:''}</div>`).join('')}</div>`;
 const pdfBB=(kd,C)=>`<div class="bb">${kd?`<span class="kd">${esc(kd)}</span>`:''}${C.map(([l,v,u,e,cl,op,f])=>`<div class="c ${cl||''}${f?' f':''}">${op?`<i class="op">${op}</i>`:''}<small>${l}</small><b><bdi dir="ltr">${v}</bdi><u>${esc(u||'')}</u></b><em>${e||''}</em></div>`).join('')}</div>`;
 const pdfFoot=()=>`<div class="foot"><span style="color:#b8862b;font-weight:800">طلای مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
