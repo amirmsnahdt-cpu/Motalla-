@@ -4297,3 +4297,7 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 :root[data-theme="dark"] :is(.ppb,.ppc,.ppl,.ppd){--ppf:#fb7196;--ppv:#e9c873;--ppa:#b9a2ff}
 :root[data-theme="dark"] .ppd.a em{background:color-mix(in srgb,#7c3aed 30%,var(--card));color:#d6c8ff}
 :root[data-theme="dark"] .txwd:not(.wf){color:#c4b5fd!important;background:color-mix(in srgb,#7c3aed 22%,var(--card))!important}
+/* v89.3: برچسب‌های واریز روی ردیف سند — یک خط، قرص کوتاه */
+.txwl{display:flex;gap:4px;margin-top:3px;min-width:0;overflow:hidden}
+.txwl .txwd{flex:none;margin:0;padding:1px 8px;border-radius:99px;font-size:10.5px;line-height:1.6;white-space:nowrap}
+.txwl .txwd:not(.wf){background:linear-gradient(135deg,#6d3fc4,#3b1680)!important;color:#fff!important}
