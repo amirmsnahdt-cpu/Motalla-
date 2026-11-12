@@ -3987,8 +3987,6 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .c6a.bkav img{width:82%;height:82%;object-fit:contain}
 
 /* v84.5 (خواسته صاحب اپ): کسر و اضافه در فهرست جستجوی سند قاب قرمز/آبی دارند (قرمز = طلبکار می‌شویم، آبی = بدهکار می‌شویم؛ مثل کاشی همان کار) */
-.bzsr.dkrw.adjf,.dkbox.open:has(>.sthd) #qKs .dkrw.adjf{border-radius:14px!important;margin:6px 0;padding:10px 10px!important;border:1.5px solid color-mix(in srgb,var(--blu) 45%,transparent)!important;background:color-mix(in srgb,var(--blu) 5%,var(--card))!important}
-.bzsr.dkrw.adjf.kr,.dkbox.open:has(>.sthd) #qKs .dkrw.adjf.kr{border-color:color-mix(in srgb,var(--red) 45%,transparent)!important;background:color-mix(in srgb,var(--red) 5%,var(--card))!important}
 .bzsr.dkrw.adjf .av{background:var(--blu2)!important;color:var(--blu)!important}.bzsr.dkrw.adjf.kr .av{background:var(--red2)!important;color:var(--red)!important}
 .bzsr.dkrw.adjf .tx b{color:var(--blu)}.bzsr.dkrw.adjf.kr .tx b{color:var(--red)}
 
@@ -4301,3 +4299,6 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .txwl{display:flex;gap:4px;margin-top:3px;min-width:0;overflow:hidden}
 .txwl .txwd{flex:none;margin:0;padding:1px 8px;border-radius:99px;font-size:10.5px;line-height:1.6;white-space:nowrap}
 .txwl .txwd:not(.wf){background:linear-gradient(135deg,#6d3fc4,#3b1680)!important;color:#fff!important}
+
+/* v90.2: نام صاحب حساب (وقتی با مشتری فرق دارد) در همان خط بانکِ ردیف لیست واریز */
+.bkl .bhn{font-style:normal;font-weight:800;color:var(--ink)}
