@@ -3987,8 +3987,6 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .c6a.bkav img{width:82%;height:82%;object-fit:contain}
 
 /* v84.5 (خواسته صاحب اپ): کسر و اضافه در فهرست جستجوی سند قاب قرمز/آبی دارند (قرمز = طلبکار می‌شویم، آبی = بدهکار می‌شویم؛ مثل کاشی همان کار) */
-.bzsr.dkrw.adjf .av{background:var(--blu2)!important;color:var(--blu)!important}.bzsr.dkrw.adjf.kr .av{background:var(--red2)!important;color:var(--red)!important}
-.bzsr.dkrw.adjf .tx b{color:var(--blu)}.bzsr.dkrw.adjf.kr .tx b{color:var(--red)}
 
 /* v84.6 اصلاح مانده بانک در پنجره تسویه */
 .bfxt{display:flex;align-items:center;gap:11px;width:100%;margin:10px 0 2px;padding:12px 13px;border-radius:18px;border:1.5px dashed color-mix(in srgb,var(--blu) 45%,transparent);background:color-mix(in srgb,var(--blu) 5%,var(--card));text-align:start;color:var(--ink)}
@@ -4302,7 +4300,13 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 
 /* v90.3 (خواسته صاحب اپ): قاب قرمز/آبی «کسر/اضافه» در فهرست جست‌وجوی همه سندها (مشتری و بانک) برگشت، این بار هم‌تراز:
    قاب داخل همان عرض فهرست می‌ماند (ظرف فهرست بیرون‌زدگی را می‌بُرد) و فاصله داخلی‌اش تقریباً همان ردیف‌های دیگر است تا آیکن و متن زیر هم بمانند */
-.bzsr.dkrw.adjf,.dkbox.open:has(>.sthd) #qKs .dkrw.adjf{box-sizing:border-box;border-radius:16px!important;border:1.5px solid color-mix(in srgb,var(--blu) 45%,transparent)!important;background:color-mix(in srgb,var(--blu) 5%,var(--card))!important;padding-inline:6px!important;margin:6px 0!important}
-.bzsr.dkrw.adjf.kr,.dkbox.open:has(>.sthd) #qKs .dkrw.adjf.kr{border-color:color-mix(in srgb,var(--red) 45%,transparent)!important;background:color-mix(in srgb,var(--red) 5%,var(--card))!important}
 /* v90.3: کادر نام صاحب حساب در ردیف‌ها همیشه یک‌خطی (نام بلند با … کوتاه می‌شود) */
 .tx .bhold{max-width:100%;min-width:0}.tx .bhold b{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tx .bhold svg{flex:none}
+/* v90.5 (خواسته صاحب اپ): «کسر/اضافه» در فهرست جست‌وجوی هیچ سندی (مشتری، بانک، هر گروه) قاب یا رنگ جدا ندارد — یک ردیف عادی مثل بقیه.
+   نام صاحب حساب سطر تازه نمی‌سازد: کادرش در همان خط نام مشتری، کنار آن می‌نشیند و اگر بلند باشد با … کوتاه می‌شود */
+.tx .nmh{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}.tx .nmh>b{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx .nmh .bhold b{overflow-wrap:normal!important;text-overflow:ellipsis!important}.tx .nmh .bhold{width:auto!important;align-self:center!important;display:inline-flex!important;align-items:center;flex:0 3 auto;margin:0!important;min-width:64px;max-width:none;white-space:nowrap!important;overflow:hidden}.tx .nmh .bhold b{display:block!important;flex:1 1 auto;min-width:0;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis}
+/* v90.5: در ردیف واریزی (homeRow) کادر صاحب حساب در خط دوم، بعد از نام بانک می‌نشیند؛ نام مشتری دست‌نخورده می‌ماند و ادامه خط (تاریخ واریز، فاکتور) جا نشد با … کوتاه می‌شود */
+.bkl.hh{display:flex!important;align-items:center;gap:5px;min-width:0;flex-wrap:nowrap}.bkl.hh>.bkn{flex:none}.bkl.hh>span:last-child{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bkl.hh>.bhold{width:auto!important;align-self:center!important;display:inline-flex!important;align-items:center;flex:0 1 auto;margin:0!important;min-width:60px;white-space:nowrap!important;overflow:hidden}
+.bkl.hh>.bhold b{display:block!important;flex:1 1 auto;min-width:0;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:normal!important}.bkl.hh>.bhold svg{flex:none}
