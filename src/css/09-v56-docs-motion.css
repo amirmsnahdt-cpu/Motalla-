@@ -4300,5 +4300,9 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .txwl .txwd{flex:none;margin:0;padding:1px 8px;border-radius:99px;font-size:10.5px;line-height:1.6;white-space:nowrap}
 .txwl .txwd:not(.wf){background:linear-gradient(135deg,#6d3fc4,#3b1680)!important;color:#fff!important}
 
-/* v90.2: نام صاحب حساب (وقتی با مشتری فرق دارد) در همان خط بانکِ ردیف لیست واریز */
-.bkl .bhn{font-style:normal;font-weight:800;color:var(--ink)}
+/* v90.3 (خواسته صاحب اپ): قاب قرمز/آبی «کسر/اضافه» در فهرست جست‌وجوی همه سندها (مشتری و بانک) برگشت، این بار هم‌تراز:
+   قاب داخل همان عرض فهرست می‌ماند (ظرف فهرست بیرون‌زدگی را می‌بُرد) و فاصله داخلی‌اش تقریباً همان ردیف‌های دیگر است تا آیکن و متن زیر هم بمانند */
+.bzsr.dkrw.adjf,.dkbox.open:has(>.sthd) #qKs .dkrw.adjf{box-sizing:border-box;border-radius:16px!important;border:1.5px solid color-mix(in srgb,var(--blu) 45%,transparent)!important;background:color-mix(in srgb,var(--blu) 5%,var(--card))!important;padding-inline:6px!important;margin:6px 0!important}
+.bzsr.dkrw.adjf.kr,.dkbox.open:has(>.sthd) #qKs .dkrw.adjf.kr{border-color:color-mix(in srgb,var(--red) 45%,transparent)!important;background:color-mix(in srgb,var(--red) 5%,var(--card))!important}
+/* v90.3: کادر نام صاحب حساب در ردیف‌ها همیشه یک‌خطی (نام بلند با … کوتاه می‌شود) */
+.tx .bhold{max-width:100%;min-width:0}.tx .bhold b{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tx .bhold svg{flex:none}
