@@ -12,8 +12,11 @@ const pdfEsc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/
 /* v61.84: اندازه کاغذ و حاشیه‌ها از @page خود برگه (پیش‌نمایش، PDF و چاپ اندروید همه از همین می‌خوانند تا شکل یکی باشد) */
 function pageSpec(html){const m=String(html).match(/@page\{size:(A4|A5)( landscape)?(?:;margin:([\d.]+)mm(?: ([\d.]+)mm)?)?/)||[,'A5',' landscape'],a4=m[1]==='A4',land=!!m[2],sw=a4?210:148,sh=a4?297:210,mv=m[3]!=null?+m[3]:a4?10:8,mh=m[4]!=null?+m[4]:mv;
   return{a4,land,mmW:land?sh:sw,mmH:land?sw:sh,mv,mh}}
+/* v90.6 «برگه‌های آماده»: برگه‌ای که خودش صفحه‌هایش را چیده (هر صفحه یک <section class="sht"> دقیقاً هم‌اندازه کاغذ، مثل فاکتور) بریده نمی‌شود:
+   هر section یک صفحه کامل PDF است، بدون حاشیه سفید و بدون جست‌وجوی جای برش — رنگ کاغذ و قاب تا لبه می‌رود و چیدمان همان پیش‌نمایش می‌ماند. */
 async function pdfMake(html,title,keep){
-  const Q=pageSpec(html),mmW=Q.mmW,mmH=Q.mmH,PX=96/25.4,
+  const Q=pageSpec(html),SHM=/<section class="sht"/.test(html);if(SHM){Q.mv=0;Q.mh=0}
+  const mmW=Q.mmW,mmH=Q.mmH,PX=96/25.4,
     W=Math.round((mmW-2*Q.mh)*PX),H=Math.round((mmH-2*Q.mv)*PX),S=3,base=location.href.replace(/[^/]*$/,'');
   const f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.style.cssText=`position:fixed;left:-20000px;top:0;width:${W}px;height:${H}px;border:0;opacity:0;pointer-events:none`;document.body.appendChild(f);
   try{
@@ -44,8 +47,9 @@ async function pdfMake(html,title,keep){
     const headH=y=>{let h=0;d.querySelectorAll('thead').forEach(th=>{const tb=th.closest('table').getBoundingClientRect(),r=th.getBoundingClientRect();if(tb.top-T<y-1&&tb.bottom-T>y+1&&r.bottom-T<=y+1)h=Math.max(h,r.height)});return h};
     /* v61.84 (خواسته صاحب اپ: «PDF دقیقاً همان شکل پیش‌نمایش»): برگه‌ای که کمی از یک صفحه بلندتر است (تا ۱.۴ برابر)
        نمی‌شکند؛ همان یک صفحه کمی کوچک‌تر کشیده می‌شود تا شکل و چیدمان دقیقاً همان پیش‌نمایش بماند */
-    const FIT=!force.size&&total>HU&&total<=HU*1.4;if(FIT)pages.push([0,total]);
-    while(!FIT&&y0<total-30){const lim=y0+HU-(y0?headH(y0):0);let y1;const fz=[...force].filter(y=>y>y0+4&&y<=lim).sort((a,b)=>a-b)[0];
+    const SHS=SHM?[...d.querySelectorAll('section.sht')].map(el=>{const r=el.getBoundingClientRect();return [r.top-T,r.bottom-T]}):[];
+    const FIT=!SHS.length&&!force.size&&total>HU&&total<=HU*1.4;if(SHS.length)pages.push(...SHS);else if(FIT)pages.push([0,total]);
+    while(!SHS.length&&!FIT&&y0<total-30){const lim=y0+HU-(y0?headH(y0):0);let y1;const fz=[...force].filter(y=>y>y0+4&&y<=lim).sort((a,b)=>a-b)[0];
       if(fz)y1=fz;else if(lim<total){const ok=C.filter(y=>y>y0+40&&y<=lim);y1=ok.length?ok[ok.length-1]:lim}else y1=total;
       pages.push([y0,Math.min(y1,total)]);y0=y1;
       /* فاصله سفید پیش از بخش تازه (حاشیه section) صفحه جدا نمی‌سازد */const nx=EL.map((e,i)=>RC[i]).filter(r=>r.h&&!r.abs&&r.t>=y0-1).reduce((m,r)=>Math.min(m,r.t),Infinity);if(isFinite(nx)&&nx>y0&&nx-y0<H*.5&&![...force].some(y=>y>y0&&y<nx))y0=Math.floor(nx)}
@@ -63,10 +67,10 @@ async function pdfMake(html,title,keep){
         if(r.th){const tr=r.th.getBoundingClientRect();if(tr.bottom-T>a+1&&tr.top-T<b-1)return}/* سرستون جدولی که در این صفحه هست */
         if(r.b<=a+1||r.t>=b-1)e2.style.setProperty('display','none','important')});
       const xml=new XMLSerializer().serializeToString(P).replace(/^<body/,'<div class="__pb"').replace(/<\/body>$/,'</div>');
-      const hp=FIT?Math.ceil(total+8):Math.min(H,Math.max(1,Math.ceil(b-a+(a?headH(a):0)+8)));
+      const hp=SHS.length?H:FIT?Math.ceil(total+8):Math.min(H,Math.max(1,Math.ceil(b-a+(a?headH(a):0)+8)));
       await draw(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${hp}"><foreignObject x="0" y="0" width="${W}" height="${hp}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${W}px;margin:0;background:#fff;direction:rtl"><style>${cssE}</style>${xml}</div></foreignObject></svg>`,hp)}
     const pt=v=>v*72/25.4,PW=pt(mmW),PH=pt(mmH),MX=pt(Q.mh),MY=pt(Q.mv),IW=PW-2*MX,IH=PH-2*MY;
-    const PP=imgs.map(o=>{let iw=IW,ih=IW*o.hp/W;if(ih>IH){const k=IH/ih;iw*=k;ih=IH}return{...o,iw,ih,x:MX+(IW-iw)/2,k:iw/IW}});
+    const PP=imgs.map(o=>{if(SHS.length)return{...o,iw:IW,ih:IH,x:MX,k:1};let iw=IW,ih=IW*o.hp/W;if(ih>IH){const k=IH/ih;iw*=k;ih=IH}return{...o,iw,ih,x:MX+(IW-iw)/2,k:iw/IW}});
     const blob=pdfBuild(PP,PW,PH,MX,MY);
     const fl=new File([blob],String(title||'motalla').replace(/[\\/:*?"<>|]/g,'-').replace(/[۰-۹]/g,d=>d.charCodeAt(0)-1776).replace(/[٠-٩]/g,d=>d.charCodeAt(0)-1632)/* v61.87: عددهای نام فایل ارسالی انگلیسی */+'.pdf',{type:'application/pdf'});
     /* keep: عکس صفحه‌ها هم برگردانده می‌شود (چاپ اندروید همان صفحه‌ها را چاپ می‌کند تا دقیقاً همان PDF باشد) */

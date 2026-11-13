@@ -249,8 +249,17 @@ function printWin(html){let w=null;try{w=window.open('','_blank')}catch(e){}if(!
   const go=()=>{try{z();w.print()}catch(e){}},ready=()=>{const f=w.document.fonts&&w.document.fonts.ready;(f?Promise.race([f,new Promise(r=>setTimeout(r,2500))]):Promise.resolve()).then(()=>setTimeout(go,250))};
   try{if(w.document.readyState==='complete')ready();else w.addEventListener('load',ready)}catch(e){}
   return true}
+function printFrame(html,done){const o=$('prf');if(o)o.remove();const f=document.createElement('iframe');f.id='prf';f.setAttribute('aria-hidden','true');f.style.cssText='position:fixed;left:-10000px;top:0;width:800px;height:600px;border:0;opacity:0;pointer-events:none';
+  f.onload=()=>{const d=f.contentDocument,w=f.contentWindow;let ran=false;const go=()=>{if(ran)return;ran=true;try{if(done)w.addEventListener('afterprint',done);w.focus();w.print()}catch(e){toast('چاپ در این برنامه ممکن نیست؛ از «اشتراک» استفاده کنید',true)}};
+    /* فونت‌ها و لوگوی زمینه (که در d.images نیست) باید پیش از باز شدن پنجره چاپ رسیده باشند */
+    const lg=new Promise(r=>{const im=new Image();im.onload=im.onerror=r;im.src='logo-stamp.png'});
+    try{Promise.all([d.fonts&&d.fonts.ready,lg,...[...d.images].filter(i=>!i.complete).map(i=>new Promise(r=>{i.onload=i.onerror=r}))]).then(()=>setTimeout(go,120),go)}catch(e){go()}setTimeout(go,3000)};
+  document.body.appendChild(f);f.srcdoc=html}
 function printReport(){const html=window.__pv||withCtx(reportHTML),doc=new DOMParser().parseFromString(html,'text/html');doc.querySelectorAll('.pb').forEach(b=>b.remove());
   if(isIOS()&&printWin('<!doctype html>'+doc.documentElement.outerHTML))return;
+  /* v90.6: «برگه‌های آماده» (هر صفحه یک section.sht هم‌اندازه کاغذ، مثل فاکتور) در یک iframe جدا چاپ می‌شوند، نه داخل #printArea:
+     آنجا سبک‌های خود برنامه روی نام کلاس‌های کوتاه برگه می‌نشست و چیدمان را به هم می‌ریخت. عنوان صفحه (نام فایل PDF) مثل پایین موقتاً عوض می‌شود. */
+  if(/<section class="sht"/.test(html)){const t0=window.__docT||(window.__docT=document.title),tt=(doc.title||'').trim();if(tt)document.title=tt;setTimeout(()=>{document.title=t0},60000);printFrame('<!doctype html>'+doc.documentElement.outerHTML,()=>{document.title=t0});return}
   let css=[...doc.querySelectorAll('style')].map(s=>s.textContent).join('\n');const pg=(css.match(/@page\{[^}]*\}/)||[''])[0];css=css.replace(pg,'').replace(/(^|\})\s*body\{/g,'$1 #printArea{');
   $('printArea').innerHTML='<style>'+pg+'@media print{'+css+'}</style>'+doc.body.innerHTML;
   /* نام فایل PDF ذخیره‌شده = عنوان صفحه هنگام چاپ؛ پس عنوان گزارش (مثلاً «مطلا ( تاریخ … )») موقتاً عنوان برنامه می‌شود */
