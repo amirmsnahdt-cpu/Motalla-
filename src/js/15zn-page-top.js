@@ -9,6 +9,7 @@ function hdGo(){const P=(act,ico,t,o)=>{o=o||{};return `<button type="button" cl
   if(cur==='bulk')return P('resetBulk','trash','',{sec:1,al:'پاک کردن'})+P('bulkAdd','plus','افزودن به لیست');
   if(cur==='backups'&&typeof bkBtn==='function')return bkBtn('bkFull','','ib0 hal hgo','down','دانلود کامل');
   if(cur==='users'&&isAdmin())return P('userNew','plus','همکار تازه');
+  if(cur==='invset'&&isAdmin()&&typeof IS!=='undefined'&&IS)return P('ivSave','check','ذخیره',{dis:!ivDirty(),al:'ذخیره تنظیمات فاکتور'});
   if(cur==='lday'){const d=hubData(ldKey);if(!d.rows.length)return '';
     /* v82.4 (خواسته صاحب اپ): «تخصیص خودکار» هم بالا، کنار «ارسال» */
     const aa='';/* v86.4: «تخصیص» و «خودکار» در گروه سرتیتر (ldHdr در 06)؛ اینجا فقط «ارسال» */

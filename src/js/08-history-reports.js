@@ -81,115 +81,66 @@ function onWheel(w){const el=$('w'+w),n=+el.dataset.n,c=wcfg();let i=Math.max(0,
   if(w!=='d'){const dn=dim(),de=$('wd');if(+de.dataset.n!==dn){if(dp.d>dn)dp.d=dn;fillWheel('d',dayItems(),dp.d-1)}}updDp()}
 /* ============ PDF مدرن و مینیمال ============ */
 const PDF_FONT='<style>@font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:600;font-display:swap;src:url(fonts/Vazirmatn-SemiBold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format(\'woff2\')}@font-face{font-family:Vazirmatn;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format(\'woff2\')}</style>';
+/* ============ v90.8 قالب گزارش‌های PDF (لیست واریز، گزارش واریزی، صورتحساب مشتری، گردش بانک، رسیدها) ============
+   خواسته صاحب اپ: «قسمت PDF هم درست شود». تا v90.7 این قالب سه لایه روی‌هم بود (سرمه‌ای v61 ← «قالب ثابت» v89.7 ← «کرم و طلایی» v89.9) که همدیگر را نیمه‌کاره
+   باطل می‌کردند: سربرگ نصف صفحه را می‌گرفت و در PDF گوشی فقط دو ردیف در صفحه اول جا می‌شد. حالا یک لایه است، با همان هویت فاکتور (15zx):
+   مرکب قهوه‌ای‌سیاه، یک طلایی، خط‌های نازک؛ سربرگ کوتاه = عنوان نستعلیق (pdfCalT) · لوگو · تاریخ/شماره؛ زیرش نوار مشخصات بین دو خط طلایی؛
+   خانه‌های خلاصه .kp؛ هر بخش یک نوار عنوان h2 (مثل نوار گروه‌های فاکتور) و جدول با سرستون طلایی و ردیف‌های خط‌نازک؛ ردیف جمع کرم.
+   این برگه‌ها بلندی ثابت ندارند (برخلاف فاکتور): کاغذ سفید با حاشیه است و pdfMake خودش جای برش صفحه را زیر ردیف‌ها پیدا می‌کند — پس اینجا هم چیزی
+   position:absolute نیست، اندازه‌ها mm/pt است و رنگ زمینه فقط روی نوارها می‌آید. */
 function pdfCSS(){return `@page{size:A5 landscape;margin:8mm 9mm}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-*{box-sizing:border-box}
-body{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;color:#16213a;font-size:9.4pt;line-height:1.6;margin:0;background:#fff;font-feature-settings:"tnum";-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.pg{page-break-after:always;max-width:192mm;margin:0 auto;padding:1mm 0}thead{display:table-header-group}tfoot{display:table-row-group}h1,h2,.top,.sub,.bar{break-after:avoid;page-break-after:avoid}.kp,.sign,.foot{break-inside:avoid;page-break-inside:avoid}.pg:last-child{page-break-after:auto}
-.pg{position:relative}.pg:before{content:"";position:absolute;left:50%;top:50%;width:70%;aspect-ratio:477/202;transform:translate(-50%,-50%) rotate(-8deg);background:url(logo-stamp.png) center/contain no-repeat;opacity:.04;pointer-events:none}.pg>*{position:relative}
-.top{display:flex;justify-content:space-between;align-items:center;gap:14px;background:linear-gradient(135deg,#0f1f3f,#13284f 60%,#1a3366);color:#fff;border-radius:16px 16px 5px 5px;padding:10px 16px 13px;position:relative;overflow:hidden}.top:after{content:"";position:absolute;inset:auto 0 0 0;height:3px;background:linear-gradient(90deg,#b8862b,#f3d892,#b8862b,#f3d892,#b8862b)}
-.brand{display:flex;align-items:center;gap:12px}.lg{flex:none;width:36mm;aspect-ratio:477/202;background:url(logo-stamp.png) center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
-.brand b{display:block;font-size:12pt;font-weight:800;line-height:1.25}.brand small{display:block;font-size:7.4pt;color:#ecd9a6;font-weight:500}.brand>span:last-child{border-inline-start:1px solid rgba(236,200,116,.35);padding-inline-start:12px}
-.doc{font-size:7.6pt;color:#ecd9a6;text-align:left;line-height:1.6;border:1px solid rgba(236,200,116,.55);border-radius:10px;padding:4px 10px}.doc b{display:block;color:#f3d892;font-size:9.5pt;font-weight:800}
-h1{font-size:16pt;font-weight:800;margin:10px 0 0;letter-spacing:-.4px;line-height:1.35}
-.sub{color:#6b7385;font-size:9pt;margin-top:2px}.sub{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}.sub .pdl{font-size:7.5pt!important;font-weight:700;color:#7a5a12;background:#f6ecd2;border-radius:6px;padding:1px 7px}.sub .pdv{font-size:9.5pt!important;font-weight:800;color:#13284f;direction:rtl;unicode-bidi:isolate}.sub .pde{direction:ltr;unicode-bidi:isolate}.sub .pde{font-size:8.5pt!important;color:#8a90a0}.sub .rg{font-size:8pt!important;color:#8a90a0;border-inline-start:1px solid #dfe3ea;padding-inline-start:8px}.sub span{direction:ltr;display:inline-block}
-.bar{height:3px;width:46px;background:linear-gradient(90deg,#ecc874,#b8862b);border-radius:3px;margin:10px 0 14px}
-.kp{display:flex;border:1px solid #e7e9ef;border-radius:14px;margin-bottom:18px;overflow:hidden}
-.kp div{flex:1;padding:10px 14px;border-left:1px solid #e7e9ef}.kp div:last-child{border-left:0}
-.kp small{display:block;font-size:7.4pt;color:#9097a5;font-weight:500}.kp b{font-size:13pt;font-weight:800}.kp b em{font-style:normal;font-size:7.6pt;color:#9097a5;font-weight:500;margin-right:3px}
-.kp .g b{color:#9a6a12}.kp .ok b{color:#15803d}.kp .rd b{color:#c2414b}
-h2{font-size:11.5pt;font-weight:800;margin:20px 0 8px;display:flex;justify-content:space-between;align-items:baseline}h2 small{font-size:8.4pt;color:#6b7385;font-weight:600}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}*{box-sizing:border-box}
+body{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;color:#211d18;font-size:8.6pt;line-height:1.55;margin:0;background:#fff;font-feature-settings:"tnum";-webkit-print-color-adjust:exact;print-color-adjust:exact}
+u,em,i,s{text-decoration:none;font-style:normal}
+.pg{page-break-after:always;break-after:page;max-width:192mm;margin:0 auto}.pg:last-child{page-break-after:auto;break-after:auto}
+thead{display:table-header-group}tfoot{display:table-row-group}h1,h2,.top,.sub,.inf{break-after:avoid;page-break-after:avoid}.kp,.sign,.foot,.inf{break-inside:avoid;page-break-inside:avoid}
+.top{display:flex;align-items:center;height:14mm}.top>div{flex:1 1 0;min-width:0}.top .ttl{display:flex;align-items:center}.top .cal{display:block;flex:none;fill:#211d18;overflow:visible}
+.top .tp{font-size:15pt;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top .tx{font-size:9.6pt;font-weight:700;color:#8a6a2a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-inline-start:2.6mm;padding-top:2mm}
+.top .lg{flex:0 0 30mm;height:12.6mm;background:url(logo-stamp.png) center/contain no-repeat}
+.top .mt{display:flex;flex-direction:column;align-items:flex-end}.top .mr{width:44mm;height:5.6mm;display:flex;align-items:baseline;border-bottom:.15mm solid #a99c85;padding:0 .8mm}.top .mr+.mr{margin-top:.4mm}.top .mr small{flex:none;font-size:6.4pt;font-weight:500;color:#8a6a2a}.top .mr b{flex:1;text-align:center;font-size:9pt;font-weight:700;white-space:nowrap;line-height:5.2mm}
+h1{font-size:11pt;font-weight:800;margin:1.6mm 0 0;line-height:1.4}
+.sub{display:flex;flex-wrap:wrap;align-items:baseline;gap:.6mm 3mm;margin-top:1.4mm;padding:1.2mm 1mm 1.3mm;border-top:.2mm solid #bf9135;border-bottom:.2mm solid #bf9135;font-size:7.6pt;color:#5c544a}
+.sub .pdl{font-size:6.6pt;font-weight:500;color:#8a6a2a}.sub .pdv{font-size:9.6pt;font-weight:700;color:#211d18}.sub .pde{direction:ltr;unicode-bidi:isolate;font-size:7.2pt;color:#8d8376}.sub .rg{font-size:7.2pt;color:#5c544a}.sub .pde+.rg{margin-inline-start:auto}
+.bar{display:none}
+.inf{display:flex;margin-top:1.4mm;border-top:.2mm solid #bf9135;border-bottom:.2mm solid #bf9135}.inf>div{flex:1;min-width:0;padding:1.1mm 2.2mm 1.3mm}.inf>div.w{flex:1.7}.inf>div+div{border-inline-start:.15mm solid #dcd1bb}
+.inf small{display:block;font-size:6.4pt;font-weight:500;color:#8a6a2a}.inf b{display:block;font-size:9.6pt;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.inf span{display:block;font-size:7pt;color:#8d8376}.inf a{color:inherit;text-decoration:none}
+.kp{display:flex;margin-top:2mm;border:.2mm solid #4a4238}.kp div{flex:1;min-width:0;padding:1.1mm 2.6mm 1.3mm}.kp div+div{border-inline-start:.15mm solid #dcd1bb}
+.kp small{display:block;font-size:6.4pt;font-weight:700;color:#8a6a2a}.kp b{font-size:12pt;font-weight:800;line-height:1.35;white-space:nowrap}.kp b em{font-size:6.6pt;font-weight:500;color:#8d8376;margin-inline-start:1.2mm}
+.kp .ok b{color:#1d6b4a}.kp .rd b{color:#9b1c31}.kp div.g{flex:1.6;background:#f4ecd8}
+h2{margin:3mm 0 0;padding:0 2mm;min-height:5.4mm;display:flex;align-items:center;gap:1.8mm;background:#f4ecd8;border-top:.2mm solid #4a4238;font-size:8pt;font-weight:700;line-height:1.4}
+h2:before{content:"◆";flex:none;font-size:5.4pt;color:#bf9135}h2 small{margin-inline-start:auto;font-size:7pt;font-weight:500;color:#5c544a;white-space:nowrap}
 table{width:100%;border-collapse:collapse}
-th{font-size:7.4pt;color:#7a5a17;font-weight:700;text-align:right;padding:6px 6px;background:#fbf6e8;border-bottom:1.5px solid #ecd9a6;white-space:nowrap}
-td{padding:9px 6px;border-bottom:1px solid #eef0f4;vertical-align:middle}
-tr{page-break-inside:avoid}
-td.n{color:#a0a6b2;width:24px;font-size:8.2pt;font-weight:600}
-.nm{font-weight:700;font-size:9.8pt;display:block}.s{display:block;font-size:7.6pt;color:#9097a5;margin-top:1px}
-.ib{direction:ltr;text-align:left;font-size:8.4pt;letter-spacing:.4px;white-space:nowrap;font-weight:500;color:#2a3550}
-td.am,th.am{text-align:left;white-space:nowrap}td.am{font-weight:800;font-size:10pt}
-tr.tot td{border-bottom:0;border-top:1.5px solid #13284f;font-weight:800;padding-top:11px;font-size:10pt}
-.st{display:inline-block;font-size:7.3pt;font-weight:700;padding:1px 9px;border-radius:20px;white-space:nowrap}
-.st.ok{background:#e9f6ef;color:#15803d}.st.fail{background:#fcecee;color:#c2414b}.st.pending{background:#fbf4e1;color:#946200}.st.none{background:#eef1f6;color:#5b6577}.sty{display:inline-block;margin-top:3px;font-size:9.5px;font-weight:700;color:#2a4fb8;background:#eaf0ff;border-radius:6px;padding:1px 6px}
-.tn{direction:ltr;display:inline-block;font-size:8pt;color:#2a3550;font-weight:600}
-.sign{display:flex;gap:46px;margin-top:26px}.sign div{flex:1;border-top:1px solid #d5d9e1;padding-top:7px;font-size:8pt;color:#6b7385;text-align:center}
-.foot{margin-top:20px;padding-top:8px;border-top:1px solid #eef0f4;display:flex;justify-content:space-between;font-size:7.2pt;color:#a0a6b2}
-.rc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.rc figure{margin:0;border:1px solid #eef0f4;border-radius:12px;padding:7px;page-break-inside:avoid}
-.rc img{width:100%;height:200px;object-fit:contain;background:#f7f8fa;border-radius:8px;display:block}.rc figcaption{font-size:8pt;margin-top:5px;line-height:1.5}.rc figcaption b{display:block}
-tbody.en{page-break-inside:avoid;break-inside:avoid}tr.hs td{border-bottom:0;padding-bottom:4px}
-tr.stlr td{padding:0 6px 11px}
-.stb{border:1px solid #eceef3;background:#fafbfc;border-radius:10px;padding:5px 11px 4px;position:relative}.stb.many{border-color:#dfe3ea;background:#f6f7fa;box-shadow:0 1px 0 #e7e9ef}
-.stbh{display:flex;justify-content:space-between;align-items:baseline;padding:1px 0 4px;border-bottom:1px solid #eceef3;margin-bottom:2px}
-.stbh span{font-size:7.4pt;font-weight:700;color:#6b7385}.stbh small{font-size:7.2pt;color:#9097a5;font-weight:600}
-.aml{display:block;font-size:6.8pt;font-weight:700;color:#9a7a3a;text-align:left}.ams{display:block;font-size:7.2pt;font-weight:700;color:#2a4fb8;text-align:left;margin-top:1px}.stbh b{font-size:11.5pt;font-weight:900;color:#13284f;white-space:nowrap}.stbh b em{font-style:normal;font-size:7.4pt;color:#9097a5;font-weight:500;margin-right:3px}
-.stbr{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:8.2pt}.stbr+.stbr{border-top:1px solid #f0f2f5}
-.stbr i{font-style:normal;width:14px;height:14px;border-radius:50%;background:#e7eaf0;color:#2a3550;font-size:6.6pt;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none}
-.stk{font-weight:800;color:#16213a;white-space:nowrap}.std{flex:1;color:#6b7385;font-size:7.6pt}.stbr b{font-weight:800;white-space:nowrap;color:#16213a}
-.stw{display:inline-block;font-size:6.8pt;font-weight:700;color:#946200;background:#fbf4e1;border-radius:6px;padding:0 5px}
-.stbr.bk .stk{color:#2a4fb8}.stbr.bk i{background:#2a4fb8;color:#fff}.stbr.bk b{color:#2a4fb8}
-.pb{position:fixed;top:10px;left:10px;padding:9px 16px;background:#13284f;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}@media print{.pb{display:none}}
-/* ===== v89.7 «قالب ثابت» همه برگه‌ها (خواسته صاحب اپ: «یک پلتفرم ثابت»؛ تمام‌عرض و یک‌ستونه، رنگی، بدون کارت طلایی) =====
-   همه PDFها از همین پنج تکه ساخته می‌شوند، به همین ترتیب: ۱) سربرگ سرمه‌ای .top (لوگو، عنوان، برگه‌های شماره/تاریخ) ۲) نوار مشخصات .inf
-   ۳) عنوان بخش h2 + جدول (سرستون سرمه‌ای، ردیف یک‌درمیان، ردیف جمع کرم) ۴) جمع‌بندی: .calc (ردیف‌های حساب) و .bb (نوار مانده: قبلی + این سند = نهایی)
-   ۵) امضا .sign و پانویس .foot */
-body{color:#16213a;font-size:9pt}.pg:before{opacity:.03}
-.top{background:linear-gradient(120deg,#0d1a38,#152c5a 65%,#1b3870);color:#fff;border-radius:12px;padding:9px 14px 11px;margin:0;border:0;box-shadow:inset 0 0 0 1px rgba(236,200,116,.28);overflow:hidden}.top:before{display:none}
-.top:after{content:"";position:absolute;inset:auto 14px 4px 14px;height:1px;border:0;background:linear-gradient(90deg,transparent,#ecc874 20%,#f6e2a6 50%,#ecc874 80%,transparent)}
-.lg{width:31mm;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}.brand b{font-size:13.5pt;font-weight:900;color:#fff;letter-spacing:-.2px}.brand small{color:#ecd9a6;font-size:7.2pt;font-weight:500}.brand>span:last-child{border-inline-start:1px solid rgba(236,200,116,.35);padding-inline-start:12px}
-.docs{display:flex;gap:6px;align-items:stretch}.doc{background:rgba(255,255,255,.06);border:1px solid rgba(236,200,116,.45);border-radius:9px;color:#ecd9a6;font-size:6.8pt;font-weight:500;padding:3px 11px 4px;text-align:center;line-height:1.5}.doc b{display:block;color:#fff;font-size:9.6pt;font-weight:800;white-space:nowrap}.doc.no b{color:#f3d892;font-size:13pt;line-height:1.25}
-.inf{display:flex;margin:8px 0 2px;border:1px solid #e3e6ee;border-radius:10px;overflow:hidden;background:#f7f8fc;break-inside:avoid}.inf>div{flex:1;padding:5px 11px 6px;min-width:0}.inf>div.w{flex:1.6}.inf>div+div{border-inline-start:1px solid #e3e6ee}
-.inf small{display:block;font-size:6.8pt;color:#8a91a1;font-weight:600}.inf b{display:block;font-size:10pt;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.inf span{display:block;font-size:7.2pt;color:#6b7385}.inf a{color:inherit;text-decoration:none}
-h1{font-size:12.5pt;font-weight:900;margin:9px 0 0}.bar{display:none}.sub{margin:2px 0 8px;padding:0;border:0}
-.kp{display:flex;gap:6px;margin:8px 0 4px;border:0;border-radius:0;overflow:visible;background:none}.kp div{flex:1;padding:5px 11px 6px;border:1px solid #e3e6ee!important;border-radius:10px;background:#f7f8fc}.kp small{font-size:6.8pt;color:#8a91a1;font-weight:600}.kp b{font-size:12.5pt;font-weight:900;color:#16213a}
-.kp div.g{background:#13284f;border-color:#13284f!important}.kp .g small{color:#ecd9a6}.kp .g b{color:#fff}.kp .g b em{color:#cdd5e6}.kp .ok b{color:#15803d}.kp .rd b{color:#c2414b}
-h2{margin:11px 0 4px;font-size:9.4pt;font-weight:900;color:#13284f;display:flex;align-items:center;justify-content:flex-start;gap:6px}h2:before{content:"";flex:none;width:3px;height:11px;border-radius:2px;background:linear-gradient(#ecc874,#b8862b)}h2:after{display:none}h2 small{order:0;margin:0;margin-inline-start:auto;background:none;padding:0;font-size:7.8pt;color:#6b7385;font-weight:600}
-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e3e6ee;border-radius:10px;overflow:hidden}
-th{background:#13284f;color:#f3d892;font-size:7pt;font-weight:800;border:0;padding:5px 7px;text-align:right;white-space:nowrap}td{padding:5px 7px;border-bottom:1px solid #eef0f4;vertical-align:middle}
-tbody tr:nth-child(even) td,tbody.en:nth-of-type(even) td{background:#f8f9fc}tbody:last-of-type tr:last-child td{border-bottom:0}
-td.n{color:#a0a6b2;font-weight:700}.nm{font-weight:800;font-size:9.6pt}td.am{font-size:10pt;font-weight:900}
-tr.tot td{background:#fbf6e8!important;border-top:1px solid #ecd9a6;border-bottom:0;color:#7a5a17;font-weight:900;padding:6px 7px;font-size:9.6pt}tr.tot td:first-child,tr.tot td:last-child{border-radius:0}
-.st{border-radius:99px;padding:1px 9px;vertical-align:middle}.st+br{display:none}.sty{margin:0 5px 0 0;vertical-align:middle;border-radius:99px;padding:1px 8px}
-/* جدول اقلام سند */
-.it td{vertical-align:top;font-size:8.4pt;white-space:nowrap}.it td:nth-child(2){white-space:normal}.it td small{display:block;color:#8a91a1;font-size:6.6pt;font-weight:400}.it td.k{color:#a0a6b2}.it td u{text-decoration:none;font-size:6.6pt;color:#8a91a1}.it td.n,.it th.n{text-align:left;width:1%}.it td.n{color:#16213a;font-weight:900;font-size:9pt}
-.it tr.by td.n,.it tr.by td.n *{color:#1d4ed8}.it td small.w75{color:#7a5a17;font-weight:600}.it td b i{font-style:normal;font-size:6.4pt}.it .gd{font-size:7.4pt;font-weight:800}.it .gd.gi{color:#15803d}.it .gd.go{color:#c2414b}
-.it tfoot td{background:#fbf6e8;border-top:1px solid #ecd9a6;border-bottom:0;color:#7a5a17;font-weight:800}
-.mo{display:inline-flex;align-items:baseline;gap:3px;white-space:nowrap}.mo bdi{unicode-bidi:isolate}.mo u{text-decoration:none;font-size:.76em;font-weight:600;color:#8a91a1}
-/* حساب سند: ردیف‌های ساده با علامت */
-.calc{border:1px solid #e3e6ee;border-radius:10px;overflow:hidden;break-inside:avoid}.calc .cl{display:flex;align-items:baseline;gap:6px;padding:4px 11px;font-size:8.8pt;border-bottom:1px solid #eef0f4}.calc .cl:last-child{border-bottom:0}.calc .cl:nth-child(even){background:#f8f9fc}
-.calc .sg{flex:none;width:14px;text-align:center;font-style:normal;font-weight:900;color:#9aa2b3;font-size:10pt;line-height:1}.calc .lb{flex:1;min-width:0}.calc .lb small{display:inline;font-size:6.8pt;color:#8a91a1;margin-inline-start:8px}.calc .cl>b{flex:none;font-weight:800}
-.calc .cl.t{background:#eef1f8!important;font-weight:900}.calc .cl.t .sg{color:#13284f}.calc .cl.by>b,.calc .cl.by>b *{color:#1d4ed8}.calc .cl.p>b,.calc .cl.p>b *{color:#15803d}.calc .cl.o>b,.calc .cl.o>b *{color:#c2414b}
-.calc .cl.r{background:#fbf6e8!important;border-top:1px solid #ecd9a6;font-weight:900;font-size:9.8pt;color:#13284f}.calc .cl.r em{font-style:normal;font-size:7pt;font-weight:800;margin-inline-start:8px}
-/* نوار مانده: قبلی + این سند = نهایی */
-.bb{display:flex;align-items:stretch;margin-top:5px;border:1px solid #e3e6ee;border-radius:11px;overflow:hidden;break-inside:avoid}.bb>.kd{flex:none;display:flex;align-items:center;padding:0 11px;background:#eef1f8;color:#13284f;font-size:7.4pt;font-weight:900;min-width:17mm}
-.bb>.c{flex:1;padding:5px 12px 6px;position:relative;min-width:0}.bb>.c+.c{border-inline-start:1px solid #e3e6ee}.bb>.c small{display:block;font-size:6.8pt;color:#8a91a1;font-weight:700}.bb>.c b{display:block;font-size:10.4pt;font-weight:900;white-space:nowrap}.bb>.c b u{text-decoration:none;font-size:6.6pt;font-weight:600;color:#8a91a1;margin-inline-start:3px}.bb>.c em{font-style:normal;font-size:6.8pt;font-weight:800}
-.bb>.c .op{position:absolute;inset-inline-start:-7px;top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;background:#fff;border:1px solid #d5d9e3;display:grid;place-items:center;font-size:8pt;font-weight:900;color:#6b7385;font-style:normal;line-height:1;z-index:1}
-.bb>.c.f{flex:1.5;background:linear-gradient(120deg,#0d1a38,#152c5a 65%,#1b3870);border-color:#13284f}.bb>.c.f small{color:#f3d892}.bb>.c.f b{color:#fff;font-size:13.5pt;line-height:1.3}.bb>.c.f b u{color:#cdd5e6}.bb>.c.f em{display:inline-block;margin-top:1px;padding:0 9px;border-radius:99px;background:rgba(255,255,255,.14);color:#fff}
-.vd b,.vd em{color:#c2414b}.vc b,.vc em{color:#1d4ed8}.vz b,.vz em{color:#15803d}.bb>.c.f.vd em{color:#ffc9cf}.bb>.c.f.vc em{color:#c9dcff}.bb>.c.f.vz em{color:#bfecd0}
-.sign{display:flex;gap:46px;margin-top:20px}.sign div{flex:1;border-top:1px solid #d5d9e1;padding-top:6px;font-size:7.8pt;color:#6b7385;text-align:center}.foot{margin-top:10px;padding-top:6px;border-top:1px solid #eef0f4}
-/* ===== v89.9 «کرم و طلایی» برای همه برگه‌ها (خواسته صاحب اپ با نمونه عکس: «همه رو با این شکل»): لوگو و عنوان وسط با خط طلایی،
-   سرستون‌ها متن طلایی روی زمینه روشن با خط طلایی زیرش، ردیف‌ها با خط نازک کرم، جمع با خط طلایی، مانده نهایی عدد درشت (بدون نوار سرمه‌ای) */
-body{color:#2b2520;background:#fff}.pg:before{display:none}
-.top{display:flex;flex-direction:column;align-items:center;text-align:center;background:none;color:#2b2520;border:0;box-shadow:none;border-radius:0;padding:0 0 4px;margin:0 0 6px}.top:after{display:none}
-.top .lg{width:30mm;filter:none}.top .shop{display:block;font-size:7pt;color:#a07b33;font-weight:600;margin-top:2px}.top .ttl{display:block;font-size:20pt;font-weight:400;color:#2b2520;line-height:1.3;margin-top:1px}.top .ru{display:block;width:26mm;height:1.6px;border-radius:2px;background:#b8893a;margin:4px 0 6px}
-.docs{display:flex;gap:18px;justify-content:center}.doc{background:none;border:0;border-radius:0;color:#a07b33;font-size:7pt;font-weight:700;padding:0;line-height:1.5}.doc b{display:inline;color:#2b2520;font-size:9pt;font-weight:800;margin-inline-start:5px}.doc.no b{color:#8a6410;font-size:10pt;font-weight:900}
-h1{font-size:13pt;font-weight:800;color:#2b2520;text-align:center;margin:2px 0 0}.sub{justify-content:center}.sub .pdl{background:none;color:#a07b33;padding:0}.sub .pdv{color:#2b2520}
-.inf{background:none;border:0;border-top:1.5px solid #b8893a;border-bottom:1px solid #ece0c8;border-radius:0}.inf>div+div{border-inline-start:1px solid #ece0c8}.inf small{color:#a07b33;font-weight:800}
-.kp{gap:0;border-top:1.5px solid #b8893a;border-bottom:1px solid #ece0c8}.kp div{background:none;border:0!important;border-radius:0}.kp div+div{border-inline-start:1px solid #ece0c8!important}.kp small{color:#a07b33;font-weight:800}.kp b{color:#2b2520}
-.kp div.g{background:none;border:0!important;border-inline-start:1px solid #ece0c8!important}.kp .g small{color:#a07b33}.kp .g b{color:#8a6410;font-size:14pt}.kp .g b em{color:#a59a8e}
-h2{color:#2b2520}h2:before{background:#b8893a;width:2px}h2 small{color:#8b8178}
-table{border:0;border-radius:0}th{background:none;color:#a07b33;font-weight:800;border-bottom:1.5px solid #b8893a}td{border-bottom:1px solid #f0e6d2}
-tbody tr:nth-child(even) td,tbody.en:nth-of-type(even) td{background:none}tbody:last-of-type tr:last-child td{border-bottom:1.5px solid #b8893a}
-tr.tot td{background:none!important;border-top:1.5px solid #b8893a;color:#8a6410}
-.calc{border:0;border-radius:0;border-top:1.5px solid #b8893a}.calc .cl{background:none!important;border-bottom:1px solid #f0e6d2}.calc .cl.t{border-top:1px solid #d9c39a}.calc .cl.r{border-top:1.5px solid #b8893a;color:#8a6410}
-.bb{border:0;border-radius:0;border-top:1.5px solid #b8893a;border-bottom:1px solid #ece0c8}.bb>.kd{background:none;color:#a07b33}.bb>.c+.c{border-inline-start:1px solid #ece0c8}.bb>.c small{color:#a07b33}
-.bb>.c.f{background:none;border-color:#ece0c8}.bb>.c.f small{color:#a07b33}.bb>.c.f b{color:#8a6410;font-size:15pt}.bb>.c.f b u{color:#a59a8e}.bb>.c.f em{background:none;padding:0}.bb>.c.f.vd b,.bb>.c.f.vd em{color:#a3123f}.bb>.c.f.vc b,.bb>.c.f.vc em{color:#1d3f9c}.bb>.c.f.vz b,.bb>.c.f.vz em{color:#0f7a4a}
-.vd b,.vd em{color:#a3123f}.vc b,.vc em{color:#1d3f9c}
-.sign div{border-top-color:#cdb98f;color:#8b8178}.foot{border-top:0;justify-content:center;gap:12px}.pb{background:#8a6410}`}
-/* v61.64 (خواسته صاحب اپ): همه PDFها با تم تازه — سرتیتر سرمه‌ای با لوگوی «طلای مطلا»، نوار طلایی و نقش کم‌رنگ لوگو پشت برگه (مثل فاکتور) */
-/* v89.7 قالب ثابت — تکه‌های مشترک: سربرگ (با شماره اختیاری)، نوار مشخصات، نوار مانده */
-function pdfTop(kind,D,no){return `<div class="top"><span class="lg" role="img" aria-label="طلای مطلا"></span><small class="shop">طلا و جواهر مطلا</small><b class="ttl">${esc(kind)}</b><i class="ru"></i><div class="docs"><div class="doc">تاریخ<b>${D.fa}</b></div>${no!=null&&no!==''?`<div class="doc no">شماره<b>${toFa(no)}</b></div>`:''}</div></div>`}
+th{font-size:6.6pt;font-weight:700;color:#8a6a2a;text-align:right;padding:1.2mm 1.6mm;border-bottom:.45mm solid #bf9135;white-space:nowrap}
+td{padding:1.4mm 1.6mm;border-bottom:.15mm solid #dcd1bb;vertical-align:middle}tr{page-break-inside:avoid;break-inside:avoid}
+td.n{width:7mm;color:#8d8376;font-size:7.2pt}.nm{display:block;font-weight:700;font-size:9pt}.s{display:block;font-size:7pt;color:#8d8376;margin-top:.2mm}
+.ib{display:block;direction:ltr;text-align:right;font-size:7.8pt;letter-spacing:.2px;white-space:nowrap;color:#3d362e}td.ib{display:table-cell}
+td.am,th.am{text-align:left;white-space:nowrap}td.am{font-weight:700;font-size:9.4pt}
+tr.tot td{background:#f4ecd8;border-top:.3mm solid #bf9135;border-bottom:.2mm solid #4a4238;font-weight:700}
+.st{display:inline-block;font-size:6.8pt;font-weight:700;padding:.1mm 2.4mm;border-radius:99px;white-space:nowrap;border:.15mm solid #cfc6b6;vertical-align:middle}.st+br{display:none}
+.st.ok{color:#1d6b4a;border-color:#9cc7b3;background:#eef7f2}.st.fail{color:#9b1c31;border-color:#dba5ae;background:#fbeef0}.st.pending{color:#8a6410;border-color:#dcc48a;background:#fbf4e1}.st.none{color:#5c544a;background:#f5f2ec}
+.sty{display:inline-block;margin-inline-start:1.4mm;font-size:6.6pt;font-weight:700;color:#1f3f8f;vertical-align:middle}.tn{direction:ltr;unicode-bidi:isolate;display:inline-block;font-size:7.4pt;font-weight:500;color:#3d362e}
+.sign{display:flex;gap:16mm;margin-top:9mm}.sign div{flex:1;border-top:.15mm solid #8d8376;padding-top:1mm;font-size:6.6pt;color:#8d8376;text-align:center}
+.foot{margin-top:3mm;display:flex;justify-content:center;gap:3mm;font-size:6.2pt;color:#8d8376}.foot b{font-weight:700;color:#8a6a2a}
+.rc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm;margin-top:3mm}.rc figure{margin:0;border:.15mm solid #dcd1bb;padding:1.6mm;page-break-inside:avoid;break-inside:avoid}
+.rc img{width:100%;height:52mm;object-fit:contain;background:#faf7f0;display:block}.rc figcaption{font-size:7.4pt;margin-top:1mm;line-height:1.5}.rc figcaption b{display:block}
+tbody.en{page-break-inside:avoid;break-inside:avoid}tr.hs td{border-bottom:0;padding-bottom:.6mm}tr.stlr td{padding:0 1.6mm 2mm}
+.stb{border:.15mm solid #dcd1bb;background:#fdfbf6;padding:.8mm 2.6mm .6mm}.stbh{display:flex;justify-content:space-between;align-items:baseline;padding:0 0 .6mm;border-bottom:.15mm solid #e9e0cd}
+.stbh span{font-size:6.8pt;font-weight:700;color:#8a6a2a}.stbh small{font-size:6.6pt;color:#8d8376}.stbh b{font-size:10pt;font-weight:800;white-space:nowrap}.stbh b em{font-size:6.6pt;color:#8d8376;font-weight:500;margin-inline-start:1mm}
+.aml{display:block;font-size:6.4pt;font-weight:700;color:#8a6a2a;text-align:left}.ams{display:block;font-size:6.8pt;font-weight:700;color:#1f3f8f;text-align:left;margin-top:.2mm}
+.stbr{display:flex;align-items:center;gap:2mm;padding:.6mm 0;font-size:7.6pt}.stbr+.stbr{border-top:.15mm dotted #d9cfba}
+.stbr i{width:3.6mm;height:3.6mm;border-radius:50%;background:#ece4d2;color:#3d362e;font-size:6pt;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.stk{font-weight:700;white-space:nowrap}.std{flex:1;color:#5c544a;font-size:7pt}.stbr b{font-weight:700;white-space:nowrap}
+.stw{display:inline-block;font-size:6.4pt;font-weight:700;color:#8a6410;border:.15mm solid #dcc48a;background:#fbf4e1;border-radius:99px;padding:0 1.6mm}
+.stbr.bk .stk,.stbr.bk b{color:#1f3f8f}.stbr.bk i{background:#1f3f8f;color:#fff}
+.pb{position:fixed;top:10px;left:10px;padding:9px 16px;background:#8a6a2a;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}@media print{.pb{display:none}}`}
+/* عنوان گزارش: کلمه‌های اولِ عنوان که در INVCAL هستند (تا سه کلمه) نستعلیق می‌شوند و بقیه (نام روز، «تسویه بدهی»…) با قلم ساده کنارش می‌آید */
+const PDFAL={'صورتحساب':['صورت','حساب'],'صورت‌حساب':['صورت','حساب']};
+function pdfCalT(kind){const W=String(kind).split(' ').filter(Boolean).flatMap(w=>PDFAL[w]||[w]),C=[];while(W.length&&C.length<3&&INVCAL[W[0]])C.push(W.shift());
+  const gp=C[0]==='صورت'?110:230,h=C.length?Math.min(12.5,+(12.5*58/invCalW(C,12.5,gp)).toFixed(2)):0;
+  return (C.length?invCal(C,h,gp):'')+(W.length?`<b class="${C.length?'tx':'tp'}">${esc(W.join(' '))}</b>`:'')}
+function pdfTop(kind,D,no){return `<div class="top"><div class="ttl">${pdfCalT(kind)}</div><span class="lg" role="img" aria-label="طلای مطلا"></span><div class="mt"><div class="mr"><small>تاریخ</small><b>${D.fa}</b></div>${no!=null&&no!==''?`<div class="mr"><small>شماره</small><b>${toFa(no)}</b></div>`:''}</div></div>`}
 const pdfInf=C=>`<div class="inf">${C.filter(Boolean).map(([l,v,x,w])=>`<div${w?' class="w"':''}><small>${l}</small><b>${v}</b>${x?`<span>${x}</span>`:''}</div>`).join('')}</div>`;
-const pdfBB=(kd,C)=>`<div class="bb">${kd?`<span class="kd">${esc(kd)}</span>`:''}${C.map(([l,v,u,e,cl,op,f])=>`<div class="c ${cl||''}${f?' f':''}">${op?`<i class="op">${op}</i>`:''}<small>${l}</small><b><bdi dir="ltr">${v}</bdi><u>${esc(u||'')}</u></b><em>${e||''}</em></div>`).join('')}</div>`;
-const pdfFoot=()=>`<div class="foot"><span style="color:#b8862b;font-weight:800">طلای مطلا</span><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
+const pdfFoot=()=>`<div class="foot"><b>طلای مطلا</b><span>تهیه‌شده ${dates().fa}، ساعت ${toFa(new Date().toTimeString().slice(0,5))}${user?' — '+esc(user):''}</span></div>`;
 const pdfDoc=(title,body)=>`<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>${PDF_FONT}<style>${pdfCSS()}</style></head><body><button class="pb" onclick="window.print()">چاپ / ذخیره PDF</button>${body}</body></html>`;
 const pdfSub=(D,reg)=>`<div class="sub"><span class="pdl">تاریخ واریز</span><span class="pdv">${D.fa}</span><span class="pde">${D.en}</span>${reg?`<span class="rg">ثبت: ${esc(reg)}</span>`:''}</div>`;
 /* v59.8: نام فایل خروجی (PDF و Excel) = تاریخ واریز، مثل «مطلا ( تاریخ ۲۹/۰۷/۱۴۰۵ )».
