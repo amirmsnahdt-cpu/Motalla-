@@ -145,15 +145,18 @@ ACT.ckSave=()=>{ckRead();if(CK&&CK.m==='bfix'){bfxRead();if(CK.bt!==''&&CK.bt!=n
 /* ثبت تسویه‌های «حواله به فروشنده واریزی» روی همان واریزی‌ها (بعد از ساخته شدن سند) */
 /* v61.75 (خواسته صاحب اپ): حواله دوطرفه — تسویه روی واریزی به حساب همین مشتری پیوند دارد (cuId، مثل ثبت دستی با انتخاب مشتری؛
    اثرش فقط در سند است، byInv)، عکس‌های ردیف سند همان عکس‌های تسویه‌اند، و با ویرایش سند وضعیت/عکس/پیگیری تسویه قبلی می‌ماند (old) */
-function ckDepApply(c,t,now,old){let n=0;for(const p of t.pays||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e)continue;const o=old&&old[String(p.entId)]&&old[String(p.entId)].shift();
+/* v90.9: stlSync هر واریزی یک بار، بعد از همه ردیف‌ها (also = واریزی‌هایی که نسخه قبلی سند تسویه‌شان را برداشته — invDepOff با lazy) تا در ویرایش سند
+   «مانده» بی‌جهت ساخته و برداشته نشود */
+function ckDepApply(c,t,now,old,also){let n=0;const T=new Set(also||[]);for(const p of t.pays||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e)continue;const o=old&&old[String(p.entId)]&&old[String(p.entId)].shift();
   const K=[...new Set([...xrPh(p),...(o?stImgs(o):[])])];if(K.length){p.imgs=K;p.img=K[0]}
   const z={id:o?o.id:nid++,st:o?o.st:'wait',name:cuName(c),phone:c.phone||'',inv:String(t.no),amount:pAmt(p),tn:(o&&o.tn)||p.tn||'',note:'سند فروش '+toFa(t.no),cuId:c.id,byInv:{cu:c.id,tx:t.id},date:t.date,at:now,by:who(),...(K.length?{imgs:K,img:K[0]}:{}),...(o&&o.okAt?{okAt:o.okAt,okBy:o.okBy}:{})};
-  e.settles=(e.settles||[]).concat([z]);e.updatedAt=now;e.updatedBy=who();p.stlId=z.id;stlSync(e);n++}if(n)saveE();return n}
+  e.settles=(e.settles||[]).concat([z]);e.updatedAt=now;e.updatedBy=who();p.stlId=z.id;T.add(e);n++}T.forEach(e=>stlSync(e));if(n||T.size)saveE();return n}
 /* حذف سند → تسویه‌های ساخته‌شده روی واریزی‌ها هم برداشته می‌شوند؛ تابع برگشتی برای «بازگردانی» */
 /* تسویه‌های فعلی واریزی‌ها برای همین سند (پیش از ویرایش) */
 function depKeep(t){const M={};(t.pays||[]).forEach(p=>{if(p.m!=='dep')return;const e=entries.find(z=>String(z.id)===String(p.entId));const z=e&&(e.settles||[]).find(s=>s.id===p.stlId);if(z)(M[String(p.entId)]=M[String(p.entId)]||[]).push({...z})});return M}
-function invDepOff(t){const R=[];if(t.type!=='inv')return ()=>{};(t.pays||[]).forEach(p=>{if(p.m!=='dep')return;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e)return;const i=(e.settles||[]).findIndex(z=>z.id===p.stlId);if(i<0)return;const z=e.settles[i];e.settles=e.settles.filter((_,k)=>k!==i);stlSync(e);R.push([e,z])});
-  if(R.length)saveE();return ()=>{R.forEach(([e,z])=>{e.settles=(e.settles||[]).concat([z]);stlSync(e)});if(R.length)saveE()}}
+function invDepOff(t,lazy){const R=[];if(t.type!=='inv')return ()=>{};(t.pays||[]).forEach(p=>{if(p.m!=='dep')return;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e)return;const i=(e.settles||[]).findIndex(z=>z.id===p.stlId);if(i<0)return;const z=e.settles[i];e.settles=e.settles.filter((_,k)=>k!==i);R.push([e,z])});
+  if(lazy)return [...new Set(R.map(x=>x[0]))];/* ویرایش سند: stlSync را ckDepApply بعد از نشستن تسویه‌های تازه می‌زند */
+  new Set(R.map(x=>x[0])).forEach(e=>stlSync(e));if(R.length)saveE();return ()=>{R.forEach(([e,z])=>{e.settles=(e.settles||[]).concat([z])});new Set(R.map(x=>x[0])).forEach(e=>stlSync(e));if(R.length)saveE()}}
 
 /* ============ v61.59 (خواسته صاحب اپ): تسویه طلا — زدن روی مانده طلا (قبلی / سند / نهایی) ============
    مانده طلا (گرم ۷۵۰) با همان رنگ‌ها؛ دو راه: «دریافت/پرداخت طلا» (ردیف دریافت/پرداخت آبشده، وزن و عیار) و

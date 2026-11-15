@@ -84,7 +84,7 @@ function svBlank(cu){const r=+ls.get('m_rate',0)||0;return{v:2,cuId:cu||'',date:
 const svFix=()=>{if(sv.gconv&&!sv.gcOld)sv.gconv=false;/* v88.7: سند قدیمی که مانده‌اش «به طلا» ثبت شده (t.gc) در ویرایش همان‌طور می‌ماند (gcOld) — قبلاً با اولین ویرایش تبدیل بی‌صدا حذف می‌شد و مانده مبلغ و طلا می‌پرید *//* v60.9: «مانده ریالی طلایی ثبت شود» فعلاً برداشته شده */if(!sv.xr)sv.xr=[];if(!sv.items)sv.items=[];if(!sv.pays)sv.pays=[];if(sv.mz==null)sv.mz=mzOf(sv.rate);if(!sv.qa)sv.qa=qaBlank();
   /* v61.46: مبلغ دستی قدیمی (با مالیات داخلش) یک بار به «پیش از مالیات» برگردانده می‌شود؛ جمع همان می‌ماند */
   sv.items.forEach(it=>{if(+it.amT>0&&!it.amN){const c=itCalc(it,sv.rate,sv.tax);if(c.fx){it.amT=c.gold+c.aj+c.pr;it.amN=1}}});};
-ACT.svNew=d=>{if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}closeSheet();svQO=0;/* v70.6: ورود به سند تازه = فهرست مشتری بسته */const cu=d&&d.cu?d.cu:'',old=ls.get('m_svd',null);
+ACT.svNew=d=>{if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}closeSheet();svQO=0;svCuLim=40;/* v70.6: ورود به سند تازه = فهرست مشتری بسته */const cu=d&&d.cu?d.cu:'',old=ls.get('m_svd',null);
   if(!(d&&d.fresh)&&old&&(old.v===1||old.v===2)&&((old.items||[]).length||(old.pays||[]).length||(old.xr||[]).length)&&(!cu||String(old.cuId||'')===String(cu)||!old.cuId)){sv=old;if(cu)sv.cuId=cu;toast('پیش‌نویس سند قبلی باز شد','', 'سند تازه',()=>{const dk=sv.dk,fc=sv.fixCu;sv=svBlank(cu);sv.dk=dk;sv.fixCu=fc;svFix();svKeep();render()})}else sv=svBlank(cu);
   /* v60.5: نوع سند: فروش یا خرید (فقط عنوان و پیشنهادهای جستجو را عوض می‌کند؛ ساختار سند همان است) */
   sv.dk=d&&d.dk==='buy'?'buy':'';sv.fixCu=!!cu;
@@ -163,11 +163,17 @@ function svCuBSync(){const B=$('svCuB'),h=svCuBHTML();if(B&&B.innerHTML!==h){B.i
 function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
   /* v61.93: زدن اول روی جستجو = فهرست آخرین مشتری‌ها با مانده (بدون کیبورد)؛ زدن دوم = تایپ */
   if(!q){if(!svQO)return '';/* v74.1 (خواسته صاحب اپ): همه حساب‌ها (نه فقط ۸ تای آخر)، با شماره مشتری. v75.3: مثل فهرست حساب مشتریان — مانده‌دارها (و در انتظار) بالا، تسویه‌شده‌ها پایین؛ داخل هر دسته تازه‌کارشده‌ها اول */const PW=pendMap();cuWPRe();const zOf=c=>cuZero(cuBal(c))&&!PW.get(String(c.id))&&!(cuWP.get(String(c.id))||0)?1:0;const R=A.map(c=>[c,zOf(c)]).sort((a,b)=>(a[1]-b[1])||String(b[0].lastAt||b[0].createdAt||'').localeCompare(String(a[0].lastAt||a[0].createdAt||''))).map(x=>x[0]);
-    return `<div class="bzsug cbl" role="listbox"><div class="cblh">همه حساب‌ها · ${fmt(R.length)}<small>برای جستجو دوباره بزنید</small></div>${R.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),cuNoH(c)+esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c,cuWP.get(String(c.id))))).join('')}${cbRow('svCuNew',{},ic('plus'),'افتتاح حساب تازه','اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
+    return `<div class="bzsug cbl" role="listbox"><div class="cblh">همه حساب‌ها · ${fmt(R.length)}<small>برای جستجو دوباره بزنید</small></div>${svCuRows(R.slice(0,svCuLim),PW)}${R.length>svCuLim?`<button type="button" class="cumore" data-act="svCuMore">${ic('chev')}<span>${fmt(R.length-svCuLim)} حساب دیگر</span></button>`:''}${cbRow('svCuNew',{},ic('plus'),'افتتاح حساب تازه','اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
   cuWPRe();const nq=toEn(q0).replace(/\D/g,''),L=A.filter(c=>nzName([c.name,c.phone,c.nid,c.grp].join(' ')).includes(q)||(nq&&String(c.cno)===nq)).sort((a,b)=>((nq&&String(b.cno)===nq)-(nq&&String(a.cno)===nq))||(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,60);
   const add=!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0));
-  return `<div class="bzsug cbl" role="listbox">${svBkRows(q0)}${L.map(c=>cbRow('svCu',{id:c.id},cuAvI(c),cuNoH(c)+esc(cuName(c)),[c.grp?esc(c.grp):'',c.phone?'<span class="ltr">'+esc(toFa(c.phone))+'</span>':''].filter(Boolean).join(' · ')||'حساب مشتری',cuBalMini(c,cuWP.get(String(c.id))))).join('')}
+  return `<div class="bzsug cbl" role="listbox">${svBkRows(q0)}${svCuRows(L,pendMap())}
     ${cbRow('svCuNew',{},ic('plus'),add?'حساب تازه: «'+esc(q0)+'»':'افتتاح حساب تازه',(L.length?'':'مشتری‌ای پیدا نشد · ')+'اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
+/* v90.9 (خواسته صاحب اپ: «لیست‌هایی که سرچ مشتری هست باید مثل لیست مشتری‌ها درست باشد که بشود قشنگ جستجو کرد و مانده‌ها را دید»):
+   ردیف حساب در جستجوی مشتری سند = همان ردیف صفحه «حساب مشتریان» (cuRowH: شماره در قاب توسی، نام کامل، تلفن و گروه در سطر دوم، قاب‌های مانده).
+   فهرست «همه حساب‌ها» ۴۰ تا ۴۰ تا می‌آید (svCuLim)؛ جستجو همیشه همه حساب‌ها را می‌گردد. */
+let svCuLim=40;
+const svCuRows=(L,PW)=>L.length?`<div class="cuLs svcl"><div class="c6l c6lb cuL">${L.map((c,ri)=>cuRowH(c,cuBal(c),ri,PW,{act:'svCu',sw:false})).join('')}</div></div>`:'';
+ACT.svCuMore=()=>{svCuLim+=120;const r=$('svCr');if(r){const y=r.scrollTop;r.innerHTML=svCrHTML();if(typeof phPaint==='function')phPaint(r);r.scrollTop=y}};
 let svQO=0;const cuAvI=c=>c&&c.av?`<img data-ik="${esc(c.av)}" alt="">`:esc(userInit(c?c.name:''));
 /* v70.2 (خواسته صاحب اپ): سند تازه اول مشتری می‌خواهد؛ با انتخاب مشتری از فهرست، پنجره «مشخصات مشتری» باز می‌شود
    (بستن = ذخیره خودکار) و بعد فهرست «تشخیص» برای ردیف اول باز می‌شود. حساب تازه: فرم مشخصات قبلاً پر شده، مستقیم «تشخیص». */
@@ -208,7 +214,7 @@ function ajLast(k){const q=nzName(k||''),c=svCu(),ok=it=>it&&!it.ab&&nzName(it.k
   for(let i=(sv.items||[]).length-1;i>=0;i--)if(ok(sv.items[i]))return ajPT(sv.items[i]);
   const scan=L=>{let b=null,ba='';for(const t of L){if(!t||t.type!=='inv'||t.del)continue;const at=String(t.at||'');if(at<ba)continue;for(const it of t.items||[])if(ok(it)){b=it;ba=at}}return b};
   const own=c&&scan(c.txs||[]);if(own)return ajPT(own);const any=scan(CU().flatMap(z=>z.txs||[]));return any?ajPT(any):null}
-const qaIt=a=>({...(+a.mz?{mz:+a.mz}:{}),k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:a.ab?0:parseFloat(a.ajP)||0,ajT:a.ab?0:+a.ajT||0,pp:parseFloat(a.pp)||0,...(a.pz?{pz:1,cnt:+a.cnt||0}:{}),...(Array.isArray(a.imgs)&&a.imgs.length?{imgs:a.imgs.slice(),img:a.imgs[0]}:{}),...(+a.amT>0?{amT:Math.round(+a.amT),amN:1}:{}),...(a.ab?{ab:1,lab:a.lab||'',ang:a.ang||'',...(a.sh?{sh:a.sh}:{})}:{})});
+const qaIt=a=>({...(+a.mz?{mz:+a.mz}:{}),k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:a.ab?0:parseFloat(a.ajP)||0,ajT:a.ab?0:+a.ajT||0,pp:parseFloat(a.pp)||0,...(a.pz?{pz:1,cnt:+a.cnt||0}:(+a.cnt>0?{cnt:+a.cnt}:{})),...(Array.isArray(a.imgs)&&a.imgs.length?{imgs:a.imgs.slice(),img:a.imgs[0]}:{}),...(+a.amT>0?{amT:Math.round(+a.amT),amN:1}:{}),...(a.ab?{ab:1,lab:a.lab||'',ang:a.ang||'',...(a.sh?{sh:a.sh}:{})}:{})});
 function qaCalc(){const B=$('qB');if(!B)return;qaRead();const a=sv.qa;if(a.p){pyHint();return}if(a.x){xrHint();return}const it=qaIt(a),c=itCalc(it,sv.rate,sv.tax),pg=$('qPg'),w7=$('qW7');if(w7)w7.textContent=it.w?wFmt(Math.round(it.w*it.ay/750*1000)/1000)+' گرم':'—';if(pg)pg.textContent=sv.rate?fmt(Math.round(sv.rate*it.ay/750)):'—';
   B.innerHTML=!sv.rate?'<small>مظنه یا نرخ گرم را بالای سند بزنید</small>':!it.w?'<small>وزن را بزنید</small>':`<button type="button" class="d6bt" data-act="qaBrk"><span>مبلغ این کالا</span><b>${fmt(c.tot)}</b><i>جزئیات ${ic('back').replace('class="i"','class="i flip"')}</i></button>`}
 /* v60.8: جزئیات طلا/اجرت/سود پنهان؛ با زدن (یا نگه داشتن) روی مبلغ، در یک حباب کوچک مثل پیام نشان داده می‌شود */
@@ -233,7 +239,9 @@ function qaBind(){const K=$('qK'),a=sv.qa,keep=()=>{qaRead();svKeep()};try{qfTop
   if(K&&!a.k){const B=K.closest('.dkbox');if(B){K.onfocus=()=>{dkOpen=true;B.classList.add('open')};K.onblur=null}}
   /* v61.59: فهرست باز → زدن = کیبورد؛ فهرست بسته → زدن = باز شدن فهرست (kb2 در 15j) */
   if(K){const B=K.closest('.dkbox');kb2(K,()=>!!(B&&B.classList.contains('open')),()=>dkShow())}
-  if(K){K.oninput=()=>{a.q=K.value;clearTimeout(K._t);K._t=setTimeout(()=>{const r=$('qKs');if(r)r.innerHTML=dkList()},60);svKeep()};
+  /* v90.9 (گزارش صاحب اپ با ویدیو: «لگ هنگام وارد کردن کالای جدید»): با هر حرف کل فهرست دوباره ساخته می‌شد و ردیف‌ها (از جمله «کالای تازه …») هر بار انیمیشن ورود را
+     از اول می‌رفتند (محو و ظاهر شدن پشت هم) و سند هم با هر حرف در حافظه گوشی نوشته می‌شد. حالا فهرست همان لحظه و بدون انیمیشن عوض می‌شود (کلاس noan) و ذخیره پیش‌نویس با مکث */
+  if(K){K.oninput=()=>{a.q=K.value;const r=$('qKs');if(r){const y=(r.firstElementChild||{}).scrollTop||0;r.innerHTML=dkList();const l=r.firstElementChild;if(l){l.classList.add('noan');l.scrollTop=y}}clearTimeout(K._t);K._t=setTimeout(svKeep,350)};
     K.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();a.q=K.value;const r=$('qKs');if(r)r.innerHTML=dkList();const f=document.querySelector('#qKs [data-act]');if(f)ACT[f.dataset.act]({...f.dataset})}};
     const KS=$('qKs');if(KS)KS.onpointerdown=e=>{if(e.target.closest('button'))e.preventDefault()}}
   const ent=e=>{if(e.key==='Enter'){e.preventDefault();ACT.qaAdd()}};
@@ -252,6 +260,8 @@ const qaDone=()=>{sv.qa=qaBlank();svKeep();qaRe();svRe()};/* v61.2: بعد از 
 ACT.qaK=d=>{qaRead();const a=sv.qa;a.k=d.k?clean(d.k):'';a.i=null;if(a.ab||a.k)Object.assign(a,{ab:0,lab:'',ang:'',mz:'',mzk:'',pp:PROFIT_DEF(),ay:750,pz:0,cnt:'',imgs:[],img:'',amT:''});/* v61.47 (خواسته صاحب اپ): متفرقه و سکه پارسیان اجرت ندارند و سود پیش‌فرض ثابت ۷٪؛ کالای ساخته = آخرین اجرت همین کالا برای همین مشتری
   (اگر نبود، آخرین اجرت همین کالا برای هر مشتری) */if(a.k){const J=ajLast(a.k);a.ajP=J&&J.P||'';a.ajT=J&&J.T||''}if(a.k)addGoods(a.k);a.q='';svKeep();qaRe(a.k?'qW':'qK')};
 ACT.qaAdd=()=>{qaRead();const a=sv.qa;if(!a.k){toast('کالا را انتخاب کنید',true);dkShow();return}const it0=qaIt(a);if(!it0.w){toast('وزن را بزنید',true);fcs('qW');return}
+  /* v90.9: ضرر، سود صفر، زیر فی خرید، نرخ پرت — پنجره خطا پیش از نشستن ردیف (15zz-warn) */
+  if(warnGate('it|'+JSON.stringify(it0),itWarn(it0),()=>ACT.qaAdd()))return;
   const old=a.i!=null?sv.items[a.i]:null,it={...it0,cat:it0.ab?'آبشده':old&&old.cat?old.cat:GK.includes(a.k)?a.k:'نو',n:old?old.n||'':''};if(!it.ab)ls.set('m_aj',it.ajP)
   if(a.i!=null){sv.items[a.i]=it;svAdd=a.i}else{sv.items.push(it);svAdd=sv.items.length-1;svUsed[it.k]=(svUsed[it.k]||0)+1}const ay=it.ay;qaDone();sv.qa.ay=ay};
 ACT.qaDel=()=>{const a=sv.qa;if(a.i==null)return;const k=sv.items.splice(a.i,1)[0];qaDone();toast('«'+(k&&k.k)+'» از سند حذف شد','', 'بازگردانی',()=>{if(k){sv.items.push(k);svKeep();svRe()}})};
@@ -293,7 +303,11 @@ ACT.xrPgR=()=>{xrRead();const x=sv.qa.x;x.pgM=false;x.pg=0;svKeep();qaRe()};
 ACT.xrSave=()=>{xrRead();const x=sv.qa.x;if(!x)return;const C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
   if(!C.n){toast(g?'وزن را بزنید':'تعداد را بزنید',true);const f=$('xrW')||$('xrQ');if(f)f.focus();return}if(g&&!(+x.ay)){toast('عیار را بزنید',true);fcs('xrY');return}
   if(m&&!C.pg){toast(g?'مظنه یا نرخ گرم را بالای سند بزنید':'نرخ هر واحد را بزنید',true);const f=g&&!x.pgM?$('svM'):$('xrG');if(f)f.focus();return}
+  /* v90.9: «خیلی بالا می‌خرید» / «زیر نرخ روز می‌فروشید» / نرخ پرت — پنجره خطا (15zz-warn) */
+  if(warnGate('xr|'+JSON.stringify([x.t,x.a,x.pul,x.w,x.q,x.ay,x.pg,x.mz,x.am,x.amT,x.cat]),xrWarn(x),()=>ACT.xrSave()))return;
   if(!g&&m)ls.set('m_px_'+x.a,x.pg);const o={t:x.t,a:x.a,pul:!!x.pul,w:g?C.n:0,q:g?0:C.n,ay:g?+x.ay:0,pg:x.pgM||!g?+x.pg:0,pgM:!!(g&&x.pgM),cat:g?x.cat||'متفرقه':''};if(x.lab)o.lab=x.lab;if(x.ang)o.ang=x.ang;if(x.sh)o.sh=x.sh;if(x.pv)o.pv=x.pv;if(x.pz){o.pz=1;o.cnt=+x.cnt||0}if(x.img)o.img=x.img;if(Array.isArray(x.imgs)&&x.imgs.length){o.imgs=x.imgs.slice();o.img=x.imgs[0]}if(g&&m&&+x.am)o.am=Math.round(+x.am);if(m&&!(g&&+x.am)&&+x.amT)o.amT=Math.round(+x.amT);if(g&&m&&+x.mz)o.mz=+x.mz;
+  /* v90.9: کالای تعدادی (غیر پارسیان) و فی خرید/فروش ردیف دریافت کالا؛ فی زده‌شده «فی فعلی» همان کالا می‌شود (15zz) */
+  if(g&&!x.pz&&+x.cnt>0)o.cnt=+x.cnt;if(g&&+x.fb>0)o.fb=+x.fb;if(g&&+x.fs>0)o.fs=+x.fs;gdFeeKeep(o);
   if(x.i!=null)sv.xr[x.i]=o;else sv.xr.push(o);qaDone()};
 ACT.xrDel=()=>{const x=sv.qa.x;if(!x||x.i==null)return;const o=sv.xr.splice(x.i,1)[0];qaDone();toast('ردیف حذف شد','', 'بازگردانی',()=>{if(o){sv.xr.push(o);svKeep();svRe()}})};
 ACT.svXrEdit=d=>{const o=sv.xr[+d.i];if(!o)return;qaRead();xrStart({...o,w:o.w?String(o.w):'',q:o.q?String(o.q):'',i:+d.i});const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
@@ -546,23 +560,25 @@ function bindSell(){if(!sv)return;svBindCu();svCuBSync();phPaint($('svCu'));svBi
 const svSig=()=>sv?JSON.stringify([sv.cuId,sv.date,+sv.rate||0,+sv.mz||0,sv.items,sv.xr,sv.pays,!!sv.tax,+sv.disc||0,sv.dk||'']):'';
 const svRows=()=>!!(sv&&(sv.items.length||sv.pays.length||(sv.xr||[]).length));
 /* ردیف نیمه‌کاره‌ای که کامل است اول به سند اضافه می‌شود */
-function svFlush(){const a=sv.qa;if(a&&a.pv){if($('stI'))stRead();if(pvHas(a.pv)){ACT.pvSave();if(sv.qa.pv)return false}}if(a&&a.k&&parseFloat(a.w))ACT.qaAdd();if(a&&a.x&&(parseFloat(a.x.w)||parseFloat(a.x.q))){ACT.xrSave();if(sv.qa.x)return false}if(a&&a.p&&(+a.p.amount>0)){ACT.pySave();if(sv.qa.p)return false}return true}
+function svFlush(){const a=sv.qa;if(a&&a.pv){if($('stI'))stRead();if(pvHas(a.pv)){ACT.pvSave();if(sv.qa.pv)return false}}if(a&&a.k&&parseFloat(a.w)){ACT.qaAdd();if($('wrnp'))return false/* v90.9: پنجره خطای همین ردیف باز شد */}if(a&&a.x&&(parseFloat(a.x.w)||parseFloat(a.x.q))){ACT.xrSave();if(sv.qa.x)return false}if(a&&a.p&&(+a.p.amount>0)){ACT.pySave();if(sv.qa.p)return false}return true}
 /* خطای ثبت (خالی = قابل ثبت) */
 function svErr(){const c=svCu();if(!c)return 'مشتری سند انتخاب نشده';if(!svRows())return 'سند ردیفی ندارد';if(svHasG()&&!sv.rate)return 'مظنه یا نرخ گرم زده نشده';
   for(const p of sv.pays)if((p.m==='cust'||p.bk)&&!CU().some(z=>String(z.id)===String(p.cuId)))return 'حساب «'+(p.cuName||'')+'» پیدا نشد';
-  for(const p of sv.pays)if(p.m==='dep'){const x=validated().find(z=>String(z.id)===String(p.entId));const mine=sv.edit&&(x&&x.settles||[]).some(z=>z.byInv&&String(z.byInv.tx)===String(sv.edit.tx));if(!x||(x.full&&!mine)||x.sentBid||depAvail(x)<ckUsedDep(p.entId))return 'واریزی «'+(p.entName||'')+'» دیگر قابل تسویه نیست؛ ردیفش را حذف کنید'}
+  for(const p of sv.pays)if(p.m==='dep'){const x=validated().find(z=>String(z.id)===String(p.entId));const mine=sv.edit&&(x&&x.settles||[]).some(z=>z.byInv&&String(z.byInv.tx)===String(sv.edit.tx));if(x&&mine&&depAvail(x)<ckUsedDep(p.entId))return 'حواله به واریزی «'+(p.entName||'')+'» بیشتر از مانده آن است (حداکثر '+fmt(depAvail(x))+' تومان)';if(!x||(x.full&&!mine)||(x.sentBid&&!mine)||depAvail(x)<ckUsedDep(p.entId))return 'واریزی «'+(p.entName||'')+'» دیگر قابل تسویه نیست؛ ردیفش را حذف کنید'}
+  /* v90.9: کم یا حذف شدن تسویه واریزی‌ای که واریز بانکی‌اش ثبت شده «مانده» می‌سازد — مجوزش بررسی می‌شود */
+  if(sv.edit){const c0=svCu(),t0=c0&&(c0.txs||[]).find(z=>String(z.id)===String(sv.edit.tx));for(const p of (t0&&t0.pays)||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e||!depBkFix(e)||remCan())continue;const z=(e.settles||[]).find(q=>q.id===p.stlId);if(z&&ckUsedDep(p.entId)<(+z.amount||0))return REMNO}}
   return ''}
 /* ثبت واقعی سند (تازه یا جایگزین نسخه قبلی در ویرایش) — برمی‌گرداند {c,t} */
-function svCommit(){const c=svCu();let depOld=null;
+function svCommit(){const c=svCu();let depOld=null,depOff=null;
   /* v61.7: ویرایش سند ثبت‌شده: نسخه قبلی (و ردیف‌های مرتبطش) کنار می‌رود و همین سند با همان شماره دوباره ثبت می‌شود */
-  let OLD=null;if(sv.edit){/* v88.5: نسخه‌ای که باز شده اگر در این فاصله جایگزین شده باشد (ویرایش از گوشی دیگر)، همان سند زنده با همین شماره کنار می‌رود — وگرنه دو سند با یک شماره می‌ماند */const t0=(c.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)&&!x.del)||(c.txs||[]).find(x=>!x.del&&x.type==='inv'&&!x.lk&&!x.pd&&!x.bl&&!x.bd&&String(x.no)===String(sv.edit.no));if(t0){OLD=t0;const at=new Date().toISOString();t0.del=true;t0.delAt=at;t0.delBy=who();t0.edBy=1;txLinked(c,t0).forEach(x=>{x.t.del=true;x.t.delAt=at;x.t.delBy=who()});depOld=depKeep(t0);invDepOff(t0)}}
+  let OLD=null;if(sv.edit){/* v88.5: نسخه‌ای که باز شده اگر در این فاصله جایگزین شده باشد (ویرایش از گوشی دیگر)، همان سند زنده با همین شماره کنار می‌رود — وگرنه دو سند با یک شماره می‌ماند */const t0=(c.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)&&!x.del)||(c.txs||[]).find(x=>!x.del&&x.type==='inv'&&!x.lk&&!x.pd&&!x.bl&&!x.bd&&String(x.no)===String(sv.edit.no));if(t0){OLD=t0;const at=new Date().toISOString();t0.del=true;t0.delAt=at;t0.delBy=who();t0.edBy=1;txLinked(c,t0).forEach(x=>{x.t.del=true;x.t.delAt=at;x.t.delBy=who()});depOld=depKeep(t0);depOff=invDepOff(t0,1)}}
   const T=svTot(),now=ns(),no=sv.edit?sv.edit.no:sv.no0&&!invNoUsed(sv.no0)?sv.no0:invNext(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}});
   const xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e}});
   const t={id:nid++,type:'inv',dk:sv.dk||undefined,no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>{const q={...p};delete q.xfId;return q}),at:now,by:who()};if(OLD){t.edOf=OLD.id;t.at0=OLD.at0||OLD.at;t.cn=cnOf(c,OLD)||undefined}else t.cn=cnNext(c)
   if(T.ge)t.ge=T.ge;if(Object.keys(T.xe).length)t.xe=T.xe;
   if(sv.gconv&&T.rest>0&&sv.rate)t.gc={r:T.rest,g:Math.round(T.rest/sv.rate*1000)/1000};
   for(const p of t.pays){if(p.m!=='cust'&&!p.bk||p.m==='pos')continue;/* v83.7: طرف مقابل = سند واقعی (15zt lnkMirror) */const x=lnkMirror(c,t,p,no,now);if(x)p.xfId=x.id}
-  (c.txs=c.txs||[]).push(t);c.lastAt=now;posDaySyncAll(1);saveCu();if(t.pays.some(p=>p.srcId!=null))saveS();ckDepApply(c,t,now,depOld);
+  (c.txs=c.txs||[]).push(t);c.lastAt=now;posDaySyncAll(1);saveCu();if(t.pays.some(p=>p.srcId!=null))saveS();ckDepApply(c,t,now,depOld,depOff);
   logA('cust',(OLD?'ویرایش ':'')+invTitle(t),cuName(c)+(items.length?' | '+items.map(i=>i.k+' '+wFmt(i.w)+' گرم').join('، '):'')+(xr.length?' | '+xr.map(xrLab).join('، '):'')+' | جمع '+fmt(T.total)+' تومان'+(T.paid?' | دریافت/پرداخت '+fmt(T.paid):''),{cu:c.id,tx:t.id});
   return {c,t}}
 /* v61.96 (خواسته صاحب اپ): فاکتور / PDF از داخل خود سند (پیش از ثبت) — همان برگه فاکتور با ردیف‌های فعلی، بدون ثبت و بدون تغییر حساب‌ها */
@@ -577,6 +593,8 @@ ACT.svPrint=()=>{if(!sv)return;const e=!svCu()?'اول مشتری سند را ا
 ACT.svSave=d=>{const c=svCu();if(!c){toast('مشتری سند را انتخاب کنید',true);const q=$('svQ');if(q){q.focus();q.scrollIntoView({behavior:'smooth',block:'center'})}return}
   if(!svFlush())return;if(!svRows()&&!svRBal()&&!(d&&d.w==='f'&&svBalL().some(z=>z[3]))){toast('حساب این مشتری تسویه است؛ کالا، طلا یا سکه اضافه کنید',true);dkShow();return}
   if(svHasG()&&!sv.rate){toast('مظنه یا نرخ گرم را بزنید',true);$('svM').focus();return}
+  if(svHasG()&&warnGate('hdr|'+sv.rate,hdrWarn(),()=>ACT.svSave(d),'svM'))return;/* v90.9: نرخ سند پرت از بازار */
+  if(svRows()&&!sv.dOk&&dateWarn()){const w=dateWarn();askWarn({ok:'اصلاح می‌کنم',...w,go:()=>{sv.dOk=sv.date;svKeep();ACT.svSave(d)}});return}
   ckOpen(d&&d.w)};
 /* v61.47: زدن هر مانده (قبلی / سند / نهایی) = تسویه همان مبلغ */
 /* v61.59: زدن مانده طلا = تسویه طلا (gkOpen در 15i)؛ مبلغ و سکه = تسویه تومانی */
@@ -584,7 +602,7 @@ ACT.svBal=d=>{if(d&&d.k==='g'){if(!svCu()){toast('مشتری سند را انت�
 /* خروج از صفحه سند → ثبت خودکار. نتیجه: true = ثبت شد */
 let svAutoBusy=false;
 function svAuto(why){if(!sv||svAutoBusy)return false;svAutoBusy=true;try{
-  try{svFlush()}catch(e){}
+  window.__wauto=1;try{svFlush()}catch(e){}finally{window.__wauto=0}/* v90.9: ثبت خودکار هنگام خروج، پنجره خطای ردیف نمی‌پرسد */
   if(!svRows()){const c0=svCu(),t0=sv.edit&&c0&&(c0.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)),emp=t0&&!(t0.items||[]).length&&!(t0.xr||[]).length&&!(t0.pays||[]).length;if(!sv.edit||emp){sv=null;ls.set('m_svd',null)}else{toast('همه ردیف‌ها برداشته شده؛ سند قبلی دست نخورد. برای حذف، از صفحه سند «حذف» را بزنید',true);sv=null;ls.set('m_svd',null)}return false}
   if(sv.edit&&sv.sig0&&svSig()===sv.sig0){if(why!=='bg'){sv=null;ls.set('m_svd',null)}return false}
   const er=svErr();if(er){svKeep();if(why!=='bg')toast('سند ثبت نشد: '+er+' · پیش‌نویس در صفحه مشتری ماند',true);return false}

@@ -184,10 +184,19 @@ function merge3(base, mine, theirs) {
 }
 
 /* ---------- مجوزها ---------- */
-function deny(user, coll, deleting, theirs) {
+/* v90.9: «بخش» یک واریزی (splitOf: پرداخت از چند منبع، مانده بعد از کم شدن تسویه مشتری) واریزی تازه نیست: با مجوز «تقسیم» یا «ویرایش»
+   ساخته و برداشته می‌شود (قبلاً «ثبت واریزی»/«حذف» می‌خواست؛ کاربر تقسیم بدون آن‌ها مبلغ واریزی اصلی را کم می‌کرد ولی بخش تازه رد می‌شد → مبلغ گم می‌شد).
+   شرط: واریزی اصلی روی سرور هست و شبای بخش همان شبای اصلی است (پول به حساب دیگری نمی‌رود). */
+const isPiece = d => isObj(d) && d.splitOf !== undefined && d.splitOf !== null && d.splitOf !== '';
+function pieceOk(d) { const r = q.getDoc.get('entries', sv(d.splitOf)); if (!r || r.deleted) return false; try { return sv(JSON.parse(r.data).iban) === sv(d.iban); } catch (e) { return false; } }
+function deny(user, coll, deleting, theirs, data) {
   if (user.role === 'admin') return null;
   const P = new Set(userPerms(user));
   if (coll === 'sources') return P.has('src') ? null : 'تغییر منابع پرداخت برای حساب شما مجاز نیست';
+  if (coll === 'entries' && (P.has('split') || P.has('edit'))) {
+    if (deleting && isPiece(theirs)) return null;
+    if (!deleting && !theirs && isPiece(data) && pieceOk(data)) return null;
+  }
   if (deleting && (coll === 'entries' || coll === 'creds')) return P.has('del') ? null : 'حذف برای حساب شما مجاز نیست';
   if (deleting && coll === 'batches' && theirs && theirs.closed) return P.has('del') ? null : 'حذف لیست بایگانی‌شده برای حساب شما مجاز نیست';
   if (!deleting && !theirs && coll === 'entries' && !P.has('add') && !P.has('undo')) return 'ثبت واریزی برای حساب شما مجاز نیست';
@@ -363,7 +372,7 @@ function doSync(user, body) {
       if (!COLLS.has(coll) || !id || id.length > 80) continue;
       const cur = q.getDoc.get(coll, id), theirs = cur && !cur.deleted ? JSON.parse(cur.data) : null;
       const deleting = ch.data === null || ch.data === undefined;
-      const why = deny(user, coll, deleting, theirs);
+      const why = deny(user, coll, deleting, theirs, ch.data);
       if (why) { rejected.push({ coll, id, why }); touched.add(coll + '\u0000' + id); continue; }
       if (deleting) {
         if (!cur || cur.deleted) continue;

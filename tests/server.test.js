@@ -309,6 +309,27 @@ test('امنیت v78.9: ورود از پیش‌نمایش githack فقط یک س
   assert.equal((await api('/api/me', { token: admin })).status, 200, 'other sessions untouched');
 });
 
+test('v90.9 بخش واریزی (splitOf): با مجوز تقسیم ساخته و برداشته می‌شود، فقط با همان شبای واریزی اصلی', async () => {
+  const sync = (t, changes) => api('/api/sync', { method: 'POST', token: t, body: { since: 0, changes } });
+  const IB = 'IR000000000000000000000071', IB2 = 'IR000000000000000000000072';
+  assert.equal((await api('/api/users', { method: 'POST', token: admin, body: { username: 'splitter', name: 'تقسیم', password: 'secret123', perms: ['split'] } })).status, 200);
+  const sp = (await api('/api/login', { method: 'POST', body: { username: 'splitter', password: 'secret123' } })).j.token;
+  const root = { id: 'pr1', name: 'فروشنده', amount: 1000, iban: IB, settles: [] };
+  assert.equal((await sync(admin, [{ coll: 'entries', id: 'pr1', data: root }])).j.rejected.length, 0);
+  // واریزی تازه (بدون splitOf) هنوز «ثبت واریزی» می‌خواهد
+  assert.equal((await sync(sp, [{ coll: 'entries', id: 'px1', data: { id: 'px1', name: 'تازه', amount: 5, iban: IB } }])).j.rejected.length, 1, 'plain new entry needs add');
+  // بخش با شبای دیگر یا واریزی اصلی ناموجود رد می‌شود
+  assert.equal((await sync(sp, [{ coll: 'entries', id: 'pp0', data: { id: 'pp0', splitOf: 'pr1', name: 'فروشنده', amount: 300, iban: IB2 } }])).j.rejected.length, 1, 'other iban rejected');
+  assert.equal((await sync(sp, [{ coll: 'entries', id: 'pp9', data: { id: 'pp9', splitOf: 'nope', name: 'فروشنده', amount: 300, iban: IB } }])).j.rejected.length, 1, 'missing root rejected');
+  // بخش درست + کم شدن مبلغ اصلی در یک درخواست: هر دو پذیرفته می‌شوند (جمع خانواده ثابت)
+  const r = await sync(sp, [{ coll: 'entries', id: 'pr1', base: root, data: { ...root, amount: 700 } }, { coll: 'entries', id: 'pp1', data: { id: 'pp1', splitOf: 'pr1', name: 'فروشنده', amount: 300, iban: IB, settles: [] } }]);
+  assert.deepEqual(r.j.rejected || [], []);
+  // برداشتن بخش (یکی کردن / مصرف مانده) بدون مجوز «حذف»
+  assert.deepEqual((await sync(sp, [{ coll: 'entries', id: 'pp1', data: null }])).j.rejected || [], []);
+  // ولی واریزی اصلی را بدون مجوز حذف نمی‌تواند حذف کند
+  assert.equal((await sync(sp, [{ coll: 'entries', id: 'pr1', data: null }])).j.rejected.length, 1);
+});
+
 test('حذف کاربر: اطلاعاتی که ثبت کرده می‌ماند، فقط ورودش بسته می‌شود', async () => {
   assert.equal((await api('/api/users', { method: 'POST', token: admin, body: { username: 'gone', name: 'رفتنی', password: 'secret123', perms: ['add', 'edit', 'debt'] } })).status, 200);
   const t = (await api('/api/login', { method: 'POST', body: { username: 'gone', password: 'secret123' } })).j.token;

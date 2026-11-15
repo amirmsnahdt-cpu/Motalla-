@@ -75,7 +75,7 @@ async function openItem(bid,i){const b=batches.find(z=>z.id==bid);if(!b)return;c
   <div class="ith">یادداشت <i>اختیاری</i></div>
   <div class="itg"><input id="itno" class="itno" value="${esc(x.note||'')}" placeholder="توضیح (اختیاری)"></div>
   <button class="xgo" data-act="itSave">${ic('check')} ${cur==='ent'&&tmpSt!=='fail'?'تأیید واریز':'ذخیره'}</button>
-  <button class="itfail" data-act="itFail">${tmpSt==='fail'?'برگرداندن به «در انتظار»':'این واریز انجام نشد'}</button></div>`);
+  <button class="itfail" data-act="itFail">${tmpSt==='fail'?'برگرداندن به «در انتظار»':'این واریز انجام نشد'}</button>${x.st!=='fail'&&!b.closed&&can('split')&&entries.some(z=>z.id===x.id)?`<button class="link itless" data-act="itLess">بانک مبلغ کمتری واریز کرد؟</button>`:''}</div>`);
   galThumbs();
   $('itn').oninput=()=>{$('itn').value=toEn($('itn').value).replace(/[^\dA-Za-z\-]/g,'');if($('itn').value&&tmpSt!=='ok')tmpSt='ok';itStPaint()};
 }

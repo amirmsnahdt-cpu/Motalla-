@@ -31,7 +31,7 @@ async function ocrRead(src){const w=await ocrWorker();let a=0;try{const r=await 
 const ocrFor=x=>!!x&&(x.m==='pos'||(x.m==='bkx'&&x.k==='bpos'));
 async function ocrRun(x,dataUrl){if(!ocrFor(x)||OCRB)return;OCRB=1;toast('در حال خواندن مبلغ از رسید…');
   try{const a=await ocrRead(dataUrl);
-    if(!a){toast('مبلغ از عکس خوانده نشد؛ دستی بزنید',true);return}
+    if(!a){toastBg('مبلغ از عکس خوانده نشد؛ دستی بزنید');return}
     const isCK=typeof CK!=='undefined'&&x===CK,cur0=+x.amount||0,pre=isCK?ckLeft():0;
     const put=()=>{if(isCK){ckRead();CK.amount=a;ckRe('ckA')}else{if(typeof qaRead==='function')qaRead();x.amount=a;svKeep();if(cur==='sell'&&typeof qaRe==='function')qaRe()}};
     if(!cur0||cur0===pre){put();toast('مبلغ از رسید خوانده شد: '+fmt(a)+' تومان — بررسی کنید')}

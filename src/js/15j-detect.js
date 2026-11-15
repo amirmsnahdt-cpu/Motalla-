@@ -47,21 +47,26 @@ const COINS=()=>Object.keys(XA).filter(k=>XA[k].k==='c'),FXS=()=>Object.keys(XA)
    کالای تازه با دسته: ساخته / سایر (پنجره اجرت و سود) یا سکه / ارز (جنس تازه در حساب جنسی، در cfg.xa ذخیره و به XA افزوده می‌شود). */
 function xaSync(){const r=cfgRec();((r&&r.xa)||[]).forEach(o=>{if(o&&o.k&&!XA[o.k])XA[o.k]={t:o.t||o.k,s:o.s||o.k,u:o.u||(o.c==='f'?'واحد':'عدد'),k:o.c==='f'?'f':'c',x:1}})}
 const gCat=k=>{const r=cfgRec();return (r&&r.gk&&r.gk[k])||'ساخته'};
-function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls)=>R.push({id,t,ico,sub,cls:cls||''});
-  if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله به مشتری':'حواله از مشتری','swap','از حساب مشتری دیگر');fx('m:hav',d==='in'?'حواله به بانک':'حواله از بانک','bank',d==='in'?'به حساب‌های ما':'از حساب‌های ما');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه');fx('m:cash','نقد','cash','پول نقد');fx('j:adj',d==='in'?'اضافه':'کسر','tag','تخفیف، مانده قبلی، هزینه بانکی، یارانه…','adjf '+(dkRed(d)?'kr':'kb'))}
+/* v90.9 (خواسته صاحب اپ: «ثابت‌ها مثل طلا، ارز و سکه هر کدام کنار هم لیست شوند»): هر مورد ثابت یک گروه دارد (g: m پول · g طلا · c سکه · f ارز)
+   و فهرست گروه‌به‌گروه با سرتیتر می‌آید: پول ← طلا (+ کالاهای خود مغازه) ← سکه (سکه‌ها، سکه پارسیان، پولی سکه) ← ارز (ارزها، پولی ارز) */
+const DKG={m:['دریافت و پرداخت','cash'],g:['طلا','coin'],c:['سکه','coin'],f:['ارز','usd']};
+function dkFixed(d){const R=[];const fx=(id,t,ico,sub,cls,g)=>R.push({id,t,ico,sub,cls:cls||'',g:g||'g'});
+  if(d==='in'||d==='out'){fx('m:cust',d==='in'?'حواله به مشتری':'حواله از مشتری','swap','از حساب مشتری دیگر','','m');fx('m:hav',d==='in'?'حواله به بانک':'حواله از بانک','bank',d==='in'?'به حساب‌های ما':'از حساب‌های ما','','m');if(d==='in')fx('m:pos','کارتخوان','card','پوزهای مغازه','','m');fx('m:cash','نقد','cash','پول نقد','','m');fx('j:adj',d==='in'?'اضافه':'کسر','tag','تخفیف، مانده قبلی، هزینه بانکی، یارانه…','adjf '+(dkRed(d)?'kr':'kb'),'m');
+    /* v61.61: مانده قبلی فقط در دریافت و پرداخت، و یک واحد: تومان و طلا با هم (دلار، سکه… هم اضافه می‌شود) */
+    fx('v:prev','مانده قبلی','clock',d==='out'?'تومان، طلا، دلار، سکه · طلبکاریم':'تومان، طلا، دلار، سکه · بدهکاریم','','m')}
   fx('g:ab','آبشده','coin',d==='sell'?'وزن، عیار، انگ، سود':'وزن و عیار','gd');
   /* v61.62 (خواسته صاحب اپ): آبشده شرطی — عیارش هنوز درنیامده؛ با ۷۵۰ حساب می‌شود و عیار واقعی بعداً از «تنظیمات › آبشده شرطی» در همه سندها می‌نشیند */
   fx('g:abs','آبشده شرطی','coin','عیار درنیامده · فعلاً ۷۵۰ · انگ را بزنید','gd');fx('g:misc','متفرقه','coin',d==='sell'?'طلای دست‌دوم با اجرت و سود':'طلای دست‌دوم','gd');
-  if(d==='sell'||d==='buy')fx('g:pz','سکه پارسیان','coin',d==='sell'?'تعداد، وزن، اجرت و سود':'تعداد، وزن و مظنه خرید','gd');
   if(d==='sell'||d==='buy')fx('g:pul','پولی','swap',d==='sell'?'طلا تحویل نمی‌شود · فروش فردایی':'طلا تحویل گرفته نمی‌شود','gd');
   /* v61.62 (خواسته صاحب اپ): قلک — دقیقاً مثل پولی (طلا تحویل نمی‌شود، مبلغ و مانده طلا در حساب)، فقط با عنوان قلک */
   if(d==='sell'||d==='buy')fx('g:qlk','قلک','coin',d==='sell'?'فروش قلک · طلا تحویل نمی‌شود':'خرید قلک · طلا تحویل گرفته نمی‌شود','gd');
+  xaSync();COINS().forEach(k=>fx('a:'+k,XA[k].t,'coin','سکه','gd','c'));
+  if(d==='sell'||d==='buy')fx('g:pz','سکه پارسیان','coin',d==='sell'?'تعداد، وزن، اجرت و سود':'تعداد، وزن و مظنه خرید','gd','c');
   /* v61.60 (خواسته صاحب اپ): پولی کردن سکه و ارز — جنس تحویل نمی‌شود؛ نرخ می‌گیرد، مبلغ و مانده همان جنس در حساب می‌ماند */
-  if(d==='sell'||d==='buy'){fx('p:c','پولی سکه','swap',d==='sell'?'سکه تحویل نمی‌شود · مبلغ و مانده سکه':'سکه تحویل گرفته نمی‌شود · مبلغ و مانده سکه','gd');fx('p:f','پولی ارز','usd',d==='sell'?'ارز تحویل نمی‌شود · مبلغ و مانده ارز':'ارز تحویل گرفته نمی‌شود · مبلغ و مانده ارز')}
-  /* v61.60: مانده قبلی (افتتاح حساب) — تومان یا طلا؛ فروش/پرداخت = طلبکاریم، خرید/دریافت = بدهکاریم */
-  /* v61.61 (خواسته صاحب اپ): مانده قبلی فقط در دریافت و پرداخت، و یک واحد: تومان و طلا با هم (دلار، سکه… هم اضافه می‌شود) */
-  if(d==='in'||d==='out')fx('v:prev','مانده قبلی','clock',d==='out'?'تومان، طلا، دلار، سکه · طلبکاریم':'تومان، طلا، دلار، سکه · بدهکاریم');
-  xaSync();COINS().forEach(k=>fx('a:'+k,XA[k].t,'coin',XA[k].x?'سکه':'سکه','gd'));FXS().forEach(k=>fx('a:'+k,XA[k].t,'usd','ارز'));return R}
+  if(d==='sell'||d==='buy')fx('p:c','پولی سکه','swap',d==='sell'?'سکه تحویل نمی‌شود · مبلغ و مانده سکه':'سکه تحویل گرفته نمی‌شود · مبلغ و مانده سکه','gd','c');
+  FXS().forEach(k=>fx('a:'+k,XA[k].t,'usd','ارز','','f'));
+  if(d==='sell'||d==='buy')fx('p:f','پولی ارز','usd',d==='sell'?'ارز تحویل نمی‌شود · مبلغ و مانده ارز':'ارز تحویل گرفته نمی‌شود · مبلغ و مانده ارز','','f');
+  return R}
 function dkHTML(){const a=sv.qa,D=a.d&&(DKA().find(z=>z[0]===a.d)||DK.find(z=>z[0]===a.d));
   const sel=(t,ico,act,cls)=>`<div class="dksel${cls?' '+cls:''}"><span class="dki">${ic(ico)}</span><b>${t}</b><button class="itx" data-act="${act}" aria-label="برداشتن">×</button></div>`;
   let h='';/* v61.5: بدون سرتیتر «ردیف تازه»؛ فقط فیلدها */
@@ -71,20 +76,25 @@ function dkHTML(){const a=sv.qa,D=a.d&&(DKA().find(z=>z[0]===a.d)||DK.find(z=>z[
 function dkList(){const a=sv.qa,q0=clean(a.q||''),q=nzName(toEn(q0)),hit=t=>!q||nzName(t).includes(q);
   /* v61.60: پولی سکه / پولی ارز — اول کدام سکه یا ارز */
   if(a.d&&a.pk){xaSync();const K=(a.pk==='c'?COINS():FXS()).filter(k=>hit(XA[k].t));return `<div class="bzsug cbl dkl"><button type="button" class="bzsr dkrw fix" data-act="dkPk0"><span class="av">${ic('back')}</span><span class="tx"><b>${a.pk==='c'?'پولی سکه':'پولی ارز'}</b><small>بازگشت به فهرست</small></span></button>${K.map(k=>`<button type="button" class="bzsr dkrw fix gd" data-act="dkPul" data-k="${esc(k)}"><span class="av">${ic(a.pk==='c'?'coin':'usd')}</span><span class="tx"><b>پولی ${esc(XA[k].t)}</b><small>نرخ هر ${esc(XA[k].u||'واحد')} · مبلغ به حساب</small></span></button>`).join('')||'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}</div>`}
-  const row=(act,data,ico,t,sub,cls)=>`<button type="button" class="bzsr dkrw${cls?' '+cls:''}" data-act="${act}"${Object.entries(data).map(([k,v])=>` data-${k}="${esc(v)}"`).join('')}><span class="av">${ic(ico)}</span><span class="tx"><b>${t}</b><small>${sub||''}</small></span></button>`;
+  const row=(act,data,ico,t,sub,cls,ex)=>`<button type="button" class="bzsr dkrw${cls?' '+cls:''}${ex?' hst':''}" data-act="${act}"${Object.entries(data).map(([k,v])=>` data-${k}="${esc(v)}"`).join('')}><span class="av">${ic(ico)}</span><span class="tx"><b>${t}</b><small>${sub||''}</small></span>${ex||''}</button>`;
+  /* v90.9: موجودی و فی کنار هر کالا (gdEx)؛ «⋯» = فی و موجودی (برای کالاهای مغازه: ویرایش نام و حذف هم) */
+  const gdAdm=isAdmin()||can('src'),wrapG=(h,k,fx)=>fx&&!gdAdm?h:`<div class="dkg">${h}<button type="button" class="dkgm" data-act="gdMenu" data-k="${esc(k)}"${fx?' data-fx="1"':''} aria-label="فی، موجودی${fx?'':'، ویرایش یا حذف'} ${esc(XA[k]?XA[k].t:k)}" aria-haspopup="menu">${ic('more')}</button></div>`;
   if(!a.d){/* v81.2 (خواسته صاحب اپ): دو ستون — فروش | خرید، پرداخت | دریافت، تعویض | مرجوعی؛ کاشی‌ها با حرکت پشت هم بالا می‌آیند */const ORD=dkBk()?['out','in','bpos','chq','pass','vos']:dkIO()?['in','out']:['sell','buy','out','in','swap','ret'],R=DKA().slice().sort((x,y)=>ORD.indexOf(x[0])-ORD.indexOf(y[0])).filter(([k,t])=>hit(t)).map(([k,t,i],n)=>row('dkD',{d:k},i,t,(dkBk()?{bpos:'واریز کارتخوان دستی (جدا از سند خودکار روز)',out:'نقدی، چک، حواله، کسر',in:'نقدی، چک، حواله، اضافه',chq:'چک به حساب گذاشته شد',pass:'چک ما از این حساب پاس شد',vos:'چک وصول شد و به حساب آمد'}:{sell:'آبشده، طلای ساخته، سکه، ارز',buy:'متفرقه، آبشده، سکه، ارز',swap:'طلای کهنه مشتری با نرخ روز',in:'حواله، نقد، طلا، سکه، ارز',out:'حواله، نقد، طلا، سکه، ارز',ret:'برگشت کالای فروخته'})[k],'top k-'+k+(dkRed(k)?' kr':' kb')).replace('class="bzsr','style="--i:'+n+'" class="bzsr'));
     return R.length?`<div class="bzsug cbl dkl dkgrid">${R.join('')}</div>`:'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}
   const o=a.d==='out',BKL=[['m:cash','نقدی','cash',o?'از صندوق به این بانک':'از این بانک به صندوق'],['b:chk','چک','inv',o?'چک به این حساب':'چک از این حساب'],['m:cust','حواله','swap',o?'از هر حساب (مشتری، بانک، هزینه…)':'به هر حساب (مشتری، بانک، هزینه…)'],['b:adj',o?'کسر':'اضافه','tag','تخفیف، مانده قبلی، هزینه بانکی، یارانه…','adjf '+(dkRed(a.d)?'kr':'kb')],['v:prev','مانده قبلی','clock','افتتاح حساب']];
-  const F=(dkBk()&&(a.d==='in'||a.d==='out')?BKL.map(([id,t,ico,sub,cls])=>({id,t,ico,sub,cls:cls||''})).filter(z=>hit(z.t+' '+z.sub)):dkFixed(a.d).filter(z=>hit(z.t+' '+z.sub))).map(z=>row('dkF',{id:z.id},z.ico,esc(z.t),esc(z.sub),'fix '+z.cls));
-  let G=[];if(dkIO()&&(a.d==='in'||a.d==='out')){const L=goodsList().filter(k=>k!=='آبشده'&&k!=='سکه'&&hit(k)).sort((x,y)=>(svUsed[y]||0)-(svUsed[x]||0)).slice(0,q?12:10);
-    G=L.map(k=>row('dkF',{id:'k:'+k},'ring',esc(k),(a.d==='in'?'ورود':'خروج')+' طلا · وزن و عیار','gd'))}
-  if(a.d==='sell'){const L=goodsList().filter(k=>k!=='آبشده'&&k!=='سکه'&&k!=='سکه پارسیان'&&hit(k)).sort((x,y)=>(q?(nzName(y).startsWith(q)-nzName(x).startsWith(q)):0)||(svUsed[y]||0)-(svUsed[x]||0)).slice(0,q?8:6);
-    G=L.map(k=>`<div class="dkg">${row('qaK',{k},'ring',esc(k),esc(gCat(k))+(svUsed[k]?'، '+toFa(svUsed[k])+' بار':''),'gd')}<button type="button" class="dkgm" data-act="gdMenu" data-k="${esc(k)}" aria-label="ویرایش یا حذف ${esc(k)}" aria-haspopup="menu">${ic('more')}</button></div>`)}
+  const bkL=dkBk()&&(a.d==='in'||a.d==='out'),F0=bkL?BKL.map(([id,t,ico,sub,cls])=>({id,t,ico,sub,cls:cls||'',g:'m'})).filter(z=>hit(z.t+' '+z.sub)):dkFixed(a.d).filter(z=>hit(z.t+' '+z.sub)),fRow=z=>{const k=bkL?'':gdKeyOf(z.id);return k?wrapG(row('dkF',{id:z.id},z.ico,esc(z.t),esc(z.sub),'fix '+z.cls,gdEx(k)),k,1):row('dkF',{id:z.id},z.ico,esc(z.t),esc(z.sub),'fix '+z.cls)};
+  /* v90.9: کالاهای مغازه در خرید، دریافت و پرداخت هم (همه حساب‌ها، نه فقط هزینه/ذوب) — ردیف طلا با نام همان کالا، تا موجودی هر کالا از سندها دربیاید */
+  let G=[];const gL=n=>goodsList().filter(k=>k!=='آبشده'&&k!=='سکه'&&k!=='سکه پارسیان'&&k!=='متفرقه'&&hit(k)).sort((x,y)=>(q?(nzName(y).startsWith(q)-nzName(x).startsWith(q)):0)||(svUsed[y]||0)-(svUsed[x]||0)).slice(0,n);
+  if(!bkL&&(a.d==='buy'||a.d==='in'||a.d==='out'))G=gL(q?12:10).map(k=>wrapG(row('dkF',{id:'k:'+k},'ring',esc(k),(a.d==='buy'?'خرید':a.d==='in'?(dkIO()?'ورود':'دریافت'):(dkIO()?'خروج':'پرداخت'))+' کالا · وزن و عیار','gd',gdEx(k)),k));
+  if(a.d==='sell')G=gL(q?8:6).map(k=>wrapG(row('qaK',{k},'ring',esc(k),esc(gCat(k))+(svUsed[k]?'، '+toFa(svUsed[k])+' بار':''),'gd',gdEx(k)),k));
   const known=q&&(dkFixed(a.d).some(z=>nzName(z.t)===q)||goodsList().some(k=>nzName(k)===q));
   let N='';if(q&&!known&&!/^\d+$/.test(q)&&a.d!=='in'&&a.d!=='out'||q&&!known&&(a.d==='in'||a.d==='out')&&!/^\d+$/.test(q)){
     N=a.nc?`<div class="dkcat"><small>«${esc(q0)}» در کدام دسته؟</small><div class="gks">${(a.d==='sell'?['ساخته','سایر','سکه','ارز']:['سکه','ارز']).map(c=>`<button class="tch" data-act="dkNew" data-c="${c}">${c}</button>`).join('')}</div></div>`
       :row('dkNc',{},'plus','کالای تازه «'+esc(q0)+'»','ساختن کالا: نوع و مشخصات','nw')}
-  const out=F.join('')+(G.length?`<div class="stsh">کالاهای اضافه‌شده</div>`+G.join(''):'')+N;
+  /* v90.9: گروه‌به‌گروه با سرتیتر؛ کالاهای خود مغازه در گروه طلا (بعد از ثابت‌های طلا) */
+  const sh=(g,n)=>`<div class="stsh dksh k${g}">${ic(DKG[g][1])}<b>${DKG[g][0]}</b>${n?`<i>${toFa(n)}</i>`:''}</div>`,grp=g=>F0.filter(z=>z.g===g);
+  let out='';if(bkL)out=F0.map(fRow).join('');else for(const g of ['m','g','c','f']){const L=grp(g),ex=g==='g'?G:[];if(!L.length&&!ex.length)continue;out+=sh(g,L.length+ex.length)+L.map(fRow).join('')+(ex.length?(L.length?`<div class="stsh dksh2">کالاهای مغازه</div>`:'')+ex.join(''):'')}
+  out+=N;
   return out?`<div class="bzsug cbl dkl">${out}</div>`:'<div class="eh" style="padding:8px">چیزی پیدا نشد</div>'}
 /* v78.9 (خواسته صاحب اپ: «معرفی کالای جدید یک پنجره جدا باز کند»): پنجره «کالای تازه» — نام و نوع کالا؛ مشخصات بیشتر (فی، اجرت…) بعداً همین‌جا */
 const GDT=[['ساخته','طلای ساخته','ring','وزن، عیار، اجرت و سود'],['سایر','غیر طلا','tag','فقط تعداد و مبلغ'],['سکه','سکه','coin','تعداد و نرخ هر سکه'],['ارز','ارز','usd','مقدار و نرخ هر واحد']];
@@ -93,19 +103,25 @@ function gdNewHTML(){const T=GDT.filter(t=>GN.d==='sell'||t[0]==='سکه'||t[0]=
   return `<div class="gdn"><div class="sh-h"><div><b>کالای تازه</b><small class="shsub">بعد از ساختن، همین حالا در سند انتخاب می‌شود</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="ef"><label for="gdnN">نام کالا</label><input id="gdnN" value="${esc(GN.k)}" autocomplete="off" enterkeyhint="done" placeholder="مثلاً انگشتر رولکس"></div>
   <div class="gdnl">نوع کالا</div><div class="gdnt">${T.map(([c,t,i,s])=>`<button type="button" class="gdnc${GN.c===c?' on':''}" data-act="gdnPick" data-c="${c}" aria-pressed="${GN.c===c}"><span class="gdni">${ic(i)}</span><b>${t}</b><small>${s}</small></button>`).join('')}</div>
+  <div class="gdnl">فی <i>اختیاری · تا ۱۰۰ = درصد، بیشتر = تومان</i></div><div class="gic gdnf"><label class="gif" for="gdnB"><span>فی خرید</span><span class="gifv"><input id="gdnB" class="ltr" inputmode="decimal" autocomplete="off" placeholder="چقدر تمام می‌شود"></span></label><label class="gif" for="gdnS"><span>فی فروش</span><span class="gifv"><input id="gdnS" class="ltr" inputmode="decimal" autocomplete="off" placeholder="چقدر می‌فروشیم"></span></label></div>
+  <label class="sw gisw"><input type="checkbox" id="gdnC"><span class="tr"></span><span class="sbt"><b>این کالا تعدادی است</b><small>در فروش و دریافت «تعداد» هم پرسیده می‌شود</small></span></label>
   <button class="xgo gdngo" data-act="gdnSave"${GN.c?'':' disabled'}>${ic('check')} ساختن کالا</button></div>`}
 ACT.dkNc=()=>{qaRead();const a=sv.qa;GN={k:clean(a.q||''),c:'',d:a.d};sheet(gdNewHTML());const n=$('gdnN');if(n)n.oninput=()=>{GN.k=n.value}};
 ACT.gdnPick=d=>{GN.c=d.c;document.querySelectorAll('#sheet .gdnc').forEach(b=>{const on=b.dataset.c===d.c;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});const g=document.querySelector('#sheet .gdngo');if(g)g.disabled=false};
 ACT.gdnSave=()=>{const n=$('gdnN'),k=clean(n?n.value:GN.k);if(!k){toast('نام کالا را بنویسید',true);n&&n.focus();return}if(!GN.c){toast('نوع کالا را انتخاب کنید',true);return}
   if(goodsList().some(x=>nzName(x)===nzName(k))||(XA[k])){toast('«'+k+'» از قبل در فهرست هست',true);return}
-  const c=GN.c;GN=null;closeSheet();ACT.dkNew({c,k})};
+  const c=GN.c,fb=+decIn(toEn(($('gdnB')||{}).value||'').replace(/,/g,''))||0,fs=+decIn(toEn(($('gdnS')||{}).value||'').replace(/,/g,''))||0,cn=!!($('gdnC')||{}).checked;
+  if(fb>0&&fs>0&&(fb<=100)===(fs<=100)&&fs<fb){askWarn({t:'فی فروش از فی خرید کمتر است',h:'فی خرید <b>'+feeTx(fb)+'</b> و فی فروش <b>'+feeTx(fs)+'</b>؛ با این فی، فروش این کالا ضرر است.',ok:'اصلاح می‌کنم'});return}
+  if(fb||fs||cn){const r=cfgRec(1);if(fb||fs)r.gfee={...(r.gfee||{}),[k]:{b:fb,s:fs}};if(cn&&c!=='سکه'&&c!=='ارز')r.gcnt={...(r.gcnt||{}),[k]:1}}
+  GN=null;closeSheet();ACT.dkNew({c,k})};
 ACT.dkNew=d=>{qaRead();const a=sv.qa,k=clean(d.k||a.q||''),c=d.c;if(d.k)a.q=k;if(!k)return;a.nc=0;const r=cfgRec(1);
   if(c==='سکه'||c==='ارز'){r.xa=(r.xa||[]).filter(o=>o.k!==k).concat([{k,t:k,s:k,u:c==='ارز'?'واحد':'عدد',c:c==='ارز'?'f':'c'}]);saveCu();xaSync();toast('«'+k+'» به '+c+'‌ها اضافه شد');ACT.dkF({id:'a:'+k});return}
   r.gk={...(r.gk||{}),[k]:c};addGoods(k);saveCu();toast('«'+k+'» در دسته '+c+' اضافه شد');ACT.qaK({k})};
 /* v61.60 (خواسته صاحب اپ): کالاهای اضافه‌شده در همان فهرست ویرایش یا حذف می‌شوند (دکمه ⋯ کنار هر ردیف).
    سندهای ثبت‌شده نام قبلی را نگه می‌دارند؛ فقط فهرست انتخاب عوض می‌شود. */
-ACT.gdMenu=(d,e)=>{const k=d.k,b=e&&e.target.closest('[data-act]');if(!k||!b)return;const c=gCat(k);
-  popMenu(b,[['gdRen',ic('edit'),'ویرایش نام',{k}],['gdCat',ic('ring'),'دسته: '+(c==='ساخته'?'سایر':'ساخته'),{k}],['gdDel',ic('trash'),'حذف از فهرست',{k},1]])};
+ACT.gdMenu=(d,e)=>{const k=d.k,b=e&&e.target.closest('[data-act]');if(!k||!b)return;const c=gCat(k),I=[['gdInfo',ic('coin'),'فی و موجودی',{k}]];
+  if(d.fx){ACT.gdInfo({k});return}/* موارد ثابت (آبشده، متفرقه، سکه، ارز): فقط فی و موجودی */
+  popMenu(b,[...(isAdmin()||can('src')?I:[]),['gdRen',ic('edit'),'ویرایش نام',{k}],['gdCat',ic('ring'),'دسته: '+(c==='ساخته'?'سایر':'ساخته'),{k}],['gdDel',ic('trash'),'حذف از فهرست',{k},1]])};
 ACT.gdRen=d=>{const k=d.k;sheet(`<div class="sh-h"><b>ویرایش نام کالا</b></div><div class="ef"><input id="gdN" value="${esc(k)}" autocomplete="off" enterkeyhint="done"></div><div class="row"><button class="btn sec" data-act="close">انصراف</button><button class="btn" data-act="gdRenOk" data-k="${esc(k)}">ذخیره</button></div>`);
   const I=$('gdN');if(I){sheetFocus(I);I.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();ACT.gdRenOk({k})}}}};
 ACT.gdRenOk=d=>{const k=d.k,I=$('gdN'),n=clean((I&&I.value)||'');if(!n){toast('نام کالا را بنویسید',true);return}if(n===k){closeSheet();return}
@@ -121,7 +137,7 @@ ACT.dkPk0=()=>{sv.qa.pk='';svKeep();const r=$('qKs');if(r)r.innerHTML=dkList()};
 ACT.dkPul=d=>{const a=sv.qa,D=a.d,k=d.k;if(!k||!XA[k])return;a.pk='';a.q='';xrStart(xrNew(D,k,{pul:true,fl:'one',fd:D}))};
 /* انتخاب از موارد ثابت */
 ACT.dkF=d=>{qaRead();const a=sv.qa,D=a.d,[ty,v]=String(d.id).split(':');a.q='';a.nc=0;const PO=D==='sell'||D==='out'?'out':'in';
-  if(ty==='k'){xrStart(xrNew(D,'gold',{cat:String(d.id).slice(2),ay:750,fl:'gold',fd:D}));return}
+  if(ty==='k'){if(D==='buy'&&!dkRateOk())return;xrStart(xrNew(D,'gold',{cat:String(d.id).slice(2),ay:750,fl:'gold',fd:D}));return}
   if(ty==='v'&&v==='prev'){pvStart({dir:D==='out'?'out':'in'});return}
   if(ty==='m'&&v==='prev'){pyStart(pyNew('prev',{dir:PO,fl:1}));return}
   if(ty==='g'&&v==='prev'){xrStart(xrNew(PO,'gold',{cat:'مانده قبلی',pul:true,ay:750,fl:'gold',fd:D}));return}

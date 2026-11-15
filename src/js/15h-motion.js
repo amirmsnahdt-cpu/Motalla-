@@ -88,7 +88,7 @@ function sheetFocus(el){if(!el)return;const w=Math.max(0,(RM()?0:480)-(Date.now(
 /* ۴) ورق زدن بین تب‌های نوار پایین: صفحه قبلی (با سربرگش) کمی کنار می‌رود و صفحه تازه از همان سمت تب روی آن می‌لغزد.
    نسخه تصویری صفحه قبلی یک کپی کامل از #app است (پس شکل و رنگ‌ها دقیقاً همان می‌ماند)، بعد از DOM واقعی قرار می‌گیرد
    تا getElementById همیشه عنصر واقعی را بدهد، و بعد از حرکت پاک می‌شود. نوار پایین ثابت می‌ماند. */
-const TAB_ORD=['home','banks','custs','audit','settings'];
+const TAB_ORD=['home','custs','banks','audit','settings'];
 function tabTurnDir(from,to){if(!TAB_ORD.includes(to))return 0;const a=TAB_ORD.indexOf(TAB[from]),b=TAB_ORD.indexOf(to);if(a<0||a===b)return 0;return b>a?-1:1}/* RTL: تب بعدی سمت چپ است */
 let turnTok=0;
 /* نسخه تصویری کامل صفحه فعلی (کپی #app) کنار DOM واقعی؛ z=0 زیر صفحه واقعی، z=3 روی آن */
