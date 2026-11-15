@@ -34,7 +34,7 @@ const okWord=t=>{t=String(t||'');return /ارسال/.test(t)?'ارسال شد':/
    - بازخورد داخل همان دکمه: سبز + «✓ … شد» و بعد ۱٫۳ ثانیه به حالت اول برمی‌گردد (btnOk). اگر پنجره همان لحظه عوض شد، دکمه‌ای با همان کار
      در همان صفحه پیدا می‌شود؛ وگرنه یک کپی از خود دکمه سر جای قبلی‌اش سبز می‌شود و محو می‌شود (نه قرص جدا).
    - قفل دو بار زدن: تا ۹۰۰ میلی‌ثانیه بعد از زدن یک دکمه اصلی، زدن دوباره هیچ دکمه اصلی‌ای اجرا نمی‌شود (زدن دوم روی دکمه تازه پنجره بعدی هم نه). */
-const TOPSEL='#sheet .sh-h .xtop,#bar .hgo:not(.sec),.ckok,#sheet .xgo';let TOPLK=0;
+const TOPSEL='#sheet .sh-h .xtop,#bar .hgo:not(.sec),.ckok,#sheet .xgo,#sheet .sh-h .shsv';let TOPLK=0;
 function btnOk(el,w){if(!el||!el.isConnected)return;if(el._okH==null)el._okH=el.innerHTML;clearTimeout(el._okT);el.classList.add('cpdone');el.disabled=true;el.innerHTML=ic('check')+'<span>'+esc(w)+'</span>';
   try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}el._okT=setTimeout(()=>{if(el._okH!=null){el.innerHTML=el._okH;el._okH=null}el.classList.remove('cpdone');el.disabled=false},1300)}
 document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest(TOPSEL);if(!b||b.closest('#auth'))return;

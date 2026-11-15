@@ -4448,3 +4448,5 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .ivact button.rd{color:var(--red)}
 #bar .hgo[disabled]{opacity:.45}
 @media (min-width:760px){.ivs{max-width:760px;margin:0 auto}}
+/* v91.1: بسته شدن پنجره بعد از زدن دکمه اصلی — اول «✓ … شد» روی خود دکمه (در نسخه تصویری پنجره)، بعد پایین رفتن */
+.ov.ghost.out.okhold .sheet{animation-delay:.46s}

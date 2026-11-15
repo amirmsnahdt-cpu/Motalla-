@@ -1,5 +1,9 @@
 const ACT={
-  back,close:()=>{if(typeof cuAutoClose==='function'&&cuAutoClose())return;aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>{if((d.n==='users'||d.n==='backups')&&cur!=='users'&&cur!=='backups')meRet=cur;go(d.n)},date:openDate,user:()=>ACT.acct(),resetBulk,bulkAdd,
+  back,close:()=>{if(typeof cuAutoClose==='function'&&cuAutoClose())return;
+    /* v91.1 (گزارش صاحب اپ: «در حواله از بانک عکس اضافه می‌کنم، جای خالی را می‌زنم، حواله ثبت نمی‌شود»): گالری عکس از داخل پنجره تسویه باز می‌شود و جای آن را می‌گیرد؛
+       هر بستنش (بیرون زدن، کشیدن پایین، ×) باید به همان پنجره تسویه با همان روش و مبلغ برگردد، نه اینکه کل پنجره و ردیف نیمه‌کاره را ببندد */
+    if(typeof GAL!=='undefined'&&GAL&&GAL.ck&&typeof CK!=='undefined'&&CK&&$('sheet').querySelector('.galg')&&!$('ov').classList.contains('hide')){ACT.ckPhBack();return}
+    aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>{if((d.n==='users'||d.n==='backups')&&cur!=='users'&&cur!=='backups')meRet=cur;go(d.n)},date:openDate,user:()=>ACT.acct(),resetBulk,bulkAdd,
   toastAct:()=>{const f=toastAct;toastHide();f&&f()},
   /* v78.8: صفحه‌های قدیمی (ثبت واریزی، لیست‌ها، پیگیری، تسویه بدهی) حذف شدند؛ دکمه‌های قدیمی به جای تازه‌شان می‌روند */
   tab:d=>{const n={custs:'custs',banks:'banks',home:'home',entry:'buy',list:'split1',split:'split1',audit:'audit',track:'split1',debt:'custs',settings:'settings'}[d&&d.n];if(!n)return;if(n==='audit'&&cur!=='audit')histTab='ev';go(n)},

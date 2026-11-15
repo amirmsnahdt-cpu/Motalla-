@@ -621,7 +621,10 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
   if(cur==='sell'&&sv&&svRows()&&!svErr()&&(!sv.edit||svSig()!==sv.sig0))svAuto('bg')});
 /* ================= نمایش سند ================= */
 let invV=null;
-function invOpen(cu,tx,fresh){if(cur==='ent')DST.push({k:'ent',id:entId,p:PARENT.ent});invV={cu,tx,fresh:!!fresh};custId=cu;if(cur!=='inv')PARENT.inv=cur==='bank'||cur==='ent'?cur:'cust';closeSheet();go('inv')}
+function invOpen(cu,tx,fresh){if(cur==='ent')DST.push({k:'ent',id:entId,p:PARENT.ent});
+  /* v91.1: ارجاع به سند حساب دیگر → جای فعلی برای برگشت نگه داشته می‌شود (IVR در 01-core) */
+  if(cur==='inv'&&invV&&(String(invV.cu)!==String(cu)||String(invV.tx)!==String(tx)))IVR.push({pg:'inv',inv:{...invV},cu:custId,p:PARENT.inv});else if(cur==='cust'&&String(custId)!==String(cu))IVR.push({pg:'cust',cu:custId,p:PARENT.inv});
+  invV={cu,tx,fresh:!!fresh};custId=cu;if(cur!=='inv')PARENT.inv=cur==='bank'||cur==='ent'?cur:'cust';closeSheet();go('inv')}
 /* v66.0 (خواسته صاحب اپ: «سند رو به من نشون بده نه جزئیات»): تراکنش‌های قدیمی «دریافت/پرداخت وجه» (مثل تسویه واریزی پیش از v65)
    هم در همان صفحه سند باز می‌شوند؛ فقط نمای سند است (داده دست نمی‌خورد، ویرایش ندارد، حذف همان تراکنش را حذف می‌کند) */
 const TXDOC=['pin','pout'];

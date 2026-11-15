@@ -231,7 +231,13 @@ function closeSheet(){const o=$('ov'),s=$('sheet');if(sheetAfter){const f=sheetA
   if(!RM()&&s.innerHTML){try{const g=o.cloneNode(true);g.removeAttribute('id');g.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
     const A=s.querySelectorAll('input,textarea,select'),B=g.querySelectorAll('input,textarea,select');A.forEach((e,i)=>{const x=B[i];if(!x)return;if(e.type==='checkbox'||e.type==='radio')x.checked=e.checked;else x.value=e.value});
     const gs=g.querySelector('.sheet'),m=/translateY\(([-\d.]+)px\)/.exec(s.style.transform||'');gs.style.transform='';gs.classList.remove('drag','snap','swap');if(m)gs.style.setProperty('--dy',m[1]+'px');
-    g.classList.add('ghost','out');g.setAttribute('aria-hidden','true');document.body.appendChild(g);gs.scrollTop=s.scrollTop;setTimeout(()=>g.remove(),360)}catch(e){}}
+    /* v91.1 (خواسته صاحب اپ: «انیمیشن ذخیره شد روی خود دکمه اجرا و بعد پنجره بسته شود»): اگر پنجره با زدن دکمه اصلی‌اش بسته می‌شود (TOPCX در 15zn)،
+       همان دکمه در نسخه تصویری پنجره سبز و «✓ … شد» می‌شود، پنجره لحظه‌ای می‌ماند و بعد پایین می‌رود — دیگر قرص سبز جدا وسط صفحه نمی‌ماند */
+    let hold=0;try{const cx=typeof TOPCX!=='undefined'?TOPCX:null;if(cx&&cx.b&&!cx.bad&&s.contains(cx.b)){const Q='.sh-h .xtop,.ckok,.xgo,.shsv',i=[...s.querySelectorAll(Q)].indexOf(cx.b),gb=i>=0?[...g.querySelectorAll(Q)][i]:null;
+      if(gb){gb.classList.add('cpdone');gb.disabled=true;gb.innerHTML=ic('check')+'<span>'+esc(okWord(cx.t))+'</span>';g.classList.add('okhold');cx.done=1;hold=460;
+        /* شکل پنجره با قاعده‌های «#sheet …» ساخته می‌شود؛ برای همین مکث کوتاه، نسخه تصویری هم همان شناسه را می‌گیرد (بعد از پنجره واقعی در صفحه است، پس $('sheet') و جستجوها اول واقعی را می‌یابند) و همه data-* آن پاک می‌شود */
+        gs.id='sheet';g.querySelectorAll('*').forEach(e=>{for(const a of [...e.attributes])if(a.name.slice(0,5)==='data-')e.removeAttribute(a.name)});try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}}}}catch(_){}
+    g.classList.add('ghost','out');g.setAttribute('aria-hidden','true');document.body.appendChild(g);gs.scrollTop=s.scrollTop;setTimeout(()=>g.remove(),360+hold)}catch(e){}}
   o.classList.add('hide');s.innerHTML='';s.style.transform='';s.classList.remove('drag','snap','swap');document.documentElement.classList.remove('shopen')}
 /* بستن پنجره با کشیدن به پایین (از سربرگ، یا هر جا وقتی محتوا بالای خودش است) */
 (()=>{let g=null;

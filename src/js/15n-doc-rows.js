@@ -202,7 +202,7 @@ function pyActs(p,c,txId,no){if(p.m==='lnk'&&p.ltx!=null)return `<span class="d8
 /* ردیف حواله در حساب طرف مقابل (xf با inv) — با شماره سند پیدا می‌شود چون ویرایش سند شناسه‌اش را عوض می‌کند */
 function xfFind(Y,fc,no,xid){const T=(Y.txs||[]).filter(z=>!z.del&&(z.type==='xf'||z.type==='inv'&&z.lk));let x=xid&&T.find(z=>String(z.id)===String(xid));if(x)return x;
   const C=custs.find(z=>String(z.id)===String(fc));return T.find(z=>(z.inv||z.lk)&&String((z.inv||z.lk).cu)===String(fc)&&(()=>{const t=C&&(C.txs||[]).find(q=>String(q.id)===String((z.inv||z.lk).tx));return t&&String(t.no)===String(no)})())||null}
-ACT.xfGo=d=>{const Y=custs.find(z=>String(z.id)===String(d.cu));if(!Y){toast('حساب طرف حواله پیدا نشد',true);return}closeSheet();custId=Y.id;go('cust');setTimeout(()=>{if(cur!=='cust'||String(custId)!==String(Y.id))return;const x=xfFind(Y,d.fc,d.no,d.x);if(x){if(x.type==='inv')invOpen(Y.id,x.id);else xfShow(Y,x)}},380)};
+ACT.xfGo=d=>{const Y=custs.find(z=>String(z.id)===String(d.cu));if(!Y){toast('حساب طرف حواله پیدا نشد',true);return}closeSheet();{const x0=xfFind(Y,d.fc,d.no,d.x);if(x0&&x0.type==='inv'&&(cur==='inv'||cur==='cust')){invOpen(Y.id,x0.id);return}}/* v91.1: مستقیم به سند طرف مقابل؛ برگشت = همان جای اول */custId=Y.id;go('cust');setTimeout(()=>{if(cur!=='cust'||String(custId)!==String(Y.id))return;const x=xfFind(Y,d.fc,d.no,d.x);if(x){if(x.type==='inv')invOpen(Y.id,x.id);else xfShow(Y,x)}},380)};
 /* سند طرف مقابل → سند اصلی */
 ACT.lkGo=d=>{const c=custs.find(z=>String(z.id)===String(d.fc)),t=c&&(c.txs||[]).find(z=>String(z.id)===String(d.tx));if(t&&t.lk){const C=custs.find(z=>String(z.id)===String(t.lk.cu));if(C)invOpen(C.id,t.lk.tx)}};
 ACT.xfInv=d=>{closeSheet();invOpen(isNaN(+d.cu)?d.cu:+d.cu,isNaN(+d.tx)?d.tx:+d.tx)};
