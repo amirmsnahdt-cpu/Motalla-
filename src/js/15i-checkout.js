@@ -72,23 +72,44 @@ function ckPhPut(n0,x){const K=xrPh(CK||{});if(!K.length)return;const p=x||(sv.p
 const ckBkL=()=>bkCus().filter(c=>String(c.id)!==String(sv&&sv.cuId));
 function ckChips(){const L=ckBkL().map(c=>({c,b:bkCuBal(c)})).sort((a,b)=>(String(b.c.id)===String(CK.srcId))-(String(a.c.id)===String(CK.srcId))||b.b-a.b);
   return `<div class="ckcs" id="ckCs">${L.slice(0,14).map(({c,b})=>`<button type="button" class="ckc${String(CK.srcId)===String(c.id)?' on':''}" data-act="ckSrc" data-id="${esc(c.id)}" style="--bk:${bkClr(c)}">${bkAvH(c)||`<span class="ckbi">${ic('bank')}</span>`}<span class="tx"><b>${esc(cuName(c).replace(/^بانک\s+/,''))}</b><small class="${b>0?'r':b<0?'b':'z'}">${fmt(Math.abs(b))}</small></span><i class="ckck">${ic('check')}</i></button>`).join('')}<button type="button" class="ckc ckca" data-act="ckAll"><span class="ckbi">${ic('search')}</span><span class="tx"><b>${L.length>14?'همه بانک‌ها':'جستجو'}</b><small>یا حساب تازه</small></span></button></div>`}
-function ckForm(){const m=CK.m;if(!m)return '';const lf=ckLeft(),big=`<div class="ckbg"><label class="ckbig"><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" placeholder="مبلغ" autocomplete="off" enterkeyhint="done" aria-label="مبلغ"><i>تومان</i></label>${lf?`<div class="ckq"><button type="button" data-act="ckAmt" data-v="${lf}">کل مانده · ${fmt(lf)}</button>${lf>=2e6?`<button type="button" data-act="ckAmt" data-v="${Math.round(lf/2)}">نصف</button>`:''}</div>`:''}</div>`;
-  const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" autocomplete="off" enterkeyhint="done"></label>`;
+/* v91.3 (خواسته صاحب اپ: «کارتخوان مثل دستگاه پوز؛ حواله به مشتری و انتخاب بانک بهتر؛ انتخاب سخت است»):
+   مبلغ همه روش‌ها با صفحه‌کلید خود برنامه (ckPad) زده می‌شود، نه کیبورد گوشی — پس هیچ‌وقت چیزی زیر کیبورد پنهان نمی‌شود.
+   کارتخوان = یک دستگاه پوز: بدنه تیره، سرتیتر با لوگو و نام بانکِ همان کارتخوان، صفحه سبز «مبلغ تراکنش»، دکمه‌های عددی و سه دکمه رنگی پوز
+   (قرمز انصراف، زرد پاک، سبز تأیید = افزودن). بانک‌ها همان ردیف چیپ بالا؛ زدن هر بانک سرتیتر دستگاه را همان لحظه عوض می‌کند. */
+const ckAmtV=()=>CK.amount?Number(CK.amount).toLocaleString('en-US'):'';
+const ckAIn=cls=>`<input id="ckA" class="ltr ${cls||''}" readonly inputmode="none" tabindex="-1" value="${ckAmtV()}" placeholder="0" autocomplete="off" aria-label="مبلغ">`;
+function ckPad(pos){const k=(v,t,c)=>`<button type="button" class="ckk${c?' '+c:''}" data-act="ckK" data-k="${v}">${t}</button>`;
+  return `<div class="ckpad${pos?' pos':''}">${['1','2','3','4','5','6','7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('000','۰۰۰','z3')}${k('0','۰')}${k('bs',ic('back').replace('class="i"','class="i bsk"'),'bs')}
+  <div class="ckpf">${k('x','<i>✕</i><span>انصراف</span>','kr')}${k('c','<i>‹</i><span>پاک</span>','ky')}${k('ok','<i>○</i><span>تأیید</span>','kg')}</div></div>`}
+function ckScr(lf){return `<div class="ckscr"><small>مبلغ</small><div class="ckscv">${ckAIn()}<i>تومان</i></div>${lf?`<div class="ckq"><button type="button" data-act="ckAmt" data-v="${lf}">کل مانده · ${fmt(lf)}</button>${lf>=2e6?`<button type="button" data-act="ckAmt" data-v="${Math.round(lf/2)}">نصف</button>`:''}</div>`:''}</div>`}
+const ckPosHead=()=>{const z=ckBkL().find(o=>String(o.id)===String(CK.srcId));return `${z?(bkAvH(z)||`<span class="ckbi">${ic('bank')}</span>`):`<span class="ckbi">${ic('card')}</span>`}<span class="tx"><b>${z?esc(cuName(z)):'کارتخوان'}</b><small>کارتخوان · پایانه فروش</small></span><span class="posig"><i></i><i></i><i></i><i></i></span>`};
+function ckPos(lf){const z=ckBkL().find(o=>String(o.id)===String(CK.srcId));
+  return `<div class="posdev" style="--bk:${z?bkClr(z):'#334155'}"><div class="posh" id="posH">${ckPosHead()}</div>
+  <div class="posscr"><div class="posl"><span>خرید</span><span>${esc(dates(sv.date||todayISO()).fa)}</span></div><small>مبلغ تراکنش</small><div class="posv">${ckAIn('posin')}<i>تومان</i></div>${lf?`<button type="button" class="posrm" data-act="ckAmt" data-v="${lf}">مانده سند ${fmt(lf)} · بزنید</button>`:''}</div>
+  ${ckPad(1)}</div>`}
+function ckForm(){const m=CK.m;if(!m)return '';const lf=ckLeft();
+  const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${ckAmtV()}" autocomplete="off" enterkeyhint="done"></label>`;
   const tn=`<label class="ckf ckf1"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
-  if(m==='cash')b=big;
+  if(m==='cash')b=ckScr(lf)+ckPad();
   if(m==='rg')b=`<div class="ckg">${amt}<label class="ckf"><small>هر گرم ۱۸ (تومان)</small><input id="ckP" class="ltr" inputmode="numeric" value="${CK.pg?Number(CK.pg).toLocaleString('en-US'):''}" autocomplete="off"></label></div><div class="ckx" id="ckX">${ckRgX()}</div>`;
   if(m==='pos'||m==='hav'){const has=ckBkL().length>0;if(has&&!ckBkL().some(z=>String(z.id)===String(CK.srcId)))CK.srcId=ckBkL()[0].id;if(has)CK.pk=1;
     if(CK.pl||!has)b=`<div class="fsearch sm">${ic('search')}<input id="ckS" type="search" value="${esc(CK.sq||'')}" placeholder="${m==='pos'?'حساب کارتخوان (بانک)…':'جستجوی حساب بانک…'}" autocomplete="off" enterkeyhint="search"></div><div id="ckPl">${ckPick()}</div>`;
-    else b=`<div class="ckcl">${m==='pos'?'کارتخوان به کدام حساب می‌نشیند؟':ckOut()?'از کدام حساب بانک؟':'به کدام حساب بانک؟'}</div>${ckChips()}${big}${m==='hav'?tn:''}`}
-  if(m==='dep'||(m==='cust'&&ckOut()))b=CK.sel?`${ckSel()}${big}`:`<div class="fsearch sm">${ic('search')}<input id="ckQ" value="${esc(CK.q||'')}" placeholder="نام، تلفن، شبا یا فاکتور…" autocomplete="off"></div><div id="ckL">${ckList()}</div>`;
+    else b=`<div class="ckcl">${m==='pos'?'کارتخوانِ کدام بانک؟':ckOut()?'از کدام حساب بانک؟':'به کدام حساب بانک؟'}</div>${ckChips()}${m==='pos'?ckPos(lf):ckScr(lf)+tn+ckPad()}`}
+  if(m==='dep'||(m==='cust'&&ckOut()))b=CK.sel?`${ckSel()}${ckScr(Math.min(lf,ckSelCap()||lf))}${ckPad()}`:`<div class="ckcl">${ckOut()?'پول را به حساب چه کسی می‌دهیم؟':'مشتری به حساب چه کسی پرداخت کرده؟'}</div><div class="fsearch sm">${ic('search')}<input id="ckQ" value="${esc(CK.q||'')}" placeholder="نام، تلفن، شبا یا فاکتور…" autocomplete="off"></div><div id="ckL">${ckList()}</div>`;
   if(m==='gx'){const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate);
     b=`<div class="ckg"><label class="ckf"><small>وزن طلای مشتری (گرم)</small><input id="ckW" class="ltr" inputmode="decimal" value="${esc(CK.w||'')}" placeholder="0.000" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="ckY" class="ltr" inputmode="numeric" value="${esc(String(CK.ay||x.ay))}" autocomplete="off"></label></div>
     <div class="ckx" id="ckX">${sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'}</div>`}
   const ok=ckFormOk();
   return `<div class="ckfm ckf2">${b}${ok?stPhHTML(CK):''}</div>`}
+/* سقف حواله به همان شخص (بدهی ما به او / مانده واریزی) */
+function ckSelCap(){const s=CK.sel;if(!s||ckOut())return 0;if(s.k==='cu'){const o=oweAccts('').find(z=>String(z.c.id)===String(s.id));return o?o.a:0}if(s.k==='dep'){const x=validated().find(z=>String(z.id)===String(s.id));return x?Math.max(0,depAvail(x)-ckUsedDep(x.id)):0}return 0}
+ACT.ckK=d=>{const A=$('ckA');if(!A)return;const k=d.k;if(k==='ok'){ACT.ckAdd();return}if(k==='x'){ACT.ckM({m:''});return}
+  let v=String(CK.amount||'').replace(/\D/g,'');if(k==='c')v='';else if(k==='bs')v=v.slice(0,-1);else if(v.length<13)v=(v+k).replace(/^0+/,'').slice(0,13);
+  CK.amount=+v||0;A.value=ckAmtV();try{navigator.vibrate&&navigator.vibrate(6)}catch(_){}
+  const h=A.closest('.posscr,.ckscr');if(h&&!RM()&&h.animate&&(k==='c'||k==='000'))h.animate([{transform:'scale(1.02)'},{transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.9,.25,1)'})};
 const ckFormOk=()=>{const m=CK.m;return !((m==='dep'||m==='cust'&&ckOut())&&!CK.sel||(m==='hav'||m==='pos')&&(CK.pl||!ckBkL().length))};
 ACT.ckAll=()=>{ckRead();CK.pl=1;CK.sq='';ckRe('ckS')};
-ACT.ckAmt=d=>{const A=$('ckA');if(!A)return;A.value=(+d.v).toLocaleString('en-US');CK.amount=+d.v;if(A.oninput)A.oninput();const h=A.closest('.ckbig');if(h&&!RM()&&h.animate)h.animate([{transform:'scale(1.03)'},{transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'})};
+ACT.ckAmt=d=>{const A=$('ckA');if(!A)return;A.value=(+d.v).toLocaleString('en-US');CK.amount=+d.v;if(A.oninput&&!A.readOnly)A.oninput();const h=A.closest('.ckbig,.posscr,.ckscr');if(h&&!RM()&&h.animate)h.animate([{transform:'scale(1.03)'},{transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'})};
 function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),wp=c&&sv.edit&&typeof wdPend==='function'?wdPend(c,sv.edit.no):0,R=ckRows(),A=ckAcct(),tg=ckTg(),gw=ckGold(),TL={p:'مانده قبلی',d:A?'این سند':'مانده این سند',f:'مانده نهایی'}[tg];
   /* ریز مانده‌ها (قبلی · سند · نهایی، مبلغ و طلا)؛ خانه انتخاب‌شده پررنگ و با زدن هر خانه هدف تسویه عوض می‌شود */
   const L=svBalL(),gr=L.find(z=>z[0]==='g'),rr=L.find(z=>z[0]==='r')||['r',0,0,0],ln=(k,v)=>`<span class="${ftCls(v)}${k==='r'?' r':''}"><b>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i></span>`;
@@ -104,13 +125,16 @@ function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),wp=c&&sv.edit&&typeof wdPe
   ${!CK.m&&c&&c.grp==='بانک'?bfxTile():''}${CK.m==='bfix'?bfxForm():CK.m?ckForm():!r&&!gw&&!ckXT().length?'':`<div class="ckt${r<0?' out':''}">${[...(r?(r<0?CKO:CKT):[]),...(gw?[['gd',(gw>0?'دریافت طلا · ':'پرداخت طلا · ')+wFmt(Math.abs(gw))+' گرم',gw>0?'dIn':'dOut'],['gp','پولی کردن طلا · '+wFmt(Math.abs(gw))+' گرم','swap']]:[]),...ckXT()].map(([k,t,i])=>`<button class="ckti q-${k}" data-act="ckM" data-m="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div>`}
   <button class="xgo cksave" data-act="ckSave">${ic('check')} پایان و ثبت سند${r>0?`<small>مانده ${fmt(r)} به حساب مشتری</small>`:''}</button></div>`}
 function ckRead(){const g=id=>{const e=$(id);return e?e.value:undefined};if($('ckA'))CK.amount=num(g('ckA'));if($('ckT'))CK.tn=toEn(g('ckT')||'').trim();if($('ckW'))CK.w=decIn(g('ckW'));if($('ckY'))CK.ay=+toEn(g('ckY')).replace(/\D/g,'')||'';if($('ckQ'))CK.q=g('ckQ');if($('ckS'))CK.sq=g('ckS');if($('ckP'))CK.pg=num(g('ckP'));if($('ckNB'))CK.nbn=g('ckNB')}
-function ckBind(f){phPaint($('sheet'));const A=$('ckA'),Q=$('ckQ'),W=$('ckW'),Y=$('ckY');const PS=$('ckS');if(PS)PS.oninput=()=>{CK.sq=PS.value;const P=$('ckPl');if(P)P.innerHTML=ckPick()};
+/* صفحه‌کلید فیزیکی (کامپیوتر) برای صفحه‌کلید مبلغ */
+document.addEventListener('keydown',e=>{if(!CK||!CK.m)return;const A=$('ckA');if(!A||!A.readOnly||!A.isConnected||$('ov').classList.contains('hide'))return;const t=e.target;if(t&&t.tagName==='INPUT'&&t!==A)return;const d=toEn(e.key);
+  if(/^\d$/.test(d)){e.preventDefault();ACT.ckK({k:d})}else if(e.key==='Backspace'){e.preventDefault();ACT.ckK({k:'bs'})}else if(e.key==='Enter'){e.preventDefault();ACT.ckK({k:'ok'})}});
+function ckBind(f){phPaint($('sheet'));const A0=$('ckA');if(A0&&A0.readOnly){A0.onfocus=()=>A0.blur()}const A=A0&&A0.readOnly?null:A0,Q=$('ckQ'),W=$('ckW'),Y=$('ckY');const PS=$('ckS');if(PS)PS.oninput=()=>{CK.sq=PS.value;const P=$('ckPl');if(P)P.innerHTML=ckPick()};
   if(A){selOnFocus(A);A.oninput=()=>{const v=num(A.value);A.value=v?v.toLocaleString('en-US'):''};A.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.ckAdd()}}}
   if(Q){Q.oninput=()=>{CK.q=Q.value;clearTimeout(Q._t);Q._t=setTimeout(()=>{const L=$('ckL');if(L)L.innerHTML=ckList()},100)};const L=$('ckL');if(L)L.onpointerdown=e=>{if(e.target.closest('.stsr'))e.preventDefault()}}
   const gx=()=>{ckRead();const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate),el=$('ckX');if(el)el.innerHTML=sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'};
   if(W)W.oninput=gx;if(Y)Y.oninput=gx;
   const P=$('ckP'),rg=()=>{ckRead();const el=$('ckX');if(el)el.innerHTML=ckRgX()};if(P){selOnFocus(P);P.oninput=()=>{const v=num(P.value);P.value=v?v.toLocaleString('en-US'):'';rg()}}if(A&&CK.m==='rg'){const o=A.oninput;A.oninput=()=>{o();rg()}}
-  bfxBind();const NB=$('ckNB');if(NB)NB.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.ckNBSave()}};const el=f&&$(f);if(el)sheetFocus(el)}
+  bfxBind();const NB=$('ckNB');if(NB)NB.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.ckNBSave()}};const el=f&&$(f);if(el&&!el.readOnly)sheetFocus(el)}
 const ckLeft=()=>Math.abs(ckRest());
 ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حساب مشتری از لیست واریزی (15q) */if(m==='wd'){wdOpen();return}/* v61.39: تخفیف از پنجره تسویه — روی مانده همین سند */if(m==='off'){svOffOpen(true);return}
   /* v85.3 (خواسته صاحب اپ: «پرداخت هر نوع مانده‌ای — سکه، دلار و بقیه»): gd = دریافت/پرداخت طلا (فرم تسویه طلا)؛
@@ -124,7 +148,7 @@ ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حس�
   const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
   ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m==='bfix'?'bfT':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
-ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;ckRe('ckA')};
+ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));const ph=$('posH');if(ph){ph.innerHTML=ckPosHead();const dv=ph.closest('.posdev'),z=ckBkL().find(o=>String(o.id)===String(d.id));if(dv&&z)dv.style.setProperty('--bk',bkClr(z));if(dv&&!RM()&&dv.animate)dv.animate([{transform:'translateY(4px)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,1.3,.4,1)'})}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;ckRe('ckA')};
 ACT.ckSrcX=()=>{ckRead();CK.pl=1;ckRe('ckS')};
 ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('ckQ');return}CK.sel={k:d.k,id:d.id};
   const av=d.k==='cu'?(()=>{const c=CU().find(z=>String(z.id)===String(d.id));const o=c&&oweAccts('').find(z=>String(z.c.id)===String(c.id));return o?o.a:0})():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();
