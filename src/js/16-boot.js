@@ -25,7 +25,7 @@ ACT.checkUpd=async()=>{if(UPD){applyUpd();return}
   if(location.protocol==='https:'&&location.hostname!=='raw.githack.com'){toast('در حال بررسی…');
     try{const j=await (await fetch('/api/status?t='+Date.now(),{cache:'no-store'})).json(),sv=+j.v||0;
       if(sv>APP_V){updFound(sv);toast('نسخه '+toFa(sv)+' آماده است؛ دکمه پایین صفحه را بزنید')}else toast('برنامه به‌روز است ✓ نسخه شما '+toFa(APP_V)+' · نسخه سرور '+toFa(sv))}
-    catch(e){toast('اتصال به سرور برقرار نیست',true)}return}
+    catch(e){toastBg('اتصال به سرور برقرار نیست')}return}
   if(location.protocol==='https:'){toast('در حال بررسی…');checkUpdate(true);setTimeout(()=>{if(!UPD)toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));else toast('نسخه جدید پیدا شد؛ دکمه طلایی پایین صفحه را بزنید')},6000);return}
   ACT.checkUpd0()};
 ACT.checkUpd0=()=>{if(location.hostname!=='raw.githack.com'){if(location.protocol!=='https:'){toast('برنامه به‌روز است ✓ نسخه '+toFa(APP_V));return}toast('در حال دریافت آخرین نسخه…');const r=()=>location.reload();try{navigator.serviceWorker.getRegistration().then(g=>g&&g.update()).catch(()=>{}).finally(()=>setTimeout(r,500))}catch(e){setTimeout(r,500)}return}

@@ -105,7 +105,8 @@ function depImgSync(z,K){if(!z||!z.byInv)return;const c=custs.find(q=>String(q.i
   let ch=false;(t.pays||[]).forEach(p=>{if(p.m==='dep'&&p.stlId===z.id){p.imgs=K.slice();p.img=K[0]||'';if(!K.length){delete p.imgs;delete p.img}ch=true}});if(ch){c.lastAt=new Date().toISOString();saveCu()}
   if(typeof sv!=='undefined'&&sv&&sv.edit&&String(sv.edit.tx)===String(t.id))(sv.pays||[]).forEach(p=>{if(p.m==='dep'&&p.stlId===z.id){p.imgs=K.slice();p.img=K[0]||''}})}
 /* مانده قابل حواله یک واریزی: مانده بانکی + تسویه‌هایی که خود همین سند (در ویرایش) قبلاً روی آن گذاشته (وگرنه ویرایش سند رد می‌شد) */
-const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&String(z.byInv.tx)===String(sv.edit.tx)).reduce((a,z)=>a+(+z.amount||0),0):0;return (x.full&&!own?0:(+x.amount||0))+own};
+/* v90.9: واریزی‌ای که واریز بانکی‌اش ثبت شده: فقط تسویه خود همین سند + «مانده آزاد» در دسترس است (مبلغ بانکیِ ثبت‌شده نه) */
+const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&String(z.byInv.tx)===String(sv.edit.tx)).reduce((a,z)=>a+(+z.amount||0),0):0;if(x.sentBid){const e=entries.find(z=>z.id===x.id);return own+(e?depFreeSum(e):0)}return (x.full&&!own?0:(+x.amount||0))+own};
 /* ============ v71.2 رفع باگ (خواسته صاحب اپ): «دریافت › حواله به مشتری» از حساب پرداخت‌کننده ============
    بدهی ما به فروشنده‌ای که واریزی دارد (سند خرید e.wd) با همان واریزی پرداخت می‌شود. اگر حواله مشتری به حساب خود فروشنده
    (m:'cust') نوشته می‌شد، حساب فروشنده کم می‌شد ولی واریزی هنوز کامل از بانک می‌رفت = دو بار پرداخت. پس:
@@ -176,13 +177,13 @@ ACT.depGo=d=>{closeSheet();ACT.openEnt({id:isNaN(+d.e)?d.e:+d.e})};
    دریافت/پرداخت: روش، مبلغ، حساب یا کارتخوان، طرف حواله، پیگیری. */
 const dtT=v=>fmt(Math.round(+v||0))+' تومان';
 function itDet(it,rate,tax,saved){const c=saved&&it.tot!=null?{gold:+it.gold||0,aj:+it.ajv||0,pr:+it.prv||0,tax:+it.taxv||0,tot:+it.tot||0,fx:+it.amT>0?1:0}:itCalc(it,rate,tax),r=+it.mz?(+it.mz)/MZK:(+rate||0),ay=+it.ay||750,w=+it.w||0;
-  return [it.pz&&+it.cnt?'تعداد: '+qFmt(it.cnt)+' عدد':'','وزن: '+wFmt(w)+' گرم',shAyL(it)||'عیار: '+toFa(ay),ay!==750||it.ab?'وزن ۷۵۰: '+wFmt(Math.round(w*ay/750*1000)/1000)+' گرم':'',
+  return [+it.cnt?'تعداد: '+qFmt(it.cnt)+' عدد':'','وزن: '+wFmt(w)+' گرم',shAyL(it)||'عیار: '+toFa(ay),ay!==750||it.ab?'وزن ۷۵۰: '+wFmt(Math.round(w*ay/750*1000)/1000)+' گرم':'',
     r?'مظنه: '+fmt(Math.round(r*MZK))+' تومان':'',r?'هر گرم ۱۸: '+dtT(r):'',c.gold?'بهای طلا: '+dtT(c.gold):'',!it.ab?'اجرت: '+ajLab(it)+(c.aj&&ajPT(it).P?' = '+dtT(c.aj):''):'',
     'سود: '+toFa(Math.round((+it.pp||0)*100)/100)+'٪'+(c.pr?' = '+dtT(c.pr):''),c.tax?'مالیات: '+dtT(c.tax):'','مبلغ: '+dtT(c.tot),c.fx?'مبلغ دستی':'',shEff(it),
     it.lab?'آزمایشگاه '+esc(it.lab):'',it.ang?'انگ '+esc(it.ang):'',it.n?'توضیح: '+esc(it.n):''].filter(Boolean).join(' · ')}
 function xrDet(x,C,rate){const g=x.a==='gold',m=x.t==='sell'||x.t==='buy',u=g?'گرم':((XA[x.a]||{}).u||'واحد'),ay=+x.ay||750,q=C.q!=null?C.q:x.q750!=null?+x.q750:(g?Math.round((+C.n||0)*ay/750*1000)/1000:C.n),r=+x.mz?(+x.mz)/MZK:(+rate||0),ab=g&&x.cat==='آبشده'&&!x.pul;
   const nm={sell:'فروش',buy:'خرید',in:'دریافت',out:'پرداخت (تحویل)'}[x.t]||x.t;
-  return ['نوع: '+nm+(x.pul?' پولی':''),g&&x.cat&&x.cat!=='متفرقه'?'دسته: '+esc(x.cat):'',!g?'جنس: '+esc((XA[x.a]||{t:x.a}).t):'',x.pz&&+x.cnt?'تعداد: '+qFmt(x.cnt)+' عدد':'',
+  return ['نوع: '+nm+(x.pul?' پولی':''),g&&x.cat&&x.cat!=='متفرقه'?'دسته: '+esc(x.cat):'',!g?'جنس: '+esc((XA[x.a]||{t:x.a}).t):'',+x.cnt?'تعداد: '+qFmt(x.cnt)+' عدد':'',
     g?(x.pz&&+x.cnt?'وزن کل: ':'وزن: ')+wFmt(C.n)+' گرم':'مقدار: '+qFmt(C.n)+' '+u,g?(shAyL(x)||'عیار: '+toFa(ay)):'',g?'وزن ۷۵۰: '+wFmt(q)+' گرم':'',
     m&&g&&r&&!x.pgM?'مظنه: '+fmt(Math.round(r*MZK))+' تومان':'',m?(ab?'هر گرم ۱۸: '+dtT(Math.round((+C.pg||0)*750/ay)):(g?(x.t==='buy'&&!x.pul?'هر گرم خرید: ':'هر گرم: '):'هر '+u+': ')+dtT(C.pg)):'',
     m?'مبلغ: '+dtT(C.amount):'',C.fx?'مبلغ دستی':'',C.e?'اثر بر '+(g?'طلا':esc((XA[x.a]||{t:x.a}).t))+': '+(g?wFmt(Math.abs(C.e))+' گرم ۱۸':qFmt(Math.abs(C.e))+' '+u)+' '+ourLab(C.e):'',shEff(x),

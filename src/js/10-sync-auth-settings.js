@@ -9,11 +9,11 @@ const DEF_STAFF=['add','edit','split','track','close','debt','export'];
 const myPerms=()=>!ME?[]:ME.role==='admin'?PERMS.map(p=>p[0]):(Array.isArray(ME.perms)?ME.perms:DEF_STAFF);
 const can=p=>isAdmin()||myPerms().includes(p);
 /* هر کار ← دسترسی لازم (کارهای مدیر: 'admin') */
-const PERM_OF={bkCuAdd:'debt',aaOpen:'split',aaMv:'split',aaTo:'split',aaSave:'split',bdRs:'src',bdCuP:'src',bdCuNew:'debt',bdD:'src',bdGo:'src',bdNext:'src',bdUp:'src',bdCancel:'src',bdFin:'src',bdRowEd:'src',bdRowDel:'src',bdAccM:'src',bdAccP:'src',bdCal:'src',bxIO:'src',bxDoc:'debt',bxConv:'debt',bxConvS:'debt',bxConvGo:'debt',svBk:'debt',entCommit:'track',mvNew:'src',entMove:'split',partMoveAll:'split',mvGo:'split',entTkQ:'track',trkArch:'close',partOkAll:'track',trkGo:'track',cuNew:'debt',cuSave:'debt',cuEdit:'debt',cuDel:'del',cuQ:'debt',posDep:'src',pdSave:'src',chMvNew:'src',chMvSave:'src',chAdd:'src',txDel:'del',acNew:'src',acOpen:'src',acSave:'src',acBal:'src',acDel:'src',acEdit:'src',posNight:'src',posSave:'src',acLedNew:'src',pkDate:'split',stlAmt:'edit',stlAmtSave:'edit',bdNew:'src',bdSave:'src',acLedSave:'src',acLedDel:'src',acSetBal:'src',buyNew:'add',bzNext:'add',bzStlNew:'add',bzStlOpen:'add',bzStlDel:'add',bzStlSave:'add',bzNewIban:'add',entryMenu:'add',xGo:'export',xOpen:'export',entOk:'track',entUnok:'track',entEditOn:'edit',entSave:'edit',entEditGo:'edit',entDel:'del',entTk:'track',entTkF:'track',entPay:'edit',stlNew:'edit',stlSave:'edit',stlDel:'edit',stlOk:'edit',stlUnok:'edit',stlDelI:'edit',cuStl:'edit',saveEntry:()=>editId?'edit':'add',bulkAdd:'add',newList:'add',tab:d=>d&&d.n==='entry'&&!editId?'add':null,edit:'edit',
+const PERM_OF={bkCuAdd:'debt',aaOpen:'split',aaMv:'split',aaTo:'split',aaSave:'split',bdRs:'src',bdCuP:'src',bdCuNew:'debt',bdD:'src',bdGo:'src',bdNext:'src',bdUp:'src',bdCancel:'src',bdFin:'src',bdRowEd:'src',bdRowDel:'src',bdAccM:'src',bdAccP:'src',bdCal:'src',bxIO:'src',bxDoc:'debt',bxConv:'debt',bxConvS:'debt',bxConvGo:'debt',svBk:'debt',entCommit:'track',mvNew:'src',entMove:'split',partMoveAll:'split',mvGo:'split',entTkQ:'track',trkArch:'close',partOkAll:'track',trkGo:'track',cuNew:'debt',cuSave:'debt',cuEdit:'debt',cuDel:'del',cuQ:'debt',posDep:'src',pdSave:'src',chMvNew:'src',chMvSave:'src',chAdd:'src',txDel:'del',acNew:'src',acOpen:'src',acSave:'src',acBal:'src',acDel:'src',acEdit:'src',posNight:'src',posSave:'src',acLedNew:'src',pkDate:'split',stlAmt:'edit',stlAmtEd:'edit',stlAmtSave:'edit',bdNew:'src',bdSave:'src',acLedSave:'src',acLedDel:'src',acSetBal:'src',buyNew:'add',bzNext:'add',bzStlNew:'add',bzStlOpen:'add',bzStlDel:'add',bzStlSave:'add',bzNewIban:'add',entryMenu:'add',xGo:'export',xOpen:'export',entOk:'track',entUnok:'track',entEditOn:'edit',entSave:'edit',entEditGo:'edit',entDel:'del',entTk:'track',entTkF:'track',entPay:'edit',stlNew:'edit',stlSave:'edit',stlDel:'edit',stlOk:'edit',stlUnok:'edit',stlDelI:'edit',cuStl:'edit',saveEntry:()=>editId?'edit':'add',bulkAdd:'add',newList:'add',tab:d=>d&&d.n==='entry'&&!editId?'add':null,edit:'edit',
   del:'del',delEdit:'del',clearDay:'del',tkDel:'del',purgeOne:'del',emptyTrash:'del',credDel:'del',payDel:'del',
   hubSend:'split',hubSendAll:'split',hubOkAll:'track',hubArch:'close',hubReopen:'close',paySplit:'split',paySplitSave:'split',paySplitUndo:'split',
   allocNew:'split',aSave:'split',partEdit:'split',partDel:'split',partDelId:'split',trackNow:'split',partsSend:'split',
-  itSave:'track',itFail:'track',tkSet:'track',tkAll:'track',tkRequeue:'track',closeBatch:'close',reopenDay:'close',undoCommit:'unsend',partUnsend:'unsend',
+  itSave:'track',itFail:'track',itLess:'split',itLessSave:'split',tkSet:'track',tkAll:'track',tkRequeue:'track',closeBatch:'close',reopenDay:'close',undoCommit:'unsend',partUnsend:'unsend',
   credNew:'debt',credSave:'debt',credEdit:'debt',payNew:'debt',paySave:'debt',payEdit:'debt',payOk:'debt',wzSave:'debt',toDebt:'debt',
   srcMgr:'src',srcSet:'src',saveSrc:'src',addSrc:'src',delSrc:'src',delSrcGo:'src',undoEv:'undo',restoreOne:'undo',restoreAll:'undo',
   expAll:'export',expOpen:'export',expPdf:'export',expText:'export',expXls:'export',dayExp:'export',dayPdf:'export',ldExp:'export',ldSrc:'export',ldSrcGo:'export',ldText:'export',ldPdf:'export',ldXls:'export',dayText:'export',dayXls:'export',partsExp:'export',partExp:'export',lexp:'export',tkReport:'export',credPdf:'export',credStmt:'export',stmtPdf:'export',stmtXls:'export',
@@ -82,7 +82,7 @@ async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.bu
     let res=await api('/api/sync',{since:SY.since,changes});try{if(res&&res.me)meUpdate(res.me)}catch(e){}try{if(res&&+res.v>APP_V){if(location.hostname==='raw.githack.com')checkUpdate(false);else updFound(+res.v)}}catch(e){}
     applyRemote(res,sent);try{chgNote(res.chg)}catch(e){}
     while(res.more){res=await api('/api/sync',{since:SY.since,changes:[]});applyRemote(res,{})}
-    if(res.rejected&&res.rejected.length)toast(res.rejected[0].why||'این تغییر مجاز نبود',true);
+    if(res.rejected&&res.rejected.length)toastBg(res.rejected[0].why||'این تغییر مجاز نبود');
     SY.last=Date.now();rawSet('m_srv',1);setSync(pendN()?'busy':'ok','');flushImgs();
   }catch(e){if(e.status!==401)setSync(e.net?'off':'err',e.message)}
   finally{SY.busy=false;if(SY.again){SY.again=false;syncSoon(50)}}}
@@ -124,9 +124,9 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('online',()=>syncSoon(100));
 /* ---------- عکس رسیدها روی سرور ---------- */
 {const _put=imgPut,_get=imgGet,_del=imgDel;
-  imgPut=async(k,v)=>{const ok=await _put(k,v);if(TOKEN)api('/api/img/'+encodeURIComponent(k),{data:v},'PUT').catch(e=>{if(e&&e.status===403){toast(e.message,true);return}const q=ls.get('m_imgq',[]);if(!q.includes(k)){q.push(k);rawSet('m_imgq',q)}});return ok};
+  imgPut=async(k,v)=>{const ok=await _put(k,v);if(TOKEN)api('/api/img/'+encodeURIComponent(k),{data:v},'PUT').catch(e=>{if(e&&e.status===403){toastBg(e.message);return}const q=ls.get('m_imgq',[]);if(!q.includes(k)){q.push(k);rawSet('m_imgq',q)}});return ok};
   imgGet=async k=>{let v=await _get(k);if(!v&&TOKEN){try{const j=await api('/api/img/'+encodeURIComponent(k));if(j&&j.data){v=j.data;_put(k,v)}}catch(e){}}return v};
-  imgDel=async k=>{await _del(k);if(TOKEN)api('/api/img/'+encodeURIComponent(k),undefined,'DELETE').catch(e=>{if(e&&e.status===403)toast(e.message,true)})}}
+  imgDel=async k=>{await _del(k);if(TOKEN)api('/api/img/'+encodeURIComponent(k),undefined,'DELETE').catch(e=>{if(e&&e.status===403)toastBg(e.message)})}}
 async function flushImgs(){const q=ls.get('m_imgq',[]);if(!q.length)return;const left=[];for(const k of q){try{const v=await imgGet(k);if(v)await api('/api/img/'+encodeURIComponent(k),{data:v},'PUT')}catch(e){if(!(e&&e.status===403))left.push(k)}}rawSet('m_imgq',left)}
 /* ---------- صفحه ورود و راه‌اندازی ---------- */
 function showAuth(msg){const a=$('auth');a.classList.remove('hide');a.innerHTML=`<div class="authc"><div class="amk amlg" role="img" aria-label="طلای مطلا"></div><b class="atl">بده بستون</b><small class="ast">طلای مطلا</small><div class="aspin">در حال اتصال…</div></div>`;
@@ -264,8 +264,8 @@ async function refreshAll(){if(!TOKEN)return {ok:false,n:0,off:true};const n0=SY
   await syncNow();for(let i=0;i<60&&SY.busy;i++)await new Promise(r=>setTimeout(r,100));
   try{checkUpdate(true)}catch(e){}
   return {ok:SY.state==='ok'||SY.state==='busy',off:SY.state==='off',err:SY.state==='err'?SY.err:'',n:(SY.newN||0)-n0,add:(SY.addN||0)-a0}}
-function refreshMsg(r){if(r.off){toast('اتصال به اینترنت یا سرور برقرار نیست؛ اطلاعات همین گوشی نمایش داده می‌شود',true);return}
-  if(r.err){toast(r.err,true);return}
+function refreshMsg(r){if(r.off){toastBg('اتصال به اینترنت یا سرور برقرار نیست؛ اطلاعات همین گوشی نمایش داده می‌شود');return}
+  if(r.err){toastBg(r.err);return}
   toast(r.n?('به‌روز شد ✓ · '+toFa(r.n)+' مورد تازه'+(r.add?' ('+toFa(r.add)+' جدید)':'')):'همه اطلاعات به‌روز است ✓')}
 /* صفحه را با نوار بارگذاری از سرور تازه کن (هنگام رفتن به هر صفحه، بدون پیام) */
 let quietT=0;function quietRefresh(){if(!TOKEN||Date.now()-quietT<2500)return;quietT=Date.now();loading(true);refreshAll().finally(()=>loading(false))}

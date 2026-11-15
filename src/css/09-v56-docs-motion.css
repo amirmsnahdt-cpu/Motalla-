@@ -3941,7 +3941,7 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 .bdcl .bdcr{align-items:center}.bdcl .bdcr .tx{flex:1;min-width:0}.bdcl .bdcr .av.cul{background:hsl(var(--h,220) 70% 94%);color:hsl(var(--h,220) 55% 40%)}
 .bdcl .bdcr .stbl{flex:none}
 /* v82.8 (خواسته صاحب اپ): وزن و فی خرید در ردیف لیست واریزی */
-.brh .tx small.rwf{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:#9a6b12}.brh .tx small.rwf svg{width:13px;height:13px;flex:none}
+/* v90.9: خط «وزن · فی» از همه لیست‌ها برداشته شد (خواسته صاحب اپ)؛ در صفحه جزئیات واریزی می‌ماند */
 /* v82.8 (خواسته صاحب اپ: «کادرهای آبی سند زدن نباید توی هم برود»): فاصله کادر باز ردیف از کارت بالای سند (هاله آبی روی کارت نمی‌افتد)؛
    فهرست طرف حساب داخل کادر قاب جدا ندارد و مانده‌ها در عرض کادر جا می‌شوند */
 .bdoc #qa,.d6 #qa:has(.dkbox.open){margin-top:16px}
@@ -4305,11 +4305,92 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 /* v90.5 (خواسته صاحب اپ): «کسر/اضافه» در فهرست جست‌وجوی هیچ سندی (مشتری، بانک، هر گروه) قاب یا رنگ جدا ندارد — یک ردیف عادی مثل بقیه.
    نام صاحب حساب سطر تازه نمی‌سازد: کادرش در همان خط نام مشتری، کنار آن می‌نشیند و اگر بلند باشد با … کوتاه می‌شود */
 .tx .nmh{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}.tx .nmh>b{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tx .nmh .bhold b{overflow-wrap:normal!important;text-overflow:ellipsis!important}.tx .nmh .bhold{width:auto!important;align-self:center!important;display:inline-flex!important;align-items:center;flex:0 3 auto;margin:0!important;min-width:64px;max-width:none;white-space:nowrap!important;overflow:hidden}.tx .nmh .bhold b{display:block!important;flex:1 1 auto;min-width:0;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis}
-/* v90.5: در ردیف واریزی (homeRow) کادر صاحب حساب در خط دوم، بعد از نام بانک می‌نشیند؛ نام مشتری دست‌نخورده می‌ماند و ادامه خط (تاریخ واریز، فاکتور) جا نشد با … کوتاه می‌شود */
-.bkl.hh{display:flex!important;align-items:center;gap:5px;min-width:0;flex-wrap:nowrap}.bkl.hh>.bkn{flex:none}.bkl.hh>span:last-child{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bkl.hh>.bhold{width:auto!important;align-self:center!important;display:inline-flex!important;align-items:center;flex:0 1 auto;margin:0!important;min-width:60px;white-space:nowrap!important;overflow:hidden}
-.bkl.hh>.bhold b{display:block!important;flex:1 1 auto;min-width:0;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:normal!important}.bkl.hh>.bhold svg{flex:none}
+.tx .nmh .bhold b{overflow-wrap:normal!important;text-overflow:ellipsis!important}.tx .nmh .bhold{width:auto!important;align-self:center!important;display:inline-flex!important;align-items:center;flex:0 1 auto;margin:0!important;min-width:64px;max-width:none;white-space:nowrap!important;overflow:hidden}.tx .nmh .bhold b{display:block!important;flex:1 1 auto;min-width:0;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis}
+/* v90.9: ردیف واریزی (homeRow) — خط دوم با صاحب حساب: کادر طلایی (لوگوی بانک + نام) اول و با اولویت کامل؛ بقیه خط (نام بانک، تاریخ واریز، فاکتور) فقط اگر
+   دست‌کم ۴٫۵em جا بماند دیده می‌شود، وگرنه به خط بعد می‌شکند که بریده (پنهان) است. کادر تک‌خط است و فقط وقتی از کل عرض بلندتر باشد … می‌گیرد. */
+.brh .tx small.bkl.hh{display:flex!important;flex-wrap:wrap;align-items:center;gap:0 6px;min-width:0;height:24px;overflow:hidden}
+.brh .tx small.bkl.hh>.bhold.bhk{display:inline-flex!important;align-items:center;gap:5px;flex:0 1 auto;width:auto!important;max-width:100%;min-width:0;height:24px;box-sizing:border-box;margin:0!important;padding:0;padding-inline:3px 9px;border-radius:12px;white-space:nowrap!important;overflow:hidden!important;align-self:center!important}
+.brh .tx small.bkl.hh>.bhold.bhk>b{display:block!important;flex:1 1 auto;min-width:0;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:normal!important;font-size:12px!important;font-weight:750!important;line-height:24px}
+.brh .tx small.bkl.hh>.bhold.bhk>.bkb{flex:none;margin:0}.brh .tx small.bkl.hh>.bhold.bhk>svg{flex:none;width:13px;height:13px;margin-inline-start:3px}
+.brh .tx small.bkl.hh>.bkt{flex:1 1 0;min-width:4.5em;line-height:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* v90.9: «مانده» واریزی (بخش بدون بانک، وقتی بخش دیگری بانک دارد): ردیف، برچسب و نوار قرمز — همان قرمزِ «نرفته» در مسیر پرداخت */
+.py7bar i.r{background:var(--ppf,var(--red));animation-delay:.24s}.py7k .r::before{background:var(--ppf,var(--red))}.py7k .r{color:var(--ppf,var(--red))}
+.py7k{flex-wrap:wrap;row-gap:4px}
+.py9t.r{background:color-mix(in srgb,var(--ppf,var(--red)) 13%,var(--card));color:var(--ppf,var(--red))}
+.py7r.b.n.rm{outline-color:color-mix(in srgb,var(--ppf,var(--red)) 55%,transparent);background:color-mix(in srgb,var(--ppf,var(--red)) 5%,var(--card))}
+.py7r.b.n.rm .tx b,.py7r.b.n.rm .py7v small{color:var(--ppf,var(--red))}.py7r.b.rm .py7a.bk{background:color-mix(in srgb,var(--ppf,var(--red)) 12%,var(--card));color:var(--ppf,var(--red))}
+#sheet .px8l.sarm{margin-top:6px;min-height:18px;font-weight:750}#sheet .px8l.sarm.rm{color:var(--ppf,var(--red))}#sheet .px8l.sarm.bad{color:var(--red)}
+.py7bar i{flex-shrink:1}.py7bar i.r{flex-shrink:0;min-width:10px}
+.itf .itless{display:block;margin:0 auto 4px;border:0;background:none;color:var(--mut);font:inherit;font-size:12.5px;font-weight:750;padding:6px 12px;min-height:36px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+#sheet .px8l.sarm{display:block;text-align:start;line-height:1.6}#sheet .px8l.sarm b{color:inherit;font-weight:850;margin:0}
+/* v90.9: ردیف‌های لیست واریز با دکمه رسید (hasrc) در گوشی باریک جای نام و صاحب حساب کم داشتند: نشان وضعیت و فاصله‌ها کمی جمع می‌شود */
+@media (max-width:420px){.brw.hasrc .brh{gap:8px}.brw.hasrc .bri{width:36px;height:36px;min-width:36px}.brw.hasrc .bri svg{width:17px;height:17px}}
+@media (max-width:380px){.brw.hasrc .brh{gap:7px;padding-inline:2px}.brw.hasrc .brc{width:40px;min-width:40px}}
+.brh .tx small.bkl{min-height:22px}/* همه ردیف‌ها یک قد: خط دوم با کادر صاحب حساب و بی آن هم‌ارتفاع */
+.brh .tx small.bkl.hh,.brh .tx small.bkl.hh>.bhold.bhk{height:22px}.brh .tx small.bkl.hh>.bhold.bhk>b,.brh .tx small.bkl.hh>.bkt{line-height:22px}
+/* v90.9: کنار نام (span.nmh در جستجو و انتخاب تخصیص) کادر صاحب حساب دیگر سه برابر نام جمع نمی‌شود — هر دو به نسبت طول خودشان کوتاه می‌شوند (قبلاً فقط نشان بانک می‌ماند) */
+/* ===== v90.9 (خواسته صاحب اپ: «اسم مشتری، شماره تماس و غیره منظم و مرتب باشد»؛ «شماره در قاب رنگی، مثلاً توسی») =====
+   ردیف حساب (cuRowH) در صفحه حساب مشتریان، پنل «پرداخت از کجا؟» و جستجوی مشتری سند: سطر اول = شماره (قاب توسی پُر) + نام کامل؛
+   سطر دوم = تلفن · گروه. قبلاً همه در یک خط بود و نام و تلفن و گروه هر سه بریده می‌شدند. DOM همان است (چیدمان با grid). */
+:is(#cures,.cuLs) .cuL .c6r .tx{display:grid!important;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:8px;row-gap:3px;min-width:0;width:auto;flex:1 1 0;text-align:right}
+:is(#cures,.cuLs) .cuL .c6r .tx>.cuno{grid-column:1;grid-row:1;margin:0;align-self:center}
+:is(#cures,.cuLs) .cuL .c6r .tx>b{grid-column:2;grid-row:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px;line-height:1.5}
+:is(#cures,.cuLs) .cuL .c6r .tx>b:first-child{grid-column:1/-1}
+:is(#cures,.cuLs) .cuL .c6r .tx>small{grid-column:1/-1;grid-row:2;margin:0;min-width:0;display:flex;align-items:center;gap:6px;font-size:12px;line-height:1.5;white-space:nowrap;overflow:hidden;color:var(--mut)}
+:is(#cures,.cuLs) .cuL .c6r .tx>small:empty{display:none}
+:is(#cures,.cuLs) .cuL .c6r .tx>small bdi{flex:none}
+:is(#cures,.cuLs) .cuL .c6r .tx>small em{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+:is(#cures,.cuLs) .cuL .c6r.zr{min-height:62px}
+/* شماره مشتری: قاب توسی پُر (نه قاب سفید با خط دور) تا شماره بودنش معلوم باشد؛ فاصله‌اش از نام همیشه سمت نام (قبلاً در جستجوی سند به نام چسبیده بود) */
+.cuno{background:color-mix(in srgb,var(--ink) 11%,var(--card))!important;box-shadow:none!important;color:var(--ink);margin:0 0 0 7px!important;border-radius:8px}
+:is(#cures,.cuLs) .cuL .c6r .tx>.cuno,.cuh9n .cuno,.cbl .bzsr .tx b .cuno{margin:0!important}
+.cbl .bzsr .tx b .cuno,.bzsr .tx b .cuno{margin:0 0 0 7px!important}
+/* جستجوی مشتری سند: همان ردیف‌ها، بدون سایه و فاصله اضافه داخل کادر جستجو */
+.cbl .svcl{padding:2px 8px 6px}.cbl .svcl .c6l{gap:8px}.cbl>.cumore{width:calc(100% - 16px);margin:4px 8px 8px}
+/* v90.9 (خواسته صاحب اپ: «دور مشخصات باید کادر آبی باشد»): قاب‌های فرم حساب (مشخصات، گروه، حساب بانکی، یادداشت) همان کادر آبی جستجوها و قاب‌های «برچسب/مقدار» */
+.cuf2 .f6g{--bfr:0 0 0 1.5px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 10%,transparent);--bfr2:0 0 0 2px var(--blu),0 0 0 6px color-mix(in srgb,var(--blu) 17%,transparent);border-radius:20px;box-shadow:var(--bfr);margin-inline:5px;transition:box-shadow .18s}
+.cuf2 .f6g:focus-within{box-shadow:var(--bfr2)}
+.cuf2 .f6g>.f6r:first-child{border-radius:20px 20px 0 0}.cuf2 .f6g>.f6r:last-child{border-radius:0 0 20px 20px}.cuf2 .f6g>.f6r:only-child{border-radius:20px}
+/* v90.9: جستجوی کالا هنگام تایپ — بدون انیمیشن ورود دوباره (ریشه «لگ» ویدیو) */
+#qKs .dkl.noan .bzsr,#qKs .dkl.noan .dkg,#qKs .dkl.noan .dkcat,#qKs .dkl.noan .stsh{animation:none!important;transition:none!important}
+/* سرتیتر گروه‌های فهرست خرید/فروش (طلا، سکه، ارز، دریافت و پرداخت) */
+#qKs .stsh.dksh{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:6px;margin:0;padding:9px 6px 6px;background:var(--card);font-size:12px;font-weight:900;color:var(--ink);border-bottom:1.5px solid color-mix(in srgb,var(--gold,#c9992e) 45%,var(--line))}
+#qKs .stsh.dksh svg{width:15px;height:15px;color:var(--gink,#8a6410);flex:none}#qKs .stsh.dksh b{font-weight:900}#qKs .stsh.dksh i{margin-inline-start:auto;font-style:normal;font-size:10.5px;font-weight:800;color:var(--mut);background:color-mix(in srgb,var(--mut) 10%,transparent);border-radius:8px;padding:1px 7px}
+#qKs .stsh.dksh.kf{border-bottom-color:color-mix(in srgb,var(--ok) 40%,var(--line))}#qKs .stsh.dksh.kf svg{color:var(--ok)}#qKs .stsh.dksh.km{border-bottom-color:color-mix(in srgb,var(--blu) 40%,var(--line))}#qKs .stsh.dksh.km svg{color:var(--blu)}
+#qKs .stsh.dksh2{padding:8px 6px 2px;font-size:11px;font-weight:800;color:var(--mut)}
+/* ===== v90.9: موجودی و فی کنار هر کالا در فهرست خرید/فروش (15zz) + پنجره «فی و موجودی» ===== */
+#qKs .dkrw.hst{align-items:center}#qKs .dkrw.hst .tx{flex:1 1 auto;min-width:0}
+#qKs .dkst{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:1px;max-width:54%;margin-inline-start:6px;text-align:left;line-height:1.35}
+#qKs .dkg .dkst{margin-inline-end:46px}
+#qKs .dkst b{font-size:12.5px;font-weight:900;color:var(--ok);white-space:nowrap}#qKs .dkst.ng b{color:var(--red)}
+#qKs .dkst small{font-size:10.5px;font-weight:750;color:var(--gink,#8a6410);white-space:nowrap;background:var(--gtint,#f7efdc);border-radius:7px;padding:1px 7px}
+#qKs .dkg>.dkgm{width:36px;height:36px;border-radius:11px}
+.gih{display:flex;align-items:center;gap:10px;margin:2px 0 10px;padding:12px 14px;border-radius:18px;background:color-mix(in srgb,var(--ok) 8%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ok) 28%,transparent)}
+.gih svg{width:22px;height:22px;color:var(--ok);flex:none}.gih .tx{display:flex;flex-direction:column;min-width:0}.gih small{font-size:11.5px;color:var(--mut);font-weight:700}.gih b{font-size:17px;font-weight:900;color:var(--ok)}.gih b.ng{color:var(--red)}
+.gil{margin:12px 4px 7px;font-size:12.5px;font-weight:900;color:var(--ink)}.gil i{font-style:normal;font-weight:700;font-size:11px;color:var(--mut);margin-inline-start:6px}
+.gic{--bfr:0 0 0 1.5px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 10%,transparent);--bfr2:0 0 0 2px var(--blu),0 0 0 6px color-mix(in srgb,var(--blu) 17%,transparent);margin:0 5px;border-radius:18px;background:var(--card);box-shadow:var(--bfr);overflow:hidden;transition:box-shadow .18s}.gic:focus-within{box-shadow:var(--bfr2)}.gic:empty{display:none}
+.gif{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:6px 14px;border-bottom:1px solid var(--hair,var(--line))}.gif:last-child{border-bottom:0}
+.gif>span:first-child{flex:none;font-size:13.5px;font-weight:800;color:var(--mut)}.gifv{flex:1;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+#sheet .gif input{flex:1;min-width:0;width:100%;border:0!important;background:none!important;box-shadow:none!important;outline:0;padding:0!important;min-height:38px;font:inherit;font-size:17px;font-weight:900;color:var(--ink);text-align:left;direction:ltr}
+#sheet .gif input::placeholder{font-size:12.5px;font-weight:600;color:var(--mut);opacity:.8;direction:rtl;text-align:left}
+.gif i{flex:none;font-style:normal;font-size:12px;font-weight:850;color:var(--blu);min-width:0}
+.gin{display:block;margin:7px 8px 0;font-size:11.5px;line-height:1.7;color:var(--mut)}
+#sheet .gisw{margin:14px 4px 4px}.gdn .gdnl i{font-style:normal;font-weight:700;font-size:11px;color:var(--mut);margin-inline-start:6px}.gdn .gdnf{margin-bottom:10px}
+/* ===== v90.9: پنجره خطا / هشدار (askWarn، errCard) — همان کارت «نوع حساب تازه»، وسط صفحه ===== */
+.cntbd.wrnbd{z-index:118;background:rgb(10 20 40/.26)}
+.cntp.wrnp{z-index:119;left:50%;top:max(72px,calc(env(safe-area-inset-top,0px) + 16vh));transform:translate(-50%,0);width:min(92vw,430px);max-height:72vh;padding:14px;transform-origin:50% 0;box-shadow:0 0 0 1.5px color-mix(in srgb,var(--red) 38%,transparent),0 0 0 6px color-mix(in srgb,var(--red) 9%,transparent),0 28px 60px -18px rgb(16 32 70/.55)}
+.wrnp.wrw{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--warn,#b45309) 45%,transparent),0 0 0 6px color-mix(in srgb,var(--warn,#b45309) 10%,transparent),0 28px 60px -18px rgb(16 32 70/.55)}
+.wrnp .cnth{align-items:flex-start;padding-bottom:10px}.wrnp .cnthi{background:var(--red)}.wrnp.wrw .cnthi{background:var(--warn,#b45309)}
+.wrnp .cnth .tx b{font-size:15.5px;line-height:1.7;white-space:normal;overflow-wrap:anywhere}.wrnp .cnth .tx small{color:var(--mut);white-space:normal}
+.wrnp.wmini .cnth .tx b{font-size:14.5px;font-weight:850}
+.wrnb{margin:0 2px 12px;padding:11px 13px;border-radius:16px;background:color-mix(in srgb,var(--red) 6%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--red) 18%,transparent);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.wrnp.wrw .wrnb{background:color-mix(in srgb,var(--warn,#b45309) 7%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--warn,#b45309) 22%,transparent)}
+.wrnb b{font-weight:900;white-space:nowrap}.wrnb .rd{color:var(--red)}.wrnb .bl{color:var(--blu)}.wrnb small{display:block;margin-top:4px;font-size:12px;color:var(--mut)}
+.wrnf{display:flex;flex-direction:row-reverse;gap:8px;padding:0 2px 2px}
+.wrnok{flex:1 1 0;min-height:46px;border:0;border-radius:15px;background:var(--blu);color:#fff;font:inherit;font-size:14.5px;font-weight:900;cursor:pointer;box-shadow:0 10px 20px -12px color-mix(in srgb,var(--blu) 80%,transparent)}
+.wrngo{flex:1 1 0;min-height:46px;border:0;border-radius:15px;background:var(--seg,var(--hair));color:var(--ink);font:inherit;font-size:13.5px;font-weight:800;cursor:pointer}
+.wrnp.wmini .wrnok{min-height:42px;flex:0 0 auto;padding:0 22px;margin-inline-start:auto}
+#sheet .gisw{display:flex;align-items:center;gap:10px}#sheet .gisw .sbt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}#sheet .gisw .sbt b{font-size:13.5px;font-weight:850}#sheet .gisw .sbt small{font-size:11.5px;color:var(--mut)}
 
 /* ============ v90.8 صفحه «تنظیمات فاکتور» (15zy) ============
    بالا: قالب‌ها + پیش‌نمایش زنده (ثابت می‌ماند)؛ پایین: نوار بخش‌ها و فرم همان بخش. کارت‌های گرد، کلیدهای iOS، دکمه‌های قطعه‌ای آبی. */

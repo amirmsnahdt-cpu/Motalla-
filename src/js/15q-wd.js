@@ -104,7 +104,8 @@ function docWdL(c,t){if(!c||!t||t.type!=='inv'||t.lk||t.pd||t.bl||t.bd)return []
 function docDelLock(c,t){if(!c||!t||t.del||t.type!=='inv'||t.lk||t.pd||t.bl||t.bd)return '';const W=docWdL(c,t);
   if(W.some(e=>entBI(e)||e.sentBid))return 'واریزی این سند به بانک ارسال شده؛ اول ارسال را در لیست واریز برگردانید، بعد سند را حذف کنید';
   if(W.some(e=>(e.settles||[]).length))return 'واریزی این سند تسویه از مشتری دارد؛ اول آن تسویه را بردارید، بعد سند را حذف کنید';
-  for(const p of t.pays||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(e&&stlBkLock(e))return 'این سند واریزی «'+(e.name||'')+'» را پرداخت کرده و واریز بانکی آن تأیید شده؛ اول تأیید بانک را در لیست واریز بردارید'}return ''}
+  /* v90.9: سندی که واریزیِ ارسال‌شده به بانک را پرداخت کرده حذف می‌شود — مبلغش «مانده» همان واریزی می‌شود (stlSync)، واریز بانکی دست نمی‌خورد؛ فقط مجوز ساخت مانده لازم است */
+  for(const p of t.pays||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(e&&depBkFix(e)&&!remCan())return REMNO}return ''}
 /* صفحه مشتری: زیر کارت مانده حساب — کارت مسیر پرداخت + واریزی‌های در راه (هر کدام = باز کردن واریزی) */
 function wdCuHTML(c){const L=wdPendL(c);if(!L.length)return '';const A=allocMap(),b=cuBal(c);let fr=0,al=0;L.forEach(o=>{let f=0;wdParts(o.e,o.S,A).forEach(q=>{if(q.fr)f+=q.a});o.fr=Math.min(f,o.S.pend);o.al=o.S.pend-o.fr;fr+=o.fr;al+=o.al});
   const rows=L.map(({e,S,fr,al})=>`<button type="button" class="ppd ${al&&!fr?'a':'l'}" data-act="depGo" data-e="${e.id}"><i></i><b>${fmt(S.pend)}</b><small>سند ${toFa(e.wd.no)} · ${esc(payLab(PD(e))||dates(PD(e)).fa)}</small><em>${al&&fr?'بخشی تخصیص‌شده':al?'تخصیص‌شده':'تخصیص نخورده'}</em>${ic('back').replace('class="i"','class="i flip"')}</button>`).join('');

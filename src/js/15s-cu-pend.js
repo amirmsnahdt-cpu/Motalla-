@@ -13,7 +13,9 @@ function cuPendHTML(b,P,pw){const R2=(+b.R||0)+pw;/* تسویه = «دریافت
 /* مانده کوچک کنار نام در جستجوی پرداخت‌کننده: یک ردیف گرم، یک ردیف تومان (+ در انتظار تأیید، زرد) */
 /* v78.4 (خواسته صاحب اپ: «مبالغی که تخصیص داده شده مشخص باشه و زرد بشه»): wp = بخشی از مانده که به واریزی‌ها تخصیص خورده و هنوز واریز/تأیید نشده (wdMap)؛ با تسویه‌های در انتظار یک خط زرد «تخصیص‌شده» */
 function cuMiniBal(c,wp){const b=cuBal(c),wa=c?(cuWA.get(String(c.id))||0):0,wf=c?(cuWF.get(String(c.id))||0):0,pw=cuPendSum(c)+wa,row=(k,v)=>`<span class="stbv ${q8S(v)}"><b>${v?balV(k,v):'۰'}</b><i>${esc(balU(k))}</i><em>${ourLab(v)}</em></span>`;
-  return `<span class="stbl${pw?' pw':wf?' wf':''}">${+b.G||!(+b.R)?row('g',+b.G||0):''}${+b.R?row('r',+b.R):''}${pw?`<span class="stbv p"><b>${fmt(pw)}</b><i>تومان</i><em>تخصیص‌شده</em></span>`:''}${wf?`<span class="stbv f"><b>${fmt(wf)}</b><i>تومان</i><em>در لیست واریز</em></span>`:''}</span>`}
+  /* v90.9: حسابی که فقط مانده سکه/ارز دارد «۰ گرم» نشان می‌داد؛ حالا هر مانده‌ای که هست (طلا، تومان، تا دو نوع سکه/ارز) */
+  const XK=Object.keys(b.X||{}).filter(k=>b.X[k]).slice(0,2),any=+b.G||+b.R||XK.length;
+  return `<span class="stbl${pw?' pw':wf?' wf':''}">${+b.G||!any?row('g',+b.G||0):''}${+b.R?row('r',+b.R):''}${XK.map(k=>row(k,+b.X[k])).join('')}${pw?`<span class="stbv p"><b>${fmt(pw)}</b><i>تومان</i><em>تخصیص‌شده</em></span>`:''}${wf?`<span class="stbv f"><b>${fmt(wf)}</b><i>تومان</i><em>در لیست واریز</em></span>`:''}</span>`}
 
 /* v61.93: مانده کوچک در همه جستجوهای مشتری (سند، تسویه): تسویه = برچسب کوچک کم‌رنگ؛ وگرنه گرم و تومان */
 const cuBalMini=(c,wp)=>{const b=cuBal(c);return cuZero(b)&&!cuPendSum(c)&&!wp?cuZTag():cuMiniBal(c,wp)};
