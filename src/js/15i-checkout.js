@@ -65,25 +65,38 @@ ACT.ckGal=()=>{ckRead();openGal({k:'row',ck:1})};
 ACT.ckPhV=d=>{ckRead();GAL={k:'row',ck:1};zvOpen(+d.i||0)};
 ACT.ckPhBack=()=>{GAL=null;sheet(ckHTML());ckBind();phPaint($('sheet'))};
 function ckPhPut(n0,x){const K=xrPh(CK||{});if(!K.length)return;const p=x||(sv.pays.length>n0?sv.pays[sv.pays.length-1]:null);if(p){p.imgs=K;p.img=K[0]}}
-function ckForm(){const m=CK.m;if(!m)return '';const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" autocomplete="off" enterkeyhint="done"></label>`;
-  const tn=`<label class="ckf"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
-  if(m==='cash')b=amt;
+/* v91.2 (خواسته صاحب اپ: «حواله‌ها و کارتخوان خیلی راحت‌تر و درست‌تر؛ وقتی کیبورد باز می‌شود هیچ چیز دیده نمی‌شود») — پنجره تسویه دو حالت دارد:
+   ۱) نمای کلی (روش انتخاب نشده): مانده‌ها، ردیف‌های ثبت‌شده، کاشی روش‌ها، «پایان و ثبت سند» — مثل قبل.
+   ۲) حالت «یک کار» (CK.m): فقط همان روش — سرتیتر = نام روش با برگشت و «افزودن»، یک خط مانده، بانک‌ها به شکل چیپ افقی (لوگو + مانده؛ انتخاب بدون ساختن دوباره صفحه،
+      پس کیبورد نمی‌پرد)، مبلغ بزرگ با «کل مانده»، بعد پیگیری و عکس. همه در بالای صفحه می‌ماند و بالای کیبورد دیده می‌شود. «همه بانک‌ها / تازه» فهرست کامل با جستجو را باز می‌کند (CK.pl). */
+const ckBkL=()=>bkCus().filter(c=>String(c.id)!==String(sv&&sv.cuId));
+function ckChips(){const L=ckBkL().map(c=>({c,b:bkCuBal(c)})).sort((a,b)=>(String(b.c.id)===String(CK.srcId))-(String(a.c.id)===String(CK.srcId))||b.b-a.b);
+  return `<div class="ckcs" id="ckCs">${L.slice(0,14).map(({c,b})=>`<button type="button" class="ckc${String(CK.srcId)===String(c.id)?' on':''}" data-act="ckSrc" data-id="${esc(c.id)}" style="--bk:${bkClr(c)}">${bkAvH(c)||`<span class="ckbi">${ic('bank')}</span>`}<span class="tx"><b>${esc(cuName(c).replace(/^بانک\s+/,''))}</b><small class="${b>0?'r':b<0?'b':'z'}">${fmt(Math.abs(b))}</small></span><i class="ckck">${ic('check')}</i></button>`).join('')}<button type="button" class="ckc ckca" data-act="ckAll"><span class="ckbi">${ic('search')}</span><span class="tx"><b>${L.length>14?'همه بانک‌ها':'جستجو'}</b><small>یا حساب تازه</small></span></button></div>`}
+function ckForm(){const m=CK.m;if(!m)return '';const lf=ckLeft(),big=`<div class="ckbg"><label class="ckbig"><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" placeholder="مبلغ" autocomplete="off" enterkeyhint="done" aria-label="مبلغ"><i>تومان</i></label>${lf?`<div class="ckq"><button type="button" data-act="ckAmt" data-v="${lf}">کل مانده · ${fmt(lf)}</button>${lf>=2e6?`<button type="button" data-act="ckAmt" data-v="${Math.round(lf/2)}">نصف</button>`:''}</div>`:''}</div>`;
+  const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${CK.amount?Number(CK.amount).toLocaleString('en-US'):''}" autocomplete="off" enterkeyhint="done"></label>`;
+  const tn=`<label class="ckf ckf1"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
+  if(m==='cash')b=big;
   if(m==='rg')b=`<div class="ckg">${amt}<label class="ckf"><small>هر گرم ۱۸ (تومان)</small><input id="ckP" class="ltr" inputmode="numeric" value="${CK.pg?Number(CK.pg).toLocaleString('en-US'):''}" autocomplete="off"></label></div><div class="ckx" id="ckX">${ckRgX()}</div>`;
-  /* v63.3 (خواسته صاحب اپ): حواله به بانک دو مرحله‌ای مثل حواله به مشتری — اول حساب ما از فهرست، با زدن روی آن مبلغ و تأیید */
-  if(m==='hav'&&CK.pk){const z=bkCus().find(o=>String(o.id)===String(CK.srcId));if(!z)CK.pk=0;else{const bb=bkCuBal(z);b=`<div class="stsel"><span class="c6a">${ic('bank')}</span><span class="tx"><b>${esc(cuName(z))}</b><small>حساب بانک · مانده ${bb<0?'−':''}${fmt(Math.abs(bb))}</small></span><button class="itx" data-act="ckSrcX" aria-label="تغییر حساب">×</button></div><div class="ckg">${amt}${tn}</div>`}}
-  if(m==='hav'&&!CK.pk)b=`<div class="fsearch sm">${ic('search')}<input id="ckS" type="search" value="${esc(CK.sq||'')}" placeholder="جستجوی حساب بانک…" autocomplete="off" enterkeyhint="search"></div><div id="ckPl">${ckPick()}</div>`;
-  if(m==='pos')b=`<div class="fsearch sm">${ic('search')}<input id="ckS" type="search" value="${esc(CK.sq||'')}" placeholder="${m==='pos'?'حساب کارتخوان (بانک)…':'جستجوی حساب بانک…'}" autocomplete="off" enterkeyhint="search"></div><div id="ckPl">${ckPick()}</div><div class="ckg ckg1">${amt}</div>`;/* v82.9 (خواسته صاحب اپ): کارتخوان شماره پیگیری نمی‌خواهد، فقط عکس */
-  if(m==='dep'||(m==='cust'&&ckOut()))b=CK.sel?`${ckSel()}${amt}`:`<div class="fsearch sm">${ic('search')}<input id="ckQ" value="${esc(CK.q||'')}" placeholder="نام، تلفن، شبا یا فاکتور…" autocomplete="off"></div><div id="ckL">${ckList()}</div>`;
+  if(m==='pos'||m==='hav'){const has=ckBkL().length>0;if(has&&!ckBkL().some(z=>String(z.id)===String(CK.srcId)))CK.srcId=ckBkL()[0].id;if(has)CK.pk=1;
+    if(CK.pl||!has)b=`<div class="fsearch sm">${ic('search')}<input id="ckS" type="search" value="${esc(CK.sq||'')}" placeholder="${m==='pos'?'حساب کارتخوان (بانک)…':'جستجوی حساب بانک…'}" autocomplete="off" enterkeyhint="search"></div><div id="ckPl">${ckPick()}</div>`;
+    else b=`<div class="ckcl">${m==='pos'?'کارتخوان به کدام حساب می‌نشیند؟':ckOut()?'از کدام حساب بانک؟':'به کدام حساب بانک؟'}</div>${ckChips()}${big}${m==='hav'?tn:''}`}
+  if(m==='dep'||(m==='cust'&&ckOut()))b=CK.sel?`${ckSel()}${big}`:`<div class="fsearch sm">${ic('search')}<input id="ckQ" value="${esc(CK.q||'')}" placeholder="نام، تلفن، شبا یا فاکتور…" autocomplete="off"></div><div id="ckL">${ckList()}</div>`;
   if(m==='gx'){const x=xrNew('buy','gold',{cat:'تعویض'});x.w=CK.w||'';x.ay=CK.ay||x.ay;const C=xrCalc(x,sv.rate);
     b=`<div class="ckg"><label class="ckf"><small>وزن طلای مشتری (گرم)</small><input id="ckW" class="ltr" inputmode="decimal" value="${esc(CK.w||'')}" placeholder="0.000" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="ckY" class="ltr" inputmode="numeric" value="${esc(String(CK.ay||x.ay))}" autocomplete="off"></label></div>
     <div class="ckx" id="ckX">${sv.rate?(C.n?'ارزش: <b>'+fmt(C.amount)+'</b> تومان · هر گرم '+fmt(C.pg):'وزن را بزنید'):'اول مظنه یا نرخ گرم را بالای سند بزنید'}</div>`}
-  const T=(ckOut()?CKO:CKT).find(z=>z[0]===m);
-  const ok=!((m==='dep'||m==='cust')&&!CK.sel||m==='hav'&&!CK.pk);/* v80.9 (خواسته صاحب اپ): «افزودن» در سرتیتر همان فرم، کنار انصراف (نه دکمه بزرگ پایین) */
-  return `<div class="ckfm"><div class="ckfh"><b>${ic(T[2])} ${T[1]}</b><span class="ckfa"><button class="lnk" data-act="ckM" data-m="">انصراف</button>${ok?`<button type="button" class="ckok" data-act="ckAdd">${ic('check')} افزودن</button>`:''}</span></div>${b}${ok?stPhHTML(CK):''}</div>`}
+  const ok=ckFormOk();
+  return `<div class="ckfm ckf2">${b}${ok?stPhHTML(CK):''}</div>`}
+const ckFormOk=()=>{const m=CK.m;return !((m==='dep'||m==='cust'&&ckOut())&&!CK.sel||(m==='hav'||m==='pos')&&(CK.pl||!ckBkL().length))};
+ACT.ckAll=()=>{ckRead();CK.pl=1;CK.sq='';ckRe('ckS')};
+ACT.ckAmt=d=>{const A=$('ckA');if(!A)return;A.value=(+d.v).toLocaleString('en-US');CK.amount=+d.v;if(A.oninput)A.oninput();const h=A.closest('.ckbig');if(h&&!RM()&&h.animate)h.animate([{transform:'scale(1.03)'},{transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'})};
 function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),wp=c&&sv.edit&&typeof wdPend==='function'?wdPend(c,sv.edit.no):0,R=ckRows(),A=ckAcct(),tg=ckTg(),gw=ckGold(),TL={p:'مانده قبلی',d:A?'این سند':'مانده این سند',f:'مانده نهایی'}[tg];
   /* ریز مانده‌ها (قبلی · سند · نهایی، مبلغ و طلا)؛ خانه انتخاب‌شده پررنگ و با زدن هر خانه هدف تسویه عوض می‌شود */
   const L=svBalL(),gr=L.find(z=>z[0]==='g'),rr=L.find(z=>z[0]==='r')||['r',0,0,0],ln=(k,v)=>`<span class="${ftCls(v)}${k==='r'?' r':''}"><b>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i></span>`;
   const mini=c?`<div class="ckbl">${[['p','قبلی',1],['d','سند',2],['f','نهایی',3]].map(([w,l,ix])=>`<button type="button" class="ckbc${tg===w?' on':''}" data-act="ckTg" data-w="${w}"><small>${l}</small>${ln('r',rr[ix])}${gr?ln('g',gr[ix]):''}</button>`).join('')}</div>`:'';
+  if(CK.m&&CK.m!=='bfix'){const Tm=(ckOut()?CKO:CKT).find(z=>z[0]===CK.m)||['','',''],ok=ckFormOk();
+    return `<div class="ckw ckfo"><div class="sh-h"><button type="button" class="shbk" data-act="ckM" data-m="" aria-label="برگشت به تسویه">${ic('back')}</button><div><b>${Tm[1]}</b><small class="shsub">${esc(c?cuName(c):'')}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+    <div class="ckrm ${r>0?'d':r<0?'c':'z'}"><small>${TL} · ${r>0?'طلبکاریم':r<0?'بدهکاریم':'تسویه'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b></div>
+    ${ckForm()}${ok?`<button class="xgo" data-act="ckAdd">${ic('check')} افزودن</button>`:''}</div>`}
   return `<div class="ckw"><div class="sh-h"><div><b>${tg==='d'&&!A?'تسویه سند':tg==='p'?'تسویه مانده قبلی':'تسویه حساب'}</b><small class="shsub">${esc(c?cuName(c):'')}${r<0?' · مانده را به مشتری می‌پردازیم':''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   ${mini}<div class="ckh ${r>0?'d':r<0?'c':'z'}${wp&&r&&wp>=Math.abs(r)-1?' w':''}"><small>${r?(wp&&wp>=Math.abs(r)-1?'رفت برای واریز · در انتظار تأیید بانک':TL+' · '+(r>0?'طلبکاریم':'بدهکاریم')):TL+' تسویه است ✓'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b><em>${tg==='d'&&!A?'جمع سند '+fmt(Math.abs(T.total)):'جمع این سند '+fmt(Math.abs(T.total))}${T.paid?(T.paid<0?' · پرداخت‌شده ':' · دریافت‌شده ')+fmt(Math.abs(T.paid)):''}${gr&&gr[3]?' · طلا '+wFmt(Math.abs(gr[3]))+' گرم '+ourLab(gr[3]):''}</em></div>
   ${wdCkHTML()}
@@ -111,8 +124,8 @@ ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حس�
   const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
   ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m==='bfix'?'bfT':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
-ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';ckRe('ckA')};
-ACT.ckSrcX=()=>{ckRead();CK.pk=0;ckRe('ckS')};
+ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;ckRe('ckA')};
+ACT.ckSrcX=()=>{ckRead();CK.pl=1;ckRe('ckS')};
 ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('ckQ');return}CK.sel={k:d.k,id:d.id};
   const av=d.k==='cu'?(()=>{const c=CU().find(z=>String(z.id)===String(d.id));const o=c&&oweAccts('').find(z=>String(z.c.id)===String(c.id));return o?o.a:0})():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();
   CK.amount=ckOut()?ckLeft():Math.max(0,Math.min(ckLeft()||av,av));ckRe('ckA')};

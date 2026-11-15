@@ -45,13 +45,19 @@ const bkClr=c=>{const b=bkOfCu(c),k=b&&(BKC[b]?b:Object.keys(BKC).find(n=>canon(
 function bfxRes(){const c=custs.find(z=>String(z.id)===String(BFX.cu));const z=bfxZ(bkCuBal(c),BFX.bt,BFX.bp,BFX.neg);
   if(!z.ok)return `<div class="bf3d n"><span class="bf3di">${ic('edit')}</span><span class="tx"><b>موجودی بانک را بزنید</b><small>اختلاف خودش حساب می‌شود</small></span></div>`;
   if(!z.d)return `<div class="bf3d ok"><span class="bf3di">${ic('check')}</span><span class="tx"><b>برنامه با بانک یکی است</b><small>${z.p?'فقط کارتخوان سند می‌خورد · مانده '+bfxMv(z.F):'سندی لازم نیست'}</small></span></div>`;
-  return `<div class="bf3d ${z.d>0?'r':'b'}"><span class="bf3di">${ic(z.d>0?'dIn':'dOut')}</span><span class="tx"><b>${z.d>0?'کسر':'اضافه'} · اصلاح حساب</b><small>مانده بعد از سند${z.p?'ها':''} ${bfxMv(z.F)}</small></span><em data-v="${Math.abs(z.d)}">${z.d>0?'+':'−'}${fmt(Math.abs(z.d))}</em></div>`}
+  /* v91.2 (خواسته صاحب اپ: «کادرهای اصلاح حساب درست نیست»): به زبان خود بانک — موجودی واقعی کمتر است = «از موجودی کم می‌شود» (قرمز، −)، بیشتر = «به موجودی اضافه می‌شود» (سبز، +).
+     قبلاً نام ردیف سند («کسر/اضافه») نوشته می‌شد که برعکسِ حس کاربر بود (موجودی کم می‌شد ولی «اضافه» می‌نوشت) */
+  return `<div class="bf3d ${z.d>0?'g':'r'}"><span class="bf3di">${ic(z.d>0?'dIn':'dOut')}</span><span class="tx"><b>${z.d>0?'به موجودی اضافه می‌شود':'از موجودی کم می‌شود'}</b><small>سند اصلاح حساب · مانده بعد از سند${z.p?'ها':''} ${bfxMv(z.F)}</small></span><em data-v="${Math.abs(z.d)}">${z.d>0?'+':'−'}${fmt(Math.abs(z.d))}</em></div>`}
+/* نوار کوچک بانک (لوگو، نام، مانده در برنامه) بالای پنجره‌های اصلاح موجودی و کارتخوان */
+const bkStrip=(c,cur)=>`<div class="bf4b" style="--bk:${bkClr(c)}">${bkAvH(c)||`<span class="ckbi">${ic('bank')}</span>`}<span class="tx"><b>${esc(cuName(c))}</b><small>مانده در برنامه</small></span><b class="bf4v ${cur>0?'r':cur<0?'b':'z'}">${cur<0?'−':''}${fmt(Math.abs(cur))}<i>تومان</i></b></div>`;
 function bfxHTML(){const c=custs.find(z=>String(z.id)===String(BFX.cu));if(!c)return '';const cur=bkCuBal(c),v=x=>x?Number(x).toLocaleString('en-US'):'';
-  return `<div class="sh-h"><div><b>اصلاح موجودی</b><small class="shsub">موجودی واقعی را با برنامه یکی کنید</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="bf3">
-  ${bkInCard(c,{label:'موجودی واقعی بانک',id:'bxT',val:v(BFX.bt),ph:fmt(Math.abs(cur)),cur,top:`<div class="bkis" role="tablist"><button type="button" class="${BFX.neg?'':'on'}" data-act="bfxSNeg" data-v="0">مثبت</button><button type="button" class="${BFX.neg?'on':''}" data-act="bfxSNeg" data-v="1">منفی</button></div>`,neg:BFX.neg})}
+  return `<div class="sh-h"><div><b>اصلاح موجودی</b><small class="shsub">موجودی واقعی بانک را بزنید؛ اختلاف خودش سند می‌خورد</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="bf3 bf4">${bkStrip(c,cur)}
+  <div class="ckcl">موجودی واقعی بانک الان چقدر است؟</div>
+  <div class="ckbg"><label class="ckbig${BFX.neg?' ng':''}">${BFX.neg?'<em>−</em>':''}<input id="bxT" class="ltr" inputmode="numeric" value="${v(BFX.bt)}" placeholder="${fmt(Math.abs(cur))}" autocomplete="off" enterkeyhint="done" aria-label="موجودی واقعی بانک"><i>تومان</i></label>
+  <div class="ckq"><button type="button" class="${BFX.neg?'on':''}" data-act="bfxSNeg">${BFX.neg?ic('check')+' موجودی منفی است':'موجودی بانک منفی است؟'}</button></div></div>
   <div id="bxL">${bfxRes()}</div>
-  ${BFX.pos?`<label class="bf3p"><span class="bf3pi">${ic('card')}</span><span class="tx"><b>کارتخوان امروز</b><small>هنوز به بانک ننشسته · سند جدا</small></span><input id="bxP" class="ltr" inputmode="numeric" value="${v(BFX.bp)}" placeholder="0" autocomplete="off" enterkeyhint="done"></label>`:`<button type="button" class="bf3c" data-act="bfxPos">${ic('card')} افزودن کارتخوان امروز</button>`}
+  ${BFX.pos?`<div class="ckcl">کارتخوان امروز <i>هنوز به بانک ننشسته · سند جدا</i></div><div class="ckbg"><label class="ckbig gn"><input id="bxP" class="ltr" inputmode="numeric" value="${v(BFX.bp)}" placeholder="0" autocomplete="off" enterkeyhint="done" aria-label="کارتخوان امروز"><i>تومان</i></label></div>`:`<button type="button" class="bf3c" data-act="bfxPos">${ic('card')} افزودن کارتخوان امروز</button>`}
   <button type="button" class="xgo" data-act="bfxSave">${ic('check')} ثبت</button></div>`}
 function bfxSRead(){const T=$('bxT'),P=$('bxP');if(T)BFX.bt=T.value.trim()===''?'':num(T.value);if(P)BFX.bp=num(P.value)||''}
 function bfxSBind(f){const T=$('bxT'),P=$('bxP');if(!T)return;phPaint($('sheet'));[T,P].filter(Boolean).forEach(e=>{selOnFocus(e);e.oninput=()=>{const n=num(e.value);e.value=n?n.toLocaleString('en-US'):e===T&&/\d/.test(e.value)?'0':'';bfxSRead();const L=$('bxL');if(L){if(typeof numMorph==='function')numMorph('#bxL em',()=>{L.innerHTML=bfxRes()});else L.innerHTML=bfxRes()}};e.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();e.blur()}}});
@@ -73,10 +79,10 @@ function bkRowCls(t,d,bk){if(bk!==false&&t.type==='inv'){const P=(t.pays||[]).fi
 /* v85.9 سند کارتخوان مستقیم از صفحه حساب بانک: مبلغ (+ شرح اختیاری) → یک سند با ردیف bkx bpos (موجودی بانک زیاد) */
 let BPS=null;
 function bpsHTML(){const c=custs.find(z=>String(z.id)===String(BPS.cu));if(!c)return '';const cur=bkCuBal(c),a=+BPS.a||0,v=x=>x?Number(x).toLocaleString('en-US'):'';
-  return `<div class="sh-h"><div><b>سند کارتخوان</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="bf3">
-  ${bkInCard(c,{label:'مبلغ کارتخوان',id:'bpA',val:v(BPS.a),ph:'0',cur,top:`<span class="bkip">${ic('card')} کارتخوان</span>`,plus:1})}
-  <label class="bpsn"><span>${ic('edit')}</span><input id="bpN" value="${esc(BPS.why||'')}" placeholder="شرح (اختیاری): شماره پایانه، تاریخ تراکنش…" autocomplete="off" enterkeyhint="done"></label>
+  return `<div class="sh-h"><div><b>سند کارتخوان</b><small class="shsub">مبلغی که کارتخوان به این حساب نشانده</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="bf3 bf4">${bkStrip(c,cur)}
+  <div class="ckbg"><label class="ckbig gn"><input id="bpA" class="ltr" inputmode="numeric" value="${v(BPS.a)}" placeholder="مبلغ کارتخوان" autocomplete="off" enterkeyhint="next" aria-label="مبلغ کارتخوان"><i>تومان</i></label></div>
+  <label class="ckf ckf1"><small>شرح <i>(اختیاری)</i></small><input id="bpN" value="${esc(BPS.why||'')}" placeholder="شماره پایانه، تاریخ…" autocomplete="off" enterkeyhint="done"></label>
   <div id="bpL">${bpsRes(cur,a)}</div>
   <button type="button" class="xgo" data-act="bpsSave">${ic('check')} ثبت</button></div>`}
 const bpsRes=(cur,a)=>a?`<div class="bf3d g"><span class="bf3di">${ic('dIn')}</span><span class="tx"><b>به موجودی اضافه می‌شود</b><small>مانده بعد از سند ${bfxMv(cur+a)}</small></span><em>+${fmt(a)}</em></div>`:`<div class="bf3d n"><span class="bf3di">${ic('card')}</span><span class="tx"><b>مبلغ کارتخوان را بزنید</b><small>مانده فعلی ${bfxMv(cur)} تومان</small></span></div>`;
