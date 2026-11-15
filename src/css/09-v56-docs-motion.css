@@ -4520,3 +4520,6 @@ html.iosbr #sheet{--sbp:calc(6px + env(safe-area-inset-bottom,0px))}
 #sheet .stsug.ckl .stsr .ckv{flex:none;display:flex;flex-direction:column;align-items:flex-end;padding:4px 10px;border-radius:12px;background:color-mix(in srgb,var(--blu) 9%,var(--card))}#sheet .stsug.ckl .stsr .ckv b{color:var(--blu);font-size:14px;font-weight:900}#sheet .stsug.ckl .stsr .ckv small{color:var(--blu);font-size:10px;font-weight:800}
 #sheet .ckw.ckfo .stsel{margin:0 5px 10px;border-radius:18px;box-shadow:inset 0 0 0 2px var(--blu);background:color-mix(in srgb,var(--blu) 6%,var(--card))}
 .ckpad.pos .ckk{min-height:44px}.ckpad.pos{gap:6px}.posdev .ckpf{gap:6px}.posscr{margin-bottom:10px}
+/* v91.4 (خواسته صاحب اپ): ردیف سندِ بی‌اثر/تسویه‌شده در گردش حساب هم همان قاب گرد ردیف‌های رنگی را دارد (قبلاً مستطیل خاکستری بود) */
+.txr.tz{border-radius:16px!important;box-shadow:inset 0 0 0 1.5px var(--line)!important;background:var(--card)!important}
+.fcard>.swr:has(>.swc>.txr.tz),.fcard .swr:has(.txr.tz){border-radius:16px!important;overflow:hidden;background:transparent!important}
