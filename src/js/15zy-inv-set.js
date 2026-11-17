@@ -31,12 +31,14 @@ function ivSecHTML(){const S=IS.W[IS.p],k=IS.sec,pn=INVP.find(x=>x[0]===IS.p)[1]
     +ivRow('متن عنوان','«خودکار» از روی خود سند: فاکتور فروش، فاکتور خرید، رسید دریافت…',`<div class="ivch"><button type="button" class="${S.ttl?'':'on'}" data-act="ivTtl" data-v="">خودکار</button>${IVTTL.map(x=>`<button type="button" class="${S.ttl===x?'on':''}" data-act="ivTtl" data-v="${x}">${x}</button>`).join('')}</div><input class="ivin" id="ivTt" value="${esc(IVTTL.includes(S.ttl)?'':S.ttl)}" placeholder="یا متن دلخواه (با خط ساده نوشته می‌شود)" maxlength="28" autocomplete="off" enterkeyhint="done">`,'col')
     +ivSw('cn','شماره سند مشتری','زیر شماره، شماره سند همین مشتری هم نوشته شود')+ivSw('wd','روز هفته کنار تاریخ','');
   else if(k==='cust')h=ivSw('ph','تلفن مشتری','')+ivSw('cno','شماره مشتری','')+ivSw('nid','کد ملی مشتری','اگر در حساب مشتری ثبت شده باشد')+ivSw('mz','مظنه روز','')+ivSw('g18','قیمت هر گرم ۱۸ عیار','');
-  else if(k==='cols')h=`<div class="ivnote">«خودکار» یعنی ستون فقط وقتی می‌آید که در همان فاکتور چیزی برای نشان دادن دارد. ردیف، شرح و مبلغ همیشه هستند.</div>`+INVCOL.map(([f,l])=>ivRow(f==='rt'&&S.rt==='g'?'فی هر گرم':l,IVCH[f],ivSeg('c'+f,AYN))).join('')
-    +`</div><div class="ivh">شکل نوشتن اجرت، سود و نرخ</div><div class="ivk">`+ivPick('aj','اجرت','«درصد و مبلغ زیرش»: بالا همان درصدِ واردشده و زیرش مبلغ تومانی اجرت',[['p','همان که وارد شده'],['t','فقط مبلغ تومانی'],['b','درصد و مبلغ زیرش']])
-    +ivPick('pp','سود','',[['p','درصد'],['t','فقط مبلغ تومانی'],['b','درصد و مبلغ زیرش']])+ivPick('rt','ستون نرخ','',[['m','مظنه'],['g','فی هر گرم']]);
+  /* v91.5 (خواسته صاحب اپ: «برای هر قسمت تیک باشد یا نباشد؛ فقط درصد هم باشد»): هر ستون یک کارت با کلید روشن/خاموش؛ روشن = «خودکار/همیشه» و
+     برای اجرت و سود شکل نوشتن (فقط درصد، فقط مبلغ، درصد و مبلغ زیرش) همان‌جا زیر خودش */
+  else if(k==='cols')h=`<div class="ivnote">ردیف، شرح و مبلغ همیشه هستند. «خودکار» یعنی ستون فقط وقتی می‌آید که در همان فاکتور چیزی برای نشان دادن دارد.</div>`+INVCOL.map(([f,l])=>{const on=S['c'+f]!=='n',T=f==='rt'&&S.rt==='g'?'فی هر گرم':l;
+      const fm=f==='aj'?[['p','همان که وارد شده'],['o','فقط درصد'],['t','فقط مبلغ'],['b','درصد + مبلغ زیرش']]:f==='pp'?[['p','درصد'],['o','فقط درصد (همیشه)'],['t','فقط مبلغ'],['b','درصد + مبلغ زیرش']]:f==='rt'?[['m','مظنه'],['g','فی هر گرم']]:null;
+      return `<div class="ivcc${on?' on':''}"><div class="ivr"><span class="tx"><b>${T}</b><small>${IVCH[f]||''}</small></span><button type="button" class="ivsw${on?' on':''}" role="switch" aria-checked="${on}" data-act="ivCol" data-f="${f}" aria-label="${esc(T)}"><i></i></button></div>${on?`<div class="ivcs">${ivSeg('c'+f,[['a','خودکار'],['y','همیشه']])}${fm?`<small class="ivcl">شکل نوشتن</small>${ivSeg(f==='rt'?'rt':f,fm)}`:''}</div>`:''}</div>`}).join('');
   else if(k==='rows')h=ivRow('ارتفاع ردیف','ردیف‌های دوخطی (درصد و مبلغ) خودشان بلندتر می‌شوند',`<div class="ivst"><button type="button" data-act="ivN" data-k="rh" data-d="-0.2" aria-label="کمتر">−</button><b>${toFa(S.rh.toFixed(1))} <small>میلی‌متر</small></b><button type="button" data-act="ivN" data-k="rh" data-d="0.2" aria-label="بیشتر">+</button></div>`)
     +ivPick('fs','اندازه نوشته جدول','',[[-1,'ریز'],[0,'معمولی'],[1,'درشت'],[2,'خیلی درشت']])
-    +ivPick('cap','نوار عنوان گروه‌ها','فروش به مشتری، خرید از مشتری، دریافت، پرداخت. خودکار = وقتی بیش از یک گروه هست',AYN)+ivSw('sum','جمع هر گروه','روی نوار گروهی که دو ردیف مبلغ‌دار یا بیشتر دارد')
+    +ivPick('cap','نوار عنوان گروه‌ها','فروش به مشتری، خرید از مشتری، دریافت، پرداخت. خودکار = وقتی بیش از یک گروه هست',AYN)+ivSw('sum','جمع هر گروه','در یک کادر زیر آخرین ردیف همان گروه: جمع وزن طلا و جمع مبلغ (وقتی دو ردیف یا بیشتر دارد)')
     +ivSw('ex','جزئیات کنار نام کالا','توضیح ردیف، شرطی، آزمایشگاه و انگ (اگر ستون جدا ندارند)، معادل ۷۵۰')
     +ivPick('py','دریافت و پرداخت‌ها','',[[1,'هر کدام یک ردیف'],[0,'یک ردیف جمع']])+ivSw('tn','شماره پیگیری حواله','')
     +ivPick('fill','فضای خالی زیر ردیف‌ها','',[['b','ساده'],['l','ادامه خط ستون‌ها'],['r','ردیف‌های خالی']]);
@@ -89,4 +91,7 @@ ACT.ivReset=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm(
 ACT.ivCopy=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('همه تنظیمات «'+pn+'» روی سه قالب دیگر هم گذاشته شود؟\nستون‌ها، ردیف‌ها، مانده حساب، سربرگ و پانویس آن‌ها جایگزین می‌شود.','کپی کن',()=>{INVP.forEach(([k])=>{if(k!==IS.p)IS.W[k]={...IS.W[IS.p]}});ivRe({keep:1,noPrev:1});toast('روی همه قالب‌ها گذاشته شد؛ برای ماندگار شدن «ذخیره» را بزنید')})};
 ACT.ivSave=()=>{if(!IS||!isAdmin())return;if(!ivDirty()){toast('چیزی عوض نشده است');return}const r=cfgRec(1),inv={};
   INVP.forEach(([k])=>{const base=invClean({...INVD,...(INVT[k]||{})}),c2=invClean(IS.W[k]),o={};for(const q in c2)if(c2[q]!==base[q])o[q]=c2[q];inv[k]=o});
-  r.inv=inv;r.shop={nm:IS.shop.nm,ad:IS.shop.ad,tel:IS.shop.tel,ig:IS.shop.ig};saveCu();IS.sig0=ivSig();hdGoSync();toast('تنظیمات فاکتور ذخیره شد')};
+  r.inv=inv;r.shop={nm:IS.shop.nm,ad:IS.shop.ad,tel:IS.shop.tel,ig:IS.shop.ig};saveCu();IS.sig0=ivSig();logA('cust','تنظیمات فاکتور','قالب‌های فاکتور ذخیره شد');toast('تنظیمات فاکتور ذخیره شد');
+  /* v91.5 (خواسته صاحب اپ: «ذخیره که خورد انیمیشن درست انجام شود، ذخیره شود و بیرون بیاید»): «✓ ذخیره شد» روی خود دکمه، بعد برگشت به تنظیمات */
+  setTimeout(()=>{if(cur==='invset'&&!ivDirty())leaveTo()},850)};
+ACT.ivCol=d=>{if(!IS)return;const S=IS.W[IS.p],k='c'+d.f;S[k]=S[k]==='n'?'a':'n';IS.W[IS.p]=invClean(S);ivRe()};

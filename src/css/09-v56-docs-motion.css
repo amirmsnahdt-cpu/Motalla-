@@ -4597,3 +4597,15 @@ html.iosbr #sheet:has(>.ckw.ckfo.fix){padding-bottom:calc(70px + env(safe-area-i
  .posdev{margin-top:12px!important;padding:10px 10px 12px!important}.posdev .posh{margin-top:24px;padding:2px 4px 6px!important}.posh .tx small{display:none}.posh .bkb,.posh img,.posh .ckbi{width:28px!important;height:28px!important;min-width:28px!important}
  .posscr{padding:5px 10px 6px!important;margin-bottom:8px!important}.posl{display:none!important}#sheet .posv input{font-size:28px!important;min-height:36px}.posdev .ckpad.pos{gap:6px}.posdev .ckpad.pos .ckpf{gap:6px}.ckpad.pos .ckk{font-size:19px}.ckpf .ckk{font-size:12.5px}}
 .posdev .ckpad.pos .ckpf .ckk{min-height:0!important}.posdev .ckpad.pos{grid-template-rows:repeat(5,minmax(34px,1fr))}
+/* ===== v91.5 صفحه «تنظیمات فاکتور» مرتب‌تر: گزینه‌ها می‌شکنند (بریده نمی‌شوند)، هر ستون یک کارت با کلید، رنگ آبی برنامه ===== */
+.ivg{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));border-radius:15px;padding:4px;gap:4px}
+.ivg button{white-space:normal!important;line-height:1.35;min-height:38px;padding:7px 8px!important;font-size:12.5px!important;text-overflow:clip!important}
+.ivg button.on{color:#fff!important;background:var(--blu)!important;box-shadow:0 6px 14px -8px var(--blu)!important}
+.ivk{padding:4px 14px;border-radius:24px;box-shadow:0 0 0 1px var(--line),0 10px 24px -18px #16213a66}
+.ivr .tx b{font-size:14.5px;font-weight:850}.ivr .tx small{line-height:1.6}
+.ivsec{position:relative}.ivsec button{min-height:40px;border-radius:999px!important;padding:0 16px!important;font-weight:850!important;white-space:nowrap}
+.ivcc{margin:10px 0;border-radius:18px;background:color-mix(in srgb,var(--mut) 4%,var(--card));box-shadow:inset 0 0 0 1px var(--line);padding:0 12px;transition:box-shadow .2s,background-color .2s}
+.ivcc .ivr{border-top:0;min-height:58px}.ivcc.on{background:color-mix(in srgb,var(--blu) 5%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent)}
+.ivcc:not(.on) .tx b{color:var(--mut)}
+.ivcs{padding:0 0 12px;display:flex;flex-direction:column;gap:6px;animation:ckRise .3s cubic-bezier(.2,1.1,.3,1) both}.ivcl{font-size:11.5px;font-weight:800;color:var(--mut);margin:4px 2px 0}
+.ivnote{border-radius:16px!important}

@@ -24,7 +24,7 @@ const INVD={paper:'a5',bg:'c',ink:'c',frame:'g',copy:0,
   sgc:1,sgs:1,by:1,th:1,shp:1,note:''};
 /* پیش‌فرض ویژه هر قالب: آبشده اجرت و مالیات ندارد و آزمایشگاه و انگش ستون جدا می‌گیرد */
 const INVT={ab:{clab:'a',cang:'a',caj:'n',ctx:'n'}};
-const INVE={paper:['a5','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','t','b'],pp:['p','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2]};
+const INVE={paper:['a5','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','o','t','b'],pp:['p','o','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2]};
 const INVCOL=[['w','وزن / تعداد'],['ay','عیار'],['w7','وزن ۷۵۰'],['lab','آزمایشگاه'],['ang','انگ'],['rt','نرخ'],['gv','مبلغ طلا'],['aj','اجرت'],['pp','سود'],['tx','مالیات']];
 function invClean(o){const r={};for(const k in INVD){const d=INVD[k],v=o?o[k]:undefined;
     if(INVE[k]||/^c(w|ay|w7|lab|ang|rt|gv|aj|pp|tx)$/.test(k))r[k]=(INVE[k]||['a','y','n']).includes(v)?v:d;
@@ -56,7 +56,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const keys=[...new Set([...Object.keys(P.X),...Object.keys(dX)])].filter(k=>Math.round(((P.X[k]||0)+(+dX[k]||0))*100)||+dX[k]||P.X[k]).sort((a,b)=>ko(a)-ko(b));
   const PG=pvGroups(pays,xs),g0=x=>x.a==='gold',un=x=>g0(x)?'گرم':(XA[x.a]||{}).u||'';
   /* واژه‌های دو طرف حساب: از دید مطلا (طلبکاریم/بدهکاریم) یا از دید مشتری (بدهکار/بستانکار) */
-  const WR=S.wr==='c'?['تسویه','بدهکار','بستانکار']:['تسویه','طلبکاریم','بدهکاریم'],side=v=>!v?WR[0]:v<0?WR[1]:WR[2],cls=v=>v<0?'vd':v>0?'vc':'vz',nm=v=>'<bdi dir="ltr">'+fmt(Math.abs(Math.round(v)))+'</bdi>';
+  const WR=S.wr==='c'?['تسویه','بدهکار','بستانکار']:['تسویه','طلبکاریم','بدهکاریم'],side=v=>!v?WR[0]:v<0?WR[1]:WR[2],cls=v=>v<0?'vd':v>0?'vc':'vz',nm=v=>'<bdi dir="ltr">'+fmt(Math.abs(Math.round(v)))+'</bdi>',pctT=v=>toFa(String(Math.round(v*100)/100))+'٪';
   /* رنگ‌ها: رنگی (کاغذ کرم یا سفید) یا سیاه‌وسفید برای چاپگر لیزری */
   const C=S.ink==='m'?{pa:'#fff',ink:'#000',ln:'#000',gd:'#4d4d4d',gl:'#333',mu:'#666',hr:'#bdbdbd',h2:'#8f8f8f',ti:'#ececec',rd:'#000',bl:'#000',gn:'#000',t2:'#333'}:{pa:S.bg==='w'?'#fff':'#fbf7ee',ink:'#211d18',ln:'#4a4238',gd:'#bf9135',gl:'#8a6a2a',mu:'#8d8376',hr:'#dcd1bb',h2:'#a99c85',ti:'#f4ecd8',rd:'#9b1c31',bl:'#1f3f8f',gn:'#1d6b4a',t2:'#5c544a'};
   /* ---- ردیف‌ها در گروه‌ها: s فروش (کالا و فروش طلا/سکه) · b خرید از مشتری · i دریافت از مشتری (پول، تخفیف، طلا/سکه‌ای که بی‌قیمت گرفته‌ایم) ·
@@ -65,14 +65,15 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
      ردیف بی‌قیمت طلا/سکه به‌جای مبلغ می‌گوید در کدام حساب نشسته است ---- */
   const GR={s:[],b:[],i:[],o:[],p:[],z:[]},XI=[],XO=[],XP=[],r3=v=>Math.round(v*1000)/1000;
   its.forEach(it=>{const J=ajPT(it),ay=+it.ay||750,mz=mzOf2(it),pg=Math.round(mz/MZK*ay/750),ajE=[J.P?toFa(String(J.P))+'٪':'',J.T?fmt(J.T):''].filter(Boolean).join(' + '),ppE=+it.pp&&!(+it.amT>0)?toFa(String(+it.pp))+'٪':'',w7=r3((+it.w||0)*ay/750);
-    GR.s.push({n:esc(it.k),e:[it.sh===1?'شرطی':'',it.n&&typeof it.n==='string'?esc(it.n):''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
+    GR.s.push({wv:+it.w||0,n:esc(it.k),e:[it.sh===1?'شرطی':'',it.n&&typeof it.n==='string'?esc(it.n):''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
       c:{w:[wFmt(it.w)+' <u>گرم</u>'],ay:[toFa(ay)],w7:[wFmt(w7)],rt:[fmt(S.rt==='g'?pg:mz)],gv:[+it.gold?fmt(it.gold):''],
-        aj:!ajE&&!+it.ajv?['']:S.aj==='t'?[+it.ajv?fmt(it.ajv):'']:S.aj==='b'&&J.P&&+it.ajv?[ajE,fmt(it.ajv)]:[ajE],
-        pp:!ppE?[+it.prv?fmt(it.prv):'']:S.pp==='t'?[+it.prv?fmt(it.prv):'']:S.pp==='b'&&+it.prv?[ppE,fmt(it.prv)]:[ppE],tx:[+it.taxv?fmt(it.taxv):'']}})});
+        /* v91.5 (خواسته صاحب اپ): «فقط درصد» — اگر اجرت/سود تومانی وارد شده، درصدش از روی مبلغ طلا حساب می‌شود */
+        aj:!ajE&&!+it.ajv?['']:S.aj==='o'?[+it.gold&&+it.ajv?pctT(it.ajv/it.gold*100):ajE]:S.aj==='t'?[+it.ajv?fmt(it.ajv):'']:S.aj==='b'&&J.P&&+it.ajv?[ajE,fmt(it.ajv)]:[ajE],
+        pp:S.pp==='o'?[+it.prv&&(+it.gold+(+it.ajv||0))?pctT(it.prv/((+it.gold)+(+it.ajv||0))*100):'']:!ppE?[+it.prv?fmt(it.prv):'']:S.pp==='t'?[+it.prv?fmt(it.prv):'']:S.pp==='b'&&+it.prv?[ppE,fmt(it.prv)]:[ppE],tx:[+it.taxv?fmt(it.taxv):'']}})});
   xs.forEach((x,xi)=>{const g=g0(x),m=x.t==='sell'||x.t==='buy',u=un(x),q=g?(x.n!=null?x.n:x.w):(x.n!=null?x.n:x.q),ay=+x.ay||750,bm=x.t==='buy'&&!x.pul&&x.cat!=='آبشده',rvM=g&&m?(bm?Math.round(mzOf2(x)*ay/750):mzOf2(x)):m&&x.pg?+x.pg:0,rv=S.rt==='g'?(m&&x.pg?+x.pg:0):rvM,pv=PG.sx.has(xi),sd=x.t==='out'?-1:1;
     /* ردیفی که به حساب طلا/سکه می‌نشیند (دریافت/تحویل بی‌قیمت یا «پولی»): کنار نامش گفته می‌شود؛ طلای غیر ۷۵۰ با معادل ۷۵۰ که همان عددِ جدول «حساب مشتری» است */
     const acc='در حساب '+(g?'طلا':(XA[x.a]||{}).k==='c'?'سکه':esc((XA[x.a]||{s:x.a}).s)),w7=g?(x.q750!=null?+x.q750:r3((+q||0)*ay/750)):0,w7d=g&&Math.abs(w7-(+q||0))>.0005;
-    (pv?XP:x.t==='sell'?GR.s:x.t==='buy'?GR.b:x.t==='in'?XI:XO).push({n:esc(nl(xrLab(x))),sdw:pv?sd:0,e:pv?[]:[x.sh===1?'شرطی':'',x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',m&&x.pul?acc:''],lab:x.lab?esc(x.lab):'',ang:x.ang?esc(toFa(x.ang)):'',w7d,eq:w7d&&(x.pul||!m)?'معادل '+wFmt(w7)+' گرم ۷۵۰':'',rv,
+    (pv?XP:x.t==='sell'?GR.s:x.t==='buy'?GR.b:x.t==='in'?XI:XO).push({wv:g?+q||0:0,n:esc(nl(xrLab(x))),sdw:pv?sd:0,e:pv?[]:[x.sh===1?'شرطی':'',x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',m&&x.pul?acc:''],lab:x.lab?esc(x.lab):'',ang:x.ang?esc(toFa(x.ang)):'',w7d,eq:w7d&&(x.pul||!m)?'معادل '+wFmt(w7)+' گرم ۷۵۰':'',rv,
       c:{w:[(g?wFmt(q):qFmt(q))+' <u>'+esc(u)+'</u>'],ay:[g?toFa(ay):''],w7:[g?wFmt(w7):''],rt:[rv?fmt(rv):''],gv:[''],aj:[''],pp:[''],tx:['']},am:m?nm(x.amount):acc,av:m?+x.amount||0:0,dl:!m})});
   let inS=0,outS=0,pvS=0,offR=0;const PY={i:[],o:[]};
   pays.forEach((p,pi)=>{const a=pAmt(p);if(!a)return;if(PG.sp.has(pi)){pvS+=a;GR.p.push({n:esc(nl(pyLab(p,1))),sdw:a,e:[],am:nm(a)});return}
@@ -122,7 +123,9 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const cell=(r,f)=>{const v=r.c[f]||[];return v[1]?`<span class="d"${cs(f)}><b>${v[0]}</b><i>${v[1]}</i></span>`:`<span${cs(f)}>${v[0]||''}</span>`};
   const row=(r,i,pre)=>`<div class="r${r.two?' t2':''}"><span class="k">${toFa(i+1)}</span><span class="nm${r.two&&r.x?' d':''}"><b>${pre||''}${r.n}</b>${r.x?` <i>${r.x}</i>`:''}</span>${r.full?UC.map(f=>cell(r,f)).join(''):''}<span class="am${r.dl?' dl':''}">${r.am}</span></div>`;
   const DIA='<svg class="dia" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" width="1.7mm" height="1.7mm"><path d="M5 0L10 5L5 10L0 5Z"/></svg>';
-  const capR=(tx,sm)=>`<div class="r cp"><span class="ct">${DIA}${tx}</span>${sm?`<span class="cs">جمع</span><span class="am">${nm(sm)}</span>`:''}</div>`,headR=`<div class="r h"><span class="k">ردیف</span><span class="nm">شرح</span>${UC.map(f=>`<span${cs(f)}>${HN[f]}</span>`).join('')}<span class="am">مبلغ (تومان)</span></div>`;
+  const capR=tx=>`<div class="r cp"><span class="ct">${DIA}${tx}</span></div>`;
+  /* v91.5 (خواسته صاحب اپ: «جمع وزن و مبلغ هر قسمت زیر ردیف‌ها که تمام می‌شود، در یک کادر»): ردیف جمع در پایان هر گروه — وزن طلا در ستون وزن، مبلغ در ستون مبلغ */
+  const SMH=+(RH+.8).toFixed(1),smR=(k,lab)=>{const L=GR[k],w=Math.round(L.reduce((a,r)=>a+(r.wv||0),0)*1000)/1000;return `<div class="r sm"><span class="k"></span><span class="nm"><b>جمع ${lab}</b></span>${UC.map(f=>`<span${cs(f)}>${f==='w'&&w?wFmt(w)+' <u>گرم</u>':''}</span>`).join('')}<span class="am">${nm(sum(k))}</span></div>`},headR=`<div class="r h"><span class="k">ردیف</span><span class="nm">شرح</span>${UC.map(f=>`<span${cs(f)}>${HN[f]}</span>`).join('')}<span class="am">مبلغ (تومان)</span></div>`;
   /* فضای خالی زیر ردیف‌ها: ساده / ادامه خط ستون‌ها / ردیف‌های خالی خط‌کشی‌شده (شکل فرم) */
   const ecell=`<span class="k"></span><span class="nm"></span>${UC.map(f=>`<span${cs(f)}></span>`).join('')}<span class="am"></span>`;
   const fillR=h=>{if(h<=.05)return '';if(S.fill==='l')return `<div class="r fl" style="height:${h.toFixed(2)}mm">${ecell}</div>`;if(S.fill==='r')return `<div class="r er">${ecell}</div>`.repeat(Math.round(h/RH));return `<div class="fl" style="height:${h.toFixed(2)}mm"></div>`};
@@ -146,11 +149,12 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const shop=(cfgRec()||{}).shop||{},shopL=[[shop.nm],[shop.ad],[shop.tel&&toFa(shop.tel),1],[shop.ig,1]].map(([v,l])=>[clean(v||''),l]).filter(x=>x[0]).map(([v,l])=>l?'<bdi dir="ltr">'+esc(v)+'</bdi>':esc(v)).join('<s>·</s>');
   const calOK=S.cal&&TTL.length>0&&TTL.every(w=>INVCAL[w]),HDH=S.lp!=='n'||calOK?17:13.4,FTH=S.th?10.4:S.sgc||S.sgs||S.shp?5.6:0,NL=S.note?(tw(S.note)*.74>176?2:1):0,NTH=NL?NL*3.4+.8:0,ZN=+(117.2-HDH-(FTH?1.2+FTH:0)-NTH).toFixed(2);
   /* ---- چیدن برگه‌ها: نوار و اولین ردیفش از هم جدا نمی‌شوند؛ ردیف آخر باید با «حساب مشتری» در یک برگه جا شود ---- */
-  const LNS=[];let rn=0;GM.forEach(([k,cap])=>GR[k].forEach((r,i)=>LNS.push({r,i:caps?i:rn++,gi:i,cap:caps?cap:'',pre:!caps&&GM.length>1&&r.py?r.py+' · ':'',sm:S.sum&&'sbio'.includes(k)&&GR[k].filter(y=>y.av).length>1?sum(k):0})));
+  const LNS=[];let rn=0;GM.forEach(([k,cap])=>{GR[k].forEach((r,i)=>LNS.push({r,i:caps?i:rn++,gi:i,cap:caps?cap:'',pre:!caps&&GM.length>1&&r.py?r.py+' · ':''}));if(S.sum&&'sbio'.includes(k)&&GR[k].filter(y=>y.av).length>1)LNS.push({smk:k,lab:{s:'فروش',b:'خرید',i:'دریافت',o:'پرداخت'}[k],cap:caps?cap:''})});
   const SH=[];let cur={H:[],h:HEADH},lastCap='';
-  LNS.forEach((L,k)=>{const rh=L.r.two?RH2:RH,need=(L.cap&&L.cap!==lastCap?CAPH:0)+rh,room=ZN-.4-(k===LNS.length-1?HB:0);
+  LNS.forEach((L,k)=>{if(L.smk){const room=ZN-.4-(k===LNS.length-1?HB:0);if(cur.H.length&&cur.h+SMH>room+.01){SH.push(cur);cur={H:[],h:HEADH};lastCap=''}cur.H.push(smR(L.smk,L.lab));cur.h+=SMH;return}
+    const rh=L.r.two?RH2:RH,need=(L.cap&&L.cap!==lastCap?CAPH:0)+rh,room=ZN-.4-(k===LNS.length-1?HB:0);
     if(cur.H.length&&cur.h+need>room+.01){SH.push(cur);cur={H:[],h:HEADH};lastCap=''}
-    if(L.cap&&L.cap!==lastCap){cur.H.push(capR(L.cap+(L.gi?' (ادامه)':''),L.gi?0:L.sm));cur.h+=CAPH;lastCap=L.cap}
+    if(L.cap&&L.cap!==lastCap){cur.H.push(capR(L.cap+(L.gi?' (ادامه)':'')));cur.h+=CAPH;lastCap=L.cap}
     cur.H.push(row(L.r,L.i,L.pre));cur.h+=rh});
   if(cur.h+HB>ZN-.4+.01&&cur.H.length){SH.push(cur);cur={H:[],h:HEADH}}
   SH.push(cur);const NP=SH.length;
@@ -192,6 +196,8 @@ u,em,i,s{text-decoration:none;font-style:normal}
 .r.cp{height:${CAPH}mm;background:${C.ti}}.r.cp>span{line-height:${+(CAPH-.2).toFixed(2)}mm;border:0}.r.cp .ct{flex:1 1 0;min-width:0;text-align:right;font-size:${z(7)}pt;font-weight:700}.r.cp .cs{font-size:${z(6.2)}pt;font-weight:500;color:${C.mu};padding:0}.r.cp .am{font-size:${z(8.3)}pt;color:${C.gl}}
 .dia{display:inline-block;vertical-align:middle;margin-inline-end:1.6mm;margin-top:-.4mm;fill:${C.gd}}
 .r.fl{border-bottom:0}
+.r.sm{height:${+(SMH-.7).toFixed(2)}mm;border:.3mm solid ${C.gd};border-radius:1.2mm;margin:.3mm .6mm .4mm;background:${C.ti};box-sizing:border-box}.r.sm>span{line-height:${+(SMH-1.5).toFixed(2)}mm;border-color:transparent;font-weight:700}.r.sm .nm b{color:${C.gl};font-size:${z(8)}pt}.r.sm .am{font-size:${z(9.2)}pt;font-weight:800;width:${+(AMW-.9).toFixed(2)}mm}.r.sm .k{width:${+(KW-.9).toFixed(2)}mm}.r.sm u{font-weight:500}
+.r .am{font-variant-numeric:tabular-nums}.r>span{font-variant-numeric:tabular-nums}
 .ac{border-top:.2mm solid ${C.ln};padding-top:.45mm}.a{display:flex;border-top:.15mm solid ${C.hr};font-size:${za(8.4)}pt}.a>span{flex:none;padding:0 1.5mm;white-space:nowrap;overflow:hidden;border-inline-start:.15mm solid ${C.hr}}.a>span:first-child{border-inline-start:0}
 .a .al{flex:1 1 0;min-width:0;text-align:right;text-overflow:ellipsis}.a .al b{font-size:${za(8.4)}pt;font-weight:700}.ac:not(.tp) .a .al b{display:inline-block;min-width:${za(31)}mm}.a .al i{font-size:${za(6.4)}pt;color:${C.mu};margin-inline-start:2.6mm}.a .al u{font-size:${za(6.2)}pt;font-weight:500;color:${C.mu};margin-inline-start:.8mm}
 .a.ah{height:${AH}mm;border-top:.2mm solid ${C.ln};border-bottom:.45mm solid ${C.gd}}.a.ah>span{font-size:${za(6.6)}pt;font-weight:700;color:${C.gl};line-height:${+(AH-.75).toFixed(2)}mm;text-align:center}.a.ah .al{font-size:${za(7)}pt;color:${C.ink};text-align:right}.a.ah u{font-size:${za(6)}pt;font-weight:500;color:${C.mu};margin-inline-start:.6mm}.a.ah+.a{border-top:0}
