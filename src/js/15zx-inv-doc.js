@@ -159,7 +159,9 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
     NBT=[0,1,2].map(j=>Math.max(0,...KD.map(K=>Math.ceil((nW(K.F(K.v[j]),(j===2?9.8:8.9)*fa)+.8)*2)/2)));CWT=NBT.map((n,j)=>Math.max(j===2?31:25,n+SB+GP+3.4));LBT=TBW-RJ.reduce((s,j)=>s+CWT[j],0)};
   acLay();for(let g=0;g<8&&!wide&&LBT<31*Math.max(1,fa)&&fa>.72;g++){fa=Math.round((fa-.06)*100)/100;acLay()}
   /* ستون طلای «حساب مشتری» درست زیر ستون «وزن ۷۵۰» (مثل تومان که زیر مبلغ است): ستون وزن ۷۵۰ به پهنای همان خانه می‌شود اگر برای نام کالا جا بماند */
-  let G7A=0;if(G7&&S.acc&&wide&&UC[UC.length-1]==='w7'){const Kg=KD.find(K=>K.k==='g'),Kr=KD[KD.length-1];if(Kg&&KD[KD.length-2]===Kg){const need=+(Kr.w-AMW+Kg.nb+3.2).toFixed(2),d=need-CW.w7;if(d<=0||NMW-d>=NMIN*Math.min(1,fz)){NMW-=d;CW.w7=need;G7A=1}}}
+  let G7A=0;if(G7&&S.acc&&wide&&UC[UC.length-1]==='w7'){const Kg=KD.find(K=>K.k==='g'),Kr=KD[KD.length-1];if(Kg&&KD[KD.length-2]===Kg){const off=Kr.w-AMW+3.2,need=+(off+Kg.nb).toFixed(2),d=need-CW.w7;
+      if(d>0){if(NMW-d>=NMIN*Math.min(1,fz)){NMW-=d;CW.w7=need;G7A=1}}
+      else{/* ستون وزن ۷۵۰ از خانه مانده پهن‌تر است: جعبه عدد مانده طلا پهن می‌شود تا لبه راستش زیر همان عددها بیفتد */const nb=+(CW.w7-off).toFixed(2),w=Math.max(Kg.w,nb+SB+GP+3.4),lb=LB-(w-Kg.w);if(lb>=36*Math.max(1,fa)){Kg.nb=nb;Kg.w=w;LB=lb;LBX=S.an&&LB>=70*Math.max(1,fa);G7A=1}}}}
   const headR=`<div class="r h"><span class="k">ردیف</span><span class="nm">شرح</span>${UC.map(f=>`<span${cs(f)}>${HN[f]}</span>`).join('')}<span class="am">مبلغ (تومان)</span></div>`,ecell=`<span class="k"></span><span class="nm"></span>${UC.map(f=>`<span${cs(f)}></span>`).join('')}<span class="am"></span>`;
   const za=n=>+(n*fa).toFixed(2);
   const acell=(K,j,w,nb,fin)=>{const v=K.v[j];return `<span class="av${fin?' fn':''}${v?'':' c'}" style="width:${w}mm">${v?`<em class="${cls(v)}">${side(v)}</em><b class="${cls(v)}" style="width:${nb}mm"><bdi dir="ltr">${K.F(v)}</bdi></b>`:fin||(j===1&&K.mv)?`<em class="vz st">${WR[0]}</em>`:'<b class="z">—</b>'}</span>`};
