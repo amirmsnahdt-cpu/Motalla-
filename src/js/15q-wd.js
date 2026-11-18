@@ -85,7 +85,14 @@ function ppBar(p,big){return `<span class="ppb${big?' big':''}" aria-hidden="tru
 /* v88.0 (خواسته صاحب اپ: «فشرده‌تر با همه داده‌ها»): در فهرست فقط یک خط — هر مرحله یک کلمه + عدد به میلیون؛ نوار = لبه پایین کاشی (بدون ارتفاع) */
 const PPL={f:'نرفته',l:'در لیست',a:'تخصیص‌شده'},PPF={l:'در لیست · منتظر تخصیص',a:'تخصیص‌شده · منتظر واریز'},ppM=n=>{n=Math.round(+n||0);return n>=1e6?fmt(Math.round(n/1e5)/10).replace('.','٫')+'م':fmt(n)};
 /* v88.1 (خواسته صاحب اپ: «هنوز کمی گیج‌کننده»): همه مانده در یک مرحله = یک جمله کامل بدون عدد؛ چند مرحله = «عدد + کلمه» در قرص‌های سفید */
-function ppLine(p){const S=PPS.filter(([k])=>p[k]>0);return `<span class="ppl">${S.length===1&&PPF[S[0][1]]?`<span class="${S[0][1]}"><i></i>${PPF[S[0][1]]}</span>`:S.map(([k,c])=>S.length>2?`<span class="${c} n"><i></i>${ppM(p[k])}</span>`:`<span class="${c}">${ppM(p[k])} ${PPL[c]}</span>`).join('')}</span>`}
+/* v91.7 (گزارش صاحب اپ: «بخشی از کلمه تخصیص در کادر نیست»): برچسب‌ها هیچ‌وقت بریده نمی‌شوند — پهنای نوشته (به em، از جدول اندازه‌گیری‌شده قلم) در --n می‌نشیند و
+   قلم با پهنای کاشی (cqi) جمع می‌شود؛ اگر دو برچسب بلند باشند (nl) در کاشی باریک کلمه کوتاه («لیست»، «تخصیص») و در کاشی خیلی باریک فقط نقطه رنگی + عدد می‌ماند */
+const PPSH={f:'نرفته',l:'لیست',a:'تخصیص'},PPE={f:[2.02,2.02],l:[3.5,2.46],a:[5.34,3.43],F:{l:10.45,a:10.57}},ppEm=t=>{let w=0;for(const ch of String(t))w+=/[۰-۹]/.test(ch)?.56:ch===','?.26:ch==='٫'?.45:.62;return w};
+function ppLine(p){const S=PPS.filter(([k])=>p[k]>0),one=S.length===1&&PPF[S[0][1]],f2=v=>(v*1.05).toFixed(2),K=S.length,nn=S.reduce((a,[k])=>a+ppEm(ppM(p[k])),0),fd=K*20+(K-1)*3+2;
+  if(one)return `<span class="ppl" style="--n:${f2(PPE.F[S[0][1]])};--fx:22px"><span class="${S[0][1]}"><i></i>${one}</span></span>`;
+  if(K>2)return `<span class="ppl n3" style="--n:${f2(nn)};--fx:${K*16+(K-1)*3+2}px">${S.map(([k,c])=>`<span class="${c} n"><i></i>${ppM(p[k])}</span>`).join('')}</span>`;
+  const n=nn+S.reduce((a,[k,c])=>a+.27+PPE[c][0],0),ns=nn+S.reduce((a,[k,c])=>a+.27+PPE[c][1],0);
+  return `<span class="ppl${n>11.4?' nl':''}" style="--n:${f2(n)};--ns:${f2(ns)};--nn:${f2(nn)};--fx:${K*12+(K-1)*3+2}px;--fd:${fd}px">${S.map(([k,c])=>`<span class="${c}"><i class="d2"></i>${ppM(p[k])} <b class="lg">${PPL[c]}</b><b class="sh">${PPSH[c]}</b></span>`).join('')}</span>`}
 const PPC={f:'نرفته به لیست',l:'در لیست',a:'تخصیص‌شده'};/* v87.8 (خواسته صاحب اپ: «فضای زیادی نگیرد»): کارت فشرده — یک خط عنوان، نوار، سه خانه کنار هم */
 function ppCard(p,title,extra,cls){return `<div class="ppc${cls?' '+cls:''}"><div class="pph"><b>${title}</b><small>از ${fmt(p.tot)}</small></div>${ppBar(p,1)}<div class="pps">${PPS.map(([k,c])=>`<span class="ppr ${c}${p[k]>0?'':' z'}"><small><i></i>${PPC[c]}</small><b>${p[k]>0?fmt(p[k]):'—'}</b></span>`).join('')}</div>${extra||''}</div>`}
 function wdSumHTML(c,no,tot){const E=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&(no==null||String(e.wd.no)===String(no)));const s=wdSpl(c,no),sent=s.fr+s.al;if(!sent&&!E.length)return '';

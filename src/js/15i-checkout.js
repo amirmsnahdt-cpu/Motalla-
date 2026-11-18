@@ -13,6 +13,30 @@ const ckTg=()=>{const t=CK&&CK.tg;if(!svCu())return 'd';if(ckAcct())return t==='
 function ckPrev(){const r=svBalL().find(z=>z[0]==='r')||['r',0,0,0],Y=sv.pays.reduce((s,p)=>s+pAmt(p),0),G=r[2]-Y;return G&&r[2]&&Math.sign(G)===Math.sign(r[2])?-r[1]:-r[3]}
 const ckRest=()=>{const t=ckTg();return t==='p'?ckPrev():t==='f'?-svRBal():svTot().rest};
 const ckOut=()=>ckRest()<0;
+/* v91.7 (خواسته صاحب اپ: «کارتخوان و بقیه روش‌های تسویه با آیکون‌های انیمیشنی که با دیدنش آدم بفهمد برای چه کاری است»):
+   هر روش یک نقاشی کوچک متحرک دارد (SVG درون‌خطی، حرکت با CSS): کارت که در کارتخوان می‌رود، سکه که به بانک می‌رود یا از آن بیرون می‌آید،
+   سکه بین دو نفر، اسکناس، شمش‌هایی که جابه‌جا می‌شوند، برچسب تخفیف، تومان که طلا می‌شود. o = جهت پرداخت (برعکس) */
+function ckAni(k,o){const G='#d9a21b',G2='#f6d77a',B='#2f6bff',N='#22a45d',S=h=>`<svg class="cka${o?' o':''}" viewBox="0 0 48 48" aria-hidden="true">${h}</svg>`,
+  ing=(x,y,sc)=>`<g transform="translate(${x} ${y}) scale(${sc||1})"><path d="M5 0h12l5 10H0z" fill="${G}"/><path d="M5 0h12l1.6 3.2H3.4z" fill="${G2}"/></g>`,
+  note=(x,y,sc)=>`<g transform="translate(${x} ${y}) scale(${sc||1})"><rect width="22" height="13" rx="2.2" fill="${N}"/><circle cx="11" cy="6.5" r="3.2" fill="#d7f5e3"/><rect x="2.2" y="2.2" width="3" height="1.6" rx=".8" fill="#d7f5e3"/><rect x="16.8" y="9.2" width="3" height="1.6" rx=".8" fill="#d7f5e3"/></g>`,
+  coin=(x,y,r,c)=>`<g class="${c||''}"><circle cx="${x}" cy="${y}" r="${r}" fill="${G}"/><circle cx="${x}" cy="${y}" r="${(r*.6).toFixed(1)}" fill="none" stroke="${G2}" stroke-width="1.3"/></g>`,
+  arr=(d,c)=>`<path class="${c||''}" d="${d}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if(k==='pos')return S(`<g class="a-card"><rect x="14" y="1" width="16" height="13" rx="2.4" fill="${B}"/><rect x="14" y="4" width="16" height="2.6" fill="#16337a"/><rect x="16.5" y="9" width="5" height="2" rx="1" fill="#cfe0ff"/></g>
+    <rect x="9" y="11" width="26" height="35" rx="5.5" fill="#3b4868"/><rect x="9" y="11" width="26" height="5" rx="2.5" fill="#161d30"/><rect x="12.5" y="18.5" width="19" height="9.5" rx="2" fill="#bdf3cd"/><rect class="a-scr" x="15" y="22" width="9" height="2.4" rx="1.2" fill="#1f7a45"/>
+    ${[0,1,2].map(r=>[0,1,2].map(c=>`<rect x="${13.5+c*6.4}" y="${31+r*4.6}" width="4.4" height="3" rx="1.2" fill="${r===2?['#e5484d','#f0b429','#2fb866'][c]:'#8794b4'}"/>`).join('')).join('')}`);
+  if(k==='hav')return S(`<path d="M5 20L24 8l19 12z" fill="${B}"/><rect x="7" y="21" width="34" height="3.2" rx="1" fill="#9db9ff"/>${[11,22,33].map(x=>`<rect x="${x}" y="25.5" width="4.4" height="12" rx="1.2" fill="${B}"/>`).join('')}<rect x="5" y="38.5" width="38" height="4.5" rx="1.6" fill="#1d47b8"/>${coin(24,3,4.6,'a-coinB')}`);
+  if(k==='dep'||k==='cust')return S(`<circle cx="10" cy="15" r="5.2" fill="#7c8cf8"/><path d="M1.5 35a8.5 8.5 0 0 1 17 0v2.5h-17z" fill="#7c8cf8"/><circle cx="38" cy="15" r="5.2" fill="${B}"/><path d="M29.500 35a8.5 8.500 0 0 1 17 0v2.500h-17z" fill="${B}"/>
+    <path d="M17 27h14" stroke="currentColor" stroke-width="2" stroke-dasharray="1.500 3.500" stroke-linecap="round" opacity=".55"/>${coin(24,27,4.4,'a-coinP')}`);
+  if(k==='cash')return S(`<g class="a-n2">${note(9,13,1.25).replace(N,'#178a4c')}</g><g class="a-n1">${note(7,19,1.36)}</g>${coin(39,37,4.6,'a-hop')}`);
+  if(k==='gx')return S(`${ing(4,7,1)}${ing(22,31,1)}<g class="a-spin">${arr('M36 10a13 13 0 0 1 3 12m0 0l-4.200-2.600m4.200 2.600l2.400-4.400')}${arr('M12 38a13 13 0 0 1-3-12m0 0l4.200 2.600m-4.200-2.600l-2.400 4.400')}</g>`);
+  if(k==='off')return S(`<g class="a-swing"><path d="M9 6h13.500a3 3 0 0 1 2.100.900l17 17a3 3 0 0 1 0 4.200L30.100 39.600a3 3 0 0 1-4.200 0l-17-17A3 3 0 0 1 8 20.500V7a1 1 0 0 1 1-1z" fill="#f0527a"/><circle cx="15.500" cy="13.500" r="2.800" fill="#fff"/><circle cx="22.500" cy="22.500" r="2.300" fill="none" stroke="#fff" stroke-width="1.900"/><circle cx="30.500" cy="30.500" r="2.300" fill="none" stroke="#fff" stroke-width="1.900"/><path d="M31.500 21.500l-10 10" stroke="#fff" stroke-width="1.900" stroke-linecap="round"/></g>`);
+  if(k==='rg')return S(`${note(1,6,.95)}${arr('M24 21v7m0 0l-3.600-3.600m3.600 3.600l3.600-3.600','a-flow')}${ing(12,31,1.1)}<path class="a-tw" d="M40 24l1.300 3.200 3.200 1.300-3.200 1.300L40 33l-1.300-3.200-3.200-1.300 3.200-1.300z" fill="${G2}"/>`);
+  if(k==='gp'||k==='cv')return S(`${ing(2,6,1.1)}${arr('M24 20v7m0 0l-3.600-3.600m3.600 3.600l3.600-3.600','a-flow')}${note(13,31,1.15)}`);
+  if(k==='wd')return S(`<rect x="7" y="5" width="22" height="30" rx="3.600" fill="#f2b84b"/>${[11,16.500,22].map(y=>`<rect x="11" y="${y}" width="14" height="2.400" rx="1.200" fill="#fff" opacity=".9"/>`).join('')}<path d="M21 43L33 37l12 6z" fill="${B}"/><rect x="24" y="43" width="18" height="2.600" rx="1" fill="#1d47b8"/><g class="a-send">${arr('M36 30V18m0 0l-4.400 4.400M36 18l4.400 4.400')}</g>`);
+  if(k==='gd'||k==='dl')return S(`${ing(8,26,1.45)}<g class="a-drop">${arr(o?'M24 20V7m0 0l-4.600 4.600M24 7l4.600 4.600':'M24 6v13m0 0l-4.600-4.600M24 19l4.600-4.600')}</g>`);
+  if(k.slice(0,2)==='x:')return S(`${coin(24,31,10)}<g class="a-drop">${arr(o?'M24 17V5m0 0l-4.600 4.600M24 5l4.600 4.600':'M24 4v12m0 0l-4.600-4.600M24 16l4.600-4.600')}</g>`);
+  if(k.slice(0,3)==='xp:')return S(`${coin(13,13,8.500)}${arr('M26 20v7m0 0l-3.600-3.600m3.600 3.600l3.600-3.600','a-flow')}${note(15,31,1.150)}`);
+  return ''}
 const CKO=[['wd','واریز به حساب مشتری','clock'],['hav','حواله از بانک','bank'],['cust','حواله از مشتری','swap'],['cash','پرداخت نقدی','cash'],['off','کسر · تخفیف','tag'],['rg','تبدیل به طلا','coin']];
 const CKT=[['pos','کارتخوان','card'],['hav','حواله به بانک','bank'],['dep','حواله به مشتری','swap'],['cash','دریافت نقدی','cash'],['gx','تعویض طلا','coin'],['off','اضافه · تخفیف','tag'],['rg','تبدیل به طلا','coin']];
 /* v71.0 (خواسته صاحب اپ): مانده مستقیم پولی/طلایی می‌شود — «تبدیل به طلا» مانده تومانی را با یک ردیف پولی طلا (گرم ۷۵۰) جابه‌جا می‌کند
@@ -93,17 +117,21 @@ function ckRoute(){const c=svCu(),m=CK.m,out=ckOut(),z=ckBkL().find(o=>String(o.
   const o=m==='cash'?box:m==='hav'?bk:(()=>{const s0=CK.sel;if(!s0)return '';const n=s0.k==='nm'?s0.n:s0.k==='cu'?cuName(CU().find(q=>String(q.id)===String(s0.id))||{}):fullName(validated().find(q=>String(q.id)===String(s0.id))||{});return `<span class="ckrn"><span class="ckra p">${esc(userInit(n||'؟'))}</span><small>${esc(n||'')}</small></span>`})();
   if(!o)return '';const [a,b]=out?[o,me]:[me,o];
   return `<div class="ckrt${out?' out':''}">${b}<span class="ckrl"><i></i><i></i><i></i><em>${m==='cash'?ic('cash'):ic('back')}</em></span>${a}</div>`}
-const ckPosHead=()=>{const z=ckBkL().find(o=>String(o.id)===String(CK.srcId));return `${z?(bkAvH(z)||`<span class="ckbi">${ic('bank')}</span>`):`<span class="ckbi">${ic('card')}</span>`}<span class="tx"><b>${z?esc(cuName(z)):'کارتخوان'}</b><small>کارتخوان · پایانه فروش</small></span><span class="posig"><i></i><i></i><i></i><i></i></span>`};
-/* v91.5 (خواسته صاحب اپ: «واقعی‌تر، سه‌بعدی و جلوه کارتخوان؛ رنگ مانده خواناتر؛ ثابت روی صفحه انگار کارتخوان دستت است؛ عکس رسید جای درست»):
-   بالای دستگاه شکاف چاپگر است و «رسید» کاغذی از آن بیرون زده (همان عکس رسید)؛ کارت بانکِ انتخاب‌شده هنگام باز شدن در شکاف کارت فرو می‌رود؛
-   صفحه نمایش شیشه‌ای با مانده سند خوانا؛ دکمه‌ها برجسته و با فشار پایین می‌روند؛ «تأیید» = «در حال ارتباط…» → «تراکنش موفق» → رسید بیرون می‌آید → ردیف در سند */
-function ckPos(lf){const z=ckBkL().find(o=>String(o.id)===String(CK.srcId)),K=xrPh(CK);
-  return `<div class="posdev" id="posD" style="--bk:${z?bkClr(z):'#334155'}">
-  <div class="posprn"><span class="posslot"></span><div class="pospap${K.length?' has':''}">${stPhHTML(CK)}</div></div>
-  <div class="poscard" aria-hidden="true"><span>${z?(bkAvH(z)||''):''}</span><i></i></div>
-  <div class="posh" id="posH">${ckPosHead()}</div>
-  <div class="posscr" id="posS"><div class="posl"><span>خرید</span><span>${esc(dates(sv.date||todayISO()).fa)}</span></div><small>مبلغ تراکنش</small><div class="posv">${ckAIn('posin')}<i>تومان</i></div>${lf?`<button type="button" class="posrm" data-act="ckAmt" data-v="${lf}"><small>مانده سند</small><b>${fmt(lf)}</b><em>بزنید</em></button>`:''}<div class="posmsg" id="posM"></div></div>
-  ${ckPad(1)}</div>`}
+const ckPosHead=()=>{const z=ckBkL().find(o=>String(o.id)===String(CK.srcId));return `${z?(bkAvH(z)||`<span class="ckbi">${ic('bank')}</span>`):`<span class="ckbi">${ic('card')}</span>`}<span class="tx"><b>${z?esc(cuName(z)):'کارتخوان'}</b><small>پایانه فروش</small></span><span class="ptm-sig"><i></i><i></i><i></i><i></i></span>`};
+/* v91.7 (خواسته صاحب اپ: «انگار یک کارتخوان واقعی؛ دکمه‌ها و طولش بهتر، دکمه‌ها این‌قدر نزدیک هم نباشند»): دستگاه پوز از نو (کلاس‌های ptm-*، بدون ارث از قالب قبلی):
+   سرِ چاپگر با رسید کاغذی که از شکاف بیرون آمده (عکس رسید روی همان کاغذ)، بدنه با نام و نشان بانک، صفحه نمایش شیشه‌ای، صفحه‌کلید واقعی پوز
+   (سه ستون عدد با فاصله + ستون رنگی انصراف/پاک/تأیید؛ تأیید دو ردیف)، پایین دستگاه شکاف کارت با کارت همان بانک. دستگاه همه قد پنجره را پر می‌کند و ردیف‌های دکمه با قد صفحه کش می‌آیند */
+function ckPos(lf){const z=ckBkL().find(o=>String(o.id)===String(CK.srcId)),K=xrPh(CK),k=(v,t,c)=>`<button type="button" class="ckk ptm-k${c?' '+c:''}" data-act="ckK" data-k="${v}">${t}</button>`;
+  return `<div class="ptm" id="posD" style="--bk:${z?bkClr(z):'#334155'}">
+  <div class="ptm-pap${K.length?' has':''}">${stPhHTML(CK)}</div>
+  <div class="ptm-top"><span class="ptm-slot"></span><span class="ptm-led"></span></div>
+  <div class="ptm-body">
+    <div class="ptm-hd" id="posH">${ckPosHead()}</div>
+    <div class="ptm-lcd" id="posS"><div class="ptm-st"><span>خرید</span><span>${esc(dates(sv.date||todayISO()).fa)}</span></div><div class="ptm-v"><small>مبلغ تراکنش</small>${ckAIn('posin')}<i>تومان</i></div>${lf?`<button type="button" class="ptm-rm" data-act="ckAmt" data-v="${lf}"><small>مانده سند</small><b>${fmt(lf)}</b><em>بزنید</em></button>`:''}<div class="ptm-msg" id="posM"></div></div>
+    <div class="ptm-keys">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('x','<i>✕</i><span>انصراف</span>','kr')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('c','<i>‹</i><span>پاک</span>','ky')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok','<i>○</i><span>تأیید</span>','kg')}${k('000','۰۰۰','z3')}${k('0','۰')}${k('bs',ic('back').replace('class="i"','class="i bsk"'),'bs')}</div>
+    <div class="ptm-bot"><span class="ptm-brand">MOTALLA<b>POS</b></span><span class="ptm-cs"></span></div>
+  </div>
+  <div class="ptm-card" aria-hidden="true"><span>${z?(bkAvH(z)||''):''}</span><i></i></div></div>`}
 function ckForm(){const m=CK.m;if(!m)return '';const lf=ckLeft();
   const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${ckAmtV()}" autocomplete="off" enterkeyhint="done"></label>`;
   const tn=`<label class="ckf ckf1"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
@@ -124,13 +152,13 @@ function ckSelCap(){const s=CK.sel;if(!s||ckOut())return 0;if(s.k==='cu'){const 
 ACT.ckK=d=>{const A=$('ckA');if(!A)return;const k=d.k;if(k==='ok'){if(CK.m==='pos'&&$('posD')&&+CK.amount>0&&+CK.amount<=ckLeft()&&!RM()){ckPosGo();return}ACT.ckAdd();return}if(k==='x'){ACT.ckM({m:''});return}
   let v=String(CK.amount||'').replace(/\D/g,'');if(k==='c')v='';else if(k==='bs')v=v.slice(0,-1);else if(v.length<13)v=(v+k).replace(/^0+/,'').slice(0,13);
   CK.amount=+v||0;A.value=ckAmtV();try{navigator.vibrate&&navigator.vibrate(6)}catch(_){}
-  const h=A.closest('.posscr,.ckscr');if(h&&!RM()&&h.animate&&(k==='c'||k==='000'))h.animate([{transform:'scale(1.02)'},{transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.9,.25,1)'})};
-function ckPosGo(){const D=$('posD'),M=$('posM');if(!D||D.classList.contains('run'))return;D.classList.add('run');if(M)M.innerHTML='<span class="posdots"><i></i><i></i><i></i></span>در حال ارتباط با بانک';
+  const h=A.closest('.ptm-lcd,.ckscr');if(h&&!RM()&&h.animate&&(k==='c'||k==='000'))h.animate([{transform:'scale(1.02)'},{transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.9,.25,1)'})};
+function ckPosGo(){const D=$('posD'),M=$('posM');if(!D||D.classList.contains('run'))return;D.classList.add('run');if(M)M.innerHTML='<span class="ptm-dots"><i></i><i></i><i></i></span>در حال ارتباط با بانک';
   setTimeout(()=>{if(!D.isConnected)return;D.classList.add('ok');if(M)M.innerHTML=`${ic('check')} تراکنش موفق · ${fmt(+CK.amount)}`;try{navigator.vibrate&&navigator.vibrate([12,40,18])}catch(_){}},700);
   setTimeout(()=>{if(D.isConnected)ACT.ckAdd()},1550)}
 const ckFormOk=()=>{const m=CK.m;return !((m==='dep'||m==='cust'&&ckOut())&&!CK.sel||(m==='hav'||m==='pos')&&(CK.pl||!ckBkL().length))};
 ACT.ckAll=()=>{ckRead();CK.pl=1;CK.sq='';ckRe('ckS')};
-ACT.ckAmt=d=>{const A=$('ckA');if(!A)return;A.value=(+d.v).toLocaleString('en-US');CK.amount=+d.v;if(A.oninput&&!A.readOnly)A.oninput();const h=A.closest('.ckbig,.posscr,.ckscr');if(h&&!RM()&&h.animate)h.animate([{transform:'scale(1.03)'},{transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'})};
+ACT.ckAmt=d=>{const A=$('ckA');if(!A)return;A.value=(+d.v).toLocaleString('en-US');CK.amount=+d.v;if(A.oninput&&!A.readOnly)A.oninput();const h=A.closest('.ckbig,.ptm-lcd,.ckscr');if(h&&!RM()&&h.animate)h.animate([{transform:'scale(1.03)'},{transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'})};
 function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),wp=c&&sv.edit&&typeof wdPend==='function'?wdPend(c,sv.edit.no):0,R=ckRows(),A=ckAcct(),tg=ckTg(),gw=ckGold(),TL={p:'مانده قبلی',d:A?'این سند':'مانده این سند',f:'مانده نهایی'}[tg];
   /* ریز مانده‌ها (قبلی · سند · نهایی، مبلغ و طلا)؛ خانه انتخاب‌شده پررنگ و با زدن هر خانه هدف تسویه عوض می‌شود */
   const L=svBalL(),gr=L.find(z=>z[0]==='g'),rr=L.find(z=>z[0]==='r')||['r',0,0,0],ln=(k,v)=>`<span class="${ftCls(v)}${k==='r'?' r':''}"><b>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i></span>`;
@@ -145,7 +173,7 @@ function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),wp=c&&sv.edit&&typeof wdPe
   ${mini}<div class="ckh ${r>0?'d':r<0?'c':'z'}${wp&&r&&wp>=Math.abs(r)-1?' w':''}"><small>${r?(wp&&wp>=Math.abs(r)-1?'رفت برای واریز · در انتظار تأیید بانک':TL+' · '+(r>0?'طلبکاریم':'بدهکاریم')):TL+' تسویه است ✓'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b><em>${tg==='d'&&!A?'جمع سند '+fmt(Math.abs(T.total)):'جمع این سند '+fmt(Math.abs(T.total))}${T.paid?(T.paid<0?' · پرداخت‌شده ':' · دریافت‌شده ')+fmt(Math.abs(T.paid)):''}${gr&&gr[3]?' · طلا '+wFmt(Math.abs(gr[3]))+' گرم '+ourLab(gr[3]):''}</em></div>
   ${wdCkHTML()}
   ${R.length?`<div class="ckrs">${R.map(z=>`<div class="ckr"><span class="d6ti pm-in">${ic(z.ico)}</span><span class="tx"><b>${esc(z.lab)}</b>${z.sub?`<small>${z.sub}</small>`:''}</span><b class="ckam">${fmt(z.amt)}</b>${z.lock?`<span class="d6x ckl0" aria-hidden="true">${ic('check')}</span>`:`<button class="d6x" data-act="ckDel" data-k="${z.k}" data-i="${z.i}" aria-label="حذف">${ic('x')}</button>`}</div>`).join('')}</div>`:''}
-  ${!CK.m&&c&&c.grp==='بانک'?bfxTile():''}${CK.m==='bfix'?bfxForm():CK.m?ckForm():!r&&!gw&&!ckXT().length?'':`<div class="ckt${r<0?' out':''}">${[...(r?(r<0?CKO:CKT):[]),...(gw?[['gd',(gw>0?'دریافت طلا · ':'پرداخت طلا · ')+wFmt(Math.abs(gw))+' گرم',gw>0?'dIn':'dOut'],['gp','پولی کردن طلا · '+wFmt(Math.abs(gw))+' گرم','swap']]:[]),...ckXT()].map(([k,t,i])=>`<button class="ckti q-${k}" data-act="ckM" data-m="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div>`}
+  ${!CK.m&&c&&c.grp==='بانک'?bfxTile():''}${CK.m==='bfix'?bfxForm():CK.m?ckForm():!r&&!gw&&!ckXT().length?'':`<div class="ckt${r<0?' out':''}">${[...(r?(r<0?CKO:CKT):[]),...(gw?[['gd',(gw>0?'دریافت طلا · ':'پرداخت طلا · ')+wFmt(Math.abs(gw))+' گرم',gw>0?'dIn':'dOut'],['gp','پولی کردن طلا · '+wFmt(Math.abs(gw))+' گرم','swap']]:[]),...ckXT()].map(([k,t,i])=>{const A=ckAni(k,k.slice(0,2)==='x:'||k==='gd'?i==='dOut':r<0);return `<button class="ckti q-${k.replace(/:.*/,'')}${A?' an':''}" data-act="ckM" data-m="${k}"><i>${A||ic(i)}</i><span>${t}</span></button>`}).join('')}</div>`}
   <button class="xgo cksave" data-act="ckSave">${ic('check')} پایان و ثبت سند${r>0?`<small>مانده ${fmt(r)} به حساب مشتری</small>`:''}</button></div>`}
 function ckRead(){const g=id=>{const e=$(id);return e?e.value:undefined};if($('ckA'))CK.amount=num(g('ckA'));if($('ckT'))CK.tn=toEn(g('ckT')||'').trim();if($('ckW'))CK.w=decIn(g('ckW'));if($('ckY'))CK.ay=+toEn(g('ckY')).replace(/\D/g,'')||'';if($('ckQ'))CK.q=g('ckQ');if($('ckS'))CK.sq=g('ckS');if($('ckP'))CK.pg=num(g('ckP'));if($('ckNB'))CK.nbn=g('ckNB')}
 /* صفحه‌کلید فیزیکی (کامپیوتر) برای صفحه‌کلید مبلغ */
@@ -171,7 +199,7 @@ ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حس�
   const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
   ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m==='bfix'?'bfT':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
-ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));const rt=document.querySelector('#sheet .ckrt');if(rt)rt.outerHTML=ckRoute();const pc=document.querySelector('#posD .poscard');if(pc){const z0=ckBkL().find(o=>String(o.id)===String(d.id));pc.querySelector('span').innerHTML=z0?(bkAvH(z0)||''):'';pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}const ph=$('posH');if(ph){ph.innerHTML=ckPosHead();const dv=ph.closest('.posdev'),z=ckBkL().find(o=>String(o.id)===String(d.id));if(dv&&z)dv.style.setProperty('--bk',bkClr(z));if(dv&&!RM()&&dv.animate)dv.animate([{transform:'translateY(4px)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,1.3,.4,1)'})}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;ckRe('ckA')};
+ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));const rt=document.querySelector('#sheet .ckrt');if(rt)rt.outerHTML=ckRoute();const pc=document.querySelector('#posD .ptm-card');if(pc){const z0=ckBkL().find(o=>String(o.id)===String(d.id));pc.querySelector('span').innerHTML=z0?(bkAvH(z0)||''):'';pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}const ph=$('posH');if(ph){ph.innerHTML=ckPosHead();const dv=ph.closest('.ptm'),z=ckBkL().find(o=>String(o.id)===String(d.id));if(dv&&z)dv.style.setProperty('--bk',bkClr(z));if(dv&&!RM()&&dv.animate)dv.animate([{transform:'translateY(4px)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,1.3,.4,1)'})}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;ckRe('ckA')};
 ACT.ckSrcX=()=>{ckRead();CK.pl=1;ckRe('ckS')};
 ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('ckQ');return}CK.sel={k:d.k,id:d.id};
   const av=d.k==='cu'?(()=>{const c=CU().find(z=>String(z.id)===String(d.id));const o=c&&oweAccts('').find(z=>String(z.c.id)===String(c.id));return o?o.a:0})():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();
@@ -231,7 +259,7 @@ function gkHTML(){const c=svCu(),r=gkRest(),L=svBalL(),g=L.find(z=>z[0]==='g')||
   const O=r>0?[['dl','دریافت طلا','dIn'],['cv','تبدیل به مبلغ','swap']]:[['dl','پرداخت طلا','dOut'],['cv','تبدیل به مبلغ','swap']];
   return `<div class="ckw gkw"><div class="sh-h"><div><b>تسویه طلا</b><small class="shsub">${esc(c?cuName(c):'')}${r<0?' · طلا را به مشتری می‌دهیم':''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   ${mini}<div class="ckh ${r>0?'d':r<0?'c':'z'}"><small>${r?TL+' · '+(r>0?'طلبکاریم':'بدهکاریم'):TL+' تسویه است ✓'}</small><b>${wFmt(Math.abs(r))}<i>گرم ۷۵۰</i></b>${sv.rate&&r?`<em>به نرخ امروز حدود ${fmt(Math.round(Math.abs(r)*sv.rate))} تومان</em>`:''}</div>
-  ${GTK.m?gkForm(r):!r?'':`<div class="ckt gkt">${O.map(([k,t,i])=>`<button class="ckti q-${k}" data-act="gkM" data-m="${k}"><i>${ic(i)}</i><span>${t}</span></button>`).join('')}</div>`}</div>`}
+  ${GTK.m?gkForm(r):!r?'':`<div class="ckt gkt">${O.map(([k,t,i])=>{const A=ckAni(k,i==='dOut');return `<button class="ckti q-${k}${A?' an':''}" data-act="gkM" data-m="${k}"><i>${A||ic(i)}</i><span>${t}</span></button>`}).join('')}</div>`}</div>`}
 function gkForm(r){const cv=GTK.m==='cv',ay=+GTK.ay||750,w=parseFloat(GTK.wt)||0,e=Math.round(w*ay/750*1000)/1000;
   const body=cv?`<div class="ckg"><label class="ckf"><small>وزن (گرم ۷۵۰)</small><input id="gkW" class="ltr" inputmode="decimal" value="${esc(GTK.wt||'')}" autocomplete="off"></label><label class="ckf"><small>هر گرم ۱۸ (تومان)</small><input id="gkP" class="ltr" inputmode="numeric" value="${GTK.pg?Number(GTK.pg).toLocaleString('en-US'):''}" autocomplete="off"></label></div>
     <div class="ckx" id="gkX">${w&&+GTK.pg?'مبلغ: <b>'+fmt(Math.round(w*GTK.pg))+'</b> تومان '+(r>0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'وزن و نرخ را بزنید'}</div>`

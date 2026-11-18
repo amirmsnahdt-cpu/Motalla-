@@ -99,24 +99,39 @@ function dkList(){const a=sv.qa,q0=clean(a.q||''),q=nzName(toEn(q0)),hit=t=>!q||
 /* v78.9 (خواسته صاحب اپ: «معرفی کالای جدید یک پنجره جدا باز کند»): پنجره «کالای تازه» — نام و نوع کالا؛ مشخصات بیشتر (فی، اجرت…) بعداً همین‌جا */
 const GDT=[['ساخته','طلای ساخته','ring','وزن، عیار، اجرت و سود'],['سایر','غیر طلا','tag','فقط تعداد و مبلغ'],['سکه','سکه','coin','تعداد و نرخ هر سکه'],['ارز','ارز','usd','مقدار و نرخ هر واحد']];
 let GN=null;
-function gdNewHTML(){const T=GDT.filter(t=>GN.d==='sell'||t[0]==='سکه'||t[0]==='ارز');
-  return `<div class="gdn"><div class="sh-h"><div><b>کالای تازه</b><small class="shsub">بعد از ساختن، همین حالا در سند انتخاب می‌شود</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="ef"><label for="gdnN">نام کالا</label><input id="gdnN" value="${esc(GN.k)}" autocomplete="off" enterkeyhint="done" placeholder="مثلاً انگشتر رولکس"></div>
-  <div class="gdnl">نوع کالا</div><div class="gdnt">${T.map(([c,t,i,s])=>`<button type="button" class="gdnc${GN.c===c?' on':''}" data-act="gdnPick" data-c="${c}" aria-pressed="${GN.c===c}"><span class="gdni">${ic(i)}</span><b>${t}</b><small>${s}</small></button>`).join('')}</div>
-  <div class="gdnl">فی <i>اختیاری · تا ۱۰۰ = درصد، بیشتر = تومان</i></div><div class="gic gdnf"><label class="gif" for="gdnB"><span>فی خرید</span><span class="gifv"><input id="gdnB" class="ltr" inputmode="decimal" autocomplete="off" placeholder="چقدر تمام می‌شود"></span></label><label class="gif" for="gdnS"><span>فی فروش</span><span class="gifv"><input id="gdnS" class="ltr" inputmode="decimal" autocomplete="off" placeholder="چقدر می‌فروشیم"></span></label></div>
-  <label class="sw gisw"><input type="checkbox" id="gdnC"><span class="tr"></span><span class="sbt"><b>این کالا تعدادی است</b><small>در فروش و دریافت «تعداد» هم پرسیده می‌شود</small></span></label>
-  <button class="xgo gdngo" data-act="gdnSave"${GN.c?'':' disabled'}>${ic('check')} ساختن کالا</button></div>`}
-ACT.dkNc=()=>{qaRead();const a=sv.qa;GN={k:clean(a.q||''),c:'',d:a.d};sheet(gdNewHTML());const n=$('gdnN');if(n)n.oninput=()=>{GN.k=n.value}};
-ACT.gdnPick=d=>{GN.c=d.c;document.querySelectorAll('#sheet .gdnc').forEach(b=>{const on=b.dataset.c===d.c;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});const g=document.querySelector('#sheet .gdngo');if(g)g.disabled=false};
+/* v91.7 (خواسته صاحب اپ: «کالای تازه همه قسمت‌ها را ندارد؛ طراحی درست مثل پنجره اخطار یا نوع حساب»): پنجره شناور وسط صفحه (همان قالب cntp):
+   نام، هر چهار نوع کالا به شکل کاشی (در فروش، خرید، دریافت و پرداخت)، فی خرید/فروش کنار هم، کلید «تعدادی»، دکمه «ساختن کالا» پایین پنجره */
+const gdnTypes=()=>GDT.filter(t=>['sell','buy','in','out'].includes(GN.d)||t[0]==='سکه'||t[0]==='ارز');
+function gdNewHTML(){const T=gdnTypes();
+  return `<div class="cnth"><span class="cnthi">${ic('plus')}</span><span class="tx"><b>کالای تازه</b><small>بعد از ساختن، همین حالا در سند انتخاب می‌شود</small></span><button type="button" class="cntx" data-act="gdnX" aria-label="بستن">${ic('x')}</button></div>
+  <label class="gdnlb" for="gdnN">نام کالا</label><input id="gdnN" class="gdnin" value="${esc(GN.k)}" autocomplete="off" enterkeyhint="done" placeholder="مثلاً انگشتر رولکس">
+  <div class="gdnlb">نوع کالا</div><div class="cntg gdng">${T.map(([c,t,i,s])=>`<button type="button" class="cntc gdnq${GN.c===c?' on':''}" data-act="gdnPick" data-c="${c}" aria-pressed="${GN.c===c}"><span class="cnti">${ic(i)}</span><span class="tx"><b>${t}</b><small>${s}</small></span><i class="gdnck">${ic('check')}</i></button>`).join('')}</div>
+  <div class="gdnlb">فی <i>اختیاری · تا ۱۰۰ = درصد، بیشتر = تومان</i></div>
+  <div class="gdnfe"><label for="gdnB"><span>فی خرید</span><input id="gdnB" class="ltr" inputmode="decimal" autocomplete="off" placeholder="تمام‌شده"></label><label for="gdnS"><span>فی فروش</span><input id="gdnS" class="ltr" inputmode="decimal" autocomplete="off" placeholder="فروش"></label></div>
+  <label class="sw gisw gdnsw" id="gdnCw"${GN.c==='سکه'||GN.c==='ارز'?' hidden':''}><input type="checkbox" id="gdnC"><span class="tr"></span><span class="sbt"><b>این کالا تعدادی است</b><small>در فروش و دریافت «تعداد» هم پرسیده می‌شود</small></span></label>
+  <div class="wrnf"><button type="button" class="wrnok gdngo" data-act="gdnSave"${GN.c?'':' disabled'}>${ic('check')} ساختن کالا</button><button type="button" class="wrngo" data-act="gdnX">انصراف</button></div>`}
+function gdnPos(){const P=$('gdnp');if(!P)return;const vv=window.visualViewport,vh=vv&&vv.height?vv.height:innerHeight,ot=vv?vv.offsetTop||0:0,top=ot+Math.max(10,Math.min(64,vh*.07));P.style.top=top+'px';P.style.maxHeight=Math.max(220,vh-(top-ot)-10)+'px'}
+function gdnClose(now){const P=$('gdnp'),B=$('gdnbd');if(!P&&!B)return;window.removeEventListener('resize',gdnPos);if(window.visualViewport)visualViewport.removeEventListener('resize',gdnPos);const rm=()=>{if(P)P.remove();if(B)B.remove()};
+  if(now||RM()||!P||!P.animate){rm();return}P.id='';if(B)B.id='';P.animate([{opacity:1,transform:'translate(-50%,0) scale(1)'},{opacity:0,transform:'translate(-50%,-8px) scale(.96)'}],{duration:160,easing:'ease-in',fill:'forwards'});if(B)B.animate([{opacity:1},{opacity:0}],{duration:160,fill:'forwards'});setTimeout(rm,170)}
+ACT.gdnX=()=>{GN=null;gdnClose()};
+ACT.dkNc=()=>{qaRead();const a=sv.qa;GN={k:clean(a.q||''),c:'',d:a.d};gdnClose(1);if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  const bd=document.createElement('div');bd.className='cntbd gdnbd';bd.id='gdnbd';bd.onclick=()=>ACT.gdnX();document.body.appendChild(bd);
+  const P=document.createElement('div');P.className='cntp gdnp';P.id='gdnp';P.setAttribute('role','dialog');P.setAttribute('aria-label','کالای تازه');P.innerHTML=gdNewHTML();document.body.appendChild(P);
+  gdnPos();window.addEventListener('resize',gdnPos);if(window.visualViewport)visualViewport.addEventListener('resize',gdnPos);
+  const n=$('gdnN');if(n){n.oninput=()=>{if(GN)GN.k=n.value};n.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();n.blur()}};if(!GN.k)setTimeout(()=>n.focus(),380)}
+  if(!RM()&&P.animate){P.animate([{opacity:0,transform:'translate(-50%,-12px) scale(.93)'},{opacity:1,transform:'translate(-50%,0) scale(1)'}],{duration:360,easing:'cubic-bezier(.2,1.3,.4,1)'});bd.animate([{opacity:0},{opacity:1}],{duration:220,fill:'both'});
+    P.querySelectorAll('.cntc').forEach((c,i)=>c.animate([{opacity:0,transform:'translateY(8px) scale(.94)'},{opacity:1,transform:'none'}],{duration:340,delay:80+i*50,easing:'cubic-bezier(.2,1.2,.4,1)',fill:'backwards'}))}};
+ACT.gdnPick=(d,e)=>{if(!GN)return;GN.c=d.c;document.querySelectorAll('#gdnp .gdnq').forEach(b=>{const on=b.dataset.c===d.c;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);if(on&&!RM()&&b.animate)b.animate([{transform:'scale(.95)'},{transform:'scale(1.03)'},{transform:'none'}],{duration:300,easing:'cubic-bezier(.2,1.2,.4,1)'})});
+  const g=document.querySelector('#gdnp .gdngo');if(g)g.disabled=false;const w=$('gdnCw');if(w)w.hidden=d.c==='سکه'||d.c==='ارز'};
 ACT.gdnSave=()=>{const n=$('gdnN'),k=clean(n?n.value:GN.k);if(!k){toast('نام کالا را بنویسید',true);n&&n.focus();return}if(!GN.c){toast('نوع کالا را انتخاب کنید',true);return}
   if(goodsList().some(x=>nzName(x)===nzName(k))||(XA[k])){toast('«'+k+'» از قبل در فهرست هست',true);return}
   const c=GN.c,fb=+decIn(toEn(($('gdnB')||{}).value||'').replace(/,/g,''))||0,fs=+decIn(toEn(($('gdnS')||{}).value||'').replace(/,/g,''))||0,cn=!!($('gdnC')||{}).checked;
   if(fb>0&&fs>0&&(fb<=100)===(fs<=100)&&fs<fb){askWarn({t:'فی فروش از فی خرید کمتر است',h:'فی خرید <b>'+feeTx(fb)+'</b> و فی فروش <b>'+feeTx(fs)+'</b>؛ با این فی، فروش این کالا ضرر است.',ok:'اصلاح می‌کنم'});return}
   if(fb||fs||cn){const r=cfgRec(1);if(fb||fs)r.gfee={...(r.gfee||{}),[k]:{b:fb,s:fs}};if(cn&&c!=='سکه'&&c!=='ارز')r.gcnt={...(r.gcnt||{}),[k]:1}}
-  GN=null;closeSheet();ACT.dkNew({c,k})};
+  GN=null;gdnClose();ACT.dkNew({c,k})};
 ACT.dkNew=d=>{qaRead();const a=sv.qa,k=clean(d.k||a.q||''),c=d.c;if(d.k)a.q=k;if(!k)return;a.nc=0;const r=cfgRec(1);
   if(c==='سکه'||c==='ارز'){r.xa=(r.xa||[]).filter(o=>o.k!==k).concat([{k,t:k,s:k,u:c==='ارز'?'واحد':'عدد',c:c==='ارز'?'f':'c'}]);saveCu();xaSync();toast('«'+k+'» به '+c+'‌ها اضافه شد');ACT.dkF({id:'a:'+k});return}
-  r.gk={...(r.gk||{}),[k]:c};addGoods(k);saveCu();toast('«'+k+'» در دسته '+c+' اضافه شد');ACT.qaK({k})};
+  r.gk={...(r.gk||{}),[k]:c};addGoods(k);saveCu();toast('«'+k+'» در دسته '+c+' اضافه شد');/* v91.7: در خرید/دریافت/پرداخت، کالای تازه همان ردیف طلا با نام خودش است */if(['buy','in','out'].includes(a.d)){if(a.d==='buy'&&!dkRateOk())return;xrStart(xrNew(a.d,'gold',{cat:k,ay:750,fl:'gold',fd:a.d}));return}ACT.qaK({k})};
 /* v61.60 (خواسته صاحب اپ): کالاهای اضافه‌شده در همان فهرست ویرایش یا حذف می‌شوند (دکمه ⋯ کنار هر ردیف).
    سندهای ثبت‌شده نام قبلی را نگه می‌دارند؛ فقط فهرست انتخاب عوض می‌شود. */
 ACT.gdMenu=(d,e)=>{const k=d.k,b=e&&e.target.closest('[data-act]');if(!k||!b)return;const c=gCat(k),I=[['gdInfo',ic('coin'),'فی و موجودی',{k}]];

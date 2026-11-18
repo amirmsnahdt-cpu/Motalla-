@@ -88,7 +88,7 @@ function shFix(c,t,R,ay){const keep=sv;try{sv=invSv(c,t);R.forEach(r=>{const o=(
       const eff=()=>{if(r.k==='it')return {r:itCalc(o,sv.rate,sv.tax).tot,g:0};const C=xrCalc(o,sv.rate);return {r:C.amount||0,g:o.t==='in'||o.t==='out'?C.q||0:0}};/* تغییر مبلغ همین ردیف و وزن ۷۵۰ آن (منفی = کمتر شد) */
       delete o.amT;delete o.amN;if(r.k==='xr'&&parseFloat(o.w)>0)delete o.am;const b=eff();o.ay=ay;o.sh=2;const a2=eff(),dr=Math.round(a2.r-b.r),dg=Math.round((a2.g-b.g)*1000)/1000;o.shd={};if(dr)o.shd.r=dr;if(dg)o.shd.g=dg});
     const T=svTot(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}}),
-      xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e}});
+      xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e,q0:C.q0,ajg:C.ajg,prg:C.prg}});
     t.items=items;t.xr=xr;t.sub=T.sub;t.total=T.total;t.disc=T.disc;if(T.ge)t.ge=T.ge;else delete t.ge;if(Object.keys(T.xe).length)t.xe=T.xe;else delete t.xe;
     if(t.gc&&T.rest>0&&t.rate)t.gc={r:T.rest,g:Math.round(T.rest/t.rate*1000)/1000};t.shAt=ns();c.lastAt=ns()}finally{sv=keep}}
 
@@ -184,9 +184,9 @@ function itDet(it,rate,tax,saved){const c=saved&&it.tot!=null?{gold:+it.gold||0,
 function xrDet(x,C,rate){const g=x.a==='gold',m=x.t==='sell'||x.t==='buy',u=g?'گرم':((XA[x.a]||{}).u||'واحد'),ay=+x.ay||750,q=C.q!=null?C.q:x.q750!=null?+x.q750:(g?Math.round((+C.n||0)*ay/750*1000)/1000:C.n),r=+x.mz?(+x.mz)/MZK:(+rate||0),ab=g&&x.cat==='آبشده'&&!x.pul;
   const nm={sell:'فروش',buy:'خرید',in:'دریافت',out:'پرداخت (تحویل)'}[x.t]||x.t;
   return ['نوع: '+nm+(x.pul?' پولی':''),g&&x.cat&&x.cat!=='متفرقه'?'دسته: '+esc(x.cat):'',!g?'جنس: '+esc((XA[x.a]||{t:x.a}).t):'',+x.cnt?'تعداد: '+qFmt(x.cnt)+' عدد':'',
-    g?(x.pz&&+x.cnt?'وزن کل: ':'وزن: ')+wFmt(C.n)+' گرم':'مقدار: '+qFmt(C.n)+' '+u,g?(shAyL(x)||'عیار: '+toFa(ay)):'',g?'وزن ۷۵۰: '+wFmt(q)+' گرم':'',
+    g?(x.pz&&+x.cnt?'وزن کل: ':'وزن: ')+wFmt(C.n)+' گرم':'مقدار: '+qFmt(C.n)+' '+u,g?(shAyL(x)||'عیار: '+toFa(ay)):'',g?'وزن ۷۵۰: '+wFmt(C.q0!=null?C.q0:q)+' گرم':'',xrAjTx(x,C),
     m&&g&&r&&!x.pgM?'مظنه: '+fmt(Math.round(r*MZK))+' تومان':'',m?(ab?'هر گرم ۱۸: '+dtT(Math.round((+C.pg||0)*750/ay)):(g?(x.t==='buy'&&!x.pul?'هر گرم خرید: ':'هر گرم: '):'هر '+u+': ')+dtT(C.pg)):'',
-    m?'مبلغ: '+dtT(C.amount):'',C.fx?'مبلغ دستی':'',C.e?'اثر بر '+(g?'طلا':esc((XA[x.a]||{t:x.a}).t))+': '+(g?wFmt(Math.abs(C.e))+' گرم ۱۸':qFmt(Math.abs(C.e))+' '+u)+' '+ourLab(C.e):'',shEff(x),
+    m?'مبلغ: '+dtT(C.amount):'',!m&&C.amount?'اثر تومانی: '+dtT(C.amount)+' '+ourLab(xrR(x,C.amount)):'',C.fx?'مبلغ دستی':'',C.e?'اثر بر '+(g?'طلا':esc((XA[x.a]||{t:x.a}).t))+': '+(g?wFmt(Math.abs(C.e))+' گرم ۱۸':qFmt(Math.abs(C.e))+' '+u)+' '+ourLab(C.e):'',shEff(x),
     x.lab?'آزمایشگاه '+esc(x.lab):'',x.ang?'انگ '+esc(x.ang):'',x.note?'توضیح: '+esc(x.note):''].filter(Boolean).join(' · ')}
 function pyDet(p,txId){if(p.m==='dep')return depSub(p,txId);const a=pAmt(p),out=a<0,M=PM[p.m]||PM.cash,ch=p.chId&&custs.find(z=>String(z.id)===String(p.chId)),Y=p.cuId&&custs.find(z=>String(z.id)===String(p.cuId));
   return ['نوع: '+(out?'پرداخت':'دریافت'),'روش: '+(p.m==='wd'?'واریز بانکی (لیست واریزی)':p.m==='cust'?'حواله دوطرفه بین حساب‌ها':p.m==='nm'?'حواله دستی':M.t),'مبلغ: '+dtT(Math.abs(a)),

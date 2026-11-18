@@ -37,7 +37,9 @@ function stSteps(){const a=sv.qa,K=stKind();
        اگر وزن خالی بماند، مبلغ پله آخر (x.am) وزن را از مظنه می‌سازد */
     /* v90.9 (خواسته صاحب اپ: «خرید و فروش اول وزن گرفته شود بعد قیمت»): ترتیب مثل کالای ساخته — وزن، عیار، بعد نرخ (هر گرم/مظنه)، بعد مبلغ */
     if(g&&m)return [...(x.pz||gdCnt(x.cat)?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v,{grp:1,...(x.pz?{}:{opt:1})})]:[]),stS('w','وزن','گرم','dec',()=>x.w,v=>{if(stNv(v)!==stNv(x.w))x.amT='';x.w=v;if(+v)x.am=''},{wOr:x,ph:'وزن (گرم) · خالی = فقط مبلغ',fm:v=>!+v&&+x.am?'از مبلغ: '+wFmt(xrCalc(x,sv.rate).n)+' گرم':null}),...(x.sh===1?[]:[stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=+v||xrAy(x.t,x.pul,x.cat)),...(x.cat==='آبشده'?[stW75(x)]:[])]),stMz(x,stBuyF(x)),stAmT(x),...ab,...gdFeeSteps(x)];
-    if(g)return [...(gdCnt(x.cat)&&!x.pul?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v,{grp:1,opt:1})]:[]),stS('w','وزن','گرم','dec',()=>x.w,v=>x.w=v),...(x.sh===1?[]:[stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=+v||xrAy(x.t,x.pul,x.cat))]),...ab,...gdFeeSteps(x)];
+    if(g)return [...(gdCnt(x.cat)&&!x.pul?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v,{grp:1,opt:1})]:[]),stS('w','وزن','گرم','dec',()=>x.w,v=>x.w=v),...(x.sh===1?[]:[stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=+v||xrAy(x.t,x.pul,x.cat))]),
+      /* v91.7: دریافت/تحویل طلا — اجرت و سود مثل فروش، فقط بدون مظنه (درصدها به طلا، اجرت تومانی به تومان)؛ آبشده فقط سود */
+      ...(xrAjOn(x)?[...(x.cat==='آبشده'?[]:[stS('ajP','اجرت','٪','dec',()=>x.ajP,v=>x.ajP=v,{opt:1,ph:'اجرت ٪ · به طلا حساب می‌شود'}),stS('ajT','اجرت تومانی','تومان','num',()=>x.ajT,v=>x.ajT=v,{opt:1})]),stS('pp','سود','٪','dec',()=>x.pp,v=>x.pp=v,{opt:1,ph:'سود ٪ · به طلا حساب می‌شود'})]:[]),...ab,...gdFeeSteps(x)];
     return [stS('q','تعداد',(XA[x.a]||{}).u||'','dec',()=>x.q,v=>x.q=v,{grp:1}),...(m?[stS('pg','نرخ هر '+((XA[x.a]||{}).u||'واحد'),'تومان','num',()=>x.pg||+ls.get('m_px_'+x.a,0)||'',v=>{if(+v!==+x.pg)x.amT='';x.pg=v}),stAmT(x)]:[])]}
   /* v61.62 (خواسته صاحب اپ): مانده قبلی هم پله‌به‌پله مثل بقیه ردیف‌ها: مبلغ · طلا · هر مانده اضافه‌شده · «+ مانده دیگر» */
   if(K==='pv'){const p=a.pv,used=new Set(p.xs.map(z=>z.k)),av=[...FXS(),...COINS()].filter(k=>!used.has(k));
@@ -88,8 +90,8 @@ function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
     if(it.w)D.push(wFmt(it.w)+' گرم'+(K==='ab'&&it.ay!=750?' (۷۵۰: '+wFmt(Math.round(it.w*it.ay/750*1000)/1000)+')':''));D.push(c&&c.fx?'سود '+toFa(String(+a.pp||0))+'٪ ('+fmt(c.pr)+') <b class="own">مبلغ دستی</b>':stMzTx(a))}
   else if(K==='xr'){const x=a.x,C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
     if(g&&m){am=C.amount||0;if(C.n)D.push(wFmt(C.n)+' گرم'+(+x.am?' <b class="calc">حساب‌شده</b>':'')+(x.cat==='آبشده'&&!x.pul&&C.q?' · وزن ۷۵۰ <b>'+wFmt(C.q)+'</b>':''));if(C.fx){const B=stBuyF(x)!==1?' خرید':'';D.push('هر گرم'+B+' '+fmt(C.pg)+' (مظنه'+B+' '+fmt(Math.round(C.pg*MZK))+') <b class="own">مبلغ دستی</b>')}else D.push(stMzTx(x,stBuyF(x)))}
-    else if(g){if(C.n)D.push(wFmt(C.n)+' گرم');if(C.q)D.push('معادل ۷۵۰: '+wFmt(C.q));
-      return `<div class="stam g ${C.n?(stDir()<0?'d':'c'):'z'}"><small>${C.n?(stDir()<0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'وزن را بزنید'}</small><b>${C.q?wFmt(C.q):'—'}<i>گرم ۷۵۰</i></b>${D.length?`<em>${D.join(' · ')}</em>`:''}</div>`}
+    else if(g){if(C.n)D.push(wFmt(C.n)+' گرم');if(C.q)D.push('معادل ۷۵۰: '+wFmt(C.q0!=null?C.q0:C.q));const J=xrAjTx(x,C);if(J)D.push(J);
+      return `<div class="stam g ${C.n?(stDir()<0?'d':'c'):'z'}"><small>${C.n?(stDir()<0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'وزن را بزنید'}</small><b>${C.q?wFmt(C.q):'—'}<i>گرم ۷۵۰</i></b>${C.amount?`<b class="stam2">${fmt(C.amount)}<i>تومان اجرت</i></b>`:''}${D.length?`<em>${D.join(' · ')}</em>`:''}</div>`}
     else{if(C.n)D.push(qFmt(C.n));if(m&&C.pg)D.push('نرخ '+fmt(C.pg)+(C.fx?' <b class="own">مبلغ دستی</b>':''));am=m?C.amount||0:0;
       if(!m)return `<div class="stam ${C.n?(stDir()<0?'d':'c'):'z'}"><small>${C.n?(stDir()<0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'تعداد را بزنید'}</small><b>${C.n?qFmt(C.n):'—'}</b></div>`}}
   else if(K==='py')am=+a.p.amount||0;
