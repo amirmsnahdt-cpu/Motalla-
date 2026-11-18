@@ -4633,11 +4633,11 @@ html.iosbr #sheet:has(>.ckw.ckfo.fix){padding-bottom:calc(70px + env(safe-area-i
 .gdnp .gdnsw{margin:12px 4px 0;gap:10px}.gdnp .gdnsw[hidden]{display:none}.gdnp .gdnsw .sbt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.5}.gdnp .gdnsw .sbt b{font-size:13.5px;font-weight:850}.gdnp .gdnsw .sbt small{font-size:11.5px;color:var(--mut);font-weight:600}
 .gdnp .wrnf{margin-top:14px}.gdnp .gdngo{display:flex;align-items:center;justify-content:center;gap:6px;flex:2 1 0;width:auto;margin:0}.gdnp .gdngo svg{width:17px;height:17px;stroke-width:3}.gdnp .gdngo:disabled{opacity:.45;box-shadow:none}
 /* v91.7: برچسب‌های مسیر پرداخت در کاشی لیست مشتری‌ها هیچ‌وقت بریده نمی‌شوند (قلم با پهنای کاشی جمع می‌شود؛ کاشی باریک = کلمه کوتاه؛ خیلی باریک = نقطه + عدد) */
-.ppl b{font:inherit;font-weight:inherit}.ppl .sh,.ppl i.d2{display:none}
+.ppl>span>span{display:inline!important;margin:0!important;padding:0!important;background:none!important;box-shadow:none!important;color:inherit!important;font:inherit!important;overflow:visible!important}.ppl>span>span.sh,.ppl i.d2{display:none!important}
 .cbk.pp .ppl>span{font-size:clamp(7px,calc((100cqi - var(--fx,29px))/var(--n,14)),10.5px)!important;padding:1px 6px!important;gap:3px!important;flex:0 0 auto!important;min-width:0}
-@container (max-width:189px){.cbk.pp .ppl.nl .lg{display:none}.cbk.pp .ppl.nl .sh{display:inline}
+@container (max-width:189px){.cbk.pp .ppl.nl>span>.lg{display:none!important}.cbk.pp .ppl.nl>span>.sh{display:inline!important}
   .cbk.pp .ppl.nl>span{font-size:clamp(7px,calc((100cqi - var(--fx,29px))/var(--ns,12)),10.5px)!important}}
-@container (max-width:124px){.cbk.pp .ppl.nl .sh{display:none}.cbk.pp .ppl.nl i.d2{display:block}
+@container (max-width:124px){.cbk.pp .ppl.nl>span>.sh{display:none!important}.cbk.pp .ppl.nl i.d2{display:block!important}
   .cbk.pp .ppl.nl>span{font-size:clamp(7px,calc((100cqi - var(--fd,45px))/var(--nn,6)),10.5px)!important}}
 .cbk.pp .ppl>span.n{padding:1px 4px!important}
 @container (max-width:124px){.cbk.pp>.ppl.n3{flex-wrap:wrap!important;white-space:normal!important;row-gap:2px}.cbk.pp .ppl.n3>span{font-size:9px!important}}
@@ -4735,7 +4735,7 @@ html.iosbr #sheet:has(>.ckw.ckfo.fix){padding-bottom:calc(8px + env(safe-area-in
 .ckw.cpos .ckcl{display:none}.ckw.cpos .ckcs{margin-top:4px}
 .ptm{margin:40px 14px 30px}
 .ptm-pap{background:repeating-linear-gradient(180deg,#fffbea 0 10px,#f1ead2 10px 11px);box-shadow:inset 0 0 0 1px rgb(120 100 40/.22),inset 0 -6px 6px -5px #0003}
-.ptm-lcd{padding:5px 12px 8px}.ptm-st{padding-bottom:2px;margin-bottom:1px}.ptm-v small{display:none}.ptm-st span:first-child::after{content:" · مبلغ تراکنش"}
+.ptm-lcd{padding:5px 12px 8px}.ptm-st{padding-bottom:2px;margin-bottom:1px}
 #sheet .ptm-v input{height:40px}
 .ptm-keys{margin-top:10px;gap:clamp(8px,1.5vh,12px) 11px}
 #sheet .ptm-k:is(.kr,.ky){flex-direction:row;gap:5px}#sheet .ptm-k:is(.kr,.ky) i{font-size:15px}
@@ -4748,3 +4748,35 @@ html.iosbr #sheet:has(>.ckw.ckfo.fix){padding-bottom:calc(8px + env(safe-area-in
  .ckw.cpos .ckcs .ckc{padding-block:5px}.ckw.cpos .ckcs .ckc :is(.bkb,img){width:32px!important;height:32px!important;min-width:32px!important}}
 @container ptmc (max-height:500px){.ptm{margin-top:32px}.ptm-pap{padding:6px 9px 5px}.ptm-rm small{display:none}.ptm-keys{gap:7px 9px;padding:7px 8px}#sheet .ptm-k{box-shadow:inset 0 1px 0 rgb(255 255 255/.26),0 3px 0 #07090e,0 5px 5px -3px rgb(0 0 0/.6)}}
 .ptm-pap .stphadd{background:#fff!important;color:#1f4fd6!important}.ptm-pap .stphl2,.ptm-pap .stphl2 svg{color:#5b5446!important}
+/* ===== v91.8 (خواسته صاحب اپ: «نقدی و حواله مثل کارتخوان ثابت، کامپکت و درست؛ کادر مبلغ متوازن؛ جهت انیمیشن درست») =====
+   فرم‌های پولی (نقدی، حواله به/از بانک، حواله به/از مشتری بعد از انتخاب شخص) = صفحه ثابت بی‌اسکرول: یک قاب روشن (cpm) با مسیر پول، کادر مبلغ وسط‌چین،
+   پیگیری/عکس و همان صفحه‌کلید پوز به رنگ روشن که جای باقی‌مانده را پر می‌کند */
+.ckw.ckfo.cpay>.ckfm{flex:1;min-height:0;display:flex;flex-direction:column;container:cpmc/size}
+.ckw.cpay .ckcl{display:none}.ckw.cpay .ckcs{flex:none;margin-top:2px}.ckw.cpay .stsel{flex:none;margin:2px 6px 8px}
+.cpm{flex:1;min-height:0;display:flex;flex-direction:column;margin:4px 6px 12px;padding:10px;border-radius:28px;background:color-mix(in srgb,var(--blu) 5%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 14%,var(--line)),0 18px 30px -22px rgb(16 32 70/.45);animation:ptmIn .45s cubic-bezier(.2,1.1,.3,1) both}
+.cpm>.ckrt{flex:none;margin:0 0 8px;padding:5px 8px;border-radius:16px;background:var(--card);animation:none}
+.cpm .ckrn{flex:0 1 auto;flex-direction:row;width:auto;max-width:39%;gap:6px;min-width:0}.cpm .ckrn.to{flex-direction:row-reverse}
+.cpm .ckrn small{max-width:none;flex:1;min-width:0;font-size:11.5px;font-weight:850;color:var(--ink)}
+.cpm .ckra,.cpm .ckrn .bkb,.cpm .ckrn img{width:30px;height:30px;min-width:30px;font-size:13px}.cpm .ckra svg{width:16px;height:16px}
+.cpm .ckrl{min-width:40px}.ckrl em .i.flip{transform:scaleX(-1)}
+.cpm>.ckscr{flex:none;margin:0 0 8px;padding:7px 12px 9px;text-align:center}
+.ckscr>small{display:block;text-align:center}.ckscr>small i{font-style:normal;font-weight:700;opacity:.8;margin-inline-start:3px}.ckscr>small i::before{content:"· "}
+.ckscr .ckscv{display:block}#sheet .ckscr .ckscv input{display:block;width:100%;text-align:center}
+.cpm>.ckrw2{flex:none;margin:0 0 8px}
+.cpm>.ptm-keys{margin-top:0}
+.ptm-keys.lt{background:color-mix(in srgb,var(--mut) 13%,var(--card));box-shadow:inset 0 2px 5px rgb(16 32 70/.14),0 1px 0 var(--card)}
+#sheet .ptm-keys.lt .ptm-k:not(.kr,.ky,.kg){background:linear-gradient(180deg,var(--card),color-mix(in srgb,var(--mut) 9%,var(--card)));color:var(--ink);box-shadow:inset 0 1px 0 rgb(255 255 255/.7),0 3px 0 color-mix(in srgb,var(--mut) 42%,var(--card)),0 6px 7px -4px rgb(16 32 70/.3)}
+#sheet .ptm-keys.lt .ptm-k:not(.kr,.ky,.kg):active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgb(255 255 255/.5),0 0 0 transparent}
+#sheet .ptm-keys.lt .ptm-k.kr{box-shadow:inset 0 1px 0 rgb(255 255 255/.32),0 3px 0 #8f1f2a,0 6px 7px -4px rgb(16 32 70/.3)}
+#sheet .ptm-keys.lt .ptm-k.ky{box-shadow:inset 0 1px 0 rgb(255 255 255/.45),0 3px 0 #a97a05,0 6px 7px -4px rgb(16 32 70/.3)}
+#sheet .ptm-keys.lt .ptm-k.kg{box-shadow:inset 0 1px 0 rgb(255 255 255/.32),0 3px 0 #0d5c2c,0 6px 7px -4px rgb(16 32 70/.3)}
+@container cpmc (max-height:560px){.cpm{padding:8px;margin-bottom:8px;border-radius:24px}.cpm>.ckrt,.cpm>.ckscr,.cpm>.ckrw2{margin-bottom:6px}.cpm>.ckscr{padding:4px 10px 7px}#sheet .cpm .ckscv input{font-size:27px!important;min-height:0;height:34px}
+ .cpm .ckq{margin-top:2px}.cpm .ckq button{padding-block:4px}.cpm .ckrw2 .stph2,.cpm .ckrw2 .ckf1{min-height:42px}.cpm .ptm-keys{padding:8px;gap:8px 9px}
+ .ckw.cpay .ckcs .ckc{min-height:48px;padding-block:5px}.ckw.cpay .ckcs .ckc :is(.bkb,img){width:30px!important;height:30px!important;min-width:30px!important}.ckw.cpay .stsel{padding-block:5px;margin-bottom:6px}}
+@container cpmc (max-height:470px){.cpm>.ckrt{padding:3px 8px}.cpm .ckra,.cpm .ckrn .bkb,.cpm .ckrn img{width:26px;height:26px;min-width:26px}.cpm .ptm-keys{gap:7px 8px;padding:7px}#sheet .cpm .ptm-k{font-size:20px}}
+/* دکمه‌ها بیش از اندازه بلند نشوند (نقدی جای زیادی دارد): قاب به اندازه خودش، صفحه‌کلید تا سقف ۴ ردیفِ ۶۴ پیکسلی */
+.cpm{flex:0 1 auto}.cpm>.ptm-keys{flex:0 1 316px}
+.cpm .ckrn .bkav{width:32px!important;height:32px!important;min-width:32px!important;flex:none}.cpm .ckrn .bkav :is(.bkb,img){width:100%!important;height:100%!important;min-width:0!important}
+/* صفحه نمایش پوز متوازن: برچسب «مبلغ تراکنش · تومان» بالای عدد، عدد دقیقاً وسط */
+.ptm-v{display:block}.ptm-v small{display:block;font-size:10.5px;line-height:1.5}#sheet .ptm-v input{display:block;width:100%;text-align:center}
+@container ptmc (max-height:575px){.ptm-lcd{padding-top:4px}#sheet .ptm-v input{height:32px}}

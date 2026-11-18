@@ -92,7 +92,7 @@ function ppLine(p){const S=PPS.filter(([k])=>p[k]>0),one=S.length===1&&PPF[S[0][
   if(one)return `<span class="ppl" style="--n:${f2(PPE.F[S[0][1]])};--fx:22px"><span class="${S[0][1]}"><i></i>${one}</span></span>`;
   if(K>2)return `<span class="ppl n3" style="--n:${f2(nn)};--fx:${K*16+(K-1)*3+2}px">${S.map(([k,c])=>`<span class="${c} n"><i></i>${ppM(p[k])}</span>`).join('')}</span>`;
   const n=nn+S.reduce((a,[k,c])=>a+.27+PPE[c][0],0),ns=nn+S.reduce((a,[k,c])=>a+.27+PPE[c][1],0);
-  return `<span class="ppl${n>11.4?' nl':''}" style="--n:${f2(n)};--ns:${f2(ns)};--nn:${f2(nn)};--fx:${K*12+(K-1)*3+2}px;--fd:${fd}px">${S.map(([k,c])=>`<span class="${c}"><i class="d2"></i>${ppM(p[k])} <b class="lg">${PPL[c]}</b><b class="sh">${PPSH[c]}</b></span>`).join('')}</span>`}
+  return `<span class="ppl${n>11.4?' nl':''}" style="--n:${f2(n)};--ns:${f2(ns)};--nn:${f2(nn)};--fx:${K*12+(K-1)*3+2}px;--fd:${fd}px">${S.map(([k,c])=>`<span class="${c}"><i class="d2"></i>${ppM(p[k])} <span class="lg">${PPL[c]}</span><span class="sh">${PPSH[c]}</span></span>`).join('')}</span>`}
 const PPC={f:'نرفته به لیست',l:'در لیست',a:'تخصیص‌شده'};/* v87.8 (خواسته صاحب اپ: «فضای زیادی نگیرد»): کارت فشرده — یک خط عنوان، نوار، سه خانه کنار هم */
 function ppCard(p,title,extra,cls){return `<div class="ppc${cls?' '+cls:''}"><div class="pph"><b>${title}</b><small>از ${fmt(p.tot)}</small></div>${ppBar(p,1)}<div class="pps">${PPS.map(([k,c])=>`<span class="ppr ${c}${p[k]>0?'':' z'}"><small><i></i>${PPC[c]}</small><b>${p[k]>0?fmt(p[k]):'—'}</b></span>`).join('')}</div>${extra||''}</div>`}
 function wdSumHTML(c,no,tot){const E=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&(no==null||String(e.wd.no)===String(no)));const s=wdSpl(c,no),sent=s.fr+s.al;if(!sent&&!E.length)return '';
