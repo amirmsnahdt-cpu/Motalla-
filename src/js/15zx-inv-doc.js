@@ -75,7 +75,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
      ردیف بی‌قیمت طلا/سکه به‌جای مبلغ می‌گوید در کدام حساب نشسته است ---- */
   /* v92.2 (صاحب اپ: «فاکتور خیلی قاطی‌پاتی است؛ وزن ۷۵۰ را در پرداخت نزده»): طلا و سکه‌ای که بی‌قیمت تحویل داده یا گرفته‌ایم گروه خودشان را دارند
      (u تحویل به مشتری · v دریافت از مشتری) و از دریافت/پرداخت «وجه» جدا هستند؛ ستون آخر هر ردیف طلا همان وزن ۷۵۰ی است که به حساب طلا می‌نشیند */
-  const GR={s:[],b:[],u:[],v:[],w:[],i:[],o:[],p:[],z:[]},XP=[],FST={},r3=v=>Math.round(v*1000)/1000,gAm=w=>`${wFmt(w)} <u>گرم ۷۵۰</u>`;if((t.items||[]).length)FST.s=-1;
+  const GR={s:[],b:[],u:[],v:[],w:[],i:[],o:[],p:[],z:[]},XP=[],FST={},r3=v=>Math.round(v*1000)/1000;if((t.items||[]).length)FST.s=-1;
   its.forEach(it=>{const J=ajPT(it),ay=+it.ay||750,mz=mzOf2(it),pg=Math.round(mz/MZK*ay/750),ajE=[J.P?toFa(String(J.P))+'٪':'',J.T?fmt(J.T):''].filter(Boolean).join(' + '),ppE=+it.pp&&!(+it.amT>0)?toFa(String(+it.pp))+'٪':'',w7=r3((+it.w||0)*ay/750);
     GR.s.push({wv:+it.w||0,n:esc(it.k),e:[it.sh===1?'شرطی':'',it.n&&typeof it.n==='string'?esc(it.n):''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
       c:{w:[wFmt(it.w)+' <u>گرم</u>'],ay:[toFa(ay)],w7:[wFmt(w7)],rt:[fmt(S.rt==='g'?pg:mz)],gv:[+it.gold?fmt(it.gold):''],
@@ -87,8 +87,8 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
     const acc='در حساب '+(g?'طلا':(XA[x.a]||{}).k==='c'?'سکه':esc((XA[x.a]||{s:x.a}).s)),wA=g?(x.q750!=null?+x.q750:r3((+q||0)*ay/750)):0,aj=g&&!m&&x.q0!=null,w7=aj?+x.q0:wA,w7d=g&&Math.abs(w7-(+q||0))>.0005,jam=aj?+x.amount||0:0;
     /* v91.7: دریافت/تحویل طلا با اجرت و سود (بدون مظنه): درصدها در ستون خودشان، «با اجرت و سود n گرم ۷۵۰» کنار نام؛ اجرت تومانی در ستون مبلغ */
     const gk=x.t==='sell'?'s':x.t==='buy'?'b':x.t==='in'?'v':'u',gq=g&&!m&&!jam&&!pv;if(!pv&&FST[gk]==null)FST[gk]=xi;
-    (pv?XP:GR[gk]).push({xi,wv:g?+q||0:0,kd:g?'g':(XA[x.a]||{}).k==='c'?'c':'f',g7:g&&!m&&!pv?wA:0,gq,n:esc(nl(xrLab(x))),sdw:pv?sd:0,e:pv?[]:[x.sh===1?'شرطی':'',x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',(m&&x.pul)||jam?acc:''],lab:x.lab?esc(x.lab):'',ang:x.ang?esc(toFa(x.ang)):'',w7d,eqA:aj&&Math.abs(wA-w7)>.0005,eq:gq?'':aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود '+wFmt(wA)+' گرم ۷۵۰':w7d&&(x.pul||!m)?'معادل '+wFmt(w7)+' گرم ۷۵۰':'',rv,
-      c:{w:[(g?wFmt(q):qFmt(q))+' <u>'+esc(u)+'</u>'],ay:[g?toFa(ay):''],w7:[g?wFmt(w7):''],rt:[rv?fmt(rv):''],gv:[''],aj:[aj?[+x.ajP?toFa(String(+x.ajP))+'٪':'',jam?fmt(jam):''].filter(Boolean).join(' + '):''],pp:[aj&&+x.pp?toFa(String(+x.pp))+'٪':''],tx:['']},am:m||jam?nm(x.amount):gq?gAm(wA):acc,av:m||jam?+x.amount||0:0,dl:!m&&!jam&&!gq})});
+    (pv?XP:GR[gk]).push({xi,wv:g?+q||0:0,kd:g?'g':(XA[x.a]||{}).k==='c'?'c':'f',g7:g&&!m&&!pv?wA:0,gq,n:esc(nl(xrLab(x))),sdw:pv?sd:0,e:pv?[]:[x.sh===1?'شرطی':'',x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',(m&&x.pul)||jam?acc:''],lab:x.lab?esc(x.lab):'',ang:x.ang?esc(toFa(x.ang)):'',w7d,eqA:!gq&&aj&&Math.abs(wA-w7)>.0005,eq:gq?(aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود ':w7d?'معادل ':'')+wFmt(wA)+' گرم ۷۵۰':aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود '+wFmt(wA)+' گرم ۷۵۰':w7d&&(x.pul||!m)?'معادل '+wFmt(w7)+' گرم ۷۵۰':'',rv,
+      c:{w:[(g?wFmt(q):qFmt(q))+' <u>'+esc(u)+'</u>'],ay:[g?toFa(ay):''],w7:[g?wFmt(gq?wA:w7):''],rt:[rv?fmt(rv):''],gv:[''],aj:[aj?[+x.ajP?toFa(String(+x.ajP))+'٪':'',jam?fmt(jam):''].filter(Boolean).join(' + '):''],pp:[aj&&+x.pp?toFa(String(+x.pp))+'٪':''],tx:['']},am:m||jam?nm(x.amount):gq?'—':acc,av:m||jam?+x.amount||0:0,dl:!m&&!jam})});
   let inS=0,outS=0,pvS=0,offR=0;const PY={i:[],o:[]};
   pays.forEach((p,pi)=>{const a=pAmt(p);if(!a)return;if(PG.sp.has(pi)){pvS+=a;GR.p.push({n:esc(nl(pyLab(p,1))),sdw:a,e:[],am:nm(a)});return}
     const k=a>0?'دریافت':'پرداخت',off=p.m==='adj'&&p.why==='تخفیف'||p.m==='off',ds=off?'تخفیف':esc(nl(pyLab(p,1)).replace(/^(دریافت|پرداخت)\s*/,''))||k;if(a>0){inS+=a;if(off)offR=1}else outS-=a;
@@ -104,7 +104,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const onlyOff=GR.i.length>0&&GR.i.every(r=>r.off);
   /* نام گروه طلا/سکه از روی خود ردیف‌ها؛ اگر سند هم طلا و هم پول جابه‌جا کرده، گروه پول «وجه» نام می‌گیرد تا با طلا قاطی نشود.
      گروه‌های کالا به ترتیب ثبت در سند می‌آیند (مثلاً تحویل طلا، دریافت طلا، بعد فروش پولی مانده) و گروه‌های پول بعد از آن‌ها */
-  if(GR.u.length&&GR.v.length){GR.w=[...GR.u,...GR.v].sort((a,b)=>a.xi-b.xi);FST.w=Math.min(FST.u,FST.v)}
+  /* یکی‌شدن فقط وقتی هر طرف یک ردیف دارد؛ با ردیف‌های بیشتر هر طرف گروه و «جمع» خودش را می‌گیرد تا وزن ۷۵۰ هر طرف زیر ستونش جمع شود */if(GR.u.length===1&&GR.v.length===1){GR.w=[...GR.u,...GR.v].sort((a,b)=>a.xi-b.xi);FST.w=Math.min(FST.u,FST.v)}
   const kdL=k=>{const K=new Set(GR[k].map(r=>r.kd));return [K.has('g')?'طلا':'',K.has('c')?'سکه':'',K.has('f')?'ارز':''].filter(Boolean).join(' و ')||'طلا'},gdx=GR.u.length+GR.v.length>0,vj=gdx?'وجه ':'';
   const GM=[...[['s','فروش به مشتری'],['b','خرید از مشتری'],...(GR.w.length?[['w','تحویل و دریافت '+kdL('w')]]:[['u','تحویل '+kdL('u')+' به مشتری'],['v','دریافت '+kdL('v')+' از مشتری']])].sort((a,b)=>(FST[a[0]]==null?1e9:FST[a[0]])-(FST[b[0]]==null?1e9:FST[b[0]])),['i',onlyOff?'تخفیف':'دریافت '+vj+'از مشتری'+(offR?' و تخفیف':'')],['o','پرداخت '+vj+'به مشتری'],['p','مانده قبلی (ثبت در این '+docN+')'],['z','تبدیل و اصلاح']].filter(g=>GR[g[0]].length);
   const ALLR=GM.flatMap(g=>GR[g[0]]),caps=S.cap==='y'?GM.length>0:S.cap==='n'?false:GM.length>1;
@@ -120,32 +120,34 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const hRt=S.rt==='g'?+t.rate||0:hMz,has=f=>f==='rt'?ALLR.some(r=>r.rv&&r.rv!==hRt):f==='w7'?ALLR.some(r=>r.w7d):ALLR.some(r=>r.c&&r.c[f]&&r.c[f][0]);
   ALLR.forEach(r=>{r.c=r.c||{};r.c.lab=[r.lab||''];r.c.ang=[r.ang||'']});
   let UC=INVCOL.map(x=>x[0]).filter(f=>S['c'+f]==='y'||(S['c'+f]==='a'&&has(f))),fz=1+S.fs*.08;
+  /* v92.3 (خواسته صاحب اپ: «در مبلغ به تومان وزن ۷۵۰ نیاید؛ ستون وزن داشته باشد که مانده زیرش نوشته شود»): سندی که طلای بی‌قیمت تحویل/دریافت دارد (G7)
+     همیشه ستون «وزن ۷۵۰» دارد، آخرین ستون پیش از مبلغ؛ ستون طلای «حساب مشتری» هم کنار تومان می‌آید و (اگر جا باشد) عددش درست زیر عددهای همین ستون می‌افتد (G7A) */
+  const G7=ALLR.some(r=>r.gq);if(G7){UC=UC.filter(f=>f!=='w7');UC.push('w7');const i=KD.findIndex(K=>K.k==='g');if(i>=0&&i<KD.length-2)KD.splice(KD.length-2,0,KD.splice(i,1)[0])}
   const tw=s=>{let w=0;for(const ch of String(s||'').replace(/<[^>]+>/g,''))w+=/[۰-۹0-9]/.test(ch)?1.95:/[,٬٫.·\s]/.test(ch)?.95:/[٪+]/.test(ch)?2.5:1.35;return w};
   const nW=(s,pt)=>{let w=0;for(const ch of String(s))w+=/[۰-۹]/.test(ch)?2.05:1.05;return w*pt/8.9},KR=KD[KD.length-1],fT=KR.F(KR.v[2]);
   const HN=Object.fromEntries(INVCOL);HN.rt=S.rt==='g'?'فی هر گرم':'نرخ';
   let CW,AMW,FPT,NMW,KW;const TBW=185.6,MN={w:19,ay:10.5,w7:15,lab:17,ang:13,rt:21,gv:22,aj:13,pp:10.5,tx:16},MX={w:30,ay:13,w7:24,lab:34,ang:26,rt:31,gv:34,aj:34,pp:24,tx:31};
-  const lay=()=>{CW={};UC.forEach(f=>{const m=Math.max(tw(HN[f])*.8,...ALLR.map(r=>{const v=(r.c&&r.c[f])||[];return Math.max(tw(v[0]),v[1]?tw(v[1])*.8:0)}),...(f==='w'&&S.sum?[...'sbiouv'].map(k=>{const w=(GR[k]||[]).reduce((a,r)=>a+(r.wv||0),0);return w?tw(wFmt(Math.round(w*1000)/1000)+' گرم')*1.1:0}):[]));CW[f]=Math.min(MX[f]*fz,Math.max(MN[f]*Math.min(1,fz),Math.ceil((m*fz+4.4)*2)/2))});
+  const lay=()=>{CW={};UC.forEach(f=>{const m=Math.max(tw(HN[f])*.8,...ALLR.map(r=>{const v=(r.c&&r.c[f])||[];return Math.max(tw(v[0]),v[1]?tw(v[1])*.8:0)}),...(f==='w'&&S.sum?[...'sbiouv'].map(k=>{const w=(GR[k]||[]).reduce((a,r)=>a+(r.wv||0),0);return w?tw(wFmt(Math.round(w*1000)/1000)+' گرم')*1.1:0}):f==='w7'&&G7?['u','v'].map(k=>{const w=GR[k].reduce((a,r)=>a+(r.g7||0),0);return w?tw(wFmt(r3(w)))*1.1:0}):[]));CW[f]=Math.min(MX[f]*fz,Math.max(MN[f]*Math.min(1,fz),Math.ceil((m*fz+4.4)*2)/2))});
     /* ستون مبلغ (و ستون تومانِ «حساب مشتری» که درست زیر آن است) به اندازه بلندترین عدد؛ مانده نهایی درشت نوشته می‌شود و اگر خیلی بلند باشد یک پله ریزتر */
-    FPT=([12.2,11,10,9].find(pt=>nW(fT,pt*fz)<=37.4)||8.4)*fz;AMW=Math.min(41,Math.max(30,Math.ceil(Math.max(S.acc?nW(fT,FPT):0,...[...ALLR.map(r=>r.av||0),...GM.map(g=>sum(g[0])),S.acc?KR.v[0]:0,S.acc?KR.v[1]:0,gcr,oth+gcr,pvS].map(v=>nW(fmt(Math.abs(Math.round(v))),8.9*fz)),...[...ALLR.filter(r=>r.gq).map(r=>r.g7),...['u','v'].map(k=>GR[k].reduce((a,r)=>a+(r.g7||0),0))].filter(Boolean).map(w=>nW(wFmt(r3(w)),8.9*fz)+10.5*fz))+3.6)));
+    FPT=([12.2,11,10,9].find(pt=>nW(fT,pt*fz)<=37.4)||8.4)*fz;AMW=Math.min(41,Math.max(30,Math.ceil(Math.max(S.acc?nW(fT,FPT):0,...[...ALLR.map(r=>r.av||0),...GM.map(g=>sum(g[0])),S.acc?KR.v[0]:0,S.acc?KR.v[1]:0,gcr,oth+gcr,pvS].map(v=>nW(fmt(Math.abs(Math.round(v))),8.9*fz)))+3.6)));
     KW=+(8*Math.max(1,fz)).toFixed(1);NMW=TBW-KW-AMW-UC.reduce((s,f)=>s+CW[f],0)};
   /* کمترین پهنای ستون «شرح»: به اندازه بلندترین نام (۲۴ تا ۴۰ میلی‌متر) — برگه آبشده با نام‌های کوتاه جای ستون بیشتری دارد */
   const NMIN=Math.min(40,Math.max(24,Math.ceil(Math.max(0,...ALLR.map(r=>tw(r.n)))*1.12+6)));
   /* جا نشد: ۱) ستون‌های اضافه‌ی خودکار کنار می‌روند ۲) قلم جدول تا ۸۰٪ ریز می‌شود ۳) آخرین چاره: ستون‌های اضافه‌ای که «همیشه» خواسته شده‌اند و بعد مالیات، سود، اجرت، نرخ، عیار (وزن هیچ‌وقت) */
-  const XTR=['gv','w7','ang','lab'],LST=['gv','w7','ang','lab','tx','pp','aj','rt','ay'];
+  const XTR=['gv','w7','ang','lab'].filter(f=>!(G7&&f==='w7')),LST=['gv','w7','ang','lab','tx','pp','aj','rt','ay'].filter(f=>!(G7&&f==='w7'));
   lay();for(let g=0;g<40&&NMW<NMIN*Math.min(1,fz);g++){const dr=XTR.find(x=>UC.includes(x)&&S['c'+x]==='a');if(dr)UC=UC.filter(y=>y!==dr);else if(fz>.8)fz=Math.round((fz-.05)*100)/100;else{const d2=LST.find(x=>UC.includes(x));if(!d2)break;UC=UC.filter(y=>y!==d2)}lay()}
   const z=n=>+(n*fz).toFixed(2),cs=f=>` style="width:${CW[f]}mm"`;
   /* ارتفاع‌ها: ردیف یک‌خطی، ردیف دوخطی (درصد و مبلغ زیرش)، نوار گروه، سرستون */
   let RH=Math.max(S.rh,+(4.7*fz).toFixed(1)),RH2=+Math.max(RH*1.36,7.3*fz).toFixed(1),CAPH=+Math.max(4.6,4.6*fz).toFixed(1);const HEADH=+Math.max(5.6,5.4*fz).toFixed(1);
-  ALLR.forEach(r=>{const E=(r.e||[]).filter(Boolean);if(S.ex){if(r.lab&&!UC.includes('lab'))E.push('آزمایشگاه '+r.lab);if(r.ang&&!UC.includes('ang'))E.push('انگ '+r.ang);if(r.eq&&(r.eqA||!UC.includes('w7')))E.push(r.eq)}
+  ALLR.forEach(r=>{const E=(r.e||[]).filter(Boolean);if(S.ex){if(r.lab&&!UC.includes('lab'))E.push('آزمایشگاه '+r.lab);if(r.ang&&!UC.includes('ang'))E.push('انگ '+r.ang);if(r.eq&&(r.eqA||!UC.includes('w7')))E.push(r.eq)}else if(r.gq&&!UC.includes('w7'))E.push(r.eq);
     r.x=(r.sdw?`<em class="${cls(r.sdw)}">${side(r.sdw)}</em>`:'')+((S.ex||r.py!=null)?E.join(' · '):(r.e||[]).filter(v=>/^در حساب /.test(v)).join(' · '));r.full=UC.some(f=>r.c[f]&&r.c[f][0]);r.two=UC.some(f=>r.c[f]&&r.c[f][1])});
-  const cell=(r,f)=>{const v=r.c[f]||[];return v[1]?`<span class="d"${cs(f)}><b>${v[0]}</b><i>${v[1]}</i></span>`:`<span${cs(f)}>${v[0]||''}</span>`};
-  const row=(r,i,pre)=>`<div class="r${r.two?' t2':''}"><span class="k">${toFa(i+1)}</span><span class="nm${r.two&&r.x?' d':''}"><b>${pre||''}${r.n}</b>${r.x?` <i>${r.x}</i>`:''}</span>${r.full?UC.map(f=>cell(r,f)).join(''):''}<span class="am${r.dl?' dl':''}${r.gq?' gq':''}">${r.am}</span></div>`;
+  const cell=(r,f)=>{const v=r.c[f]||[];return v[1]?`<span class="d"${cs(f)}><b>${v[0]}</b><i>${v[1]}</i></span>`:`<span${f==='w7'&&G7?' class="c7"':''}${cs(f)}>${v[0]||''}</span>`};
+  const row=(r,i,pre)=>`<div class="r${r.two?' t2':''}"><span class="k">${toFa(i+1)}</span><span class="nm${r.two&&r.x?' d':''}"><b>${pre||''}${r.n}</b>${r.x?` <i>${r.x}</i>`:''}</span>${r.full?UC.map(f=>cell(r,f)).join(''):''}<span class="am${r.dl?' dl':''}">${r.am}</span></div>`;
   const DIA='<svg class="dia" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" width="1.7mm" height="1.7mm"><path d="M5 0L10 5L5 10L0 5Z"/></svg>';
   const capR=tx=>`<div class="r cp"><span class="ct">${DIA}${tx}</span></div>`;
   /* v91.5 (خواسته صاحب اپ: «جمع وزن و مبلغ هر قسمت زیر ردیف‌ها که تمام می‌شود، در یک کادر»): ردیف جمع در پایان هر گروه — وزن طلا در ستون وزن، مبلغ در ستون مبلغ */
-  let SMH=+(RH+.8).toFixed(1);const g7S=k=>r3(GR[k].reduce((a,r)=>a+(r.g7||0),0)),smR=(k,lab)=>{const L=GR[k],w=Math.round(L.reduce((a,r)=>a+(r.wv||0),0)*1000)/1000;return `<div class="r sm"><span class="k"></span><span class="nm"><b>جمع ${lab}</b>${sum(k)&&g7S(k)?` <i>${wFmt(g7S(k))} گرم ۷۵۰ در حساب طلا</i>`:''}</span>${UC.map(f=>`<span${cs(f)}>${f==='w'&&w?wFmt(w)+' <u>گرم</u>':''}</span>`).join('')}<span class="am${!sum(k)&&g7S(k)?' gq':''}">${sum(k)||!g7S(k)?nm(sum(k)):gAm(g7S(k))}</span></div>`},headR=`<div class="r h"><span class="k">ردیف</span><span class="nm">شرح</span>${UC.map(f=>`<span${cs(f)}>${HN[f]}</span>`).join('')}<span class="am">مبلغ (تومان)</span></div>`;
+  let SMH=+(RH+.8).toFixed(1);const g7S=k=>r3(GR[k].reduce((a,r)=>a+(r.g7||0),0)),smR=(k,lab)=>{const L=GR[k],w=Math.round(L.reduce((a,r)=>a+(r.wv||0),0)*1000)/1000,g7=g7S(k),c7=UC.includes('w7');return `<div class="r sm"><span class="k"></span><span class="nm"><b>جمع ${lab}</b>${g7&&!c7?` <i>${wFmt(g7)} گرم ۷۵۰ در حساب طلا</i>`:''}</span>${UC.map(f=>`<span${f==='w7'&&G7?' class="c7"':''}${cs(f)}>${f==='w'&&w?wFmt(w)+' <u>گرم</u>':f==='w7'&&g7&&G7?wFmt(g7):''}</span>`).join('')}<span class="am${sum(k)?'':' dl'}">${sum(k)?nm(sum(k)):'—'}</span></div>`};
   /* فضای خالی زیر ردیف‌ها: ساده / ادامه خط ستون‌ها / ردیف‌های خالی خط‌کشی‌شده (شکل فرم) */
-  const ecell=`<span class="k"></span><span class="nm"></span>${UC.map(f=>`<span${cs(f)}></span>`).join('')}<span class="am"></span>`;
   const fillR=h=>{if(h<=.05)return '';if(S.fill==='l')return `<div class="r fl" style="height:${h.toFixed(2)}mm">${ecell}</div>`;if(S.fill==='r')return `<div class="r er">${ecell}</div>`.repeat(Math.round(h/RH));return `<div class="fl" style="height:${h.toFixed(2)}mm"></div>`};
   /* ---- جدول «حساب مشتری». خانه = [طرف حساب][عدد در جعبه هم‌پهنا]، چسبیده به لبه چپ خانه تا یکان‌ها زیر هم بیفتند. صفر = خط تیره کم‌رنگ؛ مانده نهایی صفر (و «این سند» که ردیف داشته ولی سربه‌سر شده) = «تسویه».
      حالت معمول (تا پنج ستون، اگر جا شود): ستون = نوع مانده، سطر = قبلی/این سند/نهایی و سطر نهایی درشت. وگرنه چرخیده: سطر = نوع مانده. سطرهای «مانده قبلی» و «این فاکتور» را می‌شود خاموش کرد ---- */
@@ -156,6 +158,9 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
     LB=TBW-KD.reduce((s,K)=>s+K.w,0);wide=fa===fz&&KD.length<=5&&LB>=36*m;LBX=S.an&&LB>=70*m;
     NBT=[0,1,2].map(j=>Math.max(0,...KD.map(K=>Math.ceil((nW(K.F(K.v[j]),(j===2?9.8:8.9)*fa)+.8)*2)/2)));CWT=NBT.map((n,j)=>Math.max(j===2?31:25,n+SB+GP+3.4));LBT=TBW-RJ.reduce((s,j)=>s+CWT[j],0)};
   acLay();for(let g=0;g<8&&!wide&&LBT<31*Math.max(1,fa)&&fa>.72;g++){fa=Math.round((fa-.06)*100)/100;acLay()}
+  /* ستون طلای «حساب مشتری» درست زیر ستون «وزن ۷۵۰» (مثل تومان که زیر مبلغ است): ستون وزن ۷۵۰ به پهنای همان خانه می‌شود اگر برای نام کالا جا بماند */
+  let G7A=0;if(G7&&S.acc&&wide&&UC[UC.length-1]==='w7'){const Kg=KD.find(K=>K.k==='g'),Kr=KD[KD.length-1];if(Kg&&KD[KD.length-2]===Kg){const need=+(Kr.w-AMW+Kg.nb+3.2).toFixed(2),d=need-CW.w7;if(d<=0||NMW-d>=NMIN*Math.min(1,fz)){NMW-=d;CW.w7=need;G7A=1}}}
+  const headR=`<div class="r h"><span class="k">ردیف</span><span class="nm">شرح</span>${UC.map(f=>`<span${cs(f)}>${HN[f]}</span>`).join('')}<span class="am">مبلغ (تومان)</span></div>`,ecell=`<span class="k"></span><span class="nm"></span>${UC.map(f=>`<span${cs(f)}></span>`).join('')}<span class="am"></span>`;
   const za=n=>+(n*fa).toFixed(2);
   const acell=(K,j,w,nb,fin)=>{const v=K.v[j];return `<span class="av${fin?' fn':''}${v?'':' c'}" style="width:${w}mm">${v?`<em class="${cls(v)}">${side(v)}</em><b class="${cls(v)}" style="width:${nb}mm"><bdi dir="ltr">${K.F(v)}</bdi></b>`:fin||(j===1&&K.mv)?`<em class="vz st">${WR[0]}</em>`:'<b class="z">—</b>'}</span>`};
   const kh=K=>esc(K.h)+(K.u?` <u>${esc(K.u)}</u>`:''),RL=[['مانده قبلی','پیش از این '+docN],['این '+docN,FM||'حاصل ردیف‌های همین '+docN],['مانده نهایی حساب',RJ.length>2?'مانده قبلی و این '+docN+' با هم':'']];
@@ -213,7 +218,7 @@ u,em,i,s{text-decoration:none;font-style:normal}
 .zn{height:${ZN}mm;margin-top:2.2mm}.tb{border:.3mm solid ${C.ln};overflow:hidden}
 .r{display:flex;height:${RH}mm;border-bottom:.22mm solid ${C.hr};font-size:${z(8.4)}pt}.r>span{flex:none;padding:0 1.5mm;line-height:${+(RH-.2).toFixed(2)}mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;border-inline-start:.22mm solid ${C.hr}}.r>span:first-child{border-inline-start:0}
 .r .k{width:${KW}mm;color:${C.mu};font-size:${z(7.4)}pt}.r .nm{flex:1 1 0;min-width:0;text-align:right}.r .nm b{font-weight:700;font-size:${z(8.8)}pt}.r .nm i{font-size:${z(6.6)}pt;color:${C.mu};margin-inline-start:2mm}.r .nm i em{font-weight:700}
-.r .am{width:${AMW}mm;text-align:right;font-weight:700;font-size:${z(8.9)}pt}.r .am.gq u{font-weight:700;color:${C.gl}}.r .am.dl{font-size:${z(7.2)}pt;font-weight:700;color:${C.t2}}.r u{font-size:${z(6.4)}pt;color:${C.mu};margin-inline-start:.6mm}
+.r .am{width:${AMW}mm;text-align:right;font-weight:700;font-size:${z(8.9)}pt}.r .c7{font-weight:700;font-size:${z(8.9)}pt${G7A?';text-align:right':''}}.r .am.dl{font-size:${z(7.2)}pt;font-weight:700;color:${C.t2}}.r u{font-size:${z(6.4)}pt;color:${C.mu};margin-inline-start:.6mm}
 .r.t2{height:${RH2}mm}.r.t2>span{line-height:${+(RH2-.2).toFixed(2)}mm}.r.t2>span.d{display:flex;flex-direction:column;justify-content:center;align-items:center;line-height:1.22}.r.t2>span.d b{font-weight:400;max-width:100%;overflow:hidden;text-overflow:ellipsis}.r.t2>span.d i{font-size:${z(6.5)}pt;color:${C.mu};max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .r.t2>span.nm.d{align-items:flex-start}.r.t2>span.nm.d b{font-weight:700}.r.t2>span.nm.d i{margin:0}
 .r.h{height:${HEADH}mm;border-bottom:.6mm solid ${C.gd}}.r.h>span{font-size:${z(6.6)}pt;font-weight:700;color:${C.gl};line-height:${+(HEADH-.5).toFixed(2)}mm}.r.h .k{color:${C.gl};font-size:${z(6.6)}pt}
