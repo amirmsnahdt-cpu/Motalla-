@@ -24,13 +24,13 @@ const mgPart=e=>({sno:e.sno||'',code:toEn(e.code||'').trim(),amount:Math.round(+
 const mgW=v=>parseFloat(toEn(String(v||'')))||0;
 const mgSnap=t=>JSON.parse(JSON.stringify({amount:t.amount,code:t.code||'',weight:t.weight||'',ppg:t.ppg||0,items:t.items||null,buys:t.buys||null,iban:t.iban||'',card:t.card||'',holder:t.holder||'',bank:t.bank||''}));
 /* خرید p به واریزی t اضافه می‌شود (همه فیلدهای جمع از روی e.buys دوباره حساب می‌شوند) */
-function mgApply(t,p,o){o=o||{};if(!Array.isArray(t.buys)||!t.buys.length)t.buys=[mgPart(t)];t.buys.push(p);const B=t.buys;
+function mgApply(t,p,o){o=o||{};const a0=+t.amount||0;if(!Array.isArray(t.buys)||!t.buys.length)t.buys=[mgPart(t)];t.buys.push(p);const B=t.buys;
   t.amount=B.reduce((s,b)=>s+(+b.amount||0),0);t.items=B.flatMap(b=>b.items.map(z=>({...z})));
   const w=Math.round(B.reduce((s,b)=>s+mgW(b.weight),0)*1000)/1000;t.weight=w?String(w):'';
   const ga=t.items.filter(z=>z.k==='طلا').reduce((s,z)=>s+(+z.amt||0),0);t.ppg=ppgOf(ga,t.weight)||0;
   t.code=[...new Set(B.map(b=>b.code).filter(Boolean))].join('، ');
   if(!t.iban&&o.iban){t.iban=o.iban;t.bank=''}if(!t.card&&o.card)t.card=o.card;if(!t.holder&&o.holder)t.holder=o.holder;
-  t.updatedBy=who();t.updatedAt=new Date().toISOString();saveE();if(t.wd)depDocFix(t);alloc=null}
+  t.updatedBy=who();t.updatedAt=new Date().toISOString();saveE();if(t.wd)depDocFix(t,(+t.amount||0)-a0);alloc=null}
 /* پنجره خرید: اگر واریزی هم‌لیست هست، خرید را به آن اضافه می‌کند و همان را برمی‌گرداند؛ وگرنه null (واریزی تازه مثل قبل) */
 function mgBuy(ne,cuId,S){if(!can('edit'))return null;let c=null;try{c=cuFindBy({cuId,name:ne.name,phone:ne.phone,nid:ne.nid})}catch(_){}
   const t=mgFind({...ne,cuId:c?c.id:cuId});if(!t)return null;
@@ -57,8 +57,8 @@ ACT.mgJoin=d=>{const a=entries.find(z=>String(z.id)===String(d.a)),b=entries.fin
 function mgUndo(x){const m=x.mg||{},t=entries.find(z=>String(z.id)===String(m.t));if(!t){toast('این واریزی دیگر در لیست نیست',true);return false}
   if(mgSent(t)){toast('این واریزی به بانک رفته؛ برگرداندن ممکن نیست',true);return false}
   const add=new Set((m.stl||[]).map(String));(t.settles||[]).filter(z=>add.has(String(z.id))).forEach(z=>{try{stlDocOff(z)}catch(_){}});t.settles=(t.settles||[]).filter(z=>!add.has(String(z.id)));
-  const S=m.snap||{};['amount','code','weight','ppg','iban','card','holder','bank'].forEach(k=>{if(k in S)t[k]=S[k]});if(S.items)t.items=S.items;else delete t.items;if(S.buys)t.buys=S.buys;else delete t.buys;
-  t.updatedBy=who();t.updatedAt=new Date().toISOString();try{stlSync(t)}catch(_){}saveE();if(t.wd)depDocFix(t);if(m.abs!=null)restoreIds([m.abs]);alloc=null;return true}
+  const S=m.snap||{},a0=+t.amount||0;['amount','code','weight','ppg','iban','card','holder','bank'].forEach(k=>{if(k in S)t[k]=S[k]});if(S.items)t.items=S.items;else delete t.items;if(S.buys)t.buys=S.buys;else delete t.buys;
+  t.updatedBy=who();t.updatedAt=new Date().toISOString();const a1=+t.amount||0;try{stlSync(t)}catch(_){}saveE();if(t.wd)depDocFix(t,a1-a0);if(m.abs!=null)restoreIds([m.abs]);alloc=null;return true}
 /* بخش «خریدهای این واریزی» در جزئیات (فقط وقتی بیش از یک خرید است؛ به‌جای «اقلام خرید» که همان را تکرار می‌کرد). ساعت خرید؛ تاریخ فقط اگر امروز نیست */
 function mgBuysHTML(x){const e=entries.find(z=>z.id===x.id)||x,B=e.buys;if(!Array.isArray(B)||B.length<2)return '';
   return `<div class="esec mgb"><b>خریدهای این واریزی</b><small class="emeta">${toFa(B.length)} خرید · جمع ${fmt(B.reduce((s,b)=>s+(+b.amount||0),0))} تومان</small><div class="mgl">${B.map((b,i)=>{const w=mgW(b.weight),pg=b.ppg||ppgOf(b.items.filter(z=>z.k==='طلا').reduce((s,z)=>s+(+z.amt||0),0),b.weight),at=b.at?new Date(b.at):null;

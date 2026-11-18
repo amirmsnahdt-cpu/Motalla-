@@ -28,7 +28,12 @@ ACT.entUnok=d=>entSetSt(d.id,'pending');
 ACT.entEditGo=d=>{ACT.openEnt(d);ACT.entEditOn()};
 ACT.fPay=d=>{fPay=d.iso;updPay()};
 ACT.fPayPick=()=>openCal(fPay||payDef(),iso=>ACT.fPay({iso}));
-ACT.openEnt=d=>{if(cur==='inv'&&invV)DST.push({k:'inv',inv:{...invV},cu:custId,p:PARENT.inv});entItSync(entries.find(z=>String(z.id)===String(d.id)),true)/* v72.0: ردیف‌های کهنه قبل از این نسخه با باز کردن درست می‌شوند */;entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday','cust','inv','bank'].includes(cur)?cur:cur==='sell'&&custId?'cust':'home';go('ent')};
+/* v91.9 (گزارش صاحب اپ: «برای مانده یک سند و حساب جدا باز شد؛ مانده باید در همان حساب باشد»): «مانده» یک واریزی تازه نیست، بخشی از همان واریزی است —
+   زدن روی ردیف مانده (لیست واریز، جستجو، حساب مشتری…) همان صفحه واریزی اصلی را باز می‌کند و ردیف مانده در «پرداخت این واریزی» چشمک می‌زند */
+const remRootOf=id=>{const e=entries.find(z=>String(z.id)===String(id));if(!e||!e.rem||e.splitOf==null)return null;const r=entries.find(z=>!z.del&&z.id===e.splitOf);return r||null};
+ACT.openEnt=d=>{{const r=remRootOf(d.id);if(r){const pid=d.id;d={...d,id:r.id};pyFlash=isNaN(+pid)?pid:+pid;setTimeout(()=>{pyFlash=null},1800);setTimeout(()=>{const el=document.querySelector('#py7 .py7r.rm')||$('py7');if(el&&cur==='ent')try{el.scrollIntoView({block:'center',behavior:RM()?'auto':'smooth'})}catch(_){}},420)}}
+  {const e0=entries.find(z=>String(z.id)===String(d.id));if(e0&&typeof depDocHeal==='function')depDocHeal(e0)}
+  if(cur==='inv'&&invV)DST.push({k:'inv',inv:{...invV},cu:custId,p:PARENT.inv});entItSync(entries.find(z=>String(z.id)===String(d.id)),true)/* v72.0: ردیف‌های کهنه قبل از این نسخه با باز کردن درست می‌شوند */;entId=d.id;entEdit=false;eD=null;PARENT.ent=['find','part','srcview','batch','list','split1','lday','cust','inv','bank'].includes(cur)?cur:cur==='sell'&&custId?'cust':'home';go('ent')};
 /* v70.2: دکمه حذف حالا در سرتیتر است؛ برای جلوگیری از زدن اشتباهی، تأیید می‌خواهد (به سطل بازیابی می‌رود) */
 ACT.entDel=d=>{const x=entries.find(z=>String(z.id)===String(d.id));if(!x)return;askConfirm('واریزی «'+fullName(x)+'» ('+fmt(x.amount)+' تومان) حذف شود؟ به سطل بازیابی می‌رود.','حذف',()=>{closeSheet();navBack=true;go(PARENT.ent||'home');delEntry(d.id)})};
 ACT.fF=d=>{fF=d.f;fN=120;render()};

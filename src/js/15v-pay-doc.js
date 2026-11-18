@@ -35,9 +35,18 @@ const depDoc=e=>{if(!e||!e.wd)return null;const c=custs.find(z=>!z.del&&String(z
 /* v71.0: سند خرید همان شماره سیستمی خرید (e.sno) را می‌گیرد تا هر خرید یک شماره داشته باشد (اگر آن شماره قبلاً سند دیگری است، شماره بعدی) */
 function depDocMake(e,c){const R=docMake(c,s=>{s.dk='buy';s.date=e.entryDate||todayISO();s.xr=depXr(e);if(+e.sno)s.no0=+e.sno});R.t.auto='dep';R.t.entId=e.id;
   e.wd={cu:c.id,no:R.t.no,amt:+e.amount||0,w:String(e.weight||'')};e.cuId=c.id;saveCu();saveE();return R}
-/* بعد از ویرایش مبلغ/وزن واریزی: سند خودکارش با همان شماره دوباره ساخته می‌شود (ردیف‌های پرداخت می‌مانند) */
-function depDocFix(e){const D=depDoc(e);if(!D||D.t.auto!=='dep'||String(D.t.entId)!==String(e.id))return;if(+e.wd.amt===+e.amount&&String(e.wd.w||'')===String(e.weight||''))return;
-  const R=docMake(D.c,s=>{s.edit={tx:D.t.id,no:D.t.no};s.dk='buy';s.date=D.t.date;s.xr=depXr(e);s.pays=(D.t.pays||[]).map(p=>({...p}))});R.t.auto='dep';R.t.entId=e.id;e.wd.amt=+e.amount||0;e.wd.w=String(e.weight||'');saveCu();saveE()}
+/* بعد از ویرایش مبلغ/وزن واریزی: سند خودکارش با همان شماره دوباره ساخته می‌شود (ردیف‌های پرداخت می‌مانند).
+   v91.9 (باگ ریشه‌ای): مبلغ خرید = e.wd.amt است، نه مبلغ خود واریزی اصلی. وقتی بخشی از واریزی جدا می‌شود (مانده بعد از کم شدن تسویه مشتری،
+   پرداخت از چند بانک) مبلغ واریزی اصلی کم می‌شود ولی خرید همان است؛ قبلاً اولین ویرایش بعدی، سند خرید فروشنده را به اندازه همان بخش کوچک می‌کرد
+   (بدهی ما به فروشنده گم می‌شد). حالا فقط «تغییری که کاربر در مبلغ داده» (d) روی مبلغ خرید می‌نشیند */
+function depDocFix(e,d){const D=depDoc(e);if(!D||D.t.auto!=='dep'||String(D.t.entId)!==String(e.id))return;d=Math.round(+d||0);const base=Math.round(+e.wd.amt||+e.amount||0),want=Math.max(0,base+d);
+  if(want===base&&String(e.wd.w||'')===String(e.weight||''))return;
+  const R=docMake(D.c,s=>{s.edit={tx:D.t.id,no:D.t.no};s.dk='buy';s.date=D.t.date;s.xr=depXr({...e,amount:want});s.pays=(D.t.pays||[]).map(p=>({...p}))});R.t.auto='dep';R.t.entId=e.id;e.wd.amt=want;e.wd.w=String(e.weight||'');saveCu();saveE()}
+/* ترمیم سندی که با همان باگ کوچک شده: واریزی اصلی «مانده» زنده دارد و مبلغ خرید ثبت‌شده درست برابر مبلغ خود واریزی اصلی شده
+   (یعنی بعد از جدا شدن مانده یک بار با مبلغ کم‌شده دوباره ساخته شده) → مبلغ مانده به سند برمی‌گردد. در حالت سالم این دو هیچ‌وقت برابر نیستند */
+function depDocHeal(e){try{if(!e||!e.wd||e.splitOf!=null)return 0;const D=depDoc(e);if(!D||D.t.auto!=='dep'||String(D.t.entId)!==String(e.id))return 0;
+    const rm=entries.filter(z=>!z.del&&z.rem&&z.splitOf===e.id).reduce((a,z)=>a+(+z.amount||0),0);if(!(rm>0)||Math.round(+e.wd.amt||0)!==Math.round(+e.amount||0))return 0;
+    depDocFix(e,rm);return rm}catch(_){return 0}}
 /* سند «دریافت» پرداخت‌کننده: ردیف حواله به فروشنده همین واریزی → تسویه byInv روی واریزی (ckDepApply در svCommit) */
 function payDocMake(e,c,a,o){o=o||{};const p={m:'dep',amount:Math.round(a),entId:e.id,entName:fullName(e)};if(o.tn)p.tn=o.tn;if(o.imgs&&o.imgs.length){p.imgs=o.imgs.slice();p.img=o.imgs[0]}
   const R=docMake(c,s=>{s.dk='in';s.date=todayISO();s.pays=[p]});const t=R.t;t.auto='stl';t.entId=e.id;
