@@ -53,7 +53,8 @@ function ivSecHTML(){const S=IS.W[IS.p],k=IS.sec,pn=INVP.find(x=>x[0]===IS.p)[1]
     +ivRow('نشانی','',`<input class="ivin" id="ivSa" value="${esc(IS.shop.ad)}" placeholder="نشانی کوتاه" maxlength="90" autocomplete="off" enterkeyhint="next">`,'col')
     +ivRow('تلفن','',`<input class="ivin ltr" id="ivSt" inputmode="tel" value="${esc(IS.shop.tel)}" placeholder="تلفن فروشگاه" maxlength="40" autocomplete="off" enterkeyhint="next">`,'col')
     +ivRow('اینستاگرام یا سایت','',`<input class="ivin ltr" id="ivSi" value="${esc(IS.shop.ig)}" placeholder="نشانی صفحه" maxlength="50" autocomplete="off" enterkeyhint="done">`,'col');
-  return `<div class="ivk">${h}</div><div class="ivact"><button type="button" data-act="ivCopy">${ic('copy')}<span>همین تنظیم برای همه قالب‌ها</span></button><button type="button" class="rd" data-act="ivReset">${ic('undo')}<span>پیش‌فرضِ «${pn}»</span></button></div>`}
+  const hint=k==='cols'?`<div class="ivsh own">${ic('edit')}<span>ستون‌ها فقط برای فاکتور «${pn}» است</span></div>`:`<div class="ivsh">${ic('check')}<span>این بخش برای همه فاکتورها یکی است${k==='head'?' (جز متن عنوان)':k==='foot'?' (جز یادداشت)':''}</span></div>`;
+  return `${hint}<div class="ivk">${h}</div><div class="ivact">${k==='cols'?`<button type="button" data-act="ivCopy">${ic('copy')}<span>همین ستون‌ها برای همه فاکتورها</span></button>`:''}<button type="button" class="rd" data-act="ivReset">${ic('undo')}<span>برگشت به پیش‌فرض</span></button></div>`}
 function vInvSet(){if(!isAdmin())return '<div class="card empty"><b>فقط مدیر دسترسی دارد</b></div>';if(!IS)ivOpen();
   return `<div class="ivs"><div class="ivtab" role="tablist" aria-label="قالب فاکتور">${INVP.map(([k,l])=>`<button type="button" role="tab" aria-selected="${IS.p===k}" class="${IS.p===k?'on':''}" data-act="ivTab" data-p="${k}">${l}</button>`).join('')}</div>
   <div class="ivtop"><div class="ivpv"><div class="ivpw" id="ivPw"><iframe id="ivF0" class="on" title="پیش‌نمایش فاکتور" tabindex="-1"></iframe><iframe id="ivF1" title="پیش‌نمایش فاکتور" tabindex="-1" aria-hidden="true"></iframe><button type="button" class="ivpz" data-act="ivZoom" aria-label="بزرگ‌نمایی پیش‌نمایش"><span>${ic('search')}</span></button></div><small class="ivpi" id="ivPi"></small></div>
@@ -69,7 +70,9 @@ function ivPrev(now){clearTimeout(ivPrev.t);ivPrev.t=setTimeout(()=>{const box=$
     b.srcdoc=h.replace('</head>','<style>html,body{margin:0!important;overflow:hidden!important;background:transparent!important}html body .sht{margin:0!important;border-radius:0!important;box-shadow:none!important}</style></head>');
     const i=$('ivPi');if(i)i.textContent=(X.real?'پیش‌نمایش همین سند':'پیش‌نمایش با سند نمونه')+(n>1?' · '+toFa(n)+' برگه':'')+' · برای بزرگ‌نمایی بزنید'},now?0:120)}
 /* بازسازی بدون render: فقط دکمه‌های بالا، فرم بخش و پیش‌نمایش (iframeها می‌مانند) */
-function ivRe(o){o=o||{};document.querySelectorAll('#view .ivtab button').forEach(b=>{const on=b.dataset.p===IS.p;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+/* v92.2: هر چه مشترک است (همه چیز جز عنوان، یادداشت و ستون‌ها) از قالب باز روی بقیه قالب‌ها هم می‌نشیند — برگه همه فاکتورها یک اندازه و یک شکل می‌ماند */
+function ivShSync(){if(!IS)return;const S=IS.W[IS.p];INVP.forEach(([k])=>{if(k===IS.p)return;const T=IS.W[k];for(const q in INVD)if(!invOwn(q))T[q]=S[q]})}
+function ivRe(o){o=o||{};ivShSync();document.querySelectorAll('#view .ivtab button').forEach(b=>{const on=b.dataset.p===IS.p;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
   document.querySelectorAll('#ivSc button').forEach(b=>{const on=b.dataset.s===IS.sec;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
   const C=$('ivC');if(C&&!o.keep){C.innerHTML=ivSecHTML();if(o.anim)C.classList.remove('in'),void C.offsetWidth,C.classList.add('in');ivBindIn()}hdGoSync();if(!o.noPrev)ivPrev()}
 function ivBindIn(){const S=IS.W[IS.p],B=(id,f)=>{const e=$(id);if(e)e.oninput=()=>{f(e.value);ivRe({keep:1})}};
@@ -87,10 +90,12 @@ ACT.ivV=d=>{if(!IS)return;const S=IS.W[IS.p],n=typeof INVD[d.k]==='number';S[d.k
 ACT.ivN=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=Math.round(((+S[d.k]||0)+(+d.d||0))*10)/10;IS.W[IS.p]=invClean(S);ivRe()};
 ACT.ivTtl=d=>{if(!IS)return;IS.W[IS.p].ttl=d.v||'';ivRe()};
 ACT.ivZoom=()=>{if(!IS)return;const X=ivDoc(),S={...IS.W[IS.p]},p=IS.p;openPrint(()=>ivWithShop(()=>invDoc(X.c,X.t,{S,prof:p})))};
-ACT.ivReset=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('تنظیمات قالب «'+pn+'» به پیش‌فرض برگردد؟','برگردان',()=>{IS.W[IS.p]=invClean({...INVD,...(INVT[IS.p]||{})});ivRe({anim:1});toast('قالب «'+pn+'» پیش‌فرض شد؛ برای ماندگار شدن «ذخیره» را بزنید')})};
-ACT.ivCopy=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('همه تنظیمات «'+pn+'» روی سه قالب دیگر هم گذاشته شود؟\nستون‌ها، ردیف‌ها، مانده حساب، سربرگ و پانویس آن‌ها جایگزین می‌شود.','کپی کن',()=>{INVP.forEach(([k])=>{if(k!==IS.p)IS.W[k]={...IS.W[IS.p]}});ivRe({keep:1,noPrev:1});toast('روی همه قالب‌ها گذاشته شد؛ برای ماندگار شدن «ذخیره» را بزنید')})};
+ACT.ivReset=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('همه تنظیمات به پیش‌فرض برگردد؟\nکاغذ، سربرگ، ردیف‌ها، مانده حساب و پانویس برای همه فاکتورها برمی‌گردد؛ ستون‌ها، عنوان و یادداشت فقط برای «'+pn+'».','برگردان',()=>{IS.W[IS.p]=invClean({...INVD,...(INVT[IS.p]||{})});ivRe({anim:1});toast('به پیش‌فرض برگشت؛ برای ماندگار شدن «ذخیره» را بزنید')})};
+ACT.ivCopy=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('ستون‌های «'+pn+'» روی سه فاکتور دیگر هم گذاشته شود؟\nستون‌ها و شکل اجرت، سود و نرخ آن‌ها جایگزین می‌شود.','کپی کن',()=>{INVP.forEach(([k])=>{if(k!==IS.p)for(const q in INVD)if(invOwn(q)&&q!=='ttl'&&q!=='note')IS.W[k][q]=IS.W[IS.p][q]});ivRe({keep:1,noPrev:1});toast('روی همه فاکتورها گذاشته شد؛ برای ماندگار شدن «ذخیره» را بزنید')})};
 ACT.ivSave=()=>{if(!IS||!isAdmin())return;if(!ivDirty()){toast('چیزی عوض نشده است');return}const r=cfgRec(1),inv={};
-  INVP.forEach(([k])=>{const base=invClean({...INVD,...(INVT[k]||{})}),c2=invClean(IS.W[k]),o={};for(const q in c2)if(c2[q]!==base[q])o[q]=c2[q];inv[k]=o});
+  ivShSync();INVP.forEach(([k])=>{const base=invClean({...INVD,...(INVT[k]||{})}),c2=invClean(IS.W[k]),o={};for(const q in c2)if(c2[q]!==base[q])o[q]=c2[q];inv[k]=o});
+  /* بخش مشترک جدا هم نوشته می‌شود (all)؛ در هر قالب هم می‌ماند تا گوشی‌ای که هنوز نسخه قبلی برنامه را دارد همان را بخواند */
+  {const c2=invClean(IS.W[IS.p]),all={};for(const q in c2)if(!invOwn(q)&&c2[q]!==INVD[q])all[q]=c2[q];inv.all=all}
   r.inv=inv;r.shop={nm:IS.shop.nm,ad:IS.shop.ad,tel:IS.shop.tel,ig:IS.shop.ig};saveCu();IS.sig0=ivSig();logA('cust','تنظیمات فاکتور','قالب‌های فاکتور ذخیره شد');toast('تنظیمات فاکتور ذخیره شد');
   /* v91.5 (خواسته صاحب اپ: «ذخیره که خورد انیمیشن درست انجام شود، ذخیره شود و بیرون بیاید»): «✓ ذخیره شد» روی خود دکمه، بعد برگشت به تنظیمات */
   setTimeout(()=>{if(cur==='invset'&&!ivDirty())leaveTo()},850)};

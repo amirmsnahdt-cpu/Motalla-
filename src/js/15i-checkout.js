@@ -262,10 +262,14 @@ function gkHTML(){const c=svCu(),r=gkRest(),L=svBalL(),g=L.find(z=>z[0]==='g')||
   return `<div class="ckw gkw"><div class="sh-h"><div><b>تسویه طلا</b><small class="shsub">${esc(c?cuName(c):'')}${r<0?' · طلا را به مشتری می‌دهیم':''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   ${mini}<div class="ckh ${r>0?'d':r<0?'c':'z'}"><small>${r?TL+' · '+(r>0?'طلبکاریم':'بدهکاریم'):TL+' تسویه است ✓'}</small><b>${wFmt(Math.abs(r))}<i>گرم ۷۵۰</i></b>${sv.rate&&r?`<em>به نرخ امروز حدود ${fmt(Math.round(Math.abs(r)*sv.rate))} تومان</em>`:''}</div>
   ${GTK.m?gkForm(r):!r?'':`<div class="ckt gkt">${O.map(([k,t,i])=>{const A=ckAni(k,i==='dOut');return `<button class="ckti q-${k}${A?' an':''}" data-act="gkM" data-m="${k}"><i>${A||ic(i)}</i><span>${t}</span></button>`}).join('')}</div>`}</div>`}
+/* v92.2 (خواسته صاحب اپ: «مستقیم آبشده می‌زند ولی ممکن است متفرقه گرفته باشیم»): نوع طلای دریافت/پرداخت — آبشده، متفرقه و کالاهای مغازه؛ آخرین انتخاب به یاد می‌ماند */
+function gkCats(){const F=['آبشده','متفرقه'],G=goodsList().filter(k=>!F.includes(k)&&k!=='سکه'&&k!=='سکه پارسیان'&&!['سکه','ارز'].includes(gCat(k))).sort((x,y)=>(svUsed[y]||0)-(svUsed[x]||0));return [...F,...G]}
+const gkCat0=()=>{const k=ls.get('m_gk_cat','آبشده');return gkCats().includes(k)?k:'آبشده'};
+function gkCatH(){const L=gkCats(),c=GTK.cat||'آبشده';return `<div class="gkty"><small>نوع طلا</small><div class="gktys">${L.map(k=>`<button type="button" class="gktc${k===c?' on':''}" data-act="gkCat" data-k="${esc(k)}">${ic('check')}<span>${esc(k)}</span></button>`).join('')}</div></div>`}
 function gkForm(r){const cv=GTK.m==='cv',ay=+GTK.ay||750,w=parseFloat(GTK.wt)||0,e=Math.round(w*ay/750*1000)/1000;
   const body=cv?`<div class="ckg"><label class="ckf"><small>وزن (گرم ۷۵۰)</small><input id="gkW" class="ltr" inputmode="decimal" value="${esc(GTK.wt||'')}" autocomplete="off"></label><label class="ckf"><small>هر گرم ۱۸ (تومان)</small><input id="gkP" class="ltr" inputmode="numeric" value="${GTK.pg?Number(GTK.pg).toLocaleString('en-US'):''}" autocomplete="off"></label></div>
     <div class="ckx" id="gkX">${w&&+GTK.pg?'مبلغ: <b>'+fmt(Math.round(w*GTK.pg))+'</b> تومان '+(r>0?'طلبکار می‌شویم':'بدهکار می‌شویم'):'وزن و نرخ را بزنید'}</div>`
-   :`<div class="ckg"><label class="ckf"><small>وزن (گرم)</small><input id="gkW" class="ltr" inputmode="decimal" value="${esc(GTK.wt||'')}" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="gkY" class="ltr" inputmode="numeric" value="${esc(String(ay))}" autocomplete="off"></label></div>
+   :`${gkCatH()}<div class="ckg"><label class="ckf"><small>وزن (گرم)</small><input id="gkW" class="ltr" inputmode="decimal" value="${esc(GTK.wt||'')}" autocomplete="off"></label><label class="ckf"><small>عیار</small><input id="gkY" class="ltr" inputmode="numeric" value="${esc(String(ay))}" autocomplete="off"></label></div>
     <div class="ckx" id="gkX">${w?'معادل ۷۵۰: <b>'+wFmt(e)+'</b> گرم':'وزن را بزنید'}</div>`;
   const T=cv?['تبدیل به مبلغ','swap']:r>0?['دریافت طلا','dIn']:['پرداخت طلا','dOut'];
   return `<div class="ckfm"><div class="ckfh"><b>${ic(T[1])} ${T[0]}</b><span class="ckfa"><button class="lnk" data-act="gkM" data-m="">انصراف</button><button type="button" class="ckok" data-act="gkAdd">${ic('check')} افزودن</button></span></div>${body}</div>`}
@@ -277,9 +281,10 @@ function gkBind(){const W=$('gkW'),Y=$('gkY'),P=$('gkP'),up=()=>{gkRead();const 
   if(P){selOnFocus(P);P.oninput=()=>{const v=num(P.value);P.value=v?v.toLocaleString('en-US'):'';up()}}
   if(W)sheetFocus(W)}
 ACT.gkTg=d=>{gkRead();GTK={w:d.w,m:''};gkRe()};
-ACT.gkM=d=>{gkRead();const m=d.m||'';if(m==='cv'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}GTK={w:GTK.w,m,wt:String(Math.abs(gkRest())||''),ay:750,pg:sv.rate||''};gkRe()};
+ACT.gkM=d=>{gkRead();const m=d.m||'';if(m==='cv'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}GTK={w:GTK.w,m,wt:String(Math.abs(gkRest())||''),ay:750,pg:sv.rate||'',cat:gkCat0()};gkRe()};
+ACT.gkCat=d=>{if(!GTK)return;GTK.cat=d.k;document.querySelectorAll('#sheet .gktc').forEach(b=>b.classList.toggle('on',b.dataset.k===d.k))};
 ACT.gkAdd=()=>{gkRead();const r=gkRest(),w=parseFloat(GTK.wt)||0;if(!(w>0)){toast('وزن را بزنید',true);const W=$('gkW');if(W)W.focus();return}
   if(GTK.m==='cv'){if(!(+GTK.pg>0)){toast('نرخ هر گرم را بزنید',true);return}const x=xrNew(r>0?'sell':'buy','gold',{pul:true,ay:750,cat:''});x.w=String(GTK.wt);if(+GTK.pg!==+sv.rate){x.pg=+GTK.pg;x.pgM=true}sv.xr.push(x)}
-  else{const ay=+GTK.ay||750;if(ay<100||ay>1000){toast('عیار درست نیست',true);return}const x=xrNew(r>0?'in':'out','gold',{cat:'آبشده',ay});x.w=String(GTK.wt);sv.xr.push(x)}
+  else{const ay=+GTK.ay||750;if(ay<100||ay>1000){toast('عیار درست نیست',true);return}const cat=gkCats().includes(GTK.cat)?GTK.cat:'آبشده',x=xrNew(r>0?'in':'out','gold',{cat,ay});x.w=String(GTK.wt);sv.xr.push(x);ls.set('m_gk_cat',cat)}
   GTK=null;svKeep();closeSheet();svAdd=-1;svRe();setTimeout(()=>{const R=document.querySelectorAll('#svRows .d6r'),el=R[R.length-1];if(el&&el.scrollIntoView)el.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'})},120);
   const g=(svBalL().find(z=>z[0]==='g')||[])[3]||0;toast(g?'ردیف به سند اضافه شد · مانده طلا '+wFmt(Math.abs(g))+' گرم':'طلا تسویه شد ✓')};
