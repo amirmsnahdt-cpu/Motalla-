@@ -4994,3 +4994,17 @@ button.qkk:not(.go):active{background:color-mix(in srgb,var(--blu) 20%,var(--car
 .qkk,.qks{transition:none!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button.qkk.pr:not(.go){background:color-mix(in srgb,var(--blu) 20%,var(--card));color:var(--blu);transform:translateY(2px)}
 button.qks.pr{background:color-mix(in srgb,var(--blu) 16%,var(--card));color:var(--blu)}
+
+/* ---- v97.4 (خواسته صاحب اپ: «کیبورد آیفون را فراموش کن؛ با تم و رنگ خود سند هماهنگ کن»): هر دو صفحه‌کلید رنگ همان پنجره را می‌گیرند
+   (--blu محلی: قرمز در فروش/پرداخت، آبی در خرید/دریافت): سینی کم‌رنگِ همان رنگ با خط دور، سایه زیر کلیدها و کلیدهای کمکی و پیشنهادها از همان رنگ، کلید فشرده = رنگ پُر ---- */
+.qkp,.qkp.qkb{background:color-mix(in srgb,var(--blu) 9%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 24%,var(--card))}
+.qkk{color:var(--ink);background:var(--card);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 14%,var(--card)),0 2.5px 0 color-mix(in srgb,var(--blu) 30%,var(--card)),0 6px 9px -6px color-mix(in srgb,var(--blu) 55%,transparent)}
+.qkk.em{background:none;box-shadow:none}
+.qkk.fn,.qkk.kb.fn{color:var(--blu);background:color-mix(in srgb,var(--blu) 13%,var(--card))}
+.qkk.fn svg,.qkk.fn svg *{stroke:currentColor}
+.qkk.kb.sp{color:color-mix(in srgb,var(--blu) 55%,var(--mut))}
+.qks{color:var(--blu)}
+.qks+.qks{box-shadow:inset 1px 0 0 color-mix(in srgb,var(--blu) 26%,transparent)}
+button.qkk.pr:not(.go),button.qkk:not(.go):active{background:var(--blu);color:#fff;transform:translateY(2px);box-shadow:0 0 0 transparent}
+button.qks.pr{background:var(--blu);color:#fff}
+html[data-theme=dark] .qkk:not(.go,.em){box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 22%,var(--card)),0 2.5px 0 rgb(0 0 0/.45)}
