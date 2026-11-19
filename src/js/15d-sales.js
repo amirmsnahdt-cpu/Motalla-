@@ -126,6 +126,11 @@ const xrAjOn=x=>x.a==='gold'&&(x.t==='in'||x.t==='out')&&!x.pul&&x.cat!=='مان
 /* مبلغ تومانی یک ردیف طلا/سکه در حساب مشتری: فروش و اجرتِ تحویل = طلبکار می‌شویم (منفی)، خرید و اجرتِ دریافت = بدهکار می‌شویم */
 const xrR=(x,am)=>x.t==='sell'||x.t==='out'?-(+am||0):(+am||0);
 const xrAjTx=(x,C)=>{if(!C||C.q0==null)return '';return [+x.ajP?'اجرت '+toFa(String(+x.ajP))+'٪'+(C.ajg?' ('+wFmt(C.ajg)+' گرم)':''):'',+x.pp?'سود '+toFa(String(+x.pp))+'٪'+(C.prg?' ('+wFmt(C.prg)+' گرم)':''):'',C.amount?'اجرت '+fmt(C.amount)+' تومان':''].filter(Boolean).join(' · ')};
+/* v94.0 (خواسته صاحب اپ: «در سند شرح کالا هم باشد؛ مثلاً ربع سکه (قنات‌آبادی)، متفرقه دستبند کارتیر»): هر ردیف کالا/طلا/سکه/ارز یک شرح اختیاری ds دارد
+   (ردیف‌های قدیمی کالا n متنی داشتند). dsOf = متن خام، dsH = کنار نام در ردیف‌های برنامه، dsP = «نام (شرح)» برای متن ساده */
+const dsOf=o=>o?clean(o.ds||(typeof o.n==='string'?o.n:'')||''):'';
+const dsH=o=>{const d=dsOf(o);return d?` <i class="rwds">(${esc(d)})</i>`:''};
+const dsP=o=>{const d=dsOf(o);return d?' ('+d+')':''};
 function xrLab(x){const g=x.a==='gold',A=g?'طلا':(XA[x.a]||{t:x.a}).t;if(!g&&XA[x.a]&&XA[x.a].k==='o')return (x.t==='sell'?'فروش ':'خرید ')+(x.nt||A);if(g&&x.sh===1&&x.cat==='آبشده')return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' آبشده شرطی';if(g&&x.pz)return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' سکه پارسیان';
   if(x.cat==='مانده قبلی')return 'مانده قبلی '+(g?'طلا':A)+' · '+(x.t==='out'?'طلبکاریم':'بدهکاریم');if(g&&x.cat==='تعویض')return 'تعویض طلا';if(g&&x.cat==='مرجوعی')return 'مرجوعی';if(g&&(x.t==='in'||x.t==='out')&&x.cat&&x.cat!=='متفرقه')return (x.t==='in'?'دریافت ':'تحویل ')+x.cat;if(g&&(x.t==='in'||x.t==='out')&&x.cat==='متفرقه')return (x.t==='in'?'دریافت':'تحویل')+' طلای متفرقه';
   if(g){if(x.cat==='قلک'&&x.pul)return (x.t==='buy'?'خرید':'فروش')+' قلک';if(x.t==='buy')return x.pul?'خرید پولی طلا':'خرید '+(x.cat&&x.cat!=='متفرقه'?'طلا · '+x.cat:'متفرقه');if(x.t==='sell')return x.pul?'فروش پولی طلا':'فروش '+(x.cat&&x.cat!=='متفرقه'?'طلا · '+x.cat:'متفرقه');return (x.t==='in'?'دریافت طلا':'تحویل طلا')}
@@ -222,7 +227,7 @@ function ajLast(k){const q=nzName(k||''),c=svCu(),ok=it=>it&&!it.ab&&nzName(it.k
   for(let i=(sv.items||[]).length-1;i>=0;i--)if(ok(sv.items[i]))return ajPT(sv.items[i]);
   const scan=L=>{let b=null,ba='';for(const t of L){if(!t||t.type!=='inv'||t.del)continue;const at=String(t.at||'');if(at<ba)continue;for(const it of t.items||[])if(ok(it)){b=it;ba=at}}return b};
   const own=c&&scan(c.txs||[]);if(own)return ajPT(own);const any=scan(CU().flatMap(z=>z.txs||[]));return any?ajPT(any):null}
-const qaIt=a=>({...(+a.mz?{mz:+a.mz}:{}),k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:a.ab?0:parseFloat(a.ajP)||0,ajT:a.ab?0:+a.ajT||0,pp:parseFloat(a.pp)||0,...(a.pz?{pz:1,cnt:+a.cnt||0}:(+a.cnt>0?{cnt:+a.cnt}:{})),...(Array.isArray(a.imgs)&&a.imgs.length?{imgs:a.imgs.slice(),img:a.imgs[0]}:{}),...(+a.amT>0?{amT:Math.round(+a.amT),amN:1}:{}),...(a.ab?{ab:1,lab:a.lab||'',ang:a.ang||'',...(a.sh?{sh:a.sh}:{})}:{})});
+const qaIt=a=>({...(+a.mz?{mz:+a.mz}:{}),k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:a.ab?0:parseFloat(a.ajP)||0,ajT:a.ab?0:+a.ajT||0,pp:parseFloat(a.pp)||0,...(a.pz?{pz:1,cnt:+a.cnt||0}:(+a.cnt>0?{cnt:+a.cnt}:{})),...(Array.isArray(a.imgs)&&a.imgs.length?{imgs:a.imgs.slice(),img:a.imgs[0]}:{}),...(+a.amT>0?{amT:Math.round(+a.amT),amN:1}:{}),...(clean(a.ds||'')?{ds:clean(a.ds)}:{}),...(a.ab?{ab:1,lab:a.lab||'',ang:a.ang||'',...(a.sh?{sh:a.sh}:{})}:{})});
 function qaCalc(){const B=$('qB');if(!B)return;qaRead();const a=sv.qa;if(a.p){pyHint();return}if(a.x){xrHint();return}const it=qaIt(a),c=itCalc(it,sv.rate,sv.tax),pg=$('qPg'),w7=$('qW7');if(w7)w7.textContent=it.w?wFmt(Math.round(it.w*it.ay/750*1000)/1000)+' گرم':'—';if(pg)pg.textContent=sv.rate?fmt(Math.round(sv.rate*it.ay/750)):'—';
   B.innerHTML=!sv.rate?'<small>مظنه یا نرخ گرم را بالای سند بزنید</small>':!it.w?'<small>وزن را بزنید</small>':`<button type="button" class="d6bt" data-act="qaBrk"><span>مبلغ این کالا</span><b>${fmt(c.tot)}</b><i>جزئیات ${ic('back').replace('class="i"','class="i flip"')}</i></button>`}
 /* v60.8: جزئیات طلا/اجرت/سود پنهان؛ با زدن (یا نگه داشتن) روی مبلغ، در یک حباب کوچک مثل پیام نشان داده می‌شود */
@@ -273,7 +278,7 @@ ACT.qaAdd=()=>{qaRead();const a=sv.qa;if(!a.k){toast('کالا را انتخاب
   const old=a.i!=null?sv.items[a.i]:null,it={...it0,cat:it0.ab?'آبشده':old&&old.cat?old.cat:GK.includes(a.k)?a.k:'نو',n:old?old.n||'':''};if(!it.ab)ls.set('m_aj',it.ajP)
   if(a.i!=null){sv.items[a.i]=it;svAdd=a.i}else{sv.items.push(it);svAdd=sv.items.length-1;svUsed[it.k]=(svUsed[it.k]||0)+1}const ay=it.ay;qaDone();sv.qa.ay=ay};
 ACT.qaDel=()=>{const a=sv.qa;if(a.i==null)return;const k=sv.items.splice(a.i,1)[0];qaDone();toast('«'+(k&&k.k)+'» از سند حذف شد','', 'بازگردانی',()=>{if(k){sv.items.push(k);svKeep();svRe()}})};
-ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;qaRead();const J=ajPT(it);sv.qa={...qaBlank(),mz:it.mz||'',k:it.k,w:String(it.w),ay:it.ay||750,ajP:J.P||'',ajT:J.T||'',pp:it.pp,amT:it.amT||'',pz:it.pz?1:0,cnt:it.cnt||'',imgs:xrPh(it),i:+d.i,...(it.ab?{ab:1,lab:it.lab||'',ang:it.ang||'',sh:it.sh||0}:{})};svKeep();qaRe('qW');const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
+ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;qaRead();const J=ajPT(it);sv.qa={...qaBlank(),mz:it.mz||'',k:it.k,w:String(it.w),ay:it.ay||750,ajP:J.P||'',ajT:J.T||'',pp:it.pp,amT:it.amT||'',pz:it.pz?1:0,cnt:it.cnt||'',imgs:xrPh(it),ds:dsOf(it),i:+d.i,...(it.ab?{ab:1,lab:it.lab||'',ang:it.ang||'',sh:it.sh||0}:{})};svKeep();qaRe('qW');const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
 /* ----- ردیف طلا / سکه / ارز ----- */
 const xrStart=x=>{qaRead();sv.qa.x=x;sv.qa.p=null;sv.qa.q='';svKeep();qaRe()};
 function xrHTML(){const x=sv.qa.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ed=x.i!=null,C=xrCalc(x,sv.rate),fl=x.fl||'';
@@ -313,7 +318,7 @@ ACT.xrSave=()=>{xrRead();const x=sv.qa.x;if(!x)return;const C=xrCalc(x,sv.rate),
   if(m&&!C.pg){toast(g?'مظنه یا نرخ گرم را بالای سند بزنید':'نرخ هر واحد را بزنید',true);const f=g&&!x.pgM?$('svM'):$('xrG');if(f)f.focus();return}
   /* v90.9: «خیلی بالا می‌خرید» / «زیر نرخ روز می‌فروشید» / نرخ پرت — پنجره خطا (15zz-warn) */
   if(warnGate('xr|'+JSON.stringify([x.t,x.a,x.pul,x.w,x.q,x.ay,x.pg,x.mz,x.am,x.amT,x.cat,x.ajP,x.pp]),xrWarn(x),()=>ACT.xrSave()))return;
-  if(!g&&m)ls.set('m_px_'+x.a,x.pg);const o={t:x.t,a:x.a,pul:!!x.pul,w:g?C.n:0,q:g?0:C.n,ay:g?+x.ay:0,pg:x.pgM||!g?+x.pg:0,pgM:!!(g&&x.pgM),cat:g?x.cat||'متفرقه':''};if(x.lab)o.lab=x.lab;if(x.ang)o.ang=x.ang;if(x.sh)o.sh=x.sh;if(x.pv)o.pv=x.pv;if(x.pz){o.pz=1;o.cnt=+x.cnt||0}if(x.img)o.img=x.img;if(Array.isArray(x.imgs)&&x.imgs.length){o.imgs=x.imgs.slice();o.img=x.imgs[0]}if(g&&m&&+x.am)o.am=Math.round(+x.am);if(m&&!(g&&+x.am)&&+x.amT)o.amT=Math.round(+x.amT);if(g&&m&&+x.mz)o.mz=+x.mz;
+  if(!g&&m)ls.set('m_px_'+x.a,x.pg);const o={t:x.t,a:x.a,pul:!!x.pul,w:g?C.n:0,q:g?0:C.n,ay:g?+x.ay:0,pg:x.pgM||!g?+x.pg:0,pgM:!!(g&&x.pgM),cat:g?x.cat||'متفرقه':''};if(x.lab)o.lab=x.lab;if(clean(x.ds||''))o.ds=clean(x.ds);if(x.ang)o.ang=x.ang;if(x.sh)o.sh=x.sh;if(x.pv)o.pv=x.pv;if(x.pz){o.pz=1;o.cnt=+x.cnt||0}if(x.img)o.img=x.img;if(Array.isArray(x.imgs)&&x.imgs.length){o.imgs=x.imgs.slice();o.img=x.imgs[0]}if(g&&m&&+x.am)o.am=Math.round(+x.am);if(m&&!(g&&+x.am)&&+x.amT)o.amT=Math.round(+x.amT);if(g&&m&&+x.mz)o.mz=+x.mz;
   /* v90.9: کالای تعدادی (غیر پارسیان) و فی خرید/فروش ردیف دریافت کالا؛ فی زده‌شده «فی فعلی» همان کالا می‌شود (15zz) */
   if(xrAjOn(o)){if(+x.ajP>0)o.ajP=+x.ajP;if(+x.pp>0)o.pp=+x.pp;if(+x.ajT>0)o.ajT=Math.round(+x.ajT)}
   if(g&&!x.pz&&+x.cnt>0)o.cnt=+x.cnt;if(g&&+x.fb>0)o.fb=+x.fb;if(g&&+x.fs>0)o.fs=+x.fs;gdFeeKeep(o);
@@ -454,8 +459,8 @@ function svRowsHTML(){const R=[],eff=d6Eff;
   /* v61.6: بدون ضربدر؛ کشیدن به چپ = حذف، به راست = ویرایش */
   const row=(k,i,act,ico,tag,b,sub,v,phs,ex)=>swW(d6Row({act,i,ico,phs,tag,b,sub,v,ex,key:'s'+k+i,nw:k==='it'&&i===svAdd}),{r:[[act,'ویرایش','edit','#3b6fd6']],l:[['svRowDel','حذف','trash','#d23c48']],data:{k,i}});
   const PG=pvGroups(sv.pays,sv.xr||[]);
-  sv.items.forEach((it,i)=>{const c=itCalc(it,sv.rate,sv.tax);R.push(row('it',i,'svItEdit',d6Ico('sell'),dkTag('sell'),esc(it.k)+(it.sh===1?' شرطی':'')+(it.n?' <i>'+esc(it.n)+'</i>':''),itDet(it,sv.rate,sv.tax),sv.rate?eff(-c.tot):'<small class="d6nr">نرخ را بزنید</small>',xrPh(it)))});
-  (sv.xr||[]).forEach((x,i)=>{if(PG.sx.has(i))return;const C=xrCalc(x,sv.rate),R0=xrR(x,C.amount),k=dkOfX(x);R.push(row('xr',i,'svXrEdit',d6Ico(k,'coin'),dkTag(k),esc(xrLab(x)),xrDet(x,C,sv.rate),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a),xrPh(x)))});
+  sv.items.forEach((it,i)=>{const c=itCalc(it,sv.rate,sv.tax);R.push(row('it',i,'svItEdit',d6Ico('sell'),dkTag('sell'),esc(it.k)+(it.sh===1?' شرطی':'')+dsH(it),itDet(it,sv.rate,sv.tax),sv.rate?eff(-c.tot):'<small class="d6nr">نرخ را بزنید</small>',xrPh(it)))});
+  (sv.xr||[]).forEach((x,i)=>{if(PG.sx.has(i))return;const C=xrCalc(x,sv.rate),R0=xrR(x,C.amount),k=dkOfX(x);R.push(row('xr',i,'svXrEdit',d6Ico(k,'coin'),dkTag(k),esc(xrLab(x))+dsH(x),xrDet(x,C,sv.rate),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a),xrPh(x)))});
   if(+sv.disc)R.push(row('dc',0,'svDisc','tag','','تخفیف','از جمع سند کم می‌شود',eff(+sv.disc)));
   sv.pays.forEach((p,i)=>{if(PG.sp.has(i))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row('py',i,p.m==='wd'?'svWdRow':'svPayEdit',M.i,dkTag(pyTagK(p)),esc(pyLab(p)),pyDet(p,sv.edit&&sv.edit.tx),eff(pAmt(p)),xrPh(p),p.m==='dep'?depActs(p,'s'+i):pyActs(p,svCu(),sv.edit&&sv.edit.tx,sv.edit?sv.edit.no:'')))});
   wdRowsHTML(svCu(),sv.edit?sv.edit.no:null).forEach(h=>R.push(h));
@@ -504,9 +509,9 @@ const dtL=(l,v,cl)=>`<div class="dtl${cl?' '+cl:''}"><span>${l}</span><b>${v}</b
 function svRowDet(){const R=[];
   sv.items.forEach(it=>{const c=itCalc(it,sv.rate,sv.tax),J=ajPT(it);
     const sub=[dtL('بها',fmt(c.gold)),it.ab?'':dtL('اجرت'+(J.P||J.T?' '+[J.P?toFa(J.P)+'٪':'',J.T?fmt(J.T)+' ت':''].filter(Boolean).join(' + '):''),fmt(c.aj)),dtL('سود '+toFa(String(+it.pp||0))+'٪',fmt(c.pr)),c.tax?dtL('مالیات ۱۰٪',fmt(c.tax)):''].join('');
-    R.push(`<div class="dtr"><div class="dth"><span class="dtn"><b>${esc(it.k)}</b><small>${it.pz&&+it.cnt?qFmt(it.cnt)+' عدد · ':''}${wFmt(it.w)} گرم · ${toFa(it.ay||750)}${+it.mz?' · مظنه '+fmt(it.mz):''}${c.fx?' · دستی':''}</small></span><b class="dtv d">${rdN(c.tot)}</b></div><div class="dts">${sub}</div></div>`)});
+    R.push(`<div class="dtr"><div class="dth"><span class="dtn"><b>${esc(it.k)}${dsH(it)}</b><small>${it.pz&&+it.cnt?qFmt(it.cnt)+' عدد · ':''}${wFmt(it.w)} گرم · ${toFa(it.ay||750)}${+it.mz?' · مظنه '+fmt(it.mz):''}${c.fx?' · دستی':''}</small></span><b class="dtv d">${rdN(c.tot)}</b></div><div class="dts">${sub}</div></div>`)});
   (sv.xr||[]).forEach(x=>{const C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy',u=g?'گرم':(XA[x.a]||{}).u||'';if(!m&&!C.n)return;const buy=x.t==='buy'||x.t==='in';
-    R.push(`<div class="dtr"><div class="dth"><span class="dtn"><b>${esc(xrLab(x))}</b><small>${x.pz&&+x.cnt?qFmt(x.cnt)+' عدد · ':''}${g?wFmt(C.n)+' گرم · '+toFa(x.ay||750):qFmt(C.n)+' '+esc(u)}${m?' · '+(g?'هر گرم ':'هر '+esc(u||'واحد')+' ')+fmt(C.pg):''}${C.fx?' · دستی':''}${!m&&C.q0!=null?' · '+xrAjTx(x,C):''}</small></span>${m||C.amount?`<b class="dtv ${buy?'c':'d'}">${buy?'<bdi dir="ltr">− '+rdN(C.amount)+'</bdi>':rdN(C.amount)}</b>`:`<b class="dtv z">${x.t==='in'?'دریافت':'تحویل'}</b>`}</div></div>`)});
+    R.push(`<div class="dtr"><div class="dth"><span class="dtn"><b>${esc(xrLab(x))}${dsH(x)}</b><small>${x.pz&&+x.cnt?qFmt(x.cnt)+' عدد · ':''}${g?wFmt(C.n)+' گرم · '+toFa(x.ay||750):qFmt(C.n)+' '+esc(u)}${m?' · '+(g?'هر گرم ':'هر '+esc(u||'واحد')+' ')+fmt(C.pg):''}${C.fx?' · دستی':''}${!m&&C.q0!=null?' · '+xrAjTx(x,C):''}</small></span>${m||C.amount?`<b class="dtv ${buy?'c':'d'}">${buy?'<bdi dir="ltr">− '+rdN(C.amount)+'</bdi>':rdN(C.amount)}</b>`:`<b class="dtv z">${x.t==='in'?'دریافت':'تحویل'}</b>`}</div></div>`)});
   return R.length?`<div class="dtg"><div class="dtt">ردیف‌ها <i>${toFa(R.length)}</i><span>تومان</span></div><div class="dtc">${R.join('')}</div></div>`:''}
 function svDetHTML(o){o=o||{};const c=svCu(),T=svTot(),ng=v=>'<bdi dir="ltr">− '+fmt(v)+'</bdi>',dc=T.total>0?'d':T.total<0?'c':'z',R=T.rest,rc=R>0?'d':R<0?'c':'z';
   const sale=T.sub+T.xs,tot=[sale&&(T.xb||T.disc)?dtL('جمع فروش',fmt(sale)):'',T.tax?dtL('مالیات <i>داخل فروش</i>',fmt(T.tax),'mu'):'',T.xb?dtL('خرید از مشتری',ng(T.xb)):'',T.disc?dtL('تخفیف',ng(T.disc)):''].join('');
@@ -666,8 +671,8 @@ function ivMeta(t){const D=dates(t.date),n=t.draft?null:cnOfT(t);return `<div cl
 /* v61.6: باز کردن سند = جزئیات سند و ردیف‌ها (مثل صفحه سند)؛ فاکتور کاغذی فقط با «نمایش فاکتور» */
 function ivDet(c,t){const D=dates(t.date),eff=d6Eff,R=[];
   let n=0;const row=(ico,tag,b,sub,v,phs,ex)=>d6Row({ico,phs,tag:dkTag(tag,c&&c.grp==='بانک'),b,sub,v,ex,key:'v'+t.id+'.'+n,n:n++}),PG=pvGroups(t.pays||[],t.xr||[]);
-  (t.items||[]).forEach(it=>R.push(row(d6Ico('sell'),'sell',esc(it.k)+(it.sh===1?' شرطی':'')+(it.n?' <i>'+esc(it.n)+'</i>':''),itDet(it,t.rate,t.tax,1),eff(-(+it.tot||0)),xrPh(it))));
-  (t.xr||[]).forEach((x,xi)=>{if(PG.sx.has(xi))return;const C={n:x.n!=null?x.n:(x.a==='gold'?x.w:x.q),pg:x.pg,amount:+x.amount||0,e:+x.e||0,...(x.q0!=null?{q0:+x.q0,ajg:+x.ajg||0,prg:+x.prg||0}:{})},R0=xrR(x,C.amount),k=dkOfX(x);R.push(row(d6Ico(k,'coin'),k,esc(xrLab(x)),xrDet(x,C,t.rate),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a),xrPh(x)))});
+  (t.items||[]).forEach(it=>R.push(row(d6Ico('sell'),'sell',esc(it.k)+(it.sh===1?' شرطی':'')+dsH(it),itDet(it,t.rate,t.tax,1),eff(-(+it.tot||0)),xrPh(it))));
+  (t.xr||[]).forEach((x,xi)=>{if(PG.sx.has(xi))return;const C={n:x.n!=null?x.n:(x.a==='gold'?x.w:x.q),pg:x.pg,amount:+x.amount||0,e:+x.e||0,...(x.q0!=null?{q0:+x.q0,ajg:+x.ajg||0,prg:+x.prg||0}:{})},R0=xrR(x,C.amount),k=dkOfX(x);R.push(row(d6Ico(k,'coin'),k,esc(xrLab(x))+dsH(x),xrDet(x,C,t.rate),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a),xrPh(x)))});
   if(+t.disc)R.push(row('tag','','تخفیف','از جمع سند کم شد',eff(+t.disc)));
   (t.pays||[]).forEach((p,pi)=>{if(PG.sp.has(pi))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row(M.i,pyTagK(p),esc(pyLab(p)),pyDet(p,t.id),eff(pAmt(p)),xrPh(p),p.m==='dep'?depActs(p,'v'+t.id+'.'+pi,c):pyActs(p,c,t.id,t.no)))});
   wdRowsHTML(c,t.no,t.id).forEach(h=>R.push(h));
