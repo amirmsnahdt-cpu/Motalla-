@@ -4975,3 +4975,26 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 button.qkk:not(.go):active{background:color-mix(in srgb,var(--blu) 20%,var(--card));color:var(--blu)}
 @media (max-height:720px){.qkp,.qkp.qkb{height:clamp(188px,calc(100dvh - 440px),350px);gap:7px;padding:8px}.qkp.qkb{gap:7px 0;padding:8px 5px}
   .stw:has(.stft) .qkp,.stw:has(.stph2) .qkp{height:clamp(180px,calc(100dvh - 496px),350px)}}
+
+/* ---- v97.0 صفحه‌کلید حروف به شکل کیبورد آیفون + ردیف پیشنهاد کلمه ---- */
+.qkp.qkb{background:#d1d4db;box-shadow:none;gap:7px 0;padding:6px 4px 8px;border-radius:18px}
+.qkb .qkr{gap:5px;flex:1 1 0}
+.qkb .qkr.sg{flex:.72 1 0;gap:0;align-items:stretch;padding:0 2px}
+.qks{flex:1 1 0;min-width:0;margin:0;padding:0 6px;border:0;background:none;font:inherit;font-size:clamp(15px,2.3dvh,18px);font-weight:600;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border-radius:8px;-webkit-tap-highlight-color:transparent}
+.qks+.qks{box-shadow:inset 1px 0 0 rgb(0 0 0/.16);border-radius:0}
+button.qks:active{background:rgb(255 255 255/.7)}
+.qkk.kb{background:#fff;color:#000;border-radius:7px;font-weight:500;font-size:clamp(21px,3.3dvh,27px);box-shadow:0 1px 0 rgb(0 0 0/.34)}
+.qkk.kb.fn{background:#abb1bc;color:#000}
+.qkk.kb.sp{color:#3c3c43;font-weight:500}
+.qkk.kb.tx{font-weight:600}
+button.qkk.kb:not(.go):active{background:#e9ebf0;color:#000;transform:none;box-shadow:0 1px 0 rgb(0 0 0/.34)}
+button.qkk.kb.fn:active{background:#fff}
+.qkk.kb.go{border-radius:7px;font-weight:700;box-shadow:0 1px 0 rgb(0 0 0/.34);background:var(--blu)}
+button.qkk.kb.go:active{transform:none;filter:brightness(.9);box-shadow:0 1px 0 rgb(0 0 0/.34)}
+html[data-theme=dark] .qkp.qkb{background:#2b2b2d}
+html[data-theme=dark] .qkk.kb{background:#6b6b6e;color:#fff;box-shadow:0 1px 0 rgb(0 0 0/.6)}
+html[data-theme=dark] .qkk.kb.fn{background:#47474a;color:#fff}
+html[data-theme=dark] .qks{color:#fff}html[data-theme=dark] .qks+.qks{box-shadow:inset 1px 0 0 rgb(255 255 255/.18)}
+html[data-theme=dark] button.qkk.kb:not(.go):active{background:#8a8a8e;color:#fff}
+@media (max-height:720px){.qkp.qkb{gap:5px 0;padding:5px 4px 6px}.qkb .qkr{gap:4px}}
+.qkp.qkb .qkk.kb.go,html[data-theme=dark] .qkp.qkb .qkk.kb.go{background:var(--blu);color:#fff}
