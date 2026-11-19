@@ -4824,6 +4824,12 @@ html[data-theme=dark] .ivsh.own{color:#ecd08a}
 .skl{display:flex;align-items:center;gap:7px;margin:10px 6px 0;font-size:11.5px;font-weight:700;line-height:1.7;color:var(--mut)}.skl svg{flex:none;width:14px;height:14px}
 .skw .skfe{margin-top:12px}
 html[data-theme=dark] .stkhero{background:linear-gradient(135deg,#b88a22 0%,#8a6410 55%,#5b3f04 100%)}html[data-theme=dark] .stki{color:#e2bb5e}
+/* v92.8 — تنظیمات فاکتور: زبانه پنجم «صورت‌حساب» (پنج زبانه در یک ردیف، نوشته کمی ریزتر در گوشی باریک) */
+.ivtab{grid-template-columns:repeat(5,minmax(0,1fr))}.ivtab button{font-size:12.5px;padding-inline:1px;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:380px){.ivtab button{font-size:11.5px}}
+/* v92.9 — پنجره ورود ردیف سند تا تأیید سر جایش قفل است */
+#view.qapin{overflow:hidden!important;overscroll-behavior:none}
+#qasp{flex:none;width:1px;pointer-events:none}
 /* v92.6 (طرح پیشنهادی) — صفحه‌کلید خود برنامه پایین پنجره قرمز/آبی ردیف سند: پله‌های عددی بدون کیبورد گوشی */
 .stw.haskp .st3 .stnx{display:none}
 .stw.haskp .st3{min-height:54px}.stw.haskp .st3 .stin{font-size:24px!important;font-weight:900;text-align:center;letter-spacing:.3px;caret-color:var(--blu)}

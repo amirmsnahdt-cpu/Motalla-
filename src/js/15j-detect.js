@@ -186,7 +186,7 @@ async function xrImgPaint(){const x=sv&&sv.qa&&sv.qa.x,el=$('xrFi');if(!x||!x.im
    (وقتی چیزی تایپ نشده) یا انتخاب یک نوع بسته می‌شود */
 let dkOpen=false;
 /* v61.57: باز کردن فهرست تشخیص بدون کیبورد */
-function dkShow(){const B=document.querySelector('.dkbox');if(!B)return;dkOpen=true;B.classList.add('open');const K=$('qK');if(K)K.readOnly=false;try{B.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})}catch(_){}}
+function dkShow(){const B=document.querySelector('.dkbox');if(!B)return;dkOpen=true;B.classList.add('open');const K=$('qK');if(K)K.readOnly=false;if(typeof qaPin==='function'){qaPin();return}try{B.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})}catch(_){}}
 /* v61.59 (خواسته صاحب اپ): وقتی فهرست باز است، زدن روی جستجو = کیبورد؛ وقتی بسته است، زدن = فقط باز شدن فهرست (بدون کیبورد).
    readonly یعنی «فهرست بسته»: لمس فوکوس نمی‌دهد و open() اجرا می‌شود؛ بعد از باز شدن، زدن بعدی فوکوس عادی = کیبورد */
 function kb2(el,isOpen,open){if(!el||el._kb2)return;el._kb2=1;const sync=()=>{el.readOnly=!isOpen()};sync();let x0=0,y0=0;
