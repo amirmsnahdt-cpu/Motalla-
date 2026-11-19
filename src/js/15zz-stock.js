@@ -11,7 +11,11 @@
    کلید = نام کالا، یا کد سکه/ارز (XA). موجودی فقط وقتی نشان داده می‌شود که «موجودی فعلی» زده شده یا دست‌کم یک دریافت/خرید ثبت شده باشد
    (وگرنه همه کالاها منفی دیده می‌شدند). */
 const GDSK={'g:ab':'آبشده','g:abs':'آبشده','g:misc':'متفرقه','g:pz':'سکه پارسیان'};
-const gdKeyOf=id=>{id=String(id||'');return GDSK[id]||(id.slice(0,2)==='a:'||id.slice(0,2)==='k:'?id.slice(2):'')};
+/* v95.1 (خواسته صاحب اپ: «موجودی آبشده شرطی وقتی عیارش ثبت شد از شرطی به موجودی آبشده برود»): آبشده‌ای که با عیار شرطی خریده/دریافت شده (sh:1) موجودی جدا دارد: STK_SH.
+   با ثبت عیار (shFix → sh:2 و زمانش sht) همان وزن در همان لحظه از «آبشده شرطی» کم و به «آبشده» اضافه می‌شود. ردیف‌های قدیمیِ عیارخورده که sht ندارند مثل قبل از اول در آبشده‌اند.
+   فروش/تحویل شرطی از همان موجودی «آبشده» کم می‌شود (طلا از انبار آبشده بیرون رفته) */
+const STK_SH='آبشده شرطی';
+const gdKeyOf=(id,d)=>{id=String(id||'');if(id==='g:abs'&&d&&d!=='sell'&&d!=='out')return STK_SH;return GDSK[id]||(id.slice(0,2)==='a:'||id.slice(0,2)==='k:'?id.slice(2):'')};
 const gdC=()=>cfgRec()||{};
 const gdFee=k=>(gdC().gfee||{})[k]||null;
 const gdCnt=k=>!!k&&(!!(gdC().gcnt||{})[k]||k==='سکه پارسیان');
@@ -22,7 +26,9 @@ function gdStockAll(){if(window.__gsc)return window.__gsc;const M=new Map(),B=gd
   for(const c of custs){if(!c||c.del||c.sys)continue;for(const t of c.txs||[]){if(!t||t.del||t.type!=='inv')continue;const at=t.at0||t.at;
     for(const it of t.items||[])mv(it.k,-(+it.w||0),-(+it.cnt||0),at,0);
     for(const x of t.xr||[]){if(!x||x.pul)continue;const s=x.t==='buy'||x.t==='in'?1:-1;
-      if(x.a==='gold'){if(x.cat==='مانده قبلی')continue;const k=x.pz?'سکه پارسیان':!x.cat||x.cat==='تعویض'||x.cat==='مرجوعی'?'متفرقه':x.cat;mv(k,s*(parseFloat(x.w)||0),s*(+x.cnt||0),at,s>0)}
+      if(x.a==='gold'){if(x.cat==='مانده قبلی')continue;
+        if(x.cat==='آبشده'&&s>0&&!x.pz&&(x.sh===1||(x.sh===2&&x.sht))){const w=parseFloat(x.w)||0;mv(STK_SH,w,0,at,1);if(x.sh===2){mv(STK_SH,-w,0,x.sht,0);mv('آبشده',w,0,x.sht,1)}continue}
+        const k=x.pz?'سکه پارسیان':!x.cat||x.cat==='تعویض'||x.cat==='مرجوعی'?'متفرقه':x.cat;mv(k,s*(parseFloat(x.w)||0),s*(+x.cnt||0),at,s>0)}
       else mv(x.a,0,s*(parseFloat(x.q)||0),at,s>0)}}}
   for(const k in B){const b=B[k]||{},o=M.get(k)||{w:0,n:0,rc:0};o.w+=+b.w||0;o.n+=+b.n||0;o.base=1;M.set(k,o)}
   M.forEach(o=>{o.w=Math.round(o.w*1000)/1000;o.n=Math.round(o.n*1000)/1000});return window.__gsc=M}
@@ -70,16 +76,16 @@ ACT.gdInfoSave=()=>{if(!GI)return;const k=GI.k,isX=!!XA[k],r=cfgRec(1),b=+giNum(
    ثبت = پایه تازه gstk[k] از همین لحظه (سندهای بعدی رویش می‌نشینند) + یک سطر در cfg.gstkL (۸۰ اصلاح آخر: چه کسی، کی، از چه به چه) + تاریخچه. */
 let STK={q:'',f:'all'},SKX=null;
 const stkCan=()=>isAdmin()||can('src');
-const stkGoods=()=>goodsList().filter(k=>!['آبشده','متفرقه','سکه','سکه پارسیان'].includes(k)&&!XA[k]&&!['سکه','ارز'].includes(gCat(k)));
+const stkGoods=()=>goodsList().filter(k=>!['آبشده',STK_SH,'متفرقه','سکه','سکه پارسیان'].includes(k)&&!XA[k]&&!['سکه','ارز'].includes(gCat(k)));
 /* همه ردیف‌ها: [کلید، نام، گروه g/c/f، تعدادی؟] */
-function stkAll(){xaSync();const L=[['آبشده','آبشده','g'],['متفرقه','متفرقه','g'],['سکه پارسیان','سکه پارسیان','g'],...stkGoods().map(k=>[k,k,'g'])];
+function stkAll(){xaSync();const L=[['آبشده','آبشده','g'],[STK_SH,STK_SH,'g'],['متفرقه','متفرقه','g'],['سکه پارسیان','سکه پارسیان','g'],...stkGoods().map(k=>[k,k,'g'])];
   for(const k in XA)L.push([k,XA[k].t||k,XA[k].k==='f'?'f':'c']);const M=gdStockAll();
   return L.map(([k,t,g])=>{const o=M.get(k)||{w:0,n:0},isX=g!=='g';return {k,t,g,isX,cn:isX||gdCnt(k),w:isX?0:o.w,n:o.n,v:isX?o.n:o.w,base:!!o.base}})}
 const stkDay=at=>{const d=new Date(at);if(isNaN(d))return '';const [,jm,jd]=g2j(d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()));return toFa(jd)+' '+JM[jm-1]};
 const stkLast=k=>((gdC().gstkL||[]).find(z=>z.k===k))||null;
 const stkVal=r=>r.isX?gdSgn(r.n,qFmt)+' <i>'+esc(XA[r.k].u||'عدد')+'</i>':gdSgn(r.w,wFmt)+' <i>گرم</i>';
-const stkIc=r=>ic(r.g==='f'?'usd':r.g==='c'||r.k==='سکه پارسیان'||r.k==='آبشده'||r.k==='متفرقه'?'coin':'ring');
-function stkRow(r,i){const L=stkLast(r.k),sub=L?'اصلاح '+stkDay(L.at)+(L.by?' · '+esc(L.by):''):r.base?'موجودی دستی':'از روی سندها';
+const stkIc=r=>ic(r.g==='f'?'usd':r.g==='c'||r.k==='سکه پارسیان'||r.k==='آبشده'||r.k===STK_SH||r.k==='متفرقه'?'coin':'ring');
+function stkRow(r,i){const L=stkLast(r.k),sub=(L?'اصلاح '+stkDay(L.at)+(L.by?' · '+esc(L.by):''):r.base?'موجودی دستی':'از روی سندها')+(r.k===STK_SH?' · با ثبت عیار به آبشده می‌رود':'');
   return `<button type="button" class="stkr${r.v<0?' ng':!r.v?' zr':''}" data-act="stkFix" data-k="${esc(r.k)}" style="--i:${Math.min(i,14)}"><span class="stki g-${r.g}">${stkIc(r)}</span><span class="tx"><b>${esc(r.t)}</b><small>${sub}${!r.isX&&r.cn&&r.n?' · '+gdSgn(r.n,qFmt)+' عدد':''}</small></span><span class="stkv">${stkVal(r)}</span><span class="cv">${ic('back')}</span></button>`}
 function stkListHTML(){const q=nzName(STK.q||''),f=STK.f,A=stkAll(),L=A.filter(r=>(f==='all'||(f==='neg'?r.v<0:r.g===f))&&(!q||nzName(r.t).includes(q)||nzName(r.k).includes(q)));
   if(!L.length)return `<div class="card empty"><b>${q?'چیزی با این نام پیدا نشد':'موردی نیست'}</b></div>`;
