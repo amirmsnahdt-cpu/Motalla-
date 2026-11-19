@@ -174,6 +174,8 @@ ACT.entMove=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)r
   const own=parts().find(z=>z.ids.some(i=>String(i)===String(x.id)));if(own)partId=own.id;
   if(x.sentBid&&!own){const q=entBI(x);if(!q||q.b.closed){toast('لیست این واریزی بایگانی شده است',true);return}}
   else if(x.level===2&&!own){toast('اول خطای این واریزی را اصلاح کنید',true);return}
+  /* v93.4: واریزی ارسال‌نشده → همان پنجره «پرداخت از کجا؟» (زبانه بانک)؛ پنجره «تخصیص به منبع» فقط برای انتقال ردیف ارسال‌شده می‌ماند */
+  if(!x.sentBid&&x.level<2&&pxUni(x))return;
   moveSheet([x.id],fullName(x)+'، '+fmt(x.amount)+' تومان',own)};
 ACT.aNewSrc=()=>{const st=aSt;ACT.acNew();acTmp.after=src=>{aSt=st;aSt.srcId=src.id;allocSheet();recalc()}};
 ACT.mvNew=()=>{const ids=mvIds.slice(),fr=mvFrom;ACT.acNew();acTmp.after=src=>{mvIds=ids;mvFrom=fr;ACT.mvGo({s:src.id})}};
