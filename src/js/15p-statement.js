@@ -40,58 +40,84 @@ const stNm=k=>k==='r'?'ریالی · تومان':k==='g'?'طلا · گرم ۱۸ 
 const stV=(k,v)=>k==='r'?fmt(Math.abs(v)):k==='g'?wFmt(Math.abs(v)):qFmt(Math.abs(v));
 const stL=v=>!v?'تسویه':v<0?'طلبکاریم':'بدهکاریم';
 /* v92.7 (خواسته صاحب اپ: «لیست نباید این‌قدر پیچیده باشد؛ مانده نهایی‌ها مشخص باشد؛ کادر و بوردرها اصلاً مشخص نیست»):
-   صورتحساب ساده — بالا کادرهای پررنگ «مانده نهایی حساب» (یک کادر برای هر جنس: عدد درشت، طلبکاریم/بدهکاریم و جمله ساده)،
-   بعد یک جدول تمام‌خط‌کشی: هر سند یک ردیف (عنوان + یک خط خلاصه کالا + یک خط خلاصه دریافت/پرداخت؛ بدون ریز ردیف‌ها و برچسب‌ها)،
-   و برای هر جنس فقط دو ستون «این سند» و «مانده». آخر جدول ردیف پررنگ «مانده نهایی حساب». جمع گردش‌ها در Excel می‌ماند. */
-function stmtSum(t){const L=stmtLines(t),G=[],P={'دریافت':[0,[]],'پرداخت':[0,[]]};
-  L.forEach(l=>{const tg=String(l[0]||''),q=l[2]!==''&&l[2]!=null;if(q||!P[tg]){const nm=String(l[1]||''),pre=/^(فروش|خرید|تحویل|دریافت|تعویض|مرجوعی|مانده)/.test(nm)?'':tg+' ';G.push(pre+nm+(q?' '+(l[3]==='گرم'?wFmt(l[2]):qFmt(l[2]))+' '+l[3]:'')+(tg==='تخفیف'&&l[8]?' '+fmt(Math.abs(l[8])):''));return}
-    let m=String(l[1]||'').replace(/^(دریافت|پرداخت)\s+/,'');const a=m.split(' · ');m=/^(اضافه|کسر)$/.test(a[0])&&a[1]?a[1]:a[0];P[tg][0]+=Math.abs(+l[8]||0);if(m&&!P[tg][1].includes(m))P[tg][1].push(m)});
-  const pl=k=>P[k][0]?k+' '+fmt(P[k][0])+' تومان'+(P[k][1].length?' ('+P[k][1].join('، ')+')':''):'';
-  return [G.join(' · '),[pl('دریافت'),pl('پرداخت')].filter(Boolean).join(' · ')].filter(Boolean)}
-function stmtPdfHTML(c,F){const S=stmtData(c,F),D=dates(),b=S.bal,ks=['g','r',...S.XK],land=S.XK.length>0,rng=!!(S.F.f||S.F.t);
+   صورتحساب ساده — بالا کادر پررنگ «مانده نهایی حساب»، بعد یک جدول تمام‌خط‌کشی که هر سند یک ردیف آن است، و ردیف آخر «مانده نهایی حساب».
+   v92.8 (خواسته صاحب اپ: «فروش و خرید و پرداخت و دریافت در لیست کنار هم، زیر هم ستون شود؛ برای PDF هم قسمتی که بشود ادیت کرد چه چیزهایی بیاید، در تنظیمات فاکتور»):
+   مبلغ هر سند در ستون خودش می‌نشیند — فروش | خرید | دریافت | پرداخت | مانده — و همه‌چیز برگه از «تنظیمات فاکتور › صورت‌حساب» روشن و خاموش می‌شود.
+   تنظیم‌ها (STMD؛ فقط فرق با پیش‌فرض در cfg.stm ذخیره و همگام می‌شود؛ stmClean هر مقدار خراب را به پیش‌فرض برمی‌گرداند):
+     paper a خودکار / p عمودی / l افقی · fs اندازه نوشته · lg لوگو · ph تلفن · nid کد ملی · grp گروه · cnt تعداد سند
+     fb کادر مانده نهایی بالا · fbs جمله زیر عدد · csl/cby/cin/cout ستون‌های فروش/خرید/دریافت/پرداخت · cdv ستون «این سند» (خالص) · cbl ستون مانده
+     gd ستون‌های طلا (a = وقتی حساب طلا دارد / y / n) · gdv «این سند» طلا · cx سکه و ارز · s1 خط کالاها · s2 خط روش دریافت/پرداخت · mz مظنه سند
+     tot ردیف جمع ستون‌ها · fr ردیف مانده نهایی · lgd راهنما · sg جای امضا · note یادداشت پایین برگه */
+const STMD={paper:'a',fs:0,lg:1,ph:1,nid:1,grp:1,cnt:1,fb:1,fbs:1,csl:1,cby:1,cin:1,cout:1,cdv:0,cbl:1,gd:'a',gdv:1,cx:1,s1:1,s2:1,mz:0,tot:1,fr:1,lgd:1,sg:1,note:''},STME={paper:['a','p','l'],gd:['a','y','n']},STMN={fs:[-1,2]};
+function stmClean(o){const r={};for(const k in STMD){const d=STMD[k],v=o?o[k]:undefined;if(STME[k])r[k]=STME[k].includes(v)?v:d;else if(STMN[k]){const n=Math.round(+v);r[k]=isFinite(n)&&v!==''&&v!=null?Math.min(STMN[k][1],Math.max(STMN[k][0],n)):d}else if(typeof d==='string')r[k]=typeof v==='string'?clean(v).slice(0,170):d;else r[k]=v==null?d:(v?1:0)}
+  if(!r.csl&&!r.cby&&!r.cin&&!r.cout&&!r.cdv)r.cbl=1;return r}
+const stmCfg=()=>stmClean({...STMD,...((cfgRec()||{}).stm||{})});
+/* خلاصه یک سند: [خط کالاها، خط روش‌های دریافت/پرداخت] و مبلغ تومانی هر دسته {s فروش، b خرید، i دریافت، o پرداخت} */
+function stmtSum(t,amt){const L=stmtLines(t),G=[],P={'دریافت':[0,[]],'پرداخت':[0,[]]},C={s:0,b:0,i:0,o:0};
+  L.forEach(l=>{const tg=String(l[0]||''),q=l[2]!==''&&l[2]!=null,a=+l[8]||0;if(q||!P[tg]){const nm=String(l[1]||''),pre=/^(فروش|خرید|تحویل|دریافت|تعویض|مرجوعی|مانده)/.test(nm)?'':tg+' ';G.push(pre+nm+(q?' '+(l[3]==='گرم'?wFmt(l[2]):qFmt(l[2]))+' '+l[3]:'')+(tg==='تخفیف'&&a?' '+fmt(Math.abs(a)):''));if(tg==='تخفیف')C.i+=Math.abs(a);else if(a>0)C.s+=a;else if(a<0)C.b+=-a;return}
+    let m=String(l[1]||'').replace(/^(دریافت|پرداخت)\s+/,'');const x=m.split(' · ');m=/^(اضافه|کسر)$/.test(x[0])&&x[1]?x[1]:x[0];P[tg][0]+=Math.abs(a);C[tg==='دریافت'?'i':'o']+=Math.abs(a);if(m&&!P[tg][1].includes(m))P[tg][1].push(m)});
+  const pl=k=>P[k][0]?k+(amt?' '+fmt(P[k][0])+' تومان'+(P[k][1].length?' ('+P[k][1].join('، ')+')':''):P[k][1].length?': '+P[k][1].join('، '):''):'';
+  return {g:G.join(' · '),p:[pl('دریافت'),pl('پرداخت')].filter(x=>x&&x!=='دریافت'&&x!=='پرداخت').join(' · '),C}}
+/* دسته‌های تومانی یک ردیف صورتحساب؛ هر اثر تومانی که در چهار دسته نیامده (انتقال، تبدیل، سند قدیمی…) به دریافت یا پرداخت می‌رود تا جمع ستون‌ها همیشه با مانده بخواند */
+function stmtCats(o,sm){const C=sm?{...sm.C}:{s:0,b:0,i:0,o:0},e=Math.round((o.r||0)-(-C.s+C.b+C.i-C.o));if(e>0)C.i+=e;else if(e<0)C.o+=-e;return C}
+function stmtPdfHTML(c,F,O){const S=stmtData(c,F),D=dates(),b=S.bal,Z=O&&O.S?stmClean({...STMD,...O.S}):stmCfg(),rng=!!(S.F.f||S.F.t),fz=1+Z.fs*.08,z=n=>+(n*fz).toFixed(2);
   const mv=(o,k)=>k==='r'?o.r:k==='g'?o.g:+(o.x[k]||0),bl=(o,k)=>k==='r'?o.R:k==='g'?o.G:+((o.X||{})[k]||0);
   const fin=k=>k==='r'?b.R:k==='g'?b.G:+((b.X||{})[k]||0),kn=k=>k==='r'?'مبلغ':k==='g'?'طلا':esc((XA[k]||{t:k}).t);
+  const gOn=Z.gd==='y'||(Z.gd==='a'&&(!!fin('g')||S.rows.some(o=>o.g||o.G)||!!(S.open&&S.open.G)));
+  const ks=[...(gOn?['g']:[]),'r',...(Z.cx?S.XK:[])],XS=ks.filter(k=>k!=='r');
+  /* ستون‌های هر جنس: [کلید، سرستون، کلاس رنگ] */
+  const RC=[...(Z.csl?[['s','فروش','rd']]:[]),...(Z.cby?[['b','خرید','bl']]:[]),...(Z.cin?[['i','دریافت','bl']]:[]),...(Z.cout?[['o','پرداخت','rd']]:[]),...(Z.cdv?[['d','این سند','']]:[]),...(Z.cbl?[['B','مانده','']]:[])];
+  const KC=k=>k==='r'?RC:[...(Z.gdv||k!=='g'?[['d','این سند','']]:[]),['B','مانده','']];
   const say=v=>!v?'حساب این بخش صاف است':v<0?'مشتری به مطلا بدهکار است':'مطلا به مشتری بدهکار است';
-  const card=k=>{const v=fin(k);return `<div class="fk ${v<0?'d':v>0?'c':'z'}"><div class="fkh"><b>${kn(k)}</b><u>${esc(stU(k))}</u></div><div class="fkv"><bdi>${v?stV(k,v):'۰'}</bdi><em>${stL(v)}</em></div><div class="fks">${say(v)}</div></div>`};
+  const card=k=>{const v=fin(k);return `<div class="fk ${v<0?'d':v>0?'c':'z'}"><div class="fkh"><b>${kn(k)}</b><u>${esc(stU(k))}</u></div><div class="fkv"><bdi>${v?stV(k,v):'۰'}</bdi><em>${stL(v)}</em></div>${Z.fbs?`<div class="fks">${say(v)}</div>`:''}</div>`};
   const dC=(k,v)=>v?`<bdi class="${v<0?'rd':'bl'}">${stV(k,v)}</bdi><small class="${v<0?'rd':'bl'}">${v<0?'طلبکار شدیم':'بدهکار شدیم'}</small>`:'<span class="z">—</span>';
   const bC=(k,B)=>B?`<bdi class="${B<0?'rd':'bl'}">${stV(k,B)}</bdi><small class="${B<0?'rd':'bl'}">${stL(B)}</small>`:'<bdi class="gr">۰</bdi><small class="gr">تسویه</small>';
+  const aC=(v,cl)=>v?`<bdi class="${cl}">${fmt(Math.round(v))}</bdi>`:'<span class="z">—</span>';
   /* مانده صفرِ جنسی که هنوز در این حساب گردشی نداشته خط تیره است (نه «تسویه») تا جدول شلوغ نشود */
   const seen={};if(S.open)ks.forEach(k=>{if(bl(S.open,k))seen[k]=1});
-  const cells=o=>ks.map(k=>{const v=mv(o,k),B=bl(o,k);if(v||B)seen[k]=1;return `<td class="dv">${dC(k,v)}</td><td class="bv">${B||seen[k]?bC(k,B):'<span class="z">—</span>'}</td>`}).join('');
-  const W=land?{g:[8,9],r:[10,11],x:[7,8]}:{g:[10.5,11.5],r:[14,15],x:[8,9]};
-  const cg=`<colgroup><col style="width:${land?4:5}%"><col style="width:${land?9:11}%"><col>${ks.map(k=>(W[k==='r'?'r':k==='g'?'g':'x']).map(w=>`<col style="width:${w}%">`).join('')).join('')}</colgroup>`;
-  const head=`<tr class="g1"><th rowspan="2">ردیف</th><th rowspan="2">تاریخ</th><th rowspan="2" class="ds">شرح سند</th>${ks.map(k=>`<th colspan="2" class="grp">${kn(k)} <u>${esc(stU(k))}</u></th>`).join('')}</tr><tr class="g2">${ks.map(()=>`<th>این سند</th><th>مانده</th>`).join('')}</tr>`;
-  const body=S.rows.map(o=>{const sm=o.t.type==='inv'?stmtSum(o.t):[o.desc].filter(Boolean);return `<tbody class="en"><tr class="hs"><td class="n">${fmt(o.i)}</td><td class="dt">${esc(dates(o.date).fa)}</td><td class="ds"><span class="nm">${esc(o.title)}</span>${sm.map(x=>`<span class="s">${esc(toFa(x))}</span>`).join('')}</td>${cells(o)}</tr></tbody>`}).join('');
-  const open=S.open?`<tbody class="en"><tr class="op"><td class="n"></td><td class="dt">${esc(dates(isoAdd(S.F.f,-1)).fa)}</td><td class="ds"><span class="nm">مانده از قبل</span><span class="s">نقل از پیش از ${esc(dates(S.F.f).fa)}</span></td>${ks.map(k=>`<td class="dv"></td><td class="bv">${bC(k,bl(S.open,k))}</td>`).join('')}</tr></tbody>`:'';
-  const foot=`<tbody class="en"><tr class="ft2"><td colspan="3">مانده ${rng?'پایان بازه':'نهایی حساب'}</td>${ks.map(k=>{const v=fin(k);return `<td colspan="2" class="fb ${v<0?'rd':v>0?'bl':'gr'}"><bdi>${v?stV(k,v):'۰'}</bdi> <u>${esc(stU(k))}</u> <em>${stL(v)}</em></td>`}).join('')}</tr></tbody>`;
-  const html=`<section class="pg">${pdfTop('صورتحساب مشتری',D)}${pdfInf([['مشتری',esc((c.title?c.title+' ':'')+cuName(c)),c.nid?'کد ملی '+esc(toFa(c.nid)):'',1],c.phone?['تلفن','<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>','']:null,c.grp?['گروه',esc(c.grp),'']:null,['تعداد سند',fmt(S.rows.length),'']])}${stmPer(S)?`<div class="per"><span>${esc(stmPer(S))}</span>${S.F.q?`<span>جستجو: «${esc(S.F.q)}»</span>`:''}</div>`:''}<div class="bar"></div>
-  <div class="fbx"><div class="fbt">مانده ${rng?'پایان بازه':'نهایی حساب'}</div><div class="fks2">${ks.map(card).join('')}</div></div>
-  <h2>گردش حساب <small>هر سند یک ردیف · مانده بعد از همان سند</small></h2><table class="lg2">${cg}<thead>${head}</thead>${open}${body||`<tbody><tr><td colspan="${ks.length*2+3}" class="emp">در این بازه${S.F.q?' و با این جستجو':''} ردیفی نیست</td></tr></tbody>`}${S.rows.length?foot:''}</table>
-  <div class="lgd"><span><b class="rd">طلبکاریم</b> یعنی مشتری به مطلا بدهکار است</span><span><b class="bl">بدهکاریم</b> یعنی مطلا به مشتری بدهکار است</span></div>
-  <div class="sign"><div>امضای مشتری</div><div>مهر و امضای مطلا</div></div>${pdfFoot()}</section>`;
+  const R=S.rows.map(o=>{const sm=o.t.type==='inv'?stmtSum(o.t,!(Z.cin||Z.cout)):null,C=stmtCats(o,sm);return {o,sm,C}}),T={s:0,b:0,i:0,o:0};R.forEach(x=>{for(const q in T)T[q]+=x.C[q]});
+  const cells=x=>ks.map(k=>{const v=mv(x.o,k),B=bl(x.o,k);if(v||B)seen[k]=1;return KC(k).map(([q,,cl])=>q==='d'?`<td class="dv">${dC(k,v)}</td>`:q==='B'?`<td class="bv">${B||seen[k]?bC(k,B):'<span class="z">—</span>'}</td>`:`<td class="cv">${aC(x.C[q],cl)}</td>`).join('')}).join('');
+  /* پهنای ستون‌ها از بلندترین عدد هر ستون (میلی‌متر)؛ کاغذ خودکار: عمودی اگر برای شرح دست‌کم ۴۴ میلی‌متر بماند، وگرنه افقی */
+  const tw=t=>{let w=0;for(const ch of String(t))w+=/[۰-۹0-9]/.test(ch)?1.72:/[,.٬٫]/.test(ch)?.9:1.3;return w*fz},cw=(L,mn,f)=>Math.max(mn*Math.min(1,fz),Math.ceil((Math.max(0,...L.map(tw))*(f||1)+3.6)*2)/2);
+  const CWm={};ks.forEach(k=>KC(k).forEach(([q,h])=>{const L=q==='d'?S.rows.map(o=>stV(k,mv(o,k))):q==='B'?S.rows.map(o=>stV(k,bl(o,k))):R.map(x=>fmt(Math.round(x.C[q])));CWm[k+q]=Math.max(cw(L,k==='r'?(q==='B'?19:15):q==='B'?13:12.5,q==='B'?1.08:1),'sbio'.includes(q)&&Z.tot?cw([fmt(Math.round(T[q]))],0,.95):0)}));
+  const NW=7.5*Math.max(1,fz),DW=16.5*fz,fixed=NW+DW+Object.values(CWm).reduce((a,v)=>a+v,0),land=Z.paper==='l'||(Z.paper==='a'&&190-fixed<40),PW=land?277:190,pc=v=>(v/PW*100).toFixed(2);
+  const cg=`<colgroup><col style="width:${pc(NW)}%"><col style="width:${pc(DW)}%"><col>${ks.map(k=>KC(k).map(([q])=>`<col style="width:${pc(CWm[k+q])}%">`).join('')).join('')}</colgroup>`,NC=3+ks.reduce((a,k)=>a+KC(k).length,0);
+  const head=`<tr class="g1"><th rowspan="2">ردیف</th><th rowspan="2">تاریخ</th><th rowspan="2" class="ds">شرح سند</th>${ks.map(k=>`<th colspan="${KC(k).length}" class="grp">${kn(k)} <u>${esc(stU(k))}</u></th>`).join('')}</tr><tr class="g2">${ks.map(k=>KC(k).map(([q,h,cl])=>`<th class="${cl} ${q==='B'?'hb':''}">${h}</th>`).join('')).join('')}</tr>`;
+  const body=R.map(x=>{const o=x.o,sm=x.sm,L=sm?[Z.s1?sm.g:'',Z.s2?sm.p:'',Z.mz&&o.t.rate?'مظنه '+fmt(o.t.mz||Math.round(o.t.rate*MZK)):'']:[Z.s1?o.desc:''];return `<tbody class="en"><tr class="hs"><td class="n">${fmt(o.i)}</td><td class="dt">${esc(dates(o.date).fa)}</td><td class="ds"><span class="nm">${esc(o.title)}</span>${L.filter(Boolean).map(t=>`<span class="s">${esc(toFa(t))}</span>`).join('')}</td>${cells(x)}</tr></tbody>`}).join('');
+  const open=S.open?`<tbody class="en"><tr class="op"><td class="n"></td><td class="dt">${esc(dates(isoAdd(S.F.f,-1)).fa)}</td><td class="ds"><span class="nm">مانده از قبل</span><span class="s">نقل از پیش از ${esc(dates(S.F.f).fa)}</span></td>${ks.map(k=>KC(k).map(([q])=>q==='B'?`<td class="bv">${bC(k,bl(S.open,k))}</td>`:'<td></td>').join('')).join('')}</tr></tbody>`:'';
+  const totR=Z.tot&&RC.some(c=>'sbio'.includes(c[0]))?`<tr class="ft1"><td colspan="3">جمع ${rng?'این بازه':'ستون‌ها'}</td>${ks.map(k=>KC(k).map(([q,,cl])=>k==='r'&&'sbio'.includes(q)?`<td class="cv">${aC(T[q],cl)}</td>`:'<td></td>').join('')).join('')}</tr>`:'';
+  const finR=Z.fr?`<tr class="ft2"><td colspan="3">مانده ${rng?'پایان بازه':'نهایی حساب'}</td>${ks.map(k=>{const v=fin(k);return `<td colspan="${KC(k).length}" class="fb ${v<0?'rd':v>0?'bl':'gr'}"><span><bdi>${v?stV(k,v):'۰'}</bdi> <u>${esc(stU(k))}</u></span><em>${stL(v)}</em></td>`}).join('')}</tr>`:'';
+  const foot=totR||finR?`<tbody class="en">${totR}${finR}</tbody>`:'';
+  const html=`<section class="pg">${pdfTop('صورتحساب مشتری',D)}${pdfInf([['مشتری',esc((c.title?c.title+' ':'')+cuName(c)),Z.nid&&c.nid?'کد ملی '+esc(toFa(c.nid)):'',1],Z.ph&&c.phone?['تلفن','<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>','']:null,Z.grp&&c.grp?['گروه',esc(c.grp),'']:null,Z.cnt?['تعداد سند',fmt(S.rows.length),'']:null])}${stmPer(S)?`<div class="per"><span>${esc(stmPer(S))}</span>${S.F.q?`<span>جستجو: «${esc(S.F.q)}»</span>`:''}</div>`:''}<div class="bar"></div>
+  ${Z.fb?`<div class="fbx"><div class="fbt">مانده ${rng?'پایان بازه':'نهایی حساب'}</div><div class="fks2">${ks.map(card).join('')}</div></div>`:''}
+  <h2>گردش حساب <small>هر سند یک ردیف · مانده بعد از همان سند</small></h2><table class="lg2">${cg}<thead>${head}</thead>${open}${body||`<tbody><tr><td colspan="${NC}" class="emp">در این بازه${S.F.q?' و با این جستجو':''} ردیفی نیست</td></tr></tbody>`}${S.rows.length?foot:''}</table>
+  ${Z.lgd?`<div class="lgd"><span><b class="rd">طلبکاریم</b> یعنی مشتری به مطلا بدهکار است</span><span><b class="bl">بدهکاریم</b> یعنی مطلا به مشتری بدهکار است</span></div>`:''}${Z.note?`<div class="nt">${esc(Z.note)}</div>`:''}
+  ${Z.sg?'<div class="sign"><div>امضای مشتری</div><div>مهر و امضای مطلا</div></div>':''}${pdfFoot()}</section>`;
   const LN='#5f5445',INK='#211d18';
   const css=`.pg{max-width:${land?'277mm':'190mm'}}.per{display:flex;flex-wrap:wrap;gap:2mm;margin:1.6mm 0 0}.per span{border:.2mm solid #b8962e;background:#fbf4e1;color:#6f4f08;border-radius:99px;padding:.2mm 3mm;font-size:7.2pt;font-weight:700}
-  .rd{color:#9b1c31!important}.gr{color:#1d6b4a!important}.bl{color:#1f3f8f!important}.z{color:#8f8574!important}
+  .rd{color:#9b1c31!important}.gr{color:#1d6b4a!important}.bl{color:#1f3f8f!important}.z{color:#8f8574!important}${Z.lg?'':'.top .lg{visibility:hidden}'}
   .inf{border:.3mm solid ${INK};border-top:.3mm solid ${INK};border-bottom:.3mm solid ${INK}}.inf>div+div{border-inline-start:.2mm solid ${LN}}
   .fbx{margin-top:2.6mm;border:.45mm solid ${INK};break-inside:avoid;page-break-inside:avoid}.fbt{background:${INK};color:#fff;font-size:8.4pt;font-weight:800;padding:.9mm 3mm 1.1mm}
   .fks2{display:flex}.fk{flex:1;min-width:0;padding:1.6mm 3mm 1.8mm;border-top:1.1mm solid #1d6b4a}.fk+.fk{border-inline-start:.3mm solid ${INK}}.fk.d{border-top-color:#9b1c31}.fk.c{border-top-color:#1f3f8f}
   .fkh{display:flex;align-items:baseline;gap:1.4mm}.fkh b{font-size:8.6pt;font-weight:800}.fkh u{font-size:6.8pt;font-weight:700;color:#544c42}
-  .fkv{display:flex;align-items:center;gap:2.4mm;margin:.4mm 0 .5mm}.fkv bdi{font-size:${land?'14':'17'}pt;font-weight:800;line-height:1.3;unicode-bidi:isolate;direction:ltr;color:#1d6b4a;white-space:nowrap}.fk.d .fkv bdi{color:#9b1c31}.fk.c .fkv bdi{color:#1f3f8f}
+  .fkv{display:flex;align-items:center;gap:2.4mm;margin:.4mm 0 .5mm}.fkv bdi{font-size:${ks.length>2?'14':'17'}pt;font-weight:800;line-height:1.3;unicode-bidi:isolate;direction:ltr;color:#1d6b4a;white-space:nowrap}.fk.d .fkv bdi{color:#9b1c31}.fk.c .fkv bdi{color:#1f3f8f}
   .fkv em{flex:none;margin-inline-start:auto;font-size:8pt;font-weight:800;color:#fff;background:#1d6b4a;border-radius:99px;padding:.2mm 3.2mm .4mm}.fk.d .fkv em{background:#9b1c31}.fk.c .fkv em{background:#1f3f8f}
   .fks{font-size:7pt;font-weight:700;color:#38322b}
   h2{border-top:.3mm solid ${INK};border-inline:.3mm solid ${INK};margin-top:3mm}
   table.lg2{width:100%;table-layout:fixed;border-collapse:collapse;border:.4mm solid ${INK}}
   .lg2 th,.lg2 td{border:.22mm solid ${LN}}
-  .lg2 th{font-size:7pt;font-weight:800;color:${INK};background:#f4ecd8;padding:1mm .8mm;text-align:center;line-height:1.35;white-space:normal}.lg2 th u{font-size:6pt;font-weight:700;color:#544c42}
-  .lg2 tr.g1 th.ds{text-align:right;padding-inline-start:2mm}.lg2 tr.g2 th{font-size:6.6pt;border-bottom:.45mm solid ${INK}}.lg2 tr.g1 th.grp{font-size:7.6pt}
-  .lg2 td{font-size:7.6pt;padding:1.3mm 1mm;vertical-align:middle}
-  .lg2 td.n{color:#38322b;text-align:center;font-size:7pt;width:auto}.lg2 td.dt{text-align:center;white-space:nowrap;color:${INK};font-size:7pt;font-weight:500}
-  .lg2 td.ds{padding-inline:2mm;word-break:break-word;overflow-wrap:anywhere}.lg2 td.ds .nm{display:block;font-weight:800;font-size:8.2pt}.lg2 td.ds .s{display:block;color:#38322b;font-size:6.6pt;line-height:1.5;margin-top:.2mm}
-  .lg2 td.dv,.lg2 td.bv{text-align:center;white-space:nowrap;overflow:hidden}.lg2 td bdi{display:block;unicode-bidi:isolate;direction:ltr;font-size:7.6pt;font-weight:500}.lg2 td small{display:block;font-size:5.8pt;font-weight:700;margin-top:.1mm}
-  .lg2 td.bv{background:#fbf7ec}.lg2 td.bv bdi{font-size:8.2pt;font-weight:800}
+  .lg2 th{font-size:${z(7)}pt;font-weight:800;color:${INK};background:#f4ecd8;padding:1mm .6mm;text-align:center;line-height:1.35;white-space:normal}.lg2 th u{font-size:${z(6)}pt;font-weight:700;color:#544c42}
+  .lg2 tr.g1 th.ds{text-align:right;padding-inline-start:2mm}.lg2 tr.g2 th{font-size:${z(6.8)}pt;border-bottom:.45mm solid ${INK}}.lg2 tr.g1 th.grp{font-size:${z(7.6)}pt}.lg2 tr.g2 th.hb{background:#ecdfbf}
+  .lg2 td{font-size:${z(7.6)}pt;padding:1.2mm .7mm;vertical-align:middle}
+  .lg2 td.n{color:#38322b;text-align:center;font-size:${z(7)}pt;width:auto}.lg2 td.dt{text-align:center;white-space:nowrap;color:${INK};font-size:${z(6.9)}pt;font-weight:500}
+  .lg2 td.ds{padding-inline:1.8mm;word-break:break-word;overflow-wrap:anywhere}.lg2 td.ds .nm{display:block;font-weight:800;font-size:${z(8)}pt}.lg2 td.ds .s{display:block;color:#38322b;font-size:${z(6.5)}pt;line-height:1.5;margin-top:.2mm}
+  .lg2 td.dv,.lg2 td.bv,.lg2 td.cv{text-align:center;white-space:nowrap;overflow:hidden}.lg2 td bdi{display:block;unicode-bidi:isolate;direction:ltr;font-size:${z(7.5)}pt;font-weight:600}.lg2 td small{display:block;font-size:${z(5.8)}pt;font-weight:700;margin-top:.1mm}
+  .lg2 td.bv{background:#fbf7ec}.lg2 td.bv bdi{font-size:${z(8)}pt;font-weight:800}
   .lg2 tr.op td{background:#f4ecd8}.lg2 td.emp{text-align:center;color:#38322b;padding:5mm}
-  .lg2 tr.ft2 td{background:#f4ecd8;border-top:.55mm solid ${INK};padding:1.8mm 2mm;font-size:8.6pt;font-weight:800}.lg2 tr.ft2 td.fb{text-align:center;white-space:nowrap}.lg2 tr.ft2 td.fb bdi{display:inline;font-size:11pt;font-weight:800}.lg2 tr.ft2 u{font-size:6.4pt;font-weight:700;color:#38322b}.lg2 tr.ft2 em{font-size:7.2pt;font-weight:800;margin-inline-start:1.2mm}
+  .lg2 tr.ft1 td{background:#fbf7ec;border-top:.5mm solid ${INK};padding:1.5mm 1.8mm;font-size:${z(7.8)}pt;font-weight:800}.lg2 tr.ft1 td.cv{padding-inline:.7mm}.lg2 tr.ft1 td bdi{font-weight:800;font-size:${z(7.1)}pt}
+  .lg2 tr.ft2 td{background:#f4ecd8;border-top:.55mm solid ${INK};padding:1.8mm 2mm;font-size:${z(8.6)}pt;font-weight:800}.lg2 tr.ft2 td.fb{text-align:center;white-space:nowrap;padding-inline:.6mm;overflow:hidden}.lg2 tr.ft2 td.fb span{display:block}.lg2 tr.ft2 td.fb bdi{display:inline;font-size:${z(10.5)}pt;font-weight:800}.lg2 tr.ft2 u{font-size:${z(6.4)}pt;font-weight:700;color:#38322b}.lg2 tr.ft2 em{display:block;font-size:${z(7)}pt;font-weight:800;line-height:1.3}
   .lgd{display:flex;flex-wrap:wrap;gap:.6mm 5mm;margin:1.6mm 0 0;font-size:6.8pt;font-weight:500;color:#38322b}.lgd b{font-weight:800}
+  .nt{margin-top:2mm;padding:1.2mm 2.4mm;border:.25mm solid ${LN};font-size:7.2pt;font-weight:500;line-height:1.7;color:${INK};break-inside:avoid}
   .sign div{border-top:.3mm solid ${INK};color:#38322b;font-weight:700}
   .lg2 thead{display:table-header-group}.lg2 tbody.en{break-inside:avoid;page-break-inside:avoid}`;
   return pdfDoc(stmtFile(c,S.F),html).replace(/@page\{size:A5 landscape;[^}]*\}/,land?'@page{size:A4 landscape;margin:9mm 10mm}':'@page{size:A4;margin:10mm 10mm}').replace('</head>','<style>'+css+'</style></head>')}

@@ -8,10 +8,10 @@ let IS=null;
 const IVSEC=[['paper','کاغذ و PDF'],['head','سربرگ'],['cust','مشتری و نرخ'],['cols','ستون‌ها'],['rows','ردیف‌ها'],['acc','مانده حساب'],['foot','پانویس']];
 const IVTTL=['فاکتور فروش','فاکتور خرید','فاکتور آبشده','فاکتور طلا','پیش فاکتور','رسید دریافت','رسید پرداخت','صورت حساب'];
 const ivSig=()=>JSON.stringify([IS.W,IS.shop]),ivDirty=()=>!!IS&&ivSig()!==IS.sig0;
-function ivOpen(o){o=o||{};const W={};INVP.forEach(([k])=>{W[k]=invCfg(k)});const s=(cfgRec()||{}).shop||{};
+function ivOpen(o){o=o||{};const W={};INVP.forEach(([k])=>{W[k]=invCfg(k)});W.stm=stmCfg();const s=(cfgRec()||{}).shop||{};
   IS={p:o.p||'sale',W,shop:{nm:s.nm||'',ad:s.ad||'',tel:s.tel||'',ig:s.ig||''},sec:'paper',from:o.from||'me',doc:o.doc||null,smp:{}};IS.sig0=ivSig()}
 /* سندی که پیش‌نمایش می‌شود: همان سندی که صفحه از آن باز شده (فقط در قالب خودش)، وگرنه سند نمونه آن قالب */
-function ivDoc(){const d=IS.doc;if(d&&d.p===IS.p){const c=custs.find(x=>String(x.id)===String(d.cu)),t=c&&(c.txs||[]).find(x=>String(x.id)===String(d.tx)&&!x.del);if(c&&t)return{c,t,real:1}}
+function ivDoc(){if(IS.p==='stm')return IS.smp.stm||(IS.smp.stm=stmSample());const d=IS.doc;if(d&&d.p===IS.p){const c=custs.find(x=>String(x.id)===String(d.cu)),t=c&&(c.txs||[]).find(x=>String(x.id)===String(d.tx)&&!x.del);if(c&&t)return{c,t,real:1}}
   return IS.smp[IS.p]||(IS.smp[IS.p]=invSample(IS.p))}
 /* ---- تکه‌های فرم ---- */
 const ivRow=(t,sub,ctl,cls)=>`<div class="ivr${cls?' '+cls:''}"><span class="tx"><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span>${ctl}</div>`;
@@ -20,7 +20,7 @@ const ivSeg=(k,O)=>`<div class="ivg" role="radiogroup">${O.map(([v,l])=>`<button
 const ivPick=(k,t,sub,O)=>ivRow(t,sub,ivSeg(k,O),'col');
 const AYN=[['a','خودکار'],['y','همیشه'],['n','هرگز']];
 const IVCH={w:'وزن کالا، تعداد سکه و ارز',ay:'عیار طلا',w7:'وزن بر پایه ۷۵۰ (برای طلای متفرقه و آبشده)',lab:'نام آزمایشگاه (ری‌گیری)',ang:'شماره انگ',rt:'مظنه یا فی ردیف؛ خودکار = فقط وقتی با نرخ بالای برگه فرق دارد',gv:'مبلغ خود طلا، پیش از اجرت و سود',aj:'اجرت ساخت',pp:'سود فروشنده',tx:'مالیات ارزش افزوده'};
-function ivSecHTML(){const S=IS.W[IS.p],k=IS.sec,pn=INVP.find(x=>x[0]===IS.p)[1];let h='';
+function ivSecHTML(){if(IS.p==='stm')return stmSecHTML();const S=IS.W[IS.p],k=IS.sec,pn=INVP.find(x=>x[0]===IS.p)[1];let h='';
   if(k==='paper')h=ivPick('paper','اندازه کاغذ','A4 افقی همان برگه است، بزرگ‌تر. در «A4 عمودی» دو برگه روی یک کاغذ می‌آید: نسخه مشتری بالا و نسخه فروشگاه پایین',[['a5','A5 افقی'],['a4','A4 افقی'],['a42','A4 · دو نسخه']])
     +(S.paper==='a42'?'':ivSw('copy','نسخه فروشگاه','یک برگه دوم با همان محتوا و برچسب «نسخه فروشگاه»'))
     +ivPick('ink','رنگ چاپ','سیاه‌وسفید برای چاپگر لیزری: طلایی‌ها خاکستری تیره و رنگ طلبکار/بدهکار مشکی می‌شود',[['c','رنگی'],['m','سیاه‌وسفید']])
@@ -55,48 +55,68 @@ function ivSecHTML(){const S=IS.W[IS.p],k=IS.sec,pn=INVP.find(x=>x[0]===IS.p)[1]
     +ivRow('اینستاگرام یا سایت','',`<input class="ivin ltr" id="ivSi" value="${esc(IS.shop.ig)}" placeholder="نشانی صفحه" maxlength="50" autocomplete="off" enterkeyhint="done">`,'col');
   const hint=k==='cols'?`<div class="ivsh own">${ic('edit')}<span>ستون‌ها فقط برای فاکتور «${pn}» است</span></div>`:`<div class="ivsh">${ic('check')}<span>این بخش برای همه فاکتورها یکی است${k==='head'?' (جز متن عنوان)':k==='foot'?' (جز یادداشت)':''}</span></div>`;
   return `${hint}<div class="ivk">${h}</div><div class="ivact">${k==='cols'?`<button type="button" data-act="ivCopy">${ic('copy')}<span>همین ستون‌ها برای همه فاکتورها</span></button>`:''}<button type="button" class="rd" data-act="ivReset">${ic('undo')}<span>برگشت به پیش‌فرض</span></button></div>`}
+/* v92.8 (خواسته صاحب اپ: «برای PDF هم قسمتی که بشود ادیت کرد چه چیزهایی بیاید؛ در تنظیمات فاکتور»): زبانه پنجم «صورت‌حساب» — تنظیم‌های صورت‌حساب مشتری
+   (IS.W.stm، کلیدهای STMD در 15p)، با بخش‌های خودش (STMSEC) و پیش‌نمایش زنده همان stmtPdfHTML روی یک حساب نمونه */
+const IVTABS=()=>[...INVP,['stm','صورت‌حساب']];
+const STMSEC=[['cols','ستون‌ها'],['rows','ردیف‌ها'],['fin','مانده نهایی'],['head','سربرگ'],['paper','کاغذ'],['foot','پانویس']];
+const ivSecs=()=>IS.p==='stm'?STMSEC:IVSEC,ivCl=S=>IS.p==='stm'?stmClean(S):invClean(S),ivDf=()=>IS.p==='stm'?STMD:INVD;
+const ivSecBtns=()=>{const L=ivSecs();if(!L.some(x=>x[0]===IS.sec))IS.sec=L[0][0];return L.map(([k,l])=>`<button type="button" role="tab" aria-selected="${IS.sec===k}" class="${IS.sec===k?'on':''}" data-act="ivSec" data-s="${k}">${l}</button>`).join('')};
+function stmSample(){const A=['sale','buy','rcp'].map(invSample),c=A[0].c,now=new Date(),iso=n=>{const d=new Date(now-n*864e5);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
+  c.txs=[{...c.txs[0],date:iso(9)},...A.map((x,i)=>({...x.t,id:'smp'+i,no:1001+i,date:iso(6-i*3),at:new Date(now-(6-i*3)*864e5).toISOString()}))];c.grp='مشتری';return {c,t:c.txs[1]}}
+function stmSecHTML(){const S=IS.W.stm,k=IS.sec,A3=[['a','خودکار'],['y','همیشه'],['n','هرگز']];let h='';
+  if(k==='cols')h=`<div class="ivnote">ستون‌های مبلغ (تومان) کنار هم می‌آیند: هر سند مبلغش در ستون خودش نوشته می‌شود و جمع هر ستون پایین جدول است.</div>`
+    +ivSw('csl','ستون «فروش»','جمع فروش هر سند')+ivSw('cby','ستون «خرید»','خرید از مشتری')+ivSw('cin','ستون «دریافت»','پولی که از مشتری گرفته‌ایم (کارتخوان، حواله، نقد، تخفیف)')+ivSw('cout','ستون «پرداخت»','پولی که به مشتری داده‌ایم')
+    +ivSw('cdv','ستون «این سند»','خالص اثر هر سند روی حساب (طلبکار شدیم / بدهکار شدیم)')+ivSw('cbl','ستون «مانده»','مانده حساب بعد از همان سند')
+    +ivPick('gd','ستون‌های طلا','خودکار = فقط وقتی این حساب طلا دارد',A3)+(S.gd==='n'?'':ivSw('gdv','«این سند» برای طلا','کنار مانده طلا، مقدار همان سند هم بیاید'))+ivSw('cx','سکه و ارز','اگر حساب مانده سکه یا ارز دارد ستونش بیاید');
+  else if(k==='rows')h=ivSw('s1','خط کالاها','زیر عنوان سند: «فروش آبشده ۲۰.۶۵ گرم · …»')+ivSw('s2','خط دریافت و پرداخت','روش‌ها: کارتخوان، حواله، نقد، تخفیف')+ivSw('mz','مظنه سند','')+ivSw('tot','ردیف «جمع ستون‌ها»','جمع فروش، خرید، دریافت و پرداخت پایین جدول');
+  else if(k==='fin')h=ivSw('fb','کادر «مانده نهایی حساب» بالای برگه','عدد درشت و «طلبکاریم / بدهکاریم» برای هر جنس')+(S.fb?ivSw('fbs','جمله زیر عدد','«مشتری به مطلا بدهکار است»'):'')+ivSw('fr','ردیف «مانده نهایی حساب» آخر جدول','');
+  else if(k==='head')h=ivSw('lg','لوگو','')+ivSw('ph','تلفن مشتری','')+ivSw('nid','کد ملی مشتری','اگر در حساب ثبت شده باشد')+ivSw('grp','گروه مشتری','')+ivSw('cnt','تعداد سند','');
+  else if(k==='paper')h=ivPick('paper','کاغذ','خودکار = A4 عمودی؛ اگر ستون‌ها جا نشوند خودش افقی می‌شود',[['a','خودکار'],['p','A4 عمودی'],['l','A4 افقی']])+ivPick('fs','اندازه نوشته جدول','',[[-1,'ریز'],[0,'معمولی'],[1,'درشت'],[2,'خیلی درشت']]);
+  else h=ivSw('lgd','راهنمای زیر جدول','یک خط که معنی «طلبکاریم» و «بدهکاریم» را می‌گوید')+ivSw('sg','جای امضای مشتری و مهر مطلا','')+ivRow('یادداشت پایین صورت‌حساب','',`<input class="ivin" id="ivSNt" value="${esc(S.note)}" placeholder="خالی = چیزی چاپ نمی‌شود" maxlength="170" autocomplete="off" enterkeyhint="done">`,'col');
+  return `<div class="ivsh own">${ic('edit')}<span>این تنظیم‌ها فقط برای صورت‌حساب مشتری است</span></div><div class="ivk">${h}</div><div class="ivact"><button type="button" class="rd" data-act="ivReset">${ic('undo')}<span>برگشت به پیش‌فرض</span></button></div>`}
 function vInvSet(){if(!isAdmin())return '<div class="card empty"><b>فقط مدیر دسترسی دارد</b></div>';if(!IS)ivOpen();
-  return `<div class="ivs"><div class="ivtab" role="tablist" aria-label="قالب فاکتور">${INVP.map(([k,l])=>`<button type="button" role="tab" aria-selected="${IS.p===k}" class="${IS.p===k?'on':''}" data-act="ivTab" data-p="${k}">${l}</button>`).join('')}</div>
+  return `<div class="ivs"><div class="ivtab" role="tablist" aria-label="قالب فاکتور">${IVTABS().map(([k,l])=>`<button type="button" role="tab" aria-selected="${IS.p===k}" class="${IS.p===k?'on':''}" data-act="ivTab" data-p="${k}">${l}</button>`).join('')}</div>
   <div class="ivtop"><div class="ivpv"><div class="ivpw" id="ivPw"><iframe id="ivF0" class="on" title="پیش‌نمایش فاکتور" tabindex="-1"></iframe><iframe id="ivF1" title="پیش‌نمایش فاکتور" tabindex="-1" aria-hidden="true"></iframe><button type="button" class="ivpz" data-act="ivZoom" aria-label="بزرگ‌نمایی پیش‌نمایش"><span>${ic('search')}</span></button></div><small class="ivpi" id="ivPi"></small></div>
-  <div class="ivsec" id="ivSc" role="tablist" aria-label="بخش تنظیمات">${IVSEC.map(([k,l])=>`<button type="button" role="tab" aria-selected="${IS.sec===k}" class="${IS.sec===k?'on':''}" data-act="ivSec" data-s="${k}">${l}</button>`).join('')}</div></div>
+  <div class="ivsec" id="ivSc" role="tablist" aria-label="بخش تنظیمات">${ivSecBtns()}</div></div>
   <div class="ivc" id="ivC">${ivSecHTML()}</div></div>`}
 const aInvSet=()=>'';
 /* پیش‌نمایش: برگه واقعی در اندازه واقعی کاغذ، با transform کوچک می‌شود تا در پهنای صفحه (و حداکثر ۳۶٪ ارتفاع) جا شود */
-function ivPrev(now){clearTimeout(ivPrev.t);ivPrev.t=setTimeout(()=>{const box=$('ivPw');if(!box||!IS)return;const X=ivDoc();let h;try{h=ivWithShop(()=>invDoc(X.c,X.t,{S:IS.W[IS.p],prof:IS.p}))}catch(e){const i=$('ivPi');if(i)i.textContent='پیش‌نمایش ساخته نشد';return}
+function ivPrev(now){clearTimeout(ivPrev.t);ivPrev.t=setTimeout(()=>{const box=$('ivPw');if(!box||!IS)return;const X=ivDoc(),st=IS.p==='stm';let h;try{h=st?stmtPdfHTML(X.c,{},{S:IS.W.stm}):ivWithShop(()=>invDoc(X.c,X.t,{S:IS.W[IS.p],prof:IS.p}))}catch(e){const i=$('ivPi');if(i)i.textContent='پیش‌نمایش ساخته نشد';return}
     const Q=pageSpec(h),PX=96/25.4,W=Math.round(Q.mmW*PX),H=Math.round(Q.mmH*PX),n=(h.match(/<section class="sht"/g)||[]).length,cw=Math.max(200,box.parentNode.clientWidth-16),sc=Math.min(cw/W,Math.max(150,innerHeight*.3)/H);
     box.style.width=Math.floor(W*sc)+'px';box.style.height=Math.floor(H*sc)+'px';
     const a=box.querySelector('iframe.on'),b=box.querySelector('iframe:not(.on)');if(!a||!b)return;b.style.width=W+'px';b.style.height=H+'px';b.style.transform=`scale(${sc})`;
     b.onload=()=>{b.classList.add('on');a.classList.remove('on')};
-    b.srcdoc=h.replace('</head>','<style>html,body{margin:0!important;overflow:hidden!important;background:transparent!important}html body .sht{margin:0!important;border-radius:0!important;box-shadow:none!important}</style></head>');
-    const i=$('ivPi');if(i)i.textContent=(X.real?'پیش‌نمایش همین سند':'پیش‌نمایش با سند نمونه')+(n>1?' · '+toFa(n)+' برگه':'')+' · برای بزرگ‌نمایی بزنید'},now?0:120)}
+    b.srcdoc=h.replace('</head>',st?`<style>html{background:#fff!important;overflow:hidden!important}html body{width:${W}px!important;margin:0!important;padding:${Q.mv}mm ${Q.mh}mm!important;background:#fff!important;overflow:hidden!important;box-sizing:border-box!important}.pb{display:none!important}</style></head>`:'<style>html,body{margin:0!important;overflow:hidden!important;background:transparent!important}html body .sht{margin:0!important;border-radius:0!important;box-shadow:none!important}</style></head>');
+    const i=$('ivPi');if(i)i.textContent=(st?'پیش‌نمایش با حساب نمونه':X.real?'پیش‌نمایش همین سند':'پیش‌نمایش با سند نمونه')+(n>1?' · '+toFa(n)+' برگه':'')+' · برای بزرگ‌نمایی بزنید'},now?0:120)}
 /* بازسازی بدون render: فقط دکمه‌های بالا، فرم بخش و پیش‌نمایش (iframeها می‌مانند) */
 /* v92.2: هر چه مشترک است (همه چیز جز عنوان، یادداشت و ستون‌ها) از قالب باز روی بقیه قالب‌ها هم می‌نشیند — برگه همه فاکتورها یک اندازه و یک شکل می‌ماند */
-function ivShSync(){if(!IS)return;const S=IS.W[IS.p];INVP.forEach(([k])=>{if(k===IS.p)return;const T=IS.W[k];for(const q in INVD)if(!invOwn(q))T[q]=S[q]})}
+function ivShSync(){if(!IS||IS.p==='stm')return;const S=IS.W[IS.p];INVP.forEach(([k])=>{if(k===IS.p)return;const T=IS.W[k];for(const q in INVD)if(!invOwn(q))T[q]=S[q]})}
 function ivRe(o){o=o||{};ivShSync();document.querySelectorAll('#view .ivtab button').forEach(b=>{const on=b.dataset.p===IS.p;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
   document.querySelectorAll('#ivSc button').forEach(b=>{const on=b.dataset.s===IS.sec;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
   const C=$('ivC');if(C&&!o.keep){C.innerHTML=ivSecHTML();if(o.anim)C.classList.remove('in'),void C.offsetWidth,C.classList.add('in');ivBindIn()}hdGoSync();if(!o.noPrev)ivPrev()}
 function ivBindIn(){const S=IS.W[IS.p],B=(id,f)=>{const e=$(id);if(e)e.oninput=()=>{f(e.value);ivRe({keep:1})}};
   B('ivTt',v=>{S.ttl=clean(v).slice(0,28);document.querySelectorAll('#ivC .ivch button').forEach(b=>b.classList.toggle('on',(b.dataset.v||'')===S.ttl))});
-  B('ivNt',v=>{S.note=clean(v).slice(0,170)});B('ivSn',v=>{IS.shop.nm=clean(v).slice(0,40)});B('ivSa',v=>{IS.shop.ad=clean(v).slice(0,90)});B('ivSt',v=>{IS.shop.tel=clean(v).slice(0,40)});B('ivSi',v=>{IS.shop.ig=clean(v).slice(0,50)})}
+  B('ivNt',v=>{S.note=clean(v).slice(0,170)});B('ivSNt',v=>{IS.W.stm.note=clean(v).slice(0,170)});B('ivSn',v=>{IS.shop.nm=clean(v).slice(0,40)});B('ivSa',v=>{IS.shop.ad=clean(v).slice(0,90)});B('ivSt',v=>{IS.shop.tel=clean(v).slice(0,40)});B('ivSi',v=>{IS.shop.ig=clean(v).slice(0,50)})}
 function bindInvSet(){if(!IS||!isAdmin())return;ivBindIn();ivPrev(1);if(!bindInvSet.rz){bindInvSet.rz=1;window.addEventListener('resize',()=>{if(cur==='invset')ivPrev()})}}
 /* مشخصات فروشگاه تا ذخیره نشده فقط در پیش‌نمایش دیده می‌شود: invDoc از cfg می‌خواند، پس هنگام ساختن پیش‌نمایش موقتاً جایش گذاشته می‌شود */
 const ivWithShop=f=>{const r=cfgRec();if(!r)return f();const o=r.shop;r.shop={...IS.shop};try{return f()}finally{if(o===undefined)delete r.shop;else r.shop=o}};
 ACT.invSet=()=>{if(!isAdmin()){toast('فقط مدیر می‌تواند تنظیمات فاکتور را عوض کند',true);return}if(cur!=='invset')meRet=cur;PARENT.invset='home';ivOpen({from:'me'});go('invset')};
 ACT.invSetDoc=()=>{if(!isAdmin()){toast('فقط مدیر می‌تواند تنظیمات فاکتور را عوض کند',true);return}const X=invGet();if(!X)return;const p=invProf(X.t);PARENT.invset='inv';ivOpen({from:'inv',p,doc:{cu:X.c.id,tx:X.t.id,p}});go('invset')};
-ACT.ivTab=d=>{if(!IS||IS.p===d.p)return;IS.p=d.p;ivRe({anim:1})};
+ACT.ivTab=d=>{if(!IS||IS.p===d.p)return;const sw=(IS.p==='stm')!==(d.p==='stm');IS.p=d.p;if(sw){IS.sec=ivSecs()[0][0];const c=$('ivSc');if(c)c.innerHTML=ivSecBtns()}ivRe({anim:1})};
 ACT.ivSec=d=>{if(!IS||IS.sec===d.s)return;IS.sec=d.s;ivRe({anim:1,noPrev:1});const b=document.querySelector('#ivSc button.on');if(b&&b.scrollIntoView)b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'})};
-ACT.ivT=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=S[d.k]?0:1;ivRe()};
-ACT.ivV=d=>{if(!IS)return;const S=IS.W[IS.p],n=typeof INVD[d.k]==='number';S[d.k]=n?+d.v:d.v;IS.W[IS.p]=invClean(S);ivRe()};
-ACT.ivN=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=Math.round(((+S[d.k]||0)+(+d.d||0))*10)/10;IS.W[IS.p]=invClean(S);ivRe()};
+ACT.ivT=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=S[d.k]?0:1;if(IS.p==='stm')IS.W.stm=stmClean(S);ivRe()};
+ACT.ivV=d=>{if(!IS)return;const S=IS.W[IS.p],n=typeof ivDf()[d.k]==='number';S[d.k]=n?+d.v:d.v;IS.W[IS.p]=ivCl(S);ivRe()};
+ACT.ivN=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=Math.round(((+S[d.k]||0)+(+d.d||0))*10)/10;IS.W[IS.p]=ivCl(S);ivRe()};
 ACT.ivTtl=d=>{if(!IS)return;IS.W[IS.p].ttl=d.v||'';ivRe()};
-ACT.ivZoom=()=>{if(!IS)return;const X=ivDoc(),S={...IS.W[IS.p]},p=IS.p;openPrint(()=>ivWithShop(()=>invDoc(X.c,X.t,{S,prof:p})))};
-ACT.ivReset=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('همه تنظیمات به پیش‌فرض برگردد؟\nکاغذ، سربرگ، ردیف‌ها، مانده حساب و پانویس برای همه فاکتورها برمی‌گردد؛ ستون‌ها، عنوان و یادداشت فقط برای «'+pn+'».','برگردان',()=>{IS.W[IS.p]=invClean({...INVD,...(INVT[IS.p]||{})});ivRe({anim:1});toast('به پیش‌فرض برگشت؛ برای ماندگار شدن «ذخیره» را بزنید')})};
+ACT.ivZoom=()=>{if(!IS)return;const X=ivDoc(),S={...IS.W[IS.p]},p=IS.p;if(p==='stm'){openPrint(()=>stmtPdfHTML(X.c,{},{S}));return}openPrint(()=>ivWithShop(()=>invDoc(X.c,X.t,{S,prof:p})))};
+ACT.ivReset=()=>{if(!IS)return;if(IS.p==='stm'){askConfirm('تنظیمات صورت‌حساب به پیش‌فرض برگردد؟','برگردان',()=>{IS.W.stm=stmClean(STMD);ivRe({anim:1});toast('به پیش‌فرض برگشت؛ برای ماندگار شدن «ذخیره» را بزنید')});return}const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('همه تنظیمات به پیش‌فرض برگردد؟\nکاغذ، سربرگ، ردیف‌ها، مانده حساب و پانویس برای همه فاکتورها برمی‌گردد؛ ستون‌ها، عنوان و یادداشت فقط برای «'+pn+'».','برگردان',()=>{IS.W[IS.p]=invClean({...INVD,...(INVT[IS.p]||{})});ivRe({anim:1});toast('به پیش‌فرض برگشت؛ برای ماندگار شدن «ذخیره» را بزنید')})};
 ACT.ivCopy=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('ستون‌های «'+pn+'» روی سه فاکتور دیگر هم گذاشته شود؟\nستون‌ها و شکل اجرت، سود و نرخ آن‌ها جایگزین می‌شود.','کپی کن',()=>{INVP.forEach(([k])=>{if(k!==IS.p)for(const q in INVD)if(invOwn(q)&&q!=='ttl'&&q!=='note')IS.W[k][q]=IS.W[IS.p][q]});ivRe({keep:1,noPrev:1});toast('روی همه فاکتورها گذاشته شد؛ برای ماندگار شدن «ذخیره» را بزنید')})};
 ACT.ivSave=()=>{if(!IS||!isAdmin())return;if(!ivDirty()){toast('چیزی عوض نشده است');return}const r=cfgRec(1),inv={};
   ivShSync();INVP.forEach(([k])=>{const base=invClean({...INVD,...(INVT[k]||{})}),c2=invClean(IS.W[k]),o={};for(const q in c2)if(c2[q]!==base[q])o[q]=c2[q];inv[k]=o});
   /* بخش مشترک جدا هم نوشته می‌شود (all)؛ در هر قالب هم می‌ماند تا گوشی‌ای که هنوز نسخه قبلی برنامه را دارد همان را بخواند */
-  {const c2=invClean(IS.W[IS.p]),all={};for(const q in c2)if(!invOwn(q)&&c2[q]!==INVD[q])all[q]=c2[q];inv.all=all}
-  r.inv=inv;r.shop={nm:IS.shop.nm,ad:IS.shop.ad,tel:IS.shop.tel,ig:IS.shop.ig};saveCu();IS.sig0=ivSig();logA('cust','تنظیمات فاکتور','قالب‌های فاکتور ذخیره شد');toast('تنظیمات فاکتور ذخیره شد');
+  {const c2=invClean(IS.W[IS.p==='stm'?'sale':IS.p]),all={};for(const q in c2)if(!invOwn(q)&&c2[q]!==INVD[q])all[q]=c2[q];inv.all=all}
+  {const c2=stmClean(IS.W.stm),o={};for(const q in c2)if(c2[q]!==STMD[q])o[q]=c2[q];r.stm=o}
+  r.inv=inv;r.shop={nm:IS.shop.nm,ad:IS.shop.ad,tel:IS.shop.tel,ig:IS.shop.ig};saveCu();IS.sig0=ivSig();logA('cust','تنظیمات فاکتور','قالب‌های فاکتور و صورت‌حساب ذخیره شد');toast('تنظیمات فاکتور ذخیره شد');
   /* v91.5 (خواسته صاحب اپ: «ذخیره که خورد انیمیشن درست انجام شود، ذخیره شود و بیرون بیاید»): «✓ ذخیره شد» روی خود دکمه، بعد برگشت به تنظیمات */
   setTimeout(()=>{if(cur==='invset'&&!ivDirty())leaveTo()},850)};
 ACT.ivCol=d=>{if(!IS)return;const S=IS.W[IS.p],k='c'+d.f;S[k]=S[k]==='n'?'a':'n';IS.W[IS.p]=invClean(S);ivRe()};
