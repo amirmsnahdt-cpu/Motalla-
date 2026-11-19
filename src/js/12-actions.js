@@ -152,7 +152,7 @@ ACT.homeSt=d=>{homeSt=d.t;ls.set('m_homest',homeSt);const v=$('view'),y=v.scroll
 ACT.settings=()=>go('settings');
 ACT.setTheme=d=>{const ch=themePref!==d.t;themePref=d.t;ls.set('m_theme',themePref);applyTheme();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;
   if(ch&&IOS_SA)toast('برای هم‌رنگ شدن نوار بالا، برنامه را یک بار کامل ببندید و باز کنید');};
-ACT.applyUpd=()=>applyUpd();
+ACT.applyUpd=()=>applyUpd();ACT.updX=()=>updHide();
 ACT.homeP=d=>{const k=d.iso||'';if(homePick&&homeP===k){homePick=false}else{homeP=k;homePick=true}homeF='all';if(homeP<dateVal)homeOpen.add('p'+homeP);const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.hsearch=()=>go('find');
