@@ -11,7 +11,7 @@ const PRESS_SEL='button,[data-act],a[href],[role="button"],label,summary,.opt,.l
   let cur=null,x0=0,y0=0,t0=0;
   const RMq=matchMedia('(prefers-reduced-motion: reduce)');
   const SC=(()=>{try{return CSS.supports('scale','1')}catch(_){return false}})();
-  const target=e=>{const el=e.target&&e.target.closest&&e.target.closest(PRESS_SEL);if(!el||el.disabled||el.getAttribute('aria-disabled')==='true')return null;
+  const target=e=>{const el=e.target&&e.target.closest&&e.target.closest(PRESS_SEL);if(!el||el.disabled||el.getAttribute('aria-disabled')==='true')return null;/* v97.2: کلیدهای صفحه‌کلید داخل پنجره بازخورد سبک خودشان را دارند (15k) */if(el.closest('.qkp'))return null;
     if(el.matches('input,textarea,select'))return null;
     /* برچسبی که فقط دور یک فیلد متنی است (نه دکمه) فرو نرود */
     if(el.tagName==='LABEL'&&el.querySelector('input:not([type=file]):not([type=checkbox]):not([type=radio]),textarea,select'))return null;

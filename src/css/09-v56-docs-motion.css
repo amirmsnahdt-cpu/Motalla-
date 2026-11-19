@@ -5003,3 +5003,11 @@ html[data-theme=dark] button.qkk.kb:not(.go):active{background:#8a8a8e;color:#ff
 .qkb .qkr{gap:4px}
 @media (max-height:720px){.qkp.qkb{padding:6px 5px 7px}}
 .qkk.kb:not(.tx,.go){font-size:clamp(19px,3dvh,25px)}
+
+/* ---- v97.2 کلیدهای بی‌درنگ: بدون گذار و انیمیشن، حالت فشرده با کلاس pr (همان لحظه لمس) ---- */
+.qkk,.qks{transition:none!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button.qkk.pr:not(.go){background:color-mix(in srgb,var(--blu) 20%,var(--card));color:var(--blu);transform:translateY(2px)}
+.qkp.qkb button.qkk.kb.pr:not(.go){background:#b9bdc7;color:#000;transform:none}
+.qkp.qkb button.qkk.kb.fn.pr{background:#fff}
+button.qks.pr{background:rgb(255 255 255/.7)}
+html[data-theme=dark] .qkp.qkb button.qkk.kb.pr:not(.go){background:#8a8a8e;color:#fff}
