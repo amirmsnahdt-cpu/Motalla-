@@ -31,7 +31,7 @@ const stW75=x=>stS('w75','وزن ۷۵۰','گرم','dec',()=>{const q=xrCalc(x,sv
 const stCl=(o,k)=>v=>{if(stNv(v)!==stNv(o[k]))o.amT='';o[k]=v};
 /* v94.2 (خواسته صاحب اپ: «شرح کالا در همان قالب پله‌ها باشد؛ مثلاً بعد از وزن بیاید و نوشته شود»): «شرح» یک پله معمولیِ اختیاری است، درست بعد از وزن (سکه و ارز: بعد از تعداد)؛
    با «بعدی» خالی هم رد می‌شود. (خط جدای زیر سرتیتر و پله دُمِ نسخه ۹۴.۰ برداشته شد) */
-const stDsS=o=>stS('ds','شرح','','text',()=>o.ds,v=>o.ds=clean(v||''),{opt:1,ph:'شرح کالا (اختیاری): دستبند کارتیر، قنات‌آبادی…'});
+const stDsS=o=>stS('ds','شرح','','text',()=>o.ds,v=>o.ds=clean(v||''),{opt:1,ph:'شرح · مثلاً دستبند کارتیر'});
 function stSteps(){const a=sv.qa,K=stKind();
   if(K==='it')return [...(a.pz||gdCnt(a.k)?[stS('cnt','تعداد','عدد','dec',()=>a.cnt,v=>a.cnt=v,{grp:1,...(a.pz?{}:{opt:1})})]:[]),stS('w',a.pz?'وزن کل':'وزن','گرم','dec',()=>a.w,stCl(a,'w')),stDsS(a),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),/* v61.60: اجرت درصدی و تومانی برای همه کالاها (ساخته، سایر/دست دوم، متفرقه، پارسیان) */stS('ajP','اجرت','٪','dec',()=>a.ajP,stCl(a,'ajP'),{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,stCl(a,'ajT'),{opt:1}),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a)];
   if(K==='ab')return [stS('w','وزن آبشده','گرم','dec',()=>a.w,stCl(a,'w')),stDsS(a),...(a.sh===1?[]:[stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay'))]),stMz(a),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a),stS('lab','آزمایشگاه','','text',()=>a.lab,v=>a.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>a.ang,v=>a.ang=v,{opt:1})];
