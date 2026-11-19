@@ -29,18 +29,22 @@ const grpIn=v=>{const r=decIn(toEn(String(v==null?'':v)).replace(/,/g,'')),i=r.s
 /* v61.60: وزن ۷۵۰ آبشده = وزن × عیار ÷ ۷۵۰؛ اگر عددش زده شود عیار از آن حساب می‌شود (وزن آزمایشگاه ثابت) */
 const stW75=x=>stS('w75','وزن ۷۵۰','گرم','dec',()=>{const q=xrCalc(x,sv.rate).q;return q?String(q):''},v=>{const w=parseFloat(x.w)||0,q=parseFloat(v)||0;if(!w||!q)return;const ay=Math.round(q/w*750*10)/10;if(Math.abs(ay-(+x.ay||750))>=0.05){x.ay=ay;x.amT=''}},{opt:1});
 const stCl=(o,k)=>v=>{if(stNv(v)!==stNv(o[k]))o.amT='';o[k]=v};
+/* v94.0: پله «شرح کالا» — اختیاری و دُم (tail): در نوار پله‌ها نیست و «افزودن» را عقب نمی‌اندازد؛ از خط «شرح کالا» زیر سرتیتر باز می‌شود (ACT.stDs) و بعد به همان پله قبلی برمی‌گردد */
+const stDsS=o=>stS('ds','شرح','','text',()=>o.ds,v=>o.ds=clean(v||''),{opt:1,tail:1,ph:'شرح کالا: مثلاً دستبند کارتیر، قنات‌آبادی…'});
+const stDsO=()=>{const a=sv.qa,K=stKind();return K==='xr'?a.x:K==='it'||K==='ab'?a:null};
+ACT.stDs=()=>{stRead();const a=sv.qa,S=stSteps(),j=S.findIndex(s=>s.tail);if(j<0)return;if(a.st!==j){a.dsRet=a.st||0;a.st=j;a.sq=''}svKeep();stRe()};
 function stSteps(){const a=sv.qa,K=stKind();
-  if(K==='it')return [...(a.pz||gdCnt(a.k)?[stS('cnt','تعداد','عدد','dec',()=>a.cnt,v=>a.cnt=v,{grp:1,...(a.pz?{}:{opt:1})})]:[]),stS('w',a.pz?'وزن کل':'وزن','گرم','dec',()=>a.w,stCl(a,'w')),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),/* v61.60: اجرت درصدی و تومانی برای همه کالاها (ساخته، سایر/دست دوم، متفرقه، پارسیان) */stS('ajP','اجرت','٪','dec',()=>a.ajP,stCl(a,'ajP'),{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,stCl(a,'ajT'),{opt:1}),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a)];
-  if(K==='ab')return [stS('w','وزن آبشده','گرم','dec',()=>a.w,stCl(a,'w')),...(a.sh===1?[]:[stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay'))]),stMz(a),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a),stS('lab','آزمایشگاه','','text',()=>a.lab,v=>a.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>a.ang,v=>a.ang=v,{opt:1})];
+  if(K==='it')return [...(a.pz||gdCnt(a.k)?[stS('cnt','تعداد','عدد','dec',()=>a.cnt,v=>a.cnt=v,{grp:1,...(a.pz?{}:{opt:1})})]:[]),stS('w',a.pz?'وزن کل':'وزن','گرم','dec',()=>a.w,stCl(a,'w')),stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay')),stMz(a),/* v61.60: اجرت درصدی و تومانی برای همه کالاها (ساخته، سایر/دست دوم، متفرقه، پارسیان) */stS('ajP','اجرت','٪','dec',()=>a.ajP,stCl(a,'ajP'),{opt:1}),stS('ajT','اجرت تومانی','تومان','num',()=>a.ajT,stCl(a,'ajT'),{opt:1}),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a),stDsS(a)];
+  if(K==='ab')return [stS('w','وزن آبشده','گرم','dec',()=>a.w,stCl(a,'w')),...(a.sh===1?[]:[stS('ay','عیار','','int',()=>a.ay||750,stCl(a,'ay'))]),stMz(a),stS('pp','سود','٪','dec',()=>a.pp,stCl(a,'pp'),{opt:1}),stItAm(a),stS('lab','آزمایشگاه','','text',()=>a.lab,v=>a.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>a.ang,v=>a.ang=v,{opt:1}),stDsS(a)];
   if(K==='xr'){const x=a.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ab=x.cat==='آبشده'?[stS('lab','آزمایشگاه','','text',()=>x.lab,v=>x.lab=v,{opt:1}),stS('ang','شماره انگ','','dig',()=>x.ang,v=>x.ang=v,{opt:1})]:[];
     /* خرید/فروش طلا (پولی و غیرپولی): مظنه، وزن، عیار، مبلغ. v61.56 (خواسته صاحب اپ): وزن و مبلغ جدا — پله وزن فقط گرم است (۱۰۰۰ = یک کیلو، نه مبلغ)؛
        اگر وزن خالی بماند، مبلغ پله آخر (x.am) وزن را از مظنه می‌سازد */
     /* v90.9 (خواسته صاحب اپ: «خرید و فروش اول وزن گرفته شود بعد قیمت»): ترتیب مثل کالای ساخته — وزن، عیار، بعد نرخ (هر گرم/مظنه)، بعد مبلغ */
-    if(g&&m)return [...(x.pz||gdCnt(x.cat)?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v,{grp:1,...(x.pz?{}:{opt:1})})]:[]),stS('w','وزن','گرم','dec',()=>x.w,v=>{if(stNv(v)!==stNv(x.w))x.amT='';x.w=v;if(+v)x.am=''},{wOr:x,ph:'وزن (گرم) · خالی = فقط مبلغ',fm:v=>!+v&&+x.am?'از مبلغ: '+wFmt(xrCalc(x,sv.rate).n)+' گرم':null}),...(x.sh===1?[]:[stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=+v||xrAy(x.t,x.pul,x.cat)),...(x.cat==='آبشده'?[stW75(x)]:[])]),stMz(x,stBuyF(x)),stAmT(x),...ab,...gdFeeSteps(x)];
+    if(g&&m)return [...(x.pz||gdCnt(x.cat)?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v,{grp:1,...(x.pz?{}:{opt:1})})]:[]),stS('w','وزن','گرم','dec',()=>x.w,v=>{if(stNv(v)!==stNv(x.w))x.amT='';x.w=v;if(+v)x.am=''},{wOr:x,ph:'وزن (گرم) · خالی = فقط مبلغ',fm:v=>!+v&&+x.am?'از مبلغ: '+wFmt(xrCalc(x,sv.rate).n)+' گرم':null}),...(x.sh===1?[]:[stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=+v||xrAy(x.t,x.pul,x.cat)),...(x.cat==='آبشده'?[stW75(x)]:[])]),stMz(x,stBuyF(x)),stAmT(x),...ab,...gdFeeSteps(x),stDsS(x)];
     if(g)return [...(gdCnt(x.cat)&&!x.pul?[stS('cnt','تعداد','عدد','dec',()=>x.cnt,v=>x.cnt=v,{grp:1,opt:1})]:[]),stS('w','وزن','گرم','dec',()=>x.w,v=>x.w=v),...(x.sh===1?[]:[stS('ay','عیار','','int',()=>x.ay||750,v=>x.ay=+v||xrAy(x.t,x.pul,x.cat))]),
       /* v91.7: دریافت/تحویل طلا — اجرت و سود مثل فروش، فقط بدون مظنه (درصدها به طلا، اجرت تومانی به تومان)؛ آبشده فقط سود */
-      ...(xrAjOn(x)?[...(x.cat==='آبشده'?[]:[stS('ajP','اجرت','٪','dec',()=>x.ajP,v=>x.ajP=v,{opt:1,ph:'اجرت ٪ · به طلا حساب می‌شود'}),stS('ajT','اجرت تومانی','تومان','num',()=>x.ajT,v=>x.ajT=v,{opt:1})]),stS('pp','سود','٪','dec',()=>x.pp,v=>x.pp=v,{opt:1,ph:'سود ٪ · به طلا حساب می‌شود'})]:[]),...ab,...gdFeeSteps(x)];
-    return [stS('q','تعداد',(XA[x.a]||{}).u||'','dec',()=>x.q,v=>x.q=v,{grp:1}),...(m?[stS('pg','نرخ هر '+((XA[x.a]||{}).u||'واحد'),'تومان','num',()=>x.pg||+ls.get('m_px_'+x.a,0)||'',v=>{if(+v!==+x.pg)x.amT='';x.pg=v}),stAmT(x)]:[])]}
+      ...(xrAjOn(x)?[...(x.cat==='آبشده'?[]:[stS('ajP','اجرت','٪','dec',()=>x.ajP,v=>x.ajP=v,{opt:1,ph:'اجرت ٪ · به طلا حساب می‌شود'}),stS('ajT','اجرت تومانی','تومان','num',()=>x.ajT,v=>x.ajT=v,{opt:1})]),stS('pp','سود','٪','dec',()=>x.pp,v=>x.pp=v,{opt:1,ph:'سود ٪ · به طلا حساب می‌شود'})]:[]),...ab,...gdFeeSteps(x),stDsS(x)];
+    return [stS('q','تعداد',(XA[x.a]||{}).u||'','dec',()=>x.q,v=>x.q=v,{grp:1}),...(m?[stS('pg','نرخ هر '+((XA[x.a]||{}).u||'واحد'),'تومان','num',()=>x.pg||+ls.get('m_px_'+x.a,0)||'',v=>{if(+v!==+x.pg)x.amT='';x.pg=v}),stAmT(x)]:[]),stDsS(x)]}
   /* v61.62 (خواسته صاحب اپ): مانده قبلی هم پله‌به‌پله مثل بقیه ردیف‌ها: مبلغ · طلا · هر مانده اضافه‌شده · «+ مانده دیگر» */
   if(K==='pv'){const p=a.pv,used=new Set(p.xs.map(z=>z.k)),av=[...FXS(),...COINS()].filter(k=>!used.has(k));
     return [stS('r','مبلغ','تومان','num',()=>p.r,v=>p.r=v?String(v):'',{opt:1,nopt:1}),stS('g','طلا','گرم','dec',()=>p.g,v=>p.g=v,{opt:1,nopt:1,ph:'طلا (گرم ۷۵۰)'}),
@@ -115,13 +119,14 @@ ACT.stK=d=>{const I=$('stI');if(!I)return;const k=d.k;if(k==='ok'){ACT.stNext();
   else{if(all)v='';if(k==='.'){if(v.includes('.'))return;v=(v||'0')+'.'}else{const mx=s.type==='int'?3:s.type==='dig'?12:15;if(v.replace(/\D/g,'').length+k.length>mx)return;v=v==='0'&&k!=='000'?k:v+k}}
   QKF=false;I.value=v;try{I.setSelectionRange(v.length,v.length)}catch(_){}I.dispatchEvent(new Event('input',{bubbles:true}));try{const n=I.value.length;I.setSelectionRange(n,n)}catch(_){}
   try{navigator.vibrate&&navigator.vibrate(5)}catch(_){}};
-function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.st=0;if(a.stMax==null)a.stMax=a.st;const i=a.st,cur=S[i],T=stTag(),ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null)||!!(a.pv&&a.pv.gid),last=i===n-1||!!(S[i+1]&&S[i+1].add0);
-  const seg=S.map((s,k)=>{const v=stFmt(s,s.get()),reach=k<=Math.max(a.stMax,i)||ed;return `<button type="button" class="stp${k===i?' on':''}${v&&k!==i?' dn':''}${reach?'':' fu'}" data-act="stGo" data-i="${k}"${reach?'':' disabled'}><small>${s.lab}${s.opt&&!s.nopt?' <i>اختیاری</i>':''}</small><b>${v||(k===i?'…':'—')}</b></button>`}).join('');
+function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.st=0;if(a.stMax==null)a.stMax=a.st;const i=a.st,cur=S[i],T=stTag(),ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null)||!!(a.pv&&a.pv.gid),last=(i===n-1||!!(S[i+1]&&(S[i+1].add0||S[i+1].tail)))&&!(cur.tail&&a.dsRet!=null&&a.dsRet<i);
+  const dso=stDsO(),dsv=dso?clean(dso.ds||''):'',dsl=dso?`<button type="button" class="stds${dsv?' has':''}${cur.tail?' on':''}" data-act="stDs">${ic('edit')}<span>${dsv?esc(dsv):'شرح کالا · اختیاری (مثلاً دستبند کارتیر)'}</span></button>`:'';
+  const seg=S.map((s,k)=>{if(s.tail)return '';const v=stFmt(s,s.get()),reach=k<=Math.max(a.stMax,i)||ed;return `<button type="button" class="stp${k===i?' on':''}${v&&k!==i?' dn':''}${reach?'':' fu'}" data-act="stGo" data-i="${k}"${reach?'':' disabled'}><small>${s.lab}${s.opt&&!s.nopt?' <i>اختیاری</i>':''}</small><b>${v||(k===i?'…':'—')}</b></button>`}).join('');
   const val=cur.get(),ph=cur.ph?cur.ph:cur.type==='wam'?'وزن (گرم) یا مبلغ (تومان)':cur.mz?(stBuyF(sv.qa.x)!==1?'مظنه خرید یا هر گرم خرید (تومان)':'مظنه یا هر گرم ۱۸ (تومان)'):cur.lab+(cur.u?' ('+cur.u+')':'')+(cur.opt?' · اختیاری':''),
     inp=cur.type==='pick'?`<input id="stI" class="stin" type="search" placeholder="جستجوی ${cur.lab}…" autocomplete="off" enterkeyhint="search" value="${esc(a.sq||'')}">`:`${cur.type==='text'?'<input class="stkb" data-kbn="-1" aria-hidden="true" tabindex="-1" autocomplete="off">':''}<input id="stI" data-kb="${stKbT(cur)}" class="stin${cur.type==='text'?'':' ltr'}" ${cur.type==='text'?'':'inputmode="none"'} value="${cur.type==='wam'?(+val>=1000?Number(val).toLocaleString('en-US'):esc(val||'')):cur.type==='num'?(+val?Number(val).toLocaleString('en-US'):''):cur.grp?esc(grpIn(val)):esc(val==null?'':String(val))}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}">${cur.type==='text'?'<input class="stkb" data-kbn="1" aria-hidden="true" tabindex="-1" autocomplete="off">':''}`;
   const canFin=S.every(s=>s.need&&s.need()?false:s.wOr||s.opt||s.type==='int'||stFmt(s,s.get()));
   const kp=stKbT(cur)==='num';
-  return `<div class="stw${kp?' haskp':''}">${stHead(T.D,T.it,1,{ed})}<div class="stps">${seg}</div>
+  return `<div class="stw${kp?' haskp':''}">${stHead(T.D,T.it,1,{ed})}${dsl}<div class="stps">${seg}</div>
     <div class="fsearch sm st3">${cur.type==='pick'?ic('search'):''}${inp}${cur.type==='pick'?'':`<button type="button" class="stnx${last?' go':''}" data-act="stNext">${last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':'<span>بعدی</span>'+ic('back').replace('class="i"','class="i flip"')}</button>`}${stPhIn()}</div>
     ${cur.type==='pick'?`<div id="stPk">${stPick(cur)}</div>`:''}
     <div class="stlv" id="stPv">${stLive()}${stRefHTML()}</div>
@@ -212,9 +217,11 @@ ACT.stNext=()=>{stRead();const a=sv.qa,S=stSteps(),i=Math.min(a.st||0,S.length-1
   if(!stOk(s)){toast(s.msg||s.lab+' را بزنید',true);const I=$('stI');if(I)I.focus();return}
   if(s.type==='int')s.set(+s.get()||750);
   /* v61.82 (خواسته صاحب اپ): در مانده قبلی «بعدی» بعد از آخرین مقدار به «+ دلار، سکه» نمی‌رود؛ همان «افزودن به سند» است */
-  if(i>=S.length-1||(S[i+1]&&S[i+1].add0)){stFinish();return}
+  if(s.tail&&a.dsRet!=null&&a.dsRet<i){const r=a.dsRet;a.dsRet=null;a.st=r;svKeep();stRe();return}
+  if(i>=S.length-1||(S[i+1]&&(S[i+1].add0||S[i+1].tail))){stFinish();return}
   /* برگشت برای ویرایش: بعد از «بعدی» به همان جایی می‌رود که بودید */
   let nx=i+1;if(a.stMax>i){nx=a.stMax;for(let k=i+1;k<a.stMax;k++)if(!stOk(S[k])){nx=k;break}}
+  if(S[nx]&&S[nx].tail)nx=i+1;/* پله شرح فقط با زدن خودش باز می‌شود */
   a.st=Math.min(nx,S.length-1);a.stMax=Math.max(a.stMax||0,a.st);svKeep();stRe()};
 /* v69.2: تیک بالا — اول همه پله‌ها بررسی می‌شود؛ درست بود: دکمه سبز می‌شود و تیک کشیده می‌شود، بعد ثبت. اگر ثبت به هر دلیل انجام نشد، دکمه به حال قبل برمی‌گردد */
 ACT.stFin=()=>{stRead();const S=stSteps(),miss=S.findIndex(s=>!stOk(s));if(miss>=0){sv.qa.st=miss;stRe();toast(S[miss].msg||S[miss].lab+' را بزنید',true);return}

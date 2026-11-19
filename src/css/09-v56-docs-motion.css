@@ -4903,3 +4903,20 @@ html[data-theme=dark] .qkk:not(.go,.em){box-shadow:inset 0 1px 0 rgb(255 255 255
 .bkuni>svg{flex:none;width:18px;height:18px;color:var(--mut)}
 .bkunl .acrow .bkunb{flex:none;font-style:normal;font-size:12px;font-weight:850;color:var(--blu);padding:6px 11px;border-radius:11px;background:color-mix(in srgb,var(--blu) 10%,var(--card));white-space:nowrap}
 .bkunh{display:flex;align-items:flex-start;gap:7px;margin:10px 4px 4px;font-size:12px;font-weight:600;line-height:1.6;color:var(--mut)}.bkunh svg{flex:none;width:16px;height:16px;margin-top:2px}
+
+/* v94.0 — شرح کالا: خط کوچک زیر سرتیتر پنجره ورود ردیف + متن کم‌رنگ کنار نام در ردیف‌های سند */
+.stw .stds{display:flex;align-items:center;gap:7px;width:100%;min-height:32px;margin:6px 0 2px;padding:5px 11px;border:0;border-radius:11px;background:none;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--mut) 28%,transparent);font:inherit;font-size:12.5px;font-weight:650;color:var(--mut);text-align:start;cursor:pointer}
+.stw .stds svg{flex:none;width:14px;height:14px;opacity:.8}
+.stw .stds span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stw .stds.has{color:var(--ink);font-weight:800;background:color-mix(in srgb,var(--gold) 9%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 40%,transparent)}
+.stw .stds.on{box-shadow:inset 0 0 0 1.5px var(--blu);color:var(--blu)}
+.rwds{font-style:normal;font-weight:700;color:var(--mut);font-size:.9em}
+
+/* v94.1 (شاخه صفحه‌کلید) — با خط «شرح کالا» پنجره در گوشی‌های کوتاه (مثل آیفون ۱۳ در مرورگر) جا نمی‌شد و قفل نمی‌ماند: در صفحه کوتاه همه بخش‌ها کمی فشرده‌تر */
+@media (max-height:720px){
+  .stw.haskp .stds{min-height:27px;margin:4px 0 0;padding:3px 10px;font-size:12px}
+  .stw.haskp .st3{min-height:46px}.stw.haskp .st3 .stin{font-size:22px!important}
+  .stw.haskp .stlv{min-height:122px}.stw.haskp .stam{height:70px;padding-block:6px}.stw.haskp .stam.g{min-height:70px}
+  .stw.haskp .strs,.stw.haskp .strs .strf,.stw.haskp .strs .strd{height:40px}
+  .qkp{grid-auto-rows:39px;gap:6px;padding:7px;margin-top:8px}
+}
