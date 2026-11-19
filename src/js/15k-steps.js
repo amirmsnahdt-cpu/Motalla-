@@ -77,13 +77,15 @@ const stDir=()=>{const a=sv.qa,K=stKind();if(K==='it'||K==='ab')return -1;if(K==
 const stMzTx=(o,f)=>{f=f||1;const B=f!==1?' خرید':'',k=stMzK(o),v=Math.round(stMzV(o,k)*f),w=Math.round(stMzV(o,k==='g'?'mz':'g')*f);return v?(k==='g'?'هر گرم'+B+' ':'مظنه'+B+' ')+fmt(v)+(w?' ('+(k==='g'?'مظنه'+B+' ':'هر گرم'+B+' ')+fmt(w)+')':'')+(+o.mz?' <b class="own">این ردیف</b>':''):''};
 /* v61.98 (خواسته صاحب اپ): هنگام ویرایش مبلغ یا مظنه/نرخ، مبنا دیده شود تا خطا کم شود — مبلغ حساب‌شده (و اختلاف مبلغ دستی با آن)،
    قیمت لحظه‌ای بازار و نرخ سند؛ زدن روی هر مبنا همان عدد را در فیلد می‌گذارد */
-function stRefHTML(){const a=sv.qa,S=stSteps(),cur=S[Math.min(a.st||0,S.length-1)];if(!cur)return '';const K=stKind(),R=[];
+/* v93.5 (خواسته صاحب اپ: «صفحه‌کلید نباید تکان بخورد؛ وقتی اختلاف می‌زند می‌پرد پایین»): با صفحه‌کلید برنامه این ردیف همیشه هست و یک‌خطی است
+   (حتی خالی)، و در پله مبلغ «اختلاف» همیشه جا دارد («ندارد» وقتی برابر است) — قد بالای صفحه‌کلید عوض نمی‌شود */
+function stRefHTML(){const a=sv.qa,S=stSteps(),cur=S[Math.min(a.st||0,S.length-1)];if(!cur)return '';const K=stKind(),R=[],kp=stKbT(cur)==='num';
   const chip=(l,v,on)=>v?`<button type="button" class="strf${on?' on':''}" data-act="stRefSet" data-v="${Math.round(v)}"><small>${l}</small><b>${fmt(Math.round(v))}</b></button>`:'';
   if(cur.k==='amT'){let base=0,now=0;if(K==='it'||K==='ab'){const it=qaIt(a);base=itCalc({...it,amT:0},sv.rate,sv.tax).tot||0;now=itCalc(it,sv.rate,sv.tax).tot||0}else if(K==='xr'){const x=a.x;base=xrCalc({...x,amT:''},sv.rate).amount||0;now=xrCalc(x,sv.rate).amount||0}
-    if(base){R.push(chip('مبلغ حساب‌شده',base,now===base));if(now&&now!==base)R.push(`<span class="strd ${now>base?'up':'dn'}"><small>اختلاف</small><b>${now>base?'+':'−'} ${fmt(Math.abs(now-base))}</b></span>`)}}
+    if(base){R.push(chip('مبلغ حساب‌شده',base,now===base));if(now&&now!==base)R.push(`<span class="strd ${now>base?'up':'dn'}"><small>اختلاف</small><b>${now>base?'+':'−'} ${fmt(Math.abs(now-base))}</b></span>`);else if(kp)R.push('<span class="strd eq"><small>اختلاف</small><b>ندارد</b></span>')}}
   if(cur.mz){const o=K==='xr'?a.x:a,f=K==='xr'?stBuyF(a.x):1,k=stMzK(o),g=k==='g';const mk=glOk()?Math.round((g?GL.g18:GL.mz)*f):0,dc=Math.round((g?(+sv.rate||0):(+sv.mz||mzOf(sv.rate)||0))*f),cv=+cur.get()||0;
     if(mk)R.push(chip('بازار'+(glOld()?'':' · زنده'),mk,cv===mk));if(dc&&dc!==mk)R.push(chip('نرخ سند',dc,cv===dc))}
-  return R.length?`<div class="strs">${R.join('')}</div>`:''}
+  return R.length||kp?`<div class="strs">${R.join('')}</div>`:''}
 ACT.stRefSet=d=>{const I=$('stI');if(!I)return;const v=+d.v||0;I.value=v?v.toLocaleString('en-US'):'';if(I.oninput)I.oninput();try{I.focus({preventScroll:true});const n=I.value.length;I.setSelectionRange(n,n)}catch(_){}};
 function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
   if(K==='it'||K==='ab'){const it=qaIt(a),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;am=c&&c.tot||0;
@@ -254,7 +256,7 @@ function kbChk(){const vv=window.visualViewport,h=Math.round(vv?vv.height:innerH
    اگر پنجره از جای دیدنی بلندتر باشد قفل نمی‌شود (فقط بالا می‌نشیند) تا چیزی پشت کیبورد گیر نکند. جاپرکن #qasp نمی‌گذارد صفحه کوتاه مانع بالا آمدن پنجره شود.
    با تأیید/افزودن یا انصراف قفل باز می‌شود؛ بعد از افزودن، صفحه نرم تا ردیف تازه می‌رود (qaAfter). */
 let QPIN=null;
-function qaUnpin(){const V=$('view');QPIN=null;clearTimeout(qaPin.t);document.documentElement.classList.remove('qapn');if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove()}
+function qaUnpin(){const V=$('view');QPIN=null;clearTimeout(qaPin.t);clearTimeout(qaPin.s);document.documentElement.classList.remove('qapn');if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove()}
 function qaPin(){const V=$('view'),q=$('qa');if(!V||!q||cur!=='sell'||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){if(QPIN||$('qasp'))qaUnpin();return}
   /* نوار مانده پایین سند تا بسته شدن پنجره کنار می‌رود (مثل وقتی کیبورد باز است) تا پنجره همیشه جا شود و قفل بماند */document.documentElement.classList.add('qapn');
   let sp=$('qasp');if(!sp||sp.parentNode!==V){sp=document.createElement('div');sp.id='qasp';sp.setAttribute('aria-hidden','true');V.appendChild(sp)}
@@ -263,7 +265,9 @@ function qaPin(){const V=$('view'),q=$('qa');if(!V||!q||cur!=='sell'||!(q.queryS
   if(!qaPin.on){qaPin.on=1;V.addEventListener('scroll',()=>{if(QPIN&&QPIN.lock&&Math.abs(V.scrollTop-QPIN.y)>1)V.scrollTop=QPIN.y},{passive:true});
     if(vv)vv.addEventListener('resize',()=>{if(QPIN)qaPin()})}
   clearTimeout(qaPin.t);QPIN={y,lock:false,fits};
-  const lock=()=>{if(!QPIN)return;V.scrollTop=QPIN.y;QPIN.lock=QPIN.fits;V.classList.toggle('qapin',QPIN.fits)};
-  if(first&&!RM()&&Math.abs(V.scrollTop-y)>4){V.classList.remove('qapin');requestAnimationFrame(()=>{try{V.scrollTo({top:y,behavior:'smooth'})}catch(_){V.scrollTop=y}});qaPin.t=setTimeout(lock,420)}else lock()}
+  /* v93.5: اولین بار پنجره هنوز در حال بالا آمدن است (جایش چند پیکسل فرق دارد)؛ هنگام قفل جای واقعی دوباره خوانده می‌شود تا با پله‌های بعد یکی باشد */
+  const lock=re=>{if(!QPIN)return;if(re===1&&q.isConnected)QPIN.y=Math.max(0,Math.round(q.getBoundingClientRect().top-V.getBoundingClientRect().top+V.scrollTop)-8);V.scrollTop=QPIN.y;QPIN.lock=QPIN.fits;V.classList.toggle('qapin',QPIN.fits)};
+  if(first&&!RM()&&Math.abs(V.scrollTop-y)>4){V.classList.remove('qapin');requestAnimationFrame(()=>{try{V.scrollTo({top:y,behavior:'smooth'})}catch(_){V.scrollTop=y}});qaPin.t=setTimeout(lock,420)}else lock();
+  clearTimeout(qaPin.s);qaPin.s=setTimeout(()=>{if(QPIN&&$('qa')===q)lock(1)},470)}
 /* بعد از افزودن ردیف: صفحه تا ردیف تازه (کلیدی که قبلاً نبود) نرم می‌رود */
 function qaAfter(K){setTimeout(()=>{if(cur!=='sell'||QPIN)return;const R=[...document.querySelectorAll('#svRows [data-fk]')],el=R.find(e=>!K.has(e.dataset.fk))||R[R.length-1];if(el&&el.scrollIntoView)try{el.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'})}catch(_){}},90)}
