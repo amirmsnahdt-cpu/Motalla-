@@ -4963,15 +4963,15 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 
 /* ---- v96.8 (خواسته صاحب اپ: «کیبردها بزرگ‌تر و بهتر»): قد صفحه‌کلید با قد صفحه بزرگ می‌شود (جای خالی پایین پنجره را پر می‌کند)، حروف و رقم‌ها درشت‌تر،
    صفحه‌کلید حروف تا لبه پنجره پهن می‌شود، کلید فشرده آبی می‌شود ---- */
-.qkp{grid-auto-rows:auto;grid-template-rows:repeat(4,minmax(0,1fr));box-sizing:border-box;height:clamp(226px,calc(100dvh - 462px),310px);gap:9px;padding:10px;border-radius:24px}
-.qkp.qkb{height:clamp(226px,calc(100dvh - 462px),310px);gap:9px 0;padding:10px 5px;margin-inline:-9px;border-radius:22px}
-.stw:has(.stft) .qkp,.stw:has(.stph2) .qkp{height:clamp(214px,calc(100dvh - 522px),310px)}
-.qkk{font-size:clamp(22px,3.5dvh,30px);border-radius:16px}
+.qkp{grid-auto-rows:auto;grid-template-rows:repeat(4,minmax(0,1fr));box-sizing:border-box;height:clamp(226px,calc(100dvh - 460px),350px);gap:9px;padding:10px;border-radius:24px}
+.qkp.qkb{height:clamp(226px,calc(100dvh - 460px),350px);gap:9px 0;padding:10px 4px;margin-inline:-10px;border-radius:22px}
+.stw:has(.stft) .qkp,.stw:has(.stph2) .qkp{height:clamp(214px,calc(100dvh - 520px),350px)}
+.qkk{font-size:clamp(24px,4.3dvh,36px);font-weight:900;border-radius:16px}
 .qkk.z3{font-size:clamp(16px,2.5dvh,21px)}.qkk.fn.tx{font-size:clamp(13.5px,2dvh,17px)}.qkk.go{font-size:clamp(14px,2.1dvh,17px)}
-.qkb .qkr{gap:5px;padding-inline:1px}
-.qkk.kb{border-radius:11px;font-size:clamp(20px,3.1dvh,26px);font-weight:800}
+.qkb .qkr{gap:4px;padding-inline:0}
+.qkk.kb{border-radius:11px;font-size:clamp(21px,3.4dvh,28px);font-weight:850}
 .qkk.kb.tx{font-size:clamp(13px,1.9dvh,15.5px)}.qkk.kb.zw{font-size:clamp(11px,1.6dvh,13px)}.qkk.kb.go{font-size:clamp(14px,2.1dvh,17px)}
 .qkk.kb.fn svg{width:24px;height:24px}
 button.qkk:not(.go):active{background:color-mix(in srgb,var(--blu) 20%,var(--card));color:var(--blu)}
-@media (max-height:720px){.qkp,.qkp.qkb{height:clamp(188px,calc(100dvh - 440px),310px);gap:7px;padding:8px}.qkp.qkb{gap:7px 0;padding:8px 5px}
-  .stw:has(.stft) .qkp,.stw:has(.stph2) .qkp{height:clamp(180px,calc(100dvh - 496px),310px)}}
+@media (max-height:720px){.qkp,.qkp.qkb{height:clamp(188px,calc(100dvh - 440px),350px);gap:7px;padding:8px}.qkp.qkb{gap:7px 0;padding:8px 5px}
+  .stw:has(.stft) .qkp,.stw:has(.stph2) .qkp{height:clamp(180px,calc(100dvh - 496px),350px)}}
