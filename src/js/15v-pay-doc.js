@@ -268,11 +268,9 @@ function pxBkList(){const x=entRow(),q0=clean(PX.q||''),q=nzName(toEn(q0)),out=[
 function pxBkAll(q,q0){const BC=bkCus(),used=new Set(),O=[];BC.forEach(c=>{const so=c.srcId!=null?sources.find(z=>String(z.id)===String(c.srcId)&&!z.cash):null;if(so)used.add(String(so.id));if(!q||nzName(toEn(cuName(c)+' '+bkOfCu(c))).includes(q)||(so&&bkHit(so,q0)))O.push({c,s:so||null})});
   O.sort((a,b)=>bkCuBal(b.c)-bkCuBal(a.c));ownL().forEach(so=>{if(used.has(String(so.id)))return;if(BC.some(c=>c.srcId==null&&!c.srcNo&&bkSimNm(c.name)===bkSimNm(so.name)))return;if(!q||bkHit(so,q0))O.push({c:null,s:so})});return O}
 /* منبع واریزِ یک حساب بانکی: همان که وصل است؛ وگرنه منبع هم‌نام؛ وگرنه یک منبع تازه به نام همان حساب ساخته و وصل می‌شود (فقط با دسترسی حساب‌های بانکی) */
-function pxBkSrc(c){let so=c.srcId!=null?sources.find(z=>String(z.id)===String(c.srcId)):null;if(so)return so;
-  so=ownL().find(z=>bkSimNm(z.name)===bkSimNm(c.name)&&!bkCus().some(o=>o!==c&&String(o.srcId)===String(z.id)));
-  if(!so){if(!can('src')){toast('«'+cuName(c)+'» هنوز منبع واریز ندارد؛ اولین بار مدیر باید از همین‌جا انتخابش کند',true);return null}
-    so={id:nid++,name:cuName(c),bank:bkOfCu(c)||'',limit:0,count:0,iban:c.iban||'',card:c.card||''};if(ownSet())so.own=1;sources.push(so);saveS();logA('src','منبع واریز تازه از حساب بانکی',so.name)}
-  c.srcId=so.id;c.srcAt=c.srcAt||'';delete c.srcNo;saveCu();return so}
+function pxBkSrc(c){let so=bkSrcFor(c);
+  if(!so){if(!can('src')){toast('«'+cuName(c)+'» هنوز منبع واریز ندارد؛ اولین بار مدیر باید از همین‌جا انتخابش کند',true);return null}so=bkSrcMake(c);saveS();logA('src','منبع واریز تازه از حساب بانکی',so.name)}
+  if(String(c.srcId)!==String(so.id)||c.srcNo){c.srcId=so.id;c.srcAt=c.srcAt||'';delete c.srcNo;saveCu()}return so}
 ACT.pxBkGo=d=>{let id=d.id;if(d.cu){const c=bkCus().find(z=>String(z.id)===String(d.cu));if(!c)return;const so=pxBkSrc(c);if(!so)return;id=so.id}const f=ACT[d.a];if(f)f({...d,k:'bk',id:String(id)})};
 function pxList(){return pxTab()==='bk'?pxBkList():pxCuList()}
 /* واریزی ارسال‌شده: بانک انتخاب‌شده در پنجره منابع با مبلغ خالی می‌آید (بقیه در بانک فعلی) */
@@ -307,7 +305,7 @@ function pxHTML(){const rest=pxRest(),who0=pxWho();
   ${opt.length?`<div class="px8m pxop">${opt.map(([k,t,i])=>M[k]?'':`<button type="button" data-act="pxMore" data-f="${k}">${ic(i)}<span>${t}</span></button>`).join('')}</div><div class="px8fs">${opt.filter(([k])=>M[k]).map(([k])=>fld[k]).join('')}</div>`:''}
   <div class="pxgo"><button class="xgo" data-act="pxSave">${ic('check')} ${bkm?(PX.edit!=null?'ذخیره':'ثبت تخصیص'):PX.bz?'افزودن تسویه':'ثبت تسویه'}</button></div></div>`}
 function pxRead(){const g=id=>{const el=$(id);return el?el.value:undefined};if(g('pxQ')!==undefined)PX.q=g('pxQ');if(g('pxA')!==undefined)PX.amount=num(g('pxA'));if(g('pxT')!==undefined)PX.tn=toEn(g('pxT')).trim();if(g('pxN')!==undefined)PX.note=clean(g('pxN'))}
-function pxAv(){const A=$('pxA'),h=$('pxAv');if(!A||!h)return;const a=num(A.value),r=pxRest(),bk=PX.sel&&PX.sel.k==='bk'&&sources.find(z=>String(z.id)===String(PX.sel.id)),f=bk?acFin(bk):null;
+function pxAv(){const A=$('pxA'),h=$('pxAv');if(!A||!h)return;const a=num(A.value),r=pxRest(),bk=PX.sel&&PX.sel.k==='bk'&&sources.find(z=>String(z.id)===String(PX.sel.id)),f=bk?srcBal(bk):null;
   h.innerHTML=!a?'':a>r?'بیشتر از مانده بانکی ('+fmt(r)+')':`<span>مانده بانکی بعد از این <b>${fmt(r-a)}</b></span>${bk&&f!=null?`<span>مانده «${esc(bk.name)}» <b class="${f-a<0?'n':''}">${f-a<0?'−':''}${fmt(Math.abs(f-a))}</b></span>`:''}`;h.className='px8l'+(a>r?' bad':a?' ok':'');
   document.querySelectorAll('#sheet .px8q button').forEach(b=>b.classList.toggle('on',+b.dataset.v===a))}
 ACT.pxMore=d=>{pxRead();(PX.more=PX.more||{})[d.f]=1;$('sheet').innerHTML=pxHTML();pxBind(true);const f=document.querySelector('#sheet .px8fs .px8f:last-child');if(f){if(!RM()&&f.animate)f.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});const i=f.querySelector('input:not([type=file])');if(i)i.focus();else{const fi=f.querySelector('input[type=file]');if(fi)fi.click()}}};

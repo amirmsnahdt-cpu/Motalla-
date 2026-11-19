@@ -23,6 +23,33 @@ function bkLinkHTML(){return ''}
    («بانک سپه ( داداشی )» = «سپه داداشی»)؛ قبلاً فقط نام عیناً یکسان وصل می‌شد و منبع موجودی قدیمی خودش را نشان می‌داد */
 const bkSimNm=n=>canon(nzName(toEn(String(n||''))).replace(/(^|\s)بانک(?=\s|$)/g,' ').replace(/[()（）«»\-_،,.\u200c]/g,' ').replace(/\s+/g,''));
 function bkAutoLink(c){if(!c||c.grp!=='بانک'||c.srcId!=null||c.srcNo)return 0;const M=ownL().filter(z=>bkSimNm(z.name)===bkSimNm(c.name)&&!bkCus().some(o=>o!==c&&String(o.srcId)===String(z.id)));if(M.length!==1)return 0;c.srcId=M[0].id;c.srcAt=c.srcAt||'';return 1}
+/* ---------- v93.8: یک فهرست بانک برای همه جا ----------
+   هر حساب نوع «بانک» یک منبع واریز دارد (bkSrcAll: منبع وصل‌شده، هم‌نام، یا منبع تازه به نام همان حساب) تا در تخصیص، تخصیص خودکار، ویرایش منابع و انتقال هم همان بانک‌ها با همان مانده بیایند.
+   فقط با کار کاربر صدا زده می‌شود (باز کردن پنجره تخصیص و…، bkAllocSync)، نه در رندر. منبعی که خودکار ساخته شده auto:1 دارد؛ تا وقتی استفاده نشده (srcUsed) می‌شود جایش را به یک منبع قدیمی داد.
+   منبع‌های قدیمیِ بدون حساب بانکی خودکار وصل نمی‌شوند (تاریخچه لیست‌هایشان در بانک سند می‌خورد و مانده را عوض می‌کند): کارت راهنما در زبانه بانک → bkUni، کاربر خودش انتخاب می‌کند */
+const srcUsed=s=>batches.some(b=>(b.items||[]).some(x=>x.src===s.name))||Object.values(drafts||{}).some(L=>(L||[]).some(p=>p&&p.src&&String(p.src.id)===String(s.id)));
+function bkSrcMake(c){const n0=cuName(c),nm=sources.some(z=>z.name===n0)?n0+' · '+toFa(c.cno||c.id):n0,so={id:nid++,name:nm,bank:bkOfCu(c)||'',limit:0,count:0,iban:c.iban||'',card:c.card||'',auto:1};if(ownSet())so.own=1;sources.push(so);return so}
+function bkSrcFor(c){const so=c.srcId!=null?sources.find(z=>String(z.id)===String(c.srcId)&&!z.cash):null;if(so)return so;
+  return ownL().find(z=>bkSimNm(z.name)===bkSimNm(c.name)&&!bkCus().some(o=>o!==c&&String(o.srcId)===String(z.id)))||null}
+function bkSrcAll(){if(!can('src'))return 0;let n=0,ch=0;for(const c of bkCus()){if(c.srcNo||bkSrcOf(c))continue;let so=bkSrcFor(c);if(!so){so=bkSrcMake(c);n++}c.srcId=so.id;c.srcAt=c.srcAt||'';ch++}
+  if(ch)audBg(()=>{if(n)saveS();saveCu()});return ch}
+/* حساب‌هایی که یک منبع قدیمی می‌تواند به آن‌ها وصل شود: بدون منبع، یا با منبع خودکاری که هنوز استفاده نشده */
+const srcLinkCands=()=>bkCus().filter(c=>{const s=bkSrcOf(c);return !s||(s.auto&&!srcUsed(s))});
+function srcLinkDo(so,c){if(!c){const id=bkCuNew(so.name);c=custs.find(z=>String(z.id)===String(id))}if(!c)return null;
+  const old=bkSrcOf(c);if(old&&old!==so&&old.auto&&!srcUsed(old)){sources=sources.filter(z=>z!==old);saveS()}
+  c.srcId=so.id;c.srcAt=c.srcAt||'';delete c.srcNo;if(!c.bank&&so.bank)c.bank=so.bank;c.updatedAt=new Date().toISOString();bkDepSync(c,1);saveCu();logA('cust','اتصال منبع به حساب بانک',so.name+' ← '+cuName(c));return c}
+const bkUniL=()=>DSRC().filter(s=>!srcBk(s));
+const bkUniCard=()=>{if(!can('src')||cuQ)return '';const n=bkUniL().length;return n?`<button type="button" class="bkuni" data-act="bkUni"><span class="bkunii">${ic('bank')}</span><span class="tx"><b>${toFa(n)} منبع واریز هنوز حساب بانکی ندارد</b><small>بزنید و بگویید هر کدام کدام بانک است تا مانده‌اش در بانک‌ها بیاید</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:''};
+function bkUniHTML(){const L=bkUniL();return `<div class="sh-h"><div><b>منبع‌های بدون حساب بانکی</b><small class="shsub">هر منبع را به حساب بانکی خودش وصل کنید؛ لیست‌های واریز ارسال‌شده‌اش در همان بانک سند می‌خورد</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  ${L.length?`<div class="mvl bkunl">${L.map(s=>{const bk=acBank(s);let n=0,t=0;batches.forEach(b=>(b.items||[]).forEach(x=>{if(x.src===s.name&&x.st!=='fail'){n++;t+=+x.amount||0}}));
+    return `<div class="mvs"><button type="button" class="acrow" data-act="bkUniM" data-id="${s.id}">${bk?bankBadge(bk,'lg'):`<span class="bkb lg" style="--bc:#64748b">${esc(userInit(s.name))}</span>`}<span class="tx"><b>${esc(s.name)}</b><small>${n?toFa(n)+' واریزی ارسال‌شده · '+fmt(t)+' تومان':'هنوز واریزی ارسال‌شده ندارد'}</small></span><em class="bkunb">وصل کردن</em></button></div>`}).join('')}</div>
+  <div class="bkunh">${ic('info')}<span>اگر مانده آن بانک را قبلاً دستی درست کرده‌اید، بعد از وصل کردن یک بار «اصلاح موجودی» بزنید.</span></div>`:`<div class="xnone">همه منبع‌ها حساب بانکی دارند ✓</div>`}`}
+ACT.bkUni=()=>{if(!can('src'))return;sheet(bkUniHTML())};
+ACT.bkUniM=(d,e)=>{const so=sources.find(x=>String(x.id)===String(d.id));if(!so)return;const T=e&&e.target&&e.target.closest('button');
+  popMenu(T,[['bkUniGo',ic('plus'),'حساب بانکی تازه «'+so.name+'»',{id:so.id,cu:''}],...srcLinkCands().map(c=>['bkUniGo',ic('bank'),cuName(c)+' · '+bfxMv(bkCuBal(c)),{id:so.id,cu:c.id}]),...(srcUsed(so)?[]:[['bkUniDel',ic('trash'),'حذف این منبع · استفاده نشده',{id:so.id}]])])};
+ACT.bkUniDel=d=>{const so=sources.find(x=>String(x.id)===String(d.id));if(!so||!can('src')||srcUsed(so)||srcBk(so))return;askConfirm('منبع «'+so.name+'» حذف شود؟ هیچ واریزی‌ای با آن ثبت نشده است.','حذف',()=>{sources=sources.filter(z=>z!==so);saveS();logA('src','حذف منبع بدون استفاده',so.name);render();if(bkUniL().length)sheet(bkUniHTML());else closeSheet();toast('منبع حذف شد')})};
+ACT.bkUniGo=d=>{const so=sources.find(x=>String(x.id)===String(d.id));if(!so||!can('src'))return;const c=srcLinkDo(so,d.cu?custs.find(z=>String(z.id)===String(d.cu)):null);if(!c)return;
+  render();if(bkUniL().length)sheetKeep(bkUniHTML());else closeSheet();toast('«'+so.name+'» به «'+cuName(c)+'» وصل شد')};
 function bkLinkRow(c){if(!c||!c.id||c.grp!=='بانک'||!can('src'))return '';const s=bkSrcOf(c);return `<button type="button" class="bklr" data-act="bkLinkM" data-cu="${c.id}"><span class="bkdi">${ic('list')}</span><span class="tx"><b>لیست‌های واریز</b><small>${s?'از «'+esc(s.name)+'» اینجا سند می‌خورد':'به هیچ بانکی وصل نیست'}</small></span><em>${s?'تغییر':'انتخاب'}</em></button>`}
 ACT.bkLinkM=(d,e)=>{const c=custs.find(z=>String(z.id)===String(d.cu));if(!c)return;const T=e&&e.target&&e.target.closest('button');
   popMenu(T,[...ownL().map(s=>['bkLinkS',ic(bkSrcOf(c)&&String(c.srcId)===String(s.id)?'check':'bank'),s.name,{cu:c.id,s:s.id}]),bkSrcOf(c)?['bkLinkS',ic('x'),'قطع اتصال',{cu:c.id,s:''}]:null].filter(Boolean))};
