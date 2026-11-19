@@ -4905,3 +4905,13 @@ html[data-theme=dark] .stpv.ab b{color:#e2bd62}
 .abpr .tx b{font-size:13.5px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.abpr .tx small{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .abpv{flex:none;display:flex;flex-direction:column;align-items:flex-end;line-height:1.3}.abpv b{font-size:14.5px;font-weight:900;font-feature-settings:"tnum"}.abpv small{font-size:10.5px;font-weight:750;color:var(--mut)}
 html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color:#e2bd62}
+
+/* ---- v96.6 اعلان «نسخه جدید» بالای صفحه؛ با × یا کشیدن رد می‌شود ---- */
+#updn{position:fixed;z-index:9990;top:calc(env(safe-area-inset-top,0px) + 8px);left:12px;right:12px;max-width:520px;margin-inline:auto;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 8px;border-radius:22px;background:color-mix(in srgb,var(--card) 92%,transparent);-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);color:var(--ink);box-shadow:0 18px 40px -16px rgb(11 26 74/.45),inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 28%,var(--line));cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;animation:updnIn .45s cubic-bezier(.2,.9,.3,1.15) both}
+@keyframes updnIn{from{transform:translateY(-130%);opacity:0}}
+#updn .ui{width:36px;height:36px;display:grid;place-items:center;flex:none;border-radius:50%;background:var(--blu2);color:var(--blu)}#updn .ui svg{width:19px;height:19px}
+#updn .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}
+#updn .tx b{font-size:14px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#updn .tx small{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#updn .go{flex:none;font-size:13px;font-weight:850;color:#fff;background:var(--blu);border-radius:14px;padding:9px 13px;box-shadow:0 8px 18px -10px var(--blu)}
+#updn .ux{flex:none;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;font-size:19px;line-height:1;font-weight:700;color:var(--mut);background:color-mix(in srgb,var(--mut) 13%,var(--card))}
+@media (prefers-reduced-motion:reduce){#updn{animation:none}}
