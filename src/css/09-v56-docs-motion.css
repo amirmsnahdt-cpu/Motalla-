@@ -4882,3 +4882,10 @@ html.qapn #app:not(.home) #act{display:none!important}
 
 /* v95.5 — «شرح کالا» در فرم‌های طلای تسویه (دریافت/تحویل طلا، تعویض طلا): یک خانه تمام‌عرض زیر وزن و عیار */
 .ckf.ckds{margin-top:8px}#sheet .ckf.ckds input{font-size:15px;font-weight:700}
+
+/* v95.7 — گردش حساب: سندی که با سندهای بعدی صاف شده «تسویه شد» می‌خورد (عدد کم‌رنگ، قاب خنثی)؛ فقط ردیف‌های باز رنگی‌اند */
+.txv2 b.opz>span{color:var(--mut);font-weight:700}
+.txv2 b.opz small.opok{display:inline-flex;align-items:center;gap:3px;color:var(--ok);font-weight:850;opacity:1}
+.txv2 b.opz small.opok svg{width:11px;height:11px}
+.txr.opcl .bri{opacity:.55}.txr.opcl .tx b{color:color-mix(in srgb,var(--ink) 72%,var(--mut))}
+.opnote{display:flex;align-items:flex-start;gap:6px;margin:0 6px 10px;font-size:11.5px;font-weight:650;line-height:1.6;color:var(--mut)}.opnote svg{flex:none;width:14px;height:14px;margin-top:3px;color:var(--ok)}

@@ -53,7 +53,25 @@ const cnNext=c=>{let m=0;for(const v of cnNums(c).values())if(v>m)m=v;return m+1
 const cnOfT=t=>{for(const c of custs){if(c.sys)continue;if((c.txs||[]).includes(t))return cnOf(c,t)}return null};
 const cnTag=n=>n?`<span class="cntg">سند ${toFa(n)} مشتری</span>`:'';
 const invTitle=t=>t.legacy?(t.dk==='out'?'سند پرداخت وجه':'سند دریافت وجه'):(t.dk==='buy'?'سند خرید ':t.dk==='in'&&t.auto==='stl'?'سند دریافت ':(t.items||[]).length?'فاکتور فروش ':'سند ')+toFa(t.no);
-function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`;
+/* v95.7 (خواسته صاحب اپ: «سندها حتی وقتی تسویه می‌شوند هم مانده خودشان را نشان می‌دهند و باعث اشتباه می‌شود»): ردیف‌های باز حساب.
+   هر نوع مانده (تومان، طلا، هر سکه/ارز) جدا و به ترتیب گردش حساب (تاریخ سند، بعد زمان ثبت): هر اثرِ تازه اول قدیمی‌ترین اثرِ بازِ طرف مقابل را می‌بندد.
+   خروجی برای هر سند و هر نوع: {v: اثر خود سند، rem: آنچه هنوز باز مانده}. جمع rem ردیف‌های باز = مانده همان حساب. فقط نمایش است؛ داده‌ای عوض نمی‌شود.
+   برای حساب‌های نوع «بانک» به کار نمی‌رود (آنجا هر ردیف گردش بانک است، نه بدهی باز) */
+const OPE=k=>k==='r'?1:.0005;
+function cuOpenMap(c){const st=c.id+'|'+(c.txs||[]).length+'|'+(c.updatedAt||'');if(window.__opc&&window.__opc.st===st)return window.__opc.m;
+  const K=x=>String(x.date||'')+'|'+String(x.at0||x.at||''),L=(c.txs||[]).filter(x=>x&&!x.del).sort((a,b)=>K(a)<K(b)?-1:K(a)>K(b)?1:0),m=new Map(),Q={};
+  for(const t of L){const d=txD(t),E={r:d.r,g:d.g,...(d.x||{})},o={};
+    for(const k in E){const v=+E[k]||0,e=OPE(k);if(Math.abs(v)<e)continue;const s=v>0?1:-1,q=Q[k]=Q[k]||[];let a=Math.abs(v);
+      while(a>=e&&q.length&&q[0].s!==s){const h=q[0].o[k],u=Math.min(a,h.rem);h.rem-=u;a-=u;if(h.rem<e){h.rem=0;q.shift()}}
+      o[k]={v,rem:a<e?0:a};if(o[k].rem)q.push({s,o})}
+    m.set(String(t.id),o)}
+  window.__opc={st,m};return m}
+const opNoteH=c=>{if(!c||c.grp==='بانک')return '';let n=0;cuOpenMap(c).forEach(o=>{const K=Object.keys(o);if(K.length&&K.every(k=>!o[k].rem))n++});return n?`<div class="opnote">${ic('check')}<span>${toFa(n)} سند با سندهای بعدی صاف شده و «تسویه شد» خورده است؛ جمع ردیف‌های رنگی همان مانده حساب است.</span></div>`:''};
+function txRow2(c,t){const d=txD(t),OP=c&&c.grp!=='بانک'?cuOpenMap(c).get(String(t.id)):null;let opN=0,opC=0;
+  const v=(x,k)=>{const o=OP&&OP[k];opN++;
+    if(o&&!o.rem){opC++;return `<b class="z opz"><span>${balV(k,x)} <i>${balU(k)}</i></span><small class="opok">${ic('check')}تسویه شد</small></b>`}
+    if(o&&Math.abs(Math.abs(x)-o.rem)>=OPE(k)){const r=x>0?o.rem:-o.rem;return `<b class="${x>0?'b':'r'}"><span>${balV(k,r)} <i>${balU(k)}</i></span><small>${ourLab(x)} · باز از ${balV(k,x)}</small></b>`}
+    return `<b class="${x>0?'b':'r'}"><span>${balV(k,x)} <i>${balU(k)}</i></span><small>${ourLab(x)}</small></b>`};
   let T,sub,ico;if(t.type==='inv'){const paid=(t.pays||[]).reduce((s,p)=>s+pAmt(p),0);T=invTitle(t)+(cnOf(c,t)?' · سند '+toFa(cnOf(c,t))+' مشتری':'');ico='inv';sub=[(t.items||[]).map(i=>i.k+dsP(i)).join('، '),...(t.xr||[]).map(x=>xrLab(x)+dsP(x)),(t.items||[]).length?wFmt((t.items||[]).reduce((s,i)=>s+(+i.w||0),0))+' گرم':'',paid?(paid>0?'دریافت ':'پرداخت ')+fmt(Math.abs(paid)):''].filter(Boolean).join(' · ');
     /* v83.7: سند طرف مقابل، لیست واریز و سندهای منتقل‌شده بانک: عنوان = خود ردیف، زیرش شماره سند (v83.9 رفع باگ: داخل همان شاخه inv، نه بعد از آن) */
     if(t.posm){const w=((t.pays||[])[0]||{}).why;sub=T;T='کارتخوان'+(w?' · '+w:'');ico='card'}else if(t.fix){const p0=(t.pays||[]).find(p=>p.k==='adj');sub=T;T='اصلاح حساب'+(p0?' · '+(pAmt(p0)<0?'کسر':'اضافه'):'');ico='tag'}/* v86.2 سند اصلاح موجودی *//* v85.9 سند کارتخوان دستی از صفحه بانک */
@@ -61,7 +79,7 @@ function txRow2(c,t){const d=txD(t),v=(x,k)=>`<b class="${x>0?'b':'r'}"><span>${
   else if(t.type==='xf'){T=t.inv?'پرداخت فاکتور مشتری دیگر':'انتقال مانده';ico='swap';sub=t.note||''}else{T='تبدیل '+(t.dir==='g2r'?'طلایی به ریالی':'ریالی به طلایی');ico='coin';sub=t.note||''}
   const vals=(d.r?v(d.r,'r'):'')+(d.g?v(d.g,'g'):'')+Object.keys(d.x||{}).filter(k=>+d.x[k]).map(k=>v(+d.x[k],k)).join('')||'<b>تسویه</b>';
   const wp=t.type==='inv'&&typeof wdPend==='function'?wdPend(c,t.no):0;/* v61.80: مانده رفته برای واریز */
-  return swW(`<button class="txr${c?' '+(bkRowCls(t,d,c.grp==='بانک')||'tz'):''}" data-act="txOpen" data-id="${t.id}"><span class="bri t-${t.type}">${ic(ico)}</span><span class="tx"><b>${esc(T)}</b><small>${esc(sub)}</small>${wp?(()=>{const q=wdSpl(c,t.no);/* v78.5: تخصیص‌شده زرد، در لیست بدون تخصیص بنفش *//* v89.3 (خواسته صاحب اپ: «ردیف سند این‌قدر بلند نباشد»): یک خط — قرص‌های کوتاه مثل کاشی لیست مشتری */return `<span class="txwl">${q.fr?`<em class="txwd wf">${ppM(q.fr)} در لیست</em>`:''}${q.al?`<em class="txwd">${ppM(q.al)} تخصیص‌شده</em>`:''}</span>`})():''}</span><span class="txv txv2">${vals}</span></button>`,{r:[['txOpen','جزئیات','eye','#3b6fd6']],l:can('del')||isAdmin()?[['txDel','حذف','trash','#d23c48']]:[],data:{id:t.id}})}
+  return swW(`<button class="txr${c?' '+(opN&&opC===opN?'tz opcl':(bkRowCls(t,d,c.grp==='بانک')||'tz')):''}" data-act="txOpen" data-id="${t.id}"><span class="bri t-${t.type}">${ic(ico)}</span><span class="tx"><b>${esc(T)}</b><small>${esc(sub)}</small>${wp?(()=>{const q=wdSpl(c,t.no);/* v78.5: تخصیص‌شده زرد، در لیست بدون تخصیص بنفش *//* v89.3 (خواسته صاحب اپ: «ردیف سند این‌قدر بلند نباشد»): یک خط — قرص‌های کوتاه مثل کاشی لیست مشتری */return `<span class="txwl">${q.fr?`<em class="txwd wf">${ppM(q.fr)} در لیست</em>`:''}${q.al?`<em class="txwd">${ppM(q.al)} تخصیص‌شده</em>`:''}</span>`})():''}</span><span class="txv txv2">${vals}</span></button>`,{r:[['txOpen','جزئیات','eye','#3b6fd6']],l:can('del')||isAdmin()?[['txDel','حذف','trash','#d23c48']]:[],data:{id:t.id}})}
 function xfShow(c,t){const d=txD(t),kv=(l,v)=>v?`<div class="kv"><small>${l}</small><b>${v}</b><span class="kvx"></span></div>`:'';const L=txLinked(c,t);
   sheet(`<div class="sh-h"><div><b>${t.type==='cv'?'تبدیل طلایی / ریالی':'انتقال مانده'}</b><small class="shsub">${esc(cuName(c))}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <div class="kvs" style="border:0;padding:0">${kv('اثر ریالی',d.r?fmt(Math.abs(d.r))+' تومان ('+(d.r>0?'بدهی ما':'طلب ما')+')':'')}${kv('اثر طلایی',d.g?wFmt(Math.abs(d.g))+' گرم ('+(d.g>0?'بدهی طلایی ما':'طلب طلایی ما')+')':'')}${kv('نرخ',t.rate?fmt(t.rate)+' تومان هر گرم':'')}${kv('طرف دیگر',L.map(x=>esc(cuName(x.c))).join('، '))}${kv('شرح',esc(t.note||''))}${kv('تاریخ',esc(dates(t.date).wd+' '+dates(t.date).fa))}${kv('ثبت‌کننده',esc(t.by||''))}</div>
