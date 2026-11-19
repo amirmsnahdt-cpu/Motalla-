@@ -4998,3 +4998,8 @@ html[data-theme=dark] .qks{color:#fff}html[data-theme=dark] .qks+.qks{box-shadow
 html[data-theme=dark] button.qkk.kb:not(.go):active{background:#8a8a8e;color:#fff}
 @media (max-height:720px){.qkp.qkb{gap:5px 0;padding:5px 4px 6px}.qkb .qkr{gap:4px}}
 .qkp.qkb .qkk.kb.go,html[data-theme=dark] .qkp.qkb .qkk.kb.go{background:var(--blu);color:#fff}
+/* v97.1 (خواسته صاحب اپ: «در کادر باشد و درست سر جایش»): صفحه‌کلید حروف دیگر از لبه پنجره بیرون نمی‌زند؛ همان جای صفحه‌کلید عددی */
+.qkp.qkb{margin-inline:0;padding:7px 6px 9px;border-radius:20px}
+.qkb .qkr{gap:4px}
+@media (max-height:720px){.qkp.qkb{padding:6px 5px 7px}}
+.qkk.kb:not(.tx,.go){font-size:clamp(19px,3dvh,25px)}
