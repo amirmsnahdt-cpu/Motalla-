@@ -131,8 +131,10 @@ const xrAjTx=(x,C)=>{if(!C||C.q0==null)return '';return [+x.ajP?'اجرت '+toFa
 const dsOf=o=>o?clean(o.ds||(typeof o.n==='string'?o.n:'')||''):'';
 const dsH=o=>{const d=dsOf(o);return d?` <i class="rwds">(${esc(d)})</i>`:''};
 const dsP=o=>{const d=dsOf(o);return d?' ('+d+')':''};
-function xrLab(x){const g=x.a==='gold',A=g?'طلا':(XA[x.a]||{t:x.a}).t;if(!g&&XA[x.a]&&XA[x.a].k==='o')return (x.t==='sell'?'فروش ':'خرید ')+(x.nt||A);if(g&&x.sh===1&&x.cat==='آبشده')return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' آبشده شرطی';if(g&&x.pz)return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' سکه پارسیان';
-  if(x.cat==='مانده قبلی')return 'مانده قبلی '+(g?'طلا':A)+' · '+(x.t==='out'?'طلبکاریم':'بدهکاریم');if(g&&x.cat==='تعویض')return 'تعویض طلا';if(g&&x.cat==='مرجوعی')return 'مرجوعی';if(g&&(x.t==='in'||x.t==='out')&&x.cat&&x.cat!=='متفرقه')return (x.t==='in'?'دریافت ':'تحویل ')+x.cat;if(g&&(x.t==='in'||x.t==='out')&&x.cat==='متفرقه')return (x.t==='in'?'دریافت':'تحویل')+' طلای متفرقه';
+/* v94.5: ردیف خریدی که در «تعویض» زده شده (sw) به‌جای «خرید …» می‌گوید «تعویض …» */
+function xrLab(x){const l=xrLab0(x);return x&&x.sw&&x.t==='buy'?l.replace(/^خرید (پولی )?(طلا · )?/,'تعویض '):l}
+function xrLab0(x){const g=x.a==='gold',A=g?'طلا':(XA[x.a]||{t:x.a}).t;if(!g&&XA[x.a]&&XA[x.a].k==='o')return (x.t==='sell'?'فروش ':'خرید ')+(x.nt||A);if(g&&x.sh===1&&x.cat==='آبشده')return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' آبشده شرطی';if(g&&x.pz)return (x.t==='buy'?'خرید':x.t==='sell'?'فروش':x.t==='in'?'دریافت':'تحویل')+' سکه پارسیان';
+  if(x.cat==='مانده قبلی')return 'مانده قبلی '+(g?'طلا':A)+' · '+(x.t==='out'?'طلبکاریم':'بدهکاریم');if(g&&x.cat==='تعویض')return 'تعویض متفرقه';if(g&&x.cat==='مرجوعی')return 'مرجوعی';if(g&&(x.t==='in'||x.t==='out')&&x.cat&&x.cat!=='متفرقه')return (x.t==='in'?'دریافت ':'تحویل ')+x.cat;if(g&&(x.t==='in'||x.t==='out')&&x.cat==='متفرقه')return (x.t==='in'?'دریافت':'تحویل')+' طلای متفرقه';
   if(g){if(x.cat==='قلک'&&x.pul)return (x.t==='buy'?'خرید':'فروش')+' قلک';if(x.t==='buy')return x.pul?'خرید پولی طلا':'خرید '+(x.cat&&x.cat!=='متفرقه'?'طلا · '+x.cat:'متفرقه');if(x.t==='sell')return x.pul?'فروش پولی طلا':'فروش '+(x.cat&&x.cat!=='متفرقه'?'طلا · '+x.cat:'متفرقه');return (x.t==='in'?'دریافت طلا':'تحویل طلا')}
   return XT[x.t]+(x.pul?' پولی ':' ')+A}
 function xrSub(x,C){const g=x.a==='gold',m=x.t==='sell'||x.t==='buy';C=C||xrCalc(x,sv?sv.rate:0);
@@ -318,7 +320,7 @@ ACT.xrSave=()=>{xrRead();const x=sv.qa.x;if(!x)return;const C=xrCalc(x,sv.rate),
   if(m&&!C.pg){toast(g?'مظنه یا نرخ گرم را بالای سند بزنید':'نرخ هر واحد را بزنید',true);const f=g&&!x.pgM?$('svM'):$('xrG');if(f)f.focus();return}
   /* v90.9: «خیلی بالا می‌خرید» / «زیر نرخ روز می‌فروشید» / نرخ پرت — پنجره خطا (15zz-warn) */
   if(warnGate('xr|'+JSON.stringify([x.t,x.a,x.pul,x.w,x.q,x.ay,x.pg,x.mz,x.am,x.amT,x.cat,x.ajP,x.pp]),xrWarn(x),()=>ACT.xrSave()))return;
-  if(!g&&m)ls.set('m_px_'+x.a,x.pg);const o={t:x.t,a:x.a,pul:!!x.pul,w:g?C.n:0,q:g?0:C.n,ay:g?+x.ay:0,pg:x.pgM||!g?+x.pg:0,pgM:!!(g&&x.pgM),cat:g?x.cat||'متفرقه':''};if(x.lab)o.lab=x.lab;if(clean(x.ds||''))o.ds=clean(x.ds);if(x.ang)o.ang=x.ang;if(x.sh)o.sh=x.sh;if(x.pv)o.pv=x.pv;if(x.pz){o.pz=1;o.cnt=+x.cnt||0}if(x.img)o.img=x.img;if(Array.isArray(x.imgs)&&x.imgs.length){o.imgs=x.imgs.slice();o.img=x.imgs[0]}if(g&&m&&+x.am)o.am=Math.round(+x.am);if(m&&!(g&&+x.am)&&+x.amT)o.amT=Math.round(+x.amT);if(g&&m&&+x.mz)o.mz=+x.mz;
+  if(!g&&m)ls.set('m_px_'+x.a,x.pg);const o={t:x.t,a:x.a,pul:!!x.pul,w:g?C.n:0,q:g?0:C.n,ay:g?+x.ay:0,pg:x.pgM||!g?+x.pg:0,pgM:!!(g&&x.pgM),cat:g?x.cat||'متفرقه':''};if(x.lab)o.lab=x.lab;if(x.sw&&x.t==='buy')o.sw=1;if(clean(x.ds||''))o.ds=clean(x.ds);if(x.ang)o.ang=x.ang;if(x.sh)o.sh=x.sh;if(x.pv)o.pv=x.pv;if(x.pz){o.pz=1;o.cnt=+x.cnt||0}if(x.img)o.img=x.img;if(Array.isArray(x.imgs)&&x.imgs.length){o.imgs=x.imgs.slice();o.img=x.imgs[0]}if(g&&m&&+x.am)o.am=Math.round(+x.am);if(m&&!(g&&+x.am)&&+x.amT)o.amT=Math.round(+x.amT);if(g&&m&&+x.mz)o.mz=+x.mz;
   /* v90.9: کالای تعدادی (غیر پارسیان) و فی خرید/فروش ردیف دریافت کالا؛ فی زده‌شده «فی فعلی» همان کالا می‌شود (15zz) */
   if(xrAjOn(o)){if(+x.ajP>0)o.ajP=+x.ajP;if(+x.pp>0)o.pp=+x.pp;if(+x.ajT>0)o.ajT=Math.round(+x.ajT)}
   if(g&&!x.pz&&+x.cnt>0)o.cnt=+x.cnt;if(g&&+x.fb>0)o.fb=+x.fb;if(g&&+x.fs>0)o.fs=+x.fs;gdFeeKeep(o);
@@ -423,7 +425,7 @@ ACT.svRowDel=d=>{if(d.k==='pv'){pvDel(d.i);return}if(d.k==='py'&&sv.pays[+d.i]&&
   toast('ردیف حذف شد','', 'بازگردانی',()=>{if(d.k==='dc')sv.disc=o;else if(L&&o)L.splice(+d.i,0,o);svKeep();svRe()})};
 /* ----- ردیف‌های سند: مثل جدول کیمیا، هر ردیف با اثرش بر حساب مشتری (بدهکار / طلبکار) ----- */
 /* v61.6: برچسب تشخیص روی هر ردیف سند */
-const dkOfX=x=>x.cat==='تعویض'?'swap':x.cat==='مرجوعی'?'ret':x.t;
+const dkOfX=x=>x.cat==='تعویض'||(x.sw&&x.t==='buy')?'swap':x.cat==='مرجوعی'?'ret':x.t;
 /* v83.3: نوع ردیف پرداخت (در حساب، پاس شدن، اضافه/کسر…)؛ bk = حساب نوع بانک (واریز/برداشت به‌جای دریافت/پرداخت) */
 const pyTagK=p=>p.m==='bkx'&&(BKX[p.k]||[])[1]?p.k:pAmt(p)<0?'out':'in';
 const dkTag=(id,bk)=>{const D=(bk?DKBK.find(z=>z[0]===id):null)||DKA().find(z=>z[0]===id)||DK.find(z=>z[0]===id)||DKBK.find(z=>z[0]===id);return D?`<em class="d6k k-${id}">${D[1]}</em>`:''};
