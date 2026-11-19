@@ -4827,3 +4827,6 @@ html[data-theme=dark] .stkhero{background:linear-gradient(135deg,#b88a22 0%,#8a6
 /* v92.8 — تنظیمات فاکتور: زبانه پنجم «صورت‌حساب» (پنج زبانه در یک ردیف، نوشته کمی ریزتر در گوشی باریک) */
 .ivtab{grid-template-columns:repeat(5,minmax(0,1fr))}.ivtab button{font-size:12.5px;padding-inline:1px;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:380px){.ivtab button{font-size:11.5px}}
+/* v92.9 — پنجره ورود ردیف سند تا تأیید سر جایش قفل است */
+#view.qapin{overflow:hidden!important;overscroll-behavior:none}
+#qasp{flex:none;width:1px;pointer-events:none}

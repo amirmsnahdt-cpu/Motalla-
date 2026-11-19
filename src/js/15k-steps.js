@@ -159,7 +159,7 @@ function stStrip(){const w=document.querySelector('#qa .stps'),o=w&&w.querySelec
 function stRe(){const sp=document.querySelector('#qa .stps'),sl=sp?sp.scrollLeft:null,gh=stGhost(),bw=qaDir==='bw',O=document.querySelector('#qa .stw'),I0=$('stI'),S0=stSteps(),c0=S0[Math.min(sv.qa.st||0,S0.length-1)],kb=stKbT(c0);
   let same=false;if(O&&I0&&I0.isConnected&&kb!=='pick'&&I0.dataset.kb===kb){qaDir='';same=stPatch(O,I0);if(same){stBind();phPaint($('qa'));if(document.activeElement!==I0&&$('ov').classList.contains('hide'))try{I0.focus({preventScroll:true})}catch(_){}stSel(I0,c0)}}
   if(!same){qaRe();const I=$('stI');if(I&&document.activeElement!==I&&$('ov').classList.contains('hide')&&!(c0&&c0.type==='pick'&&!c0.search)){try{I.focus({preventScroll:true})}catch(_){I.focus()}}}
-  if(sl!=null){const np=document.querySelector('#qa .stps');if(np&&np!==sp)np.scrollLeft=sl}stSlide(bw,gh);stStrip()}
+  if(sl!=null){const np=document.querySelector('#qa .stps');if(np&&np!==sp)np.scrollLeft=sl}stSlide(bw,gh);stStrip();qaPin()}
 /* v61.98 (خواسته صاحب اپ): رفتن به پله بعد نرم و پیدا — تصویر فیلد قبلی به سمت راست محو می‌شود و فیلد تازه از چپ می‌آید
    (در راست‌به‌چپ «بعدی» سمت چپ است)، کادر مبلغ کمی بعدش، و پله فعال در ردیف بالا یک بار می‌پرد */
 /* v66.8 (خواسته صاحب اپ: «مثل Liquid Glass اپل، روان؛ الان می‌پرد و انگار خطا دارد»):
@@ -231,3 +231,22 @@ function kbChk(){const vv=window.visualViewport,h=Math.round(vv?vv.height:innerH
   document.documentElement.classList.toggle('kbo',on)}
 (()=>{const f=()=>setTimeout(kbChk,60);if(window.visualViewport)visualViewport.addEventListener('resize',kbChk);addEventListener('resize',kbChk);
   addEventListener('orientationchange',()=>{kbBase=0;f()});document.addEventListener('focusin',f);document.addEventListener('focusout',f)})();
+
+/* ===== v92.9 (خواسته صاحب اپ: «قسمت سند زدن وقتی می‌رسد باید در آن قالب ثابت شود و تکان نخورد و بعد از تأیید اسکرول شود») =====
+   تا وقتی پنجره ورود ردیف (فهرست تشخیص باز یا پله‌های قرمز/آبی) باز است، صفحه سند یک بار نرم می‌رود تا پنجره بالای صفحه بنشیند و همان‌جا قفل می‌شود:
+   با «بعدی»، باز شدن کیبورد یا عوض شدن قد پنجره، صفحه دیگر بالا و پایین نمی‌پرد (#view.qapin بی‌اسکرول؛ هر اسکرول ناخواسته به جای قفل برمی‌گردد).
+   اگر پنجره از جای دیدنی بلندتر باشد قفل نمی‌شود (فقط بالا می‌نشیند) تا چیزی پشت کیبورد گیر نکند. جاپرکن #qasp نمی‌گذارد صفحه کوتاه مانع بالا آمدن پنجره شود.
+   با تأیید/افزودن یا انصراف قفل باز می‌شود؛ بعد از افزودن، صفحه نرم تا ردیف تازه می‌رود (qaAfter). */
+let QPIN=null;
+function qaUnpin(){const V=$('view');QPIN=null;clearTimeout(qaPin.t);if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove()}
+function qaPin(){const V=$('view'),q=$('qa');if(!V||!q||cur!=='sell'||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){if(QPIN||$('qasp'))qaUnpin();return}
+  let sp=$('qasp');if(!sp||sp.parentNode!==V){sp=document.createElement('div');sp.id='qasp';sp.setAttribute('aria-hidden','true');V.appendChild(sp)}
+  const vv=window.visualViewport,vr=V.getBoundingClientRect(),avail=Math.max(120,Math.min(V.clientHeight,(vv?vv.height+vv.offsetTop:innerHeight)-vr.top));sp.style.height=Math.round(avail)+'px';
+  const y=Math.max(0,Math.round(q.getBoundingClientRect().top-vr.top+V.scrollTop)-8),fits=q.getBoundingClientRect().height<=avail-12,first=!QPIN;
+  if(!qaPin.on){qaPin.on=1;V.addEventListener('scroll',()=>{if(QPIN&&QPIN.lock&&Math.abs(V.scrollTop-QPIN.y)>1)V.scrollTop=QPIN.y},{passive:true});
+    if(vv)vv.addEventListener('resize',()=>{if(QPIN)qaPin()})}
+  clearTimeout(qaPin.t);QPIN={y,lock:false,fits};
+  const lock=()=>{if(!QPIN)return;V.scrollTop=QPIN.y;QPIN.lock=QPIN.fits;V.classList.toggle('qapin',QPIN.fits)};
+  if(first&&!RM()&&Math.abs(V.scrollTop-y)>4){V.classList.remove('qapin');requestAnimationFrame(()=>{try{V.scrollTo({top:y,behavior:'smooth'})}catch(_){V.scrollTop=y}});qaPin.t=setTimeout(lock,420)}else lock()}
+/* بعد از افزودن ردیف: صفحه تا ردیف تازه (کلیدی که قبلاً نبود) نرم می‌رود */
+function qaAfter(K){setTimeout(()=>{if(cur!=='sell'||QPIN)return;const R=[...document.querySelectorAll('#svRows [data-fk]')],el=R.find(e=>!K.has(e.dataset.fk))||R[R.length-1];if(el&&el.scrollIntoView)try{el.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'})}catch(_){}},90)}
