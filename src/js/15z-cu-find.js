@@ -21,7 +21,7 @@ function cuTxHits(dq,q,dOk){if(!dq&&!q)return [];const R=[];
   return R.sort((a,b)=>String(b[1].date+'|'+(b[1].at||'')).localeCompare(String(a[1].date+'|'+(a[1].at||''))))}
 function cuTxRow(c,t){const d=txD(t),ks=[d.r?['r',d.r]:null,d.g?['g',d.g]:null,...Object.keys(d.x||{}).filter(k=>+d.x[k]).map(k=>[k,+d.x[k]])].filter(Boolean),[k,v]=ks[0]||['r',0];
   const ico=t.type==='inv'?'inv':t.type==='xf'?'swap':t.type==='cv'?'coin':((TXT[t.type]||{}).i||'plus');
-  const sub=[cuName(c),t.type==='inv'?(t.items||[]).map(i=>i.k).filter(Boolean).join('، '):[t.kind,t.weight?wFmt(t.weight)+' گرم':''].filter(Boolean).join('، '),t.note].filter(Boolean).join(' · ');
+  const sub=[cuName(c),t.type==='inv'?[...(t.items||[]).map(i=>i.k?i.k+dsP(i):''),...(t.xr||[]).filter(x=>dsOf(x)).map(x=>xrLab(x)+dsP(x))].filter(Boolean).join('، '):[t.kind,t.weight?wFmt(t.weight)+' گرم':''].filter(Boolean).join('، '),t.note].filter(Boolean).join(' · ');
   return `<button class="c6r" data-act="cuTxGo" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic(ico)}</span><span class="tx"><b>${esc(cuTxTitle(t))}</b><small>${esc(sub)}</small></span><span class="c6ivv${v<0?' d':v>0?' c':''}"><b>${v?balV(k,v):'تسویه'}</b><small>${v?esc(balU(k))+(ks.length>1?' +'+toFa(ks.length-1):''):''}</small></span></button>`}
 /* به تفکیک روز، مثل نتیجه‌های جستجوی واریزی‌ها */
 function cuTxHTML(TX){if(!TX.length)return '';const L=TX.slice(0,cuN),cnt={};TX.forEach(([,t])=>cnt[t.date]=(cnt[t.date]||0)+1);let h='',last=null;

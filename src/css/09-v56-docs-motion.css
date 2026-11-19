@@ -4879,3 +4879,6 @@ html.qapn #app:not(.home) #act{display:none!important}
 
 /* v94.0 — شرح کالا: متن کم‌رنگ کنار نام در ردیف‌های سند (v94.2: ورودش یک پله معمولی است، خط جدا برداشته شد) */
 .rwds{font-style:normal;font-weight:700;color:var(--mut);font-size:.9em}
+
+/* v95.5 — «شرح کالا» در فرم‌های طلای تسویه (دریافت/تحویل طلا، تعویض طلا): یک خانه تمام‌عرض زیر وزن و عیار */
+.ckf.ckds{margin-top:8px}#sheet .ckf.ckds input{font-size:15px;font-weight:700}
