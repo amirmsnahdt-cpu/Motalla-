@@ -171,7 +171,9 @@ let PXM=[];
    (با جستجو، حساب‌های دیگر و نام تازه هم جدا زیرش)، «بانک»: حساب‌های بانک مغازه. هر حساب یک کارت جدا مثل صفحه حساب مشتریان.
    جستجو: همه کلمه‌ها (به هر ترتیب) در نام، تلفن، گروه یا عنوان؛ یا ۳ رقم به بالا از تلفن/کد ملی؛ ی/ک عربی و فاصله‌ها یکسان. */
 const pxMe=()=>PX.bz?String(bz.d.cuId||''):(e=>e&&e.wd?String(e.wd.cu):'')(entries.find(z=>String(z.id)===String(entId)));
-const pxOwe=()=>{const me=pxMe();return CU().filter(c=>String(c.id)!==me).map(c=>({c,b:cuBal(c)})).filter(o=>o.b.R<0||o.b.G<0).sort((a,b)=>a.b.R-b.b.R||a.b.G-b.b.G)}/* v69.9: طلب طلا هم طلب است */;
+/* v93.3 (خواسته صاحب اپ: «حساب‌های بانکی در مشتری نباید باشد»): حساب‌های نوع «بانک» در بخش «حساب مشتری» نمی‌آیند؛ جایشان بخش «بانک‌های مغازه» است */
+const pxCuAll=()=>CU().filter(c=>c.grp!=='بانک');
+const pxOwe=()=>{const me=pxMe();return pxCuAll().filter(c=>String(c.id)!==me).map(c=>({c,b:cuBal(c)})).filter(o=>o.b.R<0||o.b.G<0).sort((a,b)=>a.b.R-b.b.R||a.b.G-b.b.G)}/* v69.9: طلب طلا هم طلب است */;
 function pxTab(){if(PX.only==='bk')return 'bk';if(PX.tab)return PX.tab;return 'cu'}
 /* v69.9 (خواسته صاحب اپ): دکمه دوبخشی تازه — یک «قرص» آبی زیر دو دکمه که با فنر به سمت انتخاب‌شده می‌لغزد (بدون ساختن دوباره پنل، پس پرش ندارد) */
 const pxSegHTML=tb=>`<div class="px9seg" role="tablist" style="--i:${tb==='bk'?1:0}"><i class="px9th" aria-hidden="true"></i><button type="button" role="tab" class="${tb==='cu'?'on':''}" aria-selected="${tb==='cu'}" data-act="pxTab" data-t="cu">${ic('users')}<span>حساب مشتری</span>${(n=>n?`<em>${toFa(n)}</em>`:'')(pxOwe().length)}</button><button type="button" role="tab" class="${tb==='bk'?'on':''}" aria-selected="${tb==='bk'}" data-act="pxTab" data-t="bk">${ic('bank')}<span>بانک‌های مغازه</span></button></div>`;
@@ -203,7 +205,7 @@ ACT.pxFlt=()=>{pxRead();PX.fo=PX.fo?0:1;pxTopRe();const F=document.querySelector
 ACT.pxFk=d=>{pxRead();PX.fk=d.v||'';pxFRe()};ACT.pxFg=d=>{pxRead();PX.fg=d.v||'';pxFRe()};ACT.pxFb=d=>{pxRead();PX.fb=+d.v?1:0;pxFRe()};
 ACT.pxQClr=()=>{PX.q='';pxTopRe(true);pxListRe()};ACT.pxDtClr=()=>{pxRead();PX.dt='';pxFRe()};
 /* تقویم همان پنجره سراسری است؛ بعد از انتخاب یا بستن، همین پنل با همان بخش برمی‌گردد */
-ACT.pxCal=()=>{pxRead();const P=PX,tb=pxTab(),M=new Set();if(tb==='bk')ownL().forEach(s=>{srcMoves(s).forEach(m=>m.date&&M.add(m.date));(s.led||[]).forEach(x=>!x.del&&x.date&&M.add(x.date))});else CU().forEach(c=>(c.txs||[]).forEach(t=>!t.del&&t.date&&M.add(t.date)));
+ACT.pxCal=()=>{pxRead();const P=PX,tb=pxTab(),M=new Set();if(tb==='bk'){ownL().forEach(s=>{srcMoves(s).forEach(m=>m.date&&M.add(m.date));(s.led||[]).forEach(x=>!x.del&&x.date&&M.add(x.date))});bkCus().forEach(c=>(c.txs||[]).forEach(t=>!t.del&&t.date&&M.add(t.date)))}else pxCuAll().forEach(c=>(c.txs||[]).forEach(t=>!t.del&&t.date&&M.add(t.date)));
   openCal(P.dt||todayISO(),iso=>{PX=P;PX.dt=iso;PX.step=1;sheet(pxHTML());pxBind(true)},{title:tb==='bk'?'گردش بانک در روز':'حساب‌هایی که این روز گردش دارند',marks:M})};
 const pxCuDay=c=>!PX.dt||(c.txs||[]).some(t=>!t.del&&t.date===PX.dt);
 const pxCuF=(c,b)=>(!PX.fg||(c.grp||'')===PX.fg)&&(!PX.fk||(PX.fk==='g'?b.G<0:b.R<0))&&pxCuDay(c);
@@ -216,7 +218,7 @@ const pxGh=(t,n)=>`<div class="c6gh px9g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>
 function pxCuList(){const q0=clean(PX.q||''),T=pxTok(q0),dOk=pDig(q0),me=pxMe(),O=pxOwe().filter(o=>pxHitC(o.c,T,dOk)&&pxCuF(o.c,o.b)),out=[],fl=!!(PX.dt||PX.fg||PX.fk);
   if(O.length)out.push(pxGh(T.length?'طلب ما · نتیجه جستجو':'طلب ما از این مشتری‌ها',O.length),pxCuL(O.map(o=>[o.c,o.b])));
   else if(!T.length)out.push(fl?`<div class="px7e px9e">${ic('filter')}<b>با این فیلتر حسابی نیست</b><small>تاریخ یا فیلتر را بردارید</small></div>`:`<div class="px7e px9e">${ic('check')}<b>از هیچ مشتری‌ای طلب نداریم</b><small>برای مشتری دیگر یا نام تازه، نامش را جستجو کنید</small></div>`);
-  if(T.length||dOk('')){const seen=new Set(O.map(o=>String(o.c.id))),C=CU().filter(c=>String(c.id)!==me&&!seen.has(String(c.id))&&pxHitC(c,T,dOk)&&(!PX.dt&&!PX.fg||pxCuF(c,{R:-1,G:-1}))).sort((a,b)=>(nzName(b.name).startsWith(T[0]||'#')-nzName(a.name).startsWith(T[0]||'#'))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,30);
+  if(T.length||dOk('')){const seen=new Set(O.map(o=>String(o.c.id))),C=pxCuAll().filter(c=>String(c.id)!==me&&!seen.has(String(c.id))&&pxHitC(c,T,dOk)&&(!PX.dt&&!PX.fg||pxCuF(c,{R:-1,G:-1}))).sort((a,b)=>(nzName(b.name).startsWith(T[0]||'#')-nzName(a.name).startsWith(T[0]||'#'))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,30);
     if(C.length)out.push(pxGh('حساب‌های دیگر · طلبی از آن‌ها نداریم',C.length),pxCuL(C.map(c=>[c,cuBal(c)])));
     PXM=memPeople(T.join(' '),dOk,6);if(PXM.length)out.push(pxGh('از واریزی‌ها و خریدها · بدون حساب'),`<div class="c6l px9l">${PXM.map((p,i)=>`<button type="button" class="c6r px7o px9c one" data-act="pxPick" data-k="mem" data-id="${i}"><span class="c6a m">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.n?toFa(p.n)+' واریزی':''].filter(Boolean).join(' · ')||'بدون حساب'}</small></span></button>`).join('')}</div>`);
     if(T.length&&!/^\d+$/.test(toEn(q0))&&![...O.map(o=>o.c),...C].some(c=>nzName(c.name)===T.join(' ')))out.push(`<div class="c6l px9l"><button type="button" class="c6r px7o px9c one px9n" data-act="pxPick" data-k="new" data-id=""><span class="c6a">${ic('plus')}</span><span class="tx"><b>پرداخت‌کننده تازه: «${esc(q0)}»</b><small>بدون باز کردن حساب؛ فقط سند تسویه ثبت می‌شود</small></span></button></div>`)}
@@ -225,15 +227,30 @@ function pxBkList(){const x=entRow(),q0=clean(PX.q||''),q=nzName(toEn(q0)),out=[
   if(PX.bz||!can('split'))return `<div class="px7e px9e">${ic('bank')}<b>اینجا بانکی برای انتخاب نیست</b></div>`;
   const xr=validated().find(z=>z.id===famRoot(x))||x;if(xr.id!==famRoot(x)||!(xr.amount>0))return `<div class="px7e px9e">${ic('bank')}<b>بانک را از واریزی اصلی عوض کنید</b></div>`;
   /* v77.3: مانده اصلی هنوز ارسال نشده (بقیه بخش‌ها ارسال‌شده) → انتخاب بانک برای همین مانده */
-  if(sent&&!xr.sentBid){const B=ownL().filter(s=>!q||bkHit(s,q0));if(!B.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانکی در مغازه تعریف نشده'}</b></div>`;
-    return pxGh('مانده '+fmt(xr.amount)+' تومان به کدام بانک برود؟',B.length)+`<div class="c6l bxlist px9l">${B.map((s,ri)=>{const bk=acBank(s),m=acSum(s);return `<button type="button" class="c6r bxrow px7o px9c" data-act="pxRootBk" data-e="${xr.id}" data-id="${s.id}" style="--r:${Math.min(ri,8)}"><span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):esc(userInit(s.name))}</span><span class="tx"><b>${esc(s.name)}</b><small>${esc(bk?'بانک '+bk:'حساب مغازه')}</small></span><span class="bxv"><small>مانده نهایی</small>${bxV(m)}</span></button>`}).join('')}</div>`}
+  /* v93.3 (خواسته صاحب اپ: «قسمت حساب‌های بانکی مثل همان حساب‌های بانک سندها باشد؛ مانده‌ها با مانده حساب‌های بانک یکی باشد؛ واریز از بانک دیگر مغازه منبع خودش را بسازد»):
+     فهرست = حساب‌های نوع «بانک» با مانده خود همان حساب (bkCuBal، همان عدد کارت بانک)، هر کدام به منبع واریز خودش وصل (pxBkSrc: منبع وصل‌شده، هم‌نام، یا منبع تازه که همان لحظه ساخته می‌شود)؛
+     منبع‌های قدیمی که حساب بانکی ندارند جدا زیرش می‌آیند. انتخاب هر کدام همان مسیر قبلی «بخش بانکی» است (pxPick / pxSentBk / pxRootBk با شناسه منبع). */
+  const A=pxBkAll(q,q0),row=(o,ri,act,ex,sub0)=>{const c=o.c,so=o.s,bk=c?bkOfCu(c):acBank(so),nm=c?cuName(c):so.name,v=c?bkCuBal(c):0,av=c?(bkAvH(c)||`<span class="c6a bxlogo">${esc(userInit(nm))}</span>`):`<span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):esc(userInit(nm))}</span>`;
+    return `<button type="button" class="c6r bxrow px7o px9c" data-act="pxBkGo" data-a="${act}"${ex||''} ${c?`data-cu="${c.id}"`:`data-id="${so.id}"`} style="--r:${Math.min(ri,8)}">${av}<span class="tx"><b>${esc(nm)}</b><small>${esc(sub0||(c?(bk&&!canon(nm).includes(canon(bk))?'بانک '+bk:'حساب بانکی مغازه'):'منبع واریز · بدون حساب بانکی'))}</small></span><span class="bxv"><small>${c?'مانده بانک':'مانده نهایی'}</small>${c?`<b class="${v<0?'n':''}"><span class="cbn" data-k="r" data-v="${Math.abs(v)}">${v<0?'−':''}${fmt(Math.abs(v))}</span><i>تومان</i></b>`:bxV(acSum(so))}</span></button>`};
+  const lst=(L,act,ex,subF)=>{const a=L.filter(o=>o.c),b=L.filter(o=>!o.c);return (a.length?`<div class="c6l bxlist px9l">${a.map((o,i)=>row(o,i,act,ex,subF&&subF(o))).join('')}</div>`:'')+(b.length?pxGh('منبع‌های دیگر · بدون حساب بانکی',b.length)+`<div class="c6l bxlist px9l">${b.map((o,i)=>row(o,i,act,ex,subF&&subF(o))).join('')}</div>`:'')};
+  if(sent&&!xr.sentBid){if(!A.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانکی در مغازه تعریف نشده'}</b></div>`;
+    return pxGh('مانده '+fmt(xr.amount)+' تومان به کدام بانک برود؟',A.filter(o=>o.c).length||A.length)+lst(A,'pxRootBk',` data-e="${xr.id}"`)}
   if(sent&&!ssCan(xr))return F.some(r=>!r.sentBid)?`<div class="px7e px9e">${ic('bank')}<b>بخشی هنوز ثبت واریز نشده</b><small>اول ردیف‌های بانکی «آماده ارسال» را با کشیدن به چپ ثبت واریز کنید، بعد بانک یا مبلغ را عوض کنید</small></div>`:`<div class="px7e px9e">${ic('check')}<b>بخش‌های بانکی تأیید شده یا رسید دارند</b><small>بانک یا مبلغ قفل است</small></div>`;
-  const L=pkL(xr),main=sent?'':(L[0]?L[0].src:''),B=ownL().filter(s=>String(s.id)!==main&&(!q||bkHit(s,q0))&&pxBkDay(s)&&(!PX.fb||s.bal!=null));
+  const L=pkL(xr),main=sent?'':(L[0]?L[0].src:''),B=A.filter(o=>!(o.s&&String(o.s.id)===main)&&(o.c?(!PX.dt||(o.c.txs||[]).some(t=>!t.del&&t.date===PX.dt)):pxBkDay(o.s)&&(!PX.fb||o.s.bal!=null)));
   if(!B.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانک دیگری در مغازه تعریف نشده'}</b></div>`;
-  out.push(pxGh(sent?'بخشی از مبلغ به این بانک · بقیه در بانک فعلی':'بانک‌های مغازه · بخشی یا همه مبلغ',B.length));
-  out.push(`<div class="c6l bxlist px9l">${B.map((s,ri)=>{const bk=acBank(s),m=acSum(s),has=!sent&&L.find((l,i)=>i&&l.src===String(s.id)),sub=has?'الان '+fmt(has.amount)+' تومان از این حساب':(bk&&!canon(s.name).includes(canon(bk))?'بانک '+bk:'حساب مغازه');
-    return `<button type="button" class="c6r bxrow px7o px9c" data-act="${sent?'pxSentBk':'pxPick'}" data-k="bk" data-id="${s.id}" style="--r:${Math.min(ri,8)}"><span class="c6a bxlogo">${bk?bankBadge(bk,'lg'):esc(userInit(s.name))}</span><span class="tx"><b>${esc(s.name)}</b><small>${esc(sub)}</small></span><span class="bxv"><small>مانده نهایی</small>${bxV(m)}</span></button>`}).join('')}</div>`);
+  out.push(pxGh(sent?'بخشی از مبلغ به این بانک · بقیه در بانک فعلی':'بانک‌های مغازه · بخشی یا همه مبلغ',B.filter(o=>o.c).length||B.length));
+  out.push(lst(B,sent?'pxSentBk':'pxPick','',o=>{const has=!sent&&o.s&&L.find((l,i)=>i&&l.src===String(o.s.id));return has?'الان '+fmt(has.amount)+' تومان از این حساب':''}));
   return out.join('')}
+/* همه بانک‌های قابل انتخاب: حساب‌های نوع بانک (با منبع وصل‌شده‌شان، اگر باشد) + منبع‌هایی که حساب بانکی ندارند */
+function pxBkAll(q,q0){const BC=bkCus(),used=new Set(),O=[];BC.forEach(c=>{const so=c.srcId!=null?sources.find(z=>String(z.id)===String(c.srcId)&&!z.cash):null;if(so)used.add(String(so.id));if(!q||nzName(toEn(cuName(c)+' '+bkOfCu(c))).includes(q)||(so&&bkHit(so,q0)))O.push({c,s:so||null})});
+  O.sort((a,b)=>bkCuBal(b.c)-bkCuBal(a.c));ownL().forEach(so=>{if(used.has(String(so.id)))return;if(BC.some(c=>c.srcId==null&&!c.srcNo&&bkSimNm(c.name)===bkSimNm(so.name)))return;if(!q||bkHit(so,q0))O.push({c:null,s:so})});return O}
+/* منبع واریزِ یک حساب بانکی: همان که وصل است؛ وگرنه منبع هم‌نام؛ وگرنه یک منبع تازه به نام همان حساب ساخته و وصل می‌شود (فقط با دسترسی حساب‌های بانکی) */
+function pxBkSrc(c){let so=c.srcId!=null?sources.find(z=>String(z.id)===String(c.srcId)):null;if(so)return so;
+  so=ownL().find(z=>bkSimNm(z.name)===bkSimNm(c.name)&&!bkCus().some(o=>o!==c&&String(o.srcId)===String(z.id)));
+  if(!so){if(!can('src')){toast('«'+cuName(c)+'» هنوز منبع واریز ندارد؛ اولین بار مدیر باید از همین‌جا انتخابش کند',true);return null}
+    so={id:nid++,name:cuName(c),bank:bkOfCu(c)||'',limit:0,count:0,iban:c.iban||'',card:c.card||''};if(ownSet())so.own=1;sources.push(so);saveS();logA('src','منبع واریز تازه از حساب بانکی',so.name)}
+  c.srcId=so.id;c.srcAt=c.srcAt||'';delete c.srcNo;saveCu();return so}
+ACT.pxBkGo=d=>{let id=d.id;if(d.cu){const c=bkCus().find(z=>String(z.id)===String(d.cu));if(!c)return;const so=pxBkSrc(c);if(!so)return;id=so.id}const f=ACT[d.a];if(f)f({...d,k:'bk',id:String(id)})};
 function pxList(){return pxTab()==='bk'?pxBkList():pxCuList()}
 /* واریزی ارسال‌شده: بانک انتخاب‌شده در پنجره منابع با مبلغ خالی می‌آید (بقیه در بانک فعلی) */
 ACT.pxSentBk=d=>{const x=entRow();if(!x)return;const id=famRoot(x);PX=null;closeSheet();setTimeout(()=>ACT.sentSplit({id,to:d.id}),80)};
