@@ -63,3 +63,76 @@ ACT.gdInfoSave=()=>{if(!GI)return;const k=GI.k,isX=!!XA[k],r=cfgRec(1),b=+giNum(
   if(!isX&&k!=='سکه پارسیان'){r.gcnt={...(r.gcnt||{})};if(GI.cn)r.gcnt[k]=1;else delete r.gcnt[k]}
   if(w!==''||n!==''){const o=gdStockAll().get(k)||{w:0,n:0};r.gstk={...(r.gstk||{}),[k]:{w:isX?0:(w!==''?+w||0:o.w),n:n!==''?+n||0:(isX||GI.cn?o.n:0),at:ns()}}}
   saveCu();window.__gsc=null;logA('cust','فی و موجودی کالا',k+(b?' | فی خرید '+feeTx(b):'')+(s?' | فی فروش '+feeTx(s):'')+(w!==''||n!==''?' | موجودی '+gdStkTx(k):''));GI=null;closeSheet();if(typeof gdRe==='function')gdRe();toast('ذخیره شد')};
+
+/* ===== v92.5 (خواسته صاحب اپ: «یک قسمتی برای موجودی کالاها و ادیت مانده‌هایشان می‌خواهیم؛ اصلاح موجودی باید انجام شود») =====
+   صفحه «موجودی کالاها» (stock): همه طلاها، کالاهای مغازه، سکه‌ها و ارزها با موجودی‌شان (حتی منفی و صفر)، جستجو و فیلتر.
+   زدن هر ردیف = پنجره «اصلاح موجودی»، هم‌شکل اصلاح موجودی بانک: موجودی در برنامه، موجودی واقعی، یک کارت اختلاف، «ثبت».
+   ثبت = پایه تازه gstk[k] از همین لحظه (سندهای بعدی رویش می‌نشینند) + یک سطر در cfg.gstkL (۸۰ اصلاح آخر: چه کسی، کی، از چه به چه) + تاریخچه. */
+let STK={q:'',f:'all'},SKX=null;
+const stkCan=()=>isAdmin()||can('src');
+const stkGoods=()=>goodsList().filter(k=>!['آبشده','متفرقه','سکه','سکه پارسیان'].includes(k)&&!XA[k]&&!['سکه','ارز'].includes(gCat(k)));
+/* همه ردیف‌ها: [کلید، نام، گروه g/c/f، تعدادی؟] */
+function stkAll(){xaSync();const L=[['آبشده','آبشده','g'],['متفرقه','متفرقه','g'],['سکه پارسیان','سکه پارسیان','g'],...stkGoods().map(k=>[k,k,'g'])];
+  for(const k in XA)L.push([k,XA[k].t||k,XA[k].k==='f'?'f':'c']);const M=gdStockAll();
+  return L.map(([k,t,g])=>{const o=M.get(k)||{w:0,n:0},isX=g!=='g';return {k,t,g,isX,cn:isX||gdCnt(k),w:isX?0:o.w,n:o.n,v:isX?o.n:o.w,base:!!o.base}})}
+const stkDay=at=>{const d=new Date(at);if(isNaN(d))return '';const [,jm,jd]=g2j(d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()));return toFa(jd)+' '+JM[jm-1]};
+const stkLast=k=>((gdC().gstkL||[]).find(z=>z.k===k))||null;
+const stkVal=r=>r.isX?gdSgn(r.n,qFmt)+' <i>'+esc(XA[r.k].u||'عدد')+'</i>':gdSgn(r.w,wFmt)+' <i>گرم</i>';
+const stkIc=r=>ic(r.g==='f'?'usd':r.g==='c'||r.k==='سکه پارسیان'||r.k==='آبشده'||r.k==='متفرقه'?'coin':'ring');
+function stkRow(r,i){const L=stkLast(r.k),sub=L?'اصلاح '+stkDay(L.at)+(L.by?' · '+esc(L.by):''):r.base?'موجودی دستی':'از روی سندها';
+  return `<button type="button" class="stkr${r.v<0?' ng':!r.v?' zr':''}" data-act="stkFix" data-k="${esc(r.k)}" style="--i:${Math.min(i,14)}"><span class="stki g-${r.g}">${stkIc(r)}</span><span class="tx"><b>${esc(r.t)}</b><small>${sub}${!r.isX&&r.cn&&r.n?' · '+gdSgn(r.n,qFmt)+' عدد':''}</small></span><span class="stkv">${stkVal(r)}</span><span class="cv">${ic('back')}</span></button>`}
+function stkListHTML(){const q=nzName(STK.q||''),f=STK.f,A=stkAll(),L=A.filter(r=>(f==='all'||(f==='neg'?r.v<0:r.g===f))&&(!q||nzName(r.t).includes(q)||nzName(r.k).includes(q)));
+  if(!L.length)return `<div class="card empty"><b>${q?'چیزی با این نام پیدا نشد':'موردی نیست'}</b></div>`;
+  let h='',i=0;for(const [g,t] of [['g','طلا و کالاهای مغازه'],['c','سکه'],['f','ارز']]){const R=L.filter(r=>r.g===g);if(!R.length)continue;h+=`<div class="stkh">${t}<i>${toFa(R.length)}</i></div><div class="stkc">${R.map(r=>stkRow(r,i++)).join('')}</div>`}return h}
+function stkHeroHTML(){const A=stkAll(),G=A.filter(r=>r.g==='g'),tw=Math.round(G.reduce((s,r)=>s+r.w,0)*1000)/1000,neg=A.filter(r=>r.v<0).length,has=A.filter(r=>r.v).length;
+  return `<div class="stkhero"><span class="stkwm">${ic('coin')}</span><div class="stkht"><span class="stkhi">${ic('coin')}</span><span class="tx"><b>موجودی طلا</b><small>جمع وزن طلا و کالاهای مغازه</small></span></div>
+  <div class="stkhv${tw<0?' ng':''}"><b>${gdSgn(tw,wFmt)}</b><i>گرم</i></div>
+  <div class="stkhc"><em>${toFa(has)} قلم موجود</em>${neg?`<button type="button" class="ng" data-act="stkF" data-f="neg">${toFa(neg)} قلم منفی · نیاز به اصلاح</button>`:`<em class="ok">${ic('check')} موجودی منفی نداریم</em>`}</div></div>`}
+const STKF=[['all','همه'],['g','طلا'],['c','سکه'],['f','ارز'],['neg','منفی‌ها']];
+function vStock(){return `<div class="stkp">${stkHeroHTML()}
+  <div class="fsearch stkq">${ic('search')}<input id="stkQ" type="search" value="${esc(STK.q||'')}" placeholder="جستجوی کالا، سکه یا ارز…" autocomplete="off" enterkeyhint="search" aria-label="جستجوی کالا"></div>
+  <div class="stkf" role="tablist">${STKF.map(([k,t])=>`<button type="button" role="tab" aria-selected="${STK.f===k}" class="${STK.f===k?'on':''}" data-act="stkF" data-f="${k}">${t}</button>`).join('')}</div>
+  <div id="stkL">${stkListHTML()}</div>
+  <div class="stkn">${stkCan()?'روی هر ردیف بزنید و موجودی واقعی را وارد کنید؛ از همان لحظه موجودی با عدد شما شروع می‌شود و سندهای بعدی رویش می‌نشیند.':'اصلاح موجودی فقط با مدیر است.'}</div></div>`}
+const aStock=()=>'';
+function bindStock(){const q=$('stkQ');if(!q)return;q.oninput=()=>{STK.q=q.value;const L=$('stkL');if(L){L.classList.add('noan');L.innerHTML=stkListHTML()}};q.onfocus=()=>{STK.foc=1};q.onblur=()=>{STK.foc=0};
+  if(STK.foc&&document.activeElement!==q){try{q.focus({preventScroll:true});q.setSelectionRange(q.value.length,q.value.length)}catch(e){}}}
+function stkRe(){if(cur!=='stock')return;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}
+ACT.stkF=d=>{STK.f=d.f||'all';document.querySelectorAll('#view .stkf button').forEach(b=>{const on=b.dataset.f===STK.f;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});const L=$('stkL');if(L){L.classList.remove('noan');L.innerHTML=stkListHTML()}};
+/* از «ورود حساب» خانه: برگشت به خانه (بدون باز شدن کشوی تنظیمات) */
+ACT.stkGo=()=>{meRet=null;closeSheet();go('stock')};
+
+/* ---------- پنجره «اصلاح موجودی کالا» ---------- */
+const skNum=id=>{const e=$(id);if(!e)return '';const v=decIn(toEn(e.value).replace(/,/g,''));return v};
+function skRow(){return stkAll().find(r=>r.k===SKX.k)}
+function skCalc(){const r=skRow(),w=SKX.w,n=SKX.n,hw=!r.isX&&w!=='',hn=r.cn&&n!=='';return {r,hw,hn,ok:hw||hn,dw:hw?Math.round((+w-r.w)*1000)/1000:0,dn:hn?Math.round((+n-r.n)*1000)/1000:0}}
+function skRes(){const z=skCalc(),r=z.r,u=r.isX?esc(XA[r.k].u||'عدد'):'گرم';
+  if(!z.ok)return `<div class="bf3d n"><span class="bf3di">${ic('edit')}</span><span class="tx"><b>موجودی واقعی را بزنید</b><small>اختلاف خودش حساب می‌شود</small></span></div>`;
+  const d=r.isX?z.dn:z.hw?z.dw:z.dn,du=r.isX||!z.hw?(r.isX?u:'عدد'):'گرم',ex=!r.isX&&z.hw&&z.hn&&z.dn?' · تعداد '+(z.dn>0?'+':'−')+qFmt(Math.abs(z.dn)):'';
+  if(!d&&!ex)return `<div class="bf3d ok"><span class="bf3di">${ic('check')}</span><span class="tx"><b>برنامه با انبار یکی است</b><small>اصلاحی لازم نیست</small></span></div>`;
+  if(!d)return `<div class="bf3d ok"><span class="bf3di">${ic('check')}</span><span class="tx"><b>وزن یکی است</b><small>فقط تعداد اصلاح می‌شود${ex}</small></span></div>`;
+  return `<div class="bf3d ${d>0?'g':'r'}"><span class="bf3di">${ic(d>0?'dIn':'dOut')}</span><span class="tx"><b>${d>0?'به موجودی اضافه می‌شود':'از موجودی کم می‌شود'}</b><small>اصلاح موجودی «${esc(r.t)}»${ex}</small></span><em>${d>0?'+':'−'}${(du==='گرم'?wFmt:qFmt)(Math.abs(d))} <small>${du}</small></em></div>`}
+function stkFixHTML(){const r=skRow();if(!r)return '';const L=stkLast(r.k),u=r.isX?esc(XA[r.k].u||'عدد'):'گرم',can1=stkCan();
+  return `<div class="sh-h"><div><b>اصلاح موجودی</b><small class="shsub">موجودی واقعی «${esc(r.t)}» را بزنید؛ اختلاف خودش حساب می‌شود</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="bf3 bf4 skw"><div class="bf4b" style="--bk:#b27c0e"><span class="ckbi stki g-${r.g}">${stkIc(r)}</span><span class="tx"><b>${esc(r.t)}</b><small>موجودی در برنامه</small></span><b class="bf4v ${r.v<0?'r':r.v?'g':'z'}">${r.isX?gdSgn(r.n,qFmt):gdSgn(r.w,wFmt)}<i>${u}</i></b></div>
+  ${!can1?`<div class="bf3d n"><span class="bf3di">${ic('padlock')}</span><span class="tx"><b>اصلاح موجودی فقط با مدیر است</b><small>شما فقط می‌توانید موجودی را ببینید</small></span></div>`:`
+  ${r.isX?'':`<div class="ckcl">وزن واقعی موجود چقدر است؟</div><div class="ckbg"><label class="ckbig"><input id="skW" class="ltr" inputmode="decimal" value="${esc(SKX.w)}" placeholder="${wFmt(Math.abs(r.w))}" autocomplete="off" enterkeyhint="done" aria-label="وزن واقعی موجود"><i>گرم</i></label></div>`}
+  ${r.cn?`<div class="ckcl">${r.isX?'تعداد واقعی موجود چقدر است؟':'تعداد موجود <i>اختیاری</i>'}</div><div class="ckbg"><label class="ckbig${r.isX?'':' sm'}"><input id="skN" class="ltr" inputmode="decimal" value="${esc(SKX.n)}" placeholder="${qFmt(Math.abs(r.n))}" autocomplete="off" enterkeyhint="done" aria-label="تعداد موجود"><i>${r.isX?u:'عدد'}</i></label></div>`:''}
+  <div class="ckq skq"><button type="button" data-act="skZero">موجودی صفر است</button></div>
+  <div id="skL">${skRes()}</div>`}
+  ${L?`<div class="skl">${ic('clock')}<span>آخرین اصلاح: ${stkDay(L.at)}${L.by?' · '+esc(L.by):''} · از ${r.isX?gdSgn(+L.n0||0,qFmt):gdSgn(+L.w0||0,wFmt)} به ${r.isX?gdSgn(+L.n||0,qFmt):gdSgn(+L.w||0,wFmt)} ${u}</span></div>`:''}
+  ${can1?`<button type="button" class="bf3c skfe" data-act="skFee">${ic('gear')} فی خرید و فروش و تنظیم کالا</button><button type="button" class="xgo" data-act="skSave">${ic('check')} ثبت</button>`:''}</div>`}
+function skRead(){if($('skW'))SKX.w=skNum('skW');if($('skN'))SKX.n=skNum('skN')}
+function skBind(f){['skW','skN'].forEach(id=>{const e=$(id);if(!e)return;selOnFocus(e);e.oninput=()=>{e.value=decIn(toEn(e.value).replace(/,/g,''));skRead();const L=$('skL');if(L)L.innerHTML=skRes()};e.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();e.blur()}}});const el=f&&$(f);if(el)sheetFocus(el)}
+ACT.stkFix=d=>{const k=d.k;if(!k)return;SKX={k,w:'',n:''};const r=skRow();if(!r){SKX=null;return}sheet(stkFixHTML());skBind(stkCan()?(r.isX?'skN':'skW'):'')};
+ACT.skZero=()=>{if(!SKX)return;const r=skRow();if(!r.isX)SKX.w='0';if(r.cn)SKX.n='0';$('sheet').innerHTML=stkFixHTML();skBind()};
+ACT.skFee=()=>{if(!SKX)return;const k=SKX.k;SKX=null;ACT.gdInfo({k})};
+ACT.skSave=()=>{if(!SKX)return;if(!stkCan()){toast('اصلاح موجودی فقط با مدیر است',true);return}skRead();const z=skCalc(),r=z.r;
+  if(!z.ok){toast('موجودی واقعی را بزنید',true);const e=$(r.isX?'skN':'skW');if(e)e.focus();return}
+  if((z.hw&&+SKX.w<0)||(z.hn&&+SKX.n<0)){toast('موجودی نمی‌تواند منفی باشد',true);return}
+  if(!z.dw&&!z.dn){toast('موجودی برنامه با انبار یکی است؛ اصلاحی لازم نیست');SKX=null;closeSheet();return}
+  const c=cfgRec(1),now=ns(),nw=r.isX?0:(z.hw?+SKX.w||0:r.w),nn=z.hn?+SKX.n||0:(r.cn?r.n:0);
+  c.gstk={...(c.gstk||{}),[r.k]:{w:nw,n:nn,at:now}};c.gstkL=[{k:r.k,at:now,by:who(),w0:r.w,n0:r.n,w:nw,n:nn},...(c.gstkL||[])].slice(0,80);
+  saveCu();window.__gsc=null;const u=r.isX?(XA[r.k].u||'عدد'):'گرم',fx=v=>r.isX?gdSgn(v,qFmt):gdSgn(v,wFmt);
+  logA('cust','اصلاح موجودی کالا',r.t+' | از '+fx(r.isX?r.n:r.w)+' به '+fx(r.isX?nn:nw)+' '+u+(!r.isX&&z.hn&&z.dn?' | تعداد '+qFmt(nn):''));
+  SKX=null;closeSheet();stkRe();if(typeof gdRe==='function')gdRe();toast('موجودی «'+r.t+'» اصلاح شد · '+fx(r.isX?nn:nw)+' '+u)};

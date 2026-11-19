@@ -281,8 +281,10 @@ function gkBind(){const W=$('gkW'),Y=$('gkY'),P=$('gkP'),up=()=>{gkRead();const 
   if(P){selOnFocus(P);P.oninput=()=>{const v=num(P.value);P.value=v?v.toLocaleString('en-US'):'';up()}}
   if(W)sheetFocus(W)}
 ACT.gkTg=d=>{gkRead();GTK={w:d.w,m:''};gkRe()};
-ACT.gkM=d=>{gkRead();const m=d.m||'';if(m==='cv'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}GTK={w:GTK.w,m,wt:String(Math.abs(gkRest())||''),ay:750,pg:sv.rate||'',cat:gkCat0()};gkRe()};
-ACT.gkCat=d=>{if(!GTK)return;GTK.cat=d.k;document.querySelectorAll('#sheet .gktc').forEach(b=>b.classList.toggle('on',b.dataset.k===d.k))};
+ACT.gkM=d=>{gkRead();const m=d.m||'';if(m==='cv'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}GTK={w:GTK.w,m,wt:String(Math.abs(gkRest())||''),ay:750,pg:sv.rate||'',cat:gkCat0()};if(m==='dl')GTK.ay=gkAy0(GTK.cat);gkRe()};
+/* عیار پیش‌فرض نوع طلا در تسویه: تحویل متفرقه ۷۴۰، بقیه ۷۵۰؛ اگر کاربر عیار را دست نزده باشد با عوض کردن نوع عوض می‌شود */
+const gkAy0=cat=>xrAy(gkRest()>0?'in':'out',false,cat);
+ACT.gkCat=d=>{if(!GTK)return;gkRead();if(+GTK.ay===gkAy0(GTK.cat)){GTK.ay=gkAy0(d.k);const Y=$('gkY');if(Y){Y.value=GTK.ay;if(Y.oninput)Y.oninput()}}GTK.cat=d.k;document.querySelectorAll('#sheet .gktc').forEach(b=>b.classList.toggle('on',b.dataset.k===d.k))};
 ACT.gkAdd=()=>{gkRead();const r=gkRest(),w=parseFloat(GTK.wt)||0;if(!(w>0)){toast('وزن را بزنید',true);const W=$('gkW');if(W)W.focus();return}
   if(GTK.m==='cv'){if(!(+GTK.pg>0)){toast('نرخ هر گرم را بزنید',true);return}const x=xrNew(r>0?'sell':'buy','gold',{pul:true,ay:750,cat:''});x.w=String(GTK.wt);if(+GTK.pg!==+sv.rate){x.pg=+GTK.pg;x.pgM=true}sv.xr.push(x)}
   else{const ay=+GTK.ay||750;if(ay<100||ay>1000){toast('عیار درست نیست',true);return}const cat=gkCats().includes(GTK.cat)?GTK.cat:'آبشده',x=xrNew(r>0?'in':'out','gold',{cat,ay});x.w=String(GTK.wt);sv.xr.push(x);ls.set('m_gk_cat',cat)}

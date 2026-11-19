@@ -170,7 +170,7 @@ ACT.dkF=d=>{qaRead();const a=sv.qa,D=a.d,[ty,v]=String(d.id).split(':');a.q='';a
       if(!dkRateOk())return;xrStart(xrNew(D,'gold',{cat:'پارسیان',pz:1,cnt:'',ay:D==='buy'?735:750,fl:'gold',fd:D}))/* v61.60: خرید پارسیان عیار ۷۳۵، مظنه خرید */;return}
     if(v==='pul'){if(!dkRateOk())return;xrStart(xrNew(D,'gold',{pul:true,ay:750,fl:'gold',fd:D,cat:''}));return}
     if(v==='qlk'){if(!dkRateOk())return;xrStart(xrNew(D,'gold',{pul:true,ay:750,fl:'gold',fd:D,cat:'قلک'}));return}
-    if(D==='buy'&&!dkRateOk())return;xrStart(xrNew(D,'gold',{cat:v==='ab'?'آبشده':'متفرقه',ay:v==='ab'?750:(D==='buy'?735:750),fl:'gold',fd:D}));return}};
+    if(D==='buy'&&!dkRateOk())return;xrStart(xrNew(D,'gold',{cat:v==='ab'?'آبشده':'متفرقه',ay:v==='ab'?750:xrAy(D,false,'متفرقه'),fl:'gold',fd:D}));return}};
 const dkRateOk=()=>{if(sv.rate)return true;toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);const m=$('svM');if(m)m.focus();return false};
 ACT.dkD=d=>{qaRead();const a=sv.qa,k=d.d||'';a.d=k;a.s='';a.q='';a.pk='';
   if(dkBk()&&BKX[k]&&BKX[k][1]){pyStart(pyNew('bkx',{k,dir:BKX[k][1]>0?'out':'in',fl:1}));return}

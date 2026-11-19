@@ -107,7 +107,7 @@ function itCalc(it,rate,tax){if(+it.mz)rate=(+it.mz)/MZK;/* v61.7: مظنه هم
 /* ردیف طلا، سکه یا ارز: t فروش|خرید|دریافت|تحویل · pul = پولی (جنس جابه‌جا نمی‌شود، به حساب مشتری می‌رود) */
 const XT={sell:'فروش',buy:'خرید',in:'دریافت',out:'تحویل'};
 /* v61.12: عیار پیش‌فرض همه ۷۵۰؛ فقط خرید ۷۳۵ و تعویض ۷۴۰ */
-const xrAy=(t,pul,cat)=>pul?750:cat==='تعویض'?740:cat==='مرجوعی'?750:t==='buy'?735:750;
+/* v92.5 (خواسته صاحب اپ): تحویل (پرداخت/خروج) طلای متفرقه پیش‌فرض عیار ۷۴۰ */const xrAy=(t,pul,cat)=>pul?750:cat==='تعویض'?740:cat==='مرجوعی'?750:t==='buy'?735:t==='out'&&cat==='متفرقه'?740:750;
 function xrNew(t,a,o){const g=a==='gold',x={t,a,pul:false,w:'',q:'',ay:g?xrAy(t,o&&o.pul,o&&o.cat):0,pg:0,pgM:false,cat:g?(t==='in'||t==='out'?'آبشده':'متفرقه'):'',...(o||{})};if(!g&&!x.pg)x.pg=+ls.get('m_px_'+a,0)||0;return x}
 /* خرید متفرقه = نرخ روز با عیار ۷۳۵، فروش متفرقه = عیار ۷۴۰؛ نرخ هر گرم با تغییر مظنه خودکار عوض می‌شود مگر دستی زده شده باشد */
 const fcs=id=>{const e=$(id);if(e)e.focus()};
@@ -304,9 +304,9 @@ function xrBind(){const x=sv.qa.x,keep=()=>{xrRead();svKeep();xrHint()},ent=e=>{
   const P=$('xrP');if(P)P.onchange=()=>{const was=!P.checked;if(x.a==='gold'&&+x.ay===xrAy(x.t,was)){x.ay=xrAy(x.t,P.checked);const Y=$('xrY');if(Y)Y.value=x.ay}xrRead();svKeep();qaRe()};xrHint();
   ['xrL','xrN'].forEach(id=>{const el=$(id);if(el){el.oninput=keep;el.onkeydown=ent}});xrImgPaint();
   setTimeout(()=>{if(!$('ov').classList.contains('hide'))return;const f=$('xrW')||$('xrQ');if(f&&!f.value&&document.activeElement!==f)f.focus({preventScroll:true})},40)}
-ACT.xrT=d=>{xrRead();const x=sv.qa.x;if(x.t===d.t)return;const g=x.a==='gold',np=(d.t==='sell'||d.t==='buy')&&x.pul;if(g&&+x.ay===xrAy(x.t,x.pul))x.ay=xrAy(d.t,np);x.t=d.t;x.pul=np;if(g&&(d.t==='in'||d.t==='out')&&x.cat==='متفرقه')x.cat='آبشده';svKeep();qaRe()};
+ACT.xrT=d=>{xrRead();const x=sv.qa.x;if(x.t===d.t)return;const g=x.a==='gold',np=(d.t==='sell'||d.t==='buy')&&x.pul;if(g&&+x.ay===xrAy(x.t,x.pul,x.cat))x.ay=xrAy(d.t,np,x.cat);x.t=d.t;x.pul=np;svKeep();qaRe()};
 ACT.xrA=d=>{xrRead();const x=sv.qa.x;if(x.a===d.a)return;const n=xrNew(x.t,d.a,{pul:x.pul,i:x.i,fl:x.fl,fd:x.fd});if(d.a==='gold'&&(x.t==='sell'||x.t==='buy')&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true)}sv.qa.x=n;svKeep();qaRe()};
-ACT.xrCat=d=>{xrRead();sv.qa.x.cat=d.k;svKeep();qaRe()};
+ACT.xrCat=d=>{xrRead();const x=sv.qa.x;if(+x.ay===xrAy(x.t,x.pul,x.cat))x.ay=xrAy(x.t,x.pul,d.k);x.cat=d.k;svKeep();qaRe()};
 ACT.xrPgR=()=>{xrRead();const x=sv.qa.x;x.pgM=false;x.pg=0;svKeep();qaRe()};
 ACT.xrSave=()=>{xrRead();const x=sv.qa.x;if(!x)return;const C=xrCalc(x,sv.rate),g=x.a==='gold',m=x.t==='sell'||x.t==='buy';
   if(!C.n){toast(g?'وزن را بزنید':'تعداد را بزنید',true);const f=$('xrW')||$('xrQ');if(f)f.focus();return}if(g&&!(+x.ay)){toast('عیار را بزنید',true);fcs('xrY');return}
