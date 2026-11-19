@@ -86,7 +86,7 @@ ACT.shSet=d=>{const I=[...document.querySelectorAll('#sheet .shin input')].find(
 function shFix(c,t,R,ay){const keep=sv;try{sv=invSv(c,t);R.forEach(r=>{const o=(r.k==='it'?sv.items:sv.xr)[r.i];if(!o||o.sh!==1)return;
       /* اثر تبدیل عیار بر همین ردیف (برای نمایش در جزئیات سند): مبلغ و طلای ۷۵۰ پیش و پس از عیار تازه */
       const eff=()=>{if(r.k==='it')return {r:itCalc(o,sv.rate,sv.tax).tot,g:0};const C=xrCalc(o,sv.rate);return {r:C.amount||0,g:o.t==='in'||o.t==='out'?C.q||0:0}};/* تغییر مبلغ همین ردیف و وزن ۷۵۰ آن (منفی = کمتر شد) */
-      delete o.amT;delete o.amN;if(r.k==='xr'&&parseFloat(o.w)>0)delete o.am;const b=eff();o.ay=ay;o.sh=2;const a2=eff(),dr=Math.round(a2.r-b.r),dg=Math.round((a2.g-b.g)*1000)/1000;o.shd={};if(dr)o.shd.r=dr;if(dg)o.shd.g=dg});
+      delete o.amT;delete o.amN;if(r.k==='xr'&&parseFloat(o.w)>0)delete o.am;const b=eff();o.ay=ay;o.sh=2;o.sht=new Date().toISOString();/* v95.1: زمان ثبت عیار — موجودی از «آبشده شرطی» به «آبشده» در همین لحظه می‌رود */const a2=eff(),dr=Math.round(a2.r-b.r),dg=Math.round((a2.g-b.g)*1000)/1000;o.shd={};if(dr)o.shd.r=dr;if(dg)o.shd.g=dg});
     const T=svTot(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}}),
       xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e,q0:C.q0,ajg:C.ajg,prg:C.prg}});
     t.items=items;t.xr=xr;t.sub=T.sub;t.total=T.total;t.disc=T.disc;if(T.ge)t.ge=T.ge;else delete t.ge;if(Object.keys(T.xe).length)t.xe=T.xe;else delete t.xe;
