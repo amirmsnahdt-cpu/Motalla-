@@ -342,7 +342,7 @@ ACT.xrSave=()=>{xrRead();const x=sv.qa.x;if(!x)return;const C=xrCalc(x,sv.rate),
   /* v90.9: کالای تعدادی (غیر پارسیان) و فی خرید/فروش ردیف دریافت کالا؛ فی زده‌شده «فی فعلی» همان کالا می‌شود (15zz) */
   if(xrAjOn(o)){if(+x.ajP>0)o.ajP=+x.ajP;if(+x.pp>0)o.pp=+x.pp;if(+x.ajT>0)o.ajT=Math.round(+x.ajT)}
   if(g&&!x.pz&&+x.cnt>0)o.cnt=+x.cnt;if(g&&+x.fb>0)o.fb=+x.fb;if(g&&+x.fs>0)o.fs=+x.fs;gdFeeKeep(o);
-  /* v96.1: آبشده ورودی = یک تکه با شناسه ثابت (pid)؛ آبشده خروجی می‌تواند به یک تکه وصل باشد (pc) — 15zz */if(abIn(o))o.pid=x.pid||'P'+(nid++);if(abOutX(o)&&x.pc)o.pc=x.pc;
+  /* v96.1: آبشده ورودی = یک تکه با شناسه ثابت (pid)؛ آبشده خروجی می‌تواند به یک تکه وصل باشد (pc) — 15zz */if(abIn(o))o.pid=x.pid||'P'+(nid++);if(abOutX(o)&&x.pc)o.pc=x.pc;/* v96.4: مرجوعی وصل به کالای فروخته‌شده */if(o.cat==='مرجوعی'&&x.rf)o.rf=x.rf;
   if(x.i!=null)sv.xr[x.i]=o;else sv.xr.push(o);qaDone()};
 ACT.xrDel=()=>{const x=sv.qa.x;if(!x||x.i==null)return;const o=sv.xr.splice(x.i,1)[0];qaDone();toast('ردیف حذف شد','', 'بازگردانی',()=>{if(o){sv.xr.push(o);svKeep();svRe()}})};
 ACT.svXrEdit=d=>{const o=sv.xr[+d.i];if(!o)return;qaRead();xrStart({...o,w:o.w?String(o.w):'',q:o.q?String(o.q):'',i:+d.i});const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
