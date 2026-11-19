@@ -247,7 +247,7 @@ function ajLast(k){const q=nzName(k||''),c=svCu(),ok=it=>it&&!it.ab&&nzName(it.k
   for(let i=(sv.items||[]).length-1;i>=0;i--)if(ok(sv.items[i]))return ajPT(sv.items[i]);
   const scan=L=>{let b=null,ba='';for(const t of L){if(!t||t.type!=='inv'||t.del)continue;const at=String(t.at||'');if(at<ba)continue;for(const it of t.items||[])if(ok(it)){b=it;ba=at}}return b};
   const own=c&&scan(c.txs||[]);if(own)return ajPT(own);const any=scan(CU().flatMap(z=>z.txs||[]));return any?ajPT(any):null}
-const qaIt=a=>({...(+a.mz?{mz:+a.mz}:{}),k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:a.ab?0:parseFloat(a.ajP)||0,ajT:a.ab?0:+a.ajT||0,pp:parseFloat(a.pp)||0,...(a.pz?{pz:1,cnt:+a.cnt||0}:(+a.cnt>0?{cnt:+a.cnt}:{})),...(Array.isArray(a.imgs)&&a.imgs.length?{imgs:a.imgs.slice(),img:a.imgs[0]}:{}),...(+a.amT>0?{amT:Math.round(+a.amT),amN:1}:{}),...(clean(a.ds||'')?{ds:clean(a.ds)}:{}),...(a.ab?{ab:1,lab:a.lab||'',ang:a.ang||'',...(a.sh?{sh:a.sh}:{})}:{})});
+const qaIt=a=>({...(+a.mz?{mz:+a.mz}:{}),k:a.k,w:parseFloat(a.w)||0,ay:+a.ay||750,ajP:a.ab?0:parseFloat(a.ajP)||0,ajT:a.ab?0:+a.ajT||0,pp:parseFloat(a.pp)||0,...(a.pz?{pz:1,cnt:+a.cnt||0}:(+a.cnt>0?{cnt:+a.cnt}:{})),...(Array.isArray(a.imgs)&&a.imgs.length?{imgs:a.imgs.slice(),img:a.imgs[0]}:{}),...(+a.amT>0?{amT:Math.round(+a.amT),amN:1}:{}),...(clean(a.ds||'')?{ds:clean(a.ds)}:{}),...(a.ab?{ab:1,lab:a.lab||'',ang:a.ang||'',...(a.sh?{sh:a.sh}:{}),...(a.pc?{pc:a.pc}:{})}:{})});
 function qaCalc(){const B=$('qB');if(!B)return;qaRead();const a=sv.qa;if(a.p){pyHint();return}if(a.x){xrHint();return}const it=qaIt(a),c=itCalc(it,sv.rate,sv.tax),pg=$('qPg'),w7=$('qW7');if(w7)w7.textContent=it.w?wFmt(Math.round(it.w*it.ay/750*1000)/1000)+' گرم':'—';if(pg)pg.textContent=sv.rate?fmt(Math.round(sv.rate*it.ay/750)):'—';
   B.innerHTML=!sv.rate?'<small>مظنه یا نرخ گرم را بالای سند بزنید</small>':!it.w?'<small>وزن را بزنید</small>':`<button type="button" class="d6bt" data-act="qaBrk"><span>مبلغ این کالا</span><b>${fmt(c.tot)}</b><i>جزئیات ${ic('back').replace('class="i"','class="i flip"')}</i></button>`}
 /* v60.8: جزئیات طلا/اجرت/سود پنهان؛ با زدن (یا نگه داشتن) روی مبلغ، در یک حباب کوچک مثل پیام نشان داده می‌شود */
@@ -298,7 +298,7 @@ ACT.qaAdd=()=>{qaRead();const a=sv.qa;if(!a.k){toast('کالا را انتخاب
   const old=a.i!=null?sv.items[a.i]:null,it={...it0,cat:it0.ab?'آبشده':old&&old.cat?old.cat:GK.includes(a.k)?a.k:'نو',n:old?old.n||'':''};if(!it.ab)ls.set('m_aj',it.ajP)
   if(a.i!=null){sv.items[a.i]=it;svAdd=a.i}else{sv.items.push(it);svAdd=sv.items.length-1;svUsed[it.k]=(svUsed[it.k]||0)+1}const ay=it.ay;qaDone();sv.qa.ay=ay};
 ACT.qaDel=()=>{const a=sv.qa;if(a.i==null)return;const k=sv.items.splice(a.i,1)[0];qaDone();toast('«'+(k&&k.k)+'» از سند حذف شد','', 'بازگردانی',()=>{if(k){sv.items.push(k);svKeep();svRe()}})};
-ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;qaRead();const J=ajPT(it);sv.qa={...qaBlank(),mz:it.mz||'',k:it.k,w:String(it.w),ay:it.ay||750,ajP:J.P||'',ajT:J.T||'',pp:it.pp,amT:it.amT||'',pz:it.pz?1:0,cnt:it.cnt||'',imgs:xrPh(it),ds:dsOf(it),i:+d.i,...(it.ab?{ab:1,lab:it.lab||'',ang:it.ang||'',sh:it.sh||0}:{})};svKeep();qaRe('qW');const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
+ACT.svItEdit=d=>{const it=sv.items[+d.i];if(!it)return;qaRead();const J=ajPT(it);sv.qa={...qaBlank(),mz:it.mz||'',k:it.k,w:String(it.w),ay:it.ay||750,ajP:J.P||'',ajT:J.T||'',pp:it.pp,amT:it.amT||'',pz:it.pz?1:0,cnt:it.cnt||'',imgs:xrPh(it),ds:dsOf(it),i:+d.i,...(it.ab?{ab:1,lab:it.lab||'',ang:it.ang||'',sh:it.sh||0,pc:it.pc||''}:{})};svKeep();qaRe('qW');const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
 /* ----- ردیف طلا / سکه / ارز ----- */
 const xrStart=x=>{qaRead();sv.qa.x=x;sv.qa.p=null;sv.qa.q='';svKeep();qaRe()};
 function xrHTML(){const x=sv.qa.x,g=x.a==='gold',m=x.t==='sell'||x.t==='buy',ed=x.i!=null,C=xrCalc(x,sv.rate),fl=x.fl||'';
@@ -342,6 +342,7 @@ ACT.xrSave=()=>{xrRead();const x=sv.qa.x;if(!x)return;const C=xrCalc(x,sv.rate),
   /* v90.9: کالای تعدادی (غیر پارسیان) و فی خرید/فروش ردیف دریافت کالا؛ فی زده‌شده «فی فعلی» همان کالا می‌شود (15zz) */
   if(xrAjOn(o)){if(+x.ajP>0)o.ajP=+x.ajP;if(+x.pp>0)o.pp=+x.pp;if(+x.ajT>0)o.ajT=Math.round(+x.ajT)}
   if(g&&!x.pz&&+x.cnt>0)o.cnt=+x.cnt;if(g&&+x.fb>0)o.fb=+x.fb;if(g&&+x.fs>0)o.fs=+x.fs;gdFeeKeep(o);
+  /* v96.1: آبشده ورودی = یک تکه با شناسه ثابت (pid)؛ آبشده خروجی می‌تواند به یک تکه وصل باشد (pc) — 15zz */if(abIn(o))o.pid=x.pid||'P'+(nid++);if(abOutX(o)&&x.pc)o.pc=x.pc;
   if(x.i!=null)sv.xr[x.i]=o;else sv.xr.push(o);qaDone()};
 ACT.xrDel=()=>{const x=sv.qa.x;if(!x||x.i==null)return;const o=sv.xr.splice(x.i,1)[0];qaDone();toast('ردیف حذف شد','', 'بازگردانی',()=>{if(o){sv.xr.push(o);svKeep();svRe()}})};
 ACT.svXrEdit=d=>{const o=sv.xr[+d.i];if(!o)return;qaRead();xrStart({...o,w:o.w?String(o.w):'',q:o.q?String(o.q):'',i:+d.i});const q=$('qa');if(q)q.scrollIntoView({behavior:'smooth',block:'center'})};
@@ -737,7 +738,7 @@ function ivBalP(c,t){const P=cuBalBefore(c,t),d=txD(t),K=q8Keys(P,d);
 /* v61.67 (خواسته صاحب اپ): در سند ثبت‌شده هم زدن روی مانده = تسویه — سند برای ویرایش باز و پنجره تسویه همان مانده باز می‌شود */
 ACT.invBal=d=>{if(!invGet())return;ACT.invEdit();setTimeout(()=>{if(cur==='sell'&&sv&&sv.edit)ACT.svBal(d)},420)};
 /* سند ثبت‌شده به شکل «سند در حال ویرایش» (برای ویرایش و برای پنجره جزئیات فاکتور) */
-function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','ajv','prv','taxv','tot'].forEach(k=>delete o[k]);return o}),xr=(t.xr||[]).map(x=>{const o={...x};['n','q750','amount','e','q0','ajg','prg'].forEach(k=>delete o[k]);if(o.a==='gold'&&!o.pgM)o.pg=0;return o}),pays=(t.pays||[]).map(p=>{const o={...p};delete o.xfId;return o});
+function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','ajv','prv','taxv','tot'].forEach(k=>delete o[k]);return o}),xr=(t.xr||[]).map((x,xi)=>{const o={...x};['n','q750','amount','e','q0','ajg','prg'].forEach(k=>delete o[k]);if(o.a==='gold'&&!o.pgM)o.pg=0;/* v96.1: تکه آبشده قدیمی (بدون pid) شناسه‌اش را با ویرایش سند نگه می‌دارد */if(abIn(o)&&!o.pid)o.pid=abKey(x,t,xi);return o}),pays=(t.pays||[]).map(p=>{const o={...p};delete o.xfId;return o});
   const keep=sv;sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:!!t.gc,gcOld:!!t.gc,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();const r=sv;sv=keep;return r}
 /* v61.56 (خواسته صاحب اپ): در صفحه سند ثبت‌شده هم نگه داشتن روی مانده‌های پایین = جزئیات فاکتور (همان پنجره صفحه سند) */
 function invDetHTML(){const X=invGet();if(!X)return '';const keep=sv;try{sv=invSv(X.c,X.t);return svDetHTML({inv:1})}finally{sv=keep}}

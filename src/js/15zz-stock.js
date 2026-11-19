@@ -125,7 +125,7 @@ function stkFixHTML(){const r=skRow();if(!r)return '';const L=stkLast(r.k),u=r.i
   ${r.isX?'':`<div class="ckcl">وزن واقعی موجود چقدر است؟</div><div class="ckbg"><label class="ckbig"><input id="skW" class="ltr" inputmode="decimal" value="${esc(SKX.w)}" placeholder="${wFmt(Math.abs(r.w))}" autocomplete="off" enterkeyhint="done" aria-label="وزن واقعی موجود"><i>گرم</i></label></div>`}
   ${r.cn?`<div class="ckcl">${r.isX?'تعداد واقعی موجود چقدر است؟':'تعداد موجود <i>اختیاری</i>'}</div><div class="ckbg"><label class="ckbig${r.isX?'':' sm'}"><input id="skN" class="ltr" inputmode="decimal" value="${esc(SKX.n)}" placeholder="${qFmt(Math.abs(r.n))}" autocomplete="off" enterkeyhint="done" aria-label="تعداد موجود"><i>${r.isX?u:'عدد'}</i></label></div>`:''}
   <div class="ckq skq"><button type="button" data-act="skZero">موجودی صفر است</button></div>
-  <div id="skL">${skRes()}</div>`}
+  <div id="skL">${skRes()}</div>`}${r.k==='آبشده'?abStkHTML():''}
   ${L?`<div class="skl">${ic('clock')}<span>آخرین اصلاح: ${stkDay(L.at)}${L.by?' · '+esc(L.by):''} · از ${r.isX?gdSgn(+L.n0||0,qFmt):gdSgn(+L.w0||0,wFmt)} به ${r.isX?gdSgn(+L.n||0,qFmt):gdSgn(+L.w||0,wFmt)} ${u}</span></div>`:''}
   ${can1?`<button type="button" class="bf3c skfe" data-act="skFee">${ic('gear')} فی خرید و فروش و تنظیم کالا</button><button type="button" class="xgo" data-act="skSave">${ic('check')} ثبت</button>`:''}</div>`}
 function skRead(){if($('skW'))SKX.w=skNum('skW');if($('skN'))SKX.n=skNum('skN')}
@@ -139,6 +139,50 @@ ACT.skSave=()=>{if(!SKX)return;if(!stkCan()){toast('اصلاح موجودی فق
   if(!z.dw&&!z.dn){toast('موجودی برنامه با انبار یکی است؛ اصلاحی لازم نیست');SKX=null;closeSheet();return}
   const c=cfgRec(1),now=ns(),nw=r.isX?0:(z.hw?+SKX.w||0:r.w),nn=z.hn?+SKX.n||0:(r.cn?r.n:0);
   c.gstk={...(c.gstk||{}),[r.k]:{w:nw,n:nn,at:now}};c.gstkL=[{k:r.k,at:now,by:who(),w0:r.w,n0:r.n,w:nw,n:nn},...(c.gstkL||[])].slice(0,80);
-  saveCu();window.__gsc=null;const u=r.isX?(XA[r.k].u||'عدد'):'گرم',fx=v=>r.isX?gdSgn(v,qFmt):gdSgn(v,wFmt);
+  saveCu();window.__gsc=null;window.__abp=null;const u=r.isX?(XA[r.k].u||'عدد'):'گرم',fx=v=>r.isX?gdSgn(v,qFmt):gdSgn(v,wFmt);
   logA('cust','اصلاح موجودی کالا',r.t+' | از '+fx(r.isX?r.n:r.w)+' به '+fx(r.isX?nn:nw)+' '+u+(!r.isX&&z.hn&&z.dn?' | تعداد '+qFmt(nn):''));
   SKX=null;closeSheet();stkRe();if(typeof gdRe==='function')gdRe();toast('موجودی «'+r.t+'» اصلاح شد · '+fx(r.isX?nn:nw)+' '+u)};
+
+/* ---- v96.1 آبشده‌های موجود (خواسته صاحب اپ، مثل پنجره «تسویه با آبشده» کیمیا: «وقتی می‌خواهیم آبشده تحویل بدهیم فهرست آبشده‌های موجود خودمان را بدهد») ----
+   هر ردیف خرید/دریافت آبشده = یک «تکه» با شناسه ثابت pid (ردیف‌های قدیمی: L<شناسه سند>:<ردیف>). ردیف فروش/تحویل آبشده می‌تواند با pc به یک تکه وصل شود.
+   موجودی هر تکه = وزنش − خروجی‌های وصل‌شده؛ خروجی‌های بدون تکه (سندهای قدیمی یا «بدون انتخاب») از قدیمی‌ترین تکه‌ها کم می‌شود تا جمع فهرست با موجودی آبشده بخواند.
+   اگر «موجودی فعلی» آبشده دستی اصلاح شده باشد: همان عدد یک تکه «موجودی قبلی» است و فقط سندهای بعد از آن شمرده می‌شود (مثل gdStockAll). */
+const abIn=x=>!!x&&x.a==='gold'&&!x.pul&&x.cat==='آبشده'&&!x.pz&&(x.t==='buy'||x.t==='in');
+const abOutX=x=>!!x&&x.a==='gold'&&!x.pul&&x.cat==='آبشده'&&(x.t==='sell'||x.t==='out');
+const abKey=(x,t,i)=>x.pid||'L'+t.id+':'+i;
+const abR3=v=>Math.round(v*1000)/1000;
+function abBase(ex){ex=ex==null?'':String(ex);const C=window.__abp;if(C&&C.k===ex)return C.L;
+  const b=(gdC().gstk||{})['آبشده'],bat=b&&b.at?String(b.at):'',P=[],U=new Map();let free=0;
+  const out=(pc,w)=>{if(!(w>0))return;if(pc)U.set(pc,(U.get(pc)||0)+w);else free+=w};
+  for(const c of custs){if(!c||c.del||c.sys)continue;for(const t of c.txs||[]){if(!t||t.del||t.type!=='inv')continue;const at=String(t.at0||t.at||'');if(bat&&at<=bat)continue;const own=!!ex&&String(t.id)===ex;
+    (t.xr||[]).forEach((x,i)=>{if(abIn(x))P.push({key:abKey(x,t,i),w:parseFloat(x.w)||0,ay:x.sh===1?0:+x.ay||750,sh:x.sh===1?1:0,lab:x.lab||'',ang:x.ang||'',ds:x.ds||'',cu:cuName(c),cid:c.id,tx:t.id,no:t.no,date:t.date||'',at});else if(abOutX(x)&&!own)out(x.pc,parseFloat(x.w)||0)});
+    if(!own)for(const it of t.items||[])if(it&&it.ab)out(it.pc,+it.w||0)}}
+  if(bat&&+b.w>0)P.push({key:'B',w:+b.w,ay:750,sh:0,lab:'',ang:'',ds:'',cu:'',base:1,date:bat.slice(0,10),at:bat});
+  P.sort((x,y)=>x.at<y.at?-1:x.at>y.at?1:0);const K=new Set(P.map(p=>p.key));U.forEach((w,k)=>{if(!K.has(k))free+=w});
+  for(const p of P)p.av=p.w-(U.get(p.key)||0);
+  for(const p of P){if(!(free>0.0004))break;if(p.av<=0)continue;const d=Math.min(p.av,free);p.av-=d;free-=d}
+  for(const p of P)p.av=abR3(p.av);window.__abp={k:ex,L:P};return P}
+/* فهرست برای سندِ باز: ردیف‌های همین سند (ذخیره‌نشده) هم کم می‌شود، جز ردیفی که همین حالا ویرایش می‌شود */
+function abList(){const hs=typeof sv!=='undefined'&&sv&&cur==='sell',B=abBase(hs&&sv.edit?sv.edit.tx:'');if(!hs)return B.filter(p=>p.av>0.0004);
+  const a=sv.qa||{},U=new Map(),add=(pc,w)=>{if(pc&&w>0)U.set(pc,(U.get(pc)||0)+w)};
+  (sv.items||[]).forEach((it,i)=>{if(it.ab&&!(a.k&&!a.x&&a.i===i))add(it.pc,+it.w||0)});(sv.xr||[]).forEach((x,i)=>{if(abOutX(x)&&!(a.x&&a.x.i===i))add(x.pc,parseFloat(x.w)||0)});
+  const me=a.x?a.x.pc:a.pc,g=typeof GTK!=='undefined'&&GTK?GTK.pc:'';
+  return B.map(p=>U.has(p.key)?{...p,av:abR3(p.av-U.get(p.key))}:p).filter(p=>p.av>0.0004||p.key===me||p.key===g)}
+const abDate=p=>p.date?payLab(p.date):'';
+const abNm=p=>p.base?'موجودی قبلی':[p.ang?'انگ '+toFa(String(p.ang)):'',p.lab||'',p.ds||''].filter(Boolean).join(' · ')||'آبشده';
+const abSub=p=>p.base?'از اصلاح موجودی · '+abDate(p):[p.cu?'از '+p.cu:'',abDate(p),p.no?'سند '+toFa(String(p.no)):''].filter(Boolean).join(' · ');
+const abAyT=p=>p.sh?'شرطی':'عیار '+toFa(String(p.ay));
+/* پله اول اختیاری ردیف فروش/تحویل آبشده: انتخاب از آبشده‌های موجود (وزن، عیار، انگ و آزمایشگاه همان تکه پر می‌شود) */
+function stPcS(o){const L=abList();if(!L.length&&!o.pc)return [];
+  return [stS('pc','آبشده موجود','','pick',()=>o.pc||'',v=>{if(v==='-'){o.pc='';return}const p=abList().find(z=>z.key===v);if(!p)return;o.pc=p.key;if(o.sh!==1&&p.ay)o.ay=p.ay;if(p.lab)o.lab=p.lab;if(p.ang)o.ang=p.ang;if(p.av>0){o.w=String(p.av);o.amT='';if('am' in o)o.am=''}},
+    {opt:1,opts:()=>[...L.map(p=>({v:p.key,t:abNm(p),sub:abSub(p),amt:wFmt(p.av),lab:'گرم · '+abAyT(p),ico:'coin',cls:'ab'})),{v:'-',t:'بدون انتخاب',sub:'آبشده‌ای که در این فهرست نیست',ico:'plus'}],
+     lab0:v=>{const p=v&&abBase(sv.edit?sv.edit.tx:'').find(z=>z.key===v);return p?abNm(p):''}})]}
+/* وزن ردیف از موجودی تکه انتخاب‌شده بیشتر نشود */
+function stPcN(o){if(!o.pc)return {};const p=abList().find(z=>z.key===o.pc);if(!p)return {};return {need:()=>(parseFloat(o.w)||0)>p.av+0.0004,msg:'وزن از موجودی این آبشده بیشتر است · موجود '+wFmt(p.av)+' گرم'}}
+/* تسویه طلا (تحویل آبشده): همان تکه‌ها به شکل برچسب بالای وزن */
+function gkPcH(){if(!GTK||GTK.m!=='dl'||gkRest()>0||(GTK.cat||'آبشده')!=='آبشده')return '';const L=abList();if(!L.length)return '';
+  return `<div class="gkty abpc" id="gkPcs"><small>آبشده‌های موجود <i>${toFa(L.length)} تکه</i></small><div class="gktys">${L.map(p=>`<button type="button" class="gktc abpb${p.key===GTK.pc?' on':''}" data-act="gkPc" data-k="${esc(p.key)}">${ic('check')}<span><b>${wFmt(p.av)} گرم</b><small>${esc(abAyT(p))}${p.base?' · موجودی قبلی':p.ang?' · انگ '+toFa(String(p.ang)):p.cu?' · '+esc(p.cu):''}</small></span></button>`).join('')}</div></div>`}
+ACT.gkPc=d=>{if(!GTK)return;gkRead();const p=abList().find(z=>z.key===d.k);if(!p)return;if(GTK.pc===p.key)GTK.pc='';else{GTK.pc=p.key;if(p.ay)GTK.ay=p.ay;/* وزن پیش‌فرض: به اندازه مانده طلای سند، نه بیشتر از موجودی تکه */const need=abR3(Math.abs(gkRest())*750/(+GTK.ay||750));GTK.wt=String(need>0?Math.min(p.av,need):p.av)}gkRe()};
+/* صفحه موجودی › آبشده: فهرست تکه‌های موجود */
+function abStkHTML(){const L=abBase('').filter(p=>p.av>0.0004);if(!L.length)return '';
+  return `<div class="abpl"><div class="abph"><b>آبشده‌های موجود</b><small>${toFa(L.length)} تکه · ${wFmt(abR3(L.reduce((s,p)=>s+p.av,0)))} گرم</small></div>${L.map(p=>`<div class="abpr"><span class="tx"><b>${esc(abNm(p))}</b><small>${esc(abSub(p))}</small></span><span class="abpv"><b>${wFmt(p.av)}</b><small>گرم · ${esc(abAyT(p))}${p.av<p.w-0.0004?' · از '+wFmt(p.w):''}</small></span></div>`).join('')}</div>`}
