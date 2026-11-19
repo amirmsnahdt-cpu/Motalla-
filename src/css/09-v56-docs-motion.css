@@ -4830,3 +4830,4 @@ html[data-theme=dark] .stkhero{background:linear-gradient(135deg,#b88a22 0%,#8a6
 /* v92.9 — پنجره ورود ردیف سند تا تأیید سر جایش قفل است */
 #view.qapin{overflow:hidden!important;overscroll-behavior:none}
 #qasp{flex:none;width:1px;pointer-events:none}
+html.qapn #app:not(.home) #act{display:none!important}

@@ -238,8 +238,9 @@ function kbChk(){const vv=window.visualViewport,h=Math.round(vv?vv.height:innerH
    اگر پنجره از جای دیدنی بلندتر باشد قفل نمی‌شود (فقط بالا می‌نشیند) تا چیزی پشت کیبورد گیر نکند. جاپرکن #qasp نمی‌گذارد صفحه کوتاه مانع بالا آمدن پنجره شود.
    با تأیید/افزودن یا انصراف قفل باز می‌شود؛ بعد از افزودن، صفحه نرم تا ردیف تازه می‌رود (qaAfter). */
 let QPIN=null;
-function qaUnpin(){const V=$('view');QPIN=null;clearTimeout(qaPin.t);if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove()}
+function qaUnpin(){const V=$('view');QPIN=null;clearTimeout(qaPin.t);document.documentElement.classList.remove('qapn');if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove()}
 function qaPin(){const V=$('view'),q=$('qa');if(!V||!q||cur!=='sell'||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){if(QPIN||$('qasp'))qaUnpin();return}
+  /* نوار مانده پایین سند تا بسته شدن پنجره کنار می‌رود (مثل وقتی کیبورد باز است) تا پنجره همیشه جا شود و قفل بماند */document.documentElement.classList.add('qapn');
   let sp=$('qasp');if(!sp||sp.parentNode!==V){sp=document.createElement('div');sp.id='qasp';sp.setAttribute('aria-hidden','true');V.appendChild(sp)}
   const vv=window.visualViewport,vr=V.getBoundingClientRect(),avail=Math.max(120,Math.min(V.clientHeight,(vv?vv.height+vv.offsetTop:innerHeight)-vr.top));sp.style.height=Math.round(avail)+'px';
   const y=Math.max(0,Math.round(q.getBoundingClientRect().top-vr.top+V.scrollTop)-8),fits=q.getBoundingClientRect().height<=avail-12,first=!QPIN;
