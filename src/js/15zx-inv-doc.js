@@ -14,7 +14,7 @@
    body نباید class داشته باشد (pdfMake به آن class="__pb" می‌دهد و صفت تکراری SVG را خراب می‌کند)، و چیزی با position:absolute چیده نمی‌شود.
    کاغذ A4 افقی همان برگه است که همه میلی‌مترها و اندازه قلم‌هایش در ۱٫۴۱۴ ضرب شده (invScale)؛ «A4 عمودی» دو برگه A5 (نسخه مشتری و فروشگاه) روی یک کاغذ است. */
 const INVP=[['sale','فروش طلا','کالای ساخته، سکه و هر فروش دیگر'],['ab','آبشده','وقتی همه کالاهای سند آبشده است'],['buy','خرید','خرید از مشتری، بدون فروش'],['rcp','رسید','دریافت و پرداخت بدون کالا']];
-const INVD={paper:'a5',bg:'c',ink:'c',frame:'g',copy:0,
+const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   lp:'c',cal:1,ttl:'',cn:0,wd:0,
   ph:1,cno:0,nid:0,mz:1,g18:1,
   cw:'a',cay:'a',cw7:'n',clab:'n',cang:'n',crt:'a',cgv:'n',caj:'a',cpp:'a',ctx:'a',
@@ -24,7 +24,7 @@ const INVD={paper:'a5',bg:'c',ink:'c',frame:'g',copy:0,
   sgc:1,sgs:1,by:1,th:1,shp:1,note:''};
 /* پیش‌فرض ویژه هر قالب: آبشده اجرت و مالیات ندارد و آزمایشگاه و انگش ستون جدا می‌گیرد */
 const INVT={ab:{clab:'a',cang:'a',caj:'n',ctx:'n'}};
-const INVE={paper:['a5','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','o','t','b'],pp:['p','o','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2]};
+const INVE={paper:['a5','b14','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','o','t','b'],pp:['p','o','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2]};
 const INVCOL=[['w','وزن / تعداد'],['ay','عیار'],['w7','وزن ۷۵۰'],['lab','آزمایشگاه'],['ang','انگ'],['rt','نرخ'],['gv','مبلغ طلا'],['aj','اجرت'],['pp','سود'],['tx','مالیات']];
 function invClean(o){const r={};for(const k in INVD){const d=INVD[k],v=o?o[k]:undefined;
     if(INVE[k]||/^c(w|ay|w7|lab|ang|rt|gv|aj|pp|tx)$/.test(k))r[k]=(INVE[k]||['a','y','n']).includes(v)?v:d;
@@ -175,7 +175,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const LGD=!LGH?'':!KD.some(K=>RJ.some(j=>K.v[j]))?'<div class="lgd"></div>':`<div class="lgd"><em class="vd">${WR[1]}</em> یعنی مشتری به مطلا بدهکار است<s>·</s><em class="vc">${WR[2]}</em> یعنی ${S.wr==='c'?'مشتری از مطلا طلبکار است':'مطلا به مشتری بدهکار است'}</div>`;
   /* ---- اندازه تکه‌های برگه: سربرگ کوتاه‌تر وقتی نه لوگو هست نه خوشنویسی؛ پانویس به اندازه چیزهایی که روشن است؛ هر چه آزاد شود به قاب ردیف‌ها می‌رسد ---- */
   const shop=(cfgRec()||{}).shop||{},shopL=[[shop.nm],[shop.ad],[shop.tel&&toFa(shop.tel),1],[shop.ig,1]].map(([v,l])=>[clean(v||''),l]).filter(x=>x[0]).map(([v,l])=>l?'<bdi dir="ltr">'+esc(v)+'</bdi>':esc(v)).join('<s>·</s>');
-  const calOK=S.cal&&TTL.length>0&&TTL.every(w=>INVCAL[w]),HDH=S.lp!=='n'||calOK?17:13.4,FTH=S.th?10.4:S.sgc||S.sgs||S.shp?5.6:0,NL=S.note?(tw(S.note)*.74>176?2:1):0,NTH=NL?NL*3.4+.8:0,ZN=+(117.2-HDH-(FTH?1.2+FTH:0)-NTH).toFixed(2);
+  const calOK=S.cal&&TTL.length>0&&TTL.every(w=>INVCAL[w]),HDH=S.lp!=='n'||calOK?17:13.4,FTH=S.th?10.4:S.sgc||S.sgs||S.shp?5.6:0,NL=S.note?(tw(S.note)*.74>176?2:1):0,NTH=NL?NL*3.4+.8:0,/* v97.5: کاغذ ۲۱×۱۴ سانت (دسته‌فاکتور) — همان برگه، ۸ میلی‌متر کوتاه‌تر؛ فقط جای ردیف‌ها کم می‌شود */XH=S.paper==='b14'?8:0,ZN=+(117.2-XH-HDH-(FTH?1.2+FTH:0)-NTH).toFixed(2);
   /* ---- چیدن برگه‌ها: نوار و اولین ردیفش از هم جدا نمی‌شوند؛ ردیف آخر باید با «حساب مشتری» در یک برگه جا شود ---- */
   const LNS=[];let rn=0;GM.forEach(([k,cap])=>{GR[k].forEach((r,i)=>LNS.push({r,i:caps?i:rn++,gi:i,cap:caps?cap:'',pre:!caps&&GM.length>1&&r.py?r.py+' · ':''}));if(S.sum&&'sbiouv'.includes(k)&&(GR[k].filter(y=>y.av).length>1||('uv'.includes(k)&&GR[k].filter(y=>y.g7).length>1)))LNS.push({smk:k,lab:{s:'فروش',b:bW,i:'دریافت',o:'پرداخت',u:'تحویل '+kdL('u'),v:'دریافت '+kdL('v')}[k],cap:caps?cap:''})});
   /* v92.2: اگر سند فقط کمی از یک برگه بیشتر است (تا حدود ۱۴٪)، ردیف‌ها و نوارها کمی کوتاه‌تر می‌شوند تا همه‌چیز در همان یک برگه بماند —
@@ -210,8 +210,8 @@ ${NL?`<div class="nt${NL>1?' n2':''}">${esc(S.note)}</div>`:''}${FTH?`<div class
   let css=`*{box-sizing:border-box}html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font-family:Vazirmatn,Tahoma,sans-serif;font-weight:500;color:${C.ink};font-size:8.4pt;font-weight:400;line-height:1.3;direction:rtl;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-feature-settings:"tnum"}
 u,em,i,s{text-decoration:none;font-style:normal}
-.pg{width:210mm;height:${S.paper==='a42'?148.5:148}mm;padding:5mm;background:${C.pa};overflow:hidden}.pg+.pg{border-top:.25mm dashed ${C.h2}}
-.f1{height:138mm;border:.2mm solid ${S.frame==='n'?'transparent':C.ln};padding:.35mm}.f2{height:136.9mm;border:.65mm solid ${S.frame==='g'?C.gd:'transparent'};padding:.35mm}.f3{height:134.9mm;border:.2mm solid ${S.frame==='g'?C.ln:'transparent'};padding:2.6mm 5.25mm 0;overflow:hidden}
+.pg{width:210mm;height:${S.paper==='a42'?148.5:148-XH}mm;padding:5mm;background:${C.pa};overflow:hidden}.pg+.pg{border-top:.25mm dashed ${C.h2}}
+.f1{height:${138-XH}mm;border:.2mm solid ${S.frame==='n'?'transparent':C.ln};padding:.35mm}.f2{height:${+(136.9-XH).toFixed(1)}mm;border:.65mm solid ${S.frame==='g'?C.gd:'transparent'};padding:.35mm}.f3{height:${+(134.9-XH).toFixed(1)}mm;border:.2mm solid ${S.frame==='g'?C.ln:'transparent'};padding:2.6mm 5.25mm 0;overflow:hidden}
 .hd{height:${HDH}mm;display:flex;align-items:center}.hd>div{flex:1 1 0;min-width:0}.hd .ttl{display:flex;align-items:center}.hd.lr .ttl{justify-content:center}.cal{display:block;flex:none;fill:${C.ink}}
 .hd .tp{font-size:${HDH<17?15:19}pt;font-weight:800;white-space:nowrap;line-height:1.2}.hd .tp.sm{font-size:${HDH<17?12.5:14.5}pt}
 .hd .lg{flex:0 0 37mm;height:15.6mm;background:url(logo-stamp.png) center/contain no-repeat}.hd.lr .lg{flex:0 0 36mm;background-position:right center}.hd.lr .mt{flex:0 0 47mm}.hd.lr .ttl{padding-inline-start:11mm}
@@ -243,9 +243,9 @@ u,em,i,s{text-decoration:none;font-style:normal}
 .nt{height:4.2mm;margin-top:0;padding:.6mm 1mm 0;font-size:6.8pt;line-height:3.4mm;color:${C.t2};white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nt.n2{height:7.6mm;white-space:normal}
 .ft{height:${FTH}mm;margin-top:1.2mm;display:flex;align-items:flex-end;justify-content:space-between}.sg,.sg0{flex:0 0 46mm;height:3.7mm}.sg{border-top:.22mm solid ${C.mu};text-align:center;font-size:6.4pt;color:${C.mu};line-height:3.5mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ft .mid{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}.ft .mid .cal{fill:${C.gl}}.ft .mid small{font-size:6pt;color:${C.mu};line-height:2.8mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.ft .mid small s{margin:0 1.6mm;color:${C.gd}}.ft .nx{font-size:7pt;font-weight:700;color:${C.gl};line-height:${FTH>6?5:2.8}mm}`;
-  const A4=S.paper==='a4',K4=297/210,PW=A4?297:210,PH=S.paper==='a5'?148:A4?210:297;
+  const A4=S.paper==='a4',K4=297/210,PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:A4?210:297;
   if(A4){css=invScale('<style>'+css+'</style>',K4).slice(7,-8);body=invScale(body,K4)}
-  return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(invTitle(t))} · ${esc(cuName(c))}</title><style>@page{size:${S.paper==='a5'?'A5 landscape':A4?'A4 landscape':'A4'};margin:0mm}
+  return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(invTitle(t))} · ${esc(cuName(c))}</title><style>@page{size:${S.paper==='a5'?'A5 landscape':S.paper==='b14'?'210mm 140mm':A4?'A4 landscape':'A4'};margin:0mm}
 @font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}
 .sht{width:${PW}mm;height:${PH}mm;overflow:hidden;background:${C.pa};break-after:page;page-break-after:always}.sht:last-child{break-after:auto;page-break-after:auto}
 @media print{.sht{margin:0}}
