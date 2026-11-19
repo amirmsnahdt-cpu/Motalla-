@@ -19,7 +19,9 @@ const acLedSum=s=>acLed(s).reduce((a,x)=>a+(LT[x.type]?LT[x.type].sg:0)*(+x.amou
 const srcBk=s=>s&&typeof bkCus==='function'?bkCus().find(c=>c.srcId!=null&&String(c.srcId)===String(s.id))||null:null;
 const acEst=s=>{const c=srcBk(s);if(c)return bkCuBal(c);return s.bal==null?null:(+s.bal||0)+acLedSum(s)+srcInvSum(s)-acSent(s)};
 /* پیش از تخصیص: پیوند خودکار هم‌نام‌ها و سند خوردن لیست‌های ارسال‌شده در حساب‌های بانک */
-function bkAllocSync(){try{let ch=0;bkCus().forEach(c=>{ch+=bkAutoLink(c)});if(ch)audBg(()=>saveCu());bkDepSyncAll()}catch(_){}}
+function bkAllocSync(){try{let ch=0;bkCus().forEach(c=>{ch+=bkAutoLink(c)});if(ch)audBg(()=>saveCu());bkSrcAll();bkDepSyncAll()}catch(_){}}
+/* v93.8 (خواسته صاحب اپ: «بانک‌ها در همه جای اپ یکپارچه و مانده‌ها درست»): مانده یک منبع واریز = مانده حساب بانکی وصل به آن (همان عدد کارت بانک)؛ فقط منبع بدون حساب بانکی مانده قدیمی خودش را دارد */
+const srcBal=s=>{const c=srcBk(s);return c?bkCuBal(c):acFin(s)};
 /* تخصیص‌های ارسال‌نشده = رزرو */
 function acRes(s,exPid){let t=0;Object.values(drafts||{}).forEach(L=>(L||[]).forEach(p=>{if(p.sent||p.id===exPid||!p.src||String(p.src.id)!==String(s.id))return;t+=sum(partRows(p))}));return t}
 const acFree=(s,exPid)=>{const e=acEst(s);return e==null?null:e-acRes(s,exPid)};
@@ -45,8 +47,8 @@ function acSum(s){const known=s.bal!=null,L=acLed(s);let hvIn=0,hvOut=0,nIn=0,nO
   return {known,prev,hvIn,hvOut,nIn,nOut,hv:hvIn-hvOut,posIn,posWay,pos:posIn+posWay,ledIn,ledOut,sent,out:sent+ledOut,res,now,fin:now+posWay}}
 const acFin=s=>s.bal==null?null:acSum(s).fin;
 /* برچسب مانده کنار نام بانک در همه انتخابگرها */
-const bkTag=s=>{const f=acFin(s);return f==null?'':`<em class="bktg${f<0?' n':''}">${f<0?'−':''}${fmt(Math.abs(f))}</em>`};
-const bkSub=s=>{const f=acFin(s),bk=acBank(s);return f==null?(bk?'بانک '+bk:'حساب ما'):'مانده '+(f<0?'−':'')+fmt(Math.abs(f))+' تومان'};
+const bkTag=s=>{const f=srcBal(s);return f==null?'':`<em class="bktg${f<0?' n':''}">${f<0?'−':''}${fmt(Math.abs(f))}</em>`};
+const bkSub=s=>{const f=srcBal(s),bk=acBank(s);return f==null?(bk?'بانک '+bk:'حساب ما'):'مانده '+(f<0?'−':'')+fmt(Math.abs(f))+' تومان'};
 /* v66.1 (خواسته صاحب اپ: «رنگ‌ها با برنامه سینک نیست، طرح نسخه‌های قدیمی»): کارت جمع بانک‌ها و صفحه هر حساب با همان اجزای صفحه
    حساب مشتری ساخته می‌شوند — کارت سفید «مانده» با کاشی‌های cbk (آبی/قرمز/خاکستری، شمارش cbn)، فهرست ردیف‌های c6r،
    «گردش حساب» با سرتیتر روز (fday) و ردیف‌های fcard/txr. ریز حساب دیگر پنجره نیست، یک صفحه کامل است (bank). */
@@ -75,7 +77,7 @@ function bxBlue(o){return `<div class="bxblue${o.an?' anim':''}"><small>${o.t}</
    بانک‌های قبلی (sources) دست‌نخورده از «⋯» › «بانک‌های قبلی» (vBanksOld در پنجره). */
 function vBanks(){bkDepSyncAll();bkLogoFix();const L=bkCus();cuAnim=1;cuCntId=null;
   return `<div class="c6s cusr"><div class="cusrow"><div class="fsearch c6q0">${ic('search')}<input id="cuq" type="search" placeholder="${L.length?'جستجو در '+toFa(L.length)+' حساب بانک، سند، مبلغ…':'نام بانک تازه، مثل «ملت مغازه»…'}" value="${esc(cuQ)}" autocomplete="off" enterkeyhint="search"><button class="x${cuQ?'':' hide'}" data-act="cuQClr" aria-label="پاک کردن">×</button><button class="fcal${cuDt?' on':''}" data-act="cuCal" aria-label="جستجوی تاریخ">${ic('cal')}</button></div></div></div>
-  <div id="cures">${L.length||cuQ?cuListHTML():`<div class="spempty"><div class="spill">${ic('bank')}</div><b>هنوز حساب بانکی نساخته‌اید</b><span>نام بانک را در جستجو بنویسید؛ حساب نوع «بانک» ساخته می‌شود و سندهایش مثل حساب مشتری است (واریز، برداشت، چک…).</span></div>`}</div>`}
+  ${bkUniCard()}<div id="cures">${L.length||cuQ?cuListHTML():`<div class="spempty"><div class="spill">${ic('bank')}</div><b>هنوز حساب بانکی نساخته‌اید</b><span>نام بانک را در جستجو بنویسید؛ حساب نوع «بانک» ساخته می‌شود و سندهایش مثل حساب مشتری است (واریز، برداشت، چک…).</span></div>`}</div>`}
 function vBanksOld(){cashEnsure();bxWas=!!document.querySelector('#view .bxblue');const L=ownLC(),K=L.filter(s=>s.bal!=null),P=CH('pos'),un=P.filter(c=>!chSrc(c));
   const fin=K.reduce((a,s)=>a+acSum(s).fin,0),miss=L.length-K.length;
   return `<div class="c6s"><div class="fsearch c6q0">${ic('search')}<input id="bkq" type="search" placeholder="${L.length?'جستجو در '+toFa(L.length)+' حساب، یا نام حساب تازه…':'نام حساب تازه، مثل «ملی مغازه»…'}" value="${esc(bkQ)}" autocomplete="off" enterkeyhint="search"><button class="x${bkQ?'':' hide'}" data-act="bkQClr" aria-label="پاک کردن">×</button></div></div>

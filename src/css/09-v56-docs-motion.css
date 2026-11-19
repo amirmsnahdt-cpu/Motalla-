@@ -4866,3 +4866,13 @@ html.qapn #app:not(.home) #act{display:none!important}
 
 /* v93.6 — پنجره «پرداخت از کجا؟»: بانک‌ها هم با همان کارت فهرست حساب‌ها؛ یادداشت کوچک کنار گروه (مثلاً «الان … از این حساب») */
 .c6r .tx small .c6nt{font-style:normal;font-weight:800;color:var(--blu)}
+
+/* v93.8 — بانک‌ها یکپارچه: مانده قابل تخصیص روی چیپ بانک (ویرایش منابع / چند منبع)، کارت «منبع‌های بدون حساب بانکی» در زبانه بانک و پنجره‌اش */
+.psch .pschb{font-style:normal;font-size:10.5px;font-weight:800;color:var(--ok);padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--ok) 11%,transparent);white-space:nowrap}
+.psch .pschb.n{color:var(--red);background:color-mix(in srgb,var(--red) 10%,transparent)}
+.bkuni{display:flex;align-items:center;gap:11px;width:calc(100% + 16px);margin:2px -8px 12px;padding:12px 13px;border:0;border-radius:18px;background:color-mix(in srgb,var(--gold) 9%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--gold) 45%,transparent);font:inherit;color:var(--ink);text-align:start;cursor:pointer}
+.bkunii{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--gold) 22%,var(--card));color:var(--gold)}.bkunii svg{width:21px;height:21px}
+.bkuni .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.bkuni .tx b{font-size:14px;font-weight:850}.bkuni .tx small{font-size:11.5px;font-weight:600;color:var(--mut);line-height:1.5}
+.bkuni>svg{flex:none;width:18px;height:18px;color:var(--mut)}
+.bkunl .acrow .bkunb{flex:none;font-style:normal;font-size:12px;font-weight:850;color:var(--blu);padding:6px 11px;border-radius:11px;background:color-mix(in srgb,var(--blu) 10%,var(--card));white-space:nowrap}
+.bkunh{display:flex;align-items:flex-start;gap:7px;margin:10px 4px 4px;font-size:12px;font-weight:600;line-height:1.6;color:var(--mut)}.bkunh svg{flex:none;width:16px;height:16px;margin-top:2px}

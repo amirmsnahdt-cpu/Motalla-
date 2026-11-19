@@ -8,7 +8,7 @@ const ssLock=it=>it.st==='ok'||!!it.tn||!!it.img||!!(it.imgs||[]).length;
 function ssFam(x){const F=famOf(x);if(!F.length)return null;const L=F.map(r=>({r,e:entries.find(z=>z.id===r.id),q:entBI(r)}));if(L.some(o=>!o.e||!o.q||o.q.b.closed))return null;return L}
 const ssCan=x=>{if(!x||!x.sentBid||!can('split')||sources.length<2)return false;const L=ssFam(x);return !!L&&L.some(o=>!ssLock(o.q.it))};
 const ssLeft=()=>SS.R-SS.L.reduce((a,l)=>a+(+l.amount||0),0);
-function ssChips(l,i){return `<div class="pssc">${DSRC().map(z=>{const bk=acBank(z),on=String(z.id)===String(l.to);return `<button type="button" class="psch${on?' on':''}" data-act="ssSrc" data-i="${i}" data-s="${z.id}">${bk?bankBadge(bk):`<span class="bkb" style="--bc:#64748b">${esc(userInit(z.name))}</span>`}<span>${esc(z.name)}</span></button>`}).join('')}</div>`}
+function ssChips(l,i){return `<div class="pssc">${DSRC().map(z=>{const bk=acBank(z),on=String(z.id)===String(l.to);return `<button type="button" class="psch${on?' on':''}" data-act="ssSrc" data-i="${i}" data-s="${z.id}">${bk?bankBadge(bk):`<span class="bkb" style="--bc:#64748b">${esc(userInit(z.name))}</span>`}<span>${esc(z.name)}</span>${(v=>v==null?'':`<i class="pschb${v<=0?' n':''}">${shortAmt(Math.max(0,v)).replace(/\s*تومان$/,'')}</i>`)(acFree(z))}</button>`}).join('')}</div>`}
 function ssCard(l,i){const so=sources.find(z=>String(z.id)===String(l.to)),bk=so&&acBank(so),stx=l.st==='ok'?'تأیید شده':l.st==='fail'?'ناموفق':l.nw?'بخش تازه':'در انتظار تأیید';
   if(l.lock)return `<div class="psc sslk"><div class="psch0"><span class="psn">${toFa(i+1)}</span><b>${esc(so?so.name:l.src)}</b><em class="sstag k">${ic('check')} ${l.st==='ok'?'تأیید شده':'رسید/پیگیری دارد'} · قفل</em></div><div class="ssrow">${bk?bankBadge(bk):''}<span class="tx"><b>${fmt(l.amount)}<i>تومان</i></b></span></div></div>`;
   return `<div class="psc" data-i="${i}"><div class="psch0"><span class="psn">${toFa(i+1)}</span><b>${i===0?'بخش اصلی':'بخش '+toFa(i+1)}</b><em class="sstag ${l.st==='fail'?'f':l.nw?'n':'w'}">${stx}</em>${i>0?`<button type="button" class="itx" data-act="ssDel" data-i="${i}" aria-label="حذف بخش">×</button>`:''}</div>
@@ -31,7 +31,7 @@ function ssRedraw(){$('sheet').innerHTML=ssHTML();ssBind();ssPaint()}
 function ssBind(){const sh=$('sheet');sh.oninput=e=>{const t=e.target;if(t.dataset.sa==null)return;const i=+t.dataset.sa;
   const pos=t.selectionStart||0,bf=toEn(t.value.slice(0,pos)).replace(/\D/g,'').length,v=num(t.value);t.value=v?v.toLocaleString('en-US'):'';
   let p=0,d=0;while(p<t.value.length&&d<bf){if(/\d/.test(t.value[p]))d++;p++}try{t.setSelectionRange(p,p)}catch(_){}SS.L[i].amount=v;SS.L[i].man=true;ssAuto(i);ssPaint(i)};ssPaint()}
-ACT.sentSplit=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!ssCan(x)){toast('بخش‌های این واریزی تأیید شده یا لیستش بایگانی شده است',true);return}const F=ssFam(x);
+ACT.sentSplit=d=>{bkAllocSync();const x=validated().find(r=>String(r.id)===String(d.id));if(!ssCan(x)){toast('بخش‌های این واریزی تأیید شده یا لیستش بایگانی شده است',true);return}const F=ssFam(x);
   const sid=n=>{const s=sources.find(z=>z.name===n);return s?String(s.id):''};
   const L=F.map(o=>({id:o.r.id,amount:+o.q.it.amount||0,to:sid(o.q.it.src),src:o.q.it.src,st:o.q.it.st||'pending',lock:ssLock(o.q.it)}));
   SS={root:famRoot(x),name:fullName(x),R:L.reduce((a,l)=>a+l.amount,0),L,L0:L.map(l=>({...l}))};
