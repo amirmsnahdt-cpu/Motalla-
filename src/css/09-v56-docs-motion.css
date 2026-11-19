@@ -4939,3 +4939,15 @@ html[data-theme=dark] .stpv.ab b{color:#e2bd62}
 .abpr .tx b{font-size:13.5px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.abpr .tx small{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .abpv{flex:none;display:flex;flex-direction:column;align-items:flex-end;line-height:1.3}.abpv b{font-size:14.5px;font-weight:900;font-feature-settings:"tnum"}.abpv small{font-size:10.5px;font-weight:750;color:var(--mut)}
 html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color:#e2bd62}
+
+/* ---- v96.3 صفحه‌کلید حروف داخل پنجره ردیف (پله‌های متنی): همان قاب و همان قد صفحه‌کلید عددی ---- */
+.stw.haskb .st3 .stin{font-size:18px!important;font-weight:800;text-align:start;letter-spacing:0;line-height:39.6px}
+.qkp.qkb{display:flex;flex-direction:column;gap:8px;height:226px;box-sizing:border-box;padding:9px 6px}
+.qkb .qkr{flex:1 1 0;min-height:0;display:flex;gap:4px;justify-content:center}
+.qkk.kb{flex:1 1 0;min-width:0;border-radius:10px;font-size:19px;font-weight:800}
+.qkk.kb.w1{flex:1.3 1 0}.qkk.kb.w2{flex:1.7 1 0}.qkk.kb.w3{flex:2.6 1 0}.qkk.kb.sp{flex:4.2 1 0;color:var(--mut)}
+.qkk.kb.tx{font-size:12.5px;font-weight:900}.qkk.kb.zw{font-size:10.5px}
+.qkk.kb.fn svg{width:21px;height:21px}
+.qkk.kb.go{grid-row:auto;flex-direction:row;gap:4px;font-size:13.5px}.qkk.kb.go svg{width:18px;height:18px}
+@media (max-height:700px){.qkp.qkb{height:204px;gap:7px;padding:8px 6px}.qkk.kb{font-size:18px}}
+@media (max-height:720px){.qkp.qkb{height:188px;gap:6px;padding:7px 5px}.stw.haskb .st3 .stin{line-height:36.3px}}
