@@ -37,54 +37,63 @@ const stmtFile=(c,F)=>('صورتحساب '+cuName(c)+' ('+(F&&(F.f||F.t)?stmPer(
    ریز سند: برچسب رنگی (فروش/پرداخت/تحویل قرمز، خرید/دریافت سبز). پایین: جمع هر ستون و مانده نهایی. */
 const stU=k=>k==='r'?'تومان':k==='g'?'گرم':((XA[k]||{}).u||'');
 const stNm=k=>k==='r'?'ریالی · تومان':k==='g'?'طلا · گرم ۱۸ عیار':esc((XA[k]||{t:k}).t)+' · '+esc(stU(k));
-const stV=(k,v)=>k==='r'?fmt(Math.abs(v)):k==='g'?wPdf(v):qFmt(Math.abs(v));
+const stV=(k,v)=>k==='r'?fmt(Math.abs(v)):k==='g'?wFmt(Math.abs(v)):qFmt(Math.abs(v));
 const stL=v=>!v?'تسویه':v<0?'طلبکاریم':'بدهکاریم';
-function stmtPdfHTML(c,F){const S=stmtData(c,F),D=dates(),b=S.bal,ks=['g','r',...S.XK],land=S.XK.length>0;
+/* v92.7 (خواسته صاحب اپ: «لیست نباید این‌قدر پیچیده باشد؛ مانده نهایی‌ها مشخص باشد؛ کادر و بوردرها اصلاً مشخص نیست»):
+   صورتحساب ساده — بالا کادرهای پررنگ «مانده نهایی حساب» (یک کادر برای هر جنس: عدد درشت، طلبکاریم/بدهکاریم و جمله ساده)،
+   بعد یک جدول تمام‌خط‌کشی: هر سند یک ردیف (عنوان + یک خط خلاصه کالا + یک خط خلاصه دریافت/پرداخت؛ بدون ریز ردیف‌ها و برچسب‌ها)،
+   و برای هر جنس فقط دو ستون «این سند» و «مانده». آخر جدول ردیف پررنگ «مانده نهایی حساب». جمع گردش‌ها در Excel می‌ماند. */
+function stmtSum(t){const L=stmtLines(t),G=[],P={'دریافت':[0,[]],'پرداخت':[0,[]]};
+  L.forEach(l=>{const tg=String(l[0]||''),q=l[2]!==''&&l[2]!=null;if(q||!P[tg]){const nm=String(l[1]||''),pre=/^(فروش|خرید|تحویل|دریافت|تعویض|مرجوعی|مانده)/.test(nm)?'':tg+' ';G.push(pre+nm+(q?' '+(l[3]==='گرم'?wFmt(l[2]):qFmt(l[2]))+' '+l[3]:'')+(tg==='تخفیف'&&l[8]?' '+fmt(Math.abs(l[8])):''));return}
+    let m=String(l[1]||'').replace(/^(دریافت|پرداخت)\s+/,'');const a=m.split(' · ');m=/^(اضافه|کسر)$/.test(a[0])&&a[1]?a[1]:a[0];P[tg][0]+=Math.abs(+l[8]||0);if(m&&!P[tg][1].includes(m))P[tg][1].push(m)});
+  const pl=k=>P[k][0]?k+' '+fmt(P[k][0])+' تومان'+(P[k][1].length?' ('+P[k][1].join('، ')+')':''):'';
+  return [G.join(' · '),[pl('دریافت'),pl('پرداخت')].filter(Boolean).join(' · ')].filter(Boolean)}
+function stmtPdfHTML(c,F){const S=stmtData(c,F),D=dates(),b=S.bal,ks=['g','r',...S.XK],land=S.XK.length>0,rng=!!(S.F.f||S.F.t);
   const mv=(o,k)=>k==='r'?o.r:k==='g'?o.g:+(o.x[k]||0),bl=(o,k)=>k==='r'?o.R:k==='g'?o.G:+((o.X||{})[k]||0);
-  const num=(k,v,cl)=>v?`<span class="nv ${cl||''}"><bdi>${stV(k,v)}</bdi></span>`:'<span class="z">—</span>';
-  const balC=(k,B)=>B?`<span class="nv ${B<0?'rd':'bl'}"><bdi>${stV(k,B)}</bdi></span><small class="${B<0?'rd':'bl'}">${stL(B)}</small>`:'<span class="z">۰</span><small class="z">تسویه</small>';
-  const tot={};ks.forEach(k=>{tot[k]={d:0,c:0}});S.rows.forEach(o=>ks.forEach(k=>{const v=mv(o,k);if(v<0)tot[k].d+=-v;else if(v>0)tot[k].c+=v}));
-  const fin=k=>k==='r'?b.R:k==='g'?b.G:+((b.X||{})[k]||0);
-  const card=k=>{const v=fin(k),T=tot[k];return `<div class="kc ${v<0?'d':v>0?'c':'z'}"><div class="kh">${stNm(k)}</div><div class="kv"><bdi>${v?stV(k,v):'۰'}</bdi><u>${stU(k)}</u><em>${stL(v)}</em></div><div class="kd"><span>طلبکار شدیم <b class="rd">${stV(k,T.d)}</b></span><span>بدهکار شدیم <b class="bl">${stV(k,T.c)}</b></span></div></div>`};
-  const TAG={'فروش':'d','پرداخت':'d','تحویل':'d','خرید':'c','دریافت':'c','تعویض':'c','مرجوعی':'c','تخفیف':'c'};
-  const line=l=>{const tg=String(l[0]||''),cl=TAG[tg]||(/پرداخت|تحویل|فروش/.test(tg)?'d':'c'),q=l[2]!==''&&l[2]!=null?(l[3]==='گرم'?wFmt(l[2]):qFmt(l[2]))+' '+esc(l[3]):'';
-    return `<div class="dl"><span class="tg ${cl}">${esc(tg)}</span><span class="dd">${esc(l[1])}${q?' · <b>'+q+'</b>':''}${l[4]?' · عیار '+toFa(l[4]):''}${l[5]?' · نرخ '+fmt(l[5]):''}${l[6]&&l[6]!=='۰'?' · اجرت '+esc(l[6]):''}${l[7]?' · سود '+esc(toFa(l[7])):''}${l[9]?' · '+esc(l[9]):''}</span>${l[8]?`<b class="da ${cl==='d'?'rd':'gr'}"><bdi>${fmt(Math.abs(l[8]))}</bdi><u>تومان</u></b>`:''}</div>`};
-  const cells=o=>ks.map((k,gi)=>{const v=mv(o,k),B=bl(o,k);return `<td class="am${gi?' gs':''}">${v<0?num(k,v,'rd'):'<span class="z">—</span>'}</td><td class="am">${v>0?num(k,v,'bl'):'<span class="z">—</span>'}</td><td class="am bal">${balC(k,B)}</td>`}).join('');
-  const W=land?{g:[7,7,8],r:[8,8,9],x:[6,6,7]}:{g:[8.5,8.5,10],r:[10,10,12],x:[7,7,8]};
-  const cg=`<colgroup><col style="width:4%"><col style="width:${land?8:9}%"><col>${ks.map(k=>(W[k==='r'?'r':k==='g'?'g':'x']).map(w=>`<col style="width:${w}%">`).join('')).join('')}</colgroup>`;
-  const head=`<tr class="g1"><th rowspan="2"></th><th rowspan="2">تاریخ</th><th rowspan="2" class="ds">شرح</th>${ks.map((k,gi)=>`<th colspan="3" class="grp ${k==='g'?'gg':k==='r'?'gr2':'gx'}${gi?' gs':''}">${stNm(k)}</th>`).join('')}</tr><tr class="g2">${ks.map((k,gi)=>`<th class="${gi?'gs':''}">طلبکار<br>می‌شویم</th><th>بدهکار<br>می‌شویم</th><th>مانده</th>`).join('')}</tr>`;
-  const body=S.rows.map(o=>`<tbody class="${o.lines.length>5?'':'en'}"><tr class="hs"><td class="n">${fmt(o.i)}</td><td class="dt">${esc(dates(o.date).fa)}</td><td class="ds"><span class="nm">${esc(o.title)}</span>${o.desc?`<span class="s">${esc(o.desc)}</span>`:''}</td>${cells(o)}</tr>${o.lines.length?`<tr class="dr"><td></td><td colspan="${ks.length*3+2}"><div class="dls">${o.lines.map(line).join('')}</div></td></tr>`:''}</tbody>`).join('');
-  const open=S.open?`<tbody class="en"><tr class="op"><td></td><td class="dt">${esc(dates(isoAdd(S.F.f,-1)).fa)}</td><td class="ds"><span class="nm">مانده از قبل</span><span class="s">نقل از پیش از ${esc(dates(S.F.f).fa)}</span></td>${ks.map((k,gi)=>`<td class="am${gi?' gs':''}"></td><td class="am"></td><td class="am bal">${balC(k,bl(S.open,k))}</td>`).join('')}</tr></tbody>`:'';
-  const foot=`<tfoot><tr class="ft1"><td colspan="3">جمع ${S.F.f||S.F.t?'این بازه':'گردش'}</td>${ks.map((k,gi)=>`<td class="am${gi?' gs':''}">${num(k,-tot[k].d,'rd')}</td><td class="am">${num(k,tot[k].c,'bl')}</td><td></td>`).join('')}</tr><tr class="ft2"><td colspan="3">مانده ${S.F.f||S.F.t?'پایان بازه':'نهایی'}</td>${ks.map((k,gi)=>{const v=fin(k);return `<td colspan="3" class="am fb ${v<0?'rd':v>0?'bl':'gr'}${gi?' gs':''}"><span class="nv"><bdi>${v?stV(k,v):'۰'}</bdi><u>${stU(k)}</u></span><em>${stL(v)}</em></td>`}).join('')}</tr></tfoot>`;
+  const fin=k=>k==='r'?b.R:k==='g'?b.G:+((b.X||{})[k]||0),kn=k=>k==='r'?'مبلغ':k==='g'?'طلا':esc((XA[k]||{t:k}).t);
+  const say=v=>!v?'حساب این بخش صاف است':v<0?'مشتری به مطلا بدهکار است':'مطلا به مشتری بدهکار است';
+  const card=k=>{const v=fin(k);return `<div class="fk ${v<0?'d':v>0?'c':'z'}"><div class="fkh"><b>${kn(k)}</b><u>${esc(stU(k))}</u></div><div class="fkv"><bdi>${v?stV(k,v):'۰'}</bdi><em>${stL(v)}</em></div><div class="fks">${say(v)}</div></div>`};
+  const dC=(k,v)=>v?`<bdi class="${v<0?'rd':'bl'}">${stV(k,v)}</bdi><small class="${v<0?'rd':'bl'}">${v<0?'طلبکار شدیم':'بدهکار شدیم'}</small>`:'<span class="z">—</span>';
+  const bC=(k,B)=>B?`<bdi class="${B<0?'rd':'bl'}">${stV(k,B)}</bdi><small class="${B<0?'rd':'bl'}">${stL(B)}</small>`:'<bdi class="gr">۰</bdi><small class="gr">تسویه</small>';
+  /* مانده صفرِ جنسی که هنوز در این حساب گردشی نداشته خط تیره است (نه «تسویه») تا جدول شلوغ نشود */
+  const seen={};if(S.open)ks.forEach(k=>{if(bl(S.open,k))seen[k]=1});
+  const cells=o=>ks.map(k=>{const v=mv(o,k),B=bl(o,k);if(v||B)seen[k]=1;return `<td class="dv">${dC(k,v)}</td><td class="bv">${B||seen[k]?bC(k,B):'<span class="z">—</span>'}</td>`}).join('');
+  const W=land?{g:[8,9],r:[10,11],x:[7,8]}:{g:[10.5,11.5],r:[14,15],x:[8,9]};
+  const cg=`<colgroup><col style="width:${land?4:5}%"><col style="width:${land?9:11}%"><col>${ks.map(k=>(W[k==='r'?'r':k==='g'?'g':'x']).map(w=>`<col style="width:${w}%">`).join('')).join('')}</colgroup>`;
+  const head=`<tr class="g1"><th rowspan="2">ردیف</th><th rowspan="2">تاریخ</th><th rowspan="2" class="ds">شرح سند</th>${ks.map(k=>`<th colspan="2" class="grp">${kn(k)} <u>${esc(stU(k))}</u></th>`).join('')}</tr><tr class="g2">${ks.map(()=>`<th>این سند</th><th>مانده</th>`).join('')}</tr>`;
+  const body=S.rows.map(o=>{const sm=o.t.type==='inv'?stmtSum(o.t):[o.desc].filter(Boolean);return `<tbody class="en"><tr class="hs"><td class="n">${fmt(o.i)}</td><td class="dt">${esc(dates(o.date).fa)}</td><td class="ds"><span class="nm">${esc(o.title)}</span>${sm.map(x=>`<span class="s">${esc(toFa(x))}</span>`).join('')}</td>${cells(o)}</tr></tbody>`}).join('');
+  const open=S.open?`<tbody class="en"><tr class="op"><td class="n"></td><td class="dt">${esc(dates(isoAdd(S.F.f,-1)).fa)}</td><td class="ds"><span class="nm">مانده از قبل</span><span class="s">نقل از پیش از ${esc(dates(S.F.f).fa)}</span></td>${ks.map(k=>`<td class="dv"></td><td class="bv">${bC(k,bl(S.open,k))}</td>`).join('')}</tr></tbody>`:'';
+  const foot=`<tbody class="en"><tr class="ft2"><td colspan="3">مانده ${rng?'پایان بازه':'نهایی حساب'}</td>${ks.map(k=>{const v=fin(k);return `<td colspan="2" class="fb ${v<0?'rd':v>0?'bl':'gr'}"><bdi>${v?stV(k,v):'۰'}</bdi> <u>${esc(stU(k))}</u> <em>${stL(v)}</em></td>`}).join('')}</tr></tbody>`;
   const html=`<section class="pg">${pdfTop('صورتحساب مشتری',D)}${pdfInf([['مشتری',esc((c.title?c.title+' ':'')+cuName(c)),c.nid?'کد ملی '+esc(toFa(c.nid)):'',1],c.phone?['تلفن','<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>','']:null,c.grp?['گروه',esc(c.grp),'']:null,['تعداد سند',fmt(S.rows.length),'']])}${stmPer(S)?`<div class="per"><span>${esc(stmPer(S))}</span>${S.F.q?`<span>جستجو: «${esc(S.F.q)}»</span>`:''}</div>`:''}<div class="bar"></div>
-  <h2>${S.F.f||S.F.t?'مانده پایان بازه':'مانده حساب'}</h2><div class="kcs">${ks.map(card).join('')}</div>
-  <div class="lgd"><span><b class="rd">طلبکاریم</b> مشتری به مطلا بدهکار است</span><span><b class="bl">بدهکاریم</b> مطلا به مشتری بدهکار است</span><span><i class="tg d">فروش · پرداخت</i> <i class="tg c">دریافت · خرید</i></span></div>
-  <h2>دفتر حساب</h2><table class="lg2">${cg}<thead>${head}</thead>${open}${body||`<tbody><tr><td colspan="${ks.length*3+3}" class="emp">در این بازه${S.F.q?' و با این جستجو':''} ردیفی نیست</td></tr></tbody>`}${S.rows.length?foot:''}</table>
+  <div class="fbx"><div class="fbt">مانده ${rng?'پایان بازه':'نهایی حساب'}</div><div class="fks2">${ks.map(card).join('')}</div></div>
+  <h2>گردش حساب <small>هر سند یک ردیف · مانده بعد از همان سند</small></h2><table class="lg2">${cg}<thead>${head}</thead>${open}${body||`<tbody><tr><td colspan="${ks.length*2+3}" class="emp">در این بازه${S.F.q?' و با این جستجو':''} ردیفی نیست</td></tr></tbody>`}${S.rows.length?foot:''}</table>
+  <div class="lgd"><span><b class="rd">طلبکاریم</b> یعنی مشتری به مطلا بدهکار است</span><span><b class="bl">بدهکاریم</b> یعنی مطلا به مشتری بدهکار است</span></div>
   <div class="sign"><div>امضای مشتری</div><div>مهر و امضای مطلا</div></div>${pdfFoot()}</section>`;
-  /* v90.8: یک لایه، هم‌خانواده قالب گزارش‌ها (08 pdfCSS) — خانه‌های مانده با خط طلایی بالا، دفتر حساب با خط‌های نازک، مانده نهایی روی نوار کرم */
-  const css=`.pg{max-width:${land?'277mm':'190mm'}}.per{display:flex;flex-wrap:wrap;gap:2mm;margin:1.6mm 0 0}.per span{border:.15mm solid #dcc48a;background:#fbf4e1;color:#8a6410;border-radius:99px;padding:.2mm 3mm;font-size:7.2pt;font-weight:700}
-  .rd{color:#9b1c31!important}.gr{color:#1d6b4a!important}.bl{color:#1f3f8f!important}.z{color:#b5ab9b!important}
-  .kcs{display:grid;grid-template-columns:repeat(${Math.min(ks.length,4)},1fr);gap:1.6mm;margin:1.6mm 0 0}.kc{min-width:0;border:.15mm solid #a89a7c;border-top:.45mm solid #a87b1f;padding:1.2mm 2.6mm 1.4mm;break-inside:avoid}
-  .kh{font-size:6.6pt;font-weight:700;color:#5f4712}.kv{display:flex;align-items:baseline;gap:1.2mm;margin:.3mm 0 .7mm}.kv bdi{font-size:14pt;font-weight:800;unicode-bidi:isolate;direction:ltr;line-height:1.3;color:#1d6b4a}.kc.d .kv bdi{color:#9b1c31}.kc.c .kv bdi{color:#1f3f8f}
-  .kv u{font-size:6.8pt;color:#544c42;font-weight:500}.kv em{margin-inline-start:auto;font-size:7.2pt;font-weight:800;color:#1d6b4a}.kc.d .kv em{color:#9b1c31}.kc.c .kv em{color:#1f3f8f}
-  .kd{display:flex;justify-content:space-between;gap:2mm;font-size:6.6pt;color:#544c42;border-top:.15mm dotted #cfc3aa;padding-top:.6mm}.kd b{font-weight:700}
-  .lgd{display:flex;flex-wrap:wrap;align-items:center;gap:.6mm 4mm;margin:1.4mm 0 0;font-size:6.6pt;color:#38322b}.lgd b{font-weight:700}
-  table.lg2{width:100%;table-layout:fixed;border-collapse:collapse}
-  .lg2 th{font-size:6.6pt;font-weight:700;padding:1mm .8mm;text-align:center;line-height:1.3;white-space:normal;border-bottom:0}
-  .lg2 tr.g1 th{font-size:7pt;color:#211d18;border-bottom:.2mm solid #a87b1f}.lg2 tr.g1 th.gg{color:#8a6410}.lg2 tr.g1 th.gr2{color:#1f3f8f}.lg2 tr.g1 th.ds{text-align:right}
-  .lg2 tr.g2 th{font-size:6.2pt;color:#544c42;border-bottom:.45mm solid #a87b1f}
-  .lg2 .gs{border-inline-start:.2mm solid #cfc3aa}
-  .lg2 td{font-size:7.6pt;padding:1.3mm .8mm;vertical-align:top;border-bottom:0}.lg2 tbody tr.hs td{border-top:.15mm solid #a89a7c}
-  .lg2 td.am{text-align:center;white-space:nowrap;font-size:7.2pt;font-weight:400;overflow:hidden}.lg2 td.bal{font-weight:700}.lg2 td.bal small{display:block;font-size:5.8pt;font-weight:700;margin-top:.2mm}
-  .lg2 td.n{color:#544c42;text-align:center;font-size:6.8pt;width:auto}.lg2 td.dt{white-space:nowrap;color:#38322b;font-size:7pt}.lg2 td.ds{word-break:break-word;overflow-wrap:anywhere}.lg2 td.ds .nm{display:block;font-weight:700;font-size:8pt}.lg2 td.ds .s{display:block;color:#544c42;font-size:6.4pt;line-height:1.45}
-  .nv{display:inline-block;white-space:nowrap}.nv bdi{unicode-bidi:isolate;direction:ltr}.nv u{font-size:5.8pt;color:#544c42;font-weight:500;margin-inline-start:.6mm}
-  .lg2 tr.dr td{padding-top:0;padding-bottom:1.4mm}.dls{padding:0 1mm 0 0;border-inline-start:.45mm solid #e6d9b8}.dl{display:flex;align-items:baseline;gap:1.6mm;padding:.35mm 1.6mm;font-size:6.7pt;break-inside:avoid}
-  .tg{flex:none;font-size:6pt;font-weight:700;padding:0 1.6mm;border-radius:99px;min-width:9mm;text-align:center;display:inline-block;border:.15mm solid #cfc6b6}.tg.d{color:#9b1c31;border-color:#dba5ae;background:#fbeef0}.tg.c{color:#1d6b4a;border-color:#9cc7b3;background:#eef7f2}
-  .dd{flex:1;min-width:0;color:#38322b;overflow-wrap:anywhere}.dd b{color:#211d18;font-weight:700}.da{flex:none;white-space:nowrap;font-weight:700}.da u{font-size:5.6pt;color:#544c42;font-weight:500;margin-inline-start:.6mm}
-  .lg2 tr.op td{background:#faf6ec;font-weight:500}.lg2 td.emp{text-align:center;color:#544c42;padding:5mm}
-  .lg2 tfoot td{font-weight:700;font-size:7.6pt;padding:1.5mm .8mm}.lg2 tr.ft1 td{border-top:.45mm solid #a87b1f}
-  .lg2 tr.ft2 td{background:#f4ecd8;border-top:.2mm solid #a87b1f;border-bottom:.2mm solid #2f2a24}.lg2 tr.ft2 td.fb{text-align:center}.lg2 tr.ft2 .nv bdi{font-size:10pt;font-weight:800}.lg2 tr.ft2 em{font-size:6.6pt;font-weight:800;margin-inline-start:1.6mm}
-  .lg2 thead{display:table-header-group}.lg2 tfoot{display:table-row-group}.lg2 tbody.en{break-inside:avoid;page-break-inside:avoid}`;
+  const LN='#5f5445',INK='#211d18';
+  const css=`.pg{max-width:${land?'277mm':'190mm'}}.per{display:flex;flex-wrap:wrap;gap:2mm;margin:1.6mm 0 0}.per span{border:.2mm solid #b8962e;background:#fbf4e1;color:#6f4f08;border-radius:99px;padding:.2mm 3mm;font-size:7.2pt;font-weight:700}
+  .rd{color:#9b1c31!important}.gr{color:#1d6b4a!important}.bl{color:#1f3f8f!important}.z{color:#8f8574!important}
+  .inf{border:.3mm solid ${INK};border-top:.3mm solid ${INK};border-bottom:.3mm solid ${INK}}.inf>div+div{border-inline-start:.2mm solid ${LN}}
+  .fbx{margin-top:2.6mm;border:.45mm solid ${INK};break-inside:avoid;page-break-inside:avoid}.fbt{background:${INK};color:#fff;font-size:8.4pt;font-weight:800;padding:.9mm 3mm 1.1mm}
+  .fks2{display:flex}.fk{flex:1;min-width:0;padding:1.6mm 3mm 1.8mm;border-top:1.1mm solid #1d6b4a}.fk+.fk{border-inline-start:.3mm solid ${INK}}.fk.d{border-top-color:#9b1c31}.fk.c{border-top-color:#1f3f8f}
+  .fkh{display:flex;align-items:baseline;gap:1.4mm}.fkh b{font-size:8.6pt;font-weight:800}.fkh u{font-size:6.8pt;font-weight:700;color:#544c42}
+  .fkv{display:flex;align-items:center;gap:2.4mm;margin:.4mm 0 .5mm}.fkv bdi{font-size:${land?'14':'17'}pt;font-weight:800;line-height:1.3;unicode-bidi:isolate;direction:ltr;color:#1d6b4a;white-space:nowrap}.fk.d .fkv bdi{color:#9b1c31}.fk.c .fkv bdi{color:#1f3f8f}
+  .fkv em{flex:none;margin-inline-start:auto;font-size:8pt;font-weight:800;color:#fff;background:#1d6b4a;border-radius:99px;padding:.2mm 3.2mm .4mm}.fk.d .fkv em{background:#9b1c31}.fk.c .fkv em{background:#1f3f8f}
+  .fks{font-size:7pt;font-weight:700;color:#38322b}
+  h2{border-top:.3mm solid ${INK};border-inline:.3mm solid ${INK};margin-top:3mm}
+  table.lg2{width:100%;table-layout:fixed;border-collapse:collapse;border:.4mm solid ${INK}}
+  .lg2 th,.lg2 td{border:.22mm solid ${LN}}
+  .lg2 th{font-size:7pt;font-weight:800;color:${INK};background:#f4ecd8;padding:1mm .8mm;text-align:center;line-height:1.35;white-space:normal}.lg2 th u{font-size:6pt;font-weight:700;color:#544c42}
+  .lg2 tr.g1 th.ds{text-align:right;padding-inline-start:2mm}.lg2 tr.g2 th{font-size:6.6pt;border-bottom:.45mm solid ${INK}}.lg2 tr.g1 th.grp{font-size:7.6pt}
+  .lg2 td{font-size:7.6pt;padding:1.3mm 1mm;vertical-align:middle}
+  .lg2 td.n{color:#38322b;text-align:center;font-size:7pt;width:auto}.lg2 td.dt{text-align:center;white-space:nowrap;color:${INK};font-size:7pt;font-weight:500}
+  .lg2 td.ds{padding-inline:2mm;word-break:break-word;overflow-wrap:anywhere}.lg2 td.ds .nm{display:block;font-weight:800;font-size:8.2pt}.lg2 td.ds .s{display:block;color:#38322b;font-size:6.6pt;line-height:1.5;margin-top:.2mm}
+  .lg2 td.dv,.lg2 td.bv{text-align:center;white-space:nowrap;overflow:hidden}.lg2 td bdi{display:block;unicode-bidi:isolate;direction:ltr;font-size:7.6pt;font-weight:500}.lg2 td small{display:block;font-size:5.8pt;font-weight:700;margin-top:.1mm}
+  .lg2 td.bv{background:#fbf7ec}.lg2 td.bv bdi{font-size:8.2pt;font-weight:800}
+  .lg2 tr.op td{background:#f4ecd8}.lg2 td.emp{text-align:center;color:#38322b;padding:5mm}
+  .lg2 tr.ft2 td{background:#f4ecd8;border-top:.55mm solid ${INK};padding:1.8mm 2mm;font-size:8.6pt;font-weight:800}.lg2 tr.ft2 td.fb{text-align:center;white-space:nowrap}.lg2 tr.ft2 td.fb bdi{display:inline;font-size:11pt;font-weight:800}.lg2 tr.ft2 u{font-size:6.4pt;font-weight:700;color:#38322b}.lg2 tr.ft2 em{font-size:7.2pt;font-weight:800;margin-inline-start:1.2mm}
+  .lgd{display:flex;flex-wrap:wrap;gap:.6mm 5mm;margin:1.6mm 0 0;font-size:6.8pt;font-weight:500;color:#38322b}.lgd b{font-weight:800}
+  .sign div{border-top:.3mm solid ${INK};color:#38322b;font-weight:700}
+  .lg2 thead{display:table-header-group}.lg2 tbody.en{break-inside:avoid;page-break-inside:avoid}`;
   return pdfDoc(stmtFile(c,S.F),html).replace(/@page\{size:A5 landscape;[^}]*\}/,land?'@page{size:A4 landscape;margin:9mm 10mm}':'@page{size:A4;margin:10mm 10mm}').replace('</head>','<style>'+css+'</style></head>')}
 ACT.stmtPdf=()=>{const c=curCu();if(!c)return;const F=stmF(c);if(!stmtData(c,F).rows.length&&!F.f){toast('ردیفی برای این جستجو نیست',true);return}openPrint(()=>stmtPdfHTML(c,F))};
 /* ---------- Excel ---------- */
