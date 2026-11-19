@@ -265,17 +265,22 @@ function kbChk(){const vv=window.visualViewport,h=Math.round(vv?vv.height:innerH
    اگر پنجره از جای دیدنی بلندتر باشد قفل نمی‌شود (فقط بالا می‌نشیند) تا چیزی پشت کیبورد گیر نکند. جاپرکن #qasp نمی‌گذارد صفحه کوتاه مانع بالا آمدن پنجره شود.
    با تأیید/افزودن یا انصراف قفل باز می‌شود؛ بعد از افزودن، صفحه نرم تا ردیف تازه می‌رود (qaAfter). */
 let QPIN=null;
-function qaUnpin(){const V=$('view');QPIN=null;clearTimeout(qaPin.t);clearTimeout(qaPin.s);document.documentElement.classList.remove('qapn');if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove()}
-function qaPin(){const V=$('view'),q=$('qa');if(!V||!q||cur!=='sell'||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){if(QPIN||$('qasp'))qaUnpin();return}
+/* v95.9 (باگ گزارش‌شده با عکس: «دو سه بار روی تشخیص می‌زنم، کادرها به هم می‌ریزد»): قفل پنجره سه راه فرار داشت —
+   (۱) بستن فهرست با زدن بیرون از کادر قفل را برنمی‌داشت (صفحه خالی با جستجوی چسبیده به بالا)؛ (۲) با بیرون رفتن از سند، QPIN و کلاس qapin روی #view می‌ماند
+   و صفحه حساب و فهرست مشتری‌ها هم به همان جا می‌پرید و اسکرول نمی‌شد؛ (۳) تایمر قفل بعد از ترک صفحه هم اجرا می‌شد. حالا qaPinned() همه جا بررسی می‌شود،
+   render() بیرون از سند قفل را برمی‌دارد، و با برداشتن قفل صفحه به جای قبل از قفل برمی‌گردد (y0) */
+const qaPinned=()=>!!(QPIN||$('qasp')||document.documentElement.classList.contains('qapn')||($('view')&&$('view').classList.contains('qapin')));
+function qaUnpin(){const V=$('view'),y0=QPIN&&cur==='sell'?QPIN.y0:null;QPIN=null;clearTimeout(qaPin.t);clearTimeout(qaPin.s);document.documentElement.classList.remove('qapn');if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove();if(V&&y0!=null)V.scrollTop=y0}
+function qaPin(){const V=$('view'),q=$('qa');if(!V||!q||cur!=='sell'||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){if(qaPinned())qaUnpin();return}
   /* نوار مانده پایین سند تا بسته شدن پنجره کنار می‌رود (مثل وقتی کیبورد باز است) تا پنجره همیشه جا شود و قفل بماند */document.documentElement.classList.add('qapn');
   let sp=$('qasp');if(!sp||sp.parentNode!==V){sp=document.createElement('div');sp.id='qasp';sp.setAttribute('aria-hidden','true');V.appendChild(sp)}
   const vv=window.visualViewport,vr=V.getBoundingClientRect(),avail=Math.max(120,Math.min(V.clientHeight,(vv?vv.height+vv.offsetTop:innerHeight)-vr.top));sp.style.height=Math.round(avail)+'px';
   const y=Math.max(0,Math.round(q.getBoundingClientRect().top-vr.top+V.scrollTop)-8),fits=q.getBoundingClientRect().height<=avail-12,first=!QPIN;
-  if(!qaPin.on){qaPin.on=1;V.addEventListener('scroll',()=>{if(QPIN&&QPIN.lock&&Math.abs(V.scrollTop-QPIN.y)>1)V.scrollTop=QPIN.y},{passive:true});
+  if(!qaPin.on){qaPin.on=1;V.addEventListener('scroll',()=>{if(!QPIN)return;if(cur!=='sell'||!$('qa')){qaUnpin();return}if(QPIN.lock&&Math.abs(V.scrollTop-QPIN.y)>1)V.scrollTop=QPIN.y},{passive:true});
     if(vv)vv.addEventListener('resize',()=>{if(QPIN)qaPin()})}
-  clearTimeout(qaPin.t);QPIN={y,lock:false,fits};
+  clearTimeout(qaPin.t);QPIN={y,lock:false,fits,y0:first?V.scrollTop:QPIN.y0};
   /* v93.5: اولین بار پنجره هنوز در حال بالا آمدن است (جایش چند پیکسل فرق دارد)؛ هنگام قفل جای واقعی دوباره خوانده می‌شود تا با پله‌های بعد یکی باشد */
-  const lock=re=>{if(!QPIN)return;if(re===1&&q.isConnected)QPIN.y=Math.max(0,Math.round(q.getBoundingClientRect().top-V.getBoundingClientRect().top+V.scrollTop)-8);V.scrollTop=QPIN.y;QPIN.lock=QPIN.fits;V.classList.toggle('qapin',QPIN.fits)};
+  const lock=re=>{if(!QPIN)return;if(cur!=='sell'||!q.isConnected||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){qaUnpin();return}if(re===1)QPIN.y=Math.max(0,Math.round(q.getBoundingClientRect().top-V.getBoundingClientRect().top+V.scrollTop)-8);V.scrollTop=QPIN.y;QPIN.lock=QPIN.fits;V.classList.toggle('qapin',QPIN.fits)};
   if(first&&!RM()&&Math.abs(V.scrollTop-y)>4){V.classList.remove('qapin');requestAnimationFrame(()=>{try{V.scrollTo({top:y,behavior:'smooth'})}catch(_){V.scrollTop=y}});qaPin.t=setTimeout(lock,420)}else lock();
   clearTimeout(qaPin.s);qaPin.s=setTimeout(()=>{if(QPIN&&$('qa')===q)lock(1)},470)}
 /* بعد از افزودن ردیف: صفحه تا ردیف تازه (کلیدی که قبلاً نبود) نرم می‌رود */

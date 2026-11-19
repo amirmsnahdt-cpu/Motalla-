@@ -201,7 +201,7 @@ function kb2(el,isOpen,open){if(!el||el._kb2)return;el._kb2=1;const sync=()=>{el
   el.addEventListener('blur',sync);
   el.addEventListener('keydown',e=>{if(el.readOnly&&e.key&&e.key.length===1){el.readOnly=false}})}
 document.addEventListener('pointerdown',e=>{if(!dkOpen||cur!=='sell'||!sv||!sv.qa||sv.qa.d||sv.qa.q)return;const t=e.target;if(t.closest&&(t.closest('.dkbox')||t.closest('#ov')))return;
-  dkOpen=false;const B=document.querySelector('.dkbox');if(B)B.classList.remove('open');const K=$('qK');if(K){if(document.activeElement===K)K.blur();K.readOnly=true}},true);
+  dkOpen=false;const B=document.querySelector('.dkbox');if(B)B.classList.remove('open');const K=$('qK');if(K){if(document.activeElement===K)K.blur();K.readOnly=true}if(typeof qaPin==='function')qaPin()/* v95.9: فهرست بسته شد → قفل صفحه هم برداشته شود */},true);
 
 /* v61.95 (خواسته صاحب اپ): وقتی کیبورد در پنجره ردیف سند باز است، لمس دکمه‌های همان پنجره (بعدی، پله‌ها، برگشت، افزودن، نوع کالا…)
    فوکوس را از فیلد نمی‌گیرد تا کیبورد پایین نرود؛ خود کلیک مثل همیشه اجرا می‌شود */
