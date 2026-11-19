@@ -4830,20 +4830,4 @@ html[data-theme=dark] .stkhero{background:linear-gradient(135deg,#b88a22 0%,#8a6
 /* v92.9 — پنجره ورود ردیف سند تا تأیید سر جایش قفل است */
 #view.qapin{overflow:hidden!important;overscroll-behavior:none}
 #qasp{flex:none;width:1px;pointer-events:none}
-/* v92.6 (طرح پیشنهادی) — صفحه‌کلید خود برنامه پایین پنجره قرمز/آبی ردیف سند: پله‌های عددی بدون کیبورد گوشی */
-.stw.haskp .st3 .stnx{display:none}
-.stw.haskp .st3{min-height:54px}.stw.haskp .st3 .stin{font-size:24px!important;font-weight:900;text-align:center;letter-spacing:.3px;caret-color:var(--blu)}
-.stw.haskp .st3 .stin::placeholder{font-size:13.5px;font-weight:700;letter-spacing:0}
-.qkp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.18fr);grid-auto-rows:46px;gap:8px;margin:10px 0 2px;padding:9px;border-radius:22px;background:color-mix(in srgb,var(--blu) 6%,color-mix(in srgb,var(--mut) 9%,var(--card)));box-shadow:inset 0 2px 5px rgb(16 32 70/.1);animation:bf3Up .35s cubic-bezier(.2,.9,.3,1.1) both;-webkit-user-select:none;user-select:none;touch-action:manipulation}
-.qkk{min-height:0;margin:0;padding:0;border:0;border-radius:14px;font:inherit;font-size:22px;font-weight:850;line-height:1;color:var(--ink);background:linear-gradient(180deg,var(--card),color-mix(in srgb,var(--mut) 8%,var(--card)));box-shadow:inset 0 1px 0 rgb(255 255 255/.75),0 2.5px 0 color-mix(in srgb,var(--mut) 38%,var(--card)),0 6px 8px -5px rgb(16 32 70/.28);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .07s,box-shadow .07s}
-button.qkk:active{transform:translateY(2.5px);box-shadow:inset 0 1px 0 rgb(255 255 255/.5),0 0 0 transparent}
-.qkk.em{background:none;box-shadow:none;cursor:default}
-.qkk.z3{font-size:16px;letter-spacing:1px}
-.qkk.fn{color:var(--mut);background:color-mix(in srgb,var(--mut) 13%,var(--card))}.qkk.fn.tx{font-size:13.5px;font-weight:900}.qkk.fn svg{width:22px;height:22px}
-.qkk.go{grid-row:span 2;flex-direction:column;gap:5px;color:#fff;font-size:14px;font-weight:900;background:linear-gradient(180deg,color-mix(in srgb,var(--blu) 86%,#fff),var(--blu));box-shadow:inset 0 1px 0 rgb(255 255 255/.35),0 3px 0 color-mix(in srgb,var(--blu) 62%,#000),0 9px 14px -7px color-mix(in srgb,var(--blu) 80%,transparent)}
-.qkk.go svg{width:24px;height:24px}.qkk.go svg.flip{transform:scaleX(-1)}
-button.qkk.go:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgb(255 255 255/.25),0 0 0 transparent}
-html[data-theme=dark] .qkk:not(.go,.em){box-shadow:inset 0 1px 0 rgb(255 255 255/.08),0 2.5px 0 rgb(0 0 0/.45),0 6px 8px -5px rgb(0 0 0/.5)}
-@media (max-height:700px){.qkp{grid-auto-rows:42px;gap:7px;padding:8px}.qkk{font-size:20px}}
-.qkk .qbs{width:25px;height:25px}.qkk .qdt{font-size:30px;line-height:.4;transform:translateY(-6px)}
-.qkk.go svg,.qkk.go svg *{color:#fff;stroke:#fff;opacity:1}
+html.qapn #app:not(.home) #act{display:none!important}
