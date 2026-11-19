@@ -227,10 +227,9 @@ const pxHitC=(c,T,dOk)=>{if(!T.length)return true;const h=nzName(toEn(cuHay(c)))
 /* v93.4 (خواسته صاحب اپ: «ظاهرشان مرتب‌تر»): مشتری و بانک یک شکل ردیف دارند — نشان گرد، نام یک‌خطی، یک خط ریز، و مبلغ در یک کادر کوچک در انتها */
 const pxRow=o=>`<${o.tag||'button type="button"'} class="pxu${o.tag?'':' px7o'}${o.cls?' '+o.cls:''}"${o.at||''} style="--r:${Math.min(o.ri||0,8)}">${o.av}<span class="pxut"><b>${esc(o.nm)}</b><small>${o.sub||''}</small></span>${o.v||''}</${o.tag?'div':'button'}>`;
 const pxAvT=(nm,ex)=>`<span class="pxua"${ex||''}>${esc(userInit(nm||'؟'))}</span>`;
-function pxCuRow(c,b,ri){const R=b.R,G=b.G,v=R||G,k=v<0?'r':v>0?'b':'z',ex=R&&G?`<em class="${G<0?'r':'b'}">${G<0?'طلب':'بدهی'} ${wFmt(Math.abs(G))} گرم طلا</em>`:'';
-  return pxRow({ri,at:` data-act="pxPick" data-k="cu" data-id="${c.id}"`,av:pxAvT(cuName(c),` style="--h:${cuHue(c)}"`),nm:cuName(c),sub:cuNoH(c)+`<span>${cuSub(c)}</span>`,
-    v:`<span class="pxuv ${k}">${v?`<small>${v<0?'طلب ما':'بدهی ما'}</small><b>${R?fmt(Math.abs(R)):wFmt(Math.abs(G))}<i>${R?'تومان':'گرم'}</i></b>${ex}`:'<small>تسویه</small>'}</span>`})}
-function pxCuL(B){return `<div class="pxul">${B.map(([c,b],ri)=>pxCuRow(c,b,ri)).join('')}</div>`}
+/* v93.6 (خواسته صاحب اپ، با عکس: «لیست بانک‌های مغازه هم باید به این شکل باشد»): هر دو زبانه همان کارت فهرست حساب‌ها را دارند (cuRowH: شماره، نام، گروه، کادر «مبلغ · طلبکاریم»،
+   برای بانک‌ها لوگو و نقش کم‌رنگ پشت کارت). ردیف فشرده pxRow فقط برای چیزهایی که حساب ندارند می‌ماند (منبع بدون حساب بانکی، افراد بدون حساب، پرداخت‌کننده تازه، بانک فعلی) */
+function pxCuL(B){const PW=pendMap();return `<div class="cuLs"><div class="c6l c6lb cuL">${B.map(([c,b],ri)=>cuRowH(c,b,ri,PW,{act:'pxPick',k:'cu',sw:false,cls:'px7o'})).join('')}</div></div>`}
 const pxGh=(t,n)=>`<div class="c6gh px9g">${t}${n?` <i>${toFa(n)}</i>`:''}</div>`;
 function pxCuList(){const q0=clean(PX.q||''),T=pxTok(q0),dOk=pDig(q0),me=pxMe(),O=pxOwe().filter(o=>pxHitC(o.c,T,dOk)&&pxCuF(o.c,o.b)),out=[],fl=!!(PX.dt||PX.fg||PX.fk);
   if(O.length)out.push(pxGh(T.length?'طلب ما · نتیجه جستجو':'طلب ما از این مشتری‌ها',O.length),pxCuL(O.map(o=>[o.c,o.b])));
@@ -250,7 +249,7 @@ function pxBkList(){const x=entRow(),q0=clean(PX.q||''),q=nzName(toEn(q0)),out=[
   const A=pxBkAll(q,q0),bkAv=(bk,nm)=>bk&&bkLogo(bk)?`<span class="pxua lg">${bankBadge(bk,'lg')}</span>`:pxAvT(nm),row=(o,ri,act,ex,sub0)=>{const c=o.c,so=o.s,bk=c?bkOfCu(c):acBank(so),nm=c?cuName(c):so.name,m=c?null:acSum(so),v=c?bkCuBal(c):m.known?Math.round(m.fin):null;
     return pxRow({ri,at:` data-act="pxBkGo" data-a="${act}"${ex||''} ${c?`data-cu="${c.id}"`:`data-id="${so.id}"`}`,av:bkAv(bk,nm),nm,sub:`<span>${esc(sub0||(c?(bk&&!canon(nm).includes(canon(bk))?'بانک '+bk:'حساب بانکی مغازه'):'منبع واریز · بدون حساب بانکی'))}</span>`,
       v:`<span class="pxuv ${v==null?'z':v<0?'r':'n'}">${v==null?'<small>مانده ثبت نشده</small>':`<small>${c?'مانده بانک':'مانده منبع'}</small><b>${v<0?'−':''}${fmt(Math.abs(v))}<i>تومان</i></b>`}</span>`})};
-  const lst=(L,act,ex,subF)=>{const a=L.filter(o=>o.c),b=L.filter(o=>!o.c);return (a.length?`<div class="pxul">${a.map((o,i)=>row(o,i,act,ex,subF&&subF(o))).join('')}</div>`:'')+(b.length?pxGh('منبع‌های دیگر · بدون حساب بانکی',b.length)+`<div class="pxul">${b.map((o,i)=>row(o,i,act,ex,subF&&subF(o))).join('')}</div>`:'')};
+  const lst=(L,act,ex,subF)=>{const a=L.filter(o=>o.c),b=L.filter(o=>!o.c);return (a.length?`<div class="cuLs"><div class="c6l c6lb cuL">${a.map((o,i)=>cuRowH(o.c,cuBal(o.c),i,null,{act:'pxBkGo',sw:false,cls:'px7o',at:` data-a="${act}"${ex||''} data-cu="${o.c.id}"`,note:subF&&subF(o)||''})).join('')}</div></div>`:'')+(b.length?pxGh('منبع‌های دیگر · بدون حساب بانکی',b.length)+`<div class="pxul">${b.map((o,i)=>row(o,i,act,ex,subF&&subF(o))).join('')}</div>`:'')};
   /* بخشی که هنوز بانک ندارد و باید یک‌جا بانک بگیرد: همان بخشی که رویش زده شده (pc) یا مانده اصلیِ ارسال‌نشده وقتی بقیه ارسال شده‌اند */
   const pcR=PX.pc!=null?F.find(r=>String(r.id)===String(PX.pc)&&!r.sentBid):null,free=sent?(pcR||(!xr.sentBid?xr:null)):(pcR&&pcR.id!==xr.id&&!pkSrcOf(pcR.id)?pcR:null);
   if(free){if(!A.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانکی در مغازه تعریف نشده'}</b></div>`;
