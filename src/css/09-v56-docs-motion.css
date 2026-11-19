@@ -4863,3 +4863,6 @@ html.qapn #app:not(.home) #act{display:none!important}
 .pxuk{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--blu);color:#fff}.pxuk svg{width:16px;height:16px}
 @media (max-width:370px){.px9 .pxu{gap:9px;padding:0 10px}.pxua{width:40px;height:40px}.pxuv b{font-size:14px}}
 @media (prefers-reduced-motion:reduce){.px9 .pxu{animation:none}}
+
+/* v93.6 — پنجره «پرداخت از کجا؟»: بانک‌ها هم با همان کارت فهرست حساب‌ها؛ یادداشت کوچک کنار گروه (مثلاً «الان … از این حساب») */
+.c6r .tx small .c6nt{font-style:normal;font-weight:800;color:var(--blu)}
