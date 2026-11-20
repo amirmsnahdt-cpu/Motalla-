@@ -4949,6 +4949,40 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 #updn .go{flex:none;font-size:13px;font-weight:850;color:#fff;background:var(--blu);border-radius:14px;padding:9px 13px;box-shadow:0 8px 18px -10px var(--blu)}
 #updn .ux{flex:none;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;font-size:19px;line-height:1;font-weight:700;color:var(--mut);background:color-mix(in srgb,var(--mut) 13%,var(--card))}
 @media (prefers-reduced-motion:reduce){#updn{animation:none}}
+
+/* ---- v98.0 تخصیص: «بخشی از یک واریزی به این منبع» + رفع ایرادهای ظاهری پنجره تخصیص ---- */
+/* سربرگ چسبان تا لبه‌های پنجره می‌رسد (کارت‌های منبع از کنارش بیرون می‌زدند) و زیرنویس یک خط است */
+#sheet .ash .sh-h{margin-inline:calc(-1 * var(--ashp,16px));padding-inline:var(--ashp,16px);box-shadow:0 1px 0 var(--hair),0 12px 14px -14px #0b142640}
+#sheet .ash .sh-h .shsub{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#sheet .ash .sh-h>div{min-width:0}
+/* کارت منبع انتخاب‌شده با قاب و سایه‌اش بریده نشود */
+#sheet .asrcs{padding:10px 12px 16px!important;margin:0 -12px!important;scroll-padding-inline:12px}
+/* دکمه‌های سریع مبلغ نصفه بریده نشوند؛ فاصله بین کادرهای بخش ۲ */
+#sheet .ash .qchips{flex-wrap:wrap;justify-content:center;overflow:visible;gap:8px}
+#sheet .ash #aparam{display:flex;flex-direction:column;gap:10px}
+#sheet .ash #aparam>*{margin-block:0}
+/* مبلغ ردیف انتخاب‌شده = دکمه «بخشی از مبلغ» */
+#sheet .ash .arow .ampx{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:1px;margin:0;padding:5px 9px;min-height:0;border:0;border-radius:13px;font:inherit;letter-spacing:0;cursor:pointer;color:var(--ink);background:color-mix(in srgb,var(--blu) 8%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 26%,transparent)}
+#sheet .ash .arow .ampx b{font-size:14px;font-weight:900;letter-spacing:0;font-feature-settings:normal;white-space:nowrap}
+#sheet .ash .arow .ampx small{display:flex;align-items:center;gap:3px;font-size:10.5px;font-weight:800;color:var(--blu);white-space:nowrap}
+#sheet .ash .arow .ampx small svg{width:11px;height:11px}
+#sheet .ash .arow.pt .ampx{background:var(--blu);box-shadow:0 6px 14px -8px var(--blu)}
+#sheet .ash .arow.pt .ampx b,#sheet .ash .arow.pt .ampx small{color:#fff}
+#sheet .ash .apx{margin:0 0 10px;padding:12px 12px 14px;border-radius:20px;background:var(--card);--bfr:0 0 0 1.5px var(--blu),0 0 0 5px color-mix(in srgb,var(--blu) 14%,transparent);box-shadow:var(--bfr);animation:bf3Up .3s cubic-bezier(.2,.9,.3,1.1) both}
+#sheet .ash .apxh{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+#sheet .ash .apxh>span{display:flex;flex-direction:column;min-width:0;line-height:1.5}
+#sheet .ash .apxh b{font-size:14px;font-weight:850}#sheet .ash .apxh small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sheet .ash .apx .apxi{margin:8px 0 10px}
+#sheet .ash .apxr{margin-top:10px;font-size:12px;font-weight:700;color:var(--mut);text-align:center;line-height:1.6}
+#sheet .ash .apxr.ok{color:var(--ok)}#sheet .ash .apxr.bad{color:var(--red)}
+#sheet .ash .apxok{width:100%;margin-top:10px;min-height:44px;border:0;border-radius:14px;background:var(--blu);color:#fff;font:inherit;font-size:14px;font-weight:850;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+#sheet .ash .apxok svg{width:17px;height:17px}
+#sheet .ash .agap{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:10px 12px;border:1.5px dashed color-mix(in srgb,var(--blu) 55%,transparent);border-radius:16px;background:color-mix(in srgb,var(--blu) 7%,var(--card));font:inherit;text-align:start;cursor:pointer}
+#sheet .ash .agap svg{flex:none;width:22px;height:22px;color:var(--blu)}
+#sheet .ash .agap span{display:flex;flex-direction:column;min-width:0;line-height:1.55}
+#sheet .ash .agap b{font-size:13.5px;font-weight:850;color:var(--blu)}#sheet .ash .agap small{font-size:11.5px;color:var(--mut)}
+#sheet .ash .apxtip{display:flex;align-items:flex-start;gap:8px;margin:12px 4px 2px;font-size:11.5px;line-height:1.75;color:var(--mut)}
+#sheet .ash .apxtip svg{flex:none;width:15px;height:15px;margin-top:4px}
 /* ---- v96.3 صفحه‌کلید حروف داخل پنجره ردیف (پله‌های متنی): همان قاب و همان قد صفحه‌کلید عددی ---- */
 .stw.haskb .st3 .stin{font-size:18px!important;font-weight:800;text-align:start;letter-spacing:0;line-height:39.6px}
 .qkp.qkb{display:flex;flex-direction:column;gap:8px;height:226px;box-sizing:border-box;padding:9px 6px}

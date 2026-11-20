@@ -88,7 +88,7 @@ const ACT={
   allocNew:()=>allocNew(),
   aSrc:d=>{aSt.srcId=+d.id;const s=sources.find(x=>x.id==aSt.srcId)||{};if(s.bank)aSt.bank=s.bank;/* v86.5: روش عوض نمی‌شود؛ مبلغ = موجودی آزاد منبع تازه (اگر کاربر خودش نزده) */if(aSt.method==='amount'&&aSt.amtAuto!==0)aSt.amount=aFill(s);allocSheet();recalc()},
   aAll:()=>{const q=aSt.q.trim();aPool().filter(x=>!aSt.sel.has(x.id)&&(!q||match(x,q))).forEach(x=>aSt.sel.add(x.id));renderPrev()},
-  aNone:()=>{aSt.sel=new Set();renderPrev()},
+  aNone:()=>{aSt.sel=new Set();aSt.part={};aSt.pe=null;renderPrev()},
   aMeth:d=>{aSt.method=d.m;if(d.m==='amount'&&!(aSt.amount>0)){aSt.amount=aFill(sources.find(x=>x.id==aSt.srcId));aSt.amtAuto=1}allocSheet();recalc()},aSave:()=>allocSave(),
   partView:d=>{partId=+d.id;partAll=!d.r;partOrd.k='';if(cur==='part'){const v=$('view'),y=v.scrollTop;render();v.scrollTop=y}else go('part')},
   partExp:()=>{const p=curPart();if(!p)return;const P=partSel();openExport(partSelAlloc(),'0');expCtx.track=true;expCtx.parts=P.map(z=>z.id)},
