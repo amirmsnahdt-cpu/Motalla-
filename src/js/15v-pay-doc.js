@@ -103,20 +103,20 @@ function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settle
     /* v90.9: «مانده» = بخش بدون بانک، وقتی بخش دیگری بانک دارد (مثلاً بعد از کم شدن تسویه مشتری) — جدا و قرمز دیده می‌شود */
     const remP=!q&&!s&&bk.some(o=>o.r.sentBid||o.s);
     const tag=remP?'مانده':root&&hasCu&&!multi?'مانده · بانک':'بانک',ttl=remP?'مانده پرداخت‌نشده':s?esc(s.name):'انتخاب بانک',
-      sub=[remP?(edB?'بزنید و بانک را انتخاب کنید':'بانک انتخاب نشده'):st[1],multi&&!remP?'بخش '+toFa(k+1):'',PD(r)!==PD(x)?'واریز '+esc(payLab(PD(r))):'',q&&q.it.tn?'پیگیری '+esc(toFa(q.it.tn)):''].filter(Boolean).join(' · ');
+      sub=[remP?(edB?'بزنید و بانک را انتخاب کنید':'بانک انتخاب نشده'):st[1],PD(r)!==PD(x)?'واریز '+esc(payLab(PD(r))):'',q&&q.it.tn?'پیگیری '+esc(toFa(q.it.tn)):''].filter(Boolean).join(' · ');
     /* v77.3 (باگ گزارش‌شده): بخشی از واریزی به بانک‌ها رفته (ارسال‌شده) و مانده اصلی هنوز بانک ندارد — ردیف مانده قابل زدن نبود و
        «افزودن پرداخت › بانک» هم بسته بود. حالا مانده اصلی ارسال‌نشده همیشه بانک می‌گیرد (زدن = انتخاب/تغییر بانک؛ با بانک = ثبت واریز) */
     const rootFree=edB&&!r.sentBid&&F.some(z=>z.sentBid);/* v90.9: هر بخش ارسال‌نشده (نه فقط اصلی) — مانده هم بانک می‌گیرد */
-    const act=q?`data-act="itOpen" data-b="${q.b.id}" data-i="${q.i}"`:rootFree?(s&&tk?`data-act="bkGo" data-id="${r.id}"`:`data-act="entMove" data-id="${r.id}"`):!edB||F.some(z=>z.sentBid)?(s&&tk?`data-act="bkGo" data-id="${r.id}"`:''):root?`data-act="entMove" data-id="${r.id}"`:`data-act="pkEdit" data-id="${r.id}"`;
+    const act=q?`data-act="itOpen" data-b="${q.b.id}" data-i="${q.i}"`:rootFree?(s&&tk?`data-act="bkGo" data-id="${r.id}"`:`data-act="entMove" data-id="${r.id}"`):!edB||F.some(z=>z.sentBid)?(s&&tk?`data-act="bkGo" data-id="${r.id}"`:''):root||!s?`data-act="entMove" data-id="${r.id}"`:`data-act="pkEdit" data-id="${r.id}"`;
     const cam=q?(n||tk?`<button class="py7c${n?' on':''}" data-act="galIt" data-id="${r.id}" aria-label="رسیدهای واریز">${ic(n?'cam':'plus')}${n>1?`<em>${toFa(n)}</em>`:''}</button>`:''):s&&tk?`<button class="py7c" data-act="bkGo" data-id="${r.id}" aria-label="ثبت واریز و رسید">${ic('plus')}</button>`:'';
     const row=`<div class="py7r b py9 ${st[0]}${remP?' rm':''}${pyFlash!=null&&String(pyFlash)===String(r.id)?' nw':''}"><${act?'button':'div'} class="py7b" ${act}><span class="py7a bk">${remP?ic('plus'):bkAv(s)}</span><span class="tx"><b>${ttl}</b><small>${sub}</small></span><span class="py7v"><em class="py9t ${remP?'r':'b'}">${tag}</em><b>${fmt(q&&q.it.amount!=null?+q.it.amount:r.amount)}<i>تومان</i></b></span></${act?'button':'div'}>${cam}</div>`;
     let R=[],L=[];
     if(q){if(tk&&!cl)R=q.it.st==='ok'?[['entTkQ','لغو تأیید','undo','#6b7385']]:[['entTkQ','تأیید','check','#178049']];
-      if(edB&&!cl){const xr=validated().find(z=>z.id===rootId);if(xr&&ssCan(xr)&&!lk)L.push(['sentSplit','ویرایش','edit','#3b6fd6']);if(tk&&q.it.st!=='fail'&&q.it.st!=='ok')L.push(['entTkF','ناموفق','x','#d23c48']);if(root&&xr)L.push(['entUnalloc','حذف تخصیص','x','#d23c48'])/* v69.13: همیشه دیده می‌شود؛ اگر قفل است، دلیلش گفته می‌شود */}}
+      if(edB&&!cl){const xr=validated().find(z=>z.id===rootId);if(xr&&ssCan(xr)&&!lk)L.push(['sentSplit','ویرایش','edit','#3b6fd6']);if(tk&&q.it.st!=='fail'&&q.it.st!=='ok')L.push(['entTkF','ناموفق','x','#d23c48']);if(xr)L.push(['entUnalloc','حذف تخصیص','x','#d23c48'])/* v69.13: همیشه دیده می‌شود؛ اگر قفل است، دلیلش گفته می‌شود · v98.2: روی هر بخش، فقط همان بخش */}}
     else{if(s&&tk)R=[['bkGo','ثبت واریز','check','#178049']];
       /* بخشی ارسال شده باشد: مبلغ بخش‌های ارسال‌نشده از بانک اصلی ارسال‌شده کم/زیاد نمی‌شود؛ اول این بخش هم ثبت شود، بعد «ویرایش» همه بخش‌ها */
-      if(rootFree)L=[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6']];
-      if(edB&&!F.some(z=>z.sentBid))L=root?[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6'],...(s||F.length>1?[['entUnalloc','حذف تخصیص','x','#d23c48']]:[])]:[['pkEdit','ویرایش','edit','#3b6fd6'],['pkDel','برداشتن','trash','#d23c48']]}
+      if(rootFree)L=[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6'],...(s?[['entUnalloc','حذف تخصیص','x','#d23c48']]:[])];
+      if(edB&&!F.some(z=>z.sentBid))L=root||!s?[['entMove',s?'تغییر بانک':'انتخاب بانک','swap','#3b6fd6'],...(s?[['entUnalloc','حذف تخصیص','x','#d23c48']]:[])]:[['pkEdit','ویرایش','edit','#3b6fd6'],['entUnalloc','حذف تخصیص','x','#d23c48']]}
     if(!q&&can('split')&&!x.full)L=[...L,['pkDate','تاریخ واریز','cal','#7a4fd6']];/* v78.0 */
     R=[...R,!q&&s&&tk?['pyCpSend','کپی و ارسال','copy','#b8862b']:['pyCp','کپی','copy','#b8862b']];/* v77.2: کپی با کشیدن به چپ؛ v77.8: بخش آماده ارسال = کپی و ارسال همان‌جا */
     return swW(row,{r:R,l:L,data:{id:r.id,st:'ok',b:q?q.b.id:'',i:q?q.i:'',k:'b',e:x.id}})};
@@ -142,7 +142,7 @@ function pyRe(){const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y}
 
 /* ---------- پنل «پرداخت از کجا؟»: مرحله ۱ جستجو (فهرست = اسکرول خود پنل، جستجو چسبیده بالا)، مرحله ۲ مبلغ و رسید ---------- */
 let PX=null;
-const pxRest=()=>{if(PX.bz)return Math.max(0,num(bz.d.amount||0)-bzStlSum());const x=entRow();if(!x)return 0;if(PX.sel&&PX.sel.k==='bk'){const L=pkL(x);return Math.max(0,(L[0]?+L[0].amount:0)+(PX.edit!=null?pkCur():0))}return Math.max(0,+x.amount||0)};
+const pxRest=()=>{if(PX.bz)return Math.max(0,num(bz.d.amount||0)-bzStlSum());const x=entRow();if(!x)return 0;if(PX.pg!=null){const r=famOf(x).find(z=>String(z.id)===String(PX.pg));return r&&!r.sentBid?Math.max(0,+r.amount||0):0}if(PX.sel&&PX.sel.k==='bk'){const L=pkL(x);return Math.max(0,(L[0]?+L[0].amount:0)+(PX.edit!=null?pkCur():0))}return Math.max(0,+x.amount||0)};
 /* ---------- v66.0 (خواسته صاحب اپ): «بخشی از مبلغ از بانک دیگر» بدون پنجره چند منبع ----------
    بخش‌ها همان واریزی‌های همراه (splitOf) هستند و با psApply ساخته می‌شوند؛ این فقط راه ساده‌تر ثبت است:
    بانک را بزنید، مبلغ را بزنید؛ از مانده بانک اصلی کم می‌شود و در «پرداخت این واریزی» یک ردیف با مانده می‌آید. */
@@ -160,8 +160,30 @@ function pkSave(x,srcId,a,edit){const L=pkL(x);if(!L.length)return false;if(L.so
   if(a>L[0].amount)return false;const j=L.findIndex((l,i)=>i>0&&l.src===srcId);
   if(a===L[0].amount){if(j>0){L[0].amount+=L[j].amount;L.splice(j,1)}L[0].src=srcId;pkGo(x,L,'همه مبلغ بانکی از «'+srcName(srcId)+'»');return true}
   L[0].amount-=a;if(j>0)L[j].amount+=a;else L.push({src:srcId,amount:a});pkGo(x,L,fmt(a)+' تومان از «'+srcName(srcId)+'» · مانده '+fmt(L[0].amount));return true}
-ACT.pkDel=d=>{const x=entRow();if(!x)return;const L=pkL(x),j=L.findIndex(l=>String(l.id)===String(d.id));if(j<1)return;const l=L[j];
-  askConfirm('بخش «'+(srcName(l.src)||'بانک')+'» ('+fmt(l.amount)+' تومان) برداشته شود؟ مبلغش به بانک اصلی برمی‌گردد.','برداشتن',()=>{L[0].amount+=l.amount;L.splice(j,1);pkGo(x,L,'مبلغ به بانک اصلی برگشت')})};
+/* ---------- v98.2 (خواسته صاحب اپ: «تقسیم بین چند بانک از همین صفحه هم بشود») ----------
+   هر کار روی همان بخشی است که رویش زده شده (نه همیشه واریزی اصلی)، پس وقتی بخشی از واریزی ارسال شده هم کار می‌کند:
+   pcGive(id,srcId,a): a تومان از بخش ارسال‌نشده id به بانک srcId می‌رود؛ همه مبلغ = همان بخش جابه‌جا می‌شود، کمتر = یک بخش تازه با همان مبلغ
+   برای آن بانک ساخته می‌شود و بقیه سر جای خودش (با بانک قبلی یا بدون بانک) می‌ماند. جمع واریزی، تسویه‌های مشتری و بخش‌های دیگر دست نمی‌خورد.
+   famTidy(rootId): بخش‌های ارسال‌نشده بدون بانک (مانده‌ها) با یک تاریخ واریز یکی می‌شوند؛ بخش‌های بانک‌دار دست نمی‌خورند (دو حواله جدا از یک بانک ممکن است عمدی باشد). */
+function famTidy(rootId){const now=new Date().toISOString(),G=new Map(),dead=new Set();
+  entries.forEach(e=>{if((e.id===rootId||e.splitOf===rootId)&&!e.del&&e.sentBid==null&&!pkSrcOf(e.id)){const k=e.payDate||e.entryDate||'';if(!G.has(k))G.set(k,[]);G.get(k).push(e)}});
+  G.forEach(L=>{if(L.length<2)return;const keep=L.find(e=>e.id===rootId)||L.slice().sort((a,b)=>a.id-b.id)[0];
+    L.forEach(e=>{if(e===keep||e.id===rootId||(e.settles||[]).length)return;keep.amount=(+keep.amount||0)+(+e.amount||0);if(e.unlk)keep.unlk=(keep.unlk||[]).concat(e.unlk);dead.add(e.id)});keep.updatedAt=now;keep.updatedBy=who()});
+  if(!dead.size)return 0;entries=entries.filter(e=>!dead.has(e.id));memoClear();alloc=null;return dead.size}
+function pcGive(id,srcId,a){const x=validated().find(r=>String(r.id)===String(id)),e=x&&entries.find(z=>z.id===x.id),so=sources.find(z=>String(z.id)===String(srcId)&&!z.cash);
+  if(!x||!e||!so||e.sentBid!=null||x.full||!can('split'))return null;a=Math.round(+a||0);const net=+x.amount||0,cur0=pkSrcOf(e.id);if(!(a>0)||a>net||cur0===String(so.id))return null;
+  const rid=famRoot(x),root=entries.find(z=>z.id===rid)||e,now=new Date().toISOString(),k0=ldKey;let tid=e.id;
+  if(a<net){e.amount=(+e.amount||0)-a;e.updatedAt=now;e.updatedBy=who();
+    const n={id:nid++,splitOf:root.id,name:root.name,title:root.title||'',code:root.code||'',iban:root.iban||'',card:root.card||'',bank:root.bank||'',holder:root.holder||'',phone:root.phone||'',nid:root.nid||'',entryDate:root.entryDate,payDate:e.payDate||root.payDate||root.entryDate,amount:a,settles:[],note:'',createdBy:who(),updatedBy:who(),updatedAt:now};
+    entries.push(n);tid=n.id;memoClear();alloc=null}
+  ldKey=PD(x);const own=tid===e.id?allParts().find(p=>!p.sent&&(p.ids||[]).includes(e.id))||null:null;moveTo([tid],own,so,null,1);ldKey=k0;
+  famTidy(rid);saveE();saveD();memoClear();alloc=null;
+  logA('split',a<net?'بخشی از واریزی به بانک':own?'تغییر بانک بخش':'تخصیص به منبع',fullName(x)+' | '+fmt(a)+' تومان | '+(cur0&&own?srcName(cur0)+' ← ':'')+so.name+(a<net?' | بقیه '+fmt(net-a)+(cur0?' در «'+srcName(cur0)+'»':' بدون بانک'):''));return {id:tid,rest:net-a,cur:cur0}}
+/* بخشی که در زبانه «بانک‌های مغازه» بانک می‌گیرد (همه یا بخشی از مبلغش): همان که رویش زده شده؛ وگرنه مانده بدون بانک؛
+   وقتی بخشی ارسال شده، هر بخش ارسال‌نشده. null = مسیر قدیمی «بانک اصلی» (واریزی ارسال‌نشده‌ای که روی ردیف اصلی‌اش زده شده یا مانده ندارد) */
+function pxFreeP(){const x=entRow();if(!x||!PX)return null;const F=famOf(x),rid=famRoot(x),U=F.filter(r=>!r.sentBid&&r.amount>0),pcR=PX.pc!=null?U.find(r=>String(r.id)===String(PX.pc)):null,nb=U.find(r=>!pkSrcOf(r.id)&&(r.id!==rid||F.some(z=>z.sentBid)));
+  if(F.some(r=>r.sentBid))return pcR||nb||U[0]||null;if(pcR)return pcR.id!==rid&&!pkSrcOf(pcR.id)?pcR:null;return nb||null}
+ACT.pxPcPick=d=>{pxRead();const x=validated().find(r=>String(r.id)===String(d.e));if(!x||x.sentBid)return;PX.sel={k:'bk',id:d.id};PX.pg=x.id;PX.edit=null;PX.amount=+x.amount||0;PX.step=2;pxRe(1)};
 ACT.pkEdit=d=>{const x=entRow();if(!x)return;const L=pkL(x),l=L.find(z=>String(z.id)===String(d.id));if(!l)return;PX={step:2,q:'',sel:{k:'bk',id:l.src},amount:l.amount,tn:'',note:'',imgD:'',bz:false,dir:1,edit:l.id,more:{}};sheet(pxHTML());pxBind()};
 /* از صفحه لیست/تخصیص: همان پنل، فقط بانک‌ها */
 ACT.pkFrom=d=>{closeSheet();entId=d.id;setTimeout(()=>{PX={step:1,q:'',sel:null,amount:0,tn:'',note:'',imgD:'',bz:false,dir:1,only:'bk',more:{}};sheet(pxHTML());pxBind()},60)};
@@ -245,16 +267,16 @@ function pxBkList(){const x=entRow(),q0=clean(PX.q||''),q=nzName(toEn(q0)),out=[
   /* v77.3: مانده اصلی هنوز ارسال نشده (بقیه بخش‌ها ارسال‌شده) → انتخاب بانک برای همین مانده */
   /* v93.3 (خواسته صاحب اپ: «قسمت حساب‌های بانکی مثل همان حساب‌های بانک سندها باشد؛ مانده‌ها با مانده حساب‌های بانک یکی باشد؛ واریز از بانک دیگر مغازه منبع خودش را بسازد»):
      فهرست = حساب‌های نوع «بانک» با مانده خود همان حساب (bkCuBal، همان عدد کارت بانک)، هر کدام به منبع واریز خودش وصل (pxBkSrc: منبع وصل‌شده، هم‌نام، یا منبع تازه که همان لحظه ساخته می‌شود)؛
-     منبع‌های قدیمی که حساب بانکی ندارند جدا زیرش می‌آیند. انتخاب هر کدام همان مسیر قبلی «بخش بانکی» است (pxPick / pxSentBk / pxRootBk با شناسه منبع). */
+     منبع‌های قدیمی که حساب بانکی ندارند جدا زیرش می‌آیند. انتخاب هر کدام همان مسیر قبلی «بخش بانکی» است (pxPick / pxSentBk / pxPcPick با شناسه منبع). */
   const A=pxBkAll(q,q0),bkAv=(bk,nm)=>bk&&bkLogo(bk)?`<span class="pxua lg">${bankBadge(bk,'lg')}</span>`:pxAvT(nm),row=(o,ri,act,ex,sub0)=>{const c=o.c,so=o.s,bk=c?bkOfCu(c):acBank(so),nm=c?cuName(c):so.name,m=c?null:acSum(so),v=c?bkCuBal(c):m.known?Math.round(m.fin):null;
     return pxRow({ri,at:` data-act="pxBkGo" data-a="${act}"${ex||''} ${c?`data-cu="${c.id}"`:`data-id="${so.id}"`}`,av:bkAv(bk,nm),nm,sub:`<span>${esc(sub0||(c?(bk&&!canon(nm).includes(canon(bk))?'بانک '+bk:'حساب بانکی مغازه'):'منبع واریز · بدون حساب بانکی'))}</span>`,
       v:`<span class="pxuv ${v==null?'z':v<0?'r':'n'}">${v==null?'<small>مانده ثبت نشده</small>':`<small>${c?'مانده بانک':'مانده منبع'}</small><b>${v<0?'−':''}${fmt(Math.abs(v))}<i>تومان</i></b>`}</span>`})};
   const lst=(L,act,ex,subF)=>{const a=L.filter(o=>o.c),b=L.filter(o=>!o.c);return (a.length?`<div class="cuLs"><div class="c6l c6lb cuL">${a.map((o,i)=>cuRowH(o.c,cuBal(o.c),i,null,{act:'pxBkGo',sw:false,cls:'px7o',at:` data-a="${act}"${ex||''} data-cu="${o.c.id}"`,note:subF&&subF(o)||''})).join('')}</div></div>`:'')+(b.length?pxGh('منبع‌های دیگر · بدون حساب بانکی',b.length)+`<div class="pxul">${b.map((o,i)=>row(o,i,act,ex,subF&&subF(o))).join('')}</div>`:'')};
   /* بخشی که هنوز بانک ندارد و باید یک‌جا بانک بگیرد: همان بخشی که رویش زده شده (pc) یا مانده اصلیِ ارسال‌نشده وقتی بقیه ارسال شده‌اند */
-  const pcR=PX.pc!=null?F.find(r=>String(r.id)===String(PX.pc)&&!r.sentBid):null,free=sent?(pcR||(!xr.sentBid?xr:null)):(pcR&&pcR.id!==xr.id&&!pkSrcOf(pcR.id)?pcR:null);
+  const free=pxFreeP();
   if(free){if(!A.length)return `<div class="px7e px9e">${ic('bank')}<b>${q?'بانکی با «'+esc(q0)+'» نیست':'بانکی در مغازه تعریف نشده'}</b></div>`;
     const fs=pkSrcOf(free.id),A2=fs?A.filter(o=>!(o.s&&String(o.s.id)===fs)):A;
-    return pxGh(fs?'تغییر بانکِ '+fmt(free.amount)+' تومان · الان «'+esc(srcName(fs))+'»':'مانده '+fmt(free.amount)+' تومان از کدام بانک واریز شود؟',A2.filter(o=>o.c).length||A2.length)+lst(A2,'pxRootBk',` data-e="${free.id}"`)}
+    return pxGh(fs?'الان از «'+esc(srcName(fs))+'» · همه یا بخشی از بانک دیگر':'همه یا بخشی از کدام بانک؟',A2.filter(o=>o.c).length||A2.length)+lst(A2,'pxPcPick',` data-e="${free.id}"`)}
   if(sent&&!ssCan(xr))return F.some(r=>!r.sentBid)?`<div class="px7e px9e">${ic('bank')}<b>بخشی هنوز ثبت واریز نشده</b><small>اول ردیف‌های بانکی «آماده ارسال» را با کشیدن به چپ ثبت واریز کنید، بعد بانک یا مبلغ را عوض کنید</small></div>`:`<div class="px7e px9e">${ic('check')}<b>بخش‌های بانکی تأیید شده یا رسید دارند</b><small>بانک یا مبلغ قفل است</small></div>`;
   const L=pkL(xr),main=sent?'':(L[0]?L[0].src:''),B=A.filter(o=>!(o.s&&String(o.s.id)===main)&&(o.c?(!PX.dt||(o.c.txs||[]).some(t=>!t.del&&t.date===PX.dt)):pxBkDay(o.s)&&(!PX.fb||o.s.bal!=null)));
   /* بانک فعلی واریزی: بالای فهرست، با «برداشتن» (همان حذف تخصیص) */
@@ -278,12 +300,12 @@ ACT.pxSentBk=d=>{const x=entRow();if(!x)return;const id=famRoot(x);PX=null;close
 function pxSel(){const s=PX.sel;if(!s)return null;if(s.k==='bk'){const z=sources.find(o=>String(o.id)===String(s.id));if(!z)return null;const bk=acBank(z);return {bk:z,name:z.name,av:bk?bankBadge(bk,'lg'):ic('bank'),sub:bkSub(z),bal:'',R:0}}if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return null;const R=cuBal(c).R;return {c,name:cuName(c),sub:cuSub(c),bal:R?`<b class="${R<0?'r':'b'}">${R<0?'طلب ما':'بدهی ما'} ${fmt(Math.abs(R))} تومان</b>`:'<b>حساب تسویه است</b>',R}}return {c:null,name:s.name,sub:'پرداخت‌کننده تسویه · حساب مشتری باز نمی‌شود',bal:'',R:0}}
 function pxHTML(){const rest=pxRest(),who0=pxWho();
   if(PX.step===1){const tb=pxTab(),seg=pxSegOn()?pxSegHTML(tb):'';
-    return `<div class="px7w s1 px9"><div class="sh-h px9h"><div><b>پرداخت از کجا؟</b><small class="shsub">مانده بانکی «${esc(who0)}»: ${fmt(rest)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+    return `<div class="px7w s1 px9"><div class="sh-h px9h"><div><b>پرداخت از کجا؟</b><small class="shsub">${(fp=>fp?'این بخش «'+esc(who0)+'»: '+fmt(fp.amount):'مانده بانکی «'+esc(who0)+'»: '+fmt(rest))(tb==='bk'?pxFreeP():null)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   ${seg}<div class="px7q" id="pxTop">${pxTopHTML()}</div>
   <div class="px7l" id="pxL" role="listbox">${pxList()}</div></div>`}
   /* v66.0 (خواسته صاحب اپ: «فیلدها دونه‌دونه، خودکار پر بشه و بعد مبلغ»): مسیر «از → به» خودکار پر است، بعد یک عدد بزرگ با دکمه‌های
      آماده، و فیلدهای اختیاری فقط وقتی لازم است با یک لمس باز می‌شوند */
-  const S=pxSel()||{name:'',sub:'',bal:'',R:0},bkm=PX.sel&&PX.sel.k==='bk',owe=S.R<0?Math.min(rest,-S.R):0,a=+PX.amount||0,M=PX.more||{},x=entRow(),L0=bkm&&x?pkL(x)[0]:null;
+  const S=pxSel()||{name:'',sub:'',bal:'',R:0},bkm=PX.sel&&PX.sel.k==='bk',owe=S.R<0?Math.min(rest,-S.R):0,a=+PX.amount||0,M=PX.more||{},x=entRow(),pgm=PX.pg!=null,L0=bkm&&x&&!pgm?pkL(x)[0]:null,pgS=pgm?pkSrcOf(PX.pg):'';
   const half=rest>1?Math.round(rest/2):0,chip=(v,t)=>v>0?`<button type="button" class="${a===v?'on':''}" data-act="pxAmt" data-v="${v}">${t} · ${fmt(v)}</button>`:'';
   const opt=[['tn','شماره پیگیری','list'],['img','رسید','cam'],['note','یادداشت','edit']].filter(o=>!bkm);
   const fld={tn:`<div class="ef px8f"><label for="pxT">شماره پیگیری</label><input id="pxT" class="ltr" inputmode="numeric" autocomplete="off" value="${esc(PX.tn)}"></div>`,
@@ -292,8 +314,8 @@ function pxHTML(){const rest=pxRest(),who0=pxWho();
   /* v69.8 (خواسته صاحب اپ: «طراحی تخصیص درست‌تر و راحت‌تر»): یک کارت مسیر فشرده (از → به، زدن = تغییر)، مبلغ بزرگ وسط با
      دکمه‌های آماده زیرش، فیلدهای اختیاری کوچک، و دکمه ثبت که همیشه پایین پنجره دیده می‌شود. بدون متن راهنمای اضافه. */
   const ttl=bkm?(PX.edit!=null?'ویرایش بخش بانکی':'تخصیص به بانک'):PX.bz?'تسویه از مشتری':'تسویه از مشتری',
-    main=bkm&&L0&&L0.src?srcName(L0.src):'',toSub=bkm?(main?'بقیه در «'+esc(main)+'»':'بقیه بدون بانک می‌ماند'):'مانده بانکی '+fmt(rest);
-  return `<div class="px7w s2 px10"><div class="sh-h"><div><b>${ttl}</b><small class="shsub">${esc(who0)} · مانده بانکی ${fmt(rest)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+    main=pgm?srcName(pgS):bkm&&L0&&L0.src?srcName(L0.src):'',toSub=bkm?(main?'بقیه در «'+esc(main)+'»':'بقیه بدون بانک می‌ماند'):'مانده بانکی '+fmt(rest);
+  return `<div class="px7w s2 px10"><div class="sh-h"><div><b>${ttl}</b><small class="shsub">${esc(who0)} · ${pgm?'این بخش':'مانده بانکی'} ${fmt(rest)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   <button type="button" class="pxr" data-act="pxBack" aria-label="تغییر ${bkm?'بانک':'پرداخت‌کننده'}">
     <span class="pxr1"><span class="py7a${bkm?' bk':''}">${bkm?S.av:esc(userInit(S.name||'؟'))}</span><span class="tx"><small>${bkm?'از بانک':'پرداخت‌کننده'}</small><b>${esc(S.name)}</b>${!bkm&&S.bal?`<em>${S.bal}</em>`:''}</span></span>
     <span class="pxra" aria-hidden="true">${ic('back').replace('class="i"','class="i flip"')}</span>
@@ -306,7 +328,7 @@ function pxHTML(){const rest=pxRest(),who0=pxWho();
   <div class="pxgo"><button class="xgo" data-act="pxSave">${ic('check')} ${bkm?(PX.edit!=null?'ذخیره':'ثبت تخصیص'):PX.bz?'افزودن تسویه':'ثبت تسویه'}</button></div></div>`}
 function pxRead(){const g=id=>{const el=$(id);return el?el.value:undefined};if(g('pxQ')!==undefined)PX.q=g('pxQ');if(g('pxA')!==undefined)PX.amount=num(g('pxA'));if(g('pxT')!==undefined)PX.tn=toEn(g('pxT')).trim();if(g('pxN')!==undefined)PX.note=clean(g('pxN'))}
 function pxAv(){const A=$('pxA'),h=$('pxAv');if(!A||!h)return;const a=num(A.value),r=pxRest(),bk=PX.sel&&PX.sel.k==='bk'&&sources.find(z=>String(z.id)===String(PX.sel.id)),f=bk?srcBal(bk):null;
-  h.innerHTML=!a?'':a>r?'بیشتر از مانده بانکی ('+fmt(r)+')':`<span>مانده بانکی بعد از این <b>${fmt(r-a)}</b></span>${bk&&f!=null?`<span>مانده «${esc(bk.name)}» <b class="${f-a<0?'n':''}">${f-a<0?'−':''}${fmt(Math.abs(f-a))}</b></span>`:''}`;h.className='px8l'+(a>r?' bad':a?' ok':'');
+  const pgm=PX.pg!=null;h.innerHTML=!a?'':a>r?'بیشتر از '+(pgm?'این بخش':'مانده بانکی')+' ('+fmt(r)+')':`<span>${pgm?'از این بخش می‌ماند':'مانده بانکی بعد از این'} <b>${fmt(r-a)}</b></span>${bk&&f!=null?`<span>مانده «${esc(bk.name)}» <b class="${f-a<0?'n':''}">${f-a<0?'−':''}${fmt(Math.abs(f-a))}</b></span>`:''}`;h.className='px8l'+(a>r?' bad':a?' ok':'');
   document.querySelectorAll('#sheet .px8q button').forEach(b=>b.classList.toggle('on',+b.dataset.v===a))}
 ACT.pxMore=d=>{pxRead();(PX.more=PX.more||{})[d.f]=1;$('sheet').innerHTML=pxHTML();pxBind(true);const f=document.querySelector('#sheet .px8fs .px8f:last-child');if(f){if(!RM()&&f.animate)f.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});const i=f.querySelector('input:not([type=file])');if(i)i.focus();else{const fi=f.querySelector('input[type=file]');if(fi)fi.click()}}};
 function pxBind(still){const W=$('sheet').querySelector('.px7w');if(W&&!still&&!RM()&&W.animate)W.animate([{opacity:0,transform:`translateX(${PX.dir*-18}px)`},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'});
@@ -319,10 +341,10 @@ ACT.pxPick=d=>{pxRead();if(d.k==='bk'){PX.sel={k:'bk',id:d.id};const x=entRow(),
   if(d.k==='cu')PX.sel={k:'cu',id:d.id};else if(d.k==='mem'){const p=PXM[+d.id];if(!p)return;const c=cuFindBy({name:p.name,phone:p.phone});PX.sel=c?{k:'cu',id:c.id}:{k:'mem',name:p.name,phone:p.phone||'',nid:p.nid||''}}
   else PX.sel={k:'new',name:clean(PX.q)};
   const S=pxSel(),r=pxRest();if(!PX.amount)PX.amount=S&&S.R<0?Math.min(r,-S.R):r;PX.step=2;pxRe(1)};
-ACT.pxBack=()=>{pxRead();PX.step=1;if(PX.sel&&PX.sel.k==='bk'){PX.tab='bk';PX.edit=null}pxRe(-1);setTimeout(()=>{const q=$('pxQ');if(q)q.focus()},260)};
+ACT.pxBack=()=>{pxRead();PX.step=1;if(PX.sel&&PX.sel.k==='bk'){PX.tab='bk';PX.edit=null;PX.pg=null}pxRe(-1);setTimeout(()=>{const q=$('pxQ');if(q)q.focus()},260)};
 ACT.pxAmt=d=>{const A=$('pxA');if(!A)return;PX.amount=+d.v;A.value=(+d.v).toLocaleString('en-US');pxAv();const h=A.closest('.px8i');if(h&&!RM()&&h.animate)h.animate([{transform:'scale(1.03)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.9,.25,1)'})};
-ACT.pxSave=async()=>{pxRead();const a=Math.round(PX.amount||0),r=pxRest(),s=PX.sel;if(!s){PX.step=1;pxRe(-1);return}if(!a){toast('مبلغ را وارد کنید',true);$('pxA').focus();return}if(a>r){toast('بیشتر از مانده بانکی ('+fmt(r)+') است',true);$('pxA').focus();return}
-  if(s.k==='bk'){const x=entRow();if(!x)return;const ed=PX.edit;PX=null;closeSheet();if(!pkSave(x,s.id,a,ed))toast('این تغییر ممکن نیست؛ یکی از بخش‌ها ارسال شده یا مبلغ بیشتر است',true);return}
+ACT.pxSave=async()=>{pxRead();const a=Math.round(PX.amount||0),r=pxRest(),s=PX.sel;if(!s){PX.step=1;pxRe(-1);return}if(!a){toast('مبلغ را وارد کنید',true);$('pxA').focus();return}if(a>r){toast('بیشتر از '+(PX.pg!=null?'این بخش':'مانده بانکی')+' ('+fmt(r)+') است',true);$('pxA').focus();return}
+  if(s.k==='bk'){const x=entRow();if(!x)return;if(PX.pg!=null){const pg=PX.pg;PX=null;closeSheet();const R=pcGive(pg,s.id,a);if(!R){toast('این تغییر ممکن نیست؛ این بخش همین الان عوض شد یا مبلغ بیشتر است',true);return}pyFlash=R.id;pyRe();toast(R.rest?fmt(a)+' تومان از «'+srcName(s.id)+'» · '+fmt(R.rest)+(R.cur?' در «'+srcName(R.cur)+'» ماند':' مانده بدون بانک'):'«'+srcName(s.id)+'» برای '+fmt(a)+' تومان انتخاب شد');setTimeout(()=>{pyFlash=null},1600);return}const ed=PX.edit;PX=null;closeSheet();if(!pkSave(x,s.id,a,ed))toast('این تغییر ممکن نیست؛ یکی از بخش‌ها ارسال شده یا مبلغ بیشتر است',true);return}
   if(PX.bz){const S=pxSel();bz.d.settles=(bz.d.settles||[]).concat([{name:S.name,phone:s.phone||(S.c&&S.c.phone)||'',cuId:S.c?S.c.id:'',amount:a,tn:PX.tn,note:PX.note,imgD:PX.imgD||'',inv:''}]);PX=null;closeSheet();bzStlRe();toast('تسویه اضافه شد · با ثبت واریزی سندش صادر می‌شود');return}
   const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e)return;if(PX.busy)return;PX.busy=1;
   try{let K=[];if(PX.imgD){const k=newImgKey('stl:'+e.id+'.'+Date.now());if(await imgPut(k,PX.imgD))K=[k];else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
@@ -342,7 +364,6 @@ ACT.pyCp=d=>{const e=validated().find(z=>String(z.id)===String(d.e))||entries.fi
   const dt=z.byInv&&(()=>{const c=custs.find(q=>String(q.id)===String(z.byInv.cu)),t=c&&(c.txs||[]).find(q=>String(q.id)===String(z.byInv.tx)&&!q.del);return t?invTitle(t):''})();
   cpOut('پرداخت از: '+Bo(z.name||'—')+'\nبه: '+Bo(accName(e))+'\nمبلغ: '+Bo(N(z.amount)+' تومان')+(e.iban?'\nشبا: '+Mo(ibanSp(e.iban)):'')+(e.card?'\nکارت: '+Mo(e.card):'')+(dt?'\nسند: '+dt:'')+(z.tn?'\nپیگیری: '+Mo(toEn(z.tn)):'')+(z.st==='wait'?'\nوضعیت: در انتظار تأیید':''),'تسویه '+fmt(z.amount)+' تومان کپی شد')};
 
-ACT.pxRootBk=d=>{const x=validated().find(r=>String(r.id)===String(d.e));if(!x)return;ldKey=PD(x);const own=parts().find(z=>z.ids.some(i=>String(i)===String(x.id)));PX=null;closeSheet();mvIds=[x.id];mvFrom=own?own.id:null;ACT.mvGo({s:d.id})};
 
 /* v77.8 (خواسته صاحب اپ): «کپی و ارسال» در جزئیات واریزی — متن همین بخش کپی و همین بخش ارسال می‌شود (بدون رفتن به لیست واریز) */
 ACT.pyCpSend=async d=>{const r=entries.find(z=>String(z.id)===String(d.id));if(!r||!can('track'))return;await ACT.pyCp({...d,k:'b'});
