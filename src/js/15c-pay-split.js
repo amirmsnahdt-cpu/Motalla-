@@ -59,3 +59,12 @@ function psApply(){const root=entries.find(e=>e.id===PS.root);if(!root){closeShe
   const k0=ldKey;keep.forEach(({e,src})=>{ldKey=e.payDate||PS.pay;/* v78.0: هر بخش در لیست روز خودش */const so=sources.find(z=>String(z.id)===String(src));if(so)moveTo([e.id],null,so)});ldKey=k0;
   logA('split',PS.L.length>1?'پرداخت از چند منبع':'یکی کردن بخش‌ها',PS.name+' | '+PS.L.map(l=>{const so=sources.find(z=>String(z.id)===String(l.src));return (so?so.name:'بدون منبع')+' '+fmt(l.amount)}).join('، '));
   const n=PS.L.length;PS=null;alloc=null;closeSheet();const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;toast(n>1?'پرداخت بین '+toFa(n)+' منبع تقسیم شد':'بخش‌ها یکی شدند')}
+
+/* ---- v98.0 تخصیص بخشی از یک واریزی به این منبع (پنجره تخصیص، 06: aPartOf/aPartSplit/aPxHTML) ---- */
+ACT.aPx=d=>{if(!aSt)return;const id=+d.id,x=aPool().find(z=>z.id===id);if(!x||!aSt.sel.has(id))return;if(aSt.pe===id){aSt.pe=null;renderPrev();return}aSt.pe=id;aSt.pv=aPartOf(x)||0;renderPrev();const I=$('apxA');if(I){try{I.scrollIntoView({block:'center',behavior:RM()?'auto':'smooth'})}catch(_){}setTimeout(()=>{try{I.focus()}catch(_){}},120)}};
+ACT.aPxX=()=>{if(!aSt)return;aSt.pe=null;renderPrev()};
+ACT.aPxQ=d=>{if(!aSt||aSt.pe==null)return;aSt.pv=+d.v||0;const I=$('apxA');if(I)I.value=aSt.pv?aSt.pv.toLocaleString('en-US'):'';aPxPaint()};
+ACT.aPxOk=()=>{if(!aSt||aSt.pe==null)return;const x=aPool().find(z=>z.id===aSt.pe);if(!x){aSt.pe=null;renderPrev();return}const v=Math.round(+aSt.pv||0);
+  if(!(v>0)){toast('مبلغ را بزنید',true);const I=$('apxA');if(I)I.focus();return}if(v>x.amount){toast('از مبلغ این واریزی بیشتر است',true);return}
+  if(v>=x.amount)delete aSt.part[x.id];else aSt.part[x.id]=v;aSt.pe=null;const I=$('apxA');if(I)I.blur();renderPrev()};
+ACT.aGap=d=>{if(!aSt)return;const id=+d.id,x=aPool().find(z=>z.id===id),v=Math.round(+d.v||0);if(!x||!(v>0))return;aSt.sel.add(id);if(v>=x.amount)delete aSt.part[id];else aSt.part[id]=v;aSt.pe=null;renderPrev()};
