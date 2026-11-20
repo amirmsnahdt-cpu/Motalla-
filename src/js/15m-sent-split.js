@@ -84,7 +84,7 @@ ACT.entUnsend=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x
   askConfirm(`«${fullName(root)}» (${fmt(tot)} تومان${F.length>1?'، '+toFa(F.length)+' بخش':''}) از ارسال برگردد به تخصیص؟`,'برگردد',()=>{if(!unsendDo(root))return;
     closeSheet();const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('برگشت به تخصیص — دوباره ارسال‌نشده است')})};
 /* برگرداندن از ارسال (بانک هر بخش در تخصیص همان روز می‌ماند) */
-function unsendDo(root){const G=unsendFam(root);if(!G){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return false}const now=new Date().toISOString(),pay=PD(root),tot=G.reduce((a,o)=>a+(+o.q.it.amount||0),0);
+function unsendDo(root,G0){const G=G0||unsendFam(root);if(!G){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return false}const now=new Date().toISOString(),pay=PD(root),tot=G.reduce((a,o)=>a+(+o.q.it.amount||0),0);
     G.forEach(o=>{const id=o.r.id,b=o.q.b,src=o.q.it.src;b.items=b.items.filter(z=>z.id!==id);if(!b.items.length)batches=batches.filter(z=>z!==b);delete o.e.sentBid;o.e.updatedAt=now;o.e.updatedBy=who();
       let sp=null;allParts().forEach(p=>{if(p.sent&&(p.ids||[]).includes(id)){sp=sp||p;p.ids=p.ids.filter(z=>z!==id);if(!p.ids.length)delPart(p)}});
       const so=sp?sp.src:(z=>z?{id:z.id,name:z.name,bank:z.bank||'',limit:0}:null)(sources.find(z=>z.name===src));if(!so)return;
@@ -108,14 +108,20 @@ function unlkDo(L){const now=new Date().toISOString(),B=new Set();L.forEach(o=>{
   (o.e.unlk=o.e.unlk||[]).push({src:it.src||'',st:it.st||'',tn:it.tn||'',imgs:K,amount:+it.amount||0,bid:o.q.b.id,at:now,by:who()});
   it.st='pending';delete it.tn;delete it.img;delete it.imgs;it.at=now;o.e.updatedAt=now;o.e.updatedBy=who();B.add(o.q.b.id)});saveB();saveE();
   logA('split','برداشتن تأیید/رسید برای حذف تخصیص',L.map(o=>fullName(o.e)+' | '+(o.q.it.src||'')).join('، '))}
-ACT.entUnalloc=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;const root=validated().find(r=>r.id===famRoot(x))||x;
-  const LK=unallocCan(root)?null:unlkFam(root);
-  if(!unallocCan(root)&&!LK){toast(unallocWhy(root),true);return}
-  const F=famOf(root),sent=F.some(r=>r.sentBid),tot=F.reduce((a,r)=>a+(+r.amount||0),0);
-  askConfirm({html:`تخصیص «${esc(fullName(root))}» برداشته شود؟${sent?' از پیگیری هم بیرون می‌آید و':''} دوباره بدون بانک می‌شود.${LK?`<small class="unlkw">${ic('info')} ${unlkTxt(LK)} — این‌ها از ردیف پیگیری برداشته می‌شوند (روی واریزی نگه داشته می‌شوند)${LK.some(o=>o.q.it.st==='ok')?'؛ اگر بانک واقعاً پرداخت کرده، بعداً دوباره همین بانک را بزنید':''}.</small>`:''}`},'حذف تخصیص',()=>{
-    if(LK){const L2=unlkFam(root);if(!L2){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return}unlkDo(L2)}
-    if(sent&&!unsendDo(root))return;const R=validated().find(r=>r.id===root.id)||root,G=famOf(R);
-    if(G.length>1){PS={root:famRoot(R),name:fullName(R),pay:PD(R),R:sum(G),L:[{src:'',amount:sum(G)}]};psApply()}
-    else{allParts().forEach(p=>{if(!p.sent&&(p.ids||[]).includes(R.id)){p.ids=p.ids.filter(z=>z!==R.id);if(!p.ids.length)delPart(p)}});memoClear();saveD();alloc=null}
-    logA('split','حذف تخصیص',fullName(R)+' | '+fmt(tot)+' تومان');closeSheet();if(cur==='batch'&&typeof curB==='function'&&!curB()){go('split1');toast('تخصیص برداشته شد');return}const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('تخصیص برداشته شد — دوباره بانک را انتخاب کنید')})};
+/* v98.2 (خواسته صاحب اپ: «وقتی حذف کردم کلش را حذف کرد و مانده را تغییر داد»): «حذف تخصیص» فقط روی همان بخشی که رویش زده شده کار می‌کند.
+   قبلاً همیشه کل خانواده برمی‌گشت: همه بخش‌ها از ارسال بیرون می‌آمدند، یکی می‌شدند و بانک همه برداشته می‌شد.
+   حالا: همان یک بخش (اگر ارسال شده، فقط همان از پیگیری بیرون می‌آید) بدون بانک می‌شود = «مانده»؛ بخش‌های دیگر، مبلغ‌ها و جمع واریزی دست نمی‌خورد.
+   مانده‌های بدون بانکِ همان واریزی (با یک تاریخ واریز) یکی می‌شوند (famTidy) تا فهرست پر از تکه نشود. بخش تأییدشده/رسیددار با همان هشدار قبلی. */
+ACT.entUnalloc=d=>{const x=validated().find(r=>String(r.id)===String(d.id));if(!x)return;
+  if(!can('split')||x.full){toast(unallocWhy(x),true);return}
+  const q0=x.sentBid?entBI(x):null,sid=q0?'':pkSrcOf(x.id);
+  if(x.sentBid&&(!q0||q0.b.closed)){toast('لیست پیگیری این واریزی بایگانی شده است',true);return}
+  if(!q0&&!sid){toast('این بخش هنوز بانکی ندارد',true);return}
+  const nm=q0?q0.it.src||'بانک':srcName(sid)||'بانک',am=q0&&q0.it.amount!=null?+q0.it.amount:+x.amount||0,multi=famOf(x).length>1,lk=!!q0&&ssLock(q0.it),one=()=>{const e=entries.find(z=>z.id===x.id),q=e&&e.sentBid!=null?entBI(e):null;return e&&q&&!q.b.closed?[{r:x,e,q}]:null},LK=lk?one():null;
+  askConfirm({html:`تخصیص ${esc(fmt(am))} تومان از «${esc(nm)}» برداشته شود؟${q0?' از پیگیری هم بیرون می‌آید و':''} این مبلغ دوباره بدون بانک می‌شود${multi?'؛ بخش‌های دیگر این واریزی دست نمی‌خورند':''}.${LK?`<small class="unlkw">${ic('info')} ${unlkTxt(LK)} — این‌ها از ردیف پیگیری برداشته می‌شوند (روی واریزی نگه داشته می‌شوند)${LK.some(o=>o.q.it.st==='ok')?'؛ اگر بانک واقعاً پرداخت کرده، بعداً دوباره همین بانک را بزنید':''}.</small>`:''}`},'حذف تخصیص',()=>{
+    if(q0){const G=one();if(!G||(!lk&&ssLock(G[0].q.it))){toast('این واریزی همین الان عوض شد؛ دوباره امتحان کنید',true);render();return}if(lk)unlkDo(G);if(!unsendDo(x,G))return}
+    allParts().forEach(p=>{if(!p.sent&&(p.ids||[]).includes(x.id)){p.ids=p.ids.filter(z=>z!==x.id);if(!p.ids.length)delPart(p)}});memoClear();alloc=null;
+    const rid=famRoot(x);famTidy(rid);saveE();saveD();memoClear();alloc=null;
+    logA('split','حذف تخصیص',fullName(x)+' | '+nm+' | '+fmt(am)+' تومان');closeSheet();if(cur==='batch'&&typeof curB==='function'&&!curB()){go('split1');toast('تخصیص برداشته شد');return}
+    const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast('تخصیص «'+nm+'» برداشته شد — این مبلغ حالا «مانده» است')})};
 

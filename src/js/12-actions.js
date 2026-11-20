@@ -157,11 +157,11 @@ ACT.homeP=d=>{const k=d.iso||'';if(homePick&&homeP===k){homePick=false}else{home
 ACT.homeF=d=>{homeF=homeF===d.f?'all':d.f;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y};
 ACT.hsearch=()=>go('find');
 /* انتقال به منبع دیگر — از هر جا (خانه، جستجو، لیست، منبع). واریزی تخصیص‌نیافته هم با همین کار به منبع داده می‌شود. */
-function moveTo(ids,fromP,src,toP){const P=parts(),sent=!!(fromP&&fromP.sent);let to=toP&&toP!=='new'?toP:null;
+function moveTo(ids,fromP,src,toP,quiet){const P=parts(),sent=!!(fromP&&fromP.sent);let to=toP&&toP!=='new'?toP:null;
   if(!to&&toP!=='new')to=P.find(z=>z!==fromP&&!!z.sent===sent&&(!sent||z.bid===fromP.bid)&&String(z.src.id)===String(src.id));
   if(!to){to={id:nid++,src:{id:src.id,name:src.name,bank:src.bank||'',limit:0},method:'manual',param:{},ids:[],sent,at:new Date().toISOString()};if(sent)to.bid=fromP.bid;addPart(to)}
   ids.forEach(id=>{if(fromP)fromP.ids=fromP.ids.filter(z=>z!==id);if(!to.ids.includes(id))to.ids.push(id);if(sent){const b=batches.find(x=>x.id===fromP.bid),it=b&&b.items.find(x=>x.id===id);if(it){it.src=src.name;it.pid=to.id}}});
-  if(fromP&&!fromP.ids.length)delPart(fromP);saveD();saveB();alloc=null;logA('split',fromP?'انتقال به منبع دیگر':'تخصیص به منبع',fmt(ids.length)+' واریزی | '+(fromP?fromP.src.name+' ← ':'')+src.name);return to}
+  if(fromP&&!fromP.ids.length)delPart(fromP);saveD();saveB();alloc=null;if(!quiet)logA('split',fromP?'انتقال به منبع دیگر':'تخصیص به منبع',fmt(ids.length)+' واریزی | '+(fromP?fromP.src.name+' ← ':'')+src.name);return to}
 let mvIds=[],mvFrom=null;
 function moveSheet(ids,title,fromP){bkAllocSync();mvIds=ids;mvFrom=fromP?fromP.id:null;const p=fromP,L=DSRC().filter(x=>!p||String(x.id)!==String(p.src.id));
   /* v60.2: یک واریزی که هنوز ارسال نشده → همین‌جا «پرداخت از چند منبع» (بخشی از ملت، بخشی از ملی و…) */
