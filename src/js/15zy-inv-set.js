@@ -45,7 +45,8 @@ function ivSecHTML(){if(IS.p==='stm')return stmSecHTML();const S=IS.W[IS.p],k=IS
   else if(k==='acc')h=ivSw('acc','جدول «حساب مشتری»','مانده قبلی، این فاکتور و مانده نهایی، پایین همان قاب')
     +(S.acc?ivSw('ap','سطر «مانده قبلی»','')+ivSw('ad','سطر «این فاکتور»','')+ivPick('ag','مانده طلا','',[['y','همیشه'],['a','فقط وقتی مانده دارد'],['n','هرگز']])+ivPick('ax','مانده سکه و ارز','هر سکه یا ارزی که مشتری مانده دارد یک ستون می‌گیرد',[['a','خودکار'],['n','هرگز']])
       +ivSw('an','توضیح کنار سطرها','پیش از این فاکتور · فروش − خرید − دریافت · …')+ivSw('lg','راهنمای زیر جدول','یک خط که معنی دو طرف حساب را می‌گوید')
-      +ivPick('wr','واژه‌های دو طرف حساب','از دید مطلا یا از دید مشتری',[['w','طلبکاریم / بدهکاریم'],['c','بدهکار / بستانکار']]):'');
+      +ivPick('wr','واژه‌های دو طرف حساب','از دید مطلا یا از دید مشتری',[['w','طلبکاریم / بدهکاریم'],['c','بدهکار / بستانکار']]):'')
+    +ivSw('wds','واریزی‌های در راه مشتری','زیر جدول: مانده‌ای که در لیست واریز است با تاریخ واریزش، و اینکه پس از آن حساب تسویه است یا چقدر می‌ماند');
   else h=ivSw('sgc','جای امضای مشتری','')+ivSw('sgs','جای مهر و امضای فروشنده','')+(S.sgs?ivSw('by','نام ثبت‌کننده کنار امضا','نام کاربری که سند را ثبت کرده'):'')+ivSw('th','«با سپاس از اعتماد شما»','')+ivSw('shp','مشخصات فروشگاه','نام، نشانی، تلفن و صفحه؛ اگر همه خالی باشد «طلا و جواهر مطلا»')
     +ivRow('یادداشت پایین فاکتور','مثلاً شرایط مرجوعی. فقط برای قالب «'+pn+'»',`<input class="ivin" id="ivNt" value="${esc(S.note)}" placeholder="خالی = چیزی چاپ نمی‌شود" maxlength="170" autocomplete="off" enterkeyhint="done">`,'col')
     +`</div><div class="ivh">مشخصات فروشگاه · برای همه قالب‌ها</div><div class="ivk">`
@@ -81,7 +82,9 @@ function vInvSet(){if(!isAdmin())return '<div class="card empty"><b>فقط مد�
   <div class="ivc" id="ivC">${ivSecHTML()}</div></div>`}
 const aInvSet=()=>'';
 /* پیش‌نمایش: برگه واقعی در اندازه واقعی کاغذ، با transform کوچک می‌شود تا در پهنای صفحه (و حداکثر ۳۶٪ ارتفاع) جا شود */
-function ivPrev(now){clearTimeout(ivPrev.t);ivPrev.t=setTimeout(()=>{const box=$('ivPw');if(!box||!IS)return;const X=ivDoc(),st=IS.p==='stm';let h;try{h=st?stmtPdfHTML(X.c,{},{S:IS.W.stm}):ivWithShop(()=>invDoc(X.c,X.t,{S:IS.W[IS.p],prof:IS.p}))}catch(e){const i=$('ivPi');if(i)i.textContent='پیش‌نمایش ساخته نشد';return}
+/* v98.9: در پیش‌نمایش نمونه (نه سند واقعی) اگر به مشتری بدهکاریم، یک واریزی در راه برای فردا نشان داده می‌شود تا کلید «واریزی‌های در راه» دیده شود */
+function ivSchedS(X){if(!X||X.real)return {};let r=0;try{r=Math.round(cuBalBefore(X.c,X.t).R+txD(X.t).r)}catch(_){}if(r<=0)return {};const d=new Date(Date.now()+864e5);return {sched:[{d:d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),a:r,n:1}]}}
+function ivPrev(now){clearTimeout(ivPrev.t);ivPrev.t=setTimeout(()=>{const box=$('ivPw');if(!box||!IS)return;const X=ivDoc(),st=IS.p==='stm';let h;try{h=st?stmtPdfHTML(X.c,{},{S:IS.W.stm}):ivWithShop(()=>invDoc(X.c,X.t,{S:IS.W[IS.p],prof:IS.p,...ivSchedS(X)}))}catch(e){const i=$('ivPi');if(i)i.textContent='پیش‌نمایش ساخته نشد';return}
     const Q=pageSpec(h),PX=96/25.4,W=Math.round(Q.mmW*PX),H=Math.round(Q.mmH*PX),n=(h.match(/<section class="sht"/g)||[]).length,cw=Math.max(200,box.parentNode.clientWidth-16),sc=Math.min(cw/W,Math.max(150,innerHeight*.3)/H);
     box.style.width=Math.floor(W*sc)+'px';box.style.height=Math.floor(H*sc)+'px';
     const a=box.querySelector('iframe.on'),b=box.querySelector('iframe:not(.on)');if(!a||!b)return;b.style.width=W+'px';b.style.height=H+'px';b.style.transform=`scale(${sc})`;
@@ -108,7 +111,7 @@ ACT.ivT=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=S[d.k]?0:1;if(IS.p==='stm')I
 ACT.ivV=d=>{if(!IS)return;const S=IS.W[IS.p],n=typeof ivDf()[d.k]==='number';S[d.k]=n?+d.v:d.v;IS.W[IS.p]=ivCl(S);ivRe()};
 ACT.ivN=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=Math.round(((+S[d.k]||0)+(+d.d||0))*10)/10;IS.W[IS.p]=ivCl(S);ivRe()};
 ACT.ivTtl=d=>{if(!IS)return;IS.W[IS.p].ttl=d.v||'';ivRe()};
-ACT.ivZoom=()=>{if(!IS)return;const X=ivDoc(),S={...IS.W[IS.p]},p=IS.p;if(p==='stm'){openPrint(()=>stmtPdfHTML(X.c,{},{S}));return}openPrint(()=>ivWithShop(()=>invDoc(X.c,X.t,{S,prof:p})))};
+ACT.ivZoom=()=>{if(!IS)return;const X=ivDoc(),S={...IS.W[IS.p]},p=IS.p;if(p==='stm'){openPrint(()=>stmtPdfHTML(X.c,{},{S}));return}openPrint(()=>ivWithShop(()=>invDoc(X.c,X.t,{S,prof:p,...ivSchedS(X)})))};
 ACT.ivReset=()=>{if(!IS)return;if(IS.p==='stm'){askConfirm('تنظیمات صورت‌حساب به پیش‌فرض برگردد؟','برگردان',()=>{IS.W.stm=stmClean(STMD);ivRe({anim:1});toast('به پیش‌فرض برگشت؛ برای ماندگار شدن «ذخیره» را بزنید')});return}const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('همه تنظیمات به پیش‌فرض برگردد؟\nکاغذ، سربرگ، ردیف‌ها، مانده حساب و پانویس برای همه فاکتورها برمی‌گردد؛ ستون‌ها، عنوان و یادداشت فقط برای «'+pn+'».','برگردان',()=>{IS.W[IS.p]=invClean({...INVD,...(INVT[IS.p]||{})});ivRe({anim:1});toast('به پیش‌فرض برگشت؛ برای ماندگار شدن «ذخیره» را بزنید')})};
 ACT.ivCopy=()=>{if(!IS)return;const pn=INVP.find(x=>x[0]===IS.p)[1];askConfirm('ستون‌های «'+pn+'» روی سه فاکتور دیگر هم گذاشته شود؟\nستون‌ها و شکل اجرت، سود و نرخ آن‌ها جایگزین می‌شود.','کپی کن',()=>{INVP.forEach(([k])=>{if(k!==IS.p)for(const q in INVD)if(invOwn(q)&&q!=='ttl'&&q!=='note')IS.W[k][q]=IS.W[IS.p][q]});ivRe({keep:1,noPrev:1});toast('روی همه فاکتورها گذاشته شد؛ برای ماندگار شدن «ذخیره» را بزنید')})};
 ACT.ivSave=()=>{if(!IS||!isAdmin())return;if(!ivDirty()){toast('چیزی عوض نشده است');return}const r=cfgRec(1),inv={};
