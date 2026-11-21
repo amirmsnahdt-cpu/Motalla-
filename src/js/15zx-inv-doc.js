@@ -20,7 +20,7 @@ const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   cw:'a',cay:'a',cw7:'n',clab:'n',cang:'n',crt:'a',cgv:'n',caj:'a',cpp:'a',ctx:'a',
   aj:'p',pp:'p',rt:'m',
   rh:5.5,fs:0,cap:'a',sum:1,ex:1,py:1,tn:1,fill:'b',
-  acc:1,ap:1,ad:1,ag:'y',ax:'a',an:1,lg:1,wr:'w',wds:1,
+  acc:1,ap:1,ad:1,ag:'y',ax:'a',an:1,lg:1,wr:'w',
   sgc:1,sgs:1,by:1,th:1,shp:1,note:''};
 /* پیش‌فرض ویژه هر قالب: آبشده اجرت و مالیات ندارد و آزمایشگاه و انگش ستون جدا می‌گیرد */
 const INVT={ab:{clab:'a',cang:'a',caj:'n',ctx:'n'}};
@@ -76,7 +76,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   /* v92.2 (صاحب اپ: «فاکتور خیلی قاطی‌پاتی است؛ وزن ۷۵۰ را در پرداخت نزده»): طلا و سکه‌ای که بی‌قیمت تحویل داده یا گرفته‌ایم گروه خودشان را دارند
      (u تحویل به مشتری · v دریافت از مشتری) و از دریافت/پرداخت «وجه» جدا هستند؛ ستون آخر هر ردیف طلا همان وزن ۷۵۰ی است که به حساب طلا می‌نشیند */
   const GR={s:[],b:[],u:[],v:[],w:[],i:[],o:[],p:[],z:[]},XP=[],FST={},r3=v=>Math.round(v*1000)/1000;if((t.items||[]).length)FST.s=-1;
-  its.forEach(it=>{const J=ajPT(it),ay=+it.ay||750,mz=mzOf2(it),pg=Math.round(mz/MZK*ay/750),ajE=[J.P?toFa(String(J.P))+'٪':'',J.T?fmt(J.T):''].filter(Boolean).join(' + '),ppE=+it.amT>0?'':[+it.pp?toFa(String(+it.pp))+'٪':'',+it.pp&&+it.ppT?fmt(Math.round(+it.ppT)):''].filter(Boolean).join(' + '),w7=r3((+it.w||0)*ay/750);
+  its.forEach(it=>{const J=ajPT(it),ay=+it.ay||750,mz=mzOf2(it),pg=Math.round(mz/MZK*ay/750),ajE=[J.P?toFa(String(J.P))+'٪':'',J.T?fmt(J.T):''].filter(Boolean).join(' + '),ppE=+it.pp&&!(+it.amT>0)?toFa(String(+it.pp))+'٪':'',w7=r3((+it.w||0)*ay/750);
     GR.s.push({wv:+it.w||0,n:esc(it.k+dsP(it)),e:[it.sh===1?'شرطی':''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
       c:{w:[wFmt(it.w)+' <u>گرم</u>'],ay:[toFa(ay)],w7:[wFmt(w7)],rt:[fmt(S.rt==='g'?pg:mz)],gv:[+it.gold?fmt(it.gold):''],
         /* v91.5 (خواسته صاحب اپ): «فقط درصد» — اگر اجرت/سود تومانی وارد شده، درصدش از روی مبلغ طلا حساب می‌شود */
@@ -128,7 +128,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const tw=s=>{let w=0;for(const ch of String(s||'').replace(/<[^>]+>/g,''))w+=/[۰-۹0-9]/.test(ch)?1.95:/[,٬٫.·\s]/.test(ch)?.95:/[٪+]/.test(ch)?2.5:1.35;return w};
   const nW=(s,pt)=>{let w=0;for(const ch of String(s))w+=/[۰-۹]/.test(ch)?2.05:1.05;return w*pt/8.9},KR=KD[KD.length-1],fT=KR.F(KR.v[2]);
   const HN=Object.fromEntries(INVCOL);HN.rt=S.rt==='g'?'فی هر گرم':'نرخ';
-  let CW,AMW,FPT,NMW,KW;const TBW=185.6,MN={w:19,ay:10.5,w7:15,lab:17,ang:13,rt:21,gv:22,aj:13,pp:10.5,tx:16},MX={w:30,ay:13,w7:24,lab:34,ang:26,rt:31,gv:34,aj:34,pp:34,tx:31};
+  let CW,AMW,FPT,NMW,KW;const TBW=185.6,MN={w:19,ay:10.5,w7:15,lab:17,ang:13,rt:21,gv:22,aj:13,pp:10.5,tx:16},MX={w:30,ay:13,w7:24,lab:34,ang:26,rt:31,gv:34,aj:34,pp:24,tx:31};
   const lay=()=>{CW={};UC.forEach(f=>{const m=Math.max(tw(HN[f])*.8,...ALLR.map(r=>{const v=(r.c&&r.c[f])||[];return Math.max(tw(v[0]),v[1]?tw(v[1])*.8:0)}),...(f==='w'&&S.sum?[...'sbiouv'].map(k=>{const w=(GR[k]||[]).reduce((a,r)=>a+(r.wv||0),0);return w?tw(wFmt(Math.round(w*1000)/1000)+' گرم')*1.1:0}):f==='w7'&&G7?['u','v'].map(k=>{const w=GR[k].reduce((a,r)=>a+(r.g7||0),0);return w?tw(wFmt(r3(w)))*1.1:0}):[]));CW[f]=Math.min(MX[f]*fz,Math.max(MN[f]*Math.min(1,fz),Math.ceil((m*fz+4.4)*2)/2))});
     /* ستون مبلغ (و ستون تومانِ «حساب مشتری» که درست زیر آن است) به اندازه بلندترین عدد؛ مانده نهایی درشت نوشته می‌شود و اگر خیلی بلند باشد یک پله ریزتر */
     FPT=([12.2,11,10,9].find(pt=>nW(fT,pt*fz)<=37.4)||8.4)*fz;AMW=Math.min(41,Math.max(30,Math.ceil(Math.max(S.acc?nW(fT,FPT):0,...[...ALLR.map(r=>r.av||0),...GM.map(g=>sum(g[0])),S.acc?KR.v[0]:0,S.acc?KR.v[1]:0,gcr,oth+gcr,pvS].map(v=>nW(fmt(Math.abs(Math.round(v))),8.9*fz)))+3.6)));
@@ -171,19 +171,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const AC=!S.acc?'':wide?`<div class="ac"><div class="a ah"><span class="al">${DIA}حساب مشتری</span>${KD.map(K=>`<span style="width:${K.w}mm">${kh(K)}</span>`).join('')}</div>${RJ.map(j=>`<div class="a ${j<2?'ar':'af'}"><span class="al"><b>${RL[j][0]}</b>${LBX&&RL[j][1]?` <i>${RL[j][1]}</i>`:''}</span>${KD.map(K=>acell(K,j,K.w,K.nb,j===2)).join('')}</div>`).join('')}</div>`
     :`<div class="ac tp"><div class="a ah"><span class="al">${DIA}حساب مشتری</span>${RJ.map(j=>`<span${j===2?' class="fn"':''} style="width:${CWT[j]}mm">${RL[j][0]}</span>`).join('')}</div>${KD.map(K=>`<div class="a ar"><span class="al"><b>${kh(K)}</b></span>${RJ.map(j=>acell(K,j,CWT[j],NBT[j],j===2)).join('')}</div>`).join('')}</div>`;
   /* v91.7 (خواسته صاحب اپ: «حساب مشتری از جزئیات فاکتور جدا شود»): جدول حساب مشتری کادر خودش را دارد، با فاصله زیر کادر ردیف‌ها (ACG فاصله + دو خط کادر) */
-  const ACG=1.8,ACH=!S.acc?0:ACG+.4+AH+(wide?AR*(RJ.length-1)+AF:AR*KD.length);
-  /* v98.9 (خواسته صاحب اپ: «مانده‌ای که باید واریز شود، زمان واریزش در فاکتور قید شود … و پس از آن مانده این فاکتور تسویه است»): زیر «حساب مشتری» واریزی‌های در راه مشتری
-     با تاریخ واریز می‌آید (wdSched: همین سند و سندهای پیش از آن) و جمله‌ای که مانده پس از واریز را می‌گوید. یک تاریخ = یک خط؛ چند تاریخ = هر تاریخ یک خط (تا سه خط، بقیه یک‌جا) + خط نتیجه.
-     ارتفاعش (WDH) مثل «حساب مشتری» از جای ردیف‌ها کم می‌شود و فقط در برگه آخر است. خط‌ها بلوک ساده با ارتفاع ثابت‌اند (نه flex) تا در PDF گوشی هم همان‌جا بنشینند */
-  const WS0=!S.wds?[]:(o.sched||(typeof wdSched==='function'?wdSched(c,t):[])),KRT=KD[KD.length-1],RF=KRT&&KRT.k==='r'?KRT.v[2]:Math.round(P.R+d.r),WST=WS0.reduce((s,x)=>s+x.a,0),WAF=Math.round(RF-WST),TDY=todayISO();
-  const wdD=x=>{if(!x.d)return 'در نوبت واریز است';const D2=dates(x.d),ds=`<b>${esc(D2.wd+' '+D2.fa)}</b>`;return x.d>TDY?`در تاریخ ${ds} واریز خواهد شد`:x.d===TDY?`امروز ${ds} واریز می‌شود`:`در نوبت واریز است <i>(تاریخ واریز ${esc(D2.fa)})</i>`};
-  const wdA=a=>`<b class="wa">${nm(a)}</b> تومان`,wdE=!WS0.length?'':Math.abs(WAF)<1?'حساب تومانی مشتری <em class="vz">تسویه</em> است':`مانده حساب ${wdA(WAF)} می‌شود <em class="${cls(WAF)}">(${side(WAF)})</em>`;
-  /* یک تاریخ: اگر جا شود همه در یک خط؛ با عددهای خیلی بلند جمله نتیجه به خط دوم می‌رود (پهنا با همان برآورد tw، ضریب از اندازه‌گیری واقعی) */
-  let WL=[];if(WS0.length===1){const a1=`${DIA}مبلغ ${wdA(WS0[0].a)} به حساب مشتری ${wdD(WS0[0])}`,a2=`پس از این واریز، ${wdE}`;WL=tw(a1+' · '+a2)*.95<=181?[a1+'<s>·</s>'+a2]:[a1,'<span class="wsp"></span>'+a2]}
-  else if(WS0.length){const L3=WS0.length>3?WS0.slice(0,2):WS0,RS=WS0.slice(L3.length);WL=L3.map((x,i)=>`${i?'<span class="wsp"></span>':DIA}${i?'و ':'واریز به حساب مشتری: '}${wdA(x.a)} ${wdD(x)}`);
-    if(RS.length){const lz=RS[RS.length-1],Dz=lz.d?dates(lz.d):null;WL.push(`<span class="wsp"></span>و ${wdA(RS.reduce((s,x)=>s+x.a,0))} در ${toFa(RS.length)} نوبت دیگر${Dz?` تا <b>${esc(Dz.fa)}</b>`:''}`)}
-    WL.push(`<span class="wsp"></span>جمع واریزی‌های در راه ${wdA(WST)}<s>·</s>پس از این واریزها، ${wdE}`)}
-  const WLH=4,WDH=WL.length?+(WL.length*WLH+1.6).toFixed(1):0,WDS=WL.length?`<div class="wds">${WL.map(l=>`<div class="wl">${l}</div>`).join('')}</div>`:'',HB=ACH+LGH+WDH;
+  const ACG=1.8,ACH=!S.acc?0:ACG+.4+AH+(wide?AR*(RJ.length-1)+AF:AR*KD.length),HB=ACH+LGH;
   const LGD=!LGH?'':!KD.some(K=>RJ.some(j=>K.v[j]))?'<div class="lgd"></div>':`<div class="lgd"><em class="vd">${WR[1]}</em> یعنی مشتری به مطلا بدهکار است<s>·</s><em class="vc">${WR[2]}</em> یعنی ${S.wr==='c'?'مشتری از مطلا طلبکار است':'مطلا به مشتری بدهکار است'}</div>`;
   /* ---- اندازه تکه‌های برگه: سربرگ کوتاه‌تر وقتی نه لوگو هست نه خوشنویسی؛ پانویس به اندازه چیزهایی که روشن است؛ هر چه آزاد شود به قاب ردیف‌ها می‌رسد ---- */
   const shop=(cfgRec()||{}).shop||{},shopL=[[shop.nm],[shop.ad],[shop.tel&&toFa(shop.tel),1],[shop.ig,1]].map(([v,l])=>[clean(v||''),l]).filter(x=>x[0]).map(([v,l])=>l?'<bdi dir="ltr">'+esc(v)+'</bdi>':esc(v)).join('<s>·</s>');
@@ -210,12 +198,12 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const RT=t.rate&&(S.mz||S.g18)?`<div class="f rt">${S.mz?`<small>مظنه روز</small><b>${fmt(hMz)}</b>`:''}${S.g18?`<small${S.mz?' class="s2"':''}>هر گرم ۱۸ عیار</small><b>${fmt(t.rate)}</b>`:''}</div>`:'';
   const cuAv=184-13-(S.cno&&c.cno?17:0)-(S.ph&&c.phone?27:0)-(S.nid&&c.nid?34:0)-(RT?(S.mz?41:0)+(S.g18?46:0)+6:0),cuW=tw(CUN)*1.22,cuC=cuW<=cuAv?'':cuW*.87<=cuAv?' class="l1"':' class="l2"';
   const CP=S.paper==='a42'||S.copy?['نسخه مشتری','نسخه فروشگاه']:[''];
-  const pg=(s,si,cp)=>{const last=si===NP-1;let HT=last?ZN-LGH-WDH:ZN,FL=HT-.4-s.h-(last?ACH:0);if(S.fill==='r'){const n=Math.max(0,Math.floor((FL+.01)/RH));HT-=Math.max(0,FL-n*RH);FL=n*RH}else if(FL<3){HT-=Math.max(0,FL);FL=0}
+  const pg=(s,si,cp)=>{const last=si===NP-1;let HT=last?ZN-LGH:ZN,FL=HT-.4-s.h-(last?ACH:0);if(S.fill==='r'){const n=Math.max(0,Math.floor((FL+.01)/RH));HT-=Math.max(0,FL-n*RH);FL=n*RH}else if(FL<3){HT-=Math.max(0,FL);FL=0}
     const sub=[NP>1?`برگه ${toFa(si+1)} از ${toFa(NP)}`:'',cp,cn?`سند ${toFa(cn)} مشتری`:''].filter(Boolean).join(' · ');
     return `<div class="pg"><div class="f1"><div class="f2"><div class="f3">
 <div class="hd${S.lp==='r'?' lr':''}">${S.lp==='r'?LG:''}<div class="ttl">${TT}</div>${S.lp==='c'?LG:''}<div class="mt"><div class="mr"><small>شماره</small><b>${toFa(t.no)}</b></div><div class="mr"><small>تاریخ</small><b>${esc((S.wd&&D.wd?D.wd+' ':'')+D.fa)}</b></div>${sub?`<span class="pgn">${sub}</span>`:''}</div></div>
 <div class="cu"><div class="f"><small>مشتری</small><b${cuC}>${esc(CUN)}</b>${cuX}</div>${RT}</div>
-<div class="zn"><div class="tb" style="height:${(HT-(last?ACH:0)).toFixed(2)}mm">${headR}${s.H.join('')}${fillR(FL)}</div>${last&&AC?`<div class="acw">${AC}</div>`:''}${last?WDS+LGD:''}</div>
+<div class="zn"><div class="tb" style="height:${(HT-(last?ACH:0)).toFixed(2)}mm">${headR}${s.H.join('')}${fillR(FL)}</div>${last&&AC?`<div class="acw">${AC}</div>`:''}${last?LGD:''}</div>
 ${NL?`<div class="nt${NL>1?' n2':''}">${esc(S.note)}</div>`:''}${FTH?`<div class="ft">${last&&S.sgc?`<div class="sg">امضای مشتری</div>`:'<div class="sg0"></div>'}<div class="mid">${last?(S.th?invCal(['با','سپاس','از','اعتماد','شما'],7.4,200):''):`<span class="nx">ادامه در برگه بعد</span>`}${S.shp?`<small>${shopL||'طلا و جواهر مطلا'}</small>`:''}</div>${last&&S.sgs?`<div class="sg">مهر و امضای فروشنده${S.by&&t.by?' · '+esc(t.by):''}</div>`:'<div class="sg0"></div>'}</div>`:''}
 </div></div></div></div>`};
   let body=S.paper==='a42'?SH.map((s,si)=>`<section class="sht">${pg(s,si,CP[0])}${pg(s,si,CP[1])}</section>`).join(''):CP.map(cp=>SH.map((s,si)=>`<section class="sht">${pg(s,si,cp)}</section>`).join('')).join('');
@@ -250,7 +238,6 @@ u,em,i,s{text-decoration:none;font-style:normal}
 .a .av{display:flex;align-items:center;justify-content:flex-end}.a .av.c{justify-content:center}.a .av em{flex:0 0 ${SB}mm;text-align:left;font-size:${za(6.6)}pt;font-weight:700;margin-inline-end:${GP}mm}.a .av b{flex:none;text-align:right;font-size:${za(8.9)}pt;font-weight:700;line-height:1}.a .av b.z{font-weight:500;color:${C.h2}}.a .av em.st{flex:none;margin:0;font-size:${za(7.6)}pt}
 .a.af{height:${AF}mm;background:${C.ti};border-top:.6mm solid ${C.gd}}.a.af .al{line-height:${+(AF-.5).toFixed(2)}mm}.a.af .al b{font-size:${za(9.6)}pt;font-weight:800}.a.af .av em{font-size:${za(7.4)}pt;font-weight:800}.a.af .av b{font-size:${+FPA.toFixed(2)}pt;font-weight:800}.a.af .av em.st{font-size:${za(9)}pt}
 .ac.tp .ah .fn{color:${C.ink}}.ac.tp .av.fn{background:${C.ti}}.ac.tp .av.fn b{font-size:${za(9.8)}pt;font-weight:800}.ac.tp .av.fn em{font-weight:800}
-.wds{height:${WDH}mm;padding:.9mm 1mm 0;overflow:hidden}.wl{height:${WLH}mm;line-height:${WLH}mm;font-size:7.6pt;font-weight:600;color:${C.t2};white-space:nowrap;overflow:hidden}.wl b{font-weight:800;color:${C.ink}}.wl b.wa{font-size:8.6pt}.wl i{font-style:normal;font-size:6.6pt;color:${C.mu}}.wl em{font-style:normal;font-weight:800}.wl s{text-decoration:none;margin:0 2mm;color:${C.gd}}.wl .wsp{display:inline-block;width:3.3mm}
 .lgd{height:3.6mm;line-height:4mm;font-size:6.3pt;color:${C.t2};white-space:nowrap;overflow:hidden;padding:0 1mm}.lgd em{font-weight:700}.lgd s{margin:0 2mm;color:${C.gd}}
 .vd{color:${C.rd}}.vc{color:${C.bl}}.vz{color:${C.gn}}
 .nt{height:4.2mm;margin-top:0;padding:.6mm 1mm 0;font-size:6.8pt;line-height:3.4mm;color:${C.t2};white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nt.n2{height:7.6mm;white-space:normal}

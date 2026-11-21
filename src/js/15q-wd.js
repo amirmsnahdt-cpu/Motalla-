@@ -51,13 +51,6 @@ function wdSpl(c,no){const o={fr:0,al:0};if(!c)return o;const A=allocMap();wdPen
 /* واریزی‌های در انتظار یک مشتری (یا یک سند) */
 function wdPendL(c,no){if(!c)return [];return wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&(no==null||String(e.wd.no)===String(no))).map(e=>({e,S:wdState(e)})).filter(o=>o.S.pend>0)}
 const wdPend=(c,no)=>wdPendL(c,no).reduce((s,o)=>s+o.S.pend,0);
-/* v98.9 (خواسته صاحب اپ: «مانده‌ای که تخصیص خورده و باید واریز شود، زمان واریزش در فاکتور قید شود»): واریزی‌های در راه مشتری به تفکیک تاریخ واریز،
-   برای چاپ زیر «حساب مشتری». فقط واریزی‌های همین سند یا سندهای پیش از آن شمرده می‌شود (مانده نهایی برگه همان‌ها را در خود دارد).
-   هر بخش بانکی با تاریخ واریز خودش (بخش‌های یک واریزی می‌توانند تاریخ جدا داشته باشند)؛ تسویه از مشتری در انتظار با تاریخ خود واریزی. خروجی: [{d,a,n}] از نزدیک‌ترین تاریخ */
-function wdSched(c,t){if(!c||!t)return [];const K=x=>String(x.date||'')+'|'+String(x.at0||x.at||''),k=K(t),M=new Map(),A=allocMap();
-  wdPendL(c).forEach(({e,S})=>{const d=(c.txs||[]).find(q=>!q.del&&q.type==='inv'&&String(q.no)===String(e.wd.no));if(d&&String(d.id)!==String(t.id)&&String(d.no)!==String(t.no)&&K(d)>k)return;
-    wdParts(e,S,A).forEach(p=>{const x=(p.t==='b'&&p.ent!=null&&entries.find(z=>z.id===p.ent))||e,dt=PD(x)||PD(e)||'';const o=M.get(dt)||M.set(dt,{d:dt,a:0,n:0}).get(dt);o.a+=p.a;o.n++})});
-  return [...M.values()].filter(o=>o.a>0).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0)}
 /* همگام‌سازی: ردیف‌های پرداخت سند با بخش‌های تأییدشده واریزی‌ها (دو طرفه؛ تکراری‌ها یکی می‌شوند) */
 let wdBusy=false;
 function wdSync(){if(wdBusy)return;const R=wdRoots();let any=R.length;if(!any){for(const c of custs){if(c.sys||c.del)continue;for(const t of c.txs||[])if(!t.del&&t.type==='inv'&&(t.pays||[]).some(p=>p.m==='wd')){any=1;break}if(any)break}}if(!any)return;

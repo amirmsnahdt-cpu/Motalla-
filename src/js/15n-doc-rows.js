@@ -181,7 +181,7 @@ const dtT=v=>fmt(Math.round(+v||0))+' تومان';
 function itDet(it,rate,tax,saved){const c=saved&&it.tot!=null?{gold:+it.gold||0,aj:+it.ajv||0,pr:+it.prv||0,tax:+it.taxv||0,tot:+it.tot||0,fx:+it.amT>0?1:0}:itCalc(it,rate,tax),r=+it.mz?(+it.mz)/MZK:(+rate||0),ay=+it.ay||750,w=+it.w||0;
   return [+it.cnt?'تعداد: '+qFmt(it.cnt)+' عدد':'','وزن: '+wFmt(w)+' گرم',shAyL(it)||'عیار: '+toFa(ay),ay!==750||it.ab?'وزن ۷۵۰: '+wFmt(Math.round(w*ay/750*1000)/1000)+' گرم':'',
     r?'مظنه: '+fmt(Math.round(r*MZK))+' تومان':'',r?'هر گرم ۱۸: '+dtT(r):'',c.gold?'بهای طلا: '+dtT(c.gold):'',!it.ab?'اجرت: '+ajLab(it)+(c.aj&&ajPT(it).P?' = '+dtT(c.aj):''):'',
-    'سود: '+prLab(it)+(c.pr&&(+it.pp||!+it.ppT)?' = '+dtT(c.pr):''),c.tax?'مالیات: '+dtT(c.tax):'','مبلغ: '+dtT(c.tot),c.fx?'مبلغ دستی':'',shEff(it),
+    'سود: '+toFa(Math.round((+it.pp||0)*100)/100)+'٪'+(c.pr?' = '+dtT(c.pr):''),c.tax?'مالیات: '+dtT(c.tax):'','مبلغ: '+dtT(c.tot),c.fx?'مبلغ دستی':'',shEff(it),
     it.lab?'آزمایشگاه '+esc(it.lab):'',it.ang?'انگ '+esc(it.ang):'',it.n?'توضیح: '+esc(it.n):''].filter(Boolean).join(' · ')}
 function xrDet(x,C,rate){const g=x.a==='gold',m=x.t==='sell'||x.t==='buy',u=g?'گرم':((XA[x.a]||{}).u||'واحد'),ay=+x.ay||750,q=C.q!=null?C.q:x.q750!=null?+x.q750:(g?Math.round((+C.n||0)*ay/750*1000)/1000:C.n),r=+x.mz?(+x.mz)/MZK:(+rate||0),ab=g&&x.cat==='آبشده'&&!x.pul;
   const nm={sell:'فروش',buy:'خرید',in:'دریافت',out:'پرداخت (تحویل)'}[x.t]||x.t;

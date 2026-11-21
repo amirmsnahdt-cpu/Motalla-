@@ -165,9 +165,9 @@ ACT.dkF=d=>{qaRead();const a=sv.qa,D=a.d,[ty,v]=String(d.id).split(':');a.q='';a
   if(ty==='m'){if(v==='cust'&&!svCu()){toast('اول مشتری سند را انتخاب کنید',true);return}pyStart(pyNew(v,{dir:D,fl:1}));return}
   if(ty==='a'){xrStart(xrNew(T,v,{fl:'one',fd:D,...X}));return}
   if(ty==='g'){
-    if(v==='abs'){if(D==='sell'){a.k='آبشده';a.ab=1;a.sh=1;a.ay=750;a.pp=PROFIT_AB;a.ppT='';a.mz='';a.mzk='';a.ajP='';a.ajT='';a.lab='';a.ang='';a.i=null;svKeep();qaRe('qW');return}
+    if(v==='abs'){if(D==='sell'){a.k='آبشده';a.ab=1;a.sh=1;a.ay=750;a.pp=PROFIT_AB;a.mz='';a.mzk='';a.ajP='';a.ajT='';a.lab='';a.ang='';a.i=null;svKeep();qaRe('qW');return}
       if(BUY&&!dkRateOk())return;xrStart(xrNew(D==='swap'||D==='ret'?'buy':D,'gold',{cat:'آبشده',sh:1,ay:750,fl:'gold',fd:D,...X}));return}
-    if(v==='ab'&&D==='sell'){a.k='آبشده';a.ab=1;a.ay=750;a.pp=PROFIT_AB;a.ppT='';a.mz='';a.mzk='';a.ajP='';a.ajT='';a.lab='';a.ang='';a.i=null;svKeep();qaRe('qW');return}
+    if(v==='ab'&&D==='sell'){a.k='آبشده';a.ab=1;a.ay=750;a.pp=PROFIT_AB;a.mz='';a.mzk='';a.ajP='';a.ajT='';a.lab='';a.ang='';a.i=null;svKeep();qaRe('qW');return}
     if(v==='misc'&&D==='sell'){ACT.qaK({k:'متفرقه'});return}
     if(v==='pz'){if(D==='sell'){ACT.qaK({k:'سکه پارسیان'});Object.assign(sv.qa,{pz:1,cnt:'',ajP:'',ajT:''});svKeep();qaRe();return}
       if(!dkRateOk())return;xrStart(xrNew(T,'gold',{cat:'پارسیان',pz:1,cnt:'',ay:BUY?735:750,fl:'gold',fd:D,...X}))/* v61.60: خرید پارسیان عیار ۷۳۵، مظنه خرید */;return}
