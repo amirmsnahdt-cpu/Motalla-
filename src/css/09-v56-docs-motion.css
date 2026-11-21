@@ -4952,3 +4952,7 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 
 /* v98.4 «موجودی صفر است» در اصلاح موجودی بانک: روشن = سبز (نه قرمزِ «منفی») */
 #sheet .bf4 .ckq button[data-act="bfxZero"].on{background:#15803d;color:#fff;box-shadow:0 6px 16px -8px rgba(21,128,61,.6)}
+
+/* v98.6 دکمه‌های ردیف واریزی سند: واریزی · مبلغ واریزی · انتخاب بانک کنار هم */
+.d8xi .wdab{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.d8xi .wdab .d8eb{align-self:auto}

@@ -53,7 +53,7 @@ function payDocMake(e,c,a,o){o=o||{};const p={m:'dep',amount:Math.round(a),entId
   const z=(e.settles||[]).find(s=>s.id===(t.pays[0]||{}).stlId);if(z){z.inv='';z.note=o.note||'';if(o.st==='ok'){z.st='ok';z.okAt=ns();z.okBy=who()}stlSync(e)}saveCu();saveE();return {c,t,z}}
 /* واریزی تازه → حساب + سند؛ تسویه‌های همراهش → سند دریافت هر پرداخت‌کننده */
 function depLink(e,o){o=o||{};try{const S=(o.settles||[]).filter(s=>+s.amount>0);
-    const c=cuOf({cuId:o.cuId,name:e.name,title:e.title,phone:e.phone,nid:e.nid,iban:e.iban,card:e.card,holder:e.holder},'از واریزی');depDocMake(e,c);
+    /* v98.6: «مشتری هم‌نام دیگر» در خرید دستی = حساب تازه، حتی اگر حسابی با همین نام هست */const c=(o.nwCu?null:cuFindBy({cuId:o.cuId,name:e.name,phone:e.phone,nid:e.nid}))||cuMakeBy({cuId:o.cuId,name:e.name,title:e.title,phone:e.phone,nid:e.nid,iban:e.iban,card:e.card,holder:e.holder},'از واریزی');depDocMake(e,c);
     for(const s of S){const pc=pyOf({cuId:s.cuId,name:s.name,phone:s.phone});payDocMake(e,pc,+s.amount,{tn:s.tn||'',note:s.note||'',imgs:stImgs(s),st:s.st||'ok'})}
     return c}catch(err){toast('واریزی ثبت شد، اما سند حساب مشتری ساخته نشد',true);return null}}
 /* حذف تسویه از سمت واریزی: سند خودکارش حذف، در سند دستی فقط همان ردیف */

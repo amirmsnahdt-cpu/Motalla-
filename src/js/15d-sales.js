@@ -200,7 +200,7 @@ function svCrHTML(){const q0=clean(sv.q||''),q=nzName(toEn(q0)),A=CU();
   cuWPRe();const nq=toEn(q0).replace(/\D/g,''),L=A.filter(c=>nzName([c.name,c.phone,c.nid,c.grp].join(' ')).includes(q)||(nq&&String(c.cno)===nq)).sort((a,b)=>((nq&&String(b.cno)===nq)-(nq&&String(a.cno)===nq))||((a.grp==='بانک')-(b.grp==='بانک'))||(nzName(b.name).startsWith(q)-nzName(a.name).startsWith(q))||String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,60);
   const add=!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0));
   return `<div class="bzsug cbl" role="listbox">${svBkRows(q0)}${svCuRows(L,pendMap())}
-    ${cbRow('svCuNew',{},ic('plus'),add?'حساب تازه: «'+esc(q0)+'»':'افتتاح حساب تازه',(L.length?'':'مشتری‌ای پیدا نشد · ')+'اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
+    ${cbRow('svCuNew',{},ic('plus'),add?'حساب تازه: «'+esc(q0)+'»':q0&&A.some(c=>nzName(c.name)===nzName(q0))?'حساب جدا برای «'+esc(q0)+'» دیگر (هم‌نام)':'افتتاح حساب تازه',(L.length?'':'مشتری‌ای پیدا نشد · ')+'اول مشخصات، بعد روی همین سند می‌نشیند','','nw')}</div>`}
 /* v90.9 (خواسته صاحب اپ: «لیست‌هایی که سرچ مشتری هست باید مثل لیست مشتری‌ها درست باشد که بشود قشنگ جستجو کرد و مانده‌ها را دید»):
    ردیف حساب در جستجوی مشتری سند = همان ردیف صفحه «حساب مشتریان» (cuRowH: شماره در قاب توسی، نام کامل، تلفن و گروه در سطر دوم، قاب‌های مانده).
    فهرست «همه حساب‌ها» ۴۰ تا ۴۰ تا می‌آید (svCuLim)؛ جستجو همیشه همه حساب‌ها را می‌گردد. */
@@ -604,7 +604,7 @@ function svErr(){const c=svCu();if(!c)return 'مشتری سند انتخاب ن�
   if(sv.edit){const c0=svCu(),t0=c0&&(c0.txs||[]).find(z=>String(z.id)===String(sv.edit.tx));for(const p of (t0&&t0.pays)||[]){if(p.m!=='dep')continue;const e=entries.find(z=>String(z.id)===String(p.entId));if(!e||!depBkFix(e)||remCan())continue;const z=(e.settles||[]).find(q=>q.id===p.stlId);if(z&&ckUsedDep(p.entId)<(+z.amount||0))return REMNO}}
   return ''}
 /* ثبت واقعی سند (تازه یا جایگزین نسخه قبلی در ویرایش) — برمی‌گرداند {c,t} */
-function svCommit(){const c=svCu();let depOld=null,depOff=null;
+function svCommit(){const c=svCu();let depOld=null,depOff=null;/* v98.6: بدهی و واریزی‌های در راه پیش از ثبت (wdFit بعد از ثبت، 15q) */const R0=c?wdOwe(c):0,D0=c?wdPend(c):0;
   /* v61.7: ویرایش سند ثبت‌شده: نسخه قبلی (و ردیف‌های مرتبطش) کنار می‌رود و همین سند با همان شماره دوباره ثبت می‌شود */
   let OLD=null;if(sv.edit){/* v88.5: نسخه‌ای که باز شده اگر در این فاصله جایگزین شده باشد (ویرایش از گوشی دیگر)، همان سند زنده با همین شماره کنار می‌رود — وگرنه دو سند با یک شماره می‌ماند */const t0=(c.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)&&!x.del)||(c.txs||[]).find(x=>!x.del&&x.type==='inv'&&!x.lk&&!x.pd&&!x.bl&&!x.bd&&String(x.no)===String(sv.edit.no));if(t0){OLD=t0;const at=new Date().toISOString();t0.del=true;t0.delAt=at;t0.delBy=who();t0.edBy=1;txLinked(c,t0).forEach(x=>{x.t.del=true;x.t.delAt=at;x.t.delBy=who()});depOld=depKeep(t0);depOff=invDepOff(t0,1)}}
   const T=svTot(),now=ns(),no=sv.edit?sv.edit.no:sv.no0&&!invNoUsed(sv.no0)?sv.no0:invNext(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}});
@@ -615,6 +615,7 @@ function svCommit(){const c=svCu();let depOld=null,depOff=null;
   for(const p of t.pays){if(p.m!=='cust'&&!p.bk||p.m==='pos')continue;/* v83.7: طرف مقابل = سند واقعی (15zt lnkMirror) */const x=lnkMirror(c,t,p,no,now);if(x)p.xfId=x.id}
   (c.txs=c.txs||[]).push(t);c.lastAt=now;posDaySyncAll(1);saveCu();if(t.pays.some(p=>p.srcId!=null))saveS();ckDepApply(c,t,now,depOld,depOff);
   logA('cust',(OLD?'ویرایش ':'')+invTitle(t),cuName(c)+(items.length?' | '+items.map(i=>i.k+' '+wFmt(i.w)+' گرم').join('، '):'')+(xr.length?' | '+xr.map(xrLab).join('، '):'')+' | جمع '+fmt(T.total)+' تومان'+(T.paid?' | دریافت/پرداخت '+fmt(T.paid):''),{cu:c.id,tx:t.id});
+  {const wm=wdFit(c,no,R0,D0);if(wm){if(window.__audbg)toastBg(wm);else setTimeout(()=>toast(wm),900)}}
   return {c,t}}
 /* v61.96 (خواسته صاحب اپ): فاکتور / PDF از داخل خود سند (پیش از ثبت) — همان برگه فاکتور با ردیف‌های فعلی، بدون ثبت و بدون تغییر حساب‌ها */
 function svDraftTx(){const c=svCu(),T=svTot(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}}),xr=(sv.xr||[]).map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e,q0:C.q0,ajg:C.ajg,prg:C.prg}});
