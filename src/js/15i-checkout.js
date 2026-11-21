@@ -109,7 +109,7 @@ const ckAIn=cls=>`<input id="ckA" class="ltr ${cls||''}" readonly inputmode="non
 /* v91.8 (خواسته صاحب اپ: «نقدی و حواله هم مثل کارتخوان ثابت، کامپکت و درست؛ کادر مبلغ متوازن»): یک صفحه‌کلید برای همه (همان چیدمان پوز: سه ستون عدد + ستون رنگی
    انصراف/پاک/تأیید) و یک کادر مبلغ وسط‌چین (برچسب بالا، عدد وسط، «کل مانده/نصف» زیرش؛ واحد کنار عدد نیست تا عدد از وسط بیرون نرود) */
 function ckKeys(cls){const k=(v,t,c)=>`<button type="button" class="ckk ptm-k${c?' '+c:''}" data-act="ckK" data-k="${v}">${t}</button>`;
-  return `<div class="ptm-keys${cls?' '+cls:''}">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('x','<i>✕</i><span>انصراف</span>','kr')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('bs','<i>‹</i><span>پاک</span>','ky')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok','<i>○</i><span>تأیید</span>','kg')}${/* v97.9: ردیف آخر = ۰۰ · ۰ · ۰۰۰؛ کلید زرد «پاک» یک رقم پاک می‌کند */k('00','۰۰','z3')}${k('0','۰')}${k('000','۰۰۰','z3')}</div>`}
+  return `<div class="ptm-keys${cls?' '+cls:''}">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('x','<i>✕</i><span>انصراف</span>','kr')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('c','<i>‹</i><span>پاک</span>','ky')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok','<i>○</i><span>تأیید</span>','kg')}${k('000','۰۰۰','z3')}${k('0','۰')}${k('bs',ic('back').replace('class="i"','class="i bsk"'),'bs')}</div>`}
 function ckScr(lf){return `<div class="ckscr"><small>مبلغ <i>تومان</i></small><div class="ckscv">${ckAIn()}</div>${lf?`<div class="ckq"><button type="button" data-act="ckAmt" data-v="${lf}">کل مانده · ${fmt(lf)}</button>${lf>=2e6?`<button type="button" data-act="ckAmt" data-v="${Math.round(lf/2)}">نصف</button>`:''}</div>`:''}</div>`}
 /* v91.5 (خواسته صاحب اپ: «با انیمیشن نشان بده داری آن عملیات را انجام می‌دهی»): نوار مسیر پول بالای فرم — از چه کسی/کجا به کجا، با نقطه‌های روان روی خط */
 /* v91.8: جهت درست — مبدأ سمت راست، مقصد سمت چپ، نقطه‌ها از راست به چپ (دریافت: مشتری ← بانک/صندوق؛ پرداخت: بانک/صندوق ← مشتری) */
@@ -130,7 +130,7 @@ function ckPos(lf){const z=ckBkL().find(o=>String(o.id)===String(CK.srcId)),K=xr
   <div class="ptm-body">
     <div class="ptm-hd" id="posH">${ckPosHead()}</div>
     <div class="ptm-lcd" id="posS"><div class="ptm-st"><span>خرید</span><span>${esc(dates(sv.date||todayISO()).fa)}</span></div><div class="ptm-v"><small>مبلغ تراکنش · تومان</small>${ckAIn('posin')}</div>${lf?`<button type="button" class="ptm-rm" data-act="ckAmt" data-v="${lf}"><small>مانده سند</small><b>${fmt(lf)}</b><em>بزنید</em></button>`:''}<div class="ptm-msg" id="posM"></div></div>
-    <div class="ptm-keys">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('x','<i>✕</i><span>انصراف</span>','kr')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('bs','<i>‹</i><span>پاک</span>','ky')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok','<i>○</i><span>تأیید</span>','kg')}${k('00','۰۰','z3')}${k('0','۰')}${k('000','۰۰۰','z3')}</div>
+    <div class="ptm-keys">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('x','<i>✕</i><span>انصراف</span>','kr')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('c','<i>‹</i><span>پاک</span>','ky')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok','<i>○</i><span>تأیید</span>','kg')}${k('000','۰۰۰','z3')}${k('0','۰')}${k('bs',ic('back').replace('class="i"','class="i bsk"'),'bs')}</div>
     <div class="ptm-bot"><span class="ptm-brand">MOTALLA<b>POS</b></span><span class="ptm-cs"></span></div>
   </div>
   <div class="ptm-card" aria-hidden="true"><span>${z?(bkAvH(z)||''):''}</span><i></i></div></div>`}

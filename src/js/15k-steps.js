@@ -87,15 +87,13 @@ const stDir=()=>{const a=sv.qa,K=stKind();if(K==='it'||K==='ab')return -1;if(K==
 const stMzTx=(o,f)=>{f=f||1;const B=f!==1?' خرید':'',k=stMzK(o),v=Math.round(stMzV(o,k)*f),w=Math.round(stMzV(o,k==='g'?'mz':'g')*f);return v?(k==='g'?'هر گرم'+B+' ':'مظنه'+B+' ')+fmt(v)+(w?' ('+(k==='g'?'مظنه'+B+' ':'هر گرم'+B+' ')+fmt(w)+')':'')+(+o.mz?' <b class="own">این ردیف</b>':''):''};
 /* v61.98 (خواسته صاحب اپ): هنگام ویرایش مبلغ یا مظنه/نرخ، مبنا دیده شود تا خطا کم شود — مبلغ حساب‌شده (و اختلاف مبلغ دستی با آن)،
    قیمت لحظه‌ای بازار و نرخ سند؛ زدن روی هر مبنا همان عدد را در فیلد می‌گذارد */
-/* v93.5 (خواسته صاحب اپ: «صفحه‌کلید نباید تکان بخورد؛ وقتی اختلاف می‌زند می‌پرد پایین»): با صفحه‌کلید برنامه این ردیف همیشه هست و یک‌خطی است
-   (حتی خالی)، و در پله مبلغ «اختلاف» همیشه جا دارد («ندارد» وقتی برابر است) — قد بالای صفحه‌کلید عوض نمی‌شود */
-function stRefHTML(){const a=sv.qa,S=stSteps(),cur=S[Math.min(a.st||0,S.length-1)];if(!cur)return '';const K=stKind(),R=[],kp=stKbT(cur)==='num';
+function stRefHTML(){const a=sv.qa,S=stSteps(),cur=S[Math.min(a.st||0,S.length-1)];if(!cur)return '';const K=stKind(),R=[];
   const chip=(l,v,on)=>v?`<button type="button" class="strf${on?' on':''}" data-act="stRefSet" data-v="${Math.round(v)}"><small>${l}</small><b>${fmt(Math.round(v))}</b></button>`:'';
   if(cur.k==='amT'){let base=0,now=0;if(K==='it'||K==='ab'){const it=qaIt(a);base=itCalc({...it,amT:0},sv.rate,sv.tax).tot||0;now=itCalc(it,sv.rate,sv.tax).tot||0}else if(K==='xr'){const x=a.x;base=xrCalc({...x,amT:''},sv.rate).amount||0;now=xrCalc(x,sv.rate).amount||0}
-    if(base){R.push(chip('مبلغ حساب‌شده',base,now===base));if(now&&now!==base)R.push(`<span class="strd ${now>base?'up':'dn'}"><small>اختلاف</small><b>${now>base?'+':'−'} ${fmt(Math.abs(now-base))}</b></span>`);else if(kp)R.push('<span class="strd eq"><small>اختلاف</small><b>ندارد</b></span>')}}
+    if(base){R.push(chip('مبلغ حساب‌شده',base,now===base));if(now&&now!==base)R.push(`<span class="strd ${now>base?'up':'dn'}"><small>اختلاف</small><b>${now>base?'+':'−'} ${fmt(Math.abs(now-base))}</b></span>`)}}
   if(cur.mz){const o=K==='xr'?a.x:a,f=K==='xr'?stBuyF(a.x):1,k=stMzK(o),g=k==='g';const mk=glOk()?Math.round((g?GL.g18:GL.mz)*f):0,dc=Math.round((g?(+sv.rate||0):(+sv.mz||mzOf(sv.rate)||0))*f),cv=+cur.get()||0;
     if(mk)R.push(chip('بازار'+(glOld()?'':' · زنده'),mk,cv===mk));if(dc&&dc!==mk)R.push(chip('نرخ سند',dc,cv===dc))}
-  return R.length||kp?`<div class="strs">${R.join('')}</div>`:''}
+  return R.length?`<div class="strs">${R.join('')}</div>`:''}
 ACT.stRefSet=d=>{const I=$('stI');if(!I)return;const v=+d.v||0;I.value=v?v.toLocaleString('en-US'):'';if(I.oninput)I.oninput();try{I.focus({preventScroll:true});const n=I.value.length;I.setSelectionRange(n,n)}catch(_){}};
 function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
   if(K==='it'||K==='ab'){const it=qaIt(a),c=sv.rate||+it.mz?itCalc(it,sv.rate,sv.tax):null;am=c&&c.tot||0;
@@ -112,74 +110,16 @@ function stLive(){const a=sv.qa,K=stKind(),D=[];let am=0;
   else return '';
   const d=am?(stDir()<0?'d':'c'):'z',E=D.filter(Boolean),ai=K==='xr'||K==='it'||K==='ab'?stSteps().findIndex(z=>z.k==='amT'):-1;
   return `<div class="stam ${d}${ai>=0&&sv.qa.st!==ai?' tap':''}"${ai>=0&&sv.qa.st!==ai&&am?` data-act="stGo" data-i="${ai}" role="button" aria-label="ویرایش مبلغ"`:''}><small>${am?(d==='d'?'طلبکار می‌شویم':'بدهکار می‌شویم'):'مبلغ این ردیف'}</small><span class="fz"><b${fitS((am?fmt(am):'—')+' تومان')}>${am?fmt(am):'—'}<i>تومان</i></b></span>${E.length?`<em>${E.join(' · ')}</em>`:''}</div>`}
-/* v92.6 (طرح پیشنهادی، خواسته صاحب اپ: «پنجره قرمز یا آبی یک کیبرد پایینش داشته باشد؛ طراحی کن ببینم»):
-   پله‌های عددی (وزن، عیار، مبلغ، درصد، انگ…) با صفحه‌کلید خود برنامه در پایین همان پنجره پر می‌شوند؛ کیبورد گوشی باز نمی‌شود (inputmode=none)،
-   پس نوار مانده پایین سند و خود پنجره همیشه دیده می‌شود. پله‌های متنی و فهرست‌های جستجو همان کیبورد گوشی را دارند.
-   کلیدها همان فیلد #stI را پر می‌کنند و رویداد input می‌فرستند (همه قالب‌بندی‌ها و محاسبه زنده مثل قبل). اولین رقم بعد از رسیدن به پله، مقدار قبلی را جایگزین می‌کند (QKF). */
-let QKF=false;
-/* v96.3 (خواسته صاحب اپ: «وقتی روی شرح می‌آید هم کیبورد در همان شکل باشد»): پله‌های متنی (شرح، آزمایشگاه، پیگیری…) هم صفحه‌کلید خود برنامه را
-   در همان قاب و همان قد صفحه‌کلید عددی دارند (حروف فارسی، صفحه دوم عدد و نشانه)؛ پنجره تکان نمی‌خورد. کلید «کره» کیبورد گوشی را برای همان پله باز می‌کند (QKN). */
-let QKB=0,QKN='';
-const QKL=[['ض','ص','ق','ف','غ','ع','ه','خ','ح','ج','چ'],['ش','س','ی','ب','ل','ا','ت','ن','م','ک','گ'],['ظ','ط','ژ','ز','ر','ذ','د','پ','و','ث']],
-  QKS=[['1','2','3','4','5','6','7','8','9','0'],['آ','ئ','ء','ؤ','أ','ة','،','.',':','-','/'],['(',')','«','»','؟','!','+','٪','*','#']];
-/* v97.0 (خواسته صاحب اپ: «شبیه آیفون باشد و حدس کلمات فارسی هم داشته باشد»): ردیف پیشنهاد کلمه بالای حروف.
-   واژه‌ها = فهرست پایه طلافروشی (QKW0) + هر چه در شرح‌ها، نام کالاها، آزمایشگاه‌ها و علت‌های خود مغازه نوشته شده (پرتکرارترها بالاتر؛ جفت‌واژه‌ها برای «کلمه بعدی»).
-   چیزی بیرون فرستاده نمی‌شود؛ حافظه window.__qkw با memoClear پاک می‌شود. */
-const QKW0='دستبند انگشتر گردنبند النگو زنجیر گوشواره سرویس نیم‌ست پلاک آویز دستبند‌النگویی تک‌پوش حلقه رینگ سکه شمش آبشده متفرقه کارتیر ونکلیف بولگاری تیفانی رولکس شنل هرمس لویی‌ویتون طرح مدل نگین فیروزه برلیان الماس مروارید یاقوت زمرد عقیق اتمی جواهر طلا سفید زرد رزگلد دورنگ مات براق دست‌دوم نو کارکرده شکسته قدیمی بچگانه مردانه زنانه دخترانه ظریف پهن سنگین سبک ایتالیایی ترک دبی ساخت کارگاه سفارشی فاکتور بدون با اجرت سود تخفیف امانی تعمیر آبکاری حکاکی سایز کوتاه بلند قفل فنری کارت ضمانت جعبه مشتری همکار بنکدار قنات‌آبادی بازار پاساژ'.split(' ');
-const qkNz=w=>String(w||'').replace(/ي/g,'ی').replace(/ك/g,'ک');
-function qkWords(){if(window.__qkw)return window.__qkw;const W=new Map(),B=new Map(),add=t=>{const T=qkNz(clean(t||'')).split(/[\s،,.:;()«»\/\-+*#!؟?0-9۰-۹]+/).filter(w=>w.length>1&&w.length<25&&/[؀-ۿ]/.test(w));T.forEach((w,i)=>{W.set(w,(W.get(w)||0)+3);if(i){const p=T[i-1];let m=B.get(p);if(!m)B.set(p,m=new Map());m.set(w,(m.get(w)||0)+1)}})};
-  QKW0.forEach((w,i)=>W.set(w,1-i/1000));
-  try{for(const c of custs){if(!c||c.del)continue;for(const t of c.txs||[]){if(!t||t.del)continue;for(const it of t.items||[]){add(it.k);add(dsOf(it));add(it.lab)}for(const x of t.xr||[]){add(dsOf(x));add(x.lab);if(x.a==='gold'&&x.cat&&x.cat!=='مانده قبلی')add(x.cat)}for(const p of t.pays||[])add(p.why)}}
-    goodsList().forEach(add);bdReasons().forEach(add)}catch(_){}
-  return window.__qkw={W,B}}
-function qkSug(v,p){const {W,B}=qkWords(),h=qkNz(String(v||'').slice(0,p==null?undefined:p)),m=h.match(/([^\s]*)$/),cur=m?m[1]:'',top=L=>L.sort((a,b)=>b[1]-a[1]).slice(0,3).map(z=>z[0]);
-  if(cur){const R=[];W.forEach((n,w)=>{if(w!==cur&&w.startsWith(cur))R.push([w,n])});return top(R)}
-  const pv=(h.trim().split(/\s+/).pop()||''),R=[],S=new Set();const bm=pv&&B.get(pv);if(bm)bm.forEach((n,w)=>{R.push([w,n+1000]);S.add(w)});W.forEach((n,w)=>{if(!S.has(w)&&w!==pv)R.push([w,n])});return top(R)}
-function qkSgIn(){const I=$('stI'),v=I?I.value:'',fo=I&&document.activeElement===I,L=QKB?[]:qkSug(v,fo&&I.selectionStart!=null?I.selectionStart:v.length);
-  return [0,1,2].map(i=>L[i]?`<button type="button" class="qks" data-qk="1" data-k="w:${esc(L[i])}">${esc(L[i])}</button>`:'<span class="qks em" aria-hidden="true"></span>').join('')}
-function qkSgPaint(){const E=$('qkSg');if(E){E.innerHTML=qkSgIn();qkbBind()}}
-function qkbHTML(last,ed){const L=QKB?QKS:QKL,k=(v,t,c,al)=>`<button type="button" class="qkk kb${c?' '+c:''}" ${v==='ok'?'data-act="stK"':'data-qk="1"'} data-k="${esc(v)}"${al?` aria-label="${al}"`:''}>${t}</button>`,bs='<svg class="qbs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/></svg>';
-  return `<div class="qkp qkb" dir="ltr"><div class="qkr sg" id="qkSg" dir="rtl">${qkSgIn()}</div><div class="qkr">${L[0].map(c=>k(c,QKB?toFa(c):c)).join('')}</div><div class="qkr">${L[1].map(c=>k(c,c)).join('')}</div><div class="qkr">${L[2].map(c=>k(c,c)).join('')}${k('bs',bs,'fn w2','پاک کردن یک حرف')}</div>
-    <div class="qkr">${k('pg',QKB?'ا‌ب‌پ':'۱۲۳','fn w2 tx','عدد و نشانه')}${k('nat','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.800 0 18M12 3c-3 3.200-3 14.800 0 18"/></svg>','fn w1','کیبورد گوشی')}${k('sp','فاصله','sp tx','فاصله')}${k('zw','نیم‌فاصله','fn w2 tx zw','نیم‌فاصله')}${k('ok',last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':'<span>بعدی</span>','go w3'+(last?' fin':''))}</div></div>`}
-function qkbBind(){}
-/* v97.2 (خواسته صاحب اپ: «دکمه‌ها لگ دارند؛ مثل کیبورد آیفون خوب باشد و ویبره داشته باشد»): کلیدها با لمس (pointerdown) همان لحظه کار می‌کنند، نه با click؛
-   یک شنونده برای همه کلیدها (بدون انیمیشن فشار عمومی 15h و بدون ثبت خودکار تاریخچه برای هر حرف)، ذخیره پیش‌نویس با تأخیر (stKeepL)، پله متنی بدون محاسبه دوباره مبلغ.
-   لرزش: navigator.vibrate (اندروید)؛ آیفون vibrate ندارد — از بازخورد لمسی کلید «switch» سافاری (iOS 17.4+) استفاده می‌شود که باید در pointerup/click زده شود. */
-let QKT=0,stKT=0,QKH=null;
-const stKeepL=()=>{clearTimeout(stKT);stKT=setTimeout(()=>{if(sv)svKeep()},400)};
-function qkHapt(){try{if(navigator.vibrate){navigator.vibrate(8);return}if(!QKH){const l=document.createElement('label');l.setAttribute('aria-hidden','true');l.style.cssText='position:fixed;left:-99px;top:-99px;width:1px;height:1px;opacity:0;pointer-events:none';const c=document.createElement('input');c.type='checkbox';c.setAttribute('switch','');c.tabIndex=-1;l.appendChild(c);document.body.appendChild(l);QKH=l}QKH.click()}catch(_){}}
-(function(){const key=e=>{const t=e.target&&e.target.closest&&e.target.closest('#qa .qkk,#qa .qks');return t&&t.tagName==='BUTTON'?t:null};
-  document.addEventListener('pointerdown',e=>{const b=key(e);if(!b)return;e.preventDefault();if(!b.dataset.qk)return;QKT=Date.now();b.classList.add('pr');b._pr=1;ACT.stK(b.dataset)},true);
-  document.addEventListener('mousedown',e=>{if(key(e))e.preventDefault()},true);
-  const up=e=>{document.querySelectorAll('#qa .qkk.pr,#qa .qks.pr').forEach(b=>b.classList.remove('pr'));const b=key(e);if(b&&e.type==='pointerup')qkHapt()};
-  document.addEventListener('pointerup',up,true);document.addEventListener('pointercancel',up,true);
-  /* بدون لمس (صفحه‌خوان، کلیک برنامه‌ای): همان کلید با click */
-  document.addEventListener('click',e=>{const b=key(e);if(!b||!b.dataset.qk||Date.now()-QKT<700)return;ACT.stK(b.dataset)},true)})();
-function qkpHTML(s,last,ed){/* v97.9 (خواسته صاحب اپ): پله‌ای که اعشار ندارد (مبلغ، نرخ، انگ) به جای ممیز کلید «۰۰» دارد و کنار صفر «۰۰۰» */const dot=s.type==='dec'||s.type==='wam',z3=s.type==='num'||s.type==='wam'||s.type==='dig',z2=s.type==='num'||s.type==='dig',k=(v,t,c,al)=>`<button type="button" class="qkk${c?' '+c:''}" ${v==='ok'?'data-act="stK"':'data-qk="1"'} data-k="${v}"${al?` aria-label="${al}"`:''}>${t}</button>`,e='<span class="qkk em" aria-hidden="true"></span>';
-  return `<div class="qkp" dir="ltr">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('bs','<svg class="qbs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/></svg>','fn','پاک کردن یک رقم')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('c','پاک','fn tx')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok',last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':ic('back').replace('class="i"','class="i flip"')+'<span>بعدی</span>','go'+(last?' fin':''))}${dot?k('.','<b class="qdt">.</b>','','ممیز'):z2?k('00','۰۰','z3'):e}${k('0','۰')}${z3?k('000','۰۰۰','z3'):e}</div>`}
-ACT.stK=d=>{const I=$('stI');if(!I)return;const k=d.k;if(k==='ok'){ACT.stNext();return}const a=sv.qa,S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];if(!s)return;
-  if(s.type==='text'){if(k==='pg'){QKB=QKB?0:1;const E=document.querySelector('#qa .qkb');if(E){E.outerHTML=qkbHTML(E.dataset.l==='1',E.dataset.e==='1');const N=document.querySelector('#qa .qkb');if(N){N.dataset.l=E.dataset.l;N.dataset.e=E.dataset.e;N.style.animation='none'}qkbBind()}return}
-    if(k==='nat'){stRead();QKN=s.k;svKeep();stRe();const J=$('stI');if(J){J.focus();try{const n=J.value.length;J.setSelectionRange(n,n)}catch(_){}}return}
-    const v0=I.value,fo=document.activeElement===I,n0=v0.length;let p=fo&&I.selectionStart!=null?I.selectionStart:n0,q=fo&&I.selectionEnd!=null?I.selectionEnd:n0,v;
-    if(k.slice(0,2)==='w:'){const w=k.slice(2),m=v0.slice(0,p).match(/([^\s]*)$/),st=p-(m?m[1].length:0);v=v0.slice(0,st)+w+' '+v0.slice(q).replace(/^ /,'');p=st+w.length+1;if(v.length>80)return}else if(k==='bs'){if(p===q&&p>0)p--;v=v0.slice(0,p)+v0.slice(q)}else{const ch=k==='sp'?' ':k==='zw'?'\u200c':QKB&&/^\d$/.test(k)?toFa(k):k;if(n0-(q-p)+ch.length>80)return;v=v0.slice(0,p)+ch+v0.slice(q);p+=ch.length}
-    I.value=v;try{I.setSelectionRange(p,p)}catch(_){}s.set(clean(v));const cb=document.querySelector('#qa .stp.on b');if(cb)cb.textContent=clean(v)||'…';stKeepL();qkSgPaint();return}
-  let v=toEn(I.value).replace(/,/g,'');const all=QKF||(document.activeElement===I&&v.length>0&&I.selectionStart===0&&I.selectionEnd===I.value.length);
-  if(k==='c')v='';else if(k==='bs')v=v.slice(0,-1);
-  else{if(all)v='';if(k==='.'){if(v.includes('.'))return;v=(v||'0')+'.'}else{const mx=s.type==='int'?3:s.type==='dig'?12:15;if(v.replace(/\D/g,'').length+k.length>mx)return;v=v==='0'&&k!=='000'&&k!=='00'?k:v+k}}
-  QKF=false;I.value=v;try{I.setSelectionRange(v.length,v.length)}catch(_){}I.dispatchEvent(new Event('input',{bubbles:true}));try{const n=I.value.length;I.setSelectionRange(n,n)}catch(_){}};
 function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.st=0;if(a.stMax==null)a.stMax=a.st;const i=a.st,cur=S[i],T=stTag(),ed=a.i!=null||(a.x&&a.x.i!=null)||(a.p&&a.p.i!=null)||!!(a.pv&&a.pv.gid),last=i===n-1||!!(S[i+1]&&S[i+1].add0);
   const seg=S.map((s,k)=>{const v=stFmt(s,s.get()),reach=k<=Math.max(a.stMax,i)||ed;return `<button type="button" class="stp${k===i?' on':''}${v&&k!==i?' dn':''}${reach?'':' fu'}" data-act="stGo" data-i="${k}"${reach?'':' disabled'}><small>${s.lab}${s.opt&&!s.nopt?' <i>اختیاری</i>':''}</small><b>${v||(k===i?'…':'—')}</b></button>`}).join('');
-  if(QKN&&QKN!==cur.k)QKN='';const kp=stKbT(cur)==='num',kbt=kp&&cur.type==='text';
   const val=cur.get(),ph=cur.ph?cur.ph:cur.type==='wam'?'وزن (گرم) یا مبلغ (تومان)':cur.mz?(stBuyF(sv.qa.x)!==1?'مظنه خرید یا هر گرم خرید (تومان)':'مظنه یا هر گرم ۱۸ (تومان)'):cur.lab+(cur.u?' ('+cur.u+')':'')+(cur.opt?' · اختیاری':''),
-    inp=cur.type==='pick'?`<input id="stI" class="stin" type="search" placeholder="جستجوی ${cur.lab}…" autocomplete="off" enterkeyhint="search" value="${esc(a.sq||'')}">`:`${cur.type==='text'&&!kbt?'<input class="stkb" data-kbn="-1" aria-hidden="true" tabindex="-1" autocomplete="off">':''}<input id="stI" data-kb="${stKbT(cur)}" class="stin${cur.type==='text'?'':' ltr'}" ${cur.type==='text'&&!kbt?'':'inputmode="none"'} value="${cur.type==='wam'?(+val>=1000?Number(val).toLocaleString('en-US'):esc(val||'')):cur.type==='num'?(+val?Number(val).toLocaleString('en-US'):''):cur.grp?esc(grpIn(val)):esc(val==null?'':String(val))}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}">${cur.type==='text'&&!kbt?'<input class="stkb" data-kbn="1" aria-hidden="true" tabindex="-1" autocomplete="off">':''}`;
+    inp=cur.type==='pick'?`<input id="stI" class="stin" type="search" placeholder="جستجوی ${cur.lab}…" autocomplete="off" enterkeyhint="search" value="${esc(a.sq||'')}">`:`<input class="stkb" data-kbn="-1" aria-hidden="true" tabindex="-1" ${cur.type==='text'?'':'inputmode="decimal"'} autocomplete="off"><input id="stI" data-kb="${stKbT(cur)}" class="stin${cur.type==='text'?'':' ltr'}" ${cur.type==='text'?'':'inputmode="decimal"'} value="${cur.type==='wam'?(+val>=1000?Number(val).toLocaleString('en-US'):esc(val||'')):cur.type==='num'?(+val?Number(val).toLocaleString('en-US'):''):cur.grp?esc(grpIn(val)):esc(val==null?'':String(val))}" placeholder="${ph}" autocomplete="off" enterkeyhint="${last?'done':'next'}"><input class="stkb" data-kbn="1" aria-hidden="true" tabindex="-1" ${cur.type==='text'?'':'inputmode="decimal"'} autocomplete="off">`;
   const canFin=S.every(s=>s.need&&s.need()?false:s.wOr||s.opt||s.type==='int'||stFmt(s,s.get()));
-  
-  return `<div class="stw${kp?' haskp':''}${kbt?' haskb':''}">${stHead(T.D,T.it,1,{ed})}<div class="stps">${seg}</div>
+  return `<div class="stw">${stHead(T.D,T.it,1,{ed})}<div class="stps">${seg}</div>
     <div class="fsearch sm st3">${cur.type==='pick'?ic('search'):''}${inp}${cur.type==='pick'?'':`<button type="button" class="stnx${last?' go':''}" data-act="stNext">${last?ic('check')+'<span>'+(ed?'ذخیره':'افزودن')+'</span>':'<span>بعدی</span>'+ic('back').replace('class="i"','class="i flip"')}</button>`}${stPhIn()}</div>
     ${cur.type==='pick'?`<div id="stPk">${stPick(cur)}</div>`:''}
     <div class="stlv" id="stPv">${stLive()}${stRefHTML()}</div>
     ${stPhRow()}
-    ${kbt?qkbHTML(last,ed).replace('class="qkp qkb"','class="qkp qkb" data-l="'+(last?1:0)+'" data-e="'+(ed?1:0)+'"'):kp?qkpHTML(cur,last,ed):''}
     ${ed?`<div class="stft"><button type="button" class="stdel" data-act="stDel" aria-label="حذف ردیف">${ic('trash')}<span>حذف</span></button></div>`:''}
 </div>`}
 /* v69.2 (خواسته صاحب اپ): «+ عکس» داخل همان کادر فیلد، در انتهای آن (با شمار عکس‌ها)؛ عکس‌های زده‌شده ردیف کوچکی زیر کادر مبلغ */
@@ -201,17 +141,16 @@ function stPaint(){const P=$('stPv');if(P)numMorph('#stPv .stam .fz>b',()=>{cons
 /* v66.7 (خواسته صاحب اپ): رسیدن به هر پله عددی (عیار، وزن/گرم خام، مبلغ و هر گرم ۱۸، انگ) کل مقدار را انتخاب می‌کند تا با اولین رقم عوض شود؛
    پله متنی مکان‌نما را آخر متن می‌گذارد. با onfocus (نه addEventListener) چون همان فیلد بین پله‌ها می‌ماند و شنونده‌ها روی هم جمع می‌شدند */
 function stSel(I,s){try{const n=I.value.length;if(s&&/^(int|num|dec|wam|dig)$/.test(s.type))I.setSelectionRange(0,n);else I.setSelectionRange(n,n)}catch(_){}}
-function stBind(){phPaint($('qa'));const I=$('stI'),a=sv.qa;if(!I)return;const S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];QKF=stKbT(s)==='num'&&s.type!=='text'&&!!I.value;I.onbeforeinput=()=>{QKF=false};
-  if($('qkSg'))qkSgPaint();
+function stBind(){phPaint($('qa'));const I=$('stI'),a=sv.qa;if(!I)return;const S=stSteps(),s=S[Math.min(a.st||0,S.length-1)];
   if(s.type==='pick'){I.oninput=()=>{a.sq=I.value;const P=$('stPk');if(P)P.innerHTML=stPick(s)};return}
   I.onfocus=()=>setTimeout(()=>stSel(I,s),0);I.oninput=()=>{if(s.type==='num'){const pos=I.selectionStart||0,b=toEn(I.value.slice(0,pos)).replace(/\D/g,'').length,v=num(I.value);I.value=v?v.toLocaleString('en-US'):'';let p=0,d=0;while(p<I.value.length&&d<b){if(/\d/.test(I.value[p]))d++;p++}try{I.setSelectionRange(p,p)}catch(_){}}
-    else if(s.type==='wam'){const v=toEn(I.value).replace(/,/g,'');if(+v>=1000&&/^\d+$/.test(v))I.value=(+v).toLocaleString('en-US');else I.value=decIn(I.value)}else if(s.type==='dec')I.value=s.grp?grpIn(I.value):decIn(I.value);else if(s.type==='int')I.value=toEn(I.value).replace(/\D/g,'').slice(0,3);else if(s.type==='dig')I.value=toEn(I.value).replace(/\D/g,'');stRead();stKeepL();stPaint()};
+    else if(s.type==='wam'){const v=toEn(I.value).replace(/,/g,'');if(+v>=1000&&/^\d+$/.test(v))I.value=(+v).toLocaleString('en-US');else I.value=decIn(I.value)}else if(s.type==='dec')I.value=s.grp?grpIn(I.value):decIn(I.value);else if(s.type==='int')I.value=toEn(I.value).replace(/\D/g,'').slice(0,3);else if(s.type==='dig')I.value=toEn(I.value).replace(/\D/g,'');stRead();svKeep();stPaint()};
   I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.stNext()}};
   /* v61.94 (خواسته صاحب اپ): «بعدی» روی خود کیبورد — فلش‌های ⌃⌄ بالای کیبورد آیفون به این دو فیلد نامرئی می‌روند و پله را عوض می‌کنند؛
      در اندروید کلید «بعدی» کیبورد همان Enter است. فوکوس همیشه روی همان فیلد می‌ماند (کیبورد بسته و باز نمی‌شود). */
   document.querySelectorAll('#qa .stkb').forEach(k=>{k.onfocus=()=>{const n=+k.dataset.kbn,J=$('stI');if(J)try{J.focus({preventScroll:true})}catch(_){J.focus()}if(n>0)ACT.stNext();else if((sv.qa.st||0)>0)ACT.stUp()}});
   document.querySelectorAll('#qa .stnx,#qa .stp,#qa .stdone').forEach(b=>{b.onpointerdown=b.onmousedown=e=>{if(document.activeElement===I)e.preventDefault()}})}
-const stKbT=s=>!s?'':s.type==='pick'?'pick':s.type==='text'?(QKN===s.k?'text':'num'):'num';
+const stKbT=s=>!s?'':s.type==='pick'?'pick':s.type==='text'?'text':'num';
 /* v61.94 (خواسته صاحب اپ): با «بعدی» پنجره نمی‌پرد — اگر نوع کیبورد پله بعد همان است، فقط تکه‌ها عوض می‌شوند و همان فیلد
    (با همان فوکوس و کیبورد) می‌ماند؛ ردیف پله‌ها فقط افقی جابه‌جا می‌شود (scrollIntoView عمودی صفحه را تکان می‌داد) */
 function stPatch(O,I0){const T=document.createElement('div');T.innerHTML=stHTML();const N=T.firstElementChild;if(!N)return false;const nI=N.querySelector('#stI'),o3=O.querySelector('.st3'),n3=N.querySelector('.st3');if(!nI||!o3||!n3)return false;
@@ -314,7 +253,7 @@ let QPIN=null;
    و صفحه حساب و فهرست مشتری‌ها هم به همان جا می‌پرید و اسکرول نمی‌شد؛ (۳) تایمر قفل بعد از ترک صفحه هم اجرا می‌شد. حالا qaPinned() همه جا بررسی می‌شود،
    render() بیرون از سند قفل را برمی‌دارد، و با برداشتن قفل صفحه به جای قبل از قفل برمی‌گردد (y0) */
 const qaPinned=()=>!!(QPIN||$('qasp')||document.documentElement.classList.contains('qapn')||($('view')&&$('view').classList.contains('qapin')));
-function qaUnpin(){const V=$('view'),y0=QPIN&&cur==='sell'?QPIN.y0:null;QPIN=null;clearTimeout(qaPin.t);clearTimeout(qaPin.s);document.documentElement.classList.remove('qapn');if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove();if(V&&y0!=null)V.scrollTop=y0}
+function qaUnpin(){const V=$('view'),y0=QPIN&&cur==='sell'?QPIN.y0:null;QPIN=null;clearTimeout(qaPin.t);document.documentElement.classList.remove('qapn');if(V)V.classList.remove('qapin');const sp=$('qasp');if(sp)sp.remove();if(V&&y0!=null)V.scrollTop=y0}
 function qaPin(){const V=$('view'),q=$('qa');if(!V||!q||cur!=='sell'||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){if(qaPinned())qaUnpin();return}
   /* نوار مانده پایین سند تا بسته شدن پنجره کنار می‌رود (مثل وقتی کیبورد باز است) تا پنجره همیشه جا شود و قفل بماند */document.documentElement.classList.add('qapn');
   let sp=$('qasp');if(!sp||sp.parentNode!==V){sp=document.createElement('div');sp.id='qasp';sp.setAttribute('aria-hidden','true');V.appendChild(sp)}
@@ -323,9 +262,7 @@ function qaPin(){const V=$('view'),q=$('qa');if(!V||!q||cur!=='sell'||!(q.queryS
   if(!qaPin.on){qaPin.on=1;V.addEventListener('scroll',()=>{if(!QPIN)return;if(cur!=='sell'||!$('qa')){qaUnpin();return}if(QPIN.lock&&Math.abs(V.scrollTop-QPIN.y)>1)V.scrollTop=QPIN.y},{passive:true});
     if(vv)vv.addEventListener('resize',()=>{if(QPIN)qaPin()})}
   clearTimeout(qaPin.t);QPIN={y,lock:false,fits,y0:first?V.scrollTop:QPIN.y0};
-  /* v93.5: اولین بار پنجره هنوز در حال بالا آمدن است (جایش چند پیکسل فرق دارد)؛ هنگام قفل جای واقعی دوباره خوانده می‌شود تا با پله‌های بعد یکی باشد */
-  const lock=re=>{if(!QPIN)return;if(cur!=='sell'||!q.isConnected||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){qaUnpin();return}if(re===1)QPIN.y=Math.max(0,Math.round(q.getBoundingClientRect().top-V.getBoundingClientRect().top+V.scrollTop)-8);V.scrollTop=QPIN.y;QPIN.lock=QPIN.fits;V.classList.toggle('qapin',QPIN.fits)};
-  if(first&&!RM()&&Math.abs(V.scrollTop-y)>4){V.classList.remove('qapin');requestAnimationFrame(()=>{try{V.scrollTo({top:y,behavior:'smooth'})}catch(_){V.scrollTop=y}});qaPin.t=setTimeout(lock,420)}else lock();
-  clearTimeout(qaPin.s);qaPin.s=setTimeout(()=>{if(QPIN&&$('qa')===q)lock(1)},470)}
+  const lock=()=>{if(!QPIN)return;if(cur!=='sell'||!q.isConnected||!(q.querySelector('.stw')||q.querySelector('.dkbox.open'))){qaUnpin();return}V.scrollTop=QPIN.y;QPIN.lock=QPIN.fits;V.classList.toggle('qapin',QPIN.fits)};
+  if(first&&!RM()&&Math.abs(V.scrollTop-y)>4){V.classList.remove('qapin');requestAnimationFrame(()=>{try{V.scrollTo({top:y,behavior:'smooth'})}catch(_){V.scrollTop=y}});qaPin.t=setTimeout(lock,420)}else lock()}
 /* بعد از افزودن ردیف: صفحه تا ردیف تازه (کلیدی که قبلاً نبود) نرم می‌رود */
 function qaAfter(K){setTimeout(()=>{if(cur!=='sell'||QPIN)return;const R=[...document.querySelectorAll('#svRows [data-fk]')],el=R.find(e=>!K.has(e.dataset.fk))||R[R.length-1];if(el&&el.scrollIntoView)try{el.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'})}catch(_){}},90)}
