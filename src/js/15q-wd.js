@@ -74,7 +74,12 @@ function wdRowsHTML(c,no,txId){if(no==null||!c)return [];const A=allocMap(),view
       if(o.t==='s'){const sub=[o.doc?'تسویه با '+esc(o.doc)+' در حساب «'+esc(o.nm)+'»':'تسویه از مشتری · بدون سند دریافت','وضعیت: پرداخت مستقیم به فروشنده · منتظر تأیید',o.tn?'پیگیری '+esc(toFa(o.tn)):'','تاریخ واریز: '+esc(D.fa)].filter(Boolean).join(' · ');
         R.push(d6Row({ico:'swap',tag:'<em class="d6k k-wd">در انتظار تأیید</em>',b:esc(o.nm),sub,v,ex:view&&o.tx!=null?`<span class="d8eb d8lk" role="button" data-act="cuInv" data-cu="${esc(o.cu)}" data-tx="${esc(o.tx)}">${ic('inv')}<span>${esc(o.doc)}</span><small>${esc(o.nm)}</small></span>`:depL,key:'w'+e.id+o.k}));return}
       const sub=['وضعیت: '+o.st,'تاریخ واریز: '+esc(D.fa),o.src?'منبع: '+esc(o.src):'',e.iban?'بانک: '+esc((ibanBank(e.iban)||'')+' '+String(e.iban).slice(-4)):'شبا ندارد',e.holder?'صاحب حساب: '+esc(e.holder):''].filter(Boolean).join(' · ');
-      R.push(d6Row({ico:o.fr?'cal':'clock',tag:o.fr?'<em class="d6k k-wf">در لیست واریز</em>':'<em class="d6k k-wd">در انتظار تأیید</em>',b:'واریز بانکی'+(o.src?' · '+esc(o.src):''),sub,v:o.fr?v.replace('d6e wdv','d6e wdv wf').replace('رفته برای واریز','تخصیص نخورده · آزاد'):v.replace('رفته برای واریز','تخصیص‌شده'),ex:depL,key:'w'+e.id+o.k}))})});return R}
+      R.push(d6Row({ico:o.fr?'cal':'clock',tag:o.fr?'<em class="d6k k-wf">در لیست واریز</em>':'<em class="d6k k-wd">در انتظار تأیید</em>',b:'واریز بانکی'+(o.src?' · '+esc(o.src):''),sub,v:o.fr?v.replace('d6e wdv','d6e wdv wf').replace('رفته برای واریز','تخصیص نخورده · آزاد'):v.replace('رفته برای واریز','تخصیص‌شده'),ex:depL+wdActs(e,o),key:'w'+e.id+o.k}))})});return R}
+/* v98.6 (خواسته صاحب اپ: «مانده مستقیم ادیت و تخصیص داده شود»): زیر ردیف واریزی سند دو دکمه — «مبلغ واریزی» (wdAmt) و «انتخاب بانک» (همان پنجره پرداخت، pxUni) */
+function wdActs(e,o){if(!o||o.t!=='b')return '';const p=entries.find(z=>z.id===o.ent),un=p&&p.sentBid==null,B=[];
+  if(remCan())B.push(`<span class="d8eb" role="button" data-act="wdAmt" data-e="${e.id}">${ic('edit')}<span>مبلغ واریزی</span></span>`);
+  if(un&&can('split'))B.push(`<span class="d8eb" role="button" data-act="entMove" data-id="${p.id}">${ic('bank')}<span>${o.src?'تغییر بانک':'انتخاب بانک'}</span></span>`);
+  return B.length?`<span class="wdab">${B.join('')}</span>`:''}
 /* ---- v87.7 «مسیر پرداخت» (خواسته صاحب اپ: «مدل خوانا و منطقی که بچه‌ها گیج نشوند؛ هم در حساب و سند، هم در لیست مشتری»)
    یک زبان و یک رنگ در همه جا. بدهی ما به مشتری سه مرحله دارد (واریزشده از مانده کم شده و دیگر اینجا نیست):
    ۱ نرفته به لیست (قرمز) → ۲ در لیست، تخصیص نخورده (بنفش) → ۳ تخصیص‌شده، منتظر واریز (زرد).
@@ -96,7 +101,7 @@ function ppLine(p){const S=PPS.filter(([k])=>p[k]>0),one=S.length===1&&PPF[S[0][
 const PPC={f:'نرفته به لیست',l:'در لیست',a:'تخصیص‌شده'};/* v87.8 (خواسته صاحب اپ: «فضای زیادی نگیرد»): کارت فشرده — یک خط عنوان، نوار، سه خانه کنار هم */
 function ppCard(p,title,extra,cls){return `<div class="ppc${cls?' '+cls:''}"><div class="pph"><b>${title}</b><small>از ${fmt(p.tot)}</small></div>${ppBar(p,1)}<div class="pps">${PPS.map(([k,c])=>`<span class="ppr ${c}${p[k]>0?'':' z'}"><small><i></i>${PPC[c]}</small><b>${p[k]>0?fmt(p[k]):'—'}</b></span>`).join('')}</div>${extra||''}</div>`}
 function wdSumHTML(c,no,tot){const E=wdRoots().filter(e=>String(e.wd.cu)===String(c.id)&&(no==null||String(e.wd.no)===String(no)));const s=wdSpl(c,no),sent=s.fr+s.al;if(!sent&&!E.length)return '';
-  return ppCard(ppParts(tot,sent,s.al),'مسیر پرداخت این سند')}
+  return ppCard(ppParts(tot,sent,s.al),no==null?'مسیر پرداخت مانده حساب':'مسیر پرداخت این سند')}
 /* v88.5 قفل‌های ایمنی (بازبینی مسیرها):
    docDelLock = سندی که واریزی در لیست واریز دارد حذف نمی‌شود (قبلاً سند می‌رفت، واریزی در لیست می‌ماند و پول بدون طلب از بانک پرداخت می‌شد)،
    و سندی که با «حواله از واریزی» (m:'dep') یک واریزیِ تأییدشده بانک را پرداخت کرده هم؛ stlBkLock = واریز بانکی این واریزی تأیید شده، پس تسویه‌های مشتری‌اش
@@ -119,8 +124,42 @@ function wdCuHTML(c){const L=wdPendL(c);if(!L.length)return '';const A=allocMap(
   return ppCard(ppParts(b.R,fr+al,al),'مسیر پرداخت بدهی',rows)}
 /* پنجره تسویه: سطر «رفته برای واریز» زیر عدد مانده */
 /* v87.6 (خواسته صاحب اپ): در زمان ارسال به لیست — مانده کل · رفته به لیست · نرفته به لیست */
-function wdCkHTML(){const c=svCu();if(!c||!sv.edit)return '';const p=wdPend(c,sv.edit.no);return p?wdSumHTML(c,sv.edit.no,ckLeft()):''}
-const wdFree=()=>{const c=svCu();return Math.max(0,ckLeft()-(c&&sv.edit?wdPend(c,sv.edit.no):0))};
+/* v98.6 (خواسته صاحب اپ: «مانده این فاکتور را برای تخصیص پیشنهاد بده نه کلش، وقتی مانده قبلی تخصیص داده شده بود»):
+   مانده آزاد = مانده‌ای که در پنجره تسویه دیده می‌شود − واریزی‌هایی که برای همان مانده رفته‌اند. «کل حساب» (f) همه واریزی‌های مشتری را کم می‌کند
+   (قبلاً فقط واریزی همین سند، و در سند تازه هیچ‌کدام → کل مانده دوباره پیشنهاد می‌شد)؛ «این سند» (d) فقط واریزی همین سند؛ «مانده قبلی» (p) بقیه */
+const wdPendTg=c=>{if(!c)return 0;const t=typeof ckTg==='function'?ckTg():'f',own=sv&&sv.edit?wdPend(c,sv.edit.no):0;return t==='d'?own:t==='p'?Math.max(0,wdPend(c)-own):wdPend(c)};
+function wdCkHTML(){const c=svCu();if(!c)return '';const t=typeof ckTg==='function'?ckTg():'f';if(t==='d'){if(!sv.edit)return '';return wdPend(c,sv.edit.no)?wdSumHTML(c,sv.edit.no,ckLeft()):''}return wdPend(c)?wdSumHTML(c,null,ckLeft()):''}
+const wdFree=()=>{const c=svCu();return Math.max(0,ckLeft()-wdPendTg(c))};
+/* ---- v98.6 واریزی سند همراه سند (خواسته صاحب اپ: «وقتی مبلغ فاکتور ویرایش می‌شود مانده تخصیص‌داده‌شده چیدمان درست داشته باشد که دوباره حذف و تخصیص دوباره نشود؛
+   وقتی پرداختی انجام شد و از مانده تخصیص‌داده‌شده کم شد، مانده اصلاح شود؛ مانده مستقیم ادیت و تخصیص داده شود»).
+   قاعده: جمع واریزی‌های در راه یک مشتری (wdPend) هرگز از بدهی ما به او (cuBal.R) بیشتر نمی‌شود.
+   wdAdj(e,d): مبلغ در راه یک واریزی (ریشه e) را d تومان کم/زیاد می‌کند — فقط بخش‌های ارسال‌نشده؛ کم کردن اول از بخش‌های بی‌بانک (مانده‌ها)،
+   بعد بخش‌های بانک‌دار، ریشه آخر؛ بخش صفرشده برداشته می‌شود و اگر کل واریزی صفر شد به سطل بازیافت می‌رود. زیاد کردن روی ریشه (اگر ارسال نشده)
+   وگرنه یک «مانده» آزاد (depRemAdd). wd.amt همراهش عوض می‌شود. wdFit بعد از هر ثبت سند (svCommit) این قاعده را برقرار می‌کند؛
+   اگر واریزی‌های این سند پیش از ویرایش کل بدهی را پوشانده بودند و بدهی بیشتر شد، واریزی همین سند همان‌قدر بزرگ می‌شود. */
+const wdFam=e=>entries.filter(z=>!z.del&&(z.id===e.id||z.splitOf===e.id));
+function wdPartRm(id){allParts().forEach(p=>{if(!p.sent&&(p.ids||[]).includes(id)){p.ids=p.ids.filter(z=>z!==id);if(!p.ids.length)delPart(p)}})}
+function wdAdj(e,d){d=Math.round(+d||0);if(!e||!e.wd||!d)return 0;const now=ns();
+  if(d>0){if(e.sentBid==null){e.amount=(+e.amount||0)+d;e.updatedAt=now;e.updatedBy=who()}else depRemAdd(e,d);e.wd.amt=Math.round((+e.wd.amt||+e.amount||0)+d);memoClear();alloc=null;return d}
+  let need=-d,got=0;const F=wdFam(e).filter(z=>z.sentBid==null),al=id=>pkSrcOf(id)?1:0,dead=[];
+  const ord=F.filter(z=>z.id!==e.id).sort((a,b)=>al(a.id)-al(b.id)||b.id-a.id);if(F.includes(e))ord.push(e);
+  for(const p of ord){if(need<=0)break;const net=depNet(p),root=p.id===e.id;let k=Math.min(net,need);
+    /* ریشه بی‌تسویه‌ای که بخش زنده دیگری دارد صفر نمی‌شود (ردیف صفر در لیست)؛ با تسویه مشتری صفرِ خالص یعنی «تسویه کامل» و درست است */
+    if(root&&k>=net&&!(e.settles||[]).length&&wdFam(e).some(z=>z.id!==e.id&&!dead.includes(z.id)))k=0;
+    if(!(k>0))continue;p.amount=(+p.amount||0)-k;p.updatedAt=now;p.updatedBy=who();need-=k;got+=k;if(!root&&!(depNet(p)>0))dead.push(p.id)}
+  dead.forEach(wdPartRm);if(dead.length)entries=entries.filter(z=>!dead.includes(z.id));
+  e.wd.amt=Math.max(0,Math.round((+e.wd.amt||0)-got));memoClear();alloc=null;
+  if(e.sentBid==null&&!(depNet(e)>0)&&!(e.settles||[]).length&&!wdFam(e).some(z=>z.id!==e.id)){wdPartRm(e.id);trashIds([e.id],'مبلغ سند کم شد')}
+  return got}
+const wdOwe=c=>{memoClear();return Math.max(0,Math.round(cuBal(c).R||0))};
+function wdFit(c,no,R0,D0){if(!c||c.grp==='بانک')return '';const L=wdPendL(c);if(!L.length)return '';const R1=wdOwe(c),D=L.reduce((s,o)=>s+o.S.pend,0);let msg='';
+  if(D>R1+1){if(!remCan())return 'واریزی‌های در راه این حساب '+fmt(D-R1)+' تومان از مانده بیشتر است؛ حساب شما اجازه تغییر واریزی ندارد';
+    let need=D-R1;const O=L.slice().sort((a,b)=>(String(b.e.wd.no)===String(no))-(String(a.e.wd.no)===String(no))||b.e.id-a.e.id);
+    for(const o of O){if(need<=0)break;need-=wdAdj(entries.find(z=>z.id===o.e.id),-Math.min(need,o.S.pend))}
+    msg=need>0?'واریزی در راه '+fmt(need)+' تومان از مانده بیشتر است (بخش ارسال‌شده عوض نمی‌شود)':'واریزی در لیست '+fmt(D-R1)+' تومان کم شد · '+fmt(R1)+' تومان مانده'}
+  else if(no!=null&&D0>0&&D0>=Math.max(0,R0)-1&&R1>Math.max(0,R0)&&remCan()){const own=L.filter(o=>String(o.e.wd.no)===String(no)),add=R1-D;
+    if(own.length&&add>0){wdAdj(entries.find(z=>z.id===own[own.length-1].e.id),add);msg='واریزی در لیست '+fmt(add)+' تومان بیشتر شد · '+fmt(R1)+' تومان'}}
+  if(msg){saveE();saveD();memoClear();alloc=null;logA('split','هماهنگی واریزی با مانده سند',cuName(c)+' | سند '+toFa(no)+' | '+msg)}return msg}
 /* ---------- فرم واریز ---------- */
 let WD=null;
 function wdBank(c){if(c.bk&&c.bk.iban)return {...c.bk,from:'c'};const k=nzName(cuName(c)),k2=nzName(c.name||''),p=bzPeople().find(z=>String(z.cuId)===String(c.id)&&z.iban)||bzPeople().find(z=>(z.k===k||z.k===k2)&&z.iban);return p?{iban:p.iban,card:p.card||'',holder:p.holder||'',from:'e'}:{iban:'',card:'',holder:''}}
@@ -166,3 +205,27 @@ ACT.wdSave=()=>{wdRead();const c=svCu();if(!c||!WD)return;const X=Math.round(+WD
   entries.push(ne);saveE();alloc=null;logA('add','ثبت واریزی (مانده سند)',name+' | سند '+toFa(no)+' | '+fmt(X)+' تومان | واریز '+dates(ne.payDate).fa,{ids:[ne.id],after:pick(ne)});
   const tg=WD.tg;WD=null;/* v81.7: اول خود دکمه «✓ ارسال شد» می‌شود، بعد پنجره تسویه (WD=null جلوی ثبت دوباره را می‌گیرد) */{const B=document.querySelector('#sheet .sh-h .xtop');if(B&&typeof btnOk==='function')btnOk(B,'ارسال شد')}setTimeout(()=>{render();ckOpen(tg)},RM()?0:650);toast(fmt(X)+' تومان رفت به لیست واریزی '+(payLab(ne.payDate)||dates(ne.payDate).fa)+(iban?'':' (بدون شبا؛ خطادار)'),!iban,'دیدن واریزی',()=>ACT.depGo({e:ne.id}))};
 ACT.svWdRow=()=>toast('این ردیف از تأیید واریزی در بانک ساخته شده؛ برای تغییر، خود واریزی را عوض کنید')
+
+/* ---- v98.6 پنجره «مبلغ واریزی» (wdAmt): مبلغ در راه یک واریزی سند را مستقیم عوض می‌کند (wdAdj) — سقف = بدهی ما − واریزی‌های دیگر، کف = بخش ارسال‌شده و تسویه‌های در انتظار */
+let WA=null;
+function waInfo(){const e=WA&&entries.find(z=>z.id===WA.e);if(!e||!e.wd)return null;const c=custs.find(z=>String(z.id)===String(e.wd.cu));if(!c)return null;const S=wdState(e),cur=S.pend,P=wdParts(e,S);
+  const lock=P.reduce((a,q)=>a+(q.t==='s'||(q.ent!=null&&(entries.find(z=>z.id===q.ent)||{}).sentBid!=null)?q.a:0),0),owe=wdOwe(c),oth=Math.max(0,wdPend(c)-cur),max=Math.max(cur,owe-oth);return {e,c,cur,lock,owe,oth,max}}
+function waRes(){const I=waInfo();if(!I)return '';const X=WA.v===''?null:+WA.v;
+  if(X==null)return `<div class="bf3d n"><span class="bf3di">${ic('edit')}</span><span class="tx"><b>مبلغ را بزنید</b><small>بدهی ما ${fmt(I.owe)}${I.oth?' · واریزی‌های دیگر '+fmt(I.oth):''}</small></span></div>`;
+  if(X>I.max)return `<div class="bf3d r"><span class="bf3di">${ic('x')}</span><span class="tx"><b>بیشتر از مانده آزاد</b><small>حداکثر ${fmt(I.max)} تومان</small></span></div>`;
+  if(X<I.lock)return `<div class="bf3d r"><span class="bf3di">${ic('x')}</span><span class="tx"><b>کمتر از بخش ارسال‌شده</b><small>حداقل ${fmt(I.lock)} تومان (ارسال‌شده یا تسویه در انتظار)</small></span></div>`;
+  const d=X-I.cur;if(!d)return `<div class="bf3d ok"><span class="bf3di">${ic('check')}</span><span class="tx"><b>بدون تغییر</b><small>${fmt(I.cur)} تومان در لیست</small></span></div>`;
+  return `<div class="bf3d ${d>0?'g':'r'}"><span class="bf3di">${ic(d>0?'dIn':'dOut')}</span><span class="tx"><b>${d>0?'به واریزی اضافه می‌شود':(X?'از واریزی کم می‌شود':'واریزی برداشته می‌شود')}</b><small>${X&&I.owe-I.oth-X>0?'از بدهی '+fmt(I.owe-I.oth-X)+' تومان آزاد می‌ماند':'کل بدهی در لیست واریز'}</small></span><em data-v="${Math.abs(d)}">${d>0?'+':'−'}${fmt(Math.abs(d))}</em></div>`}
+function waHTML(){const I=waInfo();if(!I)return '';const v=WA.v===''?'':Number(WA.v).toLocaleString('en-US');
+  return `<div class="sh-h"><div><b>مبلغ واریزی</b><small class="shsub">${esc(cuName(I.c))} · سند ${toFa(I.e.wd.no)} · الان ${fmt(I.cur)} تومان</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
+  <div class="bf3 bf4"><div class="ckcl">چقدر از بدهی به لیست واریز برود؟</div>
+  <div class="ckbg"><label class="ckbig"><input id="waA" class="ltr" inputmode="numeric" value="${v}" placeholder="${fmt(I.cur)}" autocomplete="off" enterkeyhint="done" aria-label="مبلغ واریزی"><i>تومان</i></label>
+  <div class="ckq"><button type="button" data-act="waQ" data-v="${I.max}">کل مانده آزاد · ${fmt(I.max)}</button>${I.lock?`<button type="button" data-act="waQ" data-v="${I.lock}">فقط ارسال‌شده · ${fmt(I.lock)}</button>`:''}</div></div>
+  <div id="waL">${waRes()}</div>
+  <button type="button" class="xgo" data-act="waSave">${ic('check')} ثبت</button></div>`}
+function waBind(f){const A=$('waA');if(!A)return;selOnFocus(A);A.oninput=()=>{const n=num(A.value);A.value=n?n.toLocaleString('en-US'):/\d/.test(toEn(A.value))?'0':'';WA.v=A.value===''?'':n;const L=$('waL');if(L)L.innerHTML=waRes()};A.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();A.blur()}};if(f)sheetFocus(A)}
+ACT.wdAmt=d=>{if(!remCan()){toast(REMNO,true);return}const e=entries.find(z=>String(z.id)===String(d.e));if(!e||!e.wd)return;WA={e:e.id,v:''};const I=waInfo();if(!I)return;WA.v=I.cur;sheet(waHTML());waBind(1)};
+ACT.waQ=d=>{if(!WA)return;WA.v=+d.v;$('sheet').innerHTML=waHTML();waBind()};
+ACT.waSave=()=>{const I=waInfo();if(!I)return;const X=WA.v===''?I.cur:Math.round(+WA.v);if(X>I.max){toast('حداکثر '+fmt(I.max)+' تومان',true);return}if(X<I.lock){toast('حداقل '+fmt(I.lock)+' تومان (بخش ارسال‌شده)',true);return}
+  const d=X-I.cur;if(!d){WA=null;closeSheet();return}const got=wdAdj(I.e,d);saveE();saveD();logA('split','ویرایش مبلغ واریزی سند',fullName(I.e)+' | سند '+toFa(I.e.wd.no)+' | '+fmt(I.cur)+' ← '+fmt(I.cur+(d>0?got:-got))+' تومان',{ids:[I.e.id]});
+  WA=null;closeSheet();const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y;toast(d>0?'واریزی '+fmt(got)+' تومان بیشتر شد':got>=-d?'واریزی '+fmt(got)+' تومان کم شد':'فقط '+fmt(got)+' تومان کم شد (بخش ارسال‌شده عوض نمی‌شود)')};

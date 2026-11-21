@@ -147,8 +147,9 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
   /* v68.1 (خواسته صاحب اپ): حساب‌های مانده‌دار (و در انتظار) بالا، تسویه‌شده‌ها پایین؛ داخل هر دسته ترتیب قبلی */
   const PW=pendMap(),zOf=([c,b])=>cuZero(b)&&!PW.get(String(c.id))&&!(cuWP.get(String(c.id))||0)?1:0;
   B.sort((a,b)=>(zOf(a)-zOf(b))||(q?(nzName(b[0].name).startsWith(q)-nzName(a[0].name).startsWith(q)):0)||String(b[0].lastAt||b[0].createdAt||'').localeCompare(String(a[0].lastAt||a[0].createdAt||'')));
-  const canAdd=q0&&!dq&&can('debt')&&!/^\d+$/.test(toEn(q0))&&!A.some(c=>nzName(c.name)===nzName(q0))&&!groupsList().some(g=>nzName(g)===q);
-  const add=canAdd&&bm?`<button class="c6add" data-act="bkCuAdd">${ic('plus')}<span><b>حساب بانک تازه «${esc(q0)}»</b><small>نوع بانک · بعد ورود به حساب</small></span></button>`:canAdd?`<button class="c6add" data-act="cuNewQ">${ic('plus')}<span><b>حساب تازه برای «${esc(q0)}»</b><small>${B.length?'اگر هیچ‌کدام از این‌ها نیست':'این نام حسابی ندارد'} · اول مشخصات، بعد ورود به حساب</small></span></button>`:'';
+  /* v98.6 (خواسته صاحب اپ: «دو مشتری هم‌نام پیش می‌آید؛ بشود حساب جدا باز کرد با شماره جدا، فقط هشدار بدهد»): حساب هم‌نام دیگر جلوی «حساب تازه» را نمی‌گیرد؛ هشدار در cuSave */
+  const same=A.some(c=>nzName(c.name)===nzName(q0)),canAdd=q0&&!dq&&can('debt')&&!/^\d+$/.test(toEn(q0))&&!groupsList().some(g=>nzName(g)===q);
+  const add=canAdd&&bm?`<button class="c6add" data-act="bkCuAdd">${ic('plus')}<span><b>حساب بانک تازه «${esc(q0)}»</b><small>نوع بانک · بعد ورود به حساب</small></span></button>`:canAdd?`<button class="c6add" data-act="cuNewQ">${ic('plus')}<span><b>${same?'حساب جدا برای «'+esc(q0)+'» دیگر (هم‌نام)':'حساب تازه برای «'+esc(q0)+'»'}</b><small>${same?'شماره مشتری جدا می‌گیرد · اگر همان شخص است همان حساب بالا را باز کنید':(B.length?'اگر هیچ‌کدام از این‌ها نیست':'این نام حسابی ندارد')+' · اول مشخصات، بعد ورود به حساب'}</small></span></button>`:'';
   /* افراد واریزی‌ها و خریدها که هنوز حساب ندارند (از حافظه برنامه): با زدن، حساب با همان مشخصات باز می‌شود */
   const P=q&&!dq&&!bm?memPeople(q,dOk,12):[];
   CUP=P;
@@ -284,7 +285,7 @@ ACT.cuSave=d=>{const name=clean($('cuN').value),phone=toEn($('cuP').value).repla
   const bI=dg(($('cuBI')||{}).value||'').slice(0,24),bK=dg(($('cuBK')||{}).value||'').slice(0,16),bH=clean(($('cuBH')||{}).value||'');if(bI&&(bI.length!==24||!ibanOk('IR'+bI))){toast('شماره شبا درست نیست',true);$('cuBI').focus();return}
   /* v90.9: حساب تکراری (همان کد ملی، تلفن یا نام) — پنجره هشدار پیش از باز شدن حساب دوم برای یک نفر */
   if(d.id==='new'){const O=CU().filter(x=>!x.del),dm=nidv&&O.find(x=>x.nid===nidv),dp=phone&&O.find(x=>x.phone===phone),dn=O.find(x=>nzName(x.name)===nzName(name)),hit=dm||dp||dn;
-    if(hit&&warnGate('cu|'+[name,phone,nidv].join('|'),{kind:'warn',t:'این حساب قبلاً باز نشده؟',h:'حساب «<b>'+esc(cuName(hit))+'</b>»'+(hit.cno?' (شماره '+toFa(hit.cno)+')':'')+' با همین <b>'+(dm?'کد ملی':dp?'شماره تماس':'نام')+'</b> هست.<small>اگر همان شخص است حساب تازه باز نکنید؛ از همان حساب استفاده کنید.</small>',goT:'حساب جدا باز شود'},()=>ACT.cuSave(d)))return}
+    if(hit&&warnGate('cu|'+[name,phone,nidv].join('|'),{kind:'warn',t:'این حساب قبلاً باز نشده؟',h:'حساب «<b>'+esc(cuName(hit))+'</b>»'+(hit.cno?' (شماره '+toFa(hit.cno)+')':'')+' با همین <b>'+(dm?'کد ملی':dp?'شماره تماس':'نام')+'</b> هست.<small>'+(dm||dp?'اگر همان شخص است حساب تازه باز نکنید؛ از همان حساب استفاده کنید.':'اگر شخص دیگری با همین نام است «حساب جدا باز شود» را بزنید؛ شماره مشتری جدا می‌گیرد. اگر همان شخص است از همان حساب استفاده کنید.')+'</small>',goT:'حساب جدا باز شود'},()=>ACT.cuSave(d)))return}
   if(grp)addGroup(grp);const now=new Date().toISOString();let c;const bk=bI||bK?{iban:bI?'IR'+bI:'',card:bK,holder:bH||name,at:now}:null;
   const ph={av:CUF.av||'',idImgs:CUF.ids.filter(Boolean)};if(d.id==='new'){c={id:nid++,title:cuT,name,phone,nid:nidv,note,grp,...ph,...(bk?{bk}:{}),txs:[],createdAt:now,lastAt:now,by:who()};if(noV)c.cno=noV;custs.push(c);logA('cust','افتتاح حساب مشتری',cuName(c))}
   else{c=custs.find(x=>String(x.id)===String(d.id));if(!c)return;Object.assign(c,{title:cuT,name,phone,nid:nidv,note,grp,...ph,updatedAt:now,updatedBy:who()});if(bk)c.bk=bk;else delete c.bk;if(noV&&noV!==+c.cno){logA('cust','تغییر شماره مشتری',cuName(c)+' | '+toFa(c.cno||'—')+' ← '+toFa(noV));c.cno=noV}logA('cust','ویرایش مشخصات مشتری',cuName(c))}
@@ -539,7 +540,7 @@ ACT.bzNext=async()=>{bzRead();const d=bz.d;
   const mt=mgBuy(ne,d.cuId,S.map(z=>({...z,st:'wait'})));if(mt){const r=mt.amount-mgStl(mt).reduce((a,z)=>a+(+z.amount||0),0),bd=r>0&&(!mt.iban||!ibanOk(mt.iban));
     bz={step:1,d:{pay:payDef()},msg:`خرید «${esc(name)}» به واریزی قبلی‌اش اضافه شد — ${fmt(ne.amount)} تومان؛ جمع واریزی ${fmt(mt.amount)} تومان، واریز ${esc(payLab(mt.payDate))}${bd?' <em>(شبا ندارد یا اشتباه است؛ خطادار)</em>':''}`};
     render();$('view').scrollTop=0;bzFocusN();toast('به واریزی قبلی «'+name+'» اضافه شد ✓',bd,'دیدن واریزی',()=>ACT.depGo({e:mt.id}));return}
-  entries.push(ne);saveE();alloc=null;depLink(ne,{cuId:d.cuId,settles:S.map(z=>({...z,st:'wait'}))});logA('add','ثبت واریزی (خرید)',name+' | '+fmt(ne.amount)+' تومان | واریز '+dates(ne.payDate).fa+(S.length?' | تسویه از مشتری '+fmt(bzStlSum(S))+' تومان':''),{ids:[ne.id],after:pick(ne)});
+  entries.push(ne);saveE();alloc=null;depLink(ne,{cuId:d.cuId,nwCu:!d.cuId&&!!bz.nwN&&nzName(bz.nwN)===nzName(name),settles:S.map(z=>({...z,st:'wait'}))});logA('add','ثبت واریزی (خرید)',name+' | '+fmt(ne.amount)+' تومان | واریز '+dates(ne.payDate).fa+(S.length?' | تسویه از مشتری '+fmt(bzStlSum(S))+' تومان':''),{ids:[ne.id],after:pick(ne)});
   const rest=ne.amount-bzStlSum(S),bad=rest>0&&(!iban||!ibanOk(iban)),why=!iban?'شبا ندارد':'شبا اشتباه است';bz={step:1,d:{pay:payDef()},msg:`«${esc(name)}» ثبت شد — ${fmt(ne.amount)} تومان، واریز ${esc(payLab(ne.payDate))}${bad?' <em>('+why+'؛ در لیست خطادار علامت خورد)</em>':''}`};
   render();$('view').scrollTop=0;bzFocusN();toast(bad?'ثبت شد، اما '+why+' (خطادار)':'ثبت شد ✓ — ثبت بعدی',bad)};
 /* v74.8 (خواسته صاحب اپ): بعد از ثبت خرید دستی، مکان‌نما همان لحظه روی نام مشتری ثبت بعدی می‌نشیند */
@@ -570,7 +571,7 @@ function bzSugHTML(q){const nq=nzName(q),qd=toEn(q).replace(/\D/g,'');if(!nq)ret
     .sort((a,b)=>(b.k.startsWith(nq)-a.k.startsWith(nq))||(b.n-a.n)||String(b.last).localeCompare(String(a.last))).slice(0,30);
   const exact=L.some(p=>p.k===nq);
   return L.map((p,i)=>`<button type="button" class="bzsr" role="option" data-i="${i}" data-k="${esc(p.k)}"><span class="av">${esc(userInit(p.name))}</span><span class="tx"><b>${esc(p.name)}</b><small>${[p.cuId?'حساب مشتری':'',p.n?toFa(p.n)+' بار ثبت شده':'',p.phone?'<span class="ltr">'+esc(toFa(p.phone))+'</span>':'',p.nid?'کد ملی <span class="ltr">'+esc(toFa(p.nid))+'</span>':''].filter(Boolean).join(' · ')||'مشتری'}</small></span></button>`).join('')
-    +(exact?'':`<button type="button" class="bzsr nw" data-k=""><span class="av">${ic('plus')}</span><span class="tx"><b>مشتری جدید: «${esc(clean(q))}»</b><small>با همین نام ثبت می‌شود</small></span></button>`)}
+    +`<button type="button" class="bzsr nw" data-k=""><span class="av">${ic('plus')}</span><span class="tx"><b>${exact?'مشتری هم‌نام دیگر':'مشتری جدید'}: «${esc(clean(q))}»</b><small>${exact?'شخص دیگری با همین نام':'با همین نام ثبت می‌شود'}</small></span></button>`}
 /* v61.93 (خواسته صاحب اپ): پیشنهاد مشتری از هر سه فیلد نام، تلفن و کد ملی؛ انتخاب = پر شدن خودکار همه (تلفن، کد ملی، حساب بانکی قبلی) */
 function bzSugBind(){[['bzN','n'],['bzP','p'],['bzM','m']].forEach(([id,by])=>{const N=$(id),B=$(id+'s');if(!N||!B)return;
   const hide=()=>{B.classList.add('hide');B.innerHTML='';N.setAttribute('aria-expanded','false')};

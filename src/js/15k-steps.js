@@ -54,6 +54,7 @@ function stSteps(){const a=sv.qa,K=stKind();
   if(K==='pv'){const p=a.pv,used=new Set(p.xs.map(z=>z.k)),av=[...FXS(),...COINS()].filter(k=>!used.has(k));
     return [stS('r','مبلغ','تومان','num',()=>p.r,v=>p.r=v?String(v):'',{opt:1,nopt:1}),stS('g','طلا','گرم','dec',()=>p.g,v=>p.g=v,{opt:1,nopt:1,ph:'طلا (گرم ۷۵۰)'}),
       ...p.xs.map(z=>stS('x:'+z.k,(XA[z.k]||{t:z.k}).t,(XA[z.k]||{}).u||'عدد','dec',()=>z.v,v=>z.v=v,{opt:1,nopt:1,grp:1})),
+      /* v98.6 (خواسته صاحب اپ: «در مانده قبلی شرح می‌خواهم») */stS('ds','شرح','','text',()=>p.ds,v=>p.ds=clean(v||''),{opt:1,ph:'شرح · مثلاً مانده دفتر قدیم'}),
       ...(av.length?[stS('add','مانده دیگر','','pick',()=>'',v=>{if(!XA[v]||p.xs.some(z=>z.k===v))return;p.xs.push({k:v,v:''});a.st=1+p.xs.length-1},{opt:1,nopt:1,add0:1,fm:()=>'＋ دلار، سکه',opts:()=>av.map(k=>({v:k,t:XA[k].t,sub:XA[k].k==='f'?'ارز':'سکه',ico:XA[k].k==='f'?'usd':'coin'}))})]:[])]}
   if(K==='py'){const p=a.p,R=[];
     if(p.m==='adj'||p.m==='bkx'&&(BKX[p.k]||[])[2])R.push(stS('why','علت','','pick',()=>p.why,v=>p.why=v,{search:1,opts:q=>{const nq=nzName(toEn(q||''));return bdReasons().filter(t=>!nq||nzName(t).includes(nq)).map(t=>({v:t,t,ico:'tag'}))},lab0:v=>v||'',add:{t:'علت',fn:n=>clean(n)}}));
