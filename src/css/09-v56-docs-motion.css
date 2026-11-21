@@ -4949,3 +4949,6 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 #sheet .ash .agap b{font-size:13.5px;font-weight:850;color:var(--blu)}#sheet .ash .agap small{font-size:11.5px;color:var(--mut)}
 #sheet .ash .apxtip{display:flex;align-items:flex-start;gap:8px;margin:12px 4px 2px;font-size:11.5px;line-height:1.75;color:var(--mut)}
 #sheet .ash .apxtip svg{flex:none;width:15px;height:15px;margin-top:4px}
+
+/* v98.4 «موجودی صفر است» در اصلاح موجودی بانک: روشن = سبز (نه قرمزِ «منفی») */
+#sheet .bf4 .ckq button[data-act="bfxZero"].on{background:#15803d;color:#fff;box-shadow:0 6px 16px -8px rgba(21,128,61,.6)}
