@@ -48,7 +48,7 @@ ACT.arcMo=d=>{const k=+d.mo,box=document.querySelector(`.armo[data-mo="${k}"]`);
   else{arcMo.add(k);clearTimeout(box._t);const L=listsData().filter(x=>arcMK(x.iso)===k);inn.innerHTML=L.map(listRowM).join('');
     void box.offsetHeight;box.classList.add('open');h.setAttribute('aria-expanded','true');
     if(!RM())inn.querySelectorAll('.arcd').forEach((el,i)=>el.animate([{opacity:0,translate:'0 -10px'},{opacity:1,translate:'0 0'}],{duration:340,delay:Math.min(i,8)*35,easing:'cubic-bezier(.32,.72,0,1)',fill:'backwards'}))}};
-ACT.arcMore=()=>{arcN+=120;const r=$('arcRes');if(r)r.innerHTML=arcBody();else render()};
+ACT.arcMore=()=>{if(!liteDone())arcN+=120;const r=$('arcRes');if(r)r.innerHTML=arcBody();else render()};
 /* v90.9: ACT.cuStl قدیمی (پنجره «تسویه از فهرست واریزی‌ها») از اینجا برداشته شد — از v71.3 تعریف تازه در 15z-cu-find جایش را گرفته بود و این یکی هرگز اجرا نمی‌شد */
 /* v65.0: از صفحه مشتری هم «سند دریافت» (همان پنل پرداخت، مرحله مبلغ) */
 ACT.cuStlPick=d=>{const c=curCu(),r=validated().find(z=>String(z.id)===String(d.id));if(!c||!r)return;entId=r.id;PX={step:2,q:'',sel:{k:'cu',id:c.id},amount:Math.min(r.amount,cuBal(c).R<0?-cuBal(c).R:r.amount),tn:'',note:'',imgD:'',bz:false,dir:1};sheet(pxHTML());pxBind()};
@@ -224,7 +224,7 @@ ACT.spTab=d=>{spTab=d.t;AM=null;render();$('view').scrollTop=0};
 ACT.arcDay=d=>{ldKey=d.iso;ldX=null;ldOpen=new Set();ldQ='';go('lday')};
 ACT.fDClr=()=>{fD='';render()};
 ACT.fClr=()=>{fQ='';fN=120;render()};
-ACT.findMore=()=>{fN+=200;$('fres').innerHTML=findHTML()};
+ACT.findMore=()=>{if(!liteDone())fN+=200;$('fres').innerHTML=findHTML()};
 /* v73.5 (خواسته صاحب اپ): آواتار بالا = کشوی کناری «حساب کاربری» مثل اپ Claude با همه تنظیمات (15ze)؛ تنظیمات از نوار پایین برداشته شد */
 ACT.acct=()=>{if(!ME){showAuth();return}if(document.documentElement.classList.contains('cdon')&&CD.open){cdClose();return}cdOpen(0,'me')};
 ACT.bkLoad=()=>{BK=null;loadBk();render()};

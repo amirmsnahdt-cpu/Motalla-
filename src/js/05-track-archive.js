@@ -144,12 +144,12 @@ const listCard=d=>{const D=dates(d.iso),pc=d.R.length?d.ok.length/d.R.length*100
    هر عبارت دیگر (نام، فاکتور، تلفن، مبلغ، شبا، کارت، منبع، پیگیری…) واریزی‌ها را با همان تطبیق صفحه اول نشان می‌دهد */
 let arcN=120;
 function arcRows(q0){const q=toEn(String(q0||'').trim()).toLowerCase(),qd=q.replace(/\D/g,'');if(!q)return [];AM=AM||allocMap();const BI=new Map();batches.forEach(b=>b.items.forEach(it=>{if(!BI.has(it.id))BI.set(it.id,{b,it})}));
-  return validated().filter(x=>{const H=findHay(x,AM.get(x.id),BI);return H.t.includes(q)||(qd.length>=2&&/^[\d\s,.\-\/+]+$/.test(q)&&H.d.some(v=>v.includes(qd)))})
+  return validated().filter(x=>{const H=findHayC(x,AM.get(x.id),BI);return H.t.includes(q)||(qd.length>=2&&/^[\d\s,.\-\/+]+$/.test(q)&&H.d.some(v=>v.includes(qd)))})
    .sort((a,b)=>{const ka=PD(a),kb=PD(b);return ka<kb?1:ka>kb?-1:(b.id-a.id)})}
 function arcRowsHTML(all){if(!all.length)return `<div class="bempty">${ic('search')}<b>چیزی پیدا نشد</b><span>نام، فاکتور، تلفن، مبلغ یا بخشی از شبا را امتحان کنید</span></div>`;
-  const L=all.slice(0,arcN);let h=`<div class="spsec"><div><b>نتیجه جستجو</b><small>${fmt(all.length)} واریزی · ${fmt(sum(all))} تومان</small></div></div>`,last=null;
+  const AN=liteCap(all.length,arcN,12),L=all.slice(0,AN);let h=`<div class="spsec"><div><b>نتیجه جستجو</b><small>${fmt(all.length)} واریزی · ${fmt(sum(all))} تومان</small></div></div>`,last=null;
   L.forEach(x=>{const k=PD(x);if(k!==last){if(last!==null)h+='</div>';last=k;const dl=all.filter(z=>PD(z)===last);h+=`<div class="fday sticky pd hit"><span>${esc(pdHead(last))}</span><small>${fmt(dl.length)} واریزی · <b>${fmt(sum(dl))}</b> تومان</small></div><div class="blist fcard hit">`}h+=homeRow(x)});if(last!==null)h+='</div>';
-  return h+(all.length>arcN?`<button class="btn sec" style="width:100%;margin-top:10px" data-act="arcMore">نمایش بیشتر (${fmt(all.length-arcN)} مورد دیگر)</button>`:'')}
+  return h+(all.length>AN?`<button class="btn sec" style="width:100%;margin-top:10px" data-act="arcMore">نمایش بیشتر (${fmt(all.length-AN)} مورد دیگر)</button>`:'')}
 /* v62.7: هنگام تایپ فقط نتیجه‌ها (#arcRes) عوض می‌شود؛ خانه جستجو دوباره ساخته نمی‌شود تا صفحه‌کلید عددی آیفون به حروف نپرد */
 function vArch(){return `<div class="fsearch">${ic('search')}<input id="arq" type="search" placeholder="نام، فاکتور، تلفن، مبلغ، شبا یا تاریخ…" value="${esc(arcQ)}" autocomplete="off" enterkeyhint="search"><button class="x${arcQ?'':' hide'}" data-act="arcClr" aria-label="پاک کردن">×</button><button class="fcal${arcD?' on':''}" data-act="arcCal" aria-label="انتخاب تاریخ">${ic('cal')}</button></div><div id="arcRes">${arcBody()}</div>`}
 let arcMo=new Set();
@@ -162,8 +162,8 @@ function arcMonthsHTML(LF){const cm=arcMK(todayISO()),G=[];LF.forEach(d=>{const 
   return G.map(g=>{if(g.k>=cm)return g.L.map(listCard).join('');
     const jy=Math.floor(g.k/100),jm=g.k%100,R=g.L.flatMap(d=>d.R),dn=g.L.filter(d=>d.done).length,all=dn===g.L.length,op=arcMo.has(g.k),pc=R.length?R.filter(r=>stOf(r.id)==='ok'||r.full).length/R.length*100:0;
     return `<div class="armo${op?' open':''}${all?' ok':''}" data-mo="${g.k}"><button class="armh" data-act="arcMo" data-mo="${g.k}" aria-expanded="${op}"><span class="cal2"><b>${JM[jm-1]}</b><small>${toFa(jy)}</small></span><span class="tx"><b>واریزهای ${JM[jm-1]} ${toFa(jy)}</b><small>${fmt(g.L.length)} لیست · ${fmt(R.length)} واریزی</small><span class="ptbar" style="width:100%;margin-top:6px"><i class="ok" style="width:${pc}%"></i></span></span><span class="v">${fmt(sum(R))}<small>${all?'تسویه کامل ✓':fmt(g.L.length-dn)+' در جریان'}</small></span><i class="chev">${ic('back')}</i></button><div class="armb"><div class="armi">${op?g.L.map(listRowM).join(''):''}</div></div></div>`}).join('')}
-function arcBody(){const L=listsData(),card=listCard;
-  const aq=arcD||qDate(arcQ),tq=!aq&&arcQ.trim()?arcQ:'',LF=aq?L.filter(d=>d.iso===aq||d.eds.includes(aq)):L,open=LF.filter(d=>!d.done),done=LF.filter(d=>d.done);
+function arcBody(){const aq=arcD||qDate(arcQ),tq=!aq&&arcQ.trim()?arcQ:'';if(tq)return arcRowsHTML(arcRows(tq));/* v99.1: جستجوی متنی به فهرست لیست‌ها نیازی ندارد (قبلاً هر بار ساخته می‌شد) */
+  const L=listsData(),card=listCard,LF=aq?L.filter(d=>d.iso===aq||d.eds.includes(aq)):L,open=LF.filter(d=>!d.done),done=LF.filter(d=>d.done);
   const top=`${tq?arcRowsHTML(arcRows(tq)):''}${tq?'':aq?`<div class="fdate">${ic('cal')} لیست‌های ${esc(relDay(aq))}، ${esc(dates(aq).fa)}<button data-act="arcClr" aria-label="حذف">×</button></div>`:''}${aq&&!LF.length?'<div class="spempty" style="padding:20px 8px"><b>برای این تاریخ لیستی نیست</b></div>':''}`;
   if(tq)return top;
   /* همه لیست‌ها به ترتیب تاریخ واریز، جدیدترین بالا؛ هر لیست همه واریزی‌های آن روز واریز است */
