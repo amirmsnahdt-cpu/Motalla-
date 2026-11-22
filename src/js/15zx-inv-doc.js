@@ -86,8 +86,15 @@ function prShtCSS(html,pl){const Q=pageSpec(html),C=prCal(Q.mmW,Q.mmH,pl),PB=pl=
 const prPlat=()=>window.AndroidBridge?'a':isIOS()?'i':'w';
 /* v99.3 تنظیم جای چاپ برای صفحه‌ای به اندازه mmW×mmH با راه چاپ pl: فقط وقتی صفحه همان کاغذ فاکتور است (همان کاغذ = همان حاشیه چاپگر) → {kx,ky,x,y} یا null (v99.4: عرض و ارتفاع جدا).
    جای اعمال: اپ اندروید روی عکس صفحه‌ها هنگام چاپ (pdfPrintAnd)، کامپیوتر هنگام چاپ (printReport)، آیفون در خود فایل PDF (pdfMake؛ آنجا چاپ از همان فایل است). */
-function prCal(mmW,mmH,pl){let S;try{S=invCfg('sale')}catch(e){return null}if(!S||S.paper==='a42')return null;const A4=S.paper==='a4',PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:210;
-  if(Math.abs(mmW-PW)>1||Math.abs(mmH-PH)>1)return null;pl=pl||prPlat();const k=(+S['psk'+pl]||100)/100,cl=v=>Math.max(.8,Math.min(1.25,v)),kx=cl(k+(+S['psw'+pl]||0)/100),ky=cl(k+(+S['psh'+pl]||0)/100),x=+S['psx'+pl]||0,y=+S['psy'+pl]||0,r=+S['psr'+pl]||0;return kx!==1||ky!==1||x||y||r?{kx,ky,x,y,r}:null}
+/* v99.9 (عکس پیش‌نمایش چاپ اندروید صاحب اپ: قاب از سمت چپ بیرون صفحه رفته و بریده شده بود): جابه‌جایی و اندازه طوری محدود می‌شود که
+   قاب برگه همیشه دست‌کم PRM میلی‌متر داخل صفحه چاپ بماند (چرخش هم حساب می‌شود). cl = عددها محدود شدند */
+const PRM=1;
+function prCalS(S,mmW,mmH,pl){if(!S||S.paper==='a42')return null;const A4=S.paper==='a4',PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:210;
+  if(Math.abs(mmW-PW)>1||Math.abs(mmH-PH)>1)return null;const ins=5*(A4?297/210:1),PG=pl==='a'&&!A4&&PH<=148.5?147:PH,k=(+S['psk'+pl]||100)/100,r=+S['psr'+pl]||0,sn=Math.abs(Math.sin(r*Math.PI/180));
+  const kM=(D,P)=>(P-2*PRM)/(D-2*ins),kx0=Math.max(.8,Math.min(1.25,k+(+S['psw'+pl]||0)/100)),ky0=Math.max(.8,Math.min(1.25,k+(+S['psh'+pl]||0)/100)),kx=Math.min(kx0,kM(PW,PW)),ky=Math.min(ky0,kM(PH,PG));
+  const bx=Math.max(0,PW/2-(PW/2-ins)*kx-sn*PH/2*ky-PRM),by=Math.max(0,PG/2-(PH/2-ins)*ky-sn*PW/2*kx-PRM),x0=+S['psx'+pl]||0,y0=+S['psy'+pl]||0,x=Math.max(-bx,Math.min(bx,x0)),y=Math.max(-by,Math.min(by,y0));
+  const cl=kx!==kx0||ky!==ky0||Math.abs(x-x0)>.05||Math.abs(y-y0)>.05;return kx!==1||ky!==1||x||y||r?{kx,ky,x,y,r,cl,bx:Math.round(bx*10)/10,by:Math.round(by*10)/10}:null}
+function prCal(mmW,mmH,pl){let S;try{S=invCfg('sale')}catch(e){return null}return prCalS(S,mmW,mmH,pl||prPlat())}
 function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...INVD,...(INVT[PF]||{}),...o.S}):invCfg(PF);
   const nl=v=>String(v).replace(/ · (طلبکاریم|بدهکاریم)$/,''),D=dates(t.date),its=t.items||[],xs=t.xr||[],pays=t.pays||[],hMz=+t.mz||(t.rate?Math.round(t.rate*MZK):0),mzOf2=x=>+x.mz||hMz;
   const P=cuBalBefore(c,t),d=txD(t),dX=d.x||{},KO=Object.keys(XA),ko=k=>{const i=KO.indexOf(k);return i<0?99:i};

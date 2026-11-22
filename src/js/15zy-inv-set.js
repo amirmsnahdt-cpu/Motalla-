@@ -44,6 +44,7 @@ function ivCalHTML(S){const P=ivCalPl(S),C=IS.cal||{},num=(id,t,v)=>`<label clas
   ${ivRow('عرض چاپ','چپ و راست قاب تا لبهٔ کاغذ',sti('psw'+P,.5,K+EW,K))}
   ${ivRow('ارتفاع چاپ','بالا و پایین قاب تا لبهٔ کاغذ',sti('psh'+P,.5,K+EH,K))}
   ${ivRow('صاف کردن خط‌ها','اگر خط‌های قاب نسبت به لبهٔ کاغذ کج‌اند؛ هر قدم یک‌دهم درجه، + = جهت عقربه‌های ساعت',st('psr'+P,.1,RT?toFa(String(Math.abs(RT)))+' <small>درجه '+(RT>0?'ساعت‌گرد':'پادساعت‌گرد')+'</small>':'صفر'))}
+  ${(()=>{const A4=S.paper==='a4',W=A4?297:210,H=S.paper==='a5'?148:S.paper==='b14'?140:210,c=prCalS(S,W,H,P);return c&&c.cl?`<div class="ivnote ivcalon">${ic('info')} با این عددها قاب از لبهٔ کاغذ بیرون می‌زد؛ موقع چاپ خودکار محدود می‌شود (جابه‌جایی افقی حداکثر ${toFa(String(c.bx))} و عمودی ${toFa(String(c.by))} میلی‌متر). اندازه یا جابه‌جایی را کمتر کنید.</div>`:''})()}
   ${Math.abs(EW-EH)>=3?`<div class="ivnote ivcalon">${ic('info')} عرض و ارتفاع ${toFa(String(Math.round(Math.abs(EW-EH)*10)/10))}٪ با هم فرق دارند؛ نوشته‌ها کمی کشیده چاپ می‌شوند.</div>`:''}
   ${S.paper==='b14'?`<div class="ivnote ivcalon">${ic('info')} کاغذ فاکتور الان «۲۱ × ۱۴ سانت» است. اگر کاغذ شما A5 است (۲۱ × ۱۴٫۸)، بالا «A5 افقی» را انتخاب کنید: خود برگه ۸ میلی‌متر بلندتر می‌شود و برای پر کردن بالا و پایین لازم نیست نوشته‌ها کشیده شوند.</div>`:''}
   ${on?`<button type="button" class="ivcal0" data-act="ivCal0">${ic('undo')}<span>برگرداندن جای چاپ ${esc(ivPlN(P))} به حالت اول</span></button>`:''}
