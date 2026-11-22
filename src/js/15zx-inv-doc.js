@@ -24,10 +24,11 @@ const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   /* v99.3 «تنظیم جای چاپ روی کاغذ»، جدا برای هر راه چاپ (a = اپ اندروید، i = آیفون، w = کامپیوتر/مرورگر): psk؟ = اندازه ٪، psx؟ = جابه‌جایی به راست (میلی‌متر، منفی = چپ)،
      psy؟ = جابه‌جایی به پایین. فقط هنگام چاپ اعمال می‌شود (prCal)، نه در خود برگه. نام‌ها عمداً بلندند: py از قبل «هر پرداخت یک ردیف / یک ردیف جمع» است */pska:100,psxa:0,psya:0,pski:100,psxi:0,psyi:0,pskw:100,psxw:0,psyw:0,
   /* v99.4 کشیدن جدا: psw؟ = چند درصد به عرض چاپ اضافه/کم شود، psh؟ = به ارتفاع (روی اندازه psk؟ می‌نشیند؛ ۰ = بدون کشیدگی) */pswa:0,psha:0,pswi:0,pshi:0,psww:0,pshw:0,
+  /* v99.6 چرخش جبرانی (درجه، + = جهت عقربه‌های ساعت) برای چاپگری که کاغذ را همیشه کمی کج می‌کشد */psra:0,psri:0,psrw:0,
   sgc:1,sgs:1,by:1,th:1,shp:1,note:''};
 /* پیش‌فرض ویژه هر قالب: آبشده اجرت و مالیات ندارد و آزمایشگاه و انگش ستون جدا می‌گیرد */
 const INVT={ab:{clab:'a',cang:'a',caj:'n',ctx:'n'}};
-const INVE={paper:['a5','b14','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','o','t','b'],pp:['p','o','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2],pska:[85,115],psxa:[-25,25],psya:[-25,25],pski:[85,115],psxi:[-25,25],psyi:[-25,25],pskw:[85,115],psxw:[-25,25],psyw:[-25,25],pswa:[-12,12],psha:[-12,12],pswi:[-12,12],pshi:[-12,12],psww:[-12,12],pshw:[-12,12]};
+const INVE={paper:['a5','b14','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','o','t','b'],pp:['p','o','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2],pska:[85,115],psxa:[-25,25],psya:[-25,25],pski:[85,115],psxi:[-25,25],psyi:[-25,25],pskw:[85,115],psxw:[-25,25],psyw:[-25,25],pswa:[-12,12],psha:[-12,12],pswi:[-12,12],pshi:[-12,12],psww:[-12,12],pshw:[-12,12],psra:[-3,3],psri:[-3,3],psrw:[-3,3]};
 const INVCOL=[['w','وزن / تعداد'],['ay','عیار'],['w7','وزن ۷۵۰'],['lab','آزمایشگاه'],['ang','انگ'],['rt','نرخ'],['gv','مبلغ طلا'],['aj','اجرت'],['pp','سود'],['tx','مالیات']];
 function invClean(o){const r={};for(const k in INVD){const d=INVD[k],v=o?o[k]:undefined;
     if(INVE[k]||/^c(w|ay|w7|lab|ang|rt|gv|aj|pp|tx)$/.test(k))r[k]=(INVE[k]||['a','y','n']).includes(v)?v:d;
@@ -73,14 +74,14 @@ function invCalFit(S,M,pl){pl=pl||'a';const A4=S.paper==='a4',PW=A4?297:210,PH=S
 /* v99.5 سبکی که هنگام چاپ مستقیم یک برگه آماده (section.sht) به آن اضافه می‌شود: جای چاپ همان دستگاه (prCal) و برای اندروید
    صفحه ۲۱۰×۱۴۷ (مثل pdfPrintAnd) تا سیستم چاپ خودش برگه را وسط کاغذ بنشاند. html = خود برگه؛ '' یعنی چیزی اضافه نمی‌شود */
 function prShtCSS(html,pl){const Q=pageSpec(html),C=prCal(Q.mmW,Q.mmH,pl),PB=pl==='a'&&!Q.a4&&Q.land&&Math.abs(Q.mmW-210)<1&&Q.mmH>=120&&Q.mmH<=148.5?147:0;if(!C&&!PB)return '';
-  const kx=C?C.kx:1,ky=C?C.ky:1,dy=(C?C.y:0)+(PB?(PB-Q.mmH)/2:0),n2=v=>(+v).toFixed(2);
-  return `<style>${PB?`@page{size:${Q.mmW}mm ${PB}mm;margin:0}.sht{height:${PB}mm!important}`:''}.sht>.pg{transform:translate(${n2(C?C.x:0)}mm,${n2(dy)}mm) scale(${kx},${ky});transform-origin:50% 50%}</style>`}
+  const kx=C?C.kx:1,ky=C?C.ky:1,dy=(C?C.y:0)+(PB?(PB-Q.mmH)/2:0),n2=v=>(+v).toFixed(2),rt=C&&C.r?` rotate(${C.r}deg)`:'';
+  return `<style>${PB?`@page{size:${Q.mmW}mm ${PB}mm;margin:0}.sht{height:${PB}mm!important}`:''}.sht>.pg{transform:translate(${n2(C?C.x:0)}mm,${n2(dy)}mm) scale(${kx},${ky})${rt};transform-origin:50% 50%}</style>`}
 /* v99.3 این دستگاه از کدام راه چاپ می‌گیرد */
 const prPlat=()=>window.AndroidBridge?'a':isIOS()?'i':'w';
 /* v99.3 تنظیم جای چاپ برای صفحه‌ای به اندازه mmW×mmH با راه چاپ pl: فقط وقتی صفحه همان کاغذ فاکتور است (همان کاغذ = همان حاشیه چاپگر) → {kx,ky,x,y} یا null (v99.4: عرض و ارتفاع جدا).
    جای اعمال: اپ اندروید روی عکس صفحه‌ها هنگام چاپ (pdfPrintAnd)، کامپیوتر هنگام چاپ (printReport)، آیفون در خود فایل PDF (pdfMake؛ آنجا چاپ از همان فایل است). */
 function prCal(mmW,mmH,pl){let S;try{S=invCfg('sale')}catch(e){return null}if(!S||S.paper==='a42')return null;const A4=S.paper==='a4',PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:210;
-  if(Math.abs(mmW-PW)>1||Math.abs(mmH-PH)>1)return null;pl=pl||prPlat();const k=(+S['psk'+pl]||100)/100,cl=v=>Math.max(.8,Math.min(1.25,v)),kx=cl(k+(+S['psw'+pl]||0)/100),ky=cl(k+(+S['psh'+pl]||0)/100),x=+S['psx'+pl]||0,y=+S['psy'+pl]||0;return kx!==1||ky!==1||x||y?{kx,ky,x,y}:null}
+  if(Math.abs(mmW-PW)>1||Math.abs(mmH-PH)>1)return null;pl=pl||prPlat();const k=(+S['psk'+pl]||100)/100,cl=v=>Math.max(.8,Math.min(1.25,v)),kx=cl(k+(+S['psw'+pl]||0)/100),ky=cl(k+(+S['psh'+pl]||0)/100),x=+S['psx'+pl]||0,y=+S['psy'+pl]||0,r=+S['psr'+pl]||0;return kx!==1||ky!==1||x||y||r?{kx,ky,x,y,r}:null}
 function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...INVD,...(INVT[PF]||{}),...o.S}):invCfg(PF);
   const nl=v=>String(v).replace(/ · (طلبکاریم|بدهکاریم)$/,''),D=dates(t.date),its=t.items||[],xs=t.xr||[],pays=t.pays||[],hMz=+t.mz||(t.rate?Math.round(t.rate*MZK):0),mzOf2=x=>+x.mz||hMz;
   const P=cuBalBefore(c,t),d=txD(t),dX=d.x||{},KO=Object.keys(XA),ko=k=>{const i=KO.indexOf(k);return i<0?99:i};

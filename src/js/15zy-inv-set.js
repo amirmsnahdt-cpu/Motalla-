@@ -26,7 +26,7 @@ const IVCH={w:'وزن کالا، تعداد سکه و ارز',ay:'عیار طل�
 const IVPL=[['a','اپ اندروید'],['i','آیفون'],['w','کامپیوتر']],ivPlN=p=>(IVPL.find(x=>x[0]===p)||[,''])[1];
 function ivCalPl(S){if(IS.calPl==null){const on=p=>S['psk'+p]!==100||S['psx'+p]||S['psy'+p],me=prPlat();IS.calPl=on(me)?me:(IVPL.find(x=>on(x[0]))||[''])[0]}return IS.calPl}
 function ivCalHTML(S){const P=ivCalPl(S),C=IS.cal||{},num=(id,t,v)=>`<label class="ivcalf"><small>${t}</small><span><input id="${id}" class="ltr" inputmode="decimal" autocomplete="off" placeholder="۰" value="${esc(v==null?'':String(v))}"><i>م‌م</i></span></label>`,
-    K=P&&S['psk'+P],X=P&&S['psx'+P],Y=P&&S['psy'+P],EW=P&&(S['psw'+P]||0),EH=P&&(S['psh'+P]||0),on=P&&(K!==100||X||Y||EW||EH),pct=v=>toFa(String(Math.round(v*10)/10))+' <small>٪</small>',
+    K=P&&S['psk'+P],X=P&&S['psx'+P],Y=P&&S['psy'+P],EW=P&&(S['psw'+P]||0),EH=P&&(S['psh'+P]||0),RT=P&&(S['psr'+P]||0),on=P&&(K!==100||X||Y||EW||EH||RT),pct=v=>toFa(String(Math.round(v*10)/10))+' <small>٪</small>',
     mm=v=>toFa(String(Math.abs(Math.round(v*10)/10))),st=(k,d,tx)=>`<div class="ivst"><button type="button" data-act="ivN" data-k="${k}" data-d="${-d}" aria-label="کمتر">−</button><b>${tx}</b><button type="button" data-act="ivN" data-k="${k}" data-d="${d}" aria-label="بیشتر">+</button></div>`,
     seg=`<div class="ivg ivcalp" role="radiogroup">${IVPL.map(([v,l])=>`<button type="button" role="radio" aria-checked="${P===v}" class="${P===v?'on':''}" data-act="ivCalP" data-v="${v}">${l}</button>`).join('')}</div>`,
     hd=`<div class="ivcalh"><b>تنظیم جای چاپ روی کاغذ</b><small>وقتی چاپ وسط کاغذ نمی‌افتد یا یک طرفش جای خالی زیاد دارد</small></div><div class="ivcalq"><b>فاکتورها با چه دستگاهی چاپ می‌شوند؟</b>${seg}</div>`;
@@ -41,6 +41,7 @@ function ivCalHTML(S){const P=ivCalPl(S),C=IS.cal||{},num=(id,t,v)=>`<label clas
   ${ivRow('جابه‌جایی عمودی','',st('psy'+P,.5,Y?mm(Y)+' <small>م‌م به '+(Y>0?'پایین':'بالا')+'</small>':'صفر'))}
   ${ivRow('عرض چاپ','چپ و راست قاب تا لبهٔ کاغذ',st('psw'+P,.5,pct(K+EW)))}
   ${ivRow('ارتفاع چاپ','بالا و پایین قاب تا لبهٔ کاغذ',st('psh'+P,.5,pct(K+EH)))}
+  ${ivRow('صاف کردن خط‌ها','اگر خط‌های قاب نسبت به لبهٔ کاغذ کج‌اند؛ هر قدم یک‌دهم درجه، + = جهت عقربه‌های ساعت',st('psr'+P,.1,RT?toFa(String(Math.abs(RT)))+' <small>درجه '+(RT>0?'ساعت‌گرد':'پادساعت‌گرد')+'</small>':'صفر'))}
   ${Math.abs(EW-EH)>=3?`<div class="ivnote ivcalon">${ic('info')} عرض و ارتفاع ${toFa(String(Math.round(Math.abs(EW-EH)*10)/10))}٪ با هم فرق دارند؛ نوشته‌ها کمی کشیده چاپ می‌شوند.</div>`:''}
   ${S.paper==='b14'?`<div class="ivnote ivcalon">${ic('info')} کاغذ فاکتور الان «۲۱ × ۱۴ سانت» است. اگر کاغذ شما A5 است (۲۱ × ۱۴٫۸)، بالا «A5 افقی» را انتخاب کنید: خود برگه ۸ میلی‌متر بلندتر می‌شود و برای پر کردن بالا و پایین لازم نیست نوشته‌ها کشیده شوند.</div>`:''}
   ${on?`<button type="button" class="ivcal0" data-act="ivCal0">${ic('undo')}<span>برگرداندن جای چاپ ${esc(ivPlN(P))} به حالت اول</span></button>`:''}
@@ -50,7 +51,7 @@ ACT.ivCal=()=>{if(!IS||IS.p==='stm')return;const P=IS.calPl;if(!P)return;const g
   if(R.err){IS.calErr=1;IS.calMsg=esc(R.err);ivRe({noPrev:1});return}
   const EW=S['psw'+P]||0,EH=S['psh'+P]||0;S['psk'+P]=R.psk;S['psx'+P]=R.psx;S['psy'+P]=R.psy;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calErr=0;const f=v=>toFa(String(Math.abs(v)));
   IS.calMsg=`${ic('check')} برای چاپ با <b>${esc(ivPlN(P))}</b> تنظیم شد · سیستم چاپ برگه را <b>${toFa(String(R.sc))}٪</b> چاپ می‌کند. از این به بعد چاپ ${R.psx?f(R.psx)+' میلی‌متر به '+(R.psx>0?'راست':'چپ'):''}${R.psx&&R.psy?' و ':''}${R.psy?f(R.psy)+' میلی‌متر به '+(R.psy>0?'پایین':'بالا'):''}${R.psx||R.psy?' می‌رود':'جابه‌جا نمی‌شود'}${EW||EH?'، عرض '+toFa(String(Math.round((R.psk+EW)*10)/10))+'٪ و ارتفاع '+toFa(String(Math.round((R.psk+EH)*10)/10))+'٪':R.psk!==100?'، اندازه '+toFa(String(R.psk))+'٪':''}. حاشیهٔ راست و چپ حدود <b>${f(R.mx)}</b> و بالا و پایین حدود <b>${f(R.my)}</b> میلی‌متر می‌شود. «ذخیره» را بزنید و یک برگه چاپ کنید؛ اگر هنوز کمی جابه‌جا بود دوباره اندازه بگیرید.`;ivRe({noPrev:1})};
-ACT.ivCal0=()=>{if(!IS||IS.p==='stm')return;const P=IS.calPl;if(!P)return;const S=IS.W[IS.p];S['psk'+P]=100;S['psx'+P]=0;S['psy'+P]=0;S['psw'+P]=0;S['psh'+P]=0;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calMsg='';IS.calErr=0;ivRe({noPrev:1})};
+ACT.ivCal0=()=>{if(!IS||IS.p==='stm')return;const P=IS.calPl;if(!P)return;const S=IS.W[IS.p];S['psk'+P]=100;S['psx'+P]=0;S['psy'+P]=0;S['psw'+P]=0;S['psh'+P]=0;S['psr'+P]=0;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calMsg='';IS.calErr=0;ivRe({noPrev:1})};
 function ivSecHTML(){if(IS.p==='stm')return stmSecHTML();const S=IS.W[IS.p],k=IS.sec,pn=INVP.find(x=>x[0]===IS.p)[1];let h='';
   if(k==='paper')h=ivPick('paper','اندازه کاغذ','«۲۱ × ۱۴» برای برگه‌های دسته‌فاکتور است (کمی کوتاه‌تر از A5). A4 افقی همان برگه است، بزرگ‌تر. در «A4 عمودی» دو برگه روی یک کاغذ می‌آید: نسخه مشتری بالا و نسخه فروشگاه پایین',[['a5','A5 افقی'],['b14','۲۱ × ۱۴ سانت'],['a4','A4 افقی'],['a42','A4 · دو نسخه']])
     +(S.paper==='a42'?'':ivSw('copy','نسخه فروشگاه','یک برگه دوم با همان محتوا و برچسب «نسخه فروشگاه»'))
