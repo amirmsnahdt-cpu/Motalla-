@@ -5021,3 +5021,7 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 
 /* v99.7 درصد نوشتنی عرض/ارتفاع چاپ */
 .ivsti{min-width:92px;display:inline-flex;align-items:center;justify-content:center;gap:3px}.ivsti input{width:64px;height:32px;border:0!important;background:var(--card)!important;border-radius:10px;box-shadow:inset 0 0 0 1.5px var(--blu)!important;font:inherit;font-size:15px;font-weight:800;text-align:center;color:var(--ink);padding:0!important;outline:0}.ivsti small{font-size:11px;font-weight:600;color:var(--mut)}
+
+/* v100.0 جابه‌جایی نوشتنی + دکمهٔ جهت */
+.ivsts{gap:4px}.ivsts .ivsti{min-width:0}.ivsts .ivsti input{width:52px}.ivsgn{width:auto!important;min-width:48px;height:32px!important;padding:0 9px!important;border-radius:10px!important;font-size:12.5px!important;font-weight:800!important;color:var(--blu)!important;background:color-mix(in srgb,var(--blu) 12%,var(--card))!important;box-shadow:none!important;white-space:nowrap}
+.ivsts .ivsti input{width:46px}.ivsgn{min-width:44px;padding:0 7px!important}

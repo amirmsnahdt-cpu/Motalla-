@@ -30,6 +30,8 @@ function ivCalHTML(S){const P=ivCalPl(S),C=IS.cal||{},num=(id,t,v)=>`<label clas
     mm=v=>toFa(String(Math.abs(Math.round(v*10)/10))),st=(k,d,tx)=>`<div class="ivst"><button type="button" data-act="ivN" data-k="${k}" data-d="${-d}" aria-label="کمتر">−</button><b>${tx}</b><button type="button" data-act="ivN" data-k="${k}" data-d="${d}" aria-label="بیشتر">+</button></div>`,
     /* v99.7 (صاحب اپ: «می‌خواهم درصد را خودم بنویسم، مثلاً ۱۰۱٫۳») عرض و ارتفاع: عدد وسط دکمه‌ها خانهٔ نوشتنی است (data-k کلید، data-b پایه که از عدد نوشته‌شده کم می‌شود) */
     sti=(k,d,v,b)=>`<div class="ivst"><button type="button" data-act="ivN" data-k="${k}" data-d="${-d}" aria-label="کمتر">−</button><label class="ivsti"><input class="ltr" inputmode="decimal" autocomplete="off" data-k="${k}" data-b="${b}" value="${toFa(String(Math.round(v*10)/10))}"><small>٪</small></label><button type="button" data-act="ivN" data-k="${k}" data-d="${d}" aria-label="بیشتر">+</button></div>`,
+    /* v100.0 (صاحب اپ: «جابه‌جایی افقی و عمودی هم باید بشود عدد داد»): خانهٔ نوشتنی برای اندازهٔ جابه‌جایی/چرخش + دکمهٔ جهت کنارش (ACT.ivSgn) */
+    sts=(k,d,v,pos,neg,u,hi)=>{const sg=v<0?-1:v>0?1:((IS.sg||{})[k]||1);return `<div class="ivst ivsts"><button type="button" data-act="ivN" data-k="${k}" data-d="${-d}" aria-label="کمتر">−</button><label class="ivsti"><input class="ltr" inputmode="decimal" autocomplete="off" data-k="${k}" data-m="s" data-hi="${hi}" value="${toFa(String(Math.abs(Math.round(v*10)/10)))}"><small>${u}</small></label><button type="button" class="ivsgn" data-act="ivSgn" data-k="${k}" data-v="${sg}">${sg>0?pos:neg}</button><button type="button" data-act="ivN" data-k="${k}" data-d="${d}" aria-label="بیشتر">+</button></div>`},
     seg=`<div class="ivg ivcalp" role="radiogroup">${IVPL.map(([v,l])=>`<button type="button" role="radio" aria-checked="${P===v}" class="${P===v?'on':''}" data-act="ivCalP" data-v="${v}">${l}</button>`).join('')}</div>`,
     hd=`<div class="ivcalh"><b>تنظیم جای چاپ روی کاغذ</b><small>وقتی چاپ وسط کاغذ نمی‌افتد یا یک طرفش جای خالی زیاد دارد</small></div><div class="ivcalq"><b>فاکتورها با چه دستگاهی چاپ می‌شوند؟</b>${seg}</div>`;
   if(!P)return `<div class="ivcalw">${hd}<div class="ivnote">اول دستگاهی را که در مغازه با آن چاپ می‌گیرید انتخاب کنید. هر دستگاه تنظیم خودش را دارد و روی بقیه اثر نمی‌گذارد.</div></div>`;
@@ -39,11 +41,11 @@ function ivCalHTML(S){const P=ivCalPl(S),C=IS.cal||{},num=(id,t,v)=>`<label clas
   <div class="ivcalg">${num('ivcT','بالا',C.t)}${num('ivcB','پایین',C.b)}${num('ivcR','راست',C.r)}${num('ivcL','چپ',C.l)}</div>
   <button type="button" class="ivcalgo" data-act="ivCal">${ic('check')}<span>وسط‌چین کن</span></button>
   ${IS.calMsg?`<div class="ivcalm${IS.calErr?' bad':''}">${IS.calMsg}</div>`:''}
-  ${ivRow('جابه‌جایی افقی','هر قدم نیم میلی‌متر',st('psx'+P,.5,X?mm(X)+' <small>م‌م به '+(X>0?'راست':'چپ')+'</small>':'صفر'))}
-  ${ivRow('جابه‌جایی عمودی','',st('psy'+P,.5,Y?mm(Y)+' <small>م‌م به '+(Y>0?'پایین':'بالا')+'</small>':'صفر'))}
+  ${ivRow('جابه‌جایی افقی','جهت با دکمهٔ آبی',sts('psx'+P,.5,X,'راست','چپ','م‌م',25))}
+  ${ivRow('جابه‌جایی عمودی','',sts('psy'+P,.5,Y,'پایین','بالا','م‌م',25))}
   ${ivRow('عرض چاپ','چپ و راست قاب تا لبهٔ کاغذ',sti('psw'+P,.5,K+EW,K))}
   ${ivRow('ارتفاع چاپ','بالا و پایین قاب تا لبهٔ کاغذ',sti('psh'+P,.5,K+EH,K))}
-  ${ivRow('صاف کردن خط‌ها','اگر خط‌های قاب نسبت به لبهٔ کاغذ کج‌اند؛ هر قدم یک‌دهم درجه، + = جهت عقربه‌های ساعت',st('psr'+P,.1,RT?toFa(String(Math.abs(RT)))+' <small>درجه '+(RT>0?'ساعت‌گرد':'پادساعت‌گرد')+'</small>':'صفر'))}
+  ${ivRow('صاف کردن خط‌ها','وقتی قاب کج چاپ می‌شود',sts('psr'+P,.1,RT,'ساعت‌گرد','پادساعت‌گرد','درجه',3))}
   ${(()=>{const A4=S.paper==='a4',W=A4?297:210,H=S.paper==='a5'?148:S.paper==='b14'?140:210,c=prCalS(S,W,H,P);return c&&c.cl?`<div class="ivnote ivcalon">${ic('info')} با این عددها قاب از لبهٔ کاغذ بیرون می‌زد؛ موقع چاپ خودکار محدود می‌شود (جابه‌جایی افقی حداکثر ${toFa(String(c.bx))} و عمودی ${toFa(String(c.by))} میلی‌متر). اندازه یا جابه‌جایی را کمتر کنید.</div>`:''})()}
   ${Math.abs(EW-EH)>=3?`<div class="ivnote ivcalon">${ic('info')} عرض و ارتفاع ${toFa(String(Math.round(Math.abs(EW-EH)*10)/10))}٪ با هم فرق دارند؛ نوشته‌ها کمی کشیده چاپ می‌شوند.</div>`:''}
   ${S.paper==='b14'?`<div class="ivnote ivcalon">${ic('info')} کاغذ فاکتور الان «۲۱ × ۱۴ سانت» است. اگر کاغذ شما A5 است (۲۱ × ۱۴٫۸)، بالا «A5 افقی» را انتخاب کنید: خود برگه ۸ میلی‌متر بلندتر می‌شود و برای پر کردن بالا و پایین لازم نیست نوشته‌ها کشیده شوند.</div>`:''}
@@ -135,7 +137,7 @@ function ivRe(o){o=o||{};ivShSync();document.querySelectorAll('#view .ivtab butt
   const C=$('ivC');if(C&&!o.keep){C.innerHTML=ivSecHTML();if(o.anim)C.classList.remove('in'),void C.offsetWidth,C.classList.add('in');ivBindIn()}hdGoSync();if(!o.noPrev)ivPrev()}
 function ivBindIn(){const S=IS.W[IS.p],B=(id,f)=>{const e=$(id);if(e)e.oninput=()=>{f(e.value);ivRe({keep:1})}};
   ['ivcT','ivcB','ivcR','ivcL'].forEach((id,i)=>{const e=$(id);if(e)e.oninput=()=>{IS.cal=IS.cal||{};IS.cal['tbrl'[i]]=e.value}});
-  document.querySelectorAll('#view .ivsti input').forEach(e=>{e.onkeydown=ev=>{if(ev.key==='Enter')e.blur()};e.onfocus=()=>{try{e.select()}catch(x){}};e.onchange=()=>{const v=parseFloat(decIn(e.value));if(!IS)return;if(!isFinite(v)||v<80||v>125){toast('عددی بین ۸۰ و ۱۲۵ درصد بنویسید',true);ivRe({noPrev:1});return}const S=IS.W[IS.p],k=e.dataset.k;S[k]=Math.round((v-(+e.dataset.b||100))*10)/10;IS.W[IS.p]=ivCl(S);ivRe({noPrev:1})}});
+  document.querySelectorAll('#view .ivsti input').forEach(e=>{e.onkeydown=ev=>{if(ev.key==='Enter')e.blur()};e.onfocus=()=>{try{e.select()}catch(x){}};e.onchange=()=>{const v=parseFloat(decIn(e.value));if(!IS)return;if(e.dataset.m==='s'){const k=e.dataset.k,hi=+e.dataset.hi||25,S=IS.W[IS.p];if(!isFinite(v)||v<0||v>hi){toast('عددی بین ۰ و '+toFa(String(hi))+' بنویسید',true);ivRe({noPrev:1});return}const sg=(+S[k]||0)<0?-1:(+S[k]||0)>0?1:((IS.sg||{})[k]||1);S[k]=Math.round(v*sg*10)/10;IS.W[IS.p]=ivCl(S);ivRe({noPrev:1});return}if(!isFinite(v)||v<80||v>125){toast('عددی بین ۸۰ و ۱۲۵ درصد بنویسید',true);ivRe({noPrev:1});return}const S=IS.W[IS.p],k=e.dataset.k;S[k]=Math.round((v-(+e.dataset.b||100))*10)/10;IS.W[IS.p]=ivCl(S);ivRe({noPrev:1})}});
   B('ivTt',v=>{S.ttl=clean(v).slice(0,28);document.querySelectorAll('#ivC .ivch button').forEach(b=>b.classList.toggle('on',(b.dataset.v||'')===S.ttl))});
   B('ivNt',v=>{S.note=clean(v).slice(0,170)});B('ivSNt',v=>{IS.W.stm.note=clean(v).slice(0,170)});B('ivSn',v=>{IS.shop.nm=clean(v).slice(0,40)});B('ivSa',v=>{IS.shop.ad=clean(v).slice(0,90)});B('ivSt',v=>{IS.shop.tel=clean(v).slice(0,40)});B('ivSi',v=>{IS.shop.ig=clean(v).slice(0,50)})}
 function bindInvSet(){if(!IS||!isAdmin())return;ivBindIn();ivPrev(1);if(!bindInvSet.rz){bindInvSet.rz=1;window.addEventListener('resize',()=>{if(cur==='invset')ivPrev()})}}
@@ -161,3 +163,6 @@ ACT.ivSave=()=>{if(!IS||!isAdmin())return;if(!ivDirty()){toast('چیزی عوض 
   /* v91.5 (خواسته صاحب اپ: «ذخیره که خورد انیمیشن درست انجام شود، ذخیره شود و بیرون بیاید»): «✓ ذخیره شد» روی خود دکمه، بعد برگشت به تنظیمات */
   setTimeout(()=>{if(cur==='invset'&&!ivDirty())leaveTo()},850)};
 ACT.ivCol=d=>{if(!IS)return;const S=IS.W[IS.p],k='c'+d.f;S[k]=S[k]==='n'?'a':'n';IS.W[IS.p]=invClean(S);ivRe()};
+
+/* v100.0 جهت جابه‌جایی/چرخش: عدد را قرینه می‌کند؛ وقتی عدد صفر است فقط جهت انتخاب‌شده برای عدد بعدی یادش می‌ماند */
+ACT.ivSgn=d=>{if(!IS)return;const S=IS.W[IS.p],k=d.k,v=+S[k]||0;IS.sg=IS.sg||{};IS.sg[k]=-(+d.v||1);if(v){S[k]=-v;IS.W[IS.p]=ivCl(S)}ivRe({noPrev:1})};
