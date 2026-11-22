@@ -211,7 +211,7 @@ function printReport(){const html=window.__pv||withCtx(reportHTML),doc=new DOMPa
   /* v90.6: «برگه‌های آماده» (هر صفحه یک section.sht هم‌اندازه کاغذ، مثل فاکتور) در یک iframe جدا چاپ می‌شوند، نه داخل #printArea:
      آنجا سبک‌های خود برنامه روی نام کلاس‌های کوتاه برگه می‌نشست و چیدمان را به هم می‌ریخت. عنوان صفحه (نام فایل PDF) مثل پایین موقتاً عوض می‌شود. */
   if(/<section class="sht"/.test(html)){const t0=window.__docT||(window.__docT=document.title),tt=(doc.title||'').trim();if(tt)document.title=tt;setTimeout(()=>{document.title=t0},60000);/* v99.3 «تنظیم جای چاپ» برای کامپیوتر/مرورگر: فقط روی برگه‌ای که به چاپگر می‌رود */
-    const Qc=pageSpec(html),CW=prPlat()==='w'?prCal(Qc.mmW,Qc.mmH,'w'):null;let ph='<!doctype html>'+doc.documentElement.outerHTML;if(CW)ph=ph.replace('</head>',`<style>.sht>.pg{transform:translate(${CW.x}mm,${CW.y}mm) scale(${CW.kx},${CW.ky});transform-origin:50% 50%}</style></head>`);
+    let ph='<!doctype html>'+doc.documentElement.outerHTML;const CW=prPlat()==='w'?prShtCSS(html,'w'):'';if(CW)ph=ph.replace('</head>',CW+'</head>');
     printFrame(ph,()=>{document.title=t0});return}
   let css=[...doc.querySelectorAll('style')].map(s=>s.textContent).join('\n');const pg=(css.match(/@page\{[^}]*\}/)||[''])[0];css=css.replace(pg,'').replace(/(^|\})\s*body\{/g,'$1 #printArea{');
   $('printArea').innerHTML='<style>'+pg+'@media print{'+css+'}</style>'+doc.body.innerHTML;

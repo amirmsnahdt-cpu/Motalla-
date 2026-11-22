@@ -70,6 +70,11 @@ function invCalFit(S,M,pl){pl=pl||'a';const A4=S.paper==='a4',PW=A4?297:210,PH=S
   /* v99.4: کشیدگی عرض/ارتفاعی که کاربر گذاشته می‌ماند؛ اندازه مشترک تا جایی بالا می‌رود که هر دو جهت جا شود */
   const k=Math.min(1.15,Math.max(.85,Math.min((PW-2*ax)/sx/(PW-2*ins)-ew,(PH-2*ay)/sy/(PH-2*ins)-eh))),cl=(v,m)=>Math.max(-m,Math.min(m,v)),r1=v=>Math.round(v*10)/10;
   return {psk:r1(k*100),psx:r1(cl((PW/2-ox)/sx-PW/2,25)),psy:r1(cl((PH/2-oy)/sy-PH/2,25)),mx:r1((PW-(PW-2*ins)*(k+ew)*sx)/2),my:r1((PH-(PH-2*ins)*(k+eh)*sy)/2),sc:Math.round((sx+sy)/2*100)}}
+/* v99.5 سبکی که هنگام چاپ مستقیم یک برگه آماده (section.sht) به آن اضافه می‌شود: جای چاپ همان دستگاه (prCal) و برای اندروید
+   صفحه ۲۱۰×۱۴۷ (مثل pdfPrintAnd) تا سیستم چاپ خودش برگه را وسط کاغذ بنشاند. html = خود برگه؛ '' یعنی چیزی اضافه نمی‌شود */
+function prShtCSS(html,pl){const Q=pageSpec(html),C=prCal(Q.mmW,Q.mmH,pl),PB=pl==='a'&&!Q.a4&&Q.land&&Math.abs(Q.mmW-210)<1&&Q.mmH>=120&&Q.mmH<=148.5?147:0;if(!C&&!PB)return '';
+  const kx=C?C.kx:1,ky=C?C.ky:1,dy=(C?C.y:0)+(PB?(PB-Q.mmH)/2:0),n2=v=>(+v).toFixed(2);
+  return `<style>${PB?`@page{size:${Q.mmW}mm ${PB}mm;margin:0}.sht{height:${PB}mm!important}`:''}.sht>.pg{transform:translate(${n2(C?C.x:0)}mm,${n2(dy)}mm) scale(${kx},${ky});transform-origin:50% 50%}</style>`}
 /* v99.3 این دستگاه از کدام راه چاپ می‌گیرد */
 const prPlat=()=>window.AndroidBridge?'a':isIOS()?'i':'w';
 /* v99.3 تنظیم جای چاپ برای صفحه‌ای به اندازه mmW×mmH با راه چاپ pl: فقط وقتی صفحه همان کاغذ فاکتور است (همان کاغذ = همان حاشیه چاپگر) → {kx,ky,x,y} یا null (v99.4: عرض و ارتفاع جدا).

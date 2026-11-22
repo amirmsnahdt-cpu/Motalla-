@@ -208,6 +208,8 @@ if(window.AndroidBridge){
   /* چاپ در اپ اندروید: منابع بیرونی حذف می‌شوند تا صفحه چاپ بدون معطلی آماده شود */
   printReport=function(){if(!window.AndroidBridge.version){askConfirm('برای چاپ و ذخیره PDF، نسخه جدید اپ اندروید لازم است. الان دانلود شود؟ (اطلاعات روی سرور است و چیزی پاک نمی‌شود)','دانلود نسخه جدید',()=>ACT.getApk());return}
     let html=(window.__pv||withCtx(reportHTML)).replace(/<button class="pb"[^>]*>.*?<\/button>/,'').replace(/<link[^>]+(googleapis|gstatic)[^>]*>/g,'').replace(/<script[\s\S]*?<\/script>/g,'');
+    /* v99.5 (صاحب اپ: «در اپ اندروید اصلاً تنظیم نمی‌شود»): این راه وقتی می‌آید که PDF هنوز آماده نیست؛ برگه آماده هم باید جای چاپ اندروید را بگیرد */
+    if(/<section class="sht"/.test(html)){const X=prShtCSS(html,'a');if(X)html=html.replace('</head>',X+'</head>')}
     toast('در حال آماده‌سازی چاپ…');try{window.AndroidBridge.printHtml(html,((html.match(/<title>([^<]*)<\/title>/)||[])[1]||'Motalla').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>'))}catch(e){toast('چاپ در این گوشی ممکن نشد',true)}};
 }
 /* ---------- خانه: فهرست عمودی وضعیت واریزی‌ها ---------- */
