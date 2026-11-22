@@ -20,12 +20,32 @@ const ivSeg=(k,O)=>`<div class="ivg" role="radiogroup">${O.map(([v,l])=>`<button
 const ivPick=(k,t,sub,O)=>ivRow(t,sub,ivSeg(k,O),'col');
 const AYN=[['a','خودکار'],['y','همیشه'],['n','هرگز']];
 const IVCH={w:'وزن کالا، تعداد سکه و ارز',ay:'عیار طلا',w7:'وزن بر پایه ۷۵۰ (برای طلای متفرقه و آبشده)',lab:'نام آزمایشگاه (ری‌گیری)',ang:'شماره انگ',rt:'مظنه یا فی ردیف؛ خودکار = فقط وقتی با نرخ بالای برگه فرق دارد',gv:'مبلغ خود طلا، پیش از اجرت و سود',aj:'اجرت ساخت',pp:'سود فروشنده',tx:'مالیات ارزش افزوده'};
+/* v99.2 (عکس صاحب اپ از فاکتور چاپ‌شده: «پایین خالی است، بغل‌ها فضای زیاد دارد»): «تنظیم جای چاپ روی کاغذ» — چهار حاشیه برگه چاپ‌شده را می‌نویسد،
+   «وسط‌چین کن» اندازه و جابه‌جایی را حساب می‌کند (invCalFit در 15zx) و برای همه فاکتورها می‌ماند؛ زیرش تنظیم دستی نیم‌میلی‌متری. */
+function ivCalHTML(S){const C=IS.cal||{},num=(id,t,v)=>`<label class="ivcalf"><small>${t}</small><span><input id="${id}" class="ltr" inputmode="decimal" autocomplete="off" placeholder="۰" value="${esc(v==null?'':String(v))}"><i>م‌م</i></span></label>`,on=S.psk!==100||S.psx||S.psy,
+    mm=v=>toFa(String(Math.abs(Math.round(v*10)/10))),st=(k,d,tx)=>`<div class="ivst"><button type="button" data-act="ivN" data-k="${k}" data-d="${-d}" aria-label="کمتر">−</button><b>${tx}</b><button type="button" data-act="ivN" data-k="${k}" data-d="${d}" aria-label="بیشتر">+</button></div>`;
+  return `<div class="ivcalw"><div class="ivcalh"><b>تنظیم جای چاپ روی کاغذ</b><small>وقتی چاپ وسط کاغذ نمی‌افتد یا یک طرفش جای خالی زیاد دارد</small></div>
+  <div class="ivnote">چاپگر برگه را خودش کمی کوچک می‌کند و گاهی به یک گوشه می‌چسباند. یک فاکتور با همین تنظیم چاپ کنید، برگه را رو به خودتان بگیرید و با خط‌کش فاصلهٔ <b>خط بیرونی قاب تا لبهٔ کاغذ</b> را از چهار طرف به میلی‌متر بنویسید.</div>
+  <div class="ivcalg">${num('ivcT','بالا',C.t)}${num('ivcB','پایین',C.b)}${num('ivcR','راست',C.r)}${num('ivcL','چپ',C.l)}</div>
+  <button type="button" class="ivcalgo" data-act="ivCal">${ic('check')}<span>وسط‌چین کن</span></button>
+  ${IS.calMsg?`<div class="ivcalm${IS.calErr?' bad':''}">${IS.calMsg}</div>`:''}
+  ${ivRow('جابه‌جایی افقی','هر قدم نیم میلی‌متر',st('psx',.5,S.psx?mm(S.psx)+' <small>م‌م به '+(S.psx>0?'راست':'چپ')+'</small>':'صفر'))}
+  ${ivRow('جابه‌جایی عمودی','',st('psy',.5,S.psy?mm(S.psy)+' <small>م‌م به '+(S.psy>0?'پایین':'بالا')+'</small>':'صفر'))}
+  ${ivRow('اندازهٔ چاپ','بزرگ‌تر از ۱۰۰ = برگه بزرگ‌تر چاپ می‌شود',st('psk',.5,toFa(String(S.psk))+' <small>٪</small>'))}
+  ${on?`<button type="button" class="ivcal0" data-act="ivCal0">${ic('undo')}<span>برگرداندن جای چاپ به حالت اول</span></button>`:''}
+  <div class="ivnote">در پیش‌نمایش، برگه همان‌قدر جابه‌جا دیده می‌شود؛ روی کاغذ وسط می‌افتد. اگر حاشیه‌ها هنوز زیاد بود، در پنجرهٔ چاپ گوشی یا چاپگر اندازهٔ کاغذ را همان کاغذ خودتان و «اندازهٔ واقعی / ۱۰۰٪» بگذارید؛ برنامه نمی‌تواند از جایی که چاپگر چاپ نمی‌کند بیرون بزند.</div></div>`}
+ACT.ivCal=()=>{if(!IS||IS.p==='stm')return;const g=id=>{const e=$(id),v=e?decIn(e.value):'';return v===''?NaN:parseFloat(v)},M={t:g('ivcT'),b:g('ivcB'),r:g('ivcR'),l:g('ivcL')},S=IS.W[IS.p],R=invCalFit(S,M);IS.cal=M;
+  if(R.err){IS.calErr=1;IS.calMsg=esc(R.err);ivRe({noPrev:1});return}
+  S.psk=R.psk;S.psx=R.psx;S.psy=R.psy;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calErr=0;const f=v=>toFa(String(Math.abs(v)));
+  IS.calMsg=`${ic('check')} تنظیم شد · چاپگر شما برگه را <b>${toFa(String(R.sc))}٪</b> چاپ می‌کند. از این به بعد چاپ ${R.psx?f(R.psx)+' میلی‌متر به '+(R.psx>0?'راست':'چپ'):''}${R.psx&&R.psy?' و ':''}${R.psy?f(R.psy)+' میلی‌متر به '+(R.psy>0?'پایین':'بالا'):''}${R.psx||R.psy?' می‌رود':'جابه‌جا نمی‌شود'}${R.psk!==100?'، اندازه '+toFa(String(R.psk))+'٪':''}. حاشیهٔ راست و چپ حدود <b>${f(R.mx)}</b> و بالا و پایین حدود <b>${f(R.my)}</b> میلی‌متر می‌شود. «ذخیره» را بزنید و یک برگه چاپ کنید؛ اگر هنوز کمی جابه‌جا بود دوباره اندازه بگیرید.`;ivRe()};
+ACT.ivCal0=()=>{if(!IS||IS.p==='stm')return;const S=IS.W[IS.p];S.psk=100;S.psx=0;S.psy=0;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calMsg='';IS.calErr=0;ivRe()};
 function ivSecHTML(){if(IS.p==='stm')return stmSecHTML();const S=IS.W[IS.p],k=IS.sec,pn=INVP.find(x=>x[0]===IS.p)[1];let h='';
   if(k==='paper')h=ivPick('paper','اندازه کاغذ','«۲۱ × ۱۴» برای برگه‌های دسته‌فاکتور است (کمی کوتاه‌تر از A5). A4 افقی همان برگه است، بزرگ‌تر. در «A4 عمودی» دو برگه روی یک کاغذ می‌آید: نسخه مشتری بالا و نسخه فروشگاه پایین',[['a5','A5 افقی'],['b14','۲۱ × ۱۴ سانت'],['a4','A4 افقی'],['a42','A4 · دو نسخه']])
     +(S.paper==='a42'?'':ivSw('copy','نسخه فروشگاه','یک برگه دوم با همان محتوا و برچسب «نسخه فروشگاه»'))
     +ivPick('ink','رنگ چاپ','سیاه‌وسفید برای چاپگر لیزری: طلایی‌ها خاکستری تیره و رنگ طلبکار/بدهکار مشکی می‌شود',[['c','رنگی'],['m','سیاه‌وسفید']])
     +(S.ink==='m'?'':ivPick('bg','رنگ کاغذ','',[['c','کرم'],['w','سفید']]))
-    +ivPick('frame','قاب دور برگه','',[['g','جدول زرّین'],['l','خط ساده'],['n','بدون قاب']]);
+    +ivPick('frame','قاب دور برگه','',[['g','جدول زرّین'],['l','خط ساده'],['n','بدون قاب']])
+    +(S.paper==='a42'?'':ivCalHTML(S));
   else if(k==='head')h=ivPick('lp','لوگو','',[['c','وسط'],['r','سمت راست'],['n','بدون لوگو']])
     +ivPick('cal','خط عنوان','',[[1,'خوشنویسی'],[0,'ساده']])
     +ivRow('متن عنوان','«خودکار» از روی خود سند: فاکتور فروش، فاکتور خرید، رسید دریافت…',`<div class="ivch"><button type="button" class="${S.ttl?'':'on'}" data-act="ivTtl" data-v="">خودکار</button>${IVTTL.map(x=>`<button type="button" class="${S.ttl===x?'on':''}" data-act="ivTtl" data-v="${x}">${x}</button>`).join('')}</div><input class="ivin" id="ivTt" value="${esc(IVTTL.includes(S.ttl)?'':S.ttl)}" placeholder="یا متن دلخواه (با خط ساده نوشته می‌شود)" maxlength="28" autocomplete="off" enterkeyhint="done">`,'col')
@@ -98,6 +118,7 @@ function ivRe(o){o=o||{};ivShSync();document.querySelectorAll('#view .ivtab butt
   document.querySelectorAll('#ivSc button').forEach(b=>{const on=b.dataset.s===IS.sec;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
   const C=$('ivC');if(C&&!o.keep){C.innerHTML=ivSecHTML();if(o.anim)C.classList.remove('in'),void C.offsetWidth,C.classList.add('in');ivBindIn()}hdGoSync();if(!o.noPrev)ivPrev()}
 function ivBindIn(){const S=IS.W[IS.p],B=(id,f)=>{const e=$(id);if(e)e.oninput=()=>{f(e.value);ivRe({keep:1})}};
+  ['ivcT','ivcB','ivcR','ivcL'].forEach((id,i)=>{const e=$(id);if(e)e.oninput=()=>{IS.cal=IS.cal||{};IS.cal['tbrl'[i]]=e.value}});
   B('ivTt',v=>{S.ttl=clean(v).slice(0,28);document.querySelectorAll('#ivC .ivch button').forEach(b=>b.classList.toggle('on',(b.dataset.v||'')===S.ttl))});
   B('ivNt',v=>{S.note=clean(v).slice(0,170)});B('ivSNt',v=>{IS.W.stm.note=clean(v).slice(0,170)});B('ivSn',v=>{IS.shop.nm=clean(v).slice(0,40)});B('ivSa',v=>{IS.shop.ad=clean(v).slice(0,90)});B('ivSt',v=>{IS.shop.tel=clean(v).slice(0,40)});B('ivSi',v=>{IS.shop.ig=clean(v).slice(0,50)})}
 function bindInvSet(){if(!IS||!isAdmin())return;ivBindIn();ivPrev(1);if(!bindInvSet.rz){bindInvSet.rz=1;window.addEventListener('resize',()=>{if(cur==='invset')ivPrev()})}}

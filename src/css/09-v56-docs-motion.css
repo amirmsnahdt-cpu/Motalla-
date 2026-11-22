@@ -5000,3 +5000,15 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 .pxux.am{background:color-mix(in srgb,var(--blu) 11%,var(--card));color:var(--blu)}
 .psleft.rm{color:var(--ppv,var(--warn))}
 @media (max-width:380px){.pxub{gap:4px}.pxub .pxux{padding:0 8px;font-size:12px}}
+/* v99.2: «تنظیم جای چاپ روی کاغذ» در تنظیمات فاکتور */
+.ivcalw{margin-top:14px;padding:14px 14px 4px;border-radius:20px;background:color-mix(in srgb,var(--blu) 4%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 30%,transparent)}
+.ivcalh b{display:block;font-size:15px;font-weight:850}.ivcalh small{display:block;margin-top:3px;font-size:11.5px;line-height:1.6;color:var(--mut)}
+.ivcalg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 10px}
+.ivcalf{display:flex;flex-direction:column;gap:5px;min-width:0}.ivcalf small{font-size:11.5px;font-weight:800;color:var(--mut);text-align:center}
+.ivcalf span{display:flex;align-items:center;gap:3px;height:48px;padding:0 8px;border-radius:14px;background:var(--card);box-shadow:var(--bfr)}.ivcalf span:focus-within{box-shadow:var(--bfr2)}
+.ivcalf input{flex:1;min-width:0;width:100%;border:0;background:none;outline:0;font:inherit;font-size:18px;font-weight:850;text-align:center;color:var(--ink);padding:0}.ivcalf i{flex:none;font-style:normal;font-size:10px;font-weight:700;color:var(--mut)}
+.ivcalgo{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:46px;border:0;border-radius:15px;background:var(--blu);color:#fff;font:inherit;font-size:15px;font-weight:850;cursor:pointer}.ivcalgo svg{width:17px;height:17px}
+.ivcalm{margin-top:10px;padding:10px 12px;border-radius:14px;font-size:12.5px;line-height:1.85;background:color-mix(in srgb,var(--ok) 10%,var(--card));color:var(--ink)}.ivcalm svg{width:14px;height:14px;vertical-align:-2px;color:var(--ok)}.ivcalm b{font-weight:850}
+.ivcalm.bad{background:color-mix(in srgb,var(--red) 9%,var(--card));color:var(--red)}
+.ivcal0{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:40px;margin:6px 0 2px;border:0;border-radius:13px;background:var(--seg);color:var(--mut);font:inherit;font-size:13px;font-weight:800;cursor:pointer}.ivcal0 svg{width:15px;height:15px}
+@media (max-width:370px){.ivcalg{gap:6px}.ivcalf input{font-size:16px}.ivcalf span{padding:0 6px}}
