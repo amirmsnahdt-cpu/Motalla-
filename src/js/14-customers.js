@@ -105,7 +105,7 @@ let cuF=(()=>{const v=ls.get('m_cuf',null);return v&&typeof v==='object'?{b:v.b|
 const CUFB=[['','همه'],['bal','مانده‌دار'],['rd','بدهکار تومانی','d'],['rc','طلبکار تومانی','c'],['gd','بدهکار طلایی','d'],['gc','طلبکار طلایی','c'],['wp','در انتظار واریز','w'],['z','تسویه']];
 /* v67.5: مانده در انتظار واریز (واریزی‌هایی که هنوز تأیید نشده‌اند) برای فهرست و فیلتر؛ یک بار در هر ساخت فهرست */
 /* v78.7 بهینه‌سازی: فهرست حساب‌ها اول ۶۰ ردیف؛ بقیه با رسیدن به پایین (یا زدن دکمه) — ساختن و چیدن صدها ردیف یک‌جا کند بود */
-let cuLim=60;ACT.cuMore=()=>{cuLim+=200;const r=$('cures');if(r){r.innerHTML=cuListHTML();if(typeof phPaint==='function')phPaint(r)}};
+let cuLim=60;ACT.cuMore=()=>{if(!liteDone())cuLim+=200;const r=$('cures');if(r){r.innerHTML=cuListHTML();if(typeof phPaint==='function')phPaint(r)}};
 document.addEventListener('scroll',()=>{if(cur!=='custs')return;const m=document.querySelector('#cures .cumore');if(m&&!m._b&&m.getBoundingClientRect().top<innerHeight+500){m._b=1;requestAnimationFrame(()=>ACT.cuMore())}},true);
 let cuWP=new Map(),cuWA=new Map(),cuWF=new Map();const cuWPRe=()=>{cuWP=wdMap();cuWA=wdAL;cuWF=wdFR;return cuWP};
 const cuFOk=(k,b,c)=>!k?true:k==='wp'?!!(c&&cuWP.get(String(c.id))):k==='bal'?!!(b.R||b.G||Object.keys(b.X||{}).length):k==='z'?!(b.R||b.G||Object.keys(b.X||{}).length):k==='rd'?b.R<0:k==='rc'?b.R>0:k==='gd'?b.G<0:k==='gc'?b.G>0:true;
@@ -138,7 +138,9 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
   /* v60.3: جستجو در همه مشخصات حساب (نام، تلفن، کد ملی، گروه، یادداشت، کارت، شبا…)؛ عدد با و بدون فاصله/صفر اول */
   const dOk=qd?(()=>false):pDig(q0);
   /* v67.6: ردیف‌های گردش همه حساب‌ها (مبلغ، وزن، شرح، فاکتور، پیگیری، کالا) و تاریخ (تقویم یا «۱۰ آبان») */
-  const TX=cuTxHits(dq,q,dOk).filter(([c])=>!bm||c.grp==='بانک');
+  /* v99.1: اگر نمایه هنوز ساخته نشده (همین حالا داده عوض شده)، تایپ منتظرش نمی‌ماند: این بار فقط خود حساب‌ها، و با آماده شدن نمایه فهرست یک بار دیگر ساخته می‌شود (cuWarmRe) */
+  const WM=!!sxGet().warm||!q||!!dq;if(!WM)sxWarm(cuWarmRe);
+  const TX=(WM?cuTxHits(dq,q,dOk):[]).filter(([c])=>!bm||c.grp==='بانک');
   if(dq){const S=new Set(TX.map(([c])=>String(c.id)));B=B.filter(([c])=>S.has(String(c.id)))}
   else if(q)B=B.filter(([c])=>cuHit(c,q,dOk));
   cuWPRe();if(!bm)B=B.filter(([c,b])=>(c.grp!=='بانک'||cuF.g==='بانک')&&cuGOk(cuF.g,c)&&cuFOk(cuF.b,b,c));/* v84.3 (خواسته صاحب اپ): حساب‌های بانک فقط در زبانه بانک (یا گروه «بانک») */
@@ -151,17 +153,17 @@ function cuListHTML(){const q0=clean(cuQ||''),qd=cuQDate(q0),dq=cuDt||qd,q=qd?''
   const same=A.some(c=>nzName(c.name)===nzName(q0)),canAdd=q0&&!dq&&can('debt')&&!/^\d+$/.test(toEn(q0))&&!groupsList().some(g=>nzName(g)===q);
   const add=canAdd&&bm?`<button class="c6add" data-act="bkCuAdd">${ic('plus')}<span><b>حساب بانک تازه «${esc(q0)}»</b><small>نوع بانک · بعد ورود به حساب</small></span></button>`:canAdd?`<button class="c6add" data-act="cuNewQ">${ic('plus')}<span><b>${same?'حساب جدا برای «'+esc(q0)+'» دیگر (هم‌نام)':'حساب تازه برای «'+esc(q0)+'»'}</b><small>${same?'شماره مشتری جدا می‌گیرد · اگر همان شخص است همان حساب بالا را باز کنید':(B.length?'اگر هیچ‌کدام از این‌ها نیست':'این نام حسابی ندارد')+' · اول مشخصات، بعد ورود به حساب'}</small></span></button>`:'';
   /* افراد واریزی‌ها و خریدها که هنوز حساب ندارند (از حافظه برنامه): با زدن، حساب با همان مشخصات باز می‌شود */
-  const P=q&&!dq&&!bm?memPeople(q,dOk,12):[];
+  const P=q&&!dq&&!bm&&WM?memPeople(q,dOk,LITE.on?5:12):[];P.length=Math.min(P.length,liteCap(P.length,12,4));
   CUP=P;
   const mem=P.length?`<div class="c6gh">از واریزی‌ها و خریدها · بدون حساب</div><div class="c6l c6mem">${P.map((p,i)=>`<button class="c6r" data-act="cuNewP" data-i="${i}"><span class="tx"><b>${esc(p.name)}</b><small>${[p.phone?'<bdi dir="ltr">'+esc(toFa(p.phone))+'</bdi>':'',p.nid?'کد ملی <bdi dir="ltr">'+esc(toFa(p.nid))+'</bdi>':'',p.n?fmt(p.n)+' واریزی':'',p.last?esc(dates(p.last).fa):''].filter(Boolean).join('، ')}</small></span><span class="c6go">${ic('plus')} حساب</span></button>`).join('')}</div>`:'';
   /* v61.33: شماره سند (فاکتور فروش، خرید و…) هم جستجو می‌شود؛ زدن = باز شدن همان سند */
-  const IV=dq?[]:cuInvHits(q0).filter(([c])=>!bm||c.grp==='بانک'),ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
+  const IV=dq?[]:cuInvHits(q0).filter(([c])=>!bm||c.grp==='بانک');IV.length=Math.min(IV.length,liteCap(IV.length,6,3));const ivh=IV.length?`<div class="c6gh">سندها</div><div class="c6l c6iv">${IV.map(([c,t])=>{const d=txD(t);return `<button class="c6r" data-act="cuInv" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(t))}</b><small>${esc(cuName(c))} · ${esc(dates(t.date).fa)}</small></span><span class="c6ivv${d.r<0?' d':d.r>0?' c':''}"><b>${fmt(Math.abs(+t.total||0))}</b><small>تومان</small></span></button>`}).join('')}</div>`:'';
   const IVS=new Set(IV.map(([,t])=>String(t.id))),txh=cuTxHTML(TX.filter(([,t])=>!IVS.has(String(t.id)))),dch=cuDtChip(qd);
   const nhh=NH?`<div class="c6gh">شماره مشتری ${toFa(NH.cno)}</div><div class="c6l c6lb cuL cunoh">${cuRowH(NH,cuBal(NH),0,PW)}</div>`:'';
   if(!B.length&&nhh)return dch+nhh+ivh+txh;
   if(!B.length)return dch+((dq?txh:ivh+txh+mem+add)||`<div class="bempty">${ic(dq?'cal':'search')}<b>${dq?'در این روز سندی ثبت نشده':cuF.b||cuF.g?'حسابی با این فیلتر نیست':'حسابی پیدا نشد'}</b>${!dq&&(cuF.b||cuF.g)?'<button class="fchip on" data-act="cuFClr">برداشتن فیلتر</button>':''}</div>`);
-  const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'';cuAnim=0;
-  return `${dch}${nhh}${ivh}${dq?txh:''}${cuSumHTML(B)}${dq?`<div class="c6gh">حساب‌های این روز · ${fmt(B.length)} حساب</div>`:''}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb cuL${an}">${B.slice(0,cuLim).map(([c,b],ri)=>cuRowH(c,b,ri,PW)).join('')}</div>${B.length>cuLim?`<button class="cumore" data-act="cuMore">${ic('chev')}<span>${fmt(B.length-cuLim)} حساب دیگر</span></button>`:''}${dq?'':txh}${mem}${add}`}
+  const G=q&&groupsList().find(g=>nzName(g)===q),an=cuAnim?' anim':'';cuAnim=0;const LIM=liteCap(B.length,cuLim,10);
+  return `${dch}${nhh}${ivh}${dq?txh:''}${cuSumHTML(B)}${dq?`<div class="c6gh">حساب‌های این روز · ${fmt(B.length)} حساب</div>`:''}${G?`<div class="c6gh">گروه «${esc(G)}» · ${fmt(B.length)} حساب</div>`:''}<div class="c6l c6lb cuL${an}">${B.slice(0,LIM).map(([c,b],ri)=>cuRowH(c,b,ri,PW)).join('')}</div>${B.length>LIM?`<button class="cumore" data-act="cuMore">${ic('chev')}<span>${fmt(B.length-LIM)} حساب دیگر</span></button>`:''}${dq?'':txh}${mem}${add}`}
 /* v69.8: ردیف یک حساب در فهرست حساب مشتریان — یک جا تعریف شده تا پنل «پرداخت از کجا؟» دقیقاً همین ردیف را نشان دهد.
    o.act/o.k = کار زدن ردیف (پیش‌فرض باز کردن حساب)، o.sw=false یعنی بدون کشیدن */
 function cuRowH(c,b,ri,PW,o){o=o||{};const pw=PW&&PW.get(String(c.id)),wp=cuWP.get(String(c.id))||0,z=cuZero(b)&&!pw&&!wp,nT=(b.G?1:0)+(b.R||pw||wp?1:0)+Object.keys(b.X||{}).filter(k=>b.X[k]).length;cbLst=1;const bp=z?'':balPills(b,pw,wp,cuWA.get(String(c.id))||0);cbLst=0;
@@ -176,8 +178,11 @@ function cuInvHits(q0){const d=toEn(q0||'').replace(/[\s,،]/g,'');if(!/^\d{1,6}
   for(const c of CU())for(const t of c.txs||[])if(t.type==='inv'&&!t.del&&t.no!=null&&String(t.no).startsWith(d))R.push([c,t]);
   return R.sort((a,b)=>(String(b[1].no)===d)-(String(a[1].no)===d)||(+b[1].no||0)-(+a[1].no||0)).slice(0,6)}
 ACT.cuInv=d=>invOpen(d.cu,+d.tx||d.tx);
+function cuWarmRe(){const q=$('cuq'),r=$('cures');if(!q||!r||!clean(cuQ||'')||(cur!=='custs'&&cur!=='banks'))return;const lite=document.activeElement===q;if(lite){q.dispatchEvent(new Event('input'));return}const v=$('view'),y=v.scrollTop;r.innerHTML=cuListHTML();if(typeof phPaint==='function')phPaint(r);v.scrollTop=y}
 const aCusts=()=>'';/* افتتاح حساب از همان جستجو (نام را بنویسید → «حساب تازه») */
-function bindCusts(){const q=$('cuq');if(!q)return;requestAnimationFrame(()=>{cuCount();cuCount('#cures .cusum .cbn')});q.oninput=()=>{cuQ=q.value;const x=q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!cuQ);clearTimeout(q._t);q._t=setTimeout(()=>{const r=$('cures');if(r)srchSwap(r,cuListHTML());else if(cuQ){const v=$('view');v.innerHTML=vCusts();bindCusts();const n=$('cuq');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}},90)};
+function bindCusts(){const q=$('cuq');if(!q)return;requestAnimationFrame(()=>{cuCount();cuCount('#cures .cusum .cbn')});q.oninput=()=>{cuQ=q.value;const x=q.parentNode.querySelector('.x');if(x)x.classList.toggle('hide',!cuQ);
+    /* v99.1: فهرست سبک بعد از مکث کوتاه (بدون انیمیشن جابه‌جایی)، فهرست کامل بعد از مکث بلندتر یا کشیدن فهرست (liteType در 01) */
+    liteType(q,()=>{const r=$('cures');if(r){const v=$('view'),y=LITE.on?null:v.scrollTop;r.innerHTML=cuListHTML();if(typeof phPaint==='function')phPaint(r);if(y!=null)v.scrollTop=y}else if(cuQ){const v=$('view');v.innerHTML=vCusts();bindCusts();const n=$('cuq');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}})};
   q.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const iv=cuInvHits(q.value);if(iv.length&&String(iv[0][1].no)===toEn(q.value).replace(/\D/g,'')){ACT.cuInv({cu:iv[0][0].id,tx:iv[0][1].id});return}const f=document.querySelector('#cures [data-act=cuOpen]'),ft=document.querySelector('#cures [data-act=cuTxGo]');if(f)ACT.cuOpen({id:f.dataset.id});else if(ft)ACT.cuTxGo({cu:ft.dataset.cu,tx:ft.dataset.tx});else if(clean(q.value)&&!cuQDate(q.value))ACT.cuNewQ()}}
 ACT.cuQClr=()=>{cuQ='';const q=$('cuq');if(q){q.value='';const x=q.parentNode.querySelector('.x');if(x)x.classList.add('hide')}const r=$('cures');if(r)srchSwap(r,cuListHTML());else{const v=$('view');v.innerHTML=vCusts();bindCusts()}};
 /* ---- صفحه یک مشتری ---- */
@@ -550,16 +555,35 @@ ACT.bzCal=()=>{bzRead();openCal(bz.d.pay||todayISO(),iso=>{bz.d.pay=iso;render()
 /* ---------- خرید طلا: پیشنهاد مشتری زیر فیلد نام (از حساب‌های مشتری و نام‌های ثبت‌شده قبلی) ---------- */
 const nzName=s=>clean(String(s||'')).replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/\u200c/g,' ').toLowerCase();
 /* v60.6: جستجوی مشترک افراد (صفحه مشتریان، تسویه از مشتری، …): همه مشخصات حساب + افراد واریزی/خرید بدون حساب */
-const pDig=q0=>{const qd=toEn(q0||'').replace(/\D/g,'');return v=>qd.length>=3&&toEn(String(v||'')).replace(/\D/g,'').includes(qd)};
+const pDig=q0=>{const qd=toEn(q0||'').replace(/\D/g,''),f=v=>qd.length>=3&&toEn(String(v||'')).replace(/\D/g,'').includes(qd);f.qd=qd;/* رقم‌های جستجو، برای نمایه‌های ازپیش‌ساخته */return f};
 const cuHay=c=>Object.keys(c).filter(k=>typeof c[k]==='string'&&!/^(id|sys|createdAt|lastAt|updatedAt|by|createdBy|updatedBy)$/.test(k)).map(k=>c[k]).join(' ');
-const cuHit=(c,q,dOk)=>{const h=cuHay(c);return nzName(h).includes(q)||dOk(h)};
-function memPeople(q,dOk,n){const A=CU();return bzPeople().filter(p=>!p.cuId&&!A.some(c=>nzName(c.name)===p.k)&&(p.k.includes(q)||nzName(p.holder||'').includes(q)||dOk([p.phone,p.nid,p.iban,p.card].join(' ')))).sort((a,b)=>(b.k.startsWith(q)-a.k.startsWith(q))||String(b.last).localeCompare(String(a.last))).slice(0,n)}
+/* ---------- v99.1 نمایه جستجو (گزارش صاحب اپ با ویدیو: «کیبورد اندروید با لگ فراوان کار می‌کند») ----------
+   ریشه: با هر مکث در تایپ، فهرست از صفر ساخته می‌شد — متن همه سندهای همه حساب‌ها دوباره قدم‌به‌قدم خوانده می‌شد (cuTxHay) و فهرست «افراد واریزی‌ها»
+   (bzPeople، با مرتب‌سازی همه واریزی‌ها) هم هر بار از نو؛ روی گوشی میان‌رده با چند هزار سند = بیش از یک ثانیه قفل شدن صفحه برای هر مکث.
+   حالا متن جستجوی هر حساب و هر سند و فهرست افراد یک بار ساخته و نگه داشته می‌شود (WeakMap روی خود رکوردها) و فقط وقتی داده واقعاً عوض شود
+   (شماره نسخه DVN از ls.set، یا عوض شدن خود آرایه/تعدادش) کنار گذاشته می‌شود؛ sxWarm آن را در وقت بیکاری صفحه از پیش می‌سازد تا اولین حرف هم مکث نداشته باشد. */
+let SXC=null,SXW=0;
+function sxGet(){const X=SXC;if(X&&X.c===custs&&X.cn===custs.length&&X.cv===(DVN.m_custs||0)&&X.e===entries&&X.en===entries.length&&X.ev===(DVN.m_entries||0))return X;
+  return SXC={c:custs,cn:custs.length,cv:DVN.m_custs||0,e:entries,en:entries.length,ev:DVN.m_entries||0,tx:new WeakMap(),cu:new WeakMap(),pp:null,nm:null,warm:0}}
+const cuHayC=c=>{const X=sxGet();let h=X.cu.get(c);if(!h){const s=cuHay(c);h={s:nzName(s),d:toEn(s).replace(/\D/g,'')};X.cu.set(c,h)}return h};
+const cuHit=(c,q,dOk)=>{const h=cuHayC(c),qd=dOk?dOk.qd:null;return h.s.includes(q)||(qd!=null?qd.length>=3&&h.d.includes(qd):!!dOk&&dOk(cuHay(c)))};
+/* ساختن نمایه در تکه‌های چند میلی‌ثانیه‌ای، بیرون از کار کاربر */
+/* sxWarm(cb): cb یک بار، وقتی نمایه آماده شد (اگر همین حالا آماده است، هیچ) — جستجویی که وسط ساخت نمایه شروع شده بعدش کامل می‌شود */
+let SXCB=[];
+function sxWarm(cb){const X=sxGet();if(X.warm)return;if(cb&&!SXCB.includes(cb))SXCB.push(cb);if(SXW)return;SXW=1;const L=custs.filter(c=>!c.del&&!c.sys);let ci=0,ti=0;const idle=window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:400}):f=>setTimeout(f,40);
+  const step=()=>{if(sxGet()!==X){SXW=0;return}const t0=performance.now();
+    while(ci<L.length){const c=L[ci],T=c.txs||[];if(!ti)cuHayC(c);while(ti<T.length&&performance.now()-t0<8){const t=T[ti++];if(!t.del&&!t.draft&&t.date&&typeof cuTxHayC==='function')cuTxHayC(t)}if(ti<T.length)break;ci++;ti=0;if(performance.now()-t0>=8)break}
+    if(ci<L.length){idle(step);return}idle(()=>{SXW=0;if(sxGet()!==X){/* داده وسط کار عوض شد: از نو */sxWarm();return}try{bzPeople()}catch(_){}X.warm=1;const C=SXCB;SXCB=[];C.forEach(f=>{try{f()}catch(_){}})})};idle(step)}
+function memPeople(q,dOk,n){const X=sxGet(),qd=dOk?dOk.qd:null;if(!X.nm)X.nm=new Set(CU().map(c=>nzName(c.name)));
+  return bzPeople().filter(p=>{if(p.cuId||X.nm.has(p.k))return false;if(p.hk===undefined){p.hk=nzName(p.holder||'');p.dg=toEn([p.phone,p.nid,p.iban,p.card].join(' ')).replace(/\D/g,'')}return p.k.includes(q)||p.hk.includes(q)||(qd!=null?qd.length>=3&&p.dg.includes(qd):!!dOk&&dOk([p.phone,p.nid,p.iban,p.card].join(' ')))}).sort((a,b)=>(b.k.startsWith(q)-a.k.startsWith(q))||String(b.last).localeCompare(String(a.last))).slice(0,n)}
 /* v73.4: حالت کارت مشتری خرید دستی — nw = «مشتری جدید» زده شد (سبز، تیک)، old = از مشتری‌های قبلی انتخاب شد (آبی)؛ با عوض شدن نام برمی‌گردد */
 function bzHS(n,v){const ph=/^09\d{9}$/.test(v||'')?telP(v):'';
   if(n&&bz.nwN&&n===bz.nwN)return {c:'nw',m:ph||'اضافه شد · تلفن را بنویسید',b:`${ic('check')}مشتری جدید`};
   if(n&&bz.oldN&&n===bz.oldN)return {c:'old',m:ph||'از ثبت‌های قبلی',b:`${ic('check')}مشتری قبلی`};
   return {c:'',m:ph||'نام را بنویسید؛ مشتری‌های قبلی پیشنهاد می‌شوند',b:''}}
-function bzPeople(){const M=new Map(),add=(name,o)=>{const k=nzName(name);if(!k)return;const p=M.get(k)||{name:clean(name),k,n:0,last:'',phone:'',nid:'',cuId:'',iban:'',card:'',holder:''};
+/* v99.1: فهرست افراد یک بار ساخته می‌شود و تا عوض شدن داده می‌ماند (هر بار یک رونوشت از همان فهرست برمی‌گردد؛ خود افراد را کسی عوض نمی‌کند) */
+function bzPeople(){const X=sxGet();if(!X.pp)X.pp=bzPeople0();return X.pp.slice()}
+function bzPeople0(){const M=new Map(),add=(name,o)=>{const k=nzName(name);if(!k)return;const p=M.get(k)||{name:clean(name),k,n:0,last:'',phone:'',nid:'',cuId:'',iban:'',card:'',holder:''};
     if(o.phone&&!p.phone)p.phone=o.phone;if(o.iban&&!p.iban){p.iban=o.iban;p.card=o.card||'';p.holder=o.holder||''}if(o.nid&&!p.nid)p.nid=o.nid;if(o.cuId&&!p.cuId)p.cuId=o.cuId;if(o.n)p.n+=o.n;if(o.last&&o.last>p.last)p.last=o.last;M.set(k,p)};
   /* v61.93: تلفن و کد ملی از خود حساب مشتری اول (کد ملی حساب قبلاً جا می‌ماند)؛ بعد واریزی‌ها؛ شبای حساب اگر واریزی شبا نداشت */
   CU().forEach(c=>add(cuName(c),{phone:toEn(c.phone||''),nid:toEn(c.nid||''),cuId:c.id,last:String(c.lastAt||'').slice(0,10)}));

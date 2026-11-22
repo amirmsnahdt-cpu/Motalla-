@@ -14,7 +14,9 @@ function cuTxHay(t){const S=[cuTxTitle(t)],N=[];
     if(typeof o==='object'){for(const j in o)if(!CUTX_SKIP.test(j))walk(o[j],j,d+1);return}
     if(typeof o==='string'){S.push(o);N.push(o)}else if(typeof o==='number'&&CUTX_NUM.test(k))N.push(String(o))};
   walk(t,'',0);return {s:nzName(S.join(' ')),n:N}}
-const cuTxHit=(t,q,dOk)=>{const h=cuTxHay(t);return (q.length>=2&&h.s.includes(q))||h.n.some(dOk)};
+/* v99.1: متن جستجوی هر سند یک بار ساخته می‌شود (sxGet در 14)؛ d = رقم‌های هر فیلد عددی، جدا از هم */
+const cuTxHayC=t=>{const X=sxGet();let h=X.tx.get(t);if(!h){h=cuTxHay(t);h.d=h.n.map(z=>toEn(String(z||'')).replace(/\D/g,''));X.tx.set(t,h)}return h};
+const cuTxHit=(t,q,dOk)=>{const h=cuTxHayC(t),qd=dOk?dOk.qd:null;return (q.length>=2&&h.s.includes(q))||(qd!=null?qd.length>=3&&h.d.some(z=>z.includes(qd)):!!dOk&&h.n.some(dOk))};
 function cuTxHits(dq,q,dOk){if(!dq&&!q)return [];const R=[];
   for(const c of CU())for(const t of c.txs||[]){if(t.del||t.draft||!t.date)continue;if(dq&&t.date!==dq)continue;
     if(q&&!(cuTxHit(t,q,dOk)||(dq&&cuHit(c,q,dOk))))continue;R.push([c,t])}
@@ -24,16 +26,16 @@ function cuTxRow(c,t){const d=txD(t),ks=[d.r?['r',d.r]:null,d.g?['g',d.g]:null,.
   const sub=[cuName(c),t.type==='inv'?[...(t.items||[]).map(i=>i.k?i.k+dsP(i):''),...(t.xr||[]).filter(x=>dsOf(x)).map(x=>xrLab(x)+dsP(x))].filter(Boolean).join('، '):[t.kind,t.weight?wFmt(t.weight)+' گرم':''].filter(Boolean).join('، '),t.note].filter(Boolean).join(' · ');
   return `<button class="c6r" data-act="cuTxGo" data-cu="${c.id}" data-tx="${t.id}"><span class="c6a iv">${ic(ico)}</span><span class="tx"><b>${esc(cuTxTitle(t))}</b><small>${esc(sub)}</small></span><span class="c6ivv${v<0?' d':v>0?' c':''}"><b>${v?balV(k,v):'تسویه'}</b><small>${v?esc(balU(k))+(ks.length>1?' +'+toFa(ks.length-1):''):''}</small></span></button>`}
 /* به تفکیک روز، مثل نتیجه‌های جستجوی واریزی‌ها */
-function cuTxHTML(TX){if(!TX.length)return '';const L=TX.slice(0,cuN),cnt={};TX.forEach(([,t])=>cnt[t.date]=(cnt[t.date]||0)+1);let h='',last=null;
+function cuTxHTML(TX){if(!TX.length)return '';const N=liteCap(TX.length,cuN,8),L=TX.slice(0,N),cnt={};TX.forEach(([,t])=>cnt[t.date]=(cnt[t.date]||0)+1);let h='',last=null;
   for(const [c,t] of L){if(t.date!==last){if(last!==null)h+='</div>';last=t.date;const r=relDay(last);h+=`<div class="fday sticky hit cutxd"><span>${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(last).wd+' '+dates(last).fa)}</span><small>${fmt(cnt[last])} ردیف</small></div><div class="c6l c6tx">`}h+=cuTxRow(c,t)}
   if(last!==null)h+='</div>';
-  return `${cuDt||cuQDate(cuQ)?'':`<div class="c6gh">در گردش حساب‌ها · ${fmt(TX.length)} ردیف</div>`}${h}${TX.length>cuN?`<button class="btn sec cutxm" data-act="cuTxMore">نمایش بیشتر (${fmt(TX.length-cuN)} ردیف دیگر)</button>`:''}`}
+  return `${cuDt||cuQDate(cuQ)?'':`<div class="c6gh">در گردش حساب‌ها · ${fmt(TX.length)} ردیف</div>`}${h}${TX.length>N?`<button class="btn sec cutxm" data-act="cuTxMore">نمایش بیشتر (${fmt(TX.length-N)} ردیف دیگر)</button>`:''}`}
 const cuDtChip=qd=>cuDt?`<div class="fdate">${ic('cal')} ${esc(relDay(cuDt))}، ${esc(dates(cuDt).fa)}<button data-act="cuDtClr" aria-label="حذف">×</button></div>`:qd?`<div class="fdate">${ic('cal')} سندهای ${esc(dates(qd).fa)}</div>`:'';
 const cuReList=()=>{const r=$('cures');if(r)srchSwap(r,cuListHTML())};
 ACT.cuCal=()=>{const M=new Set();for(const c of CU())for(const t of c.txs||[])if(!t.del&&!t.draft&&t.date)M.add(t.date);
   openCal(cuDt||todayISO(),iso=>{cuDt=iso;cuN=60;render();$('view').scrollTop=0},{title:'جستجوی تاریخ',sub:'روزهای نقطه‌دار سند دارند',q:[[-2,'پریروز'],[-1,'دیروز'],[0,'امروز']],marks:M})};
 ACT.cuDtClr=()=>{cuDt='';cuN=60;render()};
-ACT.cuTxMore=()=>{cuN+=100;cuReList()};
+ACT.cuTxMore=()=>{if(!liteDone())cuN+=100;cuReList()};
 ACT.cuTxGo=d=>{const c=custs.find(x=>String(x.id)===String(d.cu));if(!c)return;custId=c.id;const back=cur;ACT.txOpen({id:d.tx});if(cur==='inv'&&back==='custs')PARENT.inv='custs'};
 /* v67.7/v68 (خواسته صاحب اپ): تسویه از روی مانده حساب — زدن کاشی مانده = پنجره تسویه (مثل پنجره تسویه واریزی):
    مقدار پیش‌فرض کل مانده (قابل تغییر، «کل مانده» / «نصف»)، برای مبلغ روش (حواله، کارتخوان، نقد، تخفیف)؛

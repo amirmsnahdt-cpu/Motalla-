@@ -69,4 +69,6 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||/^(127\.0\.0\.1|
 
 /* v86.9 (خواسته صاحب اپ: «هر جا مبلغ یا نامی در کادر نوشته شده، با زدن روی آن همه انتخاب شود»): انتخاب کامل محتوای هر کادر متنی/عددی با فوکوس */
 document.addEventListener('focusin',e=>{const t=e.target;if(!t||t.tagName!=='INPUT'||t.readOnly||!t.value)return;const ty=(t.type||'text').toLowerCase();if(!['text','search','tel','number','email','url',''].includes(ty))return;
-  setTimeout(()=>{try{if(document.activeElement===t)t.select()}catch(_){}},0)},true);
+  const v0=t.value,all=()=>{try{if(document.activeElement!==t||t.value!==v0)return;t.select();if(t.selectionStart===t.selectionEnd)t.setSelectionRange(0,t.value.length)}catch(_){}};
+  /* v99.0: آیفون گاهی انتخابِ همان لحظه را با جاگذاری نشانگرِ لمس پاک می‌کند (آن‌وقت رقم تازه به آخر مبلغ قبلی می‌چسبد)؛ یک بار دیگر، کمی بعد، اگر هنوز چیزی تایپ نشده */
+  setTimeout(all,0);setTimeout(()=>{try{if(document.activeElement===t&&t.value===v0&&t.selectionStart===t.selectionEnd)all()}catch(_){}},120)},true);

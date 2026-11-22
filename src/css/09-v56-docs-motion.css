@@ -4995,3 +4995,25 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 #z3bar button{min-width:62px;height:40px;padding:0 12px;border:0;border-radius:12px;background:var(--blu2);color:var(--blu);font:inherit;font-size:20px;font-weight:900;letter-spacing:1.5px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #z3bar button:active{background:var(--blu);color:#fff}
 @media print{#z3bar{display:none!important}}
+/* v99.0: ردیف «بانک فعلی» دو دکمه دارد (مبلغ · برداشتن)؛ خط وضعیت پنجره منابع وقتی مانده می‌ماند */
+.pxub{flex:none;display:inline-flex;align-items:center;gap:6px}
+.pxux.am{background:color-mix(in srgb,var(--blu) 11%,var(--card));color:var(--blu)}
+.psleft.rm{color:var(--ppv,var(--warn))}
+@media (max-width:380px){.pxub{gap:4px}.pxub .pxux{padding:0 8px;font-size:12px}}
+/* v99.2: «تنظیم جای چاپ روی کاغذ» در تنظیمات فاکتور */
+.ivcalw{margin-top:14px;padding:14px 14px 4px;border-radius:20px;background:color-mix(in srgb,var(--blu) 4%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 30%,transparent)}
+.ivcalh b{display:block;font-size:15px;font-weight:850}.ivcalh small{display:block;margin-top:3px;font-size:11.5px;line-height:1.6;color:var(--mut)}
+.ivcalg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 10px}
+.ivcalf{display:flex;flex-direction:column;gap:5px;min-width:0}.ivcalf small{font-size:11.5px;font-weight:800;color:var(--mut);text-align:center}
+.ivcalf span{display:flex;align-items:center;gap:3px;height:48px;padding:0 8px;border-radius:14px;background:var(--card);box-shadow:var(--bfr)}.ivcalf span:focus-within{box-shadow:var(--bfr2)}
+.ivcalf input{flex:1;min-width:0;width:100%;border:0;background:none;outline:0;font:inherit;font-size:18px;font-weight:850;text-align:center;color:var(--ink);padding:0}.ivcalf i{flex:none;font-style:normal;font-size:10px;font-weight:700;color:var(--mut)}
+.ivcalgo{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:46px;border:0;border-radius:15px;background:var(--blu);color:#fff;font:inherit;font-size:15px;font-weight:850;cursor:pointer}.ivcalgo svg{width:17px;height:17px}
+.ivcalm{margin-top:10px;padding:10px 12px;border-radius:14px;font-size:12.5px;line-height:1.85;background:color-mix(in srgb,var(--ok) 10%,var(--card));color:var(--ink)}.ivcalm svg{width:14px;height:14px;vertical-align:-2px;color:var(--ok)}.ivcalm b{font-weight:850}
+.ivcalm.bad{background:color-mix(in srgb,var(--red) 9%,var(--card));color:var(--red)}
+.ivcal0{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:40px;margin:6px 0 2px;border:0;border-radius:13px;background:var(--seg);color:var(--mut);font:inherit;font-size:13px;font-weight:800;cursor:pointer}.ivcal0 svg{width:15px;height:15px}
+@media (max-width:370px){.ivcalg{gap:6px}.ivcalf input{font-size:16px}.ivcalf span{padding:0 6px}}
+
+/* v99.3 کادر «تنظیم جای چاپ»: پرسش «با چه دستگاهی چاپ می‌شود» بالای خانه‌ها */
+.ivcalq{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px}.ivcalq>b{font-size:14px;font-weight:800;color:var(--ink)}.ivcalq .ivcalp{width:100%}.ivcalq .ivcalp>button{flex:1 1 0;min-width:0;white-space:nowrap}
+.ivnote.ivcalon{background:color-mix(in srgb,var(--blu) 8%,transparent);border-radius:14px;padding:10px 12px;color:var(--ink)}.ivnote.ivcalon svg{width:15px;height:15px;vertical-align:-3px;color:var(--blu)}
+#view .ivcalf span>input{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;height:100%;min-height:0;margin:0;padding:0!important;-webkit-appearance:none;appearance:none}

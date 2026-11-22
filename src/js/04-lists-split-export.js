@@ -168,7 +168,7 @@ const saveB=()=>{BKDIRTY=1;ls.set('m_batches',batches)};
 /* مانده برای تخصیص در لیست جاری (همه واریزی‌های این تاریخ واریز، از هر روز ثبت) */
 const splitList=()=>validated().filter(r=>PD(r)===ldKey&&!r.sentBid&&!r.full);
 const pVis=()=>true;
-function stOf(id){if(!_stm){_stm=new Map();for(const b of batches)for(const x of b.items)if(!_stm.has(x.id))_stm.set(x.id,x.st);queueMicrotask(memoClear)}return _stm.has(id)?_stm.get(id):null}
+function stOf(id){if(!_stm||_stmB!==batches||_stmN!==batches.length||_stmV!==(DVN.m_batches||0)){_stm=new Map();for(const b of batches)for(const x of b.items)if(!_stm.has(x.id))_stm.set(x.id,x.st);_stmB=batches;_stmN=batches.length;_stmV=DVN.m_batches||0}return _stm.has(id)?_stm.get(id):null}
 /* v77.9: وضعیت یک واریزی چندبانکی = وضعیت همه بخش‌ها با هم */
 function famSt(r){const F=r._fam,S=F.map(z=>entSt(z)),k=S.map(t=>t?t[1]:'');if(r.full)return ['تسویه با مشتری','ok'];if(k.every(v=>v==='ok'))return ['تسویه شده','ok'];if(k.some(v=>v==='rd'))return ['واریز ناموفق','rd'];const ok=k.filter(v=>v==='ok').length;if(k.some(v=>v==='gd'||v==='ok'))return [ok?toFa(ok)+' از '+toFa(F.length)+' بخش تسویه شد':'ارسال شده','gd'];return S.find(Boolean)||null}
 const entSt=r=>r._fam?famSt(r):r.full?['تسویه با مشتری','ok']:r.sentBid?(s=>s==='ok'?['تسویه شده','ok']:s==='fail'?['واریز ناموفق','rd']:['ارسال شده','gd'])(stOf(r.id)):r.settled?['تسویه بخشی','g']:null;

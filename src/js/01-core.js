@@ -118,8 +118,23 @@ function toastBg(m){window.__audbg=(window.__audbg||0)+1;try{toast(m,true)}final
 document.addEventListener('click',async e=>{if(e.target.closest&&e.target.closest('a.tel,a.kcall,.telp'))return;const c=e.target.closest&&e.target.closest('.cp,.kc');if(!c)return;const t=/^[\s+\d\u06F0-\u06F9()-]{12,20}$/.test(c.dataset.cp||'')&&phFix(c.dataset.cp)?phFix(c.dataset.cp):c.dataset.cp;/* v60.7: ردیف کپی‌شده: آیکن کپی همان‌جا به «✓ کپی شد» تبدیل می‌شود و بعد برمی‌گردد */c.classList.remove('cpok');void c.offsetWidth;c.classList.add('cpok');const k=c.querySelector('.kcp');if(k){if(!k._ic)k._ic=k.innerHTML;k.innerHTML=ic('check')+'<em>کپی شد</em>';clearTimeout(k._t);k._t=setTimeout(()=>{k.innerHTML=k._ic;c.classList.remove('cpok')},1500)}else setTimeout(()=>c.classList.remove('cpok'),900);try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}try{await navigator.clipboard.writeText(t);toast('کپی شد ✓ '+t)}catch(x){const r=document.createRange();r.selectNodeContents(c);const sl=window.getSelection();sl.removeAllRanges();sl.addRange(r);toast('انتخاب شد؛ دستی کپی کنید')}});
 /* ============ ذخیره‌سازی ============ */
 let storeOK=true;
-let _vc=null,_vcE=null,_vcN=-1,_stm=null;const memoClear=()=>{_vc=null;_stm=null;window.__gsc=null/* v90.9: موجودی کالاها (15zz) */;window.__opc=null/* v95.7: ردیف‌های باز حساب (15d) */;window.__abp=null/* v96.1: آبشده‌های موجود (15zz) */};
-const ls={get(k,d){try{const v=LS.getItem(k);return v?JSON.parse(v):d}catch(e){storeOK=false;return d}},set(k,v){memoClear();try{LS.setItem(k,JSON.stringify(v))}catch(e){storeOK=false}}};
+let _vc=null,_vcE=null,_vcN=-1,_vcV=-1,_stm=null,_stmB=null,_stmN=-1,_stmV=-1;const memoClear=()=>{_vc=null;_stm=null;window.__gsc=null/* v90.9: موجودی کالاها (15zz) */;window.__opc=null/* v95.7: ردیف‌های باز حساب (15d) */;window.__abp=null/* v96.1: آبشده‌های موجود (15zz) */};
+/* ---------- v99.1 «حالت سبک هنگام تایپ» (گزارش صاحب اپ با ویدیو: کیبورد اندروید با لگ کار می‌کند) ----------
+   کشیدن هر ردیف فهرست روی صفحه گوشی میان‌رده چند میلی‌ثانیه وقت می‌برد و با کیبورد باز فقط چند ردیف اول دیده می‌شود. پس:
+   • داخل خود رویداد تایپ هیچ کار سنگینی نیست؛ فهرست بعد از مکث کوتاه ساخته می‌شود (liteType)؛
+   • آن ساخت «سبک» است (LITE.on): هر فهرست با liteCap فقط چند ردیف اولش را می‌سازد (شمارش‌ها و دکمه «N مورد دیگر» همان واقعی است)؛
+   • اگر چیزی کوتاه شده بود (LITE.cut)، بعد از مکث بلندتر یا با کشیدن فهرست، همان run بدون سبک دوباره اجرا می‌شود (فهرست کامل). */
+const LITE={on:0,cut:0,fill:null,t:0,at:0};
+function liteCap(len,full,lite){if(!LITE.on)return full;const c=Math.min(full,lite);if(c<full&&len>c)LITE.cut=1;return c}
+function liteType(inp,run,delay){clearTimeout(inp._t);clearTimeout(LITE.t);LITE.fill=null;
+  inp._t=setTimeout(()=>{LITE.on=1;LITE.cut=0;try{run()}finally{LITE.on=0}LITE.at=performance.now();
+    if(LITE.cut){const fill=()=>{clearTimeout(LITE.t);if(LITE.fill!==fill)return;LITE.fill=null;if(inp.isConnected)run()};LITE.fill=fill;LITE.t=setTimeout(fill,1200)}},delay==null?110:delay)}
+/* کاری که خودش فهرست کامل را می‌سازد (دکمه «بیشتر»، Enter): ساخت کامل معوق لغو می‌شود؛ true = فهرست فعلی سبک بود */
+const liteDone=()=>{clearTimeout(LITE.t);const f=!!LITE.fill;LITE.fill=null;return f};
+document.addEventListener('scroll',()=>{if(LITE.fill&&performance.now()-LITE.at>350)LITE.fill()},{capture:true,passive:true});
+/* v99.1: شماره نسخه داده هر کلید (با هر ذخیره یکی بالا می‌رود) — نمایه‌های جستجو (sxGet در 14) با آن می‌فهمند داده عوض شده یا نه */
+const DVN={};
+const ls={get(k,d){try{const v=LS.getItem(k);return v?JSON.parse(v):d}catch(e){storeOK=false;return d}},set(k,v){/* پیش‌نویس سند (با هر حرف ذخیره می‌شود) و نرخ لحظه‌ای طلا داده‌ای را که حافظه‌ها از آن ساخته شده‌اند عوض نمی‌کنند */if(k!=='m_svd'&&k!=='m_gl')memoClear();DVN[k]=(DVN[k]||0)+1;try{LS.setItem(k,JSON.stringify(v))}catch(e){storeOK=false}}};
 const isoAdd=(iso,n)=>{const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const JM=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
@@ -166,7 +181,10 @@ function trashIds(ids,reason){const S=new Set(ids.map(String)),now=new Date().to
 function restoreIds(ids){const S=new Set(ids.map(String)),back=[];trash=trash.filter(t=>{if(S.has(String(t.id))&&!entries.some(e=>e.id===t.id)){const{deletedAt,deletedBy,reason,...e}=t;back.push(e);return false}return !S.has(String(t.id))});entries=entries.concat(back);saveE();saveT();alloc=null;if(back.length)depDocBack(back);return back}
 /* ============ اعتبارسنجی و پارس ============ */
 const dayEntries=()=>entries.filter(e=>e.entryDate===dateVal);
-function validated(){if(_vc&&_vcE===entries&&_vcN===entries.length)return _vc;const L=validated0();_vc=L;_vcE=entries;_vcN=entries.length;queueMicrotask(memoClear);return L}
+/* v99.1 (لگ تایپ روی اندروید): بازبینی همه واریزی‌ها (validated0) قبلاً در هر «نوبت کار» از نو انجام می‌شد — یعنی با هر حرف در هر جستجو و با هر رسم صفحه.
+   حالا نتیجه تا وقتی واریزی‌ها واقعاً عوض نشده‌اند می‌ماند: هر ذخیره (ls.set) هم memoClear می‌زند و هم شماره نسخه DVN را بالا می‌برد؛ آمدن داده از سرور خود آرایه را عوض می‌کند.
+   قاعده (مثل قبل): هر کدی که واریزی‌ای را درجا عوض می‌کند و پیش از ذخیره دوباره validated() می‌خواهد، باید memoClear() بزند. */
+function validated(){if(_vc&&_vcE===entries&&_vcN===entries.length&&_vcV===(DVN.m_entries||0))return _vc;const L=validated0();_vc=L;_vcE=entries;_vcN=entries.length;_vcV=DVN.m_entries||0;return L}
 function validated0(){
   const L=entries.map(e=>{const SC=(e.settles||[]),st=SC.reduce((s,x)=>s+(+x.amount||0),0),t=+e.amount||0;return{...e,issues:[],level:0,total:t,settles:SC,stlW:(e.settles||[]).filter(x=>x.st==='wait'),settled:st,amount:Math.max(0,t-st),full:st>0&&st>=t}}),codes={},keys={},seqs={};
   for(const r of L){const bad=t=>{r.issues.push(t);r.level=2},warn=t=>{r.issues.push(t);r.level=Math.max(r.level,1)};
@@ -268,6 +286,7 @@ function render(anim){/* v79.8: کارهای خودکار هنگام رسم صف
   /* v61.57 (خواسته صاحب اپ): در صفحه‌های مشتری عنوان صفحه داخل کارت مشتری می‌رود و کارت جای عنوان را در ردیف سرتیتر می‌گیرد */
   {const hc=hdCu(),hb=cur==='bank'&&curBk(),hd=cur==='bdoc'&&BD&&bdS();B.classList.toggle('cuhd',!!(hc||hb||hd));if(hc){const T=B.querySelector('.tt2>b'),L=B.querySelector('.ttl');if(L)L.insertAdjacentHTML('beforeend',cuHead(hc,T?T.textContent:''))}else if(hb){const L=B.querySelector('.ttl');if(L)L.insertAdjacentHTML('beforeend',bkHead(hb))}else if(hd){const L=B.querySelector('.ttl');if(L)L.insertAdjacentHTML('beforeend',bdHead(hd))}}
   /* v80.9: دکمه اصلی صفحه بالا سمت چپ (15zn) */if(typeof hdGoPut==='function')hdGoPut();
+  /* v99.1: نمایه جستجو در وقت بیکاری ساخته می‌شود، پیش از اولین حرف (14) */if(typeof sxWarm==='function'&&(cur==='custs'||cur==='banks'||cur==='sell'||cur==='find'||cur==='home'))sxWarm();
   const R={bank:[vBank,aBank],bdoc:[vBdoc,aBdoc],sell:[vSell,aSell],inv:[vInv,aInv],custs:[vCusts,aCusts],cust:[vCust,aCust],banks:[vBanks,aBanks],buy:[vBuy,aBuy],ent:[vEnt,aEnt],find:[vFind,null],home:[vHome,null],bulk:[vBulk,aBulk],split1:[vSplit1,aSplit1],lday:[vLday,aLday],audit:[vAudit,null],users:[vUsers,aUsers],settings:[vSettings,null],backups:[vBackups,null],invset:[vInvSet,aInvSet],stock:[vStock,aStock]}[cur];
   $('app').classList.toggle('home',cur==='home');$('act').classList.remove('hid','sv0');$('app').classList.toggle('ent',cur==='ent');$('app').classList.toggle('banks',cur==='banks');$('app').classList.toggle('custs',cur==='custs');$('app').classList.toggle('editing',cur==='ent'&&entEdit);{const ap=$('app'),was=ap.classList.contains('full'),fu=FULLP.has(cur);ap.classList.toggle('full',fu);ap.classList.toggle('split',cur==='split1');if(fu&&anim&&!turn&&!navBack&&render._v!==cur&&(!was||SLIDEP.has(cur))){fin=true;ap.classList.add('fullin');clearTimeout(render._fi);render._fi=setTimeout(()=>ap.classList.remove('fullin'),620)}if(!fu)ap.classList.remove('fullin')}B.classList.remove('cmp');
   /* همان صفحه دوباره ساخته می‌شود (نه رفتن به صفحه دیگر): ردیف‌ها از جای قبلی به جای تازه بلغزند */
