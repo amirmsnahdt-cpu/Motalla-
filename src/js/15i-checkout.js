@@ -59,19 +59,19 @@ function ckRe(f){if(!CK||!$('sheet').querySelector('.ckw'))return;$('sheet').inn
 function ckRows(){const R=sv.pays.map((p,i)=>({k:'py',i,ico:(PM[p.m]||PM.cash).i,lab:pyLab(p),sub:p.m==='wd'?'تأیید بانک'+(p.tn?' · پیگیری '+esc(p.tn):''):p.tn?'پیگیری '+esc(p.tn):p.m==='dep'?'در همان واریزی، تسویه از مشتری ثبت می‌شود':'',amt:pAmt(p),lock:p.m==='wd'}));
   (sv.xr||[]).forEach((x,i)=>{if(x.cat==='تعویض'){const C=xrCalc(x,sv.rate);R.push({k:'xr',i,ico:'coin',lab:'تعویض طلا',sub:wFmt(C.n)+' گرم · عیار '+toFa(x.ay||750),amt:C.amount})}});return R}
 /* v61.72 (خواسته صاحب اپ): اگر طرف حواله در فهرست نیست، نامش دستی و موقت ثبت می‌شود (m:'nm' — فقط نام، به حساب کسی نمی‌رود) */
-const ckNmRow=q0=>`<button class="stsr ckn" data-act="ckNm"><span class="c6a ckna">${ic('plus')}</span><span class="tx"><b>${q0?'ثبت دستی «'+esc(q0)+'»':'ثبت دستی نام'}</b><small>${q0?'در فهرست نیست · فقط نام، بدون حساب':'نام را در جستجو بنویسید'}</small></span></button>`;
+const ckNmRow=q0=>`<button type="button" class="ptm-br add" data-act="ckNm"><span class="ckbi">${ic('plus')}</span><span class="tx"><b>${q0?'ثبت دستی «'+esc(q0)+'»':'ثبت دستی نام'}</b><small>${q0?'در فهرست نیست · فقط نام، بدون حساب':'نام را در جستجو بنویسید'}</small></span></button>`;
 ACT.ckNm=()=>{ckRead();const n=clean(CK.q||'');if(!n){toast('نام طرف حواله را در جستجو بنویسید',true);const I=$('ckQ');if(I)I.focus();return}CK.sel={k:'nm',n};ckRe('ckA')};
+/* v100.4 (خواسته صاحب اپ: «لیست مشتری‌ها و حواله به بانک مثل کارتخوان؛ اسم و مبلغ کامل دیده شود»): ردیف‌ها همان ردیف فهرست بانک‌های دستگاه کارتخوان (ptm-br):
+   نام کامل (در صورت نیاز دو خط، بدون … )، زیرش مبلغ کامل؛ داخل صفحه همان دستگاه (ckDev) */
+const ckPr=(k,id,name,lab,v,sub)=>`<button type="button" class="ptm-br" data-act="ckPick" data-k="${k}" data-id="${id}"><span class="ckbi pa">${esc(userInit(name||'؟'))}</span><span class="tx"><b>${esc(name)}</b>${v!=null?`<small>${lab} <em>${fmt(v)}</em></small>`:lab?`<small>${lab}</small>`:''}${sub?`<small class="s2">${sub}</small>`:''}</span></button>`;
 function ckList(){const q0=clean(CK.q||''),q=nzName(toEn(q0)),dOk=pDig(q0);
   if(ckOut()){const L=CU().filter(c=>String(c.id)!==String(sv.cuId)&&c.grp!=='بانک'&&(!q||cuHit(c,q,dOk))).sort((a,b)=>String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,q?60:40);
-    return `<div class="stsug ckl">${L.map(c=>`<button class="stsr" data-act="ckPick" data-k="cu" data-id="${c.id}">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'حساب مشتری'}</small></span></button>`).join('')}${ckNmRow(q0)}</div>`}
+    return L.map(c=>ckPr('cu',c.id,cuName(c),c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'حساب مشتری',null,'')).join('')+ckNmRow(q0)}
   /* v71.3: همه حساب‌هایی که بدهکاریم (بدون سقف تعداد؛ فهرست خودش اسکرول می‌خورد) + واریزی‌های بی‌حساب */
-  const C=oweAccts(q0).map(o=>[o.c,o.a,o]),D=oweDeps(q0);
-  const row=(k,id,av,cls,name,sub,v)=>`<button class="stsr" data-act="ckPick" data-k="${k}" data-id="${id}"><span class="c6a${cls}">${esc(av)}</span><span class="tx"><b>${esc(name)}</b><small>${sub}</small></span><span class="ckv"><b>${fmt(v)}</b><small>بدهکاریم</small></span></button>`;
-  if(!C.length&&!D.length)return `<div class="eh" style="padding:10px 4px">${q?'کسی در فهرست پیدا نشد':'به هیچ مشتری‌ای بدهکار نیستیم و واریزیِ ارسال‌نشده‌ای نیست'}</div><div class="stsug ckl">${ckNmRow(q0)}</div>`;
-  return `<div class="stsug ckl">${C.length?`<div class="stsh ckb">مشتری‌هایی که به آنها بدهکاریم</div>`+C.map(([c,r,o])=>row('cu',c.id,userInit(c.name),'',cuName(c),oweSub(o),r)).join(''):''}
-    ${D.length?`<div class="stsh">واریزی‌های ارسال‌نشده به بانک</div>`+D.map(([x,r])=>row('dep',x.id,userInit(fullName(x)),' m',fullName(x),['واریز '+esc(payLab(PD(x))),x.settled?'بخشی تسویه شده':'',x.bankShow?esc(x.bankShow):''].filter(Boolean).join('، '),r)).join(''):''}${ckNmRow(q0)}</div>`}
-function ckSel(){const s=CK.sel;if(!s)return '';if(s.k==='nm')return `<div class="stsel"><span class="c6a ckna">${esc(userInit(s.n))}</span><span class="tx"><b>${esc(s.n)}</b><small>ثبت دستی · ${ckOut()?'این شخص به مشتری ما پرداخت کرده':'مشتری به این شخص پرداخت کرده'} · بدون حساب</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>`;if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return '';const o=oweAccts('').find(z=>String(z.c.id)===String(c.id)),r=o?o.a:0;return `<div class="stsel">${cuAvH(c)}<span class="tx"><b>${esc(cuName(c))}</b><small>${ckOut()?'مبلغ به حساب این مشتری می‌رود':'حساب مشتری · بدهکاریم '+fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>`}
-  const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return '';const r=depAvail(x)-ckUsedDep(x.id);return `<div class="stsel"><span class="c6a m">${esc(userInit(fullName(x)))}</span><span class="tx"><b>${esc(fullName(x))}</b><small>واریزی ${esc(payLab(PD(x)))} · مانده ${fmt(r)}</small></span><button class="itx" data-act="ckPick" data-k="" aria-label="برداشتن">×</button></div>${depBar(x.id,'ck')}`}
+  const C=oweAccts(q0),D=oweDeps(q0);
+  if(!C.length&&!D.length)return `<div class="ptm-bt">${q?'کسی در فهرست پیدا نشد':'به هیچ مشتری‌ای بدهکار نیستیم و واریزیِ ارسال‌نشده‌ای نیست'}</div>${ckNmRow(q0)}`;
+  return (C.length?`<div class="ptm-bt">مشتری‌هایی که به آنها بدهکاریم</div>`+C.map(o=>ckPr('cu',o.c.id,cuName(o.c),'بدهکاریم',o.a,oweSub(o))).join(''):'')
+    +(D.length?`<div class="ptm-bt">واریزی‌های ارسال‌نشده به بانک</div>`+D.map(([x,r])=>ckPr('dep',x.id,fullName(x),'مانده',r,['واریز '+esc(payLab(PD(x))),x.settled?'بخشی تسویه شده':'',x.bankShow?esc(x.bankShow):''].filter(Boolean).join('، '))).join(''):'')+ckNmRow(q0)}
 /* v61.30: کارتخوان و حساب ما مثل بقیه فهرست‌ها: جستجو بالا، فهرست زیرش */
 /* v86.8 (خواسته صاحب اپ: «در حواله و کارتخوان لیست همه بانک‌ها با موجودی طلبکاریم؛ اسکرول درست؛ افزودن حساب بانکی از همین‌جا
    که در زبانه بانک هم ذخیره شود»): همه حساب‌های نوع بانک (بیشترین موجودی بالا)، لوگو + برچسب رنگی طلبکاریم/بدهکاریم،
@@ -98,8 +98,6 @@ function ckPhPut(n0,x){const K=xrPh(CK||{});if(!K.length)return;const p=x||(sv.p
    ۲) حالت «یک کار» (CK.m): فقط همان روش — سرتیتر = نام روش با برگشت و «افزودن»، یک خط مانده، بانک‌ها به شکل چیپ افقی (لوگو + مانده؛ انتخاب بدون ساختن دوباره صفحه،
       پس کیبورد نمی‌پرد)، مبلغ بزرگ با «کل مانده»، بعد پیگیری و عکس. همه در بالای صفحه می‌ماند و بالای کیبورد دیده می‌شود. «همه بانک‌ها / تازه» فهرست کامل با جستجو را باز می‌کند (CK.pl). */
 const ckBkL=()=>bkCus().filter(c=>String(c.id)!==String(sv&&sv.cuId));
-function ckChips(){const L=ckBkL().map(c=>({c,b:bkCuBal(c)})).sort((a,b)=>(String(b.c.id)===String(CK.srcId))-(String(a.c.id)===String(CK.srcId))||b.b-a.b);
-  return `<div class="ckcs" id="ckCs">${L.slice(0,14).map(({c,b})=>`<button type="button" class="ckc${String(CK.srcId)===String(c.id)?' on':''}" data-act="ckSrc" data-id="${esc(c.id)}" style="--bk:${bkClr(c)}">${bkAvH(c)||`<span class="ckbi">${ic('bank')}</span>`}<span class="tx"><b>${esc(cuName(c).replace(/^بانک\s+/,''))}</b><small class="${b>0?'r':b<0?'b':'z'}">${fmt(Math.abs(b))}</small></span><i class="ckck">${ic('check')}</i></button>`).join('')}<button type="button" class="ckc ckca" data-act="ckAll"><span class="ckbi">${ic('search')}</span><span class="tx"><b>${L.length>14?'همه بانک‌ها':'جستجو'}</b><small>یا حساب تازه</small></span></button></div>`}
 /* v91.3 (خواسته صاحب اپ: «کارتخوان مثل دستگاه پوز؛ حواله به مشتری و انتخاب بانک بهتر؛ انتخاب سخت است»):
    مبلغ همه روش‌ها با صفحه‌کلید خود برنامه (ckPad) زده می‌شود، نه کیبورد گوشی — پس هیچ‌وقت چیزی زیر کیبورد پنهان نمی‌شود.
    کارتخوان = یک دستگاه پوز: بدنه تیره، سرتیتر با لوگو و نام بانکِ همان کارتخوان، صفحه سبز «مبلغ تراکنش»، دکمه‌های عددی و سه دکمه رنگی پوز
@@ -110,35 +108,43 @@ const ckAIn=cls=>`<input id="ckA" class="ltr ${cls||''}" readonly inputmode="non
    انصراف/پاک/تأیید) و یک کادر مبلغ وسط‌چین (برچسب بالا، عدد وسط، «کل مانده/نصف» زیرش؛ واحد کنار عدد نیست تا عدد از وسط بیرون نرود) */
 function ckKeys(cls){const k=(v,t,c)=>`<button type="button" class="ckk ptm-k${c?' '+c:''}" data-act="ckK" data-k="${v}">${t}</button>`;
   return `<div class="ptm-keys${cls?' '+cls:''}">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('x','<i>✕</i><span>انصراف</span>','kr')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('c','<i>‹</i><span>پاک</span>','ky')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok','<i>○</i><span>تأیید</span>','kg')}${k('000','۰۰۰','z3')}${k('0','۰')}${k('bs',ic('back').replace('class="i"','class="i bsk"'),'bs')}</div>`}
-function ckScr(lf){return `<div class="ckscr"><small>مبلغ <i>تومان</i></small><div class="ckscv">${ckAIn()}</div>${lf?`<div class="ckq"><button type="button" data-act="ckAmt" data-v="${lf}">کل مانده · ${fmt(lf)}</button>${lf>=2e6?`<button type="button" data-act="ckAmt" data-v="${Math.round(lf/2)}">نصف</button>`:''}</div>`:''}</div>`}
 /* v91.5 (خواسته صاحب اپ: «با انیمیشن نشان بده داری آن عملیات را انجام می‌دهی»): نوار مسیر پول بالای فرم — از چه کسی/کجا به کجا، با نقطه‌های روان روی خط */
 /* v91.8: جهت درست — مبدأ سمت راست، مقصد سمت چپ، نقطه‌ها از راست به چپ (دریافت: مشتری ← بانک/صندوق؛ پرداخت: بانک/صندوق ← مشتری) */
-function ckRoute(){const c=svCu(),m=CK.m,out=ckOut(),z=ckBkL().find(o=>String(o.id)===String(CK.srcId)),me=`<span class="ckrn"><span class="ckra c">${esc(userInit(c?cuName(c):'؟'))}</span><small>${esc(c?cuName(c):'مشتری')}</small></span>`;
-  const bk=z?`<span class="ckrn" id="ckRb">${bkAvH(z)||`<span class="ckra b">${ic('bank')}</span>`}<small>${esc(cuName(z).replace(/^بانک\s+/,''))}</small></span>`:`<span class="ckrn"><span class="ckra b">${ic('bank')}</span><small>بانک</small></span>`;
-  const box=`<span class="ckrn"><span class="ckra g">${ic('cash')}</span><small>صندوق مغازه</small></span>`;
-  const o=m==='cash'?box:m==='hav'?bk:(()=>{const s0=CK.sel;if(!s0)return '';const n=s0.k==='nm'?s0.n:s0.k==='cu'?cuName(CU().find(q=>String(q.id)===String(s0.id))||{}):fullName(validated().find(q=>String(q.id)===String(s0.id))||{});return `<span class="ckrn"><span class="ckra p">${esc(userInit(n||'؟'))}</span><small>${esc(n||'')}</small></span>`})();
-  if(!o)return '';const [src,dst]=out?[o,me]:[me,o];
-  return `<div class="ckrt${out?' out':''}">${src}<span class="ckrl"><i></i><i></i><i></i><em>${m==='cash'?ic('cash'):ic('back').replace('class="i"','class="i flip"')}</em></span>${dst.replace('class="ckrn"','class="ckrn to"')}</div>`}
-const ckPosHead=()=>{const z=ckBkL().find(o=>String(o.id)===String(CK.srcId));return `${z?(bkAvH(z)||`<span class="ckbi">${ic('bank')}</span>`):`<span class="ckbi">${ic('card')}</span>`}<span class="tx"><b>${z?esc(cuName(z)):'کارتخوان'}</b><small>پایانه فروش</small></span><span class="ptm-chg">${CK.pb?'بستن':'تغییر بانک'}${ic('back').replace('class="i"','class="i ptmcv"')}</span><span class="ptm-sig"><i></i><i></i><i></i><i></i></span>`};
+/* v100.4: سرتیتر همه دستگاه‌ها (کارتخوان، حواله بانک، نقدی، حواله به مشتری) */
+const ckSelNm=()=>{const s0=CK.sel;if(!s0)return '';return s0.k==='nm'?s0.n:s0.k==='cu'?cuName(CU().find(q=>String(q.id)===String(s0.id))||{}):fullName(validated().find(q=>String(q.id)===String(s0.id))||{})};
+const ckPosHead=()=>{const m=CK.m,out=ckOut(),sig='<span class="ptm-sig"><i></i><i></i><i></i><i></i></span>';
+  if(m==='cash')return `<span class="ckbi g">${ic('cash')}</span><span class="tx"><b>صندوق مغازه</b><small>${out?'پرداخت نقدی به مشتری':'دریافت نقدی از مشتری'}</small></span>${sig}`;
+  if(m==='dep'||m==='cust'){const s0=CK.sel;if(!s0)return `<span class="ckbi">${ic('user')}</span><span class="tx"><b>${out?'به حساب چه کسی؟':'به حساب چه کسی پرداخت کرده؟'}</b><small>شخص را از فهرست انتخاب کنید</small></span>`;
+    const n=ckSelNm(),cap=ckSelCap(),sub=s0.k==='nm'?'ثبت دستی · بدون حساب':out?'مبلغ به حساب این مشتری می‌رود':s0.k==='dep'?'واریزی ارسال‌نشده · مانده '+fmt(cap):'بدهکاریم '+fmt(cap);
+    return `<span class="ckbi pa">${esc(userInit(n||'؟'))}</span><span class="tx"><b>${esc(n)}</b><small>${sub}</small></span><span class="ptm-chg">تغییر شخص${ic('back').replace('class="i"','class="i ptmcv"')}</span>`}
+  const z=ckBkL().find(o=>String(o.id)===String(CK.srcId));return `${z?(bkAvH(z)||`<span class="ckbi">${ic('bank')}</span>`):`<span class="ckbi">${ic('card')}</span>`}<span class="tx"><b>${z?esc(cuName(z)):'کارتخوان'}</b><small>${m==='pos'?'پایانه فروش':out?'حواله از این حساب':'حواله به این حساب'}</small></span><span class="ptm-chg">${CK.pb?'بستن':'تغییر بانک'}${ic('back').replace('class="i"','class="i ptmcv"')}</span>${m==='pos'?sig:''}`};
 /* v98.9 (خواسته صاحب اپ: «پنجره کارتخوان‌ها در خود بانک باشد؛ با زدنش لیست بانک‌ها را بیاورد»): ردیف چیپ بانک‌ها بالای دستگاه برداشته شد؛ سرتیتر خود دستگاه (نام و نشان بانک) دکمه است
    (ACT.ckPosBk، CK.pb) و فهرست بانک‌ها روی صفحه همان دستگاه باز می‌شود (جای صفحه نمایش و دکمه‌ها): هر بانک با نشان و مانده، انتخاب‌شده بالا؛ آخرش «جستجو / حساب بانکی تازه» */
 function ckPosList(){const L=ckBkL().map(c=>({c,b:bkCuBal(c)})).sort((a,b)=>(String(b.c.id)===String(CK.srcId))-(String(a.c.id)===String(CK.srcId))||b.b-a.b);
-  return `<div class="ptm-bl" id="posL"><div class="ptm-bt">کارتخوانِ کدام بانک؟</div>${L.map(({c,b})=>`<button type="button" class="ptm-br${String(CK.srcId)===String(c.id)?' on':''}" data-act="ckSrc" data-id="${esc(c.id)}">${bkAvH(c)||`<span class="ckbi">${ic('bank')}</span>`}<span class="tx"><b>${esc(cuName(c))}</b><small>${b>0?'موجودی':b<0?'بدهکار':'بدون موجودی'}</small></span>${b?`<em>${b<0?'−':''}${fmt(Math.abs(b))}</em>`:''}${String(CK.srcId)===String(c.id)?`<i class="ptm-bk">${ic('check')}</i>`:''}</button>`).join('')}<button type="button" class="ptm-br add" data-act="ckAll"><span class="ckbi">${ic('search')}</span><span class="tx"><b>جستجو یا حساب بانکی تازه</b><small>فهرست کامل بانک‌ها</small></span></button></div>`}
-ACT.ckPosBk=()=>{if(!CK||CK.m!=='pos')return;ckRead();CK.pb=CK.pb?0:1;CK.noan=1;ckRe();CK.noan=0};
+  return `<div class="ptm-bl" id="posL"><div class="ptm-bt">${CK.m==='pos'?'کارتخوانِ کدام بانک؟':ckOut()?'حواله از کدام حساب بانک؟':'حواله به کدام حساب بانک؟'}</div>${L.map(({c,b})=>`<button type="button" class="ptm-br${String(CK.srcId)===String(c.id)?' on':''}" data-act="ckSrc" data-id="${esc(c.id)}">${bkAvH(c)||`<span class="ckbi">${ic('bank')}</span>`}<span class="tx"><b>${esc(cuName(c))}</b><small>${b>0?'موجودی':b<0?'بدهکار':'بدون موجودی'}${b?` <em>${b<0?'−':''}${fmt(Math.abs(b))}</em>`:''}</small></span>${String(CK.srcId)===String(c.id)?`<i class="ptm-bk">${ic('check')}</i>`:''}</button>`).join('')}<button type="button" class="ptm-br add" data-act="ckAll"><span class="ckbi">${ic('search')}</span><span class="tx"><b>جستجو یا حساب بانکی تازه</b><small>فهرست کامل بانک‌ها</small></span></button></div>`}
+ACT.ckPosBk=()=>{if(!CK||(CK.m!=='pos'&&CK.m!=='hav'))return;ckRead();CK.pb=CK.pb?0:1;CK.noan=1;ckRe();CK.noan=0};
 /* v91.7 (خواسته صاحب اپ: «انگار یک کارتخوان واقعی؛ دکمه‌ها و طولش بهتر، دکمه‌ها این‌قدر نزدیک هم نباشند»): دستگاه پوز از نو (کلاس‌های ptm-*، بدون ارث از قالب قبلی):
    سرِ چاپگر با رسید کاغذی که از شکاف بیرون آمده (عکس رسید روی همان کاغذ)، بدنه با نام و نشان بانک، صفحه نمایش شیشه‌ای، صفحه‌کلید واقعی پوز
    (سه ستون عدد با فاصله + ستون رنگی انصراف/پاک/تأیید؛ تأیید دو ردیف)، پایین دستگاه شکاف کارت با کارت همان بانک. دستگاه همه قد پنجره را پر می‌کند و ردیف‌های دکمه با قد صفحه کش می‌آیند */
-function ckPos(lf){const z=ckBkL().find(o=>String(o.id)===String(CK.srcId)),K=xrPh(CK),k=(v,t,c)=>`<button type="button" class="ckk ptm-k${c?' '+c:''}" data-act="ckK" data-k="${v}">${t}</button>`;
-  return `<div class="ptm${CK.pb?' pbl':''}${CK.noan?' noan':''}" id="posD" style="--bk:${z?bkClr(z):'#334155'}">
-  <div class="ptm-pap${K.length?' has':''}">${stPhHTML(CK)}</div>
+/* v100.4 (خواسته صاحب اپ: «حواله به بانک، حواله به مشتری و نقدی هم مثل کارتخوان؛ عکس رسید مثل کارتخوان»): یک دستگاه برای همه —
+   کارتخوان تیره، بقیه روشن (lt). کاغذ رسید با عکس (و برای حواله بانک «پیگیری») از شکاف بالا بیرون آمده؛ سرتیتر = بانک / صندوق / شخص و دکمه «تغییر»
+   که فهرست را روی صفحه همان دستگاه باز می‌کند (بانک‌ها: ckPosList؛ اشخاص: جستجو + ckList). */
+function ckDev(lf){const m=CK.m,pos=m==='pos',bk=pos||m==='hav',pp=m==='dep'||m==='cust',out=ckOut(),z=bk?ckBkL().find(o=>String(o.id)===String(CK.srcId)):null,K=xrPh(CK),lst=bk?!!CK.pb:pp&&!CK.sel;
+  const sc=pp&&CK.sel?ckSelCap():0,cap=sc&&sc<lf?sc:lf,act=bk?' data-act="ckPosBk" aria-label="تغییر بانک"':pp&&CK.sel?' data-act="ckPick" data-k="" aria-label="تغییر شخص"':'';
+  const hd=act?`<button type="button" class="ptm-hd" id="posH"${act}>${ckPosHead()}</button>`:`<div class="ptm-hd" id="posH">${ckPosHead()}</div>`;
+  const tn=m==='hav'?`<label class="ptm-tn"><small>پیگیری</small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" placeholder="اختیاری" autocomplete="off" enterkeyhint="done"></label>`:'';
+  const list=bk?ckPosList():`<div class="ptm-sq">${ic('search')}<input id="ckQ" value="${esc(CK.q||'')}" placeholder="نام، تلفن، شبا یا فاکتور…" autocomplete="off" enterkeyhint="search"></div><div class="ptm-bl" id="ckL">${ckList()}</div>`;
+  const st=pos?'خرید':m==='hav'?(out?'حواله از بانک':'حواله به بانک'):m==='cash'?(out?'پرداخت نقدی':'دریافت نقدی'):(out?'حواله به حساب':'حواله از مشتری');
+  return `<div class="ptm${pos?'':' lt'}${lst?' pbl':''}${CK.noan?' noan':''}${tn?' wtn':''}${pp&&!CK.sel?' nopap':''}" id="posD" style="--bk:${z?bkClr(z):pos?'#334155':'#2152d9'}">
+  ${pp&&!CK.sel?'':`<div class="ptm-pap${K.length?' has':''}">${tn}${stPhHTML(CK)}</div>`}
   <div class="ptm-top"><span class="ptm-slot"></span><span class="ptm-led"></span></div>
-  <div class="ptm-body">
-    <button type="button" class="ptm-hd" id="posH" data-act="ckPosBk" aria-label="تغییر بانک کارتخوان">${ckPosHead()}</button>
-    ${CK.pb?ckPosList():`<div class="ptm-lcd" id="posS"><div class="ptm-st"><span>خرید</span><span>${esc(dates(sv.date||todayISO()).fa)}</span></div><div class="ptm-v"><small>مبلغ تراکنش · تومان</small>${ckAIn('posin')}</div>${lf?`<button type="button" class="ptm-rm" data-act="ckAmt" data-v="${lf}"><small>مانده سند</small><b>${fmt(lf)}</b><em>بزنید</em></button>`:''}<div class="ptm-msg" id="posM"></div></div>
-    <div class="ptm-keys">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('x','<i>✕</i><span>انصراف</span>','kr')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('c','<i>‹</i><span>پاک</span>','ky')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok','<i>○</i><span>تأیید</span>','kg')}${k('000','۰۰۰','z3')}${k('0','۰')}${k('bs',ic('back').replace('class="i"','class="i bsk"'),'bs')}</div>`}
-    <div class="ptm-bot"><span class="ptm-brand">MOTALLA<b>POS</b></span><span class="ptm-cs"></span></div>
+  <div class="ptm-body">${hd}
+    ${lst?list:`<div class="ptm-lcd" id="posS"><div class="ptm-st"><span>${st}</span><span>${esc(dates(sv.date||todayISO()).fa)}</span></div><div class="ptm-v"><small>${pos?'مبلغ تراکنش':'مبلغ'} · تومان</small>${ckAIn('posin')}</div>${cap?`<button type="button" class="ptm-rm" data-act="ckAmt" data-v="${cap}"><small>${sc&&sc<lf?(s0k()==='dep'?'مانده واریزی':'بدهی ما به او'):'مانده سند'}</small><b>${fmt(cap)}</b><em>بزنید</em></button>`:''}<div class="ptm-msg" id="posM"></div></div>
+    ${ckKeys(pos?'':'lt')}`}
+    ${pos?'<div class="ptm-bot"><span class="ptm-brand">MOTALLA<b>POS</b></span><span class="ptm-cs"></span></div>':''}
   </div>
-  <div class="ptm-card" aria-hidden="true"><span>${z?(bkAvH(z)||''):''}</span><i></i></div></div>`}
+  ${pos?`<div class="ptm-card" aria-hidden="true"><span>${z?(bkAvH(z)||''):''}</span><i></i></div>`:''}</div>`}
+const s0k=()=>CK.sel?CK.sel.k:'';
 /* ---- v98.9 «تعویض طلا» در پنجره تسویه (خواسته صاحب اپ: «نرخ و قیمت کل را نشان بدهد که بشود ادیت کرد؛ پنجره درهم‌برهم است») ----
    چهار خانه مرتب: وزن و عیار کنار هم، «هر گرم (خرید)» که از نرخ سند و عیار پر می‌شود و قابل تغییر است (CK.gr → ردیف با mz خودش)،
    و کادر بزرگ «قیمت کل» که با وزن × نرخ پر می‌شود و اگر دستی زده شود همان می‌ماند (CK.gv → amT؛ نرخ = مبلغ ÷ وزن).
@@ -160,13 +166,12 @@ function ckGxForm(){const x=ckGxX(),C=ckGxC(),nv=v=>v?Number(v).toLocaleString('
 function ckForm(){const m=CK.m;if(!m)return '';const lf=ckLeft();
   const amt=`<label class="ckf"><small>مبلغ (تومان)</small><input id="ckA" class="ltr" inputmode="numeric" value="${ckAmtV()}" autocomplete="off" enterkeyhint="done"></label>`;
   const tn=`<label class="ckf ckf1"><small>پیگیری <i>(اختیاری)</i></small><input id="ckT" class="ltr" inputmode="numeric" value="${esc(CK.tn||'')}" autocomplete="off"></label>`;let b='';
-  const ph=`<div class="ckrw2">${m==='hav'?tn:'<span class="ckf0"></span>'}${stPhHTML(CK)}</div>`;
-  if(m==='cash')b=`<div class="cpm">${ckRoute()}${ckScr(lf)}${ph}${ckKeys('lt')}</div>`;
+  if(m==='cash')b=ckDev(lf);
   if(m==='rg')b=`<div class="ckg">${amt}<label class="ckf"><small>هر گرم ۱۸ (تومان)</small><input id="ckP" class="ltr" inputmode="numeric" value="${CK.pg?Number(CK.pg).toLocaleString('en-US'):''}" autocomplete="off"></label></div><div class="ckx" id="ckX">${ckRgX()}</div>`;
   if(m==='pos'||m==='hav'){const has=ckBkL().length>0;if(has&&!ckBkL().some(z=>String(z.id)===String(CK.srcId)))CK.srcId=ckBkL()[0].id;if(has)CK.pk=1;
     if(CK.pl||!has)b=`<div class="fsearch sm">${ic('search')}<input id="ckS" type="search" value="${esc(CK.sq||'')}" placeholder="${m==='pos'?'حساب کارتخوان (بانک)…':'جستجوی حساب بانک…'}" autocomplete="off" enterkeyhint="search"></div><div id="ckPl">${ckPick()}</div>`;
-    else b=m==='pos'?ckPos(lf):`<div class="ckcl">${ckOut()?'از کدام حساب بانک؟':'به کدام حساب بانک؟'}</div>${ckChips()}<div class="cpm">${ckRoute()}${ckScr(lf)}${ph}${ckKeys('lt')}</div>`}
-  if(m==='dep'||(m==='cust'&&ckOut()))b=CK.sel?`${ckSel()}<div class="cpm">${ckRoute()}${ckScr(Math.min(lf,ckSelCap()||lf))}${ph}${ckKeys('lt')}</div>`:`<div class="ckcl">${ckOut()?'پول را به حساب چه کسی می‌دهیم؟':'مشتری به حساب چه کسی پرداخت کرده؟'}</div><div class="fsearch sm">${ic('search')}<input id="ckQ" value="${esc(CK.q||'')}" placeholder="نام، تلفن، شبا یا فاکتور…" autocomplete="off"></div><div id="ckL">${ckList()}</div>`;
+    else b=ckDev(lf)}
+  if(m==='dep'||(m==='cust'&&ckOut()))b=ckDev(lf);
   if(m==='gx')b=ckGxForm();
   const ok=ckFormOk(),inl=m==='pos'||m==='hav'||m==='cash'||((m==='dep'||m==='cust')&&CK.sel);
   return `<div class="ckfm ckf2">${b}${ok&&!inl&&!CK.pl?stPhHTML(CK):''}</div>`}
@@ -186,9 +191,9 @@ function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),wp=c&&sv.edit&&typeof wdPe
   /* ریز مانده‌ها (قبلی · سند · نهایی، مبلغ و طلا)؛ خانه انتخاب‌شده پررنگ و با زدن هر خانه هدف تسویه عوض می‌شود */
   const L=svBalL(),gr=L.find(z=>z[0]==='g'),rr=L.find(z=>z[0]==='r')||['r',0,0,0],ln=(k,v)=>`<span class="${ftCls(v)}${k==='r'?' r':''}"><b>${v?balV(k,v):'۰'}</b><i>${balU(k)}</i></span>`;
   const mini=c?`<div class="ckbl">${[['p','قبلی',1],['d','سند',2],['f','نهایی',3]].map(([w,l,ix])=>`<button type="button" class="ckbc${tg===w?' on':''}" data-act="ckTg" data-w="${w}"><small>${l}</small>${ln('r',rr[ix])}${gr?ln('g',gr[ix]):''}</button>`).join('')}</div>`:'';
-  if(CK.m&&CK.m!=='bfix'){const Tm=(ckOut()?CKO:CKT).find(z=>z[0]===CK.m)||['','',''],ok=ckFormOk(),pz=CK.m==='pos'&&!CK.pl&&ckBkL().length>0;
+  if(CK.m&&CK.m!=='bfix'){const Tm=(ckOut()?CKO:CKT).find(z=>z[0]===CK.m)||['','',''],ok=ckFormOk(),pz=!CK.pl&&(((CK.m==='pos'||CK.m==='hav')&&ckBkL().length>0)||CK.m==='cash'||CK.m==='dep'||(CK.m==='cust'&&ckOut()));
     /* v91.5: کارتخوان = صفحه ثابت (بدون اسکرول، دستگاه همه جا را می‌گیرد) و مانده داخل صفحه نمایش خود دستگاه است */
-    const pm=CK.m==='cash'||(CK.m==='hav'&&!CK.pl&&ckBkL().length>0)||((CK.m==='dep'||CK.m==='cust'&&ckOut())&&!!CK.sel),fx=pz||pm||((CK.m==='dep'||CK.m==='cust'&&ckOut())&&!CK.sel);
+    const pm=false,fx=pz;
     return `<div class="ckw ckfo m-${CK.m}${CK.pl?' pl':''}${pz?' cpos':''}${pm?' cpay':''}${fx?' fix':''}"><div class="sh-h"><button type="button" class="shbk" data-act="ckM" data-m="" aria-label="برگشت به تسویه">${ic('back')}</button><div><b>${Tm[1]}</b><small class="shsub">${esc(c?cuName(c):'')}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
     ${pz||pm?'':`<div class="ckrm ${r>0?'d':r<0?'c':'z'}"><small>${TL} · ${r>0?'طلبکاریم':r<0?'بدهکاریم':'تسویه'}</small><b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span><i>تومان</i></b></div>`}
     ${ckForm()}${ok?`<button class="xgo" data-act="ckAdd">${ic('check')} افزودن</button>`:''}</div>`}
@@ -224,7 +229,7 @@ ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حس�
   const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
   ckRe(m==='dep'||m==='cust'?'ckQ':m==='gx'?'ckW':m==='bfix'?'bfT':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
-ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));const rt=document.querySelector('#sheet .ckrt');if(rt)rt.outerHTML=ckRoute();const pc=document.querySelector('#posD .ptm-card');if(pc){const z0=ckBkL().find(o=>String(o.id)===String(d.id));pc.querySelector('span').innerHTML=z0?(bkAvH(z0)||''):'';pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}const ph=$('posH');if(ph){ph.innerHTML=ckPosHead();const dv=ph.closest('.ptm'),z=ckBkL().find(o=>String(o.id)===String(d.id));if(dv&&z)dv.style.setProperty('--bk',bkClr(z));if(dv&&!RM()&&dv.animate)dv.animate([{transform:'translateY(4px)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,1.3,.4,1)'})}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;if(CK.pb){CK.pb=0;CK.noan=1;ckRe('ckA');CK.noan=0;const pc=document.querySelector('#posD .ptm-card');if(pc){pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}ckRe('ckA')};
+ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));const pc=document.querySelector('#posD .ptm-card');if(pc){const z0=ckBkL().find(o=>String(o.id)===String(d.id));pc.querySelector('span').innerHTML=z0?(bkAvH(z0)||''):'';pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}const ph=$('posH');if(ph){ph.innerHTML=ckPosHead();const dv=ph.closest('.ptm'),z=ckBkL().find(o=>String(o.id)===String(d.id));if(dv&&z)dv.style.setProperty('--bk',bkClr(z));if(dv&&!RM()&&dv.animate)dv.animate([{transform:'translateY(4px)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,1.3,.4,1)'})}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;if(CK.pb){CK.pb=0;CK.noan=1;ckRe('ckA');CK.noan=0;const pc=document.querySelector('#posD .ptm-card');if(pc){pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}ckRe('ckA')};
 ACT.ckSrcX=()=>{ckRead();CK.pl=1;ckRe('ckS')};
 ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('ckQ');return}CK.sel={k:d.k,id:d.id};
   const av=d.k==='cu'?(()=>{const c=CU().find(z=>String(z.id)===String(d.id));const o=c&&oweAccts('').find(z=>String(z.c.id)===String(c.id));return o?o.a:0})():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();

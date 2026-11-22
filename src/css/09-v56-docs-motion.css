@@ -5066,3 +5066,48 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 #pv .prnbt{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:4px}
 #pv .prnbt button{display:flex;align-items:center;gap:6px;border:0;border-radius:999px;background:var(--blu2);color:var(--blu);font:inherit;font-size:12.5px;font-weight:800;padding:8px 12px}
 #pv .prnbt button.dl{background:var(--red2);color:var(--red)}#pv .prnbt .i{width:15px;height:15px}
+/* v100.4 دستگاه روشن برای حواله بانک / نقدی / حواله به مشتری (ckDev در 15i) + فهرست‌ها با نام و مبلغ کامل */
+.ptm-br .tx b{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.4}
+.ptm-br .tx small{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;line-height:1.5}
+.ptm-br .tx small em{font-style:normal;direction:ltr;unicode-bidi:isolate;font-size:14.5px;font-weight:900;font-variant-numeric:tabular-nums;color:#14532d}
+.ptm-br .tx small.s2{display:block;font-size:10.5px;font-weight:650;opacity:.85;white-space:normal}
+#sheet .ptm-br{align-items:center}
+.ckbi.pa{font-size:14px;font-weight:900;color:#1d3f9c!important;background:#e6edfc!important}
+.ckbi.g{color:#15803d!important}
+/* روشن */
+.ptm.lt .ptm-top{background:linear-gradient(180deg,#e9edf5 0%,#d5dbe7 60%,#c3cada 100%);box-shadow:inset 0 2px 0 #fff,inset 0 -2px 0 rgb(30 40 70/.18)}
+.ptm.lt .ptm-slot{background:#3b4559;box-shadow:inset 0 2px 3px #0008,0 1px 0 #fff}.ptm.lt .ptm-top::after{background:linear-gradient(180deg,#2a3243,#c3cada)}
+.ptm.lt .ptm-body{background:linear-gradient(165deg,color-mix(in srgb,var(--blu) 4%,#fff) 0%,color-mix(in srgb,var(--blu) 7%,#f1f3f8) 100%);
+ box-shadow:inset 0 2px 0 #fff,inset 0 -3px 0 rgb(30 40 70/.12),0 0 0 1px color-mix(in srgb,var(--blu) 16%,var(--line)),0 8px 0 #c9cfdc,0 11px 0 color-mix(in srgb,var(--bk) 35%,#b9c0cf),0 30px 34px -18px rgb(16 32 70/.45)}
+.ptm.lt .ptm-hd .tx b{color:var(--ink)}.ptm.lt .ptm-hd .tx small{color:var(--mut)}
+#sheet .ptm.lt button.ptm-hd,.ptm.lt div.ptm-hd{border-radius:14px;padding:5px 6px 7px;margin:-3px -3px 6px;box-sizing:content-box;width:calc(100% - 6px);background:#fff;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 14%,var(--line))}
+.ptm.lt .ptm-hd .bkb,.ptm.lt .ptm-hd img,.ptm.lt .ptm-hd .ckbi{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 18%,var(--line));background:#fff}
+.ptm.lt .ptm-chg{background:var(--blu2);color:var(--blu)}
+.ptm.lt .ptm-lcd{border:3px solid color-mix(in srgb,var(--blu) 22%,#cfd6e4);background:linear-gradient(180deg,#fff 0%,#f4f7fd 100%);color:var(--ink);box-shadow:inset 0 2px 6px rgb(16 32 70/.12)}
+.ptm.lt .ptm-lcd::after{display:none}.ptm.lt .ptm-st{color:var(--mut);border-bottom-color:color-mix(in srgb,var(--blu) 20%,var(--line))}
+.ptm.lt .ptm-v small,.ptm.lt .ptm-v i{color:var(--mut)}#sheet .ptm.lt .ptm-v input{color:var(--ink)!important;text-shadow:none}#sheet .ptm.lt .ptm-v input::placeholder{color:color-mix(in srgb,var(--ink) 25%,transparent)}
+.ptm.lt .ptm-rm{background:var(--blu);box-shadow:0 2px 0 color-mix(in srgb,var(--blu) 60%,#000)}.ptm.lt .ptm-rm small{color:#dbe6ff}.ptm.lt .ptm-rm em{background:#fff;color:var(--blu)}
+.ptm.lt .ptm-keys{margin-top:10px}
+.ptm.lt .ptm-bl{border:3px solid color-mix(in srgb,var(--blu) 22%,#cfd6e4);background:color-mix(in srgb,var(--blu) 5%,#f6f8fc);box-shadow:inset 0 2px 6px rgb(16 32 70/.1)}
+.ptm.lt .ptm-bt{color:var(--blu)}
+#sheet .ptm.lt .ptm-br{background:#fff;color:var(--ink);box-shadow:0 1px 0 rgb(16 32 70/.08),inset 0 0 0 1px color-mix(in srgb,var(--blu) 10%,var(--line))}
+#sheet .ptm.lt .ptm-br.on{box-shadow:0 0 0 2px var(--blu)}.ptm.lt .ptm-br .tx small{color:var(--mut)}.ptm.lt .ptm-br .tx small em{color:#1d3f9c}
+.ptm.lt .ptm-br .ptm-bk{background:var(--blu)}#sheet .ptm.lt .ptm-br.add{background:transparent;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 40%,transparent)}
+.ptm.lt .ptm-br.add .tx b{color:var(--blu)}
+.ptm-sq{flex:none;display:flex;align-items:center;gap:8px;height:42px;margin:0 0 8px;padding:0 12px;border-radius:14px;background:var(--card);box-shadow:var(--bfr)}.ptm-sq:focus-within{box-shadow:var(--bfr2)}
+.ptm-sq .i{width:17px;height:17px;color:var(--mut);flex:none}#sheet .ptm-sq input{flex:1;min-width:0;border:0!important;background:none!important;box-shadow:none!important;padding:0!important;min-height:0;height:40px;font:inherit;font-size:15px;color:var(--ink);outline:0}
+.ptm.nopap{margin-top:14px}
+/* کاغذ رسید با «پیگیری» (حواله بانک) */
+.ptm.wtn .ptm-pap{width:84%;display:flex;align-items:center;gap:8px}
+.ptm.wtn .ptm-pap .stph2{flex:none}
+.ptm-tn{flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:0 8px;height:32px;border-radius:7px;background:rgb(255 255 255/.75);box-shadow:inset 0 0 0 1px rgb(120 100 40/.3)}
+.ptm-tn small{flex:none;font-size:11px;font-weight:850;color:#5b5446}#sheet .ptm-tn input{flex:1;min-width:0;border:0!important;background:none!important;box-shadow:none!important;padding:0!important;min-height:0;height:30px;font:inherit;font-size:14px;font-weight:800;color:#2a2418;outline:0}
+#sheet .ptm-tn input::placeholder{color:#9c9584;font-weight:600}
+.ptm.wtn .ptm-pap .stphl2{display:none}
+/* تیره */
+html[data-theme="dark"] .ptm.lt .ptm-body,html[data-theme="dark"] .ptm.lt .ptm-lcd,html[data-theme="dark"] .ptm.lt div.ptm-hd,html[data-theme="dark"] #sheet .ptm.lt button.ptm-hd,html[data-theme="dark"] #sheet .ptm.lt .ptm-br{background:var(--card)}
+html[data-theme="dark"] .ptm.lt .ptm-bl{background:var(--bg)}html[data-theme="dark"] .ptm.lt .ptm-br .tx small em{color:#9db8ff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ptm.lt .ptm-body,:root:not([data-theme="light"]) .ptm.lt .ptm-lcd,:root:not([data-theme="light"]) .ptm.lt div.ptm-hd,:root:not([data-theme="light"]) #sheet .ptm.lt button.ptm-hd,:root:not([data-theme="light"]) #sheet .ptm.lt .ptm-br{background:var(--card)}
+ :root:not([data-theme="light"]) .ptm.lt .ptm-bl{background:var(--bg)}:root:not([data-theme="light"]) .ptm.lt .ptm-br .tx small em{color:#9db8ff}}
+/* v100.4 نام کامل بانک/شخص در سرتیتر دستگاه (حداکثر دو خط، بدون «…») */
+.ptm-hd .tx b{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.3}
