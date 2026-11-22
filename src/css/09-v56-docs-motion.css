@@ -5018,3 +5018,6 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 .ivnote.ivcalon{background:color-mix(in srgb,var(--blu) 8%,transparent);border-radius:14px;padding:10px 12px;color:var(--ink)}.ivnote.ivcalon svg{width:15px;height:15px;vertical-align:-3px;color:var(--blu)}
 #view .ivcalf span>input{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;height:100%;min-height:0;margin:0;padding:0!important;-webkit-appearance:none;appearance:none}
 .ivcalw .ivnote.ivcalon+.ivnote.ivcalon{margin-top:8px}
+
+/* v99.7 درصد نوشتنی عرض/ارتفاع چاپ */
+.ivsti{min-width:92px;display:inline-flex;align-items:center;justify-content:center;gap:3px}.ivsti input{width:64px;height:32px;border:0!important;background:var(--card)!important;border-radius:10px;box-shadow:inset 0 0 0 1.5px var(--blu)!important;font:inherit;font-size:15px;font-weight:800;text-align:center;color:var(--ink);padding:0!important;outline:0}.ivsti small{font-size:11px;font-weight:600;color:var(--mut)}
