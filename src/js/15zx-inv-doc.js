@@ -21,6 +21,7 @@ const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   aj:'p',pp:'p',rt:'m',
   rh:5.5,fs:0,cap:'a',sum:1,ex:1,py:1,tn:1,fill:'b',
   acc:1,ap:1,ad:1,ag:'y',ax:'a',an:1,lg:1,wr:'w',wds:1,
+  /* v100.5 (صاحب اپ: «سود بیشتر از ۷ مثلاً ۷٫۰۱ ذخیره می‌شود؛ همان ۷ بزند») درصد سود در چاپ بدون اعشار (فقط نوشته؛ مبلغ‌ها دست نمی‌خورد) */ppi:1,
   /* v99.3 «تنظیم جای چاپ روی کاغذ»، جدا برای هر راه چاپ (a = اپ اندروید، i = آیفون، w = کامپیوتر/مرورگر): psk؟ = اندازه ٪، psx؟ = جابه‌جایی به راست (میلی‌متر، منفی = چپ)،
      psy؟ = جابه‌جایی به پایین. فقط هنگام چاپ اعمال می‌شود (prCal)، نه در خود برگه. نام‌ها عمداً بلندند: py از قبل «هر پرداخت یک ردیف / یک ردیف جمع» است */pska:100,psxa:0,psya:0,pski:100,psxi:0,psyi:0,pskw:100,psxw:0,psyw:0,
   /* v99.4 کشیدن جدا: psw؟ = چند درصد به عرض چاپ اضافه/کم شود، psh؟ = به ارتفاع (روی اندازه psk؟ می‌نشیند؛ ۰ = بدون کشیدگی) */pswa:0,psha:0,pswi:0,pshi:0,psww:0,pshw:0,
@@ -112,7 +113,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const keys=[...new Set([...Object.keys(P.X),...Object.keys(dX)])].filter(k=>Math.round(((P.X[k]||0)+(+dX[k]||0))*100)||+dX[k]||P.X[k]).sort((a,b)=>ko(a)-ko(b));
   const PG=pvGroups(pays,xs),g0=x=>x.a==='gold',un=x=>g0(x)?'گرم':(XA[x.a]||{}).u||'';
   /* واژه‌های دو طرف حساب: از دید مطلا (طلبکاریم/بدهکاریم) یا از دید مشتری (بدهکار/بستانکار) */
-  const WR=S.wr==='c'?['تسویه','بدهکار','بستانکار']:['تسویه','طلبکاریم','بدهکاریم'],side=v=>!v?WR[0]:v<0?WR[1]:WR[2],cls=v=>v<0?'vd':v>0?'vc':'vz',nm=v=>'<bdi dir="ltr">'+fmt(Math.abs(Math.round(v)))+'</bdi>',pctT=v=>toFa(String(Math.round(v*100)/100))+'٪';
+  const WR=S.wr==='c'?['تسویه','بدهکار','بستانکار']:['تسویه','طلبکاریم','بدهکاریم'],side=v=>!v?WR[0]:v<0?WR[1]:WR[2],cls=v=>v<0?'vd':v>0?'vc':'vz',nm=v=>'<bdi dir="ltr">'+fmt(Math.abs(Math.round(v)))+'</bdi>',pctT=v=>toFa(String(Math.round(v*100)/100))+'٪',ppN=v=>S.ppi?Math.round(+v):Math.round(+v*100)/100,ppT=v=>toFa(String(ppN(v)))+'٪';
   /* رنگ‌ها: رنگی (کاغذ کرم یا سفید) یا سیاه‌وسفید برای چاپگر لیزری */
   /* v92.1 (صاحب اپ: «سیاه‌وسفید نمی‌خواهم؛ همان رنگ‌ها، فقط خط‌ها و نوشته‌ها پررنگ‌تر»): طلایی و رنگ‌های برگه می‌مانند ولی پرمایه‌تر؛ خط‌ها ضخیم‌تر (مو .۲۲، کادر .۳، طلایی .۳۵/.۶ میلی‌متر)،
      نوشته پایه نیمه‌ضخیم و برچسب‌ها و واحدها ضخیم. border-box است، پس ضخامت خط ارتفاع ردیف‌ها را عوض نمی‌کند */
@@ -126,19 +127,19 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   /* v92.2 (صاحب اپ: «فاکتور خیلی قاطی‌پاتی است؛ وزن ۷۵۰ را در پرداخت نزده»): طلا و سکه‌ای که بی‌قیمت تحویل داده یا گرفته‌ایم گروه خودشان را دارند
      (u تحویل به مشتری · v دریافت از مشتری) و از دریافت/پرداخت «وجه» جدا هستند؛ ستون آخر هر ردیف طلا همان وزن ۷۵۰ی است که به حساب طلا می‌نشیند */
   const GR={s:[],b:[],u:[],v:[],w:[],i:[],o:[],p:[],z:[]},XP=[],FST={},r3=v=>Math.round(v*1000)/1000;if((t.items||[]).length)FST.s=-1;
-  its.forEach(it=>{const J=ajPT(it),ay=+it.ay||750,mz=mzOf2(it),pg=Math.round(mz/MZK*ay/750),ajE=[J.P?toFa(String(J.P))+'٪':'',J.T?fmt(J.T):''].filter(Boolean).join(' + '),ppE=+it.amT>0?'':[+it.pp?toFa(String(+it.pp))+'٪':'',+it.pp&&+it.ppT?fmt(Math.round(+it.ppT)):''].filter(Boolean).join(' + '),w7=r3((+it.w||0)*ay/750);
+  its.forEach(it=>{const J=ajPT(it),ay=+it.ay||750,mz=mzOf2(it),pg=Math.round(mz/MZK*ay/750),ajE=[J.P?toFa(String(J.P))+'٪':'',J.T?fmt(J.T):''].filter(Boolean).join(' + '),ppE=+it.amT>0?'':[+it.pp?ppT(+it.pp):'',+it.pp&&+it.ppT?fmt(Math.round(+it.ppT)):''].filter(Boolean).join(' + '),w7=r3((+it.w||0)*ay/750);
     GR.s.push({wv:+it.w||0,n:esc(it.k+dsP(it)),e:[it.sh===1?'شرطی':''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
       c:{w:[wFmt(it.w)+' <u>گرم</u>'],ay:[toFa(ay)],w7:[wFmt(w7)],rt:[fmt(S.rt==='g'?pg:mz)],gv:[+it.gold?fmt(it.gold):''],
         /* v91.5 (خواسته صاحب اپ): «فقط درصد» — اگر اجرت/سود تومانی وارد شده، درصدش از روی مبلغ طلا حساب می‌شود */
         aj:!ajE&&!+it.ajv?['']:S.aj==='o'?[+it.gold&&+it.ajv?pctT(it.ajv/it.gold*100):ajE]:S.aj==='t'?[+it.ajv?fmt(it.ajv):'']:S.aj==='b'&&J.P&&+it.ajv?[ajE,fmt(it.ajv)]:[ajE],
-        pp:S.pp==='o'?[+it.prv&&(+it.gold+(+it.ajv||0))?pctT(it.prv/((+it.gold)+(+it.ajv||0))*100):'']:!ppE?[+it.prv?fmt(it.prv):'']:S.pp==='t'?[+it.prv?fmt(it.prv):'']:S.pp==='b'&&+it.prv?[ppE,fmt(it.prv)]:[ppE],tx:[+it.taxv?fmt(it.taxv):'']}})});
+        pp:S.pp==='o'?[+it.prv&&(+it.gold+(+it.ajv||0))?ppT(it.prv/((+it.gold)+(+it.ajv||0))*100):'']:!ppE?[+it.prv?fmt(it.prv):'']:S.pp==='t'?[+it.prv?fmt(it.prv):'']:S.pp==='b'&&+it.prv?[ppE,fmt(it.prv)]:[ppE],tx:[+it.taxv?fmt(it.taxv):'']}})});
   xs.forEach((x,xi)=>{const g=g0(x),m=x.t==='sell'||x.t==='buy',u=un(x),q=g?(x.n!=null?x.n:x.w):(x.n!=null?x.n:x.q),ay=+x.ay||750,bm=x.t==='buy'&&!x.pul&&x.cat!=='آبشده',rvM=g&&m?(bm?Math.round(mzOf2(x)*ay/750):mzOf2(x)):m&&x.pg?+x.pg:0,rv=S.rt==='g'?(m&&x.pg?+x.pg:0):rvM,pv=PG.sx.has(xi),sd=x.t==='out'?-1:1;
     /* ردیفی که به حساب طلا/سکه می‌نشیند (دریافت/تحویل بی‌قیمت یا «پولی»): کنار نامش گفته می‌شود؛ طلای غیر ۷۵۰ با معادل ۷۵۰ که همان عددِ جدول «حساب مشتری» است */
     const acc='در حساب '+(g?'طلا':(XA[x.a]||{}).k==='c'?'سکه':esc((XA[x.a]||{s:x.a}).s)),wA=g?(x.q750!=null?+x.q750:r3((+q||0)*ay/750)):0,aj=g&&!m&&x.q0!=null,w7=aj?+x.q0:wA,w7d=g&&Math.abs(w7-(+q||0))>.0005,jam=aj?+x.amount||0:0;
     /* v91.7: دریافت/تحویل طلا با اجرت و سود (بدون مظنه): درصدها در ستون خودشان، «با اجرت و سود n گرم ۷۵۰» کنار نام؛ اجرت تومانی در ستون مبلغ */
     const gk=x.t==='sell'?'s':x.t==='buy'?'b':x.t==='in'?'v':'u',gq=g&&!m&&!jam&&!pv;if(!pv&&FST[gk]==null)FST[gk]=xi;
     (pv?XP:GR[gk]).push({xi,sw:dkOfX(x)==='swap',wv:g?+q||0:0,kd:g?'g':(XA[x.a]||{}).k==='c'?'c':'f',g7:g&&!m&&!pv?wA:0,gq,n:esc(nl(xrLab(x))+dsP(x)),sdw:pv?sd:0,e:pv?[]:[x.sh===1?'شرطی':'',x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',(m&&x.pul)||jam?acc:''],lab:x.lab?esc(x.lab):'',ang:x.ang?esc(toFa(x.ang)):'',w7d,eqA:!gq&&aj&&Math.abs(wA-w7)>.0005,eq:gq?(aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود ':w7d?'معادل ':'')+wFmt(wA)+' گرم ۷۵۰':aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود '+wFmt(wA)+' گرم ۷۵۰':w7d&&(x.pul||!m)?'معادل '+wFmt(w7)+' گرم ۷۵۰':'',rv,
-      c:{w:[(g?wFmt(q):qFmt(q))+' <u>'+esc(u)+'</u>'],ay:[g?toFa(ay):''],w7:[g?wFmt(gq?wA:w7):''],rt:[rv?fmt(rv):''],gv:[''],aj:[aj?[+x.ajP?toFa(String(+x.ajP))+'٪':'',jam?fmt(jam):''].filter(Boolean).join(' + '):''],pp:[aj&&+x.pp?toFa(String(+x.pp))+'٪':''],tx:['']},am:m||jam?nm(x.amount):gq?'—':acc,av:m||jam?+x.amount||0:0,dl:!m&&!jam})});
+      c:{w:[(g?wFmt(q):qFmt(q))+' <u>'+esc(u)+'</u>'],ay:[g?toFa(ay):''],w7:[g?wFmt(gq?wA:w7):''],rt:[rv?fmt(rv):''],gv:[''],aj:[aj?[+x.ajP?toFa(String(+x.ajP))+'٪':'',jam?fmt(jam):''].filter(Boolean).join(' + '):''],pp:[aj&&+x.pp?ppT(+x.pp):''],tx:['']},am:m||jam?nm(x.amount):gq?'—':acc,av:m||jam?+x.amount||0:0,dl:!m&&!jam})});
   let inS=0,outS=0,pvS=0,offR=0;const PY={i:[],o:[]};
   pays.forEach((p,pi)=>{const a=pAmt(p);if(!a)return;if(PG.sp.has(pi)){pvS+=a;GR.p.push({n:esc(nl(pyLab(p,1))),sdw:a,e:[],am:nm(a)});return}
     const k=a>0?'دریافت':'پرداخت',off=p.m==='adj'&&p.why==='تخفیف'||p.m==='off',ds=off?'تخفیف':esc(nl(pyLab(p,1)).replace(/^(دریافت|پرداخت)\s*/,''))||k;if(a>0){inS+=a;if(off)offR=1}else outS-=a;
