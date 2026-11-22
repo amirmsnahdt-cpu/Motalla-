@@ -56,12 +56,18 @@ function pvaReopen(){const el=$('pva');if(!el)return;PVA.pl=prPlat();el.innerHTM
 /* وضعیت چاپگر در ردیف بالای پنل (آماده / کاغذ ندارد …) */
 async function prnStRe(){const C=prnCfg();if(!C||!$('prnSt'))return;const I=await prnInfoP(C.h,C.p,C.rp),e=$('prnSt');if(!e)return;const st=prnState(I);e.textContent=st.t+' · '+C.h;e.classList.toggle('bad',!!st.bad);e.classList.toggle('ok',!st.bad)}
 /* ---------- ساختن صفحه‌ها به اندازه دقیق کاغذ ---------- */
+/* v100.5 (صاحب اپ با عکس چاپ: «خطوط نشان داده شود و معلوم باشد، پررنگ‌تر»): برای چاپگر سیاه‌وسفید (لیزری)، رنگ کاغذ کرم/طلایی سفید می‌شود
+   و هر خاکستری (خط‌های طلایی، نوشته‌های کم‌رنگ، لبه حروف) تیره‌تر؛ مشکی همان مشکی. منحنی: L≥242 → سفید، زمینه‌های کم‌رنگ (۲۰۰–۲۴۲) → خاکستری خیلی روشن، بقیه (خط و نوشته) → ۰٫۵۵×L */
+const PRNLUT=(()=>{const t=new Uint8ClampedArray(256);for(let v=0;v<256;v++)t[v]=v>=242?255:v>=200?Math.round(215+(v-200)/42*40):Math.round(v*.55);return t})();
+function prnTone(x,cv){x.setTransform(1,0,0,1,0,0);const D=x.getImageData(0,0,cv.width,cv.height),d=D.data,T=PRNLUT;
+  for(let i=0;i<d.length;i+=4){const g=T[(d[i]*299+d[i+1]*587+d[i+2]*114+500)/1000|0];d[i]=d[i+1]=d[i+2]=g}x.putImageData(D,0,0)}
 const prnImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src});
 async function prnPages(fl,C){const Q=fl._spec,A4=!!Q.a4,M=A4?{w:210,h:297,n:'iso_a4_210x297mm'}:{w:148,h:210,n:'iso_a5_148x210mm'},land=Q.mmW>Q.mmH+.5,cal=prCal(Q.mmW,Q.mmH,'d'),dpi=Math.min(300,C.dpi||300),s=dpi/25.4,out=[];
   for(const p of fl._pages){const im=await prnImg(p.j),cv=document.createElement('canvas');cv.width=Math.round(M.w*s);cv.height=Math.round(M.h*s);const x=cv.getContext('2d');
     x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.setTransform(s,0,0,s,0,0);x.translate(M.w/2,M.h/2);if(land)x.rotate(Math.PI/2);
     if(cal){x.translate(cal.x,cal.y);x.scale(cal.kx,cal.ky);if(cal.r)x.rotate(cal.r*Math.PI/180)}
     x.imageSmoothingQuality='high';x.drawImage(im,-Q.mmW/2+Q.mh+((Q.mmW-2*Q.mh)-p.wmm)/2,-Q.mmH/2+Q.mv,p.wmm,p.hmm);
+    if(C.gray)prnTone(x,cv);
     out.push(cv.toDataURL('image/jpeg',.92));cv.width=cv.height=1;await new Promise(r=>setTimeout(r,0))}
   return {M,pages:out}}
 function prnPdf(pages,M){const pt=v=>v*72/25.4,P=pages.map(j=>{const b=Uint8Array.from(atob(j.split(',')[1]),c=>c.charCodeAt(0));return {b,w:0,h:0,iw:pt(M.w),ih:pt(M.h),x:0,y:0,j}});
