@@ -5120,3 +5120,7 @@ html.kbo .ckw.cpos .sh-h .shsub{display:none}
 .ptm.pbl:has(.ptm-sq input:focus){margin:2px 6px 4px;animation:none}
 .ptm.pbl:has(.ptm-sq input:focus) :is(.ptm-top,.ptm-hd,.ptm-pap){display:none}
 .ptm.pbl:has(.ptm-sq input:focus) .ptm-body{margin-top:0;padding:7px 8px 8px;border-radius:20px}
+/* v101.0 گروه‌های تازه موجودی کالا */
+.stki.g-m{background:color-mix(in srgb,#b27c0e 16%,var(--card));color:#8a5d06}.stki.g-o{background:color-mix(in srgb,#7c3aed 13%,var(--card));color:#6d28d9}
+.stkh i{font-style:normal}
+.stkf{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.stkf::-webkit-scrollbar{display:none}.stkf button{flex:none}
