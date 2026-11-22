@@ -21,12 +21,12 @@ const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   aj:'p',pp:'p',rt:'m',
   rh:5.5,fs:0,cap:'a',sum:1,ex:1,py:1,tn:1,fill:'b',
   acc:1,ap:1,ad:1,ag:'y',ax:'a',an:1,lg:1,wr:'w',wds:1,
-  /* v99.2 تنظیم جای چاپ روی کاغذ (برای همه فاکتورها): psk = اندازه ٪، psx = جابه‌جایی به راست (میلی‌متر، منفی = چپ)، psy = جابه‌جایی به پایین.
-     نام‌ها عمداً بلندند: py از قبل «هر پرداخت یک ردیف / یک ردیف جمع» است */psk:100,psx:0,psy:0,
+  /* v99.3 «تنظیم جای چاپ روی کاغذ»، جدا برای هر راه چاپ (a = اپ اندروید، i = آیفون، w = کامپیوتر/مرورگر): psk؟ = اندازه ٪، psx؟ = جابه‌جایی به راست (میلی‌متر، منفی = چپ)،
+     psy؟ = جابه‌جایی به پایین. فقط هنگام چاپ اعمال می‌شود (prCal)، نه در خود برگه. نام‌ها عمداً بلندند: py از قبل «هر پرداخت یک ردیف / یک ردیف جمع» است */pska:100,psxa:0,psya:0,pski:100,psxi:0,psyi:0,pskw:100,psxw:0,psyw:0,
   sgc:1,sgs:1,by:1,th:1,shp:1,note:''};
 /* پیش‌فرض ویژه هر قالب: آبشده اجرت و مالیات ندارد و آزمایشگاه و انگش ستون جدا می‌گیرد */
 const INVT={ab:{clab:'a',cang:'a',caj:'n',ctx:'n'}};
-const INVE={paper:['a5','b14','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','o','t','b'],pp:['p','o','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2],psk:[85,115],psx:[-25,25],psy:[-25,25]};
+const INVE={paper:['a5','b14','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','o','t','b'],pp:['p','o','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2],pska:[85,115],psxa:[-25,25],psya:[-25,25],pski:[85,115],psxi:[-25,25],psyi:[-25,25],pskw:[85,115],psxw:[-25,25],psyw:[-25,25]};
 const INVCOL=[['w','وزن / تعداد'],['ay','عیار'],['w7','وزن ۷۵۰'],['lab','آزمایشگاه'],['ang','انگ'],['rt','نرخ'],['gv','مبلغ طلا'],['aj','اجرت'],['pp','سود'],['tx','مالیات']];
 function invClean(o){const r={};for(const k in INVD){const d=INVD[k],v=o?o[k]:undefined;
     if(INVE[k]||/^c(w|ay|w7|lab|ang|rt|gv|aj|pp|tx)$/.test(k))r[k]=(INVE[k]||['a','y','n']).includes(v)?v:d;
@@ -58,16 +58,22 @@ function invSample(pf){const M=1e6,rate=10400000,now=new Date(),old=new Date(now
   const t={id:'smp',type:'inv',no:1001,date:iso(now),rate,mz:Math.round(rate*MZK),items:D.items,xr:D.xr,pays:D.pays,tax:true,disc:0,total,at:now.toISOString(),by:typeof who==='function'?who():''};if(ge)t.ge=ge;
   return{c:{id:'smpc',name:'مشتری نمونه',phone:'09120000000',cno:125,nid:'0012345678',txs:[{id:'smp0',type:'xf',r:D.p[0],g:D.p[1],date:iso(old),at:old.toISOString()},t]},t}}
 
-/* v99.2 حساب «تنظیم جای چاپ» از روی چهار حاشیه اندازه‌گرفته‌شده (فاصله خط بیرونی قاب تا لبه کاغذ، میلی‌متر) روی برگه‌ای که با تنظیم فعلی S چاپ شده.
-   چاپگر: X = ox + sx·x (x = جای روی صفحه PDF). از حاشیه‌ها sx, sy, ox, oy درمی‌آید؛ بعد بزرگ‌ترین قابی که هم وسط کاغذ باشد و هم از جایی که چاپگر می‌تواند چاپ کند بیرون نزند.
+/* v99.2 حساب «تنظیم جای چاپ» از روی چهار حاشیه اندازه‌گرفته‌شده (فاصله خط بیرونی قاب تا لبه کاغذ، میلی‌متر) روی برگه‌ای که با تنظیم فعلی همان راه چاپ (pl) چاپ شده.
+   چاپگر: X = ox + sx·x (x = جای روی صفحه). از حاشیه‌ها sx, sy, ox, oy درمی‌آید؛ بعد بزرگ‌ترین قابی که هم وسط کاغذ باشد و هم از جایی که چاپگر می‌تواند چاپ کند بیرون نزند.
    خروجی: {psk,psx,psy,mx,my,sc} (mx/my = حاشیه دو طرف و بالا/پایین بعد از تنظیم، sc = درصدی که چاپگر کوچک می‌کند) یا {err} */
-function invCalFit(S,M){const A4=S.paper==='a4',PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:A4?210:297,ins=5*(A4?297/210:1),k0=(+S.psk||100)/100,dx0=+S.psx||0,dy0=+S.psy||0;
+function invCalFit(S,M,pl){pl=pl||'a';const A4=S.paper==='a4',PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:A4?210:297,ins=5*(A4?297/210:1),k0=(+S['psk'+pl]||100)/100,dx0=+S['psx'+pl]||0,dy0=+S['psy'+pl]||0;
   const T=+M.t,B=+M.b,R=+M.r,L=+M.l;if(![T,B,R,L].every(v=>isFinite(v)&&v>=0&&v<=70))return {err:'هر چهار حاشیه را به میلی‌متر بنویسید'};
   const xl=PW/2-(PW/2-ins)*k0+dx0,xr=PW/2+(PW/2-ins)*k0+dx0,yt=PH/2-(PH/2-ins)*k0+dy0,yb=PH/2+(PH/2-ins)*k0+dy0,sx=(PW-L-R)/(xr-xl),sy=(PH-T-B)/(yb-yt);
   if(!(sx>.7&&sx<1.2&&sy>.7&&sy<1.2))return {err:'این اندازه‌ها با اندازه کاغذ انتخاب‌شده نمی‌خواند؛ کاغذ و عددها را دوباره ببینید'};
   const ox=L-sx*xl,oy=T-sy*yt,e=.8,FL=ins,/* کمتر از حاشیه خود طرح (۵ میلی‌متر) نمی‌شود: چاپگر بی‌نقص = بدون تغییر */ax=Math.max(ox+sx*e,PW-(ox+sx*(PW-e)),FL),ay=Math.max(oy+sy*e,PH-(oy+sy*(PH-e)),FL);
   const k=Math.min(1.15,Math.max(.85,Math.min((PW-2*ax)/sx/(PW-2*ins),(PH-2*ay)/sy/(PH-2*ins)))),cl=(v,m)=>Math.max(-m,Math.min(m,v)),r1=v=>Math.round(v*10)/10;
   return {psk:r1(k*100),psx:r1(cl((PW/2-ox)/sx-PW/2,25)),psy:r1(cl((PH/2-oy)/sy-PH/2,25)),mx:r1((PW-(PW-2*ins)*k*sx)/2),my:r1((PH-(PH-2*ins)*k*sy)/2),sc:Math.round((sx+sy)/2*100)}}
+/* v99.3 این دستگاه از کدام راه چاپ می‌گیرد */
+const prPlat=()=>window.AndroidBridge?'a':isIOS()?'i':'w';
+/* v99.3 تنظیم جای چاپ برای صفحه‌ای به اندازه mmW×mmH با راه چاپ pl: فقط وقتی صفحه همان کاغذ فاکتور است (همان کاغذ = همان حاشیه چاپگر) → {k,x,y} یا null.
+   جای اعمال: اپ اندروید روی عکس صفحه‌ها هنگام چاپ (pdfPrintAnd)، کامپیوتر هنگام چاپ (printReport)، آیفون در خود فایل PDF (pdfMake؛ آنجا چاپ از همان فایل است). */
+function prCal(mmW,mmH,pl){let S;try{S=invCfg('sale')}catch(e){return null}if(!S||S.paper==='a42')return null;const A4=S.paper==='a4',PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:210;
+  if(Math.abs(mmW-PW)>1||Math.abs(mmH-PH)>1)return null;pl=pl||prPlat();const k=(+S['psk'+pl]||100)/100,x=+S['psx'+pl]||0,y=+S['psy'+pl]||0;return k!==1||x||y?{k,x,y}:null}
 function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...INVD,...(INVT[PF]||{}),...o.S}):invCfg(PF);
   const nl=v=>String(v).replace(/ · (طلبکاریم|بدهکاریم)$/,''),D=dates(t.date),its=t.items||[],xs=t.xr||[],pays=t.pays||[],hMz=+t.mz||(t.rate?Math.round(t.rate*MZK):0),mzOf2=x=>+x.mz||hMz;
   const P=cuBalBefore(c,t),d=txD(t),dX=d.x||{},KO=Object.keys(XA),ko=k=>{const i=KO.indexOf(k);return i<0?99:i};
@@ -280,14 +286,12 @@ u,em,i,s{text-decoration:none;font-style:normal}
 .a .av{display:table-cell;text-align:left;white-space:nowrap}.a .av.c{text-align:center}
 .a .av em{display:inline-block;width:${SB}mm;vertical-align:middle}.a .av b{display:inline-block;vertical-align:middle}.a .av em.st{width:auto}`;
   const A4=S.paper==='a4',K4=297/210,PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:A4?210:297;
-  /* v99.2 (عکس صاحب اپ از یک فاکتور چاپ‌شده: «پایین خالی است، بغل‌ها فضای زیاد دارد»): چاپگر برگه را خودش کوچک می‌کند (آن برگه ۹۳٪) و به یک گوشه می‌چسباند،
-     پس چاپ وسط کاغذ نمی‌افتد. اندازه صفحه PDF همان کاغذ می‌ماند؛ خود برگه داخل آن با psk بزرگ/کوچک و با psx/psy جابه‌جا می‌شود (حاشیه، نه transform — در PDF گوشی هم همان‌جا می‌نشیند)
-     تا بعد از کار چاپگر درست وسط بیفتد. عددها را صفحه تنظیمات از روی چهار حاشیه اندازه‌گرفته‌شده حساب می‌کند (invCalFit). برای «A4 · دو نسخه» اعمال نمی‌شود. */
-  const CAL=S.paper!=='a42',KP=CAL?(+S.psk||100)/100:1,DX=CAL?+S.psx||0:0,DY=CAL?+S.psy||0:0,KT=(A4?K4:1)*KP,CALC=KP!==1||DX||DY?`.sht>.pg{margin:${+(PH*(1-KP)/2+DY).toFixed(2)}mm ${+(PW*(1-KP)/2-DX).toFixed(2)}mm 0 auto}`:'';
+  /* v99.3: «تنظیم جای چاپ» دیگر داخل خود برگه نیست (پیش‌نمایش و فایل PDF دست نمی‌خورد)؛ فقط هنگام چاپ روی همان دستگاه اعمال می‌شود (prCal). */
+  const KT=A4?K4:1;
   if(KT!==1){css=invScale('<style>'+css+'</style>',KT).slice(7,-8);body=invScale(body,KT)}
   return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(invTitle(t))} · ${esc(cuName(c))}</title><style>@page{size:${S.paper==='a5'?'A5 landscape':S.paper==='b14'?'210mm 140mm':A4?'A4 landscape':'A4'};margin:0mm}
 @font-face{font-family:Vazirmatn;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:Vazirmatn;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-ExtraBold.woff2) format('woff2')}
-.sht{width:${PW}mm;height:${PH}mm;overflow:hidden;background:${C.pa};break-after:page;page-break-after:always}.sht:last-child{break-after:auto;page-break-after:auto}${CALC}
+.sht{width:${PW}mm;height:${PH}mm;overflow:hidden;background:${C.pa};break-after:page;page-break-after:always}.sht:last-child{break-after:auto;page-break-after:auto}
 @media print{.sht{margin:0}}
 @media screen{html body{background:transparent!important;box-shadow:none!important;border-radius:0!important;min-height:0!important}html body .sht{margin:0 auto 14px;border-radius:4px;box-shadow:0 10px 34px rgba(16,33,58,.16),0 0 0 1px rgba(16,33,58,.06)}}
 </style><style>${css}</style></head><body>${body}</body></html>`}

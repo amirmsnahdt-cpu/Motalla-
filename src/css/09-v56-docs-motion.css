@@ -5012,3 +5012,8 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 .ivcalm.bad{background:color-mix(in srgb,var(--red) 9%,var(--card));color:var(--red)}
 .ivcal0{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:40px;margin:6px 0 2px;border:0;border-radius:13px;background:var(--seg);color:var(--mut);font:inherit;font-size:13px;font-weight:800;cursor:pointer}.ivcal0 svg{width:15px;height:15px}
 @media (max-width:370px){.ivcalg{gap:6px}.ivcalf input{font-size:16px}.ivcalf span{padding:0 6px}}
+
+/* v99.3 کادر «تنظیم جای چاپ»: پرسش «با چه دستگاهی چاپ می‌شود» بالای خانه‌ها */
+.ivcalq{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px}.ivcalq>b{font-size:14px;font-weight:800;color:var(--ink)}.ivcalq .ivcalp{width:100%}.ivcalq .ivcalp>button{flex:1 1 0;min-width:0;white-space:nowrap}
+.ivnote.ivcalon{background:color-mix(in srgb,var(--blu) 8%,transparent);border-radius:14px;padding:10px 12px;color:var(--ink)}.ivnote.ivcalon svg{width:15px;height:15px;vertical-align:-3px;color:var(--blu)}
+#view .ivcalf span>input{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;height:100%;min-height:0;margin:0;padding:0!important;-webkit-appearance:none;appearance:none}

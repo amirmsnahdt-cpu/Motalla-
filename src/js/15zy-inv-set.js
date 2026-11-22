@@ -20,25 +20,34 @@ const ivSeg=(k,O)=>`<div class="ivg" role="radiogroup">${O.map(([v,l])=>`<button
 const ivPick=(k,t,sub,O)=>ivRow(t,sub,ivSeg(k,O),'col');
 const AYN=[['a','خودکار'],['y','همیشه'],['n','هرگز']];
 const IVCH={w:'وزن کالا، تعداد سکه و ارز',ay:'عیار طلا',w7:'وزن بر پایه ۷۵۰ (برای طلای متفرقه و آبشده)',lab:'نام آزمایشگاه (ری‌گیری)',ang:'شماره انگ',rt:'مظنه یا فی ردیف؛ خودکار = فقط وقتی با نرخ بالای برگه فرق دارد',gv:'مبلغ خود طلا، پیش از اجرت و سود',aj:'اجرت ساخت',pp:'سود فروشنده',tx:'مالیات ارزش افزوده'};
-/* v99.2 (عکس صاحب اپ از فاکتور چاپ‌شده: «پایین خالی است، بغل‌ها فضای زیاد دارد»): «تنظیم جای چاپ روی کاغذ» — چهار حاشیه برگه چاپ‌شده را می‌نویسد،
-   «وسط‌چین کن» اندازه و جابه‌جایی را حساب می‌کند (invCalFit در 15zx) و برای همه فاکتورها می‌ماند؛ زیرش تنظیم دستی نیم‌میلی‌متری. */
-function ivCalHTML(S){const C=IS.cal||{},num=(id,t,v)=>`<label class="ivcalf"><small>${t}</small><span><input id="${id}" class="ltr" inputmode="decimal" autocomplete="off" placeholder="۰" value="${esc(v==null?'':String(v))}"><i>م‌م</i></span></label>`,on=S.psk!==100||S.psx||S.psy,
-    mm=v=>toFa(String(Math.abs(Math.round(v*10)/10))),st=(k,d,tx)=>`<div class="ivst"><button type="button" data-act="ivN" data-k="${k}" data-d="${-d}" aria-label="کمتر">−</button><b>${tx}</b><button type="button" data-act="ivN" data-k="${k}" data-d="${d}" aria-label="بیشتر">+</button></div>`;
-  return `<div class="ivcalw"><div class="ivcalh"><b>تنظیم جای چاپ روی کاغذ</b><small>وقتی چاپ وسط کاغذ نمی‌افتد یا یک طرفش جای خالی زیاد دارد</small></div>
-  <div class="ivnote">چاپگر برگه را خودش کمی کوچک می‌کند و گاهی به یک گوشه می‌چسباند. یک فاکتور با همین تنظیم چاپ کنید، برگه را رو به خودتان بگیرید و با خط‌کش فاصلهٔ <b>خط بیرونی قاب تا لبهٔ کاغذ</b> را از چهار طرف به میلی‌متر بنویسید.</div>
+/* v99.2 → v99.3 «تنظیم جای چاپ روی کاغذ»: چهار حاشیه برگه چاپ‌شده را می‌نویسد، «وسط‌چین کن» اندازه و جابه‌جایی را حساب می‌کند (invCalFit در 15zx).
+   v99.3: هر راه چاپ تنظیم خودش را دارد (IVPL: اپ اندروید / آیفون / کامپیوتر؛ کلیدهای psk؟/psx؟/psy؟) و فقط هنگام چاپ با همان دستگاه اعمال می‌شود (prCal)؛
+   پیش‌نمایش و فایل PDF دست نمی‌خورد. تا دستگاه انتخاب نشود خانه‌ها نمی‌آیند (صاحب اپ با آیفون تنظیم می‌کند ولی مغازه با اندروید چاپ می‌گیرد). */
+const IVPL=[['a','اپ اندروید'],['i','آیفون'],['w','کامپیوتر']],ivPlN=p=>(IVPL.find(x=>x[0]===p)||[,''])[1];
+function ivCalPl(S){if(IS.calPl==null){const on=p=>S['psk'+p]!==100||S['psx'+p]||S['psy'+p],me=prPlat();IS.calPl=on(me)?me:(IVPL.find(x=>on(x[0]))||[''])[0]}return IS.calPl}
+function ivCalHTML(S){const P=ivCalPl(S),C=IS.cal||{},num=(id,t,v)=>`<label class="ivcalf"><small>${t}</small><span><input id="${id}" class="ltr" inputmode="decimal" autocomplete="off" placeholder="۰" value="${esc(v==null?'':String(v))}"><i>م‌م</i></span></label>`,
+    K=P&&S['psk'+P],X=P&&S['psx'+P],Y=P&&S['psy'+P],on=P&&(K!==100||X||Y),
+    mm=v=>toFa(String(Math.abs(Math.round(v*10)/10))),st=(k,d,tx)=>`<div class="ivst"><button type="button" data-act="ivN" data-k="${k}" data-d="${-d}" aria-label="کمتر">−</button><b>${tx}</b><button type="button" data-act="ivN" data-k="${k}" data-d="${d}" aria-label="بیشتر">+</button></div>`,
+    seg=`<div class="ivg ivcalp" role="radiogroup">${IVPL.map(([v,l])=>`<button type="button" role="radio" aria-checked="${P===v}" class="${P===v?'on':''}" data-act="ivCalP" data-v="${v}">${l}</button>`).join('')}</div>`,
+    hd=`<div class="ivcalh"><b>تنظیم جای چاپ روی کاغذ</b><small>وقتی چاپ وسط کاغذ نمی‌افتد یا یک طرفش جای خالی زیاد دارد</small></div><div class="ivcalq"><b>فاکتورها با چه دستگاهی چاپ می‌شوند؟</b>${seg}</div>`;
+  if(!P)return `<div class="ivcalw">${hd}<div class="ivnote">اول دستگاهی را که در مغازه با آن چاپ می‌گیرید انتخاب کنید. هر دستگاه تنظیم خودش را دارد و روی بقیه اثر نمی‌گذارد.</div></div>`;
+  return `<div class="ivcalw">${hd}
+  <div class="ivnote">سیستم چاپ برگه را کمی کوچک می‌کند و به یک گوشه می‌چسباند. یک فاکتور با ${esc(ivPlN(P))} چاپ کنید، برگه را رو به خودتان بگیرید و با خط‌کش فاصلهٔ <b>خط بیرونی قاب تا لبهٔ کاغذ</b> را از چهار طرف به میلی‌متر بنویسید.</div>
+  ${on?`<div class="ivnote ivcalon">${ic('info')} برای ${esc(ivPlN(P))} الان تنظیم دارد. فقط عددهای برگه‌ای را بنویسید که <b>بعد از این تنظیم</b> چاپ شده؛ برای شروع از اول، پایین «برگرداندن به حالت اول» را بزنید.</div>`:''}
   <div class="ivcalg">${num('ivcT','بالا',C.t)}${num('ivcB','پایین',C.b)}${num('ivcR','راست',C.r)}${num('ivcL','چپ',C.l)}</div>
   <button type="button" class="ivcalgo" data-act="ivCal">${ic('check')}<span>وسط‌چین کن</span></button>
   ${IS.calMsg?`<div class="ivcalm${IS.calErr?' bad':''}">${IS.calMsg}</div>`:''}
-  ${ivRow('جابه‌جایی افقی','هر قدم نیم میلی‌متر',st('psx',.5,S.psx?mm(S.psx)+' <small>م‌م به '+(S.psx>0?'راست':'چپ')+'</small>':'صفر'))}
-  ${ivRow('جابه‌جایی عمودی','',st('psy',.5,S.psy?mm(S.psy)+' <small>م‌م به '+(S.psy>0?'پایین':'بالا')+'</small>':'صفر'))}
-  ${ivRow('اندازهٔ چاپ','بزرگ‌تر از ۱۰۰ = برگه بزرگ‌تر چاپ می‌شود',st('psk',.5,toFa(String(S.psk))+' <small>٪</small>'))}
-  ${on?`<button type="button" class="ivcal0" data-act="ivCal0">${ic('undo')}<span>برگرداندن جای چاپ به حالت اول</span></button>`:''}
-  <div class="ivnote">در پیش‌نمایش، برگه همان‌قدر جابه‌جا دیده می‌شود؛ روی کاغذ وسط می‌افتد. اگر حاشیه‌ها هنوز زیاد بود، در پنجرهٔ چاپ گوشی یا چاپگر اندازهٔ کاغذ را همان کاغذ خودتان و «اندازهٔ واقعی / ۱۰۰٪» بگذارید؛ برنامه نمی‌تواند از جایی که چاپگر چاپ نمی‌کند بیرون بزند.</div></div>`}
-ACT.ivCal=()=>{if(!IS||IS.p==='stm')return;const g=id=>{const e=$(id),v=e?decIn(e.value):'';return v===''?NaN:parseFloat(v)},M={t:g('ivcT'),b:g('ivcB'),r:g('ivcR'),l:g('ivcL')},S=IS.W[IS.p],R=invCalFit(S,M);IS.cal=M;
+  ${ivRow('جابه‌جایی افقی','هر قدم نیم میلی‌متر',st('psx'+P,.5,X?mm(X)+' <small>م‌م به '+(X>0?'راست':'چپ')+'</small>':'صفر'))}
+  ${ivRow('جابه‌جایی عمودی','',st('psy'+P,.5,Y?mm(Y)+' <small>م‌م به '+(Y>0?'پایین':'بالا')+'</small>':'صفر'))}
+  ${ivRow('اندازهٔ چاپ','بزرگ‌تر از ۱۰۰ = برگه بزرگ‌تر چاپ می‌شود',st('psk'+P,.5,toFa(String(K))+' <small>٪</small>'))}
+  ${on?`<button type="button" class="ivcal0" data-act="ivCal0">${ic('undo')}<span>برگرداندن جای چاپ ${esc(ivPlN(P))} به حالت اول</span></button>`:''}
+  <div class="ivnote">این تنظیم فقط هنگام چاپ با ${esc(ivPlN(P))} اعمال می‌شود؛ پیش‌نمایش بالا${P==='i'?' دست نمی‌خورد، ولی روی آیفون چاپ از خود فایل PDF است و فایلی که از آیفون می‌فرستید هم همین‌قدر جابه‌جا می‌شود':' و فایل PDFی که برای مشتری می‌فرستید دست نمی‌خورد'}. برنامه نمی‌تواند از جایی که چاپگر چاپ نمی‌کند بیرون بزند؛ اگر چاپگر یک نوار از کنار کاغذ را چاپ نمی‌کند، حاشیه از آن کمتر نمی‌شود.</div></div>`}
+ACT.ivCalP=d=>{if(!IS||IS.p==='stm')return;IS.calPl=d.v;IS.cal={};IS.calMsg='';IS.calErr=0;ivRe({noPrev:1})};
+ACT.ivCal=()=>{if(!IS||IS.p==='stm')return;const P=IS.calPl;if(!P)return;const g=id=>{const e=$(id),v=e?decIn(e.value):'';return v===''?NaN:parseFloat(v)},M={t:g('ivcT'),b:g('ivcB'),r:g('ivcR'),l:g('ivcL')},S=IS.W[IS.p],R=invCalFit(S,M,P);IS.cal=M;
   if(R.err){IS.calErr=1;IS.calMsg=esc(R.err);ivRe({noPrev:1});return}
-  S.psk=R.psk;S.psx=R.psx;S.psy=R.psy;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calErr=0;const f=v=>toFa(String(Math.abs(v)));
-  IS.calMsg=`${ic('check')} تنظیم شد · چاپگر شما برگه را <b>${toFa(String(R.sc))}٪</b> چاپ می‌کند. از این به بعد چاپ ${R.psx?f(R.psx)+' میلی‌متر به '+(R.psx>0?'راست':'چپ'):''}${R.psx&&R.psy?' و ':''}${R.psy?f(R.psy)+' میلی‌متر به '+(R.psy>0?'پایین':'بالا'):''}${R.psx||R.psy?' می‌رود':'جابه‌جا نمی‌شود'}${R.psk!==100?'، اندازه '+toFa(String(R.psk))+'٪':''}. حاشیهٔ راست و چپ حدود <b>${f(R.mx)}</b> و بالا و پایین حدود <b>${f(R.my)}</b> میلی‌متر می‌شود. «ذخیره» را بزنید و یک برگه چاپ کنید؛ اگر هنوز کمی جابه‌جا بود دوباره اندازه بگیرید.`;ivRe()};
-ACT.ivCal0=()=>{if(!IS||IS.p==='stm')return;const S=IS.W[IS.p];S.psk=100;S.psx=0;S.psy=0;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calMsg='';IS.calErr=0;ivRe()};
+  S['psk'+P]=R.psk;S['psx'+P]=R.psx;S['psy'+P]=R.psy;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calErr=0;const f=v=>toFa(String(Math.abs(v)));
+  IS.calMsg=`${ic('check')} برای چاپ با <b>${esc(ivPlN(P))}</b> تنظیم شد · سیستم چاپ برگه را <b>${toFa(String(R.sc))}٪</b> چاپ می‌کند. از این به بعد چاپ ${R.psx?f(R.psx)+' میلی‌متر به '+(R.psx>0?'راست':'چپ'):''}${R.psx&&R.psy?' و ':''}${R.psy?f(R.psy)+' میلی‌متر به '+(R.psy>0?'پایین':'بالا'):''}${R.psx||R.psy?' می‌رود':'جابه‌جا نمی‌شود'}${R.psk!==100?'، اندازه '+toFa(String(R.psk))+'٪':''}. حاشیهٔ راست و چپ حدود <b>${f(R.mx)}</b> و بالا و پایین حدود <b>${f(R.my)}</b> میلی‌متر می‌شود. «ذخیره» را بزنید و یک برگه چاپ کنید؛ اگر هنوز کمی جابه‌جا بود دوباره اندازه بگیرید.`;ivRe({noPrev:1})};
+ACT.ivCal0=()=>{if(!IS||IS.p==='stm')return;const P=IS.calPl;if(!P)return;const S=IS.W[IS.p];S['psk'+P]=100;S['psx'+P]=0;S['psy'+P]=0;IS.W[IS.p]=ivCl(S);IS.cal={};IS.calMsg='';IS.calErr=0;ivRe({noPrev:1})};
 function ivSecHTML(){if(IS.p==='stm')return stmSecHTML();const S=IS.W[IS.p],k=IS.sec,pn=INVP.find(x=>x[0]===IS.p)[1];let h='';
   if(k==='paper')h=ivPick('paper','اندازه کاغذ','«۲۱ × ۱۴» برای برگه‌های دسته‌فاکتور است (کمی کوتاه‌تر از A5). A4 افقی همان برگه است، بزرگ‌تر. در «A4 عمودی» دو برگه روی یک کاغذ می‌آید: نسخه مشتری بالا و نسخه فروشگاه پایین',[['a5','A5 افقی'],['b14','۲۱ × ۱۴ سانت'],['a4','A4 افقی'],['a42','A4 · دو نسخه']])
     +(S.paper==='a42'?'':ivSw('copy','نسخه فروشگاه','یک برگه دوم با همان محتوا و برچسب «نسخه فروشگاه»'))
