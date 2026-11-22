@@ -4995,3 +4995,8 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 #z3bar button{min-width:62px;height:40px;padding:0 12px;border:0;border-radius:12px;background:var(--blu2);color:var(--blu);font:inherit;font-size:20px;font-weight:900;letter-spacing:1.5px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #z3bar button:active{background:var(--blu);color:#fff}
 @media print{#z3bar{display:none!important}}
+/* v99.0: ردیف «بانک فعلی» دو دکمه دارد (مبلغ · برداشتن)؛ خط وضعیت پنجره منابع وقتی مانده می‌ماند */
+.pxub{flex:none;display:inline-flex;align-items:center;gap:6px}
+.pxux.am{background:color-mix(in srgb,var(--blu) 11%,var(--card));color:var(--blu)}
+.psleft.rm{color:var(--ppv,var(--warn))}
+@media (max-width:380px){.pxub{gap:4px}.pxub .pxux{padding:0 8px;font-size:12px}}
