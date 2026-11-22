@@ -5111,3 +5111,12 @@ html[data-theme="dark"] .ptm.lt .ptm-bl{background:var(--bg)}html[data-theme="da
  :root:not([data-theme="light"]) .ptm.lt .ptm-bl{background:var(--bg)}:root:not([data-theme="light"]) .ptm.lt .ptm-br .tx small em{color:#9db8ff}}
 /* v100.4 نام کامل بانک/شخص در سرتیتر دستگاه (حداکثر دو خط، بدون «…») */
 .ptm-hd .tx b{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.3}
+/* v100.8 فهرست اشخاص/بانک‌ها روی دستگاه وقتی کیبورد باز است (html.kbo): سرِ چاپگر و سرتیتر دستگاه کنار می‌روند تا جستجو و فهرست همه جا را بگیرند */
+html.kbo .ptm.pbl{margin:2px 6px 4px;animation:none}
+html.kbo .ptm.pbl .ptm-top,html.kbo .ptm.pbl .ptm-hd,html.kbo .ptm.pbl .ptm-pap{display:none}
+html.kbo .ptm.pbl .ptm-body{margin-top:0;padding:7px 8px 8px;border-radius:20px}
+html.kbo .ptm.pbl .ptm-sq{margin-bottom:6px}
+html.kbo .ckw.cpos .sh-h .shsub{display:none}
+.ptm.pbl:has(.ptm-sq input:focus){margin:2px 6px 4px;animation:none}
+.ptm.pbl:has(.ptm-sq input:focus) :is(.ptm-top,.ptm-hd,.ptm-pap){display:none}
+.ptm.pbl:has(.ptm-sq input:focus) .ptm-body{margin-top:0;padding:7px 8px 8px;border-radius:20px}
