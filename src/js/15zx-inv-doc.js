@@ -71,6 +71,12 @@ function invCalFit(S,M,pl){pl=pl||'a';const A4=S.paper==='a4',PW=A4?297:210,PH=S
   /* v99.4: کشیدگی عرض/ارتفاعی که کاربر گذاشته می‌ماند؛ اندازه مشترک تا جایی بالا می‌رود که هر دو جهت جا شود */
   const k=Math.min(1.15,Math.max(.85,Math.min((PW-2*ax)/sx/(PW-2*ins)-ew,(PH-2*ay)/sy/(PH-2*ins)-eh))),cl=(v,m)=>Math.max(-m,Math.min(m,v)),r1=v=>Math.round(v*10)/10;
   return {psk:r1(k*100),psx:r1(cl((PW/2-ox)/sx-PW/2,25)),psy:r1(cl((PH/2-oy)/sy-PH/2,25)),mx:r1((PW-(PW-2*ins)*(k+ew)*sx)/2),my:r1((PH-(PH-2*ins)*(k+eh)*sy)/2),sc:Math.round((sx+sy)/2*100)}}
+/* v99.8 ردیف‌های برگه فاکتور (div.r / div.a که فقط span دارند) → جدول واقعی؛ ویژگی‌ها (class, style) روی table/td می‌مانند */
+function invTbl(h){if(typeof DOMParser==='undefined')return h;const D=new DOMParser().parseFromString('<!doctype html><html><body><div id="ivtb">'+h+'</div></body></html>','text/html'),R=D.getElementById('ivtb');
+  R.querySelectorAll('div.r,div.a').forEach(d=>{const ch=[...d.children];if(ch.some(c=>c.tagName!=='SPAN'))return;const t=D.createElement('table'),tb=D.createElement('tbody'),tr=D.createElement('tr');for(const at of d.attributes)t.setAttribute(at.name,at.value);
+    ch.forEach(sp=>{const td=D.createElement('td');for(const at of sp.attributes)td.setAttribute(at.name,at.value);while(sp.firstChild)td.appendChild(sp.firstChild);tr.appendChild(td)});
+    if(!ch.length){const td=D.createElement('td');td.className='k';tr.appendChild(td)}tb.appendChild(tr);t.appendChild(tb);d.replaceWith(t)});
+  return R.innerHTML}
 /* v99.5 سبکی که هنگام چاپ مستقیم یک برگه آماده (section.sht) به آن اضافه می‌شود: جای چاپ همان دستگاه (prCal) و برای اندروید
    صفحه ۲۱۰×۱۴۷ (مثل pdfPrintAnd) تا سیستم چاپ خودش برگه را وسط کاغذ بنشاند. html = خود برگه؛ '' یعنی چیزی اضافه نمی‌شود */
 function prShtCSS(html,pl){const Q=pageSpec(html),C=prCal(Q.mmW,Q.mmH,pl),PB=pl==='a'&&!Q.a4&&Q.land&&Math.abs(Q.mmW-210)<1&&Q.mmH>=120&&Q.mmH<=148.5?147:0;if(!C&&!PB)return '';
@@ -295,6 +301,9 @@ u,em,i,s{text-decoration:none;font-style:normal}
 .a .av em{display:inline-block;width:${SB}mm;vertical-align:middle}.a .av b{display:inline-block;vertical-align:middle}.a .av em.st{width:auto}`;
   const A4=S.paper==='a4',K4=297/210,PW=A4?297:210,PH=S.paper==='a5'?148:S.paper==='b14'?140:A4?210:297;
   /* v99.3: «تنظیم جای چاپ» دیگر داخل خود برگه نیست (پیش‌نمایش و فایل PDF دست نمی‌خورد)؛ فقط هنگام چاپ روی همان دستگاه اعمال می‌شود (prCal). */
+  /* v99.8 (عکس پیش‌نمایش چاپ اندروید صاحب اپ: باز خانه‌های بعد از «شرح» و بعد از عنوان «حساب مشتری» یک ردیف پایین‌تر افتاده بودند، یعنی موتور چاپ آن گوشی
+     display:table روی div/span را هم مثل جدول نمی‌چیند). ردیف‌ها حالا جدول واقعی HTML هستند (table > tr > td) که هر موتوری درست می‌چیند؛ همان کلاس‌ها و اندازه‌ها. */
+  css=css.replace(/>span/g,' td');body=invTbl(body);
   const KT=A4?K4:1;
   if(KT!==1){css=invScale('<style>'+css+'</style>',KT).slice(7,-8);body=invScale(body,KT)}
   return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(invTitle(t))} · ${esc(cuName(c))}</title><style>@page{size:${S.paper==='a5'?'A5 landscape':S.paper==='b14'?'210mm 140mm':A4?'A4 landscape':'A4'};margin:0mm}
