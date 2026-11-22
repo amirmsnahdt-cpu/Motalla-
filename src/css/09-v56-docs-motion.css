@@ -5017,3 +5017,4 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 .ivcalq{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px}.ivcalq>b{font-size:14px;font-weight:800;color:var(--ink)}.ivcalq .ivcalp{width:100%}.ivcalq .ivcalp>button{flex:1 1 0;min-width:0;white-space:nowrap}
 .ivnote.ivcalon{background:color-mix(in srgb,var(--blu) 8%,transparent);border-radius:14px;padding:10px 12px;color:var(--ink)}.ivnote.ivcalon svg{width:15px;height:15px;vertical-align:-3px;color:var(--blu)}
 #view .ivcalf span>input{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;height:100%;min-height:0;margin:0;padding:0!important;-webkit-appearance:none;appearance:none}
+.ivcalw .ivnote.ivcalon+.ivnote.ivcalon{margin-top:8px}

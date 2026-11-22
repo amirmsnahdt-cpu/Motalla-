@@ -73,7 +73,7 @@ async function pdfMake(html,title,keep){
     const PP=imgs.map(o=>{if(SHS.length)return{...o,iw:IW,ih:IH,x:MX,k:1};let iw=IW,ih=IW*o.hp/W;if(ih>IH){const k=IH/ih;iw*=k;ih=IH}return{...o,iw,ih,x:MX+(IW-iw)/2,k:iw/IW}});
     /* v99.3 «تنظیم جای چاپ» برای آیفون: آنجا چاپ از خود همین فایل PDF است، پس عکس صفحه داخل صفحه PDF کوچک/بزرگ و جابه‌جا می‌شود (اندازه صفحه همان کاغذ می‌ماند).
        اپ اندروید فایل PDF را دست نمی‌زند (pdfPrintAnd فقط هنگام چاپ اعمال می‌کند). */
-    const CI=isIOS()&&!window.AndroidBridge?prCal(mmW,mmH,'i'):null;if(CI)PP.forEach(o=>{const k=CI.k;o.x=PW*(1-k)/2+o.x*k+pt(CI.x);o.y=PH*(1-k)/2+MY*k+pt(CI.y);o.iw*=k;o.ih*=k});
+    const CI=isIOS()&&!window.AndroidBridge?prCal(mmW,mmH,'i'):null;if(CI)PP.forEach(o=>{const kx=CI.kx,ky=CI.ky;o.x=PW*(1-kx)/2+o.x*kx+pt(CI.x);o.y=PH*(1-ky)/2+MY*ky+pt(CI.y);o.iw*=kx;o.ih*=ky});
     const blob=pdfBuild(PP,PW,PH,MX,MY);
     const fl=new File([blob],String(title||'motalla').replace(/[\\/:*?"<>|]/g,'-').replace(/[۰-۹]/g,d=>d.charCodeAt(0)-1776).replace(/[٠-٩]/g,d=>d.charCodeAt(0)-1632)/* v61.87: عددهای نام فایل ارسالی انگلیسی */+'.pdf',{type:'application/pdf'});
     /* keep: عکس صفحه‌ها هم برگردانده می‌شود (چاپ اندروید همان صفحه‌ها را چاپ می‌کند تا دقیقاً همان PDF باشد) */
@@ -117,8 +117,15 @@ function pdfPrintAnd(){const fl=PDFK.file,B=window.AndroidBridge;if(!fl||!fl._pa
   /* v99.3 (دو عکس صاحب اپ از فاکتورهای چاپ‌شده: «همه را این‌جوری چاپ می‌کند»): سیستم چاپ اندروید حاشیه چاپگر را به صفحه می‌دهد، صفحه را به همان اندازه کوچک می‌کند و از گوشه می‌چیند
      (شبیه‌سازی با حاشیه ۱۱ و ۳ میلی‌متر دقیقاً همان برگه را داد). «تنظیم جای چاپ» همین‌جا، فقط روی برگه‌ای که به چاپگر می‌رود، اعمال می‌شود: عکس صفحه k برابر و (x,y) میلی‌متر جابه‌جا
      داخل همان صفحه؛ بدون تنظیم، همان HTML قبلی. */
-  const C=prCal(Q.mmW,Q.mmH,'a'),k=C?C.k:1,n2=v=>(+v).toFixed(2),pz=`@page{size:${Q.cz?Q.mmW+'mm '+Q.mmH+'mm':(Q.a4?'A4':'A5')+(Q.land?' landscape':'')};margin:0}html,body{margin:0;padding:0;background:#fff}`;
-  const css=C?`${pz}.p{width:${Q.mmW}mm;height:${Q.mmH}mm;overflow:hidden;page-break-after:always;break-after:page}.p:last-child{page-break-after:auto;break-after:auto}.q{width:${n2(Q.mmW*k)}mm;height:${n2(Q.mmH*k)}mm;margin:${n2(Q.mmH*(1-k)/2+C.y)}mm 0 0 ${n2(Q.mmW*(1-k)/2+C.x)}mm;box-sizing:border-box;padding:${n2(Q.mv*k)}mm ${n2(Q.mh*k)}mm;overflow:hidden}img{display:block}`
+  /* v99.4 (صاحب اپ با برگه ۲۱×۱۴ چاپ گرفت و برگه «درست‌تر» شد: از روی عکس، وسط کاغذ و ۹۶٪؛ همان چاپگر برگه A5 را ۹۴٪ و چسبیده به گوشه چاپ می‌کرد):
+     وقتی اندازه صفحه برگه دقیقاً همان کاغذ است، سیستم چاپ حاشیه چاپگر را داخل صفحه می‌برد؛ وقتی کمی فرق دارد، خودش صفحه را وسط کاغذ می‌نشاند.
+     پس برگه A5 افقی هم مثل ۲۱×۱۴ با اندازه میلی‌متری و یک میلی‌متر کوتاه‌تر از کاغذ فرستاده می‌شود (چیزی از قاب بریده نمی‌شود).
+     kx/ky = عرض و ارتفاع جدا (تنظیم «کشیدن»). */
+  /* PB = قد صفحه‌ای که به چاپ می‌رود برای برگه‌های افقیِ ۲۱ سانتی (A5 و ۲۱×۱۴): ۱۴۷ میلی‌متر = یک میلی‌متر کمتر از کاغذ A5. برگه وسط همین صفحه می‌نشیند
+     (۲۱×۱۴: ۳٫۵ میلی‌متر بالا و پایین، همان جایی که سیستم چاپ خودش می‌گذاشت؛ A5: نیم میلی‌متر از حاشیه سفید بریده می‌شود) و اگر «ارتفاع چاپ» بیشتر شود جا برای بلند شدن دارد. */
+  const C=prCal(Q.mmW,Q.mmH,'a'),kx=C?C.kx:1,ky=C?C.ky:1,n2=v=>(+v).toFixed(2),PB=!Q.a4&&Q.land&&Math.abs(Q.mmW-210)<1&&Q.mmH>=120&&Q.mmH<=148.5?147:0,HB=PB||Q.mmH,
+    pz=`@page{size:${Q.cz||PB?Q.mmW+'mm '+n2(HB)+'mm':(Q.a4?'A4':'A5')+(Q.land?' landscape':'')};margin:0}html,body{margin:0;padding:0;background:#fff}`;
+  const css=C||PB?`${pz}.p{width:${Q.mmW}mm;height:${n2(HB)}mm;overflow:hidden;page-break-after:always;break-after:page}.p:last-child{page-break-after:auto;break-after:auto}.q{width:${n2(Q.mmW*kx)}mm;height:${n2(Q.mmH*ky)}mm;margin:${n2((HB-Q.mmH*ky)/2+(C?C.y:0))}mm 0 0 ${n2(Q.mmW*(1-kx)/2+(C?C.x:0))}mm;box-sizing:border-box;padding:${n2(Q.mv*ky)}mm ${n2(Q.mh*kx)}mm;overflow:hidden}img{display:block}`
     :`${pz}.p{width:${Q.mmW}mm;height:${Q.mmH}mm;box-sizing:border-box;padding:${Q.mv}mm ${Q.mh}mm;overflow:hidden;page-break-after:always;break-after:page}.p:last-child{page-break-after:auto;break-after:auto}img{display:block}`;
-  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${pdfEsc(fl.name.replace(/\.pdf$/,''))}</title><style>${css}</style></head><body>${fl._pages.map(p=>{const im=`<img src="${p.j}" style="width:${n2(p.wmm*k)}mm;height:${n2(p.hmm*k)}mm;margin:0 auto">`;return `<div class="p">${C?`<div class="q">${im}</div>`:im}</div>`}).join('')}</body></html>`;
+  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${pdfEsc(fl.name.replace(/\.pdf$/,''))}</title><style>${css}</style></head><body>${fl._pages.map(p=>{const im=`<img src="${p.j}" style="width:${n2(p.wmm*kx)}mm;height:${n2(p.hmm*ky)}mm;margin:0 auto">`;return `<div class="p">${C||PB?`<div class="q">${im}</div>`:im}</div>`}).join('')}</body></html>`;
   toast('در حال آماده‌سازی چاپ…');try{B.printHtml(html,fl.name.replace(/\.pdf$/,''))}catch(e){toast('چاپ در این گوشی ممکن نشد',true)}return true}
