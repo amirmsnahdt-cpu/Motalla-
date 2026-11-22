@@ -402,6 +402,14 @@ public class MainActivity extends Activity {
         return false;
     }
 
+    private DirectPrint dprint;
+    private synchronized DirectPrint directPrint() {
+        if (dprint == null) dprint = new DirectPrint(this, (kind, json) -> ui.post(() -> {
+            if (web != null) web.evaluateJavascript("window.__prn&&window.__prn(" + JSONObject.quote(kind) + "," + json + ")", null);
+        }));
+        return dprint;
+    }
+
     /** پل جاوااسکریپت ← اندروید */
     private class Bridge {
         /** رسیدهای رسیده از «اشتراک‌گذاری» برنامه‌های دیگر (JSON آرایه data URL)؛ با هر بار گرفتن خالی می‌شود */
@@ -595,6 +603,19 @@ public class MainActivity extends Activity {
                 pv.loadDataWithBaseURL(serverUrl, html, "text/html", "utf-8", null);
             });
         }
+
+        /** v100.2 چاپ مستقیم روی چاپگر وای‌فای (DirectPrint): پیدا کردن، پرسیدن توانایی‌ها، فرستادن. نتیجه‌ها: window.__prn(kind, data) */
+        @JavascriptInterface
+        public boolean prnOk() { return true; }
+
+        @JavascriptInterface
+        public void prnFind(final int ms) { runOnUiThread(() -> directPrint().find(ms)); }
+
+        @JavascriptInterface
+        public void prnInfo(String host, int port, String path) { directPrint().info(host, port, path); }
+
+        @JavascriptInterface
+        public boolean prnPrint(String json) { return directPrint().print(json); }
 
         /** شماره نسخه اپ اندروید (برای اینکه صفحه وب بداند این پوسته چه امکاناتی دارد) */
         @JavascriptInterface
