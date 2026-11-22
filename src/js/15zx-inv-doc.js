@@ -94,7 +94,16 @@ function prCalS(S,mmW,mmH,pl){if(!S||S.paper==='a42')return null;const A4=S.pape
   const kM=(D,P)=>(P-2*PRM)/(D-2*ins),kx0=Math.max(.8,Math.min(1.25,k+(+S['psw'+pl]||0)/100)),ky0=Math.max(.8,Math.min(1.25,k+(+S['psh'+pl]||0)/100)),kx=Math.min(kx0,kM(PW,PW)),ky=Math.min(ky0,kM(PH,PG));
   const bx=Math.max(0,PW/2-(PW/2-ins)*kx-sn*PH/2*ky-PRM),by=Math.max(0,PG/2-(PH/2-ins)*ky-sn*PW/2*kx-PRM),x0=+S['psx'+pl]||0,y0=+S['psy'+pl]||0,x=Math.max(-bx,Math.min(bx,x0)),y=Math.max(-by,Math.min(by,y0));
   const cl=kx!==kx0||ky!==ky0||Math.abs(x-x0)>.05||Math.abs(y-y0)>.05;return kx!==1||ky!==1||x||y||r?{kx,ky,x,y,r,cl,bx:Math.round(bx*10)/10,by:Math.round(by*10)/10}:null}
-function prCal(mmW,mmH,pl){let S;try{S=invCfg('sale')}catch(e){return null}return prCalS(S,mmW,mmH,pl||prPlat())}
+/* v100.1 (صاحب اپ: «هر چه ادیت می‌کنم در اندروید نمی‌شود؛ یک قسمت در خود برنامه که از همان‌جا درست کنم و از همان‌جا چاپ بگیرم»):
+   تنظیمی که از صفحهٔ چاپ (pvAdj، 15zz-xprint) گذاشته می‌شود اول روی خود همین گوشی می‌ماند (LS m_prcal: {pl:{v:[psk,psw,psh,psx,psy,psr],b}})،
+   پس بدون همگام‌سازی و بدون دسترسی مدیر هم همان لحظه روی چاپ همین گوشی اثر دارد. b = عددهای مشترک همان راه در لحظهٔ ذخیره؛
+   اگر بعداً تنظیم مشترک (صفحهٔ تنظیمات فاکتور، هر دستگاهی) عوض شود، همان تازه‌تر است و تنظیم این گوشی کنار می‌رود. */
+const PRK=['psk','psw','psh','psx','psy','psr'],prK0=k=>k==='psk'?100:0;
+function prLoc(){try{const o=JSON.parse(LS.getItem('m_prcal')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return {}}}
+function prLocSet(o){try{if(Object.keys(o).length)LS.setItem('m_prcal',JSON.stringify(o));else LS.removeItem('m_prcal')}catch(e){}}
+const prShV=(S,pl)=>PRK.map(k=>{const v=+S[k+pl];return isFinite(v)&&S[k+pl]!=null?v:prK0(k)}).join(',');
+function prEff(S,pl){const L=prLoc()[pl];if(!S||!L||!Array.isArray(L.v)||L.b!==prShV(S,pl))return S;const o={...S};PRK.forEach((k,i)=>{const v=+L.v[i];o[k+pl]=isFinite(v)?v:prK0(k)});return o}
+function prCal(mmW,mmH,pl){let S;try{S=invCfg('sale')}catch(e){return null}pl=pl||prPlat();return prCalS(prEff(S,pl),mmW,mmH,pl)}
 function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...INVD,...(INVT[PF]||{}),...o.S}):invCfg(PF);
   const nl=v=>String(v).replace(/ · (طلبکاریم|بدهکاریم)$/,''),D=dates(t.date),its=t.items||[],xs=t.xr||[],pays=t.pays||[],hMz=+t.mz||(t.rate?Math.round(t.rate*MZK):0),mzOf2=x=>+x.mz||hMz;
   const P=cuBalBefore(c,t),d=txD(t),dX=d.x||{},KO=Object.keys(XA),ko=k=>{const i=KO.indexOf(k);return i<0?99:i};

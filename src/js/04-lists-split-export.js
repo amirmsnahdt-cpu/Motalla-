@@ -106,11 +106,11 @@ function openText(){const t=txtGen?txtGen():withCtx(txt),ln=t.split('\n').length
    ساختن برگه (h0 می‌تواند متن، تابع یا Promise باشد) بعد از نمایش پنجره انجام می‌شود و برگه بعد از بار شدن فونت‌ها و عکس‌ها
    با محو شدن نرم دیده می‌شود؛ تا آن موقع دکمه‌های چاپ و اشتراک غیرفعال‌اند */
 let pvSeq=0;
-function openPrint(h0){const P=$('pv'),f=$('pvf'),seq=++pvSeq;P.classList.remove('hide');P.classList.add('ld');f.classList.remove('rdy');document.body.style.overflow='hidden';
+function openPrint(h0){const P=$('pv'),f=$('pvf'),seq=++pvSeq;pvaOff();pvaBtn('');P.classList.remove('hide');P.classList.add('ld');f.classList.remove('rdy');document.body.style.overflow='hidden';
   const L=P.querySelector('.pvld');if(!L)P.querySelector('.pvw').insertAdjacentHTML('beforeend','<div class="pvld" role="status" aria-live="polite"><span class="pvsp"></span><b>در حال آماده‌سازی…</b><small>چند لحظه</small></div>');
   const fail=e=>{if(seq!==pvSeq)return;P.classList.remove('ld');toast('برگه آماده نشد؛ دوباره امتحان کنید',true);closePrint()};
   requestAnimationFrame(()=>setTimeout(async()=>{if(seq!==pvSeq)return;let html;try{html=await (typeof h0==='function'?h0():h0!=null?h0:withCtx(reportHTML))}catch(e){fail(e);return}
-    if(seq!==pvSeq||!html)return;html=String(html).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.__pv=html;
+    if(seq!==pvSeq||!html)return;html=String(html).replace(/<button class="pb"[^>]*>.*?<\/button>/,'');window.__pv=html;pvaBtn(html);
     /* v61.72: روی آیفون بعد از دیده شدن برگه، فایل PDF A5 هم ساخته می‌شود؛ دکمه‌ها تا آماده شدنش صبر می‌کنند */
     const show=()=>{if(seq!==pvSeq)return;f.classList.add('rdy');if(!pdfOn()){P.classList.remove('ld');return}
       const L2=P.querySelector('.pvld b');if(L2)L2.textContent='در حال ساخت PDF…';P.classList.add('ld2');
@@ -135,7 +135,7 @@ function pvZoomBind(f,d,W){const box=f.parentNode,H0=()=>{d.documentElement.styl
   d.addEventListener('touchend',e=>{if(pin&&e.touches.length<2){pin=null;return}},{passive:true});
   d.addEventListener('click',()=>{if(pin)return;apply(atFit?Math.min(fz*4,Math.max(fz*2,1)):fz,true)});
   addEventListener('resize',refit);f._pvOff=()=>removeEventListener('resize',refit)}
-function closePrint(){const f0=$('pvf');if(f0&&f0._pvOff){f0._pvOff();f0._pvOff=null}if(f0){f0.style.width='';f0.style.height=''}pvSeq++;$('pv').classList.add('hide');$('pv').classList.remove('ld');$('pvf').srcdoc='';document.body.style.overflow=''}
+function closePrint(){pvaOff();const f0=$('pvf');if(f0&&f0._pvOff){f0._pvOff();f0._pvOff=null}if(f0){f0.style.width='';f0.style.height=''}pvSeq++;$('pv').classList.add('hide');$('pv').classList.remove('ld');$('pvf').srcdoc='';document.body.style.overflow=''}
 /* کپی با پشتیبان برای وب‌ویوهایی که clipboard ندارند */
 /* v63.9 (خواسته صاحب اپ): بازخورد کپی در همه بخش‌ها — دکمه‌ای که زده شد سبز می‌شود و «✓ کپی شد» نشان می‌دهد؛
    کپی از کشیدن ردیف (دکمه پشت ردیف) خود ردیف را یک لحظه سبز می‌کند */

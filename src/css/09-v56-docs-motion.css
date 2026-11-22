@@ -5025,3 +5025,23 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 /* v100.0 جابه‌جایی نوشتنی + دکمهٔ جهت */
 .ivsts{gap:4px}.ivsts .ivsti{min-width:0}.ivsts .ivsti input{width:52px}.ivsgn{width:auto!important;min-width:48px;height:32px!important;padding:0 9px!important;border-radius:10px!important;font-size:12.5px!important;font-weight:800!important;color:var(--blu)!important;background:color-mix(in srgb,var(--blu) 12%,var(--card))!important;box-shadow:none!important;white-space:nowrap}
 .ivsts .ivsti input{width:46px}.ivsgn{min-width:44px;padding:0 7px!important}
+/* v100.1 «تنظیم چاپ» داخل صفحهٔ چاپ (15zz-xprint) */
+#pv .pva{display:none;order:2;background:var(--card);border-top:1px solid var(--line);padding:10px 12px 6px;max-height:52dvh;overflow:auto;overscroll-behavior:contain}
+#pv.adj .pva{display:block;animation:pvaUp .26s cubic-bezier(.2,.9,.25,1)}@keyframes pvaUp{from{opacity:0;transform:translateY(14px)}}
+#pv .pvah{display:flex;align-items:center;gap:8px;margin-bottom:8px}#pv .pvah>div{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}
+#pv .pvah b{font-size:15px;font-weight:900}#pv .pvah small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pv .pvag{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#pv .pvac{background:var(--bg);border-radius:16px;padding:7px 8px 8px;min-width:0;display:flex;flex-direction:column;gap:5px}
+#pv .pvat{display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:22px}#pv .pvat small{font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pv .pvsg{border:0;border-radius:999px;background:var(--blu);color:#fff;font:inherit;font-size:11px;font-weight:800;padding:2px 9px;white-space:nowrap;flex:none}
+#pv .pvar{display:flex;align-items:center;gap:5px}
+#pv .pvar>button{flex:none;width:36px;height:36px;border:0;border-radius:12px;background:var(--blu2);color:var(--blu);font:inherit;font-size:19px;font-weight:900;line-height:1;display:grid;place-items:center;padding:0}
+#pv .pvar label{flex:1;min-width:0;display:flex;align-items:center;gap:3px;height:36px;padding:0 8px;border-radius:12px;background:var(--card);box-shadow:var(--bfr)}
+#pv .pvar label:focus-within{box-shadow:var(--bfr2)}
+#pv .pvar input{flex:1;min-width:0;width:100%;border:0!important;background:transparent!important;box-shadow:none!important;padding:0!important;font:inherit;font-size:16px;font-weight:900;text-align:center;color:var(--ink);outline:0}
+#pv .pvar i{font-style:normal;font-size:11px;color:var(--mut);flex:none}
+#pv .pvaz{justify-content:center}#pv .pva0{border:0;border-radius:14px;background:transparent;color:var(--red);font:inherit;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;height:100%;min-height:44px}
+#pv .pva0 .i{width:17px;height:17px}
+#pv .pvan{display:flex;align-items:flex-start;gap:6px;font-size:11.5px;line-height:1.6;color:var(--mut);padding:8px 2px 2px}#pv .pvan .i{width:15px;height:15px;flex:none;margin-top:2px}#pv .pvan.bad{color:var(--red)}
+#pv .pvh .btn.pvadb.on{background:var(--blu)!important;color:#fff!important}
+@media (max-height:720px){#pv .pva{padding:8px 10px 4px}#pv .pvah{margin-bottom:6px}#pv .pvah b{font-size:14px}#pv .pvag{gap:6px}#pv .pvac{padding:5px 7px 6px;gap:3px;border-radius:14px}#pv .pvar>button,#pv .pvar label{height:32px}#pv .pvar>button{width:32px}#pv .pvar input{font-size:15px}#pv .pva0{min-height:38px}}

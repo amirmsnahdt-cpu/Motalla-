@@ -24,7 +24,8 @@ const IVCH={w:'وزن کالا، تعداد سکه و ارز',ay:'عیار طل�
    v99.3: هر راه چاپ تنظیم خودش را دارد (IVPL: اپ اندروید / آیفون / کامپیوتر؛ کلیدهای psk؟/psx؟/psy؟) و فقط هنگام چاپ با همان دستگاه اعمال می‌شود (prCal)؛
    پیش‌نمایش و فایل PDF دست نمی‌خورد. v99.4: «عرض چاپ» و «ارتفاع چاپ» جدا (psw؟/psh؟ روی اندازه مشترک psk؟ می‌نشینند؛ نمایش = جمع). تا دستگاه انتخاب نشود خانه‌ها نمی‌آیند (صاحب اپ با آیفون تنظیم می‌کند ولی مغازه با اندروید چاپ می‌گیرد). */
 const IVPL=[['a','اپ اندروید'],['i','آیفون'],['w','کامپیوتر']],ivPlN=p=>(IVPL.find(x=>x[0]===p)||[,''])[1];
-function ivCalPl(S){if(IS.calPl==null){const on=p=>S['psk'+p]!==100||S['psx'+p]||S['psy'+p],me=prPlat();IS.calPl=on(me)?me:(IVPL.find(x=>on(x[0]))||[''])[0]}return IS.calPl}
+/* v100.1: در اپ اندروید همیشه «اپ اندروید» انتخاب است (قبلاً اگر راه آیفون عدد داشت همان انتخاب می‌شد و هر چه روی گوشی اندروید تنظیم می‌شد به آیفون می‌رفت) */
+function ivCalPl(S){if(IS.calPl==null){const on=p=>PRK.some(k=>(+S[k+p]||prK0(k))!==prK0(k)),me=prPlat();IS.calPl=me!=='w'||on(me)?me:(IVPL.find(x=>on(x[0]))||[''])[0]}return IS.calPl}
 function ivCalHTML(S){const P=ivCalPl(S),C=IS.cal||{},num=(id,t,v)=>`<label class="ivcalf"><small>${t}</small><span><input id="${id}" class="ltr" inputmode="decimal" autocomplete="off" placeholder="۰" value="${esc(v==null?'':String(v))}"><i>م‌م</i></span></label>`,
     K=P&&S['psk'+P],X=P&&S['psx'+P],Y=P&&S['psy'+P],EW=P&&(S['psw'+P]||0),EH=P&&(S['psh'+P]||0),RT=P&&(S['psr'+P]||0),on=P&&(K!==100||X||Y||EW||EH||RT),
     mm=v=>toFa(String(Math.abs(Math.round(v*10)/10))),st=(k,d,tx)=>`<div class="ivst"><button type="button" data-act="ivN" data-k="${k}" data-d="${-d}" aria-label="کمتر">−</button><b>${tx}</b><button type="button" data-act="ivN" data-k="${k}" data-d="${d}" aria-label="بیشتر">+</button></div>`,
@@ -159,7 +160,7 @@ ACT.ivSave=()=>{if(!IS||!isAdmin())return;if(!ivDirty()){toast('چیزی عوض 
   /* بخش مشترک جدا هم نوشته می‌شود (all)؛ در هر قالب هم می‌ماند تا گوشی‌ای که هنوز نسخه قبلی برنامه را دارد همان را بخواند */
   {const c2=invClean(IS.W[IS.p==='stm'?'sale':IS.p]),all={};for(const q in c2)if(!invOwn(q)&&c2[q]!==INVD[q])all[q]=c2[q];inv.all=all}
   {const c2=stmClean(IS.W.stm),o={};for(const q in c2)if(c2[q]!==STMD[q])o[q]=c2[q];r.stm=o}
-  r.inv=inv;r.shop={nm:IS.shop.nm,ad:IS.shop.ad,tel:IS.shop.tel,ig:IS.shop.ig};saveCu();IS.sig0=ivSig();logA('cust','تنظیمات فاکتور','قالب‌های فاکتور و صورت‌حساب ذخیره شد');toast('تنظیمات فاکتور ذخیره شد');
+  prLocSet({});r.inv=inv;r.shop={nm:IS.shop.nm,ad:IS.shop.ad,tel:IS.shop.tel,ig:IS.shop.ig};saveCu();IS.sig0=ivSig();logA('cust','تنظیمات فاکتور','قالب‌های فاکتور و صورت‌حساب ذخیره شد');toast('تنظیمات فاکتور ذخیره شد');
   /* v91.5 (خواسته صاحب اپ: «ذخیره که خورد انیمیشن درست انجام شود، ذخیره شود و بیرون بیاید»): «✓ ذخیره شد» روی خود دکمه، بعد برگشت به تنظیمات */
   setTimeout(()=>{if(cur==='invset'&&!ivDirty())leaveTo()},850)};
 ACT.ivCol=d=>{if(!IS)return;const S=IS.W[IS.p],k='c'+d.f;S[k]=S[k]==='n'?'a':'n';IS.W[IS.p]=invClean(S);ivRe()};
