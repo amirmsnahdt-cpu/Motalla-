@@ -210,24 +210,32 @@ final class DirectPrint {
         };
     }
 
-    /** صفحه از تصویر (JPEG/PNG)؛ وقتی اندازه با کاغذ فرق دارد کشیده می‌شود. تصویر فقط موقع نوشتن همان صفحه باز می‌شود و بعد آزاد می‌شود. */
+    /** صفحه از تصویر (JPEG/PNG). تصویر با اندازه خودش باز می‌شود (مثلاً ۳۰۰ dpi) و هر سطرِ dpi چاپگر (مثلاً ۶۰۰ برای HP) از نزدیک‌ترین پیکسل ساخته می‌شود؛
+        پس تصویر بزرگ ۶۰۰ dpi (حدود ۷۰ مگابایت) هیچ‌وقت در حافظه ساخته نمی‌شود. تصویر فقط موقع نوشتن همان صفحه باز و بعد آزاد می‌شود. */
     private static final class BmpPage implements IppCore.Page {
         private final String b64;
         private final int w, h;
         private Bitmap bmp;
+        private int[] src, xi;
+        private int sy = -1;
         BmpPage(String b64, int w, int h) { this.b64 = b64; this.w = w; this.h = h; }
         @Override public int width() { return w; }
         @Override public int height() { return h; }
         @Override public void row(int y, int[] o) {
             if (bmp == null) {
                 byte[] d = Base64.decode(b64, Base64.DEFAULT);
-                Bitmap s = BitmapFactory.decodeByteArray(d, 0, d.length);
-                if (s == null) throw new IllegalStateException("bad page image");
-                bmp = s.getWidth() == w && s.getHeight() == h ? s : Bitmap.createScaledBitmap(s, w, h, true);
-                if (bmp != s) s.recycle();
+                bmp = BitmapFactory.decodeByteArray(d, 0, d.length);
+                if (bmp == null) throw new IllegalStateException("bad page image");
+                int bw = bmp.getWidth();
+                src = new int[bw];
+                xi = new int[w];
+                for (int x = 0; x < w; x++) xi[x] = Math.min(bw - 1, (int) ((x + 0.5) * bw / w));
+                sy = -1;
             }
-            bmp.getPixels(o, 0, w, 0, y, w, 1);
-            if (y == h - 1) { bmp.recycle(); bmp = null; }
+            int bh = bmp.getHeight(), yy = Math.min(bh - 1, (int) ((y + 0.5) * bh / h));
+            if (yy != sy) { bmp.getPixels(src, 0, src.length, 0, yy, src.length, 1); sy = yy; }
+            for (int x = 0; x < w; x++) o[x] = src[xi[x]];
+            if (y == h - 1) { bmp.recycle(); bmp = null; src = null; xi = null; }
         }
     }
 }
