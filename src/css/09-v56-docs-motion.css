@@ -4956,3 +4956,42 @@ html[data-theme=dark] .abph small,html[data-theme=dark] .gkty.abpc>small>i{color
 /* v98.6 دکمه‌های ردیف واریزی سند: واریزی · مبلغ واریزی · انتخاب بانک کنار هم */
 .d8xi .wdab{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .d8xi .wdab .d8eb{align-self:auto}
+
+/* v98.9 «تعویض طلا» در پنجره تسویه: خانه‌های مرتب (وزن · عیار · هر گرم)، کادر بزرگ قیمت کل، کارت نتیجه */
+.gxw{display:flex;flex-direction:column;gap:8px}
+.gxg{display:grid;grid-template-columns:1.25fr 1fr;gap:8px}
+.gxf{display:flex;flex-direction:column;gap:3px;min-width:0;padding:9px 13px 8px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--hair);cursor:text;transition:box-shadow .18s}
+.gxf:focus-within{box-shadow:inset 0 0 0 1.5px var(--blu)}
+.gxf.wide{grid-column:1/-1}
+.gxf small{font-size:11.5px;font-weight:800;color:var(--mut)}.gxf small i{font-style:normal;font-weight:650;opacity:.85}
+.gxf>span{display:flex;align-items:baseline;gap:6px;direction:ltr}
+#sheet .gxf input{flex:1;min-width:0;width:100%;border:0;outline:0;background:none;padding:0;font:inherit;font-size:20px;font-weight:900;color:var(--ink);text-align:left;font-variant-numeric:tabular-nums}
+.gxf>span>i{flex:none;font-style:normal;font-size:12px;font-weight:750;color:var(--mut)}
+.gxw .ckcl{margin:4px 4px 0}.gxw .ckbg{margin:0}.gxw .ckbig{margin:0 3px}
+.gxw .bf3d em.gxr{color:var(--red)}.gxw .bf3d em.gxb{color:var(--blu)}.gxw .bf3d em.gxz{color:var(--ok)}
+.gxw .ckf.ckds{margin-top:0}
+
+/* v98.9 کارتخوان: انتخاب بانک داخل خود دستگاه — سرتیتر دستگاه دکمه است و فهرست بانک‌ها روی صفحه همان دستگاه باز می‌شود */
+#sheet button.ptm-hd{width:100%;border:0;background:none;font:inherit;color:inherit;text-align:right;cursor:pointer;border-radius:14px;padding:5px 6px 7px;margin:-3px -3px 6px;box-sizing:content-box;width:calc(100% - 6px);background:rgb(255 255 255/.06);box-shadow:inset 0 0 0 1px rgb(255 255 255/.1)}
+.ptm-chg{flex:none;display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 9px 0 6px;border-radius:99px;background:rgb(255 255 255/.14);color:#e2e8f0;font-size:11px;font-weight:850;white-space:nowrap}
+.ptm-chg svg.ptmcv{width:12px;height:12px;rotate:-90deg;transition:rotate .25s}
+.ptm.pbl .ptm-chg svg.ptmcv{rotate:90deg}
+.ptm.noan{animation:none}
+.ptm-bl{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;padding:8px;border:5px solid #06080c;border-radius:19px;background:linear-gradient(180deg,#d6f0da 0%,#b4dcbc 100%);box-shadow:0 0 0 1px rgb(255 255 255/.1),inset 0 3px 9px rgb(0 50 15/.3);animation:ptmBl .28s cubic-bezier(.2,.9,.3,1) both}
+@keyframes ptmBl{from{opacity:0;transform:translateY(-8px)}}
+.ptm-bt{flex:none;padding:1px 4px 3px;font-size:12px;font-weight:900;color:#14532d;text-align:center}
+#sheet .ptm-br{flex:none;display:flex;align-items:center;gap:10px;width:100%;min-height:54px;padding:7px 10px;border:0;border-radius:14px;background:rgb(255 255 255/.7);font:inherit;color:#0f2416;text-align:right;cursor:pointer;box-shadow:0 1px 0 rgb(0 60 20/.14)}
+#sheet .ptm-br.on{background:#fff;box-shadow:0 0 0 2px #15803d}
+.ptm-br .bkb,.ptm-br img,.ptm-br .ckbi{flex:none;width:34px;height:34px;min-width:34px;border-radius:50%;background:#fff;display:grid;place-items:center;color:#334155;box-shadow:0 0 0 1px rgb(0 0 0/.08)}.ptm-br .ckbi svg{width:17px;height:17px}
+.ptm-br .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}.ptm-br .tx b{font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ptm-br .tx small{font-size:11px;font-weight:700;color:#3f6b4c}
+.ptm-br em{flex:none;font-style:normal;direction:ltr;unicode-bidi:isolate;font-size:14.5px;font-weight:900;font-variant-numeric:tabular-nums;color:#14532d}
+.ptm-br .ptm-bk{flex:none;width:22px;height:22px;border-radius:50%;background:#15803d;color:#fff;display:grid;place-items:center}.ptm-br .ptm-bk svg{width:13px;height:13px}
+#sheet .ptm-br.add{background:rgb(255 255 255/.4);box-shadow:inset 0 0 0 1.5px rgb(21 128 61/.35)}
+@media (prefers-reduced-motion:reduce){.ptm-bl{animation:none}}
+
+/* v98.9 نوار «۰۰۰ / ۰۰» بالای صفحه‌کلید گوشی برای خانه‌های مبلغ */
+#z3bar{position:fixed;left:8px;top:0;z-index:9500;display:none;gap:6px;padding:5px;border-radius:17px;direction:ltr;background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 8px 20px -8px rgb(15 23 42/.4),inset 0 0 0 1px var(--hair);will-change:transform}
+#z3bar.on{display:flex}
+#z3bar button{min-width:62px;height:40px;padding:0 12px;border:0;border-radius:12px;background:var(--blu2);color:var(--blu);font:inherit;font-size:20px;font-weight:900;letter-spacing:1.5px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#z3bar button:active{background:var(--blu);color:#fff}
+@media print{#z3bar{display:none!important}}
