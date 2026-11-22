@@ -115,10 +115,10 @@ const depAvail=x=>{const own=sv&&sv.edit?(x.settles||[]).filter(z=>z.byInv&&Stri
    - cuDepPend(c): بخشی از طلب مشتری که پشتش واریزی هست (مانده تأییدنشده هر واریزی با سند خرید همین مشتری، wdState.pend)
    - طلب آزاد مشتری = مانده − همان بخش؛ فقط این مقدار با حواله به حساب خودش پرداخت می‌شود و بقیه فقط روی واریزی (m:'dep')
    - فهرست طرف حواله (پله‌ها و پنجره تسویه): واریزی‌های ارسال‌نشده + مشتری‌هایی که طلب آزاد دارند، مثل همان پنجره تسویه سند */
-const cuDepPend=c=>{let a=0;for(const e of entries){if(e.del||!e.wd||String(e.wd.cu)!==String(c.id))continue;if(e.splitOf!=null&&entries.some(z=>z.id===e.splitOf&&z.wd))continue;a+=wdState(e).pend}return a};
+const cuDepPend=(c,I)=>{if(I)return I.pend.get(String(c.id))||0;let a=0;for(const e of entries){if(e.del||!e.wd||String(e.wd.cu)!==String(c.id))continue;if(e.splitOf!=null&&entries.some(z=>z.id===e.splitOf&&z.wd))continue;a+=wdState(e).pend}return a};
 /* v88.5: در ویرایش سند، حواله ثبت‌شده همین سند (سند آینه در حساب طرف مقابل) دوباره به طلب آزاد برمی‌گردد — قبلاً دو بار کم می‌شد */
 const cuOwnLk=c=>sv&&sv.edit?(c.txs||[]).filter(t=>!t.del&&t.lk&&String(t.lk.tx)===String(sv.edit.tx)).reduce((s,t)=>s-(t.pays||[]).reduce((a,p)=>a+pAmt(p),0),0):0;
-const cuFree=(c,skip)=>Math.max(0,Math.round(cuBal(c).R+cuOwnLk(c)-cuDepPend(c)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='cust'&&String(p.cuId)===String(c.id)).reduce((s,p)=>s+pAmt(p),0):0)));
+const cuFree=(c,skip,I)=>Math.max(0,Math.round(cuBal(c).R+cuOwnLk(c)-cuDepPend(c,I)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='cust'&&String(p.cuId)===String(c.id)).reduce((s,p)=>s+pAmt(p),0):0)));
 const depLeft=(x,skip)=>Math.max(0,Math.round(depAvail(x)-(sv?sv.pays.filter((p,i)=>i!==skip&&p.m==='dep'&&String(p.entId)===String(x.id)).reduce((s,p)=>s+pAmt(p),0):0)));
 /* v71.3 (خواسته صاحب اپ: «هر حسابی که مانده دارد و تخصیص داده نشده باید در فهرست بدهکاریم باشد»):
    یک فهرست برای همه جا (پنجره تسویه سند، پنجره مانده صفحه مشتری، پله‌های ردیف): هر حساب مشتری که به او بدهکاریم یک ردیف،
@@ -130,10 +130,18 @@ const depLeft=(x,skip)=>Math.max(0,Math.round(depAvail(x)-(sv?sv.pays.filter((p,
 const depAllocSet=()=>{const S=new Set();Object.values(drafts||{}).forEach(L=>(L||[]).forEach(p=>{if(!p.sent)(p.ids||[]).forEach(id=>S.add(String(id)))}));return S};
 /* v84.8: بخشی از همان واریزی که ارسال شده (sentBid) هم یعنی تخصیص خورده */
 const depFreeOk=(x,A)=>!A.has(String(x.id))&&!entries.some(z=>!z.del&&z.splitOf!=null&&String(z.splitOf)===String(x.id)&&(A.has(String(z.id))||z.sentBid!=null));
-const cuDeps=(c,skip)=>{const A=depAllocSet();return validated().filter(x=>!x.sentBid&&depFreeOk(x,A)&&x.wd&&String(x.wd.cu)===String(c.id)).map(x=>[x,depLeft(x,skip)]).filter(z=>z[1]>0)};
-function oweAccts(q,skip){const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId);
-  return CU().filter(c=>String(c.id)!==me&&(!nq||cuHit(c,nq,dOk))).map(c=>{const f=cuFree(c,skip),D=cuDeps(c,skip);return {c,f,D,a:f+D.reduce((s,z)=>s+z[1],0)}}).filter(o=>o.a>0).sort((x,y)=>y.a-x.a)}
-const oweDeps=(q,skip)=>{const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId),A=depAllocSet();return validated().filter(x=>!x.sentBid&&depFreeOk(x,A)&&!(x.wd&&CU().some(c=>String(c.id)===String(x.wd.cu)))&&!(x.wd&&String(x.wd.cu)===me)).map(x=>[x,depLeft(x,skip)]).filter(([x,r])=>r>0&&(!nq||nzName(fullName(x)+' '+(x.holder||'')).includes(nq)||dOk([x.phone,x.iban,x.code,x.card].join(' ')))).sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0]))))};
+const cuDeps=(c,skip,I)=>{if(I)return (I.byCu.get(String(c.id))||[]).map(x=>[x,depLeft(x,skip)]).filter(z=>z[1]>0);const A=depAllocSet();return validated().filter(x=>!x.sentBid&&depFreeOk(x,A)&&x.wd&&String(x.wd.cu)===String(c.id)).map(x=>[x,depLeft(x,skip)]).filter(z=>z[1]>0)};
+/* v100.9 (ویدیوی صاحب اپ: «حواله به مشتری لگ دارد، دکمه بار اول کار نمی‌کند»): oweAccts برای هر حساب همه واریزی‌ها را دوباره می‌گشت و برای هر واریزی
+   دوباره همه را (depFreeOk) — با ۹۰۰ حساب و ۴۰۰۰ واریزی ۱۲ ثانیه روی کامپیوتر. حالا یک بار در هر فراخوانی یک فهرست آماده ساخته می‌شود:
+   تخصیص‌ها، ریشه‌هایی که بخشی از آن‌ها تخصیص/ارسال شده، واریزی‌های آزاد هر حساب و «در انتظار» هر حساب (cuDepPend) */
+function oweIx(){const A=depAllocSet(),busy=new Set(),byId=new Map();entries.forEach(z=>{byId.set(z.id,z);if(!z.del&&z.splitOf!=null&&(A.has(String(z.id))||z.sentBid!=null))busy.add(String(z.splitOf))});
+  const ok=x=>!A.has(String(x.id))&&!busy.has(String(x.id)),byCu=new Map(),pend=new Map();
+  validated().forEach(x=>{if(x.sentBid||!x.wd||!ok(x))return;const k=String(x.wd.cu);if(!byCu.has(k))byCu.set(k,[]);byCu.get(k).push(x)});
+  entries.forEach(e=>{if(e.del||!e.wd)return;if(e.splitOf!=null){const r=byId.get(e.splitOf);if(r&&r.wd)return}const k=String(e.wd.cu);pend.set(k,(pend.get(k)||0)+wdState(e).pend)});
+  return {A,ok,byCu,pend}}
+function oweAccts(q,skip){const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId),I=oweIx();
+  return CU().filter(c=>String(c.id)!==me&&(!nq||cuHit(c,nq,dOk))).map(c=>{const f=cuFree(c,skip,I),D=cuDeps(c,skip,I);return {c,f,D,a:f+D.reduce((s,z)=>s+z[1],0)}}).filter(o=>o.a>0).sort((x,y)=>y.a-x.a)}
+const oweDeps=(q,skip)=>{const dOk=pDig(q||''),nq=nzName(toEn(q||'')),me=String(sv&&sv.cuId),I=oweIx(),CS=new Set(CU().map(c=>String(c.id)));return validated().filter(x=>!x.sentBid&&I.ok(x)&&!(x.wd&&CS.has(String(x.wd.cu)))&&!(x.wd&&String(x.wd.cu)===me)).map(x=>[x,depLeft(x,skip)]).filter(([x,r])=>r>0&&(!nq||nzName(fullName(x)+' '+(x.holder||'')).includes(nq)||dOk([x.phone,x.iban,x.code,x.card].join(' ')))).sort((a,b)=>String(PD(b[0])).localeCompare(String(PD(a[0]))))};
 const oweSub=o=>[o.c.grp?esc(o.c.grp):'',o.D.length?(o.f?'آزاد '+fmt(o.f)+' · ':'')+'واریزی '+fmt(o.D.reduce((s,z)=>s+z[1],0)):'',o.c.phone?'<bdi dir="ltr">'+esc(toFa(o.c.phone))+'</bdi>':''].filter(Boolean).join('، ')||'حساب مشتری';
 /* مبلغ a از حساب c: ردیف‌های پرداخت (اول طلب آزاد، بعد هر واریزی ارسال‌نشده) */
 function oweSplit(c,a,skip){const R=[];let r=Math.round(a);const f=Math.min(r,cuFree(c,skip));if(f>0){R.push({m:'cust',amount:f,cuId:c.id,cuName:cuName(c)});r-=f}

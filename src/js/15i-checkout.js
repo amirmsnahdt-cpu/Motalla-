@@ -68,10 +68,10 @@ function ckList(){const q0=clean(CK.q||''),q=nzName(toEn(q0)),dOk=pDig(q0);
   if(ckOut()){const L=CU().filter(c=>String(c.id)!==String(sv.cuId)&&c.grp!=='بانک'&&(!q||cuHit(c,q,dOk))).sort((a,b)=>String(b.lastAt||'').localeCompare(String(a.lastAt||''))).slice(0,q?60:40);
     return L.map(c=>ckPr('cu',c.id,cuName(c),c.phone?'<bdi dir="ltr">'+esc(toFa(c.phone))+'</bdi>':'حساب مشتری',null,'')).join('')+ckNmRow(q0)}
   /* v71.3: همه حساب‌هایی که بدهکاریم (بدون سقف تعداد؛ فهرست خودش اسکرول می‌خورد) + واریزی‌های بی‌حساب */
-  const C=oweAccts(q0),D=oweDeps(q0);
+  const C0=oweAccts(q0),D0=oweDeps(q0),NC=CK.lim||40,C=C0.slice(0,NC),D=D0.slice(0,Math.max(20,NC/2)),more=C0.length>C.length||D0.length>D.length;
   if(!C.length&&!D.length)return `<div class="ptm-bt">${q?'کسی در فهرست پیدا نشد':'به هیچ مشتری‌ای بدهکار نیستیم و واریزیِ ارسال‌نشده‌ای نیست'}</div>${ckNmRow(q0)}`;
   return (C.length?`<div class="ptm-bt">مشتری‌هایی که به آنها بدهکاریم</div>`+C.map(o=>ckPr('cu',o.c.id,cuName(o.c),'بدهکاریم',o.a,oweSub(o))).join(''):'')
-    +(D.length?`<div class="ptm-bt">واریزی‌های ارسال‌نشده به بانک</div>`+D.map(([x,r])=>ckPr('dep',x.id,fullName(x),'مانده',r,['واریز '+esc(payLab(PD(x))),x.settled?'بخشی تسویه شده':'',x.bankShow?esc(x.bankShow):''].filter(Boolean).join('، '))).join(''):'')+ckNmRow(q0)}
+    +(D.length?`<div class="ptm-bt">واریزی‌های ارسال‌نشده به بانک</div>`+D.map(([x,r])=>ckPr('dep',x.id,fullName(x),'مانده',r,['واریز '+esc(payLab(PD(x))),x.settled?'بخشی تسویه شده':'',x.bankShow?esc(x.bankShow):''].filter(Boolean).join('، '))).join(''):'')+(more?`<button type="button" class="ptm-br add" data-act="ckMore"><span class="ckbi">${ic('chev')}</span><span class="tx"><b>نمایش بیشتر</b><small>${toFa(String(C0.length+D0.length-C.length-D.length))} مورد دیگر · یا نام را جستجو کنید</small></span></button>`:'')+ckNmRow(q0)}
 /* v61.30: کارتخوان و حساب ما مثل بقیه فهرست‌ها: جستجو بالا، فهرست زیرش */
 /* v86.8 (خواسته صاحب اپ: «در حواله و کارتخوان لیست همه بانک‌ها با موجودی طلبکاریم؛ اسکرول درست؛ افزودن حساب بانکی از همین‌جا
    که در زبانه بانک هم ذخیره شود»): همه حساب‌های نوع بانک (بیشترین موجودی بالا)، لوگو + برچسب رنگی طلبکاریم/بدهکاریم،
@@ -123,6 +123,7 @@ const ckPosHead=()=>{const m=CK.m,out=ckOut(),sig='<span class="ptm-sig"><i></i>
    (ACT.ckPosBk، CK.pb) و فهرست بانک‌ها روی صفحه همان دستگاه باز می‌شود (جای صفحه نمایش و دکمه‌ها): هر بانک با نشان و مانده، انتخاب‌شده بالا؛ آخرش «جستجو / حساب بانکی تازه» */
 function ckPosList(){const L=ckBkL().map(c=>({c,b:bkCuBal(c)})).sort((a,b)=>(String(b.c.id)===String(CK.srcId))-(String(a.c.id)===String(CK.srcId))||b.b-a.b);
   return `<div class="ptm-bl" id="posL"><div class="ptm-bt">${CK.m==='pos'?'کارتخوانِ کدام بانک؟':ckOut()?'حواله از کدام حساب بانک؟':'حواله به کدام حساب بانک؟'}</div>${L.map(({c,b})=>`<button type="button" class="ptm-br${String(CK.srcId)===String(c.id)?' on':''}" data-act="ckSrc" data-id="${esc(c.id)}">${bkAvH(c)||`<span class="ckbi">${ic('bank')}</span>`}<span class="tx"><b>${esc(cuName(c))}</b><small>${b>0?'موجودی':b<0?'بدهکار':'بدون موجودی'}${b?` <em>${b<0?'−':''}${fmt(Math.abs(b))}</em>`:''}</small></span>${String(CK.srcId)===String(c.id)?`<i class="ptm-bk">${ic('check')}</i>`:''}</button>`).join('')}<button type="button" class="ptm-br add" data-act="ckAll"><span class="ckbi">${ic('search')}</span><span class="tx"><b>جستجو یا حساب بانکی تازه</b><small>فهرست کامل بانک‌ها</small></span></button></div>`}
+ACT.ckMore=()=>{if(!CK)return;CK.lim=(CK.lim||40)+80;const L=$('ckL');if(L)L.innerHTML=ckList()};
 ACT.ckPosBk=()=>{if(!CK||(CK.m!=='pos'&&CK.m!=='hav'))return;ckRead();CK.pb=CK.pb?0:1;CK.noan=1;ckRe();CK.noan=0};
 /* v91.7 (خواسته صاحب اپ: «انگار یک کارتخوان واقعی؛ دکمه‌ها و طولش بهتر، دکمه‌ها این‌قدر نزدیک هم نباشند»): دستگاه پوز از نو (کلاس‌های ptm-*، بدون ارث از قالب قبلی):
    سرِ چاپگر با رسید کاغذی که از شکاف بیرون آمده (عکس رسید روی همان کاغذ)، بدنه با نام و نشان بانک، صفحه نمایش شیشه‌ای، صفحه‌کلید واقعی پوز
@@ -178,9 +179,9 @@ function ckForm(){const m=CK.m;if(!m)return '';const lf=ckLeft();
   const ok=ckFormOk(),inl=/^xq:/.test(m)||m==='pos'||m==='hav'||m==='cash'||((m==='dep'||m==='cust')&&CK.sel);
   return `<div class="ckfm ckf2">${b}${ok&&!inl&&!CK.pl?stPhHTML(CK):''}</div>`}
 /* سقف حواله به همان شخص (بدهی ما به او / مانده واریزی) */
-function ckSelCap(){const s=CK.sel;if(!s||ckOut())return 0;if(s.k==='cu'){const o=oweAccts('').find(z=>String(z.c.id)===String(s.id));return o?o.a:0}if(s.k==='dep'){const x=validated().find(z=>String(z.id)===String(s.id));return x?Math.max(0,depAvail(x)-ckUsedDep(x.id)):0}return 0}
-ACT.ckK=d=>{const A=$('ckA');if(!A)return;const k=d.k;if(k==='ok'){if(CK.m==='pos'&&$('posD')&&+CK.amount>0&&+CK.amount<=ckLeft()&&!RM()){ckPosGo();return}ACT.ckAdd();return}if(k==='x'){ACT.ckM({m:''});return}
-  let v=String(CK.amount||'').replace(/\D/g,'');if(k==='c')v='';else if(k==='bs')v=v.slice(0,-1);else if(v.length<13)v=(v+k).replace(/^0+/,'').slice(0,13);
+function ckSelCap(){const s=CK.sel;if(!s||ckOut())return 0;if(s.k==='cu'){const c=CU().find(z=>String(z.id)===String(s.id));if(!c)return 0;const I=oweIx();return cuFree(c,undefined,I)+cuDeps(c,undefined,I).reduce((a,z)=>a+z[1],0)}if(s.k==='dep'){const x=validated().find(z=>String(z.id)===String(s.id));return x?Math.max(0,depAvail(x)-ckUsedDep(x.id)):0}return 0}
+ACT.ckK=d=>{const A=$('ckA');if(!A)return;const k=d.k;/* v100.9: تا نیم ثانیه بعد از انتخاب شخص/بانک، زدن‌های اضافه (که قبلاً روی دکمه‌های تازه پیدا شده می‌افتاد و رقم اضافه می‌کرد) نادیده */if(CK.kbT&&Date.now()<CK.kbT)return;if(k==='ok'){if(CK.m==='pos'&&$('posD')&&+CK.amount>0&&+CK.amount<=ckLeft()&&!RM()){ckPosGo();return}ACT.ckAdd();return}if(k==='x'){ACT.ckM({m:''});return}
+  let v=String(CK.amount||'').replace(/\D/g,'');/* v100.9: اولین رقم بعد از باز شدن یا انتخاب، جای مبلغ پیشنهادی می‌نشیند (مثل ماشین‌حساب) */if(CK.pre&&k!=='ok'&&k!=='x'){if(/^\d/.test(k))v='';CK.pre=0}if(k==='c')v='';else if(k==='bs')v=v.slice(0,-1);else if(v.length<13)v=(v+k).replace(/^0+/,'').slice(0,13);
   CK.amount=+v||0;A.value=ckAmtV();try{navigator.vibrate&&navigator.vibrate(6)}catch(_){}
   const h=A.closest('.ptm-lcd,.ckscr');if(h&&!RM()&&h.animate&&(k==='c'||k==='000'))h.animate([{transform:'scale(1.02)'},{transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.9,.25,1)'})};
 function ckPosGo(){const D=$('posD'),M=$('posM');if(!D||D.classList.contains('run'))return;D.classList.add('run');if(M)M.innerHTML='<span class="ptm-dots"><i></i><i></i><i></i></span>در حال ارتباط با بانک';
@@ -226,18 +227,18 @@ ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حس�
   if(/^xp?:/.test(m)){const[kk,k]=m.split(':'),v=ckXv(k);if(!v)return;const q=String(Math.abs(v));
     /* v100.7 (صاحب اپ: «ارز را که می‌خواهم تحویل بدهم قسمت تحویل را نمی‌آورد؛ برای همه باید باشد»): کاشی و زدن مانده آن جنس در نوار پایین سند
        فرم خودش را باز می‌کند (همان دستگاه روشن): تعداد با صفحه‌کلید، پیش‌فرض کل مانده، بعد «تأیید» */
-    if(kk==='x'){const tg=CK&&CK.tg;CK={m:'xq:'+k,tg,amount:Math.abs(v),q:''};ckRe('ckA');return}
+    if(kk==='x'){const tg=CK&&CK.tg;CK={m:'xq:'+k,tg,amount:Math.abs(v),q:'',pre:1};ckRe('ckA');return}
     closeSheet();setTimeout(()=>xrStart(xrNew(v>0?'sell':'buy',k,{pul:true,q,fl:'one',fd:v>0?'sell':'buy'})),80);return}
   if(m==='gp'){if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}gkOpen(ckTg());ACT.gkM({m:'cv'});return}
   if(m==='rg'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}
-  const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:''};if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
+  const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:'',pre:1};if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
   /* v100.8: فهرست اشخاص بدون پریدن کیبورد باز می‌شود (جستجو فقط با زدن خودش) */
   ckRe(m==='dep'||m==='cust'?'':m==='gx'?'ckW':m==='bfix'?'bfT':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
-ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));const pc=document.querySelector('#posD .ptm-card');if(pc){const z0=ckBkL().find(o=>String(o.id)===String(d.id));pc.querySelector('span').innerHTML=z0?(bkAvH(z0)||''):'';pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}const ph=$('posH');if(ph){ph.innerHTML=ckPosHead();const dv=ph.closest('.ptm'),z=ckBkL().find(o=>String(o.id)===String(d.id));if(dv&&z)dv.style.setProperty('--bk',bkClr(z));if(dv&&!RM()&&dv.animate)dv.animate([{transform:'translateY(4px)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,1.3,.4,1)'})}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;if(CK.pb){CK.pb=0;CK.noan=1;ckRe('ckA');CK.noan=0;const pc=document.querySelector('#posD .ptm-card');if(pc){pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}ckRe('ckA')};
+ACT.ckSrc=d=>{ckRead();CK.srcId=+d.id||d.id;CK.pk=1;CK.sq='';if(CK.pb)CK.kbT=Date.now()+550;const cs=$('ckCs');if(cs&&!CK.pl){cs.querySelectorAll('.ckc').forEach(b=>b.classList.toggle('on',b.dataset.id===String(d.id)));const pc=document.querySelector('#posD .ptm-card');if(pc){const z0=ckBkL().find(o=>String(o.id)===String(d.id));pc.querySelector('span').innerHTML=z0?(bkAvH(z0)||''):'';pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}const ph=$('posH');if(ph){ph.innerHTML=ckPosHead();const dv=ph.closest('.ptm'),z=ckBkL().find(o=>String(o.id)===String(d.id));if(dv&&z)dv.style.setProperty('--bk',bkClr(z));if(dv&&!RM()&&dv.animate)dv.animate([{transform:'translateY(4px)'},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,1.3,.4,1)'})}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}CK.pl=0;if(CK.pb){CK.pb=0;CK.noan=1;ckRe('ckA');CK.noan=0;const pc=document.querySelector('#posD .ptm-card');if(pc){pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}return}ckRe('ckA')};
 ACT.ckSrcX=()=>{ckRead();CK.pl=1;ckRe('ckS')};
-ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('');return}CK.sel={k:d.k,id:d.id};
-  const av=d.k==='cu'?(()=>{const c=CU().find(z=>String(z.id)===String(d.id));const o=c&&oweAccts('').find(z=>String(z.c.id)===String(c.id));return o?o.a:0})():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();
+ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('');return}CK.sel={k:d.k,id:d.id};CK.kbT=Date.now()+550;CK.pre=1;
+  const av=d.k==='cu'?ckSelCap():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();
   CK.amount=ckOut()?ckLeft():Math.max(0,Math.min(ckLeft()||av,av));ckRe('ckA')};
 ACT.ckAdd=()=>{ckRead();const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0,n0=sv.pays.length;
   if(/^xq:/.test(m)){const k=m.slice(3),v=ckXv(k),A=XA[k]||{t:k,u:'عدد'};if(!(a>0)){toast('تعداد را بزنید',true);return}if(a>Math.abs(v)+1e-9){toast('بیشتر از مانده '+A.t+' است ('+qFmt(Math.abs(v))+')',true);return}
