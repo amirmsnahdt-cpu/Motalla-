@@ -22,12 +22,12 @@ const rpN=v=>toFa(String(v));
 /* ---------- تعریف گزارش‌ها: [کلید، عنوان، توضیح، آیکون، رنگ، گروه، بازه دارد؟] ---------- */
 const RPL=[
   ['bal','مانده حساب و مدت','مانده هر حساب و از چند روز پیش باز است','users','v','a',0],
-  ['moin','دفتر معین','گردش و صورتحساب یک حساب','list','b','a',0],
+  ['moin','دفتر معین','گردش یک یا چند حساب در یک بازه','list','b','a',1],
   ['ppl','کارکرد اشخاص','فروش، خرید، دریافت و پرداخت هر حساب','user','v','a',1],
   ['cap','سهم شرکا','مانده حساب‌های سرمایه','split','v','a',0],
   ['exp','هزینه‌ها','سندهای حساب‌های هزینه','tag','r','a',1],
-  ['stk','موجودی اجناس','موجودی همه کالاها و اصلاح آن','coin','a','g',0],
-  ['abs','موجودی آبشده و متفرقه','طلای خام مغازه','coin','a','g',0],
+  ['stk','موجودی اجناس','موجودی هر کالا و مدت خواب آن','coin','a','g',0],
+  ['abs','موجودی آبشده و متفرقه','تکه‌های آبشده موجود و طلای متفرقه','coin','a','g',0],
   ['gds','کارکرد اجناس','فروش و خرید هر کالا','ring','a','g',1],
   ['cond','دفتر شرطی','آبشده‌هایی که عیارشان ثبت نشده','clock','a','g',0],
   ['fwd','دفتر فردایی','فروش و خرید پولی (طلا تحویل نشده)','swap','a','g',1],
@@ -41,8 +41,7 @@ const RPG=[['a','حساب‌ها'],['g','طلا و کالا'],['s','فروش و 
 const rpDef=k=>RPL.find(z=>z[0]===k);
 function vReports(){const ic2=k=>IC[k]?ic(k):ic('list');
   return `<div class="rpw">${RPG.map(([g,gt])=>`<div class="rpgh">${gt}</div><div class="rpgr">${RPL.filter(z=>z[5]===g).map((z,i)=>`<button class="rpti t-${z[4]}" data-act="rpGo" data-k="${z[0]}" style="--i:${i}"><i>${ic2(z[3])}</i><span><b>${z[1]}</b><small>${z[2]}</small></span></button>`).join('')}</div>`).join('')}</div>`}
-ACT.rpGo=d=>{const k=d.k;if(k==='stk'||k==='abs'){STK.f=k==='abs'?'g':'all';STK.q='';meRet='reports';closeSheet();go('stock');return}
-  if(k==='moin'){go('custs');setTimeout(()=>toast('حساب را انتخاب کنید؛ گردش و صورتحساب در صفحه حساب است'),300);return}
+ACT.rpGo=d=>{const k=d.k;if(k==='stkp'){STK.f='all';STK.q='';meRet='reports';closeSheet();go('stock');return}
   if(k==='hist'){histTab='ev';go('audit');return}
   if(RPT.k!==k){RPT.s='all';RPT.o='a';RPT.q=''}RPT.k=k;const D=rpDef(k);TITLES.rpt=D?D[1]:'گزارش';go('rpt')};
 /* پنجره بازه تاریخ — همان شکل و رفتار «بازه تاریخ» گردش حساب (stmRangeHTML): خلاصه بالا، بازه‌های آماده با تعداد، بازه دلخواه با تقویم */
@@ -89,23 +88,14 @@ const rpSum=L=>`<div class="rpsm c${Math.min(L.length,3)}">${L.map(([l,v,c,s])=>
 const rpVal=(v,u,f)=>`<em class="${rpSide(v)}"><b>${f?f(Math.abs(v)):fmt(Math.abs(v))}</b>${u?` <u>${u}</u>`:''}<small>${rpSideT(v)}</small></em>`;
 const rpRow=(o)=>`<button class="rprw${o.cls?' '+o.cls:''}"${o.at||''}><span class="rpa">${o.av||''}</span><span class="rpt"><b>${o.t}</b>${o.s?`<small>${o.s}</small>`:''}</span><span class="rpv">${o.v||''}</span></button>`;
 /* ردیف سند = همان ردیف گردش حساب (txRow) با نام مشتری بالای عنوان؛ زدن = باز شدن همان سند (rpTx)، بدون کشیدن حذف */
-function rpTxRow(c,t){let h='';try{h=txRow(c,t)}catch(_){return ''}const a=h.indexOf('<button class="txr'),b=h.lastIndexOf('</button>');if(a<0||b<a)return '';h=h.slice(a,b+9);
-  return `<div class="fcard rpfc">${h.replace(/data-act="txOpen" data-id="[^"]*"/,`data-act="rpTx" data-cu="${c.id}" data-tx="${t.id}"`).replace('<span class="tx"><b>',`<span class="tx"><em class="rpcn">${esc(cuName(c))}</em><b>`)}</div>`}
+function rpTxRow(c,t,nn){let h='';try{h=txRow(c,t)}catch(_){return ''}const a=h.indexOf('<button class="txr'),b=h.lastIndexOf('</button>');if(a<0||b<a)return '';h=h.slice(a,b+9);
+  return `<div class="fcard rpfc">${h.replace(/data-act="txOpen" data-id="[^"]*"/,`data-act="rpTx" data-cu="${c.id}" data-tx="${t.id}"`).replace('<span class="tx"><b>',nn?'<span class="tx"><b>':`<span class="tx"><em class="rpcn">${esc(cuName(c))}</em><b>`)}</div>`}
 const rpCuRow=(c,b,i,note)=>{try{return cuRowH(c,b,i,null,{sw:false,act:'rpCu',note})}catch(_){return ''}};
 const rpAv=c=>`<i class="rpav">${esc((cuName(c)||'؟').trim().slice(0,1))}</i>`;
 const rpEmpty=t=>`<div class="rpem">${ic('info')}<b>${t||'در این بازه چیزی نیست'}</b></div>`;
 const rpHead=(sub)=>{const D=rpDef(RPT.k)||[];return `<div class="rphd t-${D[4]||'b'}"><i>${IC[D[3]]?ic(D[3]):ic('list')}</i><span><b>${D[1]||''}</b><small>${sub||D[2]||''}</small></span></div>`};
 /* ---------- گزارش‌ها ---------- */
 const RPF={
-bal(){const T=todayISO();let A=[];for(const c of CU()){if(c.grp==='بانک')continue;const b=cuBal(c);if(Math.abs(b.R)<1&&Math.abs(b.G)<0.0005)continue;
-    let od='';const m=cuOpenMap(c);for(const t of (c.txs||[])){if(!t||t.del)continue;const o=m.get(String(t.id));if(o&&o.r&&o.r.rem>0&&t.date&&(!od||t.date<od))od=t.date}
-    A.push({c,b,R:b.R,G:b.G,od,d:od?rpDays(od):0})}
-  const tr=A.filter(a=>a.R<0),tb=A.filter(a=>a.R>0),sR=tr.reduce((s,a)=>s+a.R,0),sB=tb.reduce((s,a)=>s+a.R,0),sG=A.reduce((s,a)=>s+a.G,0);
-  if(RPT.s==='r')A=tr;else if(RPT.s==='b')A=tb;
-  A.sort(RPT.o==='d'?(x,y)=>y.d-x.d||Math.abs(y.R)-Math.abs(x.R):(x,y)=>Math.abs(y.R)-Math.abs(x.R));
-  return rpBar(0)+rpSum([['طلبکاریم · '+rpN(tr.length)+' حساب',fmt(Math.abs(sR)),'r','تومان'],['بدهکاریم · '+rpN(tb.length)+' حساب',fmt(sB),'b','تومان'],['طلا · خالص',wFmt(Math.abs(sG))+' گرم',rpSide(sG),rpSideT(sG)]])
-   
-   +(A.length?`<div class="cuLs"><div class="cuL rpls rpcl">${A.slice(0,400).map((a,i)=>rpCuRow(a.c,a.b,i,a.od?`باز از ${dates(a.od).fa} · ${rpN(a.d)} روز`:'')).join('')}</div></div>`:rpEmpty('حساب بازی نیست'))},
 day(){const L=rpDocs(1).filter(z=>z.t.type==='inv').sort((a,b)=>String(b.t.date+(b.t.at||'')).localeCompare(String(a.t.date+(a.t.at||''))));
   let S=0,I=0,O=0;L.forEach(({t})=>stmtLines(t).forEach(l=>{const a=+l[8]||0;if(l[0]==='فروش')S+=a;else if(l[0]==='دریافت')I+=Math.abs(a);else if(l[0]==='پرداخت')O+=Math.abs(a)}));
   let last='',h='';L.slice(0,500).forEach(({c,t})=>{if(t.date!==last){last=t.date;const r=relDay(t.date);h+=`<div class="fday">${['امروز','دیروز','فردا'].includes(r)?r+'، ':''}${esc(dates(t.date).fa)}</div>`}h+=rpTxRow(c,t)});
@@ -157,6 +147,96 @@ gfx(){let gOwe=0,gDue=0;for(const c of CU()){if(c.grp==='بانک')continue;cons
   let st=0;try{for(const [k,o] of gdStockAll()){if(XA[k]||gCat(k)==='سایر')continue;st+=+o.w||0}}catch(_){}
   const net=st+gDue-gOwe,P=+rtRef0()||0,v=Math.round(net*P),p1=Math.round(Math.abs(net)*P/100);
   return rpSum([['خالص طلای ما',wFmt(Math.abs(net))+' گرم',net>=0?'g':'r',net>=0?'دارایی':'کسری'],['ارزش به قیمت روز',P?fmt(Math.abs(v)):'—',net>=0?'g':'r',P?'هر گرم '+fmt(P):'قیمت روز در دست نیست'],['هر ۱٪ نوسان',P?fmt(p1):'—','a','تومان']])
-   +`<div class="rpls">${rpRow({t:'موجودی طلای مغازه',s:'از صفحه موجودی کالاها (وزن خام)',v:`<em class="${st<0?'r':'g'}"><b>${st<0?'−':''}${wFmt(Math.abs(st))}</b><small>گرم${st<0?' · منفی':''}</small></em>`,at:' data-act="rpGo" data-k="stk"'})}${rpRow({t:'طلبکاریم از مشتری‌ها',s:'طلایی که باید به ما بدهند',v:`<em class="r"><b>${wFmt(gDue)}</b><small>گرم</small></em>`})}${rpRow({t:'بدهکاریم به مشتری‌ها',s:'طلایی که باید تحویل بدهیم',v:`<em class="b"><b>${wFmt(gOwe)}</b><small>گرم</small></em>`})}</div>`
+   +`<div class="rpls">${rpRow({t:'موجودی طلای مغازه',s:'از صفحه موجودی کالاها (وزن خام)',v:`<em class="${st<0?'r':'g'}"><b>${st<0?'−':''}${wFmt(Math.abs(st))}</b><small>گرم${st<0?' · منفی':''}</small></em>`,at:' data-act="rpGo" data-k="stkp"'})}${rpRow({t:'طلبکاریم از مشتری‌ها',s:'طلایی که باید به ما بدهند',v:`<em class="r"><b>${wFmt(gDue)}</b><small>گرم</small></em>`})}${rpRow({t:'بدهکاریم به مشتری‌ها',s:'طلایی که باید تحویل بدهیم',v:`<em class="b"><b>${wFmt(gOwe)}</b><small>گرم</small></em>`})}</div>`
    +(Object.keys((gdC&&gdC().gstk)||{}).length?'':`<div class="rpnote">${ic('info')} موجودی اولیه کالاها هنوز ثبت نشده؛ موجودی مغازه فقط از سندها حساب شده و ممکن است منفی دیده شود. از «موجودی اجناس» اصلاحش کنید.</div>`)+`<div class="rpnote">${ic('info')} ${net>=0?'با هر ۱۰۰٬۰۰۰ تومان بالا رفتن قیمت هر گرم، دارایی شما '+fmt(Math.round(Math.abs(net)*100000))+' تومان بیشتر می‌شود و با پایین آمدنش همین‌قدر کمتر.':'شما طلا کم دارید: با هر ۱۰۰٬۰۰۰ تومان بالا رفتن قیمت هر گرم، '+fmt(Math.round(Math.abs(net)*100000))+' تومان زیان می‌کنید.'}</div>`}};
 function vRpt(){if(PARENT.cust==='rpt')PARENT.cust='custs';const D=rpDef(RPT.k);if(!D||!RPF[RPT.k])return rpEmpty('گزارش پیدا نشد');let b='';try{b=RPF[RPT.k]()}catch(e){console.error(e);b=rpEmpty('این گزارش ساخته نشد')}return `<div class="rpw rpp">${rpHead(D[6]?'':D[2])}${b}</div>`}
+/* ---- v102.7 تنظیم‌های «به انتخاب خودم» مثل کیمیا (صاحب اپ، عکس‌های مانده حساب و مدت / دفتر معین / موجودی اجناس / موجودی آبشده و متفرقه) ----
+   هر گزارش: چند حالت آماده بالای صفحه (rpPre، همان دکمه‌های بخش‌بندی‌شده برنامه) + «به انتخاب خودم» = پنجره تنظیم (همان ردیف‌های cufr با تیک)
+   + «تا تاریخ» (مانده در یک روز) یا «بازه». هیچ چیز ذخیره نمی‌شود؛ تنظیم‌ها تا بستن برنامه می‌مانند (RPC). */
+const RPC={bal:{pr:'all',at:'',side:'bal',grp:[],kd:[],sum:0,tol:0,age:'o',gage:0,bd:30},moin:{ids:[],asc:0,sum:0,nog:0},stk:{pr:'all',grp:[],z:0},abs:{pr:'all',kd:['a','s','m']}};
+const rpC=()=>RPC[RPT.k]||{};
+const rpPre=L=>`<div class="seg rpseg2">${L.map(([v,t])=>`<button class="${rpC().pr===v?'on':''}" data-act="rpPr" data-v="${v}">${t}</button>`).join('')}</div>`;
+ACT.rpPr=d=>{const C=rpC();if(d.v==='c'){C.pr='c';render();setTimeout(()=>ACT.rpCus(),40);return}C.pr=d.v;render()};
+/* صفحه خالی مثل کیمیا: «هیچ نتیجه‌ای پیدا نکردم» با راهنما */
+const rpNone=(tips)=>`<div class="rpno"><span class="rpnoi">${ic('search')}</span><b>هیچ نتیجه‌ای پیدا نکردم</b><ul>${(tips||['تاریخ یا بازه بالا را بررسی کنید','شاید تنظیم‌هایی که در «به انتخاب خودم» داده‌اید نتیجه‌ای ندارد']).map(t=>`<li>${t}</li>`).join('')}</ul><button type="button" class="lnk" data-act="rpReset">برگشت به حالت پیش‌فرض</button></div>`;
+ACT.rpReset=()=>{const k=RPT.k,D={bal:{pr:'all',at:'',side:'bal',grp:[],kd:[],sum:0,tol:0,age:'o',gage:0,bd:30},moin:{ids:RPC.moin.ids,asc:0,sum:0,nog:0},stk:{pr:'all',grp:[],z:0},abs:{pr:'all',kd:['a','s','m']}}[k];if(D)RPC[k]=D;RPT.q='';render()};
+/* ---------- پنجره «به انتخاب خودم» ---------- */
+const rpCk=(on,act,data,lab,sub,n,ico)=>`<button type="button" class="cufr${on?' on':''}" data-act="${act}" ${data}><span class="cufi">${ico||ic('check')}</span><span class="tx"><b>${lab}</b>${sub?`<small>${sub}</small>`:''}</span>${n!=null?`<em>${typeof n==='number'?fmt(n):n}</em>`:''}<span class="cufc">${ic('check')}</span></button>`;
+const rpSw=(on,f,lab,sub)=>rpCk(on,'rpTg',`data-f="${f}"`,lab,sub,null,ic(on?'check':'x'));
+const RPSIDE=[['all','همه','هر حسابی، با مانده یا بی‌مانده'],['bal','همه مانده‌دارها',''],['d','بدهکار','هر نوع مانده · طلبکاریم'],['dg','بدهکار طلا','طلبکاریم طلا'],['dr','بدهکار مبلغ','طلبکاریم تومان'],['c','بستانکار','هر نوع مانده · بدهکاریم'],['cg','بستانکار طلا','بدهکاریم طلا'],['cr','بستانکار مبلغ','بدهکاریم تومان']];
+const rpKinds=()=>{xaSync();return [['r','مبلغ (تومان)'],['g','طلا (گرم)'],...Object.keys(XA).map(k=>[k,XA[k].t||k])]};
+function rpCusHTML(){const k=RPT.k,C=rpC(),D=rpDef(k)||[],sec=(t,h)=>`<div class="f6h">${t}</div><div class="cufg2">${h}</div>`;let b='';
+  if(k==='bal'){const G=groupsList(),cnt=rpBalCnt();
+    b=sec('بدهکار / بستانکار',RPSIDE.map(([v,l,s])=>rpCk(C.side===v,'rpSet',`data-f="side" data-v="${v}"`,l,s,cnt[v]||0)).join(''))
+     +sec('نمایش',rpSw(C.sum,'sum','خلاصه','ردیف یک‌خطی به‌جای کارت حساب')+rpSw(C.tol,'tol','با تلورانس','مانده‌های خیلی کم (زیر ۱۰۰ هزار تومان و ۰٫۰۱ گرم) حساب نشود')+rpSw(C.age==='r','ager','محاسبه مدت رأس','میانگین وزنی روزهای مانده باز، نه قدیمی‌ترین سند')+rpSw(C.gage,'gage','محاسبه مدت تسویه طلا','مدت باز بودن مانده طلا هم نوشته شود'))
+     +sec('گروه حساب‌ها'+(C.grp.length?' · '+toFa(C.grp.length)+' انتخاب':' · همه'),G.map(g=>rpCk(C.grp.includes(g),'rpMul',`data-f="grp" data-v="${esc(g)}"`,esc(g),'',null,ic('users'))).join(''))
+     +sec('ارز ردیف'+(C.kd.length?' · '+toFa(C.kd.length)+' انتخاب':' · همه'),rpKinds().map(([v,l])=>rpCk(C.kd.includes(v),'rpMul',`data-f="kd" data-v="${esc(v)}"`,esc(l),'',null,ic(v==='r'?'debt':'coin'))).join(''))}
+  if(k==='moin'){const q=(RPT.mq||'').trim(),L=CU().filter(c=>c.grp!=='بانک'||1).filter(c=>!q||String(cuName(c)).includes(q)||String(c.cno||'')===toEn(q)).sort((a,b)=>(C.ids.includes(b.id)-C.ids.includes(a.id))||((+a.cno||0)-(+b.cno||0))).slice(0,80);
+    b=sec('نمایش',rpSw(C.sum,'sum','خلاصه','فقط مانده ابتدا و انتهای بازه، بدون ردیف سندها')+rpSw(C.asc,'asc','به ترتیب تاریخ','از قدیم به جدید (پیش‌فرض: جدید بالا)')+rpSw(C.nog,'nog','ته‌حساب طلا را نمی‌خواهم','ستون و مانده طلا نیاید'))
+     +`<div class="f6h">حساب‌ها${C.ids.length?' · '+toFa(C.ids.length)+' انتخاب':''}</div><div class="fsearch rpmq">${ic('search')}<input id="rpMq" type="search" placeholder="نام یا شماره حساب…" value="${esc(RPT.mq||'')}" autocomplete="off"></div><div class="cufg2" id="rpMl">${L.map(c=>rpCk(C.ids.includes(c.id),'rpMul',`data-f="ids" data-v="${c.id}"`,`${c.cno?`<i class="rpno2">${toFa(c.cno)}</i>`:''}${esc(cuName(c))}`,esc(c.grp||''),null,ic('user'))).join('')||'<div class="rpem"><b>حسابی پیدا نشد</b></div>'}</div>`}
+  if(k==='stk'){const G=[['g','طلای خام'],['m','طلای ساخته'],['o','غیر طلا'],['c','سکه'],['f','ارز']];
+    b=sec('گروه کالا'+(C.grp.length?' · '+toFa(C.grp.length)+' انتخاب':' · همه'),G.map(([v,l])=>rpCk(C.grp.includes(v),'rpMul',`data-f="grp" data-v="${v}"`,l,'',null,ic(v==='c'||v==='f'?'coin':'ring'))).join(''))+sec('نمایش',rpSw(C.z,'z','کالاهای با موجودی صفر هم بیاید',''))}
+  if(k==='abs'){b=sec('چه چیزی بیاید',[['a','آبشده','تکه‌های آبشده موجود'],['s','آبشده شرطی','عیارش هنوز ثبت نشده'],['m','متفرقه','طلای دست‌دوم']].map(([v,l,s])=>rpCk(C.kd.includes(v),'rpMul',`data-f="kd" data-v="${v}"`,l,s,null,ic('coin'))).join(''))}
+  return `<div class="sh-h"><div><b>به انتخاب خودم</b><small class="shsub">${esc(D[1]||'')}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div><div class="srw">${b}<button type="button" class="btn gold srgo" data-act="rpCusOk">${ic('check')} تأیید</button></div>`}
+ACT.rpCus=()=>{if(!RPC[RPT.k])return ACT.rpFilt&&ACT.rpFilt();sheet(rpCusHTML());rpMqBind()};
+const rpCusRe=()=>{if($('sheet')&&!$('ov').classList.contains('hide')){sheetKeep(rpCusHTML());rpMqBind()}};
+function rpMqBind(){const I=$('rpMq');if(!I)return;I.oninput=()=>{clearTimeout(I._t);I._t=setTimeout(()=>{RPT.mq=I.value;const C=rpC(),q=I.value.trim(),L=CU().filter(c=>!q||String(cuName(c)).includes(q)||String(c.cno||'')===toEn(q)).sort((a,b)=>(C.ids.includes(b.id)-C.ids.includes(a.id))||((+a.cno||0)-(+b.cno||0))).slice(0,80),M=$('rpMl');if(M)M.innerHTML=L.map(c=>rpCk(C.ids.includes(c.id),'rpMul',`data-f="ids" data-v="${c.id}"`,`${c.cno?`<i class="rpno2">${toFa(c.cno)}</i>`:''}${esc(cuName(c))}`,esc(c.grp||''),null,ic('user'))).join('')||'<div class="rpem"><b>حسابی پیدا نشد</b></div>'},140)}}
+ACT.rpSet=d=>{rpC()[d.f]=d.v;if(RPC[RPT.k].pr)RPC[RPT.k].pr='c';rpCusRe()};
+ACT.rpTg=d=>{const C=rpC();if(d.f==='ager')C.age=C.age==='r'?'o':'r';else C[d.f]=C[d.f]?0:1;if(C.pr)C.pr='c';rpCusRe()};
+ACT.rpMul=d=>{const C=rpC(),A=C[d.f]||(C[d.f]=[]),v=d.f==='ids'?(isNaN(+d.v)?d.v:+d.v):d.v,i=A.findIndex(x=>String(x)===String(v));if(i<0)A.push(v);else A.splice(i,1);if(C.pr)C.pr='c';if(d.f==='ids'){const S=$('sheet'),b=S&&S.querySelector(`.cufr[data-f="ids"][data-v="${d.v}"]`);if(b){b.classList.toggle('on',i<0);const h=[...S.querySelectorAll('.f6h')].pop();if(h)h.textContent='حساب‌ها'+(A.length?' · '+toFa(A.length)+' انتخاب':'')}return}rpCusRe()};
+ACT.rpCusOk=()=>{closeSheet();render()};
+/* «تا تاریخ» برای مانده‌ها (مانده در پایان یک روز) */
+ACT.rpAt=()=>{const C=rpC();openCal(C.at||todayISO(),iso=>{C.at=iso>=todayISO()?'':iso;render()},{title:'مانده تا تاریخ',sub:'مانده حساب‌ها در پایان این روز',q:[[0,'امروز'],[-1,'دیروز'],[-30,'یک ماه پیش']]})};
+/* ---------- محاسبه مانده تا یک تاریخ و مدت باز بودن ---------- */
+function rpBalAt(c,at){let R=0,G=0;const X={};for(const t of (c.txs||[])){if(!t||t.del||t.draft)continue;if(at&&t.date&&t.date>at)continue;const d=txD(t);R+=d.r||0;G+=d.g||0;for(const k in (d.x||{}))X[k]=(X[k]||0)+(+d.x[k]||0)}return {R:Math.round(R),G:Math.round(G*1000)/1000,X}}
+/* مانده باز هر جنس به روش «اول بیاید، اول تسویه شود» (مثل cuOpenMap) → قدیمی‌ترین تاریخ باز و میانگین وزنی روزها (مدت رأس) */
+function rpAge(c,k,at){const T=(c.txs||[]).filter(t=>t&&!t.del&&!t.draft&&t.date&&(!at||t.date<=at)).sort((a,b)=>String(a.date+(a.at0||a.at||'')).localeCompare(String(b.date+(b.at0||b.at||''))));const Q=[],e=k==='g'?0.0005:1;
+  for(const t of T){const d=txD(t),v=k==='r'?d.r:k==='g'?d.g:(+(d.x||{})[k]||0);if(!v||Math.abs(v)<e)continue;const s=v>0?1:-1;let a=Math.abs(v);while(a>=e&&Q.length&&Q[0].s!==s){const u=Math.min(a,Q[0].a);Q[0].a-=u;a-=u;if(Q[0].a<e)Q.shift()}if(a>=e)Q.push({s,a,d:t.date})}
+  if(!Q.length)return null;const ref=at||todayISO(),days=iso=>Math.max(0,Math.round((new Date(ref+'T12:00:00')-new Date(iso+'T12:00:00'))/864e5)),tot=Q.reduce((x,q)=>x+q.a,0);return {od:Q[0].d,d:days(Q[0].d),r:Math.round(Q.reduce((x,q)=>x+q.a*days(q.d),0)/tot)}}
+function rpBalOk(side,b,kd,tol){const has=k=>!kd.length||kd.includes(k),eR=tol?100000:1,eG=tol?0.01:0.0005,xs=Object.keys(b.X||{}).filter(k=>has(k)&&Math.abs(b.X[k])>=(tol?1:0.01));
+  const r=has('r')&&Math.abs(b.R)>=eR?b.R:0,g=has('g')&&Math.abs(b.G)>=eG?b.G:0,neg=r<0||g<0||xs.some(k=>b.X[k]<0),pos=r>0||g>0||xs.some(k=>b.X[k]>0);
+  return side==='all'?true:side==='bal'?(neg||pos):side==='d'?neg:side==='c'?pos:side==='dg'?g<0:side==='cg'?g>0:side==='dr'?r<0:side==='cr'?r>0:true}
+function rpBalCnt(){const C=RPC.bal,o={};const L=CU().filter(c=>c.grp!=='بانک'&&(!C.grp.length||C.grp.includes(c.grp||'')));const B=L.map(c=>rpBalAt(c,C.at));RPSIDE.forEach(([v])=>{o[v]=B.filter(b=>rpBalOk(v,b,C.kd,C.tol)).length});return o}
+
+/* نوار بالای گزارش‌های تنظیم‌دار: جستجو + «به انتخاب خودم» (+ «تا تاریخ» یا «بازه») — همان کادر جستجوی برنامه */
+function rpBar2(o){const D=rpDef(RPT.k)||[],C=rpC(),cu=C.pr==='c'||(RPT.k==='moin'&&C.ids.length);
+  return `<div class="stmbar rpsb"><div class="fsearch stms2">${ic('search')}<input id="rpQ" type="search" enterkeyhint="search" autocomplete="off" placeholder="جستجو در ${esc(D[1]||'گزارش')}…" value="${esc(RPT.q)}">${RPT.q?`<button type="button" class="x" data-act="rpQClr" aria-label="پاک کردن جستجو">×</button>`:''}<button type="button" class="cufbtn${cu?' on':''}" data-act="rpCus" aria-label="به انتخاب خودم">${ic('filter')}<span>${o.cl||'انتخاب'}</span>${RPT.k==='moin'&&C.ids.length?`<em>${toFa(C.ids.length)}</em>`:''}</button>${o.at?`<button type="button" class="cufbtn${C.at?' on':''}" data-act="rpAt" aria-label="تا تاریخ">${ic('cal')}<span>${C.at?esc(dates(C.at).fa.replace(/ [۰-۹]{4}$/,'')):'امروز'}</span></button>`:''}${o.per?`<button type="button" class="cufbtn${RPT.f||RPT.t?' on':''}" data-act="rpRange" aria-label="بازه تاریخ">${ic('cal')}<span>${esc(RPT.f||RPT.t?rpPerTx():'بازه')}</span></button>`:''}</div></div>`}
+RPF.bal=function(){const C=RPC.bal,at=C.at,T=at||todayISO(),pr=C.pr,side=pr==='bad'?'dr':pr==='all'?'bal':C.side,kd=pr==='c'?C.kd:[],tol=pr==='c'?C.tol:0;
+  let A=[];for(const c of CU()){if(c.grp==='بانک')continue;if(pr==='c'&&C.grp.length&&!C.grp.includes(c.grp||''))continue;const b=rpBalAt(c,at);if(!rpBalOk(side,b,kd,tol))continue;
+    const ag=Math.abs(b.R)>=1?rpAge(c,'r',at):null,gg=(pr==='c'&&C.gage&&Math.abs(b.G)>=0.0005)?rpAge(c,'g',at):null,d=ag?(pr==='c'&&C.age==='r'?ag.r:ag.d):0;
+    if(pr==='bad'&&!(b.R<0&&d>=C.bd))continue;A.push({c,b,R:b.R,G:b.G,ag,gg,d})}
+  const tr=A.filter(a=>a.R<0),tb=A.filter(a=>a.R>0),sR=tr.reduce((s,a)=>s+a.R,0),sB=tb.reduce((s,a)=>s+a.R,0),sG=A.reduce((s,a)=>s+a.G,0);
+  A.sort(pr==='bad'?(x,y)=>y.d-x.d:(x,y)=>Math.abs(y.R)-Math.abs(x.R)||Math.abs(y.G)-Math.abs(x.G));
+  const note=a=>[a.ag?(pr==='c'&&C.age==='r'?'مدت رأس '+rpN(a.ag.r)+' روز':'باز از '+dates(a.ag.od).fa+' · '+rpN(a.ag.d)+' روز'):'',a.gg?'طلا '+rpN(pr==='c'&&C.age==='r'?a.gg.r:a.gg.d)+' روز':''].filter(Boolean).join(' · ');
+  const sum=pr==='c'&&C.sum;
+  const rows=A.slice(0,400).map((a,i)=>sum?rpRow({av:rpAv(a.c),t:esc(cuName(a.c)),s:esc(note(a)),v:(Math.abs(a.R)>=1?rpVal(a.R,'تومان'):'')+(Math.abs(a.G)>=0.0005?rpVal(a.G,'گرم',wFmt):'')||'<em class="z"><small>تسویه</small></em>',at:` data-act="rpCu" data-id="${a.c.id}"`}):rpCuRow(a.c,a.b,i,note(a))).join('');
+  return rpBar2({at:1,cl:'انتخاب خودم'})+rpPre([['all','هر چی هست'],['bad','بدحساب‌ها'],['c','به انتخاب خودم']])
+   +(pr==='bad'?`<div class="rpnote">${ic('info')} حساب‌هایی که بیش از ${rpN(C.bd)} روز است تومان به ما بدهکارند، از قدیمی‌ترین</div>`:'')
+   +(at?`<div class="rpnote">${ic('cal')} مانده‌ها در پایان ${esc(dates(at).fa)}</div>`:'')
+   +(A.length?rpSum([['طلبکاریم · '+rpN(tr.length)+' حساب',fmt(Math.abs(sR)),'r','تومان'],['بدهکاریم · '+rpN(tb.length)+' حساب',fmt(sB),'b','تومان'],['طلا · خالص',wFmt(Math.abs(sG))+' گرم',rpSide(sG),rpSideT(sG)]])+`<div class="${sum?'rpls':'cuLs"><div class="cuL rpls rpcl'}">${rows}</div>${sum?'':'</div>'}`:rpNone())};
+RPF.moin=function(){const C=RPC.moin,[f,t]=rpRange(),L=C.ids.map(id=>custs.find(c=>String(c.id)===String(id)&&!c.del)).filter(Boolean);
+  const top=rpBar2({per:1,cl:'حساب‌ها'});if(!L.length)return top+`<div class="rpno"><span class="rpnoi">${ic('user')}</span><b>حسابی انتخاب نشده</b><ul><li>از «حساب‌ها» یک یا چند حساب را انتخاب کنید</li><li>بازه تاریخ را از «بازه» عوض کنید</li></ul><button type="button" class="btn gold" data-act="rpCus">${ic('users')} انتخاب حساب</button></div>`;
+  const ff=RPT.f||'',tt=RPT.t||'9999-12-31';let h='';
+  for(const c of L){const T=(c.txs||[]).filter(x=>x&&!x.del&&!x.draft&&x.date),pre=T.filter(x=>ff&&x.date<ff),inn=T.filter(x=>x.date>=ff&&x.date<=tt),bal=Ls=>{let R=0,G=0;Ls.forEach(x=>{const d=txD(x);R+=d.r||0;G+=d.g||0});return {R:Math.round(R),G:Math.round(G*1000)/1000}},o=bal(pre),e=bal(pre.concat(inn));
+    const V=(b)=>(Math.abs(b.R)>=1?rpVal(b.R,'تومان'):'<em class="z"><small>تومان تسویه</small></em>')+(!C.nog&&Math.abs(b.G)>=0.0005?rpVal(b.G,'گرم',wFmt):'');
+    h+=`<div class="rpmh">${rpRow({cls:'rpmhc',av:rpAv(c),t:esc(cuName(c))+(c.cno?' <i class="rpno2">'+toFa(c.cno)+'</i>':''),s:rpN(inn.length)+' سند در بازه',v:V(e),at:` data-act="rpCu" data-id="${c.id}"`})}<div class="rpmb"><span><small>مانده ابتدای بازه</small>${V(o)}</span><span><small>مانده پایان بازه</small>${V(e)}</span></div></div>`;
+    if(!C.sum){const S=inn.slice().sort((a,b)=>String(a.date+(a.at0||a.at||'')).localeCompare(String(b.date+(b.at0||b.at||''))));if(!C.asc)S.reverse();let last='';S.forEach(x=>{if(x.date!==last){last=x.date;h+=`<div class="fday">${esc(dates(x.date).fa)}</div>`}h+=rpTxRow(c,x,1)})}}
+  return top+`<div class="rpls">${h}</div>`};
+/* موجودی اجناس: هر کالا با موجودی و آخرین حرکت (مدت خواب) */
+function rpLastMove(){const M=new Map(),set=(k,d)=>{if(k&&d&&(!M.has(k)||M.get(k)<d))M.set(k,d)};for(const c of custs){if(!c||c.del||c.sys)continue;for(const t of c.txs||[]){if(!t||t.del||t.type!=='inv'||!t.date)continue;(t.items||[]).forEach(it=>set(it.ab?'آبشده':it.k,t.date));(t.xr||[]).forEach(x=>{if(!x||x.pul)return;if(x.a==='gold'){if(x.cat==='مانده قبلی')return;set(x.pz?'سکه پارسیان':!x.cat||x.cat==='تعویض'||x.cat==='مرجوعی'?'متفرقه':x.cat==='آبشده'&&x.sh===1?STK_SH:x.cat,t.date)}else set(x.a,t.date)})}}return M}
+RPF.stk=function(){const C=RPC.stk,pr=C.pr,LM=rpLastMove(),GN={g:'طلای خام',m:'طلای ساخته',o:'غیر طلا',c:'سکه',f:'ارز'};
+  let A=stkAll().map(o=>{const k=o.k,lm=LM.get(k)||'';return {k,l:o.t,g:o.g,v:+o.v||0,u:o.isX?((XA[k]||{}).u||'عدد'):'گرم',lm,d:lm?rpDays(lm):null}});
+  if(pr==='c'&&C.grp.length)A=A.filter(a=>C.grp.includes(a.g));if(!(pr==='c'&&C.z))A=A.filter(a=>Math.abs(a.v)>(a.u==='گرم'?0.0004:0));
+  if(pr==='slp'){A=A.filter(a=>a.v>0).sort((x,y)=>(y.d==null?1e9:y.d)-(x.d==null?1e9:x.d))}
+  const tg=A.filter(a=>a.u==='گرم'&&(a.g==='g'||a.g==='m')).reduce((s,a)=>s+a.v,0),neg=A.filter(a=>a.v<0).length;
+  return rpBar2({cl:'انتخاب خودم'})+rpPre([['all','هر چی هست'],['slp','مدت خواب اجناس'],['c','به انتخاب خودم']])+`<div class="rpnote">${ic('info')} موجودی امروز · برای اصلاح موجودی روی ردیف بزنید</div>`
+   +(A.length?rpSum([['طلای مغازه',wFmt(tg)+' گرم','a'],['قلم',rpN(A.length),''],...(neg?[['منفی',rpN(neg)+' قلم','r']]:[])])+`<div class="rpls">${A.map(a=>rpRow({av:`<i class="rpav g">${ic(a.u==='گرم'?'ring':'coin')}</i>`,t:esc(a.l),s:esc(GN[a.g]||'')+(a.lm?' · آخرین حرکت '+dates(a.lm).fa+(pr==='slp'?' · <b class="'+(a.d>60?'old':'')+'">'+rpN(a.d)+' روز خواب</b>':''):' · بدون حرکت'),v:`<em class="${a.v<0?'r':'a'}"><b>${a.v<0?'−':''}${a.u==='گرم'?wFmt(Math.abs(a.v)):qFmt(Math.abs(a.v))}</b><small>${esc(a.u)}</small></em>`,at:' data-act="rpGo" data-k="stkp"'})).join('')}</div>`:rpNone(['کالایی با این تنظیم موجودی ندارد','از «به انتخاب خودم» «کالاهای با موجودی صفر هم بیاید» را روشن کنید']))};
+/* موجودی آبشده و متفرقه: هر تکه آبشده موجود (abBase) + آبشده شرطی + متفرقه */
+RPF.abs=function(){const C=RPC.abs,kd=C.pr==='c'?C.kd:['a','s','m'],P=abBase('').filter(p=>p.av>0.0004),M=gdStockAll(),sh=(M.get(STK_SH)||{}).w||0,mt=(M.get('متفرقه')||{}).w||0;
+  const pa=kd.includes('a')?P.filter(p=>!p.sh):[],ps=kd.includes('s')?P.filter(p=>p.sh):[],aw=P.filter(p=>!p.sh).reduce((s,p)=>s+p.av,0);
+  let h='';const pr=p=>rpRow({av:`<i class="rpav g">${ic('coin')}</i>`,t:(p.base?'موجودی قبلی':esc(p.cu||''))+(p.ang?' · انگ '+esc(toFa(p.ang)):''),s:[p.sh?'عیار ثبت نشده':'عیار '+toFa(p.ay),p.lab?'آزمایشگاه '+esc(p.lab):'',p.date?dates(p.date).fa:'',p.no?'سند '+toFa(p.no):'',p.ds?esc(p.ds):''].filter(Boolean).join(' · '),v:`<em class="a"><b>${wFmt(p.av)}</b><small>گرم${p.av<p.w-0.0004?' از '+wFmt(p.w):''}</small></em>`,at:p.cid?` data-act="rpTx" data-cu="${p.cid}" data-tx="${p.tx}"`:''});
+  if(pa.length)h+=`<div class="rpgh2">آبشده · ${rpN(pa.length)} تکه</div><div class="rpls">${pa.map(pr).join('')}</div>`;
+  if(ps.length)h+=`<div class="rpgh2">آبشده شرطی · ${rpN(ps.length)} تکه</div><div class="rpls">${ps.map(pr).join('')}</div>`;
+  if(kd.includes('m')&&Math.abs(mt)>0.0004)h+=`<div class="rpgh2">متفرقه</div><div class="rpls">${rpRow({av:`<i class="rpav g">${ic('ring')}</i>`,t:'طلای متفرقه',s:'جمع موجودی (تکه به تکه ثبت نمی‌شود)',v:`<em class="${mt<0?'r':'a'}"><b>${mt<0?'−':''}${wFmt(Math.abs(mt))}</b><small>گرم</small></em>`,at:' data-act="rpGo" data-k="stkp"'})}</div>`;
+  return rpBar2({cl:'انتخاب خودم'})+rpPre([['all','هر چی هست'],['c','به انتخاب خودم']])+rpSum([['آبشده',wFmt(aw)+' گرم','a'],['شرطی',wFmt(sh)+' گرم','a'],['متفرقه',wFmt(mt)+' گرم',mt<0?'r':'a']])
+   +(h||rpNone(['آبشده یا متفرقه‌ای در مغازه ثبت نشده','شاید تنظیم‌هایی که در «به انتخاب خودم» داده‌اید نتیجه‌ای ندارد']))};
