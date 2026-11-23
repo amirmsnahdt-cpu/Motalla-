@@ -224,12 +224,12 @@ let tmpISO=null,confirmCb=null,dpMode='';
 /* پنجره پایین مثل iOS: بالا آمدن فنری، صفحه پشت عقب می‌رود؛ بستن با یک نسخه تصویری که پایین می‌لغزد
    (خود پنجره همان لحظه بسته و خالی می‌شود تا کدهایی که بلافاصله پنجره بعدی را باز می‌کنند درست کار کنند) */
 const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
-function sheet(h){/* v75.6 (خواسته صاحب اپ): پنجره (مثلاً تأیید حذف حساب) زیر کیبورد نماند — کادر نوشتن بیرون پنجره اول کیبورد را می‌بندد */{const a=document.activeElement;if(a&&a.matches&&a.matches('input,textarea,select,[contenteditable]')&&!a.closest('#sheet'))a.blur()}const o=$('ov'),s=$('sheet'),open=!o.classList.contains('hide');s.innerHTML=h;
+function sheet(h){window.__navT=performance.now();/* v75.6 (خواسته صاحب اپ): پنجره (مثلاً تأیید حذف حساب) زیر کیبورد نماند — کادر نوشتن بیرون پنجره اول کیبورد را می‌بندد */{const a=document.activeElement;if(a&&a.matches&&a.matches('input,textarea,select,[contenteditable]')&&!a.closest('#sheet'))a.blur()}const o=$('ov'),s=$('sheet'),open=!o.classList.contains('hide');s.innerHTML=h;
   if(open){if(!RM()){s.classList.remove('swap');void s.offsetWidth;s.classList.add('swap')}}
   else{shOpenT=Date.now();s.classList.remove('swap','drag','snap');s.style.transform='';s.scrollTop=0;o.classList.remove('hide');document.documentElement.classList.add('shopen')}}
 /* v70.2: کاری که بعد از بسته شدن پنجره فعلی باید انجام شود (یک بار)؛ مثلاً بعد از «مشخصات مشتری» در سند، باز شدن «تشخیص» */
 let sheetAfter=null;
-function closeSheet(){const o=$('ov'),s=$('sheet');try{if(history.state&&history.state.ck&&!o.classList.contains('hide')&&s.querySelector('.ckw,.galg')){window.__ckPopIgn=1;history.back()}}catch(_){}if(sheetAfter){const f=sheetAfter;sheetAfter=null;setTimeout(()=>{try{f()}catch(_){}},260)}if(o.classList.contains('hide')){s.innerHTML='';return}
+function closeSheet(){window.__navT=performance.now();const o=$('ov'),s=$('sheet');try{if(history.state&&history.state.ck&&!o.classList.contains('hide')&&s.querySelector('.ckw,.galg')){window.__ckPopIgn=1;history.back()}}catch(_){}if(sheetAfter){const f=sheetAfter;sheetAfter=null;setTimeout(()=>{try{f()}catch(_){}},260)}if(o.classList.contains('hide')){s.innerHTML='';return}
   if(!RM()&&s.innerHTML){try{const g=o.cloneNode(true);g.removeAttribute('id');g.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
     const A=s.querySelectorAll('input,textarea,select'),B=g.querySelectorAll('input,textarea,select');A.forEach((e,i)=>{const x=B[i];if(!x)return;if(e.type==='checkbox'||e.type==='radio')x.checked=e.checked;else x.value=e.value});
     const gs=g.querySelector('.sheet'),m=/translateY\(([-\d.]+)px\)/.exec(s.style.transform||'');gs.style.transform='';gs.classList.remove('drag','snap','swap');if(m)gs.style.setProperty('--dy',m[1]+'px');

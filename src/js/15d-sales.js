@@ -740,7 +740,8 @@ function ivBalP(c,t){const P=cuBalBefore(c,t),d=txD(t),K=q8Keys(P,d);
   const now=diff?`<button type="button" class="ivnow" data-act="cuOpen" data-id="${c.id}">${ic('clock')}<span><small>سندهای بعدی هم ثبت شده · مانده امروز حساب</small><b>${[B.R?fmt(Math.abs(B.R))+' تومان '+ourLab(B.R):'',B.G?wFmt(Math.abs(B.G))+' گرم '+ourLab(B.G):''].filter(Boolean).join(' · ')||'تسویه'}</b></span>${ic('back').replace('class="i"','class="i flip"')}</button>`:'';
   return now+balGrid(rows,[{lab:'قبلی',w:'p'},{lab:'این سند',w:'d'},{lab:'نهایی',w:'f',m:1}],{an:ivCntId!==String(t.id),act:can('debt')?'invBal':'',hint:can('debt')?'زدن = تسویه · نگه داشتن = جزئیات فاکتور':''})}
 /* v61.67 (خواسته صاحب اپ): در سند ثبت‌شده هم زدن روی مانده = تسویه — سند برای ویرایش باز و پنجره تسویه همان مانده باز می‌شود */
-ACT.invBal=d=>{if(!invGet())return;ACT.invEdit();setTimeout(()=>{if(cur==='sell'&&sv&&sv.edit)ACT.svBal(d)},420)};
+/* v102.1: پنجره تسویه بلافاصله بعد از رسم صفحه ویرایش باز می‌شود (۴۲۰ میلی‌ثانیه انتظار ثابت برداشته شد) */
+ACT.invBal=d=>{if(!invGet())return;ACT.invEdit();requestAnimationFrame(()=>{if(cur==='sell'&&sv&&sv.edit)ACT.svBal(d)})};
 /* سند ثبت‌شده به شکل «سند در حال ویرایش» (برای ویرایش و برای پنجره جزئیات فاکتور) */
 function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','ajv','prv','taxv','tot'].forEach(k=>delete o[k]);return o}),xr=(t.xr||[]).map((x,xi)=>{const o={...x};['n','q750','amount','e','q0','ajg','prg'].forEach(k=>delete o[k]);if(o.a==='gold'&&!o.pgM)o.pg=0;/* v96.1: تکه آبشده قدیمی (بدون pid) شناسه‌اش را با ویرایش سند نگه می‌دارد */if(abIn(o)&&!o.pid)o.pid=abKey(x,t,xi);return o}),pays=(t.pays||[]).map(p=>{const o={...p};delete o.xfId;return o});
   const keep=sv;sv={v:2,cuId:c.id,date:t.date,rate:+t.rate||0,mz:+t.mz||mzOf(t.rate),items,xr,pays,tax:!!t.tax,disc:+t.disc||0,gconv:!!t.gc,gcOld:!!t.gc,q:'',dk:t.dk||'',fixCu:true,edit:{tx:t.id,no:t.no}};svFix();const r=sv;sv=keep;return r}

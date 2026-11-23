@@ -570,9 +570,11 @@ const cuHit=(c,q,dOk)=>{const h=cuHayC(c),qd=dOk?dOk.qd:null;return h.s.includes
 /* ساختن نمایه در تکه‌های چند میلی‌ثانیه‌ای، بیرون از کار کاربر */
 /* sxWarm(cb): cb یک بار، وقتی نمایه آماده شد (اگر همین حالا آماده است، هیچ) — جستجویی که وسط ساخت نمایه شروع شده بعدش کامل می‌شود */
 let SXCB=[];
-function sxWarm(cb){const X=sxGet();if(X.warm)return;if(cb&&!SXCB.includes(cb))SXCB.push(cb);if(SXW)return;SXW=1;const L=custs.filter(c=>!c.del&&!c.sys);let ci=0,ti=0;const idle=window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:400}):f=>setTimeout(f,40);
-  const step=()=>{if(sxGet()!==X){SXW=0;return}const t0=performance.now();
-    while(ci<L.length){const c=L[ci],T=c.txs||[];if(!ti)cuHayC(c);while(ti<T.length&&performance.now()-t0<8){const t=T[ti++];if(!t.del&&!t.draft&&t.date&&typeof cuTxHayC==='function')cuTxHayC(t)}if(ti<T.length)break;ci++;ti=0;if(performance.now()-t0>=8)break}
+function sxWarm(cb){const X=sxGet();if(X.warm)return;if(cb&&!SXCB.includes(cb))SXCB.push(cb);if(SXW)return;SXW=1;const L=custs.filter(c=>!c.del&&!c.sys);let ci=0,ti=0;/* v102.1 (صاحب اپ: «برنامه کند است و لگ دارد»، ویدیو): ساخت نمایه کنار انیمیشن‌های صفحه/پنجره اجرا نمی‌شود (۹۰۰ میلی‌ثانیه بعد از هر رسم صفحه، باز/بسته شدن پنجره)
+       و هر تکه فقط تا وقتی مرورگر بیکار است کار می‌کند (deadline) — قبلاً روی گوشی کند در وسط حرکت صفحه‌ها ۶۰۰ میلی‌ثانیه کار می‌کرد */
+    const idle=f=>{const go=dl=>{if(performance.now()-(window.__navT||0)<900){setTimeout(()=>idle(f),450);return}f(dl)};window.requestIdleCallback?requestIdleCallback(go,{timeout:2500}):setTimeout(go,60)};
+  const step=dl=>{if(sxGet()!==X){SXW=0;return}const t0=performance.now(),BU=Math.max(3,Math.min(8,dl&&dl.timeRemaining?dl.timeRemaining()-1:6));
+    while(ci<L.length){const c=L[ci],T=c.txs||[];if(!ti)cuHayC(c);while(ti<T.length&&performance.now()-t0<BU){const t=T[ti++];if(!t.del&&!t.draft&&t.date&&typeof cuTxHayC==='function')cuTxHayC(t)}if(ti<T.length)break;ci++;ti=0;if(performance.now()-t0>=BU)break}
     if(ci<L.length){idle(step);return}idle(()=>{SXW=0;if(sxGet()!==X){/* داده وسط کار عوض شد: از نو */sxWarm();return}try{bzPeople()}catch(_){}X.warm=1;const C=SXCB;SXCB=[];C.forEach(f=>{try{f()}catch(_){}})})};idle(step)}
 function memPeople(q,dOk,n){const X=sxGet(),qd=dOk?dOk.qd:null;if(!X.nm)X.nm=new Set(CU().map(c=>nzName(c.name)));
   return bzPeople().filter(p=>{if(p.cuId||X.nm.has(p.k))return false;if(p.hk===undefined){p.hk=nzName(p.holder||'');p.dg=toEn([p.phone,p.nid,p.iban,p.card].join(' ')).replace(/\D/g,'')}return p.k.includes(q)||p.hk.includes(q)||(qd!=null?qd.length>=3&&p.dg.includes(qd):!!dOk&&dOk([p.phone,p.nid,p.iban,p.card].join(' ')))}).sort((a,b)=>(b.k.startsWith(q)-a.k.startsWith(q))||String(b.last).localeCompare(String(a.last))).slice(0,n)}

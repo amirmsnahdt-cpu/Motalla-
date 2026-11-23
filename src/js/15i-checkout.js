@@ -16,6 +16,23 @@ const ckOut=()=>ckRest()<0;
 /* v91.7 (خواسته صاحب اپ: «کارتخوان و بقیه روش‌های تسویه با آیکون‌های انیمیشنی که با دیدنش آدم بفهمد برای چه کاری است»):
    هر روش یک نقاشی کوچک متحرک دارد (SVG درون‌خطی، حرکت با CSS): کارت که در کارتخوان می‌رود، سکه که به بانک می‌رود یا از آن بیرون می‌آید،
    سکه بین دو نفر، اسکناس، شمش‌هایی که جابه‌جا می‌شوند، برچسب تخفیف، تومان که طلا می‌شود. o = جهت پرداخت (برعکس) */
+/* v102.1 (صاحب اپ: «دکمه‌ها، انیمیشن‌ها و لوگوهای روی دکمه‌ها مینیمال‌تر و جالب‌تر»): آیکون خطی ساده (۲۴×۲۴، یک رنگ، خط ۱٫۸) در مربع رنگی کم‌رنگ؛
+   فقط یک بار هنگام باز شدن کشیده می‌شود (pathLength=1، CSS ckDraw) و بعد ثابت است — ckAni با ۱۳ انیمیشن همیشگی روی گوشی کند لگ می‌ساخت */
+const CKIC={pos:['g','<rect x="5" y="2.5" width="14" height="19" rx="3"/><rect x="8" y="5.5" width="8" height="5" rx="1.2"/><path d="M9 14.5h.01M12 14.5h.01M15 14.5h.01M9 18h.01M12 18h.01M15 18h.01"/>'],
+  hav:['b','<path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 11v6.5M10 11v6.5M14 11v6.5M18.5 11v6.5"/><path d="M3 20.5h18"/>'],
+  dep:['v','<circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.6-3 2.6-5 5-5s4.4 2 5 5"/><path d="M14.2 18.6c.4-2.2 1.5-3.7 2.8-3.7s2.4 1.5 2.8 3.7"/>'],
+  cash:['e','<rect x="2.5" y="6" width="19" height="12" rx="2.6"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.6h.01M18 14.4h.01"/>'],
+  gx:['a','<path d="M4 8.5h13.5l-3.2-3.2"/><path d="M20 15.5H6.5l3.2 3.2"/>'],
+  off:['r','<path d="M20.4 13.6 13.6 20.4a1.8 1.8 0 0 1-2.6 0L3.5 12.9V3.5h9.4l7.5 7.5a1.8 1.8 0 0 1 0 2.6z"/><circle cx="8" cy="8" r="1.5"/>'],
+  rg:['a','<path d="M5.5 20h13l-2.4-6H7.9z"/><path d="M12 3v7.5M9 7.5l3 3 3-3"/>'],
+  gp:['a','<path d="M3.5 11.5h9l-2-5h-5z"/><rect x="10.5" y="13.5" width="10.5" height="7" rx="1.8"/><circle cx="15.75" cy="17" r="1.4"/>'],
+  wd:['v','<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'],
+  coin:['a','<circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="4.4"/>']};
+function ckIco(k,out){const kk=k==='cust'?'dep':/^x[pq]?:/.test(k)?'coin':k;let D=CKIC[kk];
+  if(k==='gd')D=['a','<path d="M5.5 20.5h13l-2.4-6H7.9z"/>'+(out?'<path d="M12 11V3.5M9 6.5l3-3 3 3"/>':'<path d="M12 3.5V11M9 8l3 3 3-3"/>')];
+  if(!D)return '';const sv=D[1].replace(/<(path|rect|circle)\b/g,'<$1 pathLength="1"');
+  return `<svg class="cki" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${sv}</svg>`}
+const ckIcT=k=>{const kk=k==='cust'?'dep':/^x[pq]?:/.test(k)?'coin':k==='gd'?'rg':k;return (CKIC[kk]||['b'])[0]};
 function ckAni(k,o){const G='#d9a21b',G2='#f6d77a',B='#2f6bff',N='#22a45d',S=h=>`<svg class="cka${o?' o':''}" viewBox="0 0 48 48" aria-hidden="true">${h}</svg>`,
   ing=(x,y,sc)=>`<g transform="translate(${x} ${y}) scale(${sc||1})"><path d="M5 0h12l5 10H0z" fill="${G}"/><path d="M5 0h12l1.6 3.2H3.4z" fill="${G2}"/></g>`,
   note=(x,y,sc)=>`<g transform="translate(${x} ${y}) scale(${sc||1})"><rect width="22" height="13" rx="2.2" fill="${N}"/><circle cx="11" cy="6.5" r="3.2" fill="#d7f5e3"/><rect x="2.2" y="2.2" width="3" height="1.6" rx=".8" fill="#d7f5e3"/><rect x="16.8" y="9.2" width="3" height="1.6" rx=".8" fill="#d7f5e3"/></g>`,
@@ -318,7 +335,7 @@ function ckHTML(){const T=svTot(),c=svCu(),r=ckRest(),wp=c&&sv.edit&&typeof wdPe
   const card=`<div class="ckob ${wq?'w':k3}"><div class="ckobt"><span>${r?(wq?'رفت برای واریز · منتظر تأیید بانک':TL+' · '+(r>0?'طلبکاریم':'بدهکاریم')):TL+' · تسویه است'}</span><em>${tg==='d'&&!A?'جمع سند':'این سند'} ${fmt(Math.abs(T.total))}</em></div>
     <div class="ckobv">${r?`<b><span id="ckRn" data-v="${Math.abs(r)}">${fmt(Math.abs(r))}</span></b><i>تومان</i>`:`<i>${ic('check')}</i><b class="ok">تسویه شد</b>`}</div>${chips?`<div class="ckobc">${chips}</div>`:''}${seg}</div>`;
   const pz=R.length?`<div class="ckoz" aria-label="دریافت و پرداخت‌های این سند">${R.map(z=>`<div class="ckoi"><span class="ckoii">${ic(z.ico)}</span><span class="tx"><small>${esc(z.lab)}</small><b>${fmt(Math.abs(z.amt))}</b></span>${z.lock?`<span class="ckoil">${ic('check')}</span>`:`<button type="button" class="ckoix" data-act="ckDel" data-k="${z.k}" data-i="${z.i}" aria-label="حذف ${esc(z.lab)}">${ic('x')}</button>`}</div>`).join('')}</div>`:'';
-  const tl=!r&&!gw&&!ckXT().length?'':`<div class="ckt cko3${r<0?' out':''}">${[...(r?(r<0?CKO:CKT):[]),...(gw?[['gd',(gw>0?'دریافت طلا · ':'پرداخت طلا · ')+wFmt(Math.abs(gw))+' گرم',gw>0?'dIn':'dOut'],['gp','پولی کردن طلا · '+wFmt(Math.abs(gw))+' گرم','swap']]:[]),...ckXT()].map(([k,t,i])=>{const A2=ckAni(k,k.slice(0,2)==='x:'||k==='gd'?i==='dOut':r<0);return `<button class="ckti q-${k.replace(/:.*/,'')}${A2?' an':''}" data-act="ckM" data-m="${k}"><i>${A2||ic(i)}</i><span>${t}</span></button>`}).join('')}</div>`;
+  const tl=!r&&!gw&&!ckXT().length?'':`<div class="ckt cko3${r<0?' out':''}">${[...(r?(r<0?CKO:CKT):[]),...(gw?[['gd',(gw>0?'دریافت طلا · ':'پرداخت طلا · ')+wFmt(Math.abs(gw))+' گرم',gw>0?'dIn':'dOut'],['gp','پولی کردن طلا · '+wFmt(Math.abs(gw))+' گرم','swap']]:[]),...ckXT()].map(([k,t,i])=>{const A2=ckIco(k,k.slice(0,2)==='x:'||k==='gd'?i==='dOut':r<0);return `<button class="ckti mi t-${ckIcT(k)} q-${k.replace(/:.*/,'')}" data-act="ckM" data-m="${k}"><i>${A2||ic(i)}</i><span>${(m=>m?`${m[1]}<small class="ckts">${m[2]}</small>`:t)(/^(.+?) · (.*[\d۰-۹].*)$/.exec(t))}</span></button>`}).join('')}</div>`;
   const bf=CK.m==='bfix';
   return `<div class="ckw${bf?'':' cko fix'}"><div class="sh-h"><div><b>${tg==='d'&&!A?'تسویه سند':tg==='p'?'تسویه مانده قبلی':'تسویه حساب'}</b><small class="shsub">${esc(c?cuName(c):'')}${r<0?' · مانده را به مشتری می‌پردازیم':''}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
   ${card}${wdCkHTML()}${pz}
