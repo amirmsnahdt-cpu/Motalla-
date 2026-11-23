@@ -221,7 +221,8 @@ const CKWZM={gx:1,rg:1,gdl:1,gcv:1};
 const cWzGin=()=>ckGold()>0;/* مشتری طلا بدهکار است = دریافت طلا */
 function cWzSteps(){const m=CK.m;
   if(m==='gx'){const C=ckGxC();return [{k:'w',l:'وزن طلای مشتری',s:'وزن',u:'گرم',t:'dec',need:'وزن طلای مشتری را بزنید'},{k:'ay',l:'عیار',s:'عیار',t:'int',d:()=>ckGxX().ay},{k:'gr',l:'هر گرم · خرید از مشتری',s:'هر گرم',u:'تومان',t:'num',d:()=>C.pg||'',v:()=>+CK.gv>0?C.pg:''},{k:'gv',l:'قیمت کل طلای مشتری',s:'قیمت کل',u:'تومان',t:'num',d:()=>C.amount||''}]}
-  if(m==='rg')return [{k:'amount',l:'مبلغی که طلا می‌شود',s:'مبلغ',u:'تومان',t:'num',d:()=>ckLeft()},{k:'pg',l:'هر گرم ۱۸',s:'نرخ',u:'تومان',t:'num',d:()=>sv.rate||''}];
+  /* v101.6 (صاحب اپ: «در تبدیل به طلا وزن هم بدانم چقدر می‌شود و بشود ادیت کرد»): مرحله سوم «وزن ۷۵۰» = مبلغ ÷ نرخ؛ اگر دستی زده شود مبلغ = وزن × نرخ */
+  if(m==='rg')return [{k:'amount',l:'مبلغی که طلا می‌شود',s:'مبلغ',u:'تومان',t:'num',d:()=>ckLeft()},{k:'pg',l:'هر گرم ۱۸',s:'نرخ',u:'تومان',t:'num',d:()=>sv.rate||''},{k:'rw',l:'وزن طلا · گرم ۷۵۰',s:'وزن',u:'گرم',t:'dec',d:()=>{const a=+cWzVal({k:'amount',d:()=>ckLeft()})||0,pg=+cWzVal({k:'pg',d:()=>sv.rate})||0;return a&&pg?String(Math.round(a/pg*1000)/1000):''}}];
   if(m==='gdl')return [{k:'cat',l:'نوع طلا',s:'نوع',t:'pick'},{k:'wt',l:cWzGin()?'وزن طلای دریافتی':'وزن طلای تحویلی',s:'وزن',u:'گرم',t:'dec',d:()=>Math.abs(ckGold())||'',need:'وزن را بزنید'},{k:'ay',l:'عیار',s:'عیار',t:'int',d:()=>xrAy(cWzGin()?'in':'out',false,CK.cat||gkCat0())}];
   if(m==='gcv')return [{k:'wt',l:'وزن طلا · گرم ۷۵۰',s:'وزن',u:'گرم',t:'dec',d:()=>Math.abs(ckGold())||'',need:'وزن را بزنید'},{k:'pg',l:'هر گرم ۱۸',s:'نرخ',u:'تومان',t:'num',d:()=>sv.rate||''}];
   return []}
@@ -230,7 +231,7 @@ const cWzVal=z=>{const r=cWzRaw(z);if(r!=='')return r;const v=z.v&&z.v();if(v!==
 const cWzFmt=(z,v)=>v===''?'':z.t==='num'?Number(v).toLocaleString('en-US'):z.t==='dec'?v:z.t==='pick'?v:toEn(String(v));
 function cWzRes(){const m=CK.m,side=v=>v>0?'طلبکاریم':v<0?'بدهکاریم':'تسویه';
   if(m==='gx'){const C=ckGxC(),r=ckRest();if(!(C.n>0))return 'وزن را بزنید؛ قیمت کل خودش حساب می‌شود';const af=r-C.amount,q=Math.round(C.n*(+ckGxX().ay||750)/750*1000)/1000;return `معادل ۷۵۰ <b>${wFmt(q)}</b> گرم · مانده بعد <b class="${af>0?'r':af<0?'b':'z'}">${fmt(Math.abs(af))}</b> ${side(af)}`}
-  if(m==='rg'){const a=+cWzVal({k:'amount',d:()=>ckLeft()})||0,pg=+cWzVal({k:'pg',d:()=>sv.rate})||0;if(!(a>0&&pg>0))return 'مبلغ و نرخ را بزنید';return `معادل <b>${wFmt(Math.round(a/pg*1000)/1000)}</b> گرم ۷۵۰ · ${ckOut()?'مشتری طلا طلبکار می‌شود':'مشتری طلا بدهکار می‌شود'}`}
+  if(m==='rg'){const pg=+cWzVal({k:'pg',d:()=>sv.rate})||0,rw=+CK.rw||0,a=rw&&pg?Math.round(rw*pg):+cWzVal({k:'amount',d:()=>ckLeft()})||0;if(!(a>0&&pg>0))return 'مبلغ و نرخ را بزنید';return `${rw?'مبلغ <b>'+fmt(a)+'</b> تومان':'معادل <b>'+wFmt(Math.round(a/pg*1000)/1000)+'</b> گرم ۷۵۰'} · ${ckOut()?'مشتری طلا طلبکار می‌شود':'مشتری طلا بدهکار می‌شود'}`}
   const g=ckGold(),w=parseFloat(cWzVal(cWzSteps().find(z=>z.k==='wt')))||0;
   if(m==='gdl'){const ay=+cWzVal(cWzSteps()[2])||750,e=Math.round(w*ay/750*1000)/1000,af=Math.round((Math.abs(g)-e)*1000)/1000;if(!w)return 'وزن را بزنید';return `معادل ۷۵۰ <b>${wFmt(e)}</b> گرم · مانده طلا ${af>0.0005?`<b>${wFmt(af)}</b> گرم ${g>0?'طلبکاریم':'بدهکاریم'}`:af<-0.0005?`<b>${wFmt(-af)}</b> گرم ${g>0?'بدهکاریم':'طلبکاریم'}`:'<b class="z">تسویه</b>'}`}
   if(m==='gcv'){const pg=+cWzVal({k:'pg',d:()=>sv.rate})||0;if(!(w&&pg))return 'وزن و نرخ را بزنید';return `مبلغ <b>${fmt(Math.round(w*pg))}</b> تومان · ${g>0?'طلبکار':'بدهکار'} تومانی می‌شویم`}
@@ -241,7 +242,9 @@ function cWzHead(){const m=CK.m,g=ckGold(),r=ckRest(),gold=m==='gdl'||m==='gcv';
   const A=ckAni(m==='gdl'?'gd':(CKWZT[m]||[])[1]||'gx',m==='gdl'&&!cWzGin());return `<span class="ckbi g wzi">${A||ic('coin')}</span><span class="tx"><b>${cWzTitle()}</b><small>${sub}</small></span>`}
 function cWzLcd(){const S=cWzSteps(),i=Math.min(CK.st|0,S.length-1),z=S[i];
   const chips=`<div class="wzc">${S.map((q,j)=>{const v=cWzVal(q);return `<button type="button" class="${j===i?'on':j<i?'dn':''}" data-act="ckWzGo" data-i="${j}"><small>${toFa(j+1)} · ${q.s}</small><b>${v?esc(cWzFmt(q,v)):'—'}</b></button>`}).join('')}</div>`;
-  if(z.t==='pick'){const L=gkCats(),c=CK.cat||gkCat0();return chips+`<div class="ptm-bt">${esc(z.l)}؟</div><div class="wzp">${L.map(k=>`<button type="button" class="ptm-br${k===c?' on':''}" data-act="ckWzPk" data-k="${esc(k)}"><span class="ckbi g">${ic('coin')}</span><span class="tx"><b>${esc(k)}</b><small>عیار ${toFa(String(xrAy(cWzGin()?'in':'out',false,k)))}</small></span>${k===c?`<i class="ptm-bk">${ic('check')}</i>`:''}</button>`).join('')}</div>`}
+  /* v101.6 (صاحب اپ: «تحویل طلا باید لیست باشد؛ عمدتاً متفرقه یا آبشده، آن‌ها جدا و بقیه زیر»): دو کاشی بزرگ آبشده و متفرقه، زیرش فهرست یک‌خطی کالاهای مغازه */
+  if(z.t==='pick'){const L=gkCats(),c=CK.cat||gkCat0(),ay=k=>toFa(String(xrAy(cWzGin()?'in':'out',false,k))),on=k=>k===c?' on':'';const T=L.filter(k=>k==='آبشده'||k==='متفرقه'),G=L.filter(k=>!T.includes(k));
+    return chips+`<div class="wzp2">${T.map(k=>`<button type="button" class="wzt${on(k)}" data-act="ckWzPk" data-k="${esc(k)}"><b>${esc(k)}</b><small>عیار ${ay(k)}</small>${k===c?`<i>${ic('check')}</i>`:''}</button>`).join('')}</div>${G.length?`<div class="wzgh">کالاهای مغازه</div><div class="wzp">${G.map(k=>`<button type="button" class="wzr1${on(k)}" data-act="ckWzPk" data-k="${esc(k)}"><b>${esc(k)}</b><small>عیار ${ay(k)}</small>${k===c?`<i>${ic('check')}</i>`:''}</button>`).join('')}</div>`:''}`}
   const raw=cWzRaw(z),v=cWzVal(z);return chips+`<div class="ptm-v wzv"><small>${esc(z.l)}${z.u?' · '+z.u:''}</small><b class="${raw===''&&!(z.v&&z.v())?'df':''}">${v?esc(cWzFmt(z,v)):'0'}</b></div><div class="wzr">${cWzRes()}</div>`}
 function ckWiz(){const m=CK.m,S=cWzSteps(),i=Math.min(CK.st|0,S.length-1),z=S[i],pk=z.t==='pick',pap=m==='gx'||m==='gdl';
   return `<div class="ptm lt wz${pk?' wpk':''}${CK.noan?' noan':''}${pap&&!pk?'':' nopap'}" id="posD" style="--bk:#b27c0e">
@@ -261,7 +264,7 @@ function ckWzK(k){const S=cWzSteps(),i=Math.min(CK.st|0,S.length-1),z=S[i];if(!z
   if(CK.pre){if(/^[\d.]/.test(k))v='';else if(v==='')v=String(cWzVal(z));CK.pre=0}
   if(k==='c')v='';else if(k==='bs')v=v.slice(0,-1);else if(k==='.'){if(z.t==='dec'&&!v.includes('.'))v=(v||'0')+'.'}
   else{v=v+k;if(z.t!=='dec')v=v.replace(/^0+(?=\d)/,'');if(z.t==='dec'){const[a,b]=v.split('.');v=a.slice(0,5)+(b!=null?'.'+b.slice(0,3):'')}else v=v.slice(0,z.t==='int'?4:13)}
-  CK[z.k]=v;if(CK.m==='gx'&&z.k!=='gv')CK.gv='';
+  CK[z.k]=v;if(CK.m==='gx'&&z.k!=='gv')CK.gv='';if(CK.m==='rg'&&z.k!=='rw')CK.rw='';
   try{navigator.vibrate&&navigator.vibrate(6)}catch(_){}cWzPaint()}
 ACT.ckWzGo=d=>{if(!CK||!CKWZM[CK.m])return;const o=CK.st|0;CK.st=+d.i||0;CK.pre=1;cWzPaint(0,CK.st>o?1:CK.st<o?-1:0)};
 ACT.ckWzPk=d=>{if(!CK)return;const a0=xrAy(cWzGin()?'in':'out',false,CK.cat||gkCat0());if(CK.ay===''||CK.ay==null||+CK.ay===a0)CK.ay='';CK.cat=d.k;CK.st=1;CK.pre=1;try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}cWzPaint(1)};
@@ -317,7 +320,7 @@ ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حس�
     if(kk==='x'){const tg=CK&&CK.tg;CK={m:'xq:'+k,tg,amount:Math.abs(v),q:'',pre:1};ckRe('ckA');return}
     closeSheet();setTimeout(()=>xrStart(xrNew(v>0?'sell':'buy',k,{pul:true,q,fl:'one',fd:v>0?'sell':'buy'})),80);return}
   if(m==='rg'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}
-  const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:'',pre:1,st:0};if(m==='gx'){CK.w='';CK.ay='';CK.gr='';CK.gv=''}if(m==='rg'){CK.amount='';CK.pg=''}if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
+  const tg=CK&&CK.tg;CK={m,tg,amount:m==='gx'||m==='bfix'?0:ckLeft(),q:'',pg:m==='rg'?sv.rate:'',pre:1,st:0};if(m==='gx'){CK.w='';CK.ay='';CK.gr='';CK.gv=''}if(m==='rg'){CK.amount='';CK.pg='';CK.rw=''}if(m==='pos'||m==='hav'){const L=bkCus().filter(c=>String(c.id)!==String(sv.cuId)),last=ls.get('m_bk_cu',''),s0=L.find(c=>String(c.id)===String(last));CK.srcId=((s0||L[0]||{}).id);if(CK.srcId==null)CK.srcId='';if(m==='hav'&&s0)CK.pk=1}
   /* v100.8: فهرست اشخاص بدون پریدن کیبورد باز می‌شود (جستجو فقط با زدن خودش) */
   ckRe(m==='dep'||m==='cust'?'':m==='gx'?'ckW':m==='bfix'?'bfT':m?'ckA':'')};
 ACT.ckCh=d=>{ckRead();CK.chId=d.id;ckRe()};
@@ -326,7 +329,7 @@ ACT.ckSrcX=()=>{ckRead();CK.pl=1;ckRe('ckS')};
 ACT.ckPick=d=>{ckRead();if(!d.k){CK.sel=null;ckRe('');return}CK.sel={k:d.k,id:d.id};CK.kbT=Date.now()+550;CK.pre=1;
   const av=d.k==='cu'?ckSelCap():(()=>{const x=validated().find(z=>String(z.id)===String(d.id));return x?x.amount-ckUsedDep(x.id):0})();
   CK.amount=ckOut()?ckLeft():Math.max(0,Math.min(ckLeft()||av,av));ckRe('ckA')};
-ACT.ckAdd=()=>{ckRead();if(CK.m==='rg'){if(CK.amount===''||CK.amount==null)CK.amount=ckLeft();if(!(+CK.pg>0))CK.pg=sv.rate||''}const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0,n0=sv.pays.length;
+ACT.ckAdd=()=>{ckRead();if(CK.m==='rg'){if(CK.amount===''||CK.amount==null)CK.amount=ckLeft();if(!(+CK.pg>0))CK.pg=sv.rate||'';if(+CK.rw>0&&+CK.pg>0)CK.amount=Math.round(+CK.rw*+CK.pg)}const m=CK.m,a0=+CK.amount||0,out=ckOut(),a=a0,n0=sv.pays.length;
   if(m==='gdl'||m==='gcv'){const S=cWzSteps(),V=k=>cWzVal(S.find(z=>z.k===k)||{k});GTK={w:ckTg(),m:m==='gcv'?'cv':'dl',wt:V('wt'),ay:m==='gdl'?+V('ay')||750:750,pg:m==='gcv'?+V('pg')||0:'',cat:CK.cat||gkCat0(),ds:clean(CK.ds||''),pc:''};
     if(!gkAddCore()){GTK=null;return}const x=sv.xr[sv.xr.length-1];GTK=null;ckPhPut(n0,x);CK={m:''};ckBackToDoc();return}
   if(/^xq:/.test(m)){const k=m.slice(3),v=ckXv(k),A=XA[k]||{t:k,u:'عدد'};if(!(a>0)){toast('تعداد را بزنید',true);return}if(a>Math.abs(v)+1e-9){toast('بیشتر از مانده '+A.t+' است ('+qFmt(Math.abs(v))+')',true);return}
