@@ -111,7 +111,11 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const nl=v=>String(v).replace(/ · (طلبکاریم|بدهکاریم)$/,''),D=dates(t.date),its=t.items||[],xs=t.xr||[],pays=t.pays||[],hMz=+t.mz||(t.rate?Math.round(t.rate*MZK):0),mzOf2=x=>+x.mz||hMz;
   const P=cuBalBefore(c,t),d=txD(t),dX=d.x||{},KO=Object.keys(XA),ko=k=>{const i=KO.indexOf(k);return i<0?99:i};
   const keys=[...new Set([...Object.keys(P.X),...Object.keys(dX)])].filter(k=>Math.round(((P.X[k]||0)+(+dX[k]||0))*100)||+dX[k]||P.X[k]).sort((a,b)=>ko(a)-ko(b));
-  const PG=pvGroups(pays,xs),g0=x=>x.a==='gold',un=x=>g0(x)?'گرم':(XA[x.a]||{}).u||'';
+  const PG=pvGroups(pays,xs),g0=x=>x.a==='gold',
+    /* v102.9 (خواسته صاحب اپ): مظنه‌ای که ردیف‌ها واقعاً با آن حساب شده‌اند؛ اگر همه ردیف‌های طلای قیمت‌دار یک مظنه داشته باشند (مثلاً مظنه دستی همان ردیف)
+       همان روی فاکتور می‌آید و «هر گرم ۱۸» از همان ساخته می‌شود، نه مظنه روزِ سربرگ سند */
+    eMzL=[...new Set([...its.map(it=>+it.mz||hMz),...xs.filter(x=>x.a==='gold'&&(x.t==='sell'||x.t==='buy')&&!x.pgM).map(mzOf2)].filter(Boolean))],
+    eMz=eMzL.length===1?eMzL[0]:hMz,eOwn=eMz!==hMz,eG18=eOwn?Math.round(eMz/MZK):+t.rate||0,un=x=>g0(x)?'گرم':(XA[x.a]||{}).u||'';
   /* واژه‌های دو طرف حساب: از دید مطلا (طلبکاریم/بدهکاریم) یا از دید مشتری (بدهکار/بستانکار) */
   const WR=S.wr==='c'?['تسویه','بدهکار','بستانکار']:['تسویه','طلبکاریم','بدهکاریم'],side=v=>!v?WR[0]:v<0?WR[1]:WR[2],cls=v=>v<0?'vd':v>0?'vc':'vz',nm=v=>'<bdi dir="ltr">'+fmt(Math.abs(Math.round(v)))+'</bdi>',pctT=v=>toFa(String(Math.round(v*100)/100))+'٪',ppN=v=>S.ppi?Math.round(+v):Math.round(+v*100)/100,ppT=v=>toFa(String(ppN(v)))+'٪';
   /* رنگ‌ها: رنگی (کاغذ کرم یا سفید) یا سیاه‌وسفید برای چاپگر لیزری */
@@ -170,7 +174,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
     return {k,h,u,v:[p,dd,f],mv:k==='r'?!!(its.length||pays.some(pAmt)||xs.some(x=>+x.amount)||disc||gcr):xs.some(x=>(k==='g'?x.a==='gold':x.a===k)&&(x.pul||x.t==='in'||x.t==='out'))||(k==='g'&&!!gcr),F:v=>toFa(Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:dp,maximumFractionDigits:dp}))}}).filter(K=>K.k!=='g'||S.ag==='y'||(S.ag==='a'&&(K.v.some(Boolean)||K.mv)));
   /* ---- ستون‌ها. هر ستون: خودکار (فقط وقتی داده دارد؛ «نرخ» وقتی ردیفی نرخی جز نرخ بالای برگه دارد، «وزن ۷۵۰» وقتی طلای غیر ۷۵۰ هست) / همیشه / هرگز.
      پهنای هر ستون از بلندترین نوشته‌اش؛ اگر برای نام کالا جا نماند اول ستون‌های خودکارِ کم‌اهمیت‌تر کنار می‌روند و بعد قلم جدول یک پله ریز می‌شود ---- */
-  const hRt=S.rt==='g'?+t.rate||0:hMz,has=f=>f==='rt'?ALLR.some(r=>r.rv&&r.rv!==hRt):f==='w7'?ALLR.some(r=>r.w7d):ALLR.some(r=>r.c&&r.c[f]&&r.c[f][0]);
+  const hRt=S.rt==='g'?eG18:eMz,has=f=>f==='rt'?ALLR.some(r=>r.rv&&r.rv!==hRt):f==='w7'?ALLR.some(r=>r.w7d):ALLR.some(r=>r.c&&r.c[f]&&r.c[f][0]);
   ALLR.forEach(r=>{r.c=r.c||{};r.c.lab=[r.lab||''];r.c.ang=[r.ang||'']});
   let UC=INVCOL.map(x=>x[0]).filter(f=>S['c'+f]==='y'||(S['c'+f]==='a'&&has(f))),fz=1+S.fs*.08;
   /* v92.3 (خواسته صاحب اپ: «در مبلغ به تومان وزن ۷۵۰ نیاید؛ ستون وزن داشته باشد که مانده زیرش نوشته شود»): سندی که طلای بی‌قیمت تحویل/دریافت دارد (G7)
@@ -258,7 +262,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const ttlH=calOK?Math.min(16,+(16*(S.lp==='r'?62:68)/invCalW(TTL,16,TTL[0]==='صورت'?110:230)).toFixed(2)):0;
   const TT=calOK?invCal(TTL,ttlH,TTL[0]==='صورت'?110:230):`<b class="tp${TTL.join(' ').length>14?' sm':''}">${esc(TTL.join(' '))}</b>`,LG=S.lp==='n'?'':'<span class="lg" role="img" aria-label="طلای مطلا"></span>',cn=S.cn&&typeof cnOf==='function'?cnOf(c,t):null;
   const CUN=(c.title?c.title+' ':'')+cuName(c),cuX=[S.cno&&c.cno?`<span class="ph">شماره ${toFa(c.cno)}</span>`:'',S.ph&&c.phone?`<span class="ph"><bdi dir="ltr">${esc(toFa(c.phone))}</bdi></span>`:'',S.nid&&c.nid?`<span class="ph">کد ملی <bdi dir="ltr">${esc(toFa(c.nid))}</bdi></span>`:''].join('');
-  const RT=t.rate&&(S.mz||S.g18)?`<div class="f rt">${S.mz?`<small>مظنه روز</small><b>${fmt(hMz)}</b>`:''}${S.g18?`<small${S.mz?' class="s2"':''}>هر گرم ۱۸ عیار</small><b>${fmt(t.rate)}</b>`:''}</div>`:'';
+  const RT=(t.rate||eOwn)&&(S.mz||S.g18)?`<div class="f rt">${S.mz?`<small>${eOwn?'مظنه':'مظنه روز'}</small><b>${fmt(eMz)}</b>`:''}${S.g18?`<small${S.mz?' class="s2"':''}>هر گرم ۱۸ عیار</small><b>${fmt(eG18)}</b>`:''}</div>`:'';
   const cuAv=184-13-(S.cno&&c.cno?17:0)-(S.ph&&c.phone?27:0)-(S.nid&&c.nid?34:0)-(RT?(S.mz?41:0)+(S.g18?46:0)+6:0),cuW=tw(CUN)*1.22,cuC=cuW<=cuAv?'':cuW*.87<=cuAv?' class="l1"':' class="l2"';
   const CP=S.paper==='a42'||S.copy?['نسخه مشتری','نسخه فروشگاه']:[''];
   const pg=(s,si,cp)=>{const last=si===NP-1;let HT=last?ZN-LGH-WDH:ZN,FL=HT-.4-s.h-(last?ACH:0);if(S.fill==='r'){const n=Math.max(0,Math.floor((FL+.01)/RH));HT-=Math.max(0,FL-n*RH);FL=n*RH}else if(FL<3){HT-=Math.max(0,FL);FL=0}
