@@ -18,7 +18,14 @@ const stlCounts=z=>!!(+(z&&z.amount))&&(z.st!=='wait'||stlBooked(z));
 function wdState(e,F,BI){const ok=[],bi=BI||entBI;if(!F){try{F=famOf(e)}catch(_){F=[e]}}if(!F.length)F=[e];
   F.forEach(p=>{const b=bi(p);if(b&&b.it.st==='ok')ok.push({k:'wd'+p.id,a:+b.it.amount||+p.amount||0,src:b.it.src||'',tn:b.it.tn||'',at:b.it.at||''})});
   (e.settles||[]).forEach((z,i)=>{if(stlCounts(z))ok.push({k:'wds'+e.id+'.'+(z.id||i),a:+z.amount,nm:z.name||'',tn:z.tn||'',at:z.okAt||z.at||'',w:z.st==='wait'?1:0})});
-  const done=ok.reduce((s,o)=>s+o.a,0),amt=+(e.wd.amt)||+e.amount||0;return {ok,done,amt,pend:Math.max(0,Math.round(amt-done))}}
+  const done=ok.reduce((s,o)=>s+o.a,0),amt=wdFamAmt(e);return {ok,done,amt,pend:Math.max(0,Math.round(amt-done))}}
+/* v102.5 رفع باگ از ریشه (صاحب اپ: «واریزی واریز شده ولی در سند هنوز «در لیست واریز · تخصیص نخورده» می‌خورد؛ چک کن چرا»):
+   مبلغی که واریزی به مشتری می‌پردازد = جمع واقعی خانواده واریزی (خود واریزی + بخش‌های زنده‌اش، مبلغ کامل با تسویه‌های مشتری)، نه نسخه ذخیره‌شده e.wd.amt.
+   علت: ویرایش مبلغ واریزی‌ای که با «واریز به مشتری» از یک سند معمولی ساخته شده بود (و ادغام واریزی‌ها) e.amount را عوض می‌کرد ولی depDocFix
+   برای سندهای غیرخودکار زود برمی‌گشت و wd.amt قدیمی می‌ماند (مثلاً ۹۲ میلیون در برابر واریزی ۴۶ میلیونی ارسال‌شده) → wdParts فرق را یک ردیف
+   «در لیست واریز · تخصیص نخورده» می‌ساخت که هیچ واریزی پشتش نبود. حالا آن مانده درست «نرفته به لیست» است و depDocFix هم wd.amt را همراه می‌کند */
+function wdFamAmt(e){let L=null;try{L=famIdx().get(e.id)}catch(_){}if(!L||!L.length)return Math.max(0,Math.round(+e.amount||0));
+  return Math.max(0,Math.round(L.reduce((s,r)=>s+(r.del?0:(r.total!=null?+r.total:+r.amount)||0),0)))}
 /* v67.5 (خواسته صاحب اپ): مانده در انتظار یک واریزی به تفکیک — هر تسویه از مشتری (با سند دریافت خودش) و هر بخش بانکی جدا،
    تا در سند فروشنده هر بخش ردیف خودش را داشته باشد (نه یک ردیف کلی). جمع بخش‌ها = S.pend (اختلاف احتمالی در ردیف بانک). */
 /* v78.5 (خواسته صاحب اپ): هر بخش بانکی که هنوز نه بانکی گرفته نه ارسال شده fr:1 دارد = «در لیست واریز · تخصیص نخورده» (بنفش کم‌رنگ، جزو مانده آزاد)؛
@@ -60,7 +67,10 @@ function wdSched(c,t){if(!c||!t)return [];const K=x=>String(x.date||'')+'|'+Stri
   return [...M.values()].filter(o=>o.a>0).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0)}
 /* همگام‌سازی: ردیف‌های پرداخت سند با بخش‌های تأییدشده واریزی‌ها (دو طرفه؛ تکراری‌ها یکی می‌شوند) */
 let wdBusy=false;
-function wdSync(){if(wdBusy)return;const R=wdRoots();let any=R.length;if(!any){for(const c of custs){if(c.sys||c.del)continue;for(const t of c.txs||[])if(!t.del&&t.type==='inv'&&(t.pays||[]).some(p=>p.m==='wd')){any=1;break}if(any)break}}if(!any)return;
+/* v102.5: داده‌هایی که پیش از این رفع خراب شده‌اند (wd.amt بزرگ‌تر یا کوچک‌تر از واریزی واقعی) — فقط برای واریزی‌های «واریز به مشتری» از سند معمولی؛
+   سند خودکار «خرید دستی» دست نمی‌خورد (ترمیم آن با depDocHeal است) */
+function wdAmtHeal(R){let ch=0;for(const e of R){const D=typeof depDoc==='function'?depDoc(e):null;if(D&&D.t.auto==='dep')continue;const a=wdFamAmt(e);if(a>0&&Math.round(+e.wd.amt||0)!==a){e.wd.amt=a;ch=1}}if(ch){const f=()=>saveE();typeof audBg==='function'?audBg(f):f()}}
+function wdSync(){if(wdBusy)return;const R=wdRoots();try{wdAmtHeal(R)}catch(_){}let any=R.length;if(!any){for(const c of custs){if(c.sys||c.del)continue;for(const t of c.txs||[])if(!t.del&&t.type==='inv'&&(t.pays||[]).some(p=>p.m==='wd')){any=1;break}if(any)break}}if(!any)return;
   wdBusy=true;try{const W=new Map(),live=new Set(entries.filter(e=>!e.del).map(e=>String(e.id)));
     R.forEach(e=>{const k=e.wd.cu+'|'+e.wd.no;W.set(k,(W.get(k)||[]).concat(wdState(e).ok.map(o=>({...o,ent:e.id}))))});
     let ch=false;const now=new Date().toISOString();

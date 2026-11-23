@@ -39,7 +39,7 @@ function depDocMake(e,c){const R=docMake(c,s=>{s.dk='buy';s.date=e.entryDate||to
    v91.9 (باگ ریشه‌ای): مبلغ خرید = e.wd.amt است، نه مبلغ خود واریزی اصلی. وقتی بخشی از واریزی جدا می‌شود (مانده بعد از کم شدن تسویه مشتری،
    پرداخت از چند بانک) مبلغ واریزی اصلی کم می‌شود ولی خرید همان است؛ قبلاً اولین ویرایش بعدی، سند خرید فروشنده را به اندازه همان بخش کوچک می‌کرد
    (بدهی ما به فروشنده گم می‌شد). حالا فقط «تغییری که کاربر در مبلغ داده» (d) روی مبلغ خرید می‌نشیند */
-function depDocFix(e,d){const D=depDoc(e);if(!D||D.t.auto!=='dep'||String(D.t.entId)!==String(e.id))return;d=Math.round(+d||0);const base=Math.round(+e.wd.amt||+e.amount||0),want=Math.max(0,base+d);
+function depDocFix(e,d){const D=depDoc(e);if(!D||D.t.auto!=='dep'||String(D.t.entId)!==String(e.id)){/* v102.5: واریزی «واریز به مشتری» از سند معمولی — سند دست نمی‌خورد ولی wd.amt همراه مبلغ واریزی می‌رود */if(e&&e.wd){const n0=Math.round(+e.wd.amt||0),dd=Math.round(+d||0);if(dd){e.wd.amt=Math.max(0,n0+dd);saveE()}}return}d=Math.round(+d||0);const base=Math.round(+e.wd.amt||+e.amount||0),want=Math.max(0,base+d);
   if(want===base&&String(e.wd.w||'')===String(e.weight||''))return;
   const R=docMake(D.c,s=>{s.edit={tx:D.t.id,no:D.t.no};s.dk='buy';s.date=D.t.date;s.xr=depXr({...e,amount:want});s.pays=(D.t.pays||[]).map(p=>({...p}))});R.t.auto='dep';R.t.entId=e.id;e.wd.amt=want;e.wd.w=String(e.weight||'');saveCu();saveE()}
 /* ترمیم سندی که با همان باگ کوچک شده: واریزی اصلی «مانده» زنده دارد و مبلغ خرید ثبت‌شده درست برابر مبلغ خود واریزی اصلی شده
