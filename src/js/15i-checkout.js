@@ -241,7 +241,8 @@ const cWzTitle=()=>CK.m==='gdl'?(cWzGin()?'دریافت طلا':'تحویل طل
 function cWzHead(){const m=CK.m,g=ckGold(),r=ckRest(),gold=m==='gdl'||m==='gcv';const sub=gold?`مانده طلا ${wFmt(Math.abs(g))} گرم · ${g>0?'طلبکاریم':g<0?'بدهکاریم':'تسویه'}`:`مانده ${fmt(Math.abs(r))} تومان · ${r>0?'طلبکاریم':r<0?'بدهکاریم':'تسویه'}`;
   const A=ckAni(m==='gdl'?'gd':(CKWZT[m]||[])[1]||'gx',m==='gdl'&&!cWzGin());return `<span class="ckbi g wzi">${A||ic('coin')}</span><span class="tx"><b>${cWzTitle()}</b><small>${sub}</small></span>`}
 function cWzLcd(){const S=cWzSteps(),i=Math.min(CK.st|0,S.length-1),z=S[i];
-  const chips=`<div class="wzc">${S.map((q,j)=>{const v=cWzVal(q);return `<button type="button" class="${j===i?'on':j<i?'dn':''}" data-act="ckWzGo" data-i="${j}"><small>${toFa(j+1)} · ${q.s}</small><b>${v?esc(cWzFmt(q,v)):'—'}</b></button>`}).join('')}</div>`;
+  /* v101.8 (صاحب اپ، روی ردیف مرحله‌ها خط کشید: «این پنجره کلاً باید برود به پنجره بعدی»): ردیف دکمه‌های مرحله حذف شد؛ هر مرحله یک صفحه کامل است، فقط نقطه‌های پیشرفت + «مرحله n از m» (نقطه‌های قبلی = برگشت به آن مرحله) */
+  const chips=`<div class="wzst"><span class="wzdt">${S.map((q,j)=>j<i?`<i class="dn" data-act="ckWzGo" data-i="${j}"></i>`:`<i class="${j===i?'on':''}"></i>`).join('')}</span><small>مرحله ${toFa(i+1)} از ${toFa(S.length)}</small></div>`;
   /* v101.7 (صاحب اپ: «آبشده و متفرقه هم لیست باشند ولی رنگشان فرق کند؛ کل کادر با انیمیشن برود بعدی»): همه نوع‌ها یک فهرست؛ آبشده و متفرقه ردیف طلایی بالای فهرست، کالاهای مغازه زیرش؛ محتوای نمایشگر یک «صفحه» است (.wzpg) که در cWzPaint کامل جابه‌جا می‌شود */
   if(z.t==='pick'){const L=gkCats(),c=CK.cat||gkCat0(),ay=k=>toFa(String(xrAy(cWzGin()?'in':'out',false,k))),T=L.filter(k=>k==='آبشده'||k==='متفرقه'),G=L.filter(k=>!T.includes(k)),
     row=(k,g)=>`<button type="button" class="wzr1${g?' gd':''}${k===c?' on':''}" data-act="ckWzPk" data-k="${esc(k)}"><b>${esc(k)}</b><small>عیار ${ay(k)}</small>${k===c?`<i>${ic('check')}</i>`:''}</button>`;
@@ -255,16 +256,16 @@ function ckWiz(){const m=CK.m,S=cWzSteps(),i=Math.min(CK.st|0,S.length-1),z=S[i]
     <div class="ptm-lcd wzl${pk?' pk':''}" id="posS">${cWzLcd()}</div>
     ${pk?'':ckKeys('lt',z.t==='dec')}</div></div>`}
 function cWzPaint(full,dir){const S=cWzSteps(),z=S[Math.min(CK.st|0,S.length-1)],L=$('posS'),dot=!!document.querySelector('#posD .ptm-k.dot');
-  /* v101.7: کل صفحه نمایشگر (مرحله‌ها + عدد + نتیجه / فهرست) مثل ورق زدن عوض می‌شود: صفحه قبلی کنار می‌رود و صفحه تازه از طرف دیگر می‌آید (جلو = صفحه تازه از چپ، مثل خواندن راست‌به‌چپ) */
-  const op=dir&&!RM()&&L?L.querySelector('.wzpg'):null,oc=op&&op.animate?op.cloneNode(true):null,ob=oc&&[op.offsetTop,op.offsetLeft,op.offsetWidth,op.offsetHeight];
+  /* v101.8: کل کادر نمایشگر (با قابش) مثل ورق کنار می‌رود و کادر مرحله بعد از طرف دیگر می‌آید (جلو = کادر تازه از چپ، راست‌به‌چپ) */
+  const oc=dir&&!RM()&&L&&L.animate?L.cloneNode(true):null,ob=oc&&[L.offsetTop,L.offsetLeft,L.offsetWidth,L.offsetHeight];
   if(full||!L||(z.t==='pick')!==L.classList.contains('pk')||(z.t==='dec')!==dot){ckRead();CK.noan=1;ckRe();CK.noan=0}else{L.innerHTML=cWzLcd();const H=$('posH');if(H)H.innerHTML=cWzHead()}
   if(oc)cWzSlide(oc,ob,dir)}
-function cWzSlide(oc,ob,dir){const L=$('posS'),nw=L&&L.querySelector('.wzpg');if(!nw||!nw.animate)return;
-  oc.classList.add('wzold');oc.setAttribute('aria-hidden','true');oc.querySelectorAll('[data-act]').forEach(e=>e.removeAttribute('data-act'));
-  Object.assign(oc.style,{top:ob[0]+'px',left:ob[1]+'px',width:ob[2]+'px',height:ob[3]+'px'});L.appendChild(oc);
-  const out=dir>0?'translateX(104%)':'translateX(-104%)',inn=dir>0?'translateX(-104%)':'translateX(104%)',E={duration:300,easing:'cubic-bezier(.22,.9,.24,1)'};
-  oc.animate([{transform:'none',opacity:1},{transform:out,opacity:.2}],E).onfinish=()=>oc.remove();
-  nw.animate([{transform:inn,opacity:.2},{transform:'none',opacity:1}],E)}
+function cWzSlide(oc,ob,dir){const nw=$('posS'),B=nw&&nw.parentNode;if(!B||!nw.animate)return;
+  oc.removeAttribute('id');oc.classList.add('wzold');oc.setAttribute('aria-hidden','true');oc.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));oc.querySelectorAll('[data-act]').forEach(e=>e.removeAttribute('data-act'));
+  Object.assign(oc.style,{top:ob[0]+'px',left:ob[1]+'px',width:ob[2]+'px',height:ob[3]+'px'});B.classList.add('wzan');B.appendChild(oc);
+  const out=dir>0?'translateX(112%)':'translateX(-112%)',inn=dir>0?'translateX(-112%)':'translateX(112%)',E={duration:320,easing:'cubic-bezier(.22,.9,.24,1)'};
+  oc.animate([{transform:'none',opacity:1},{transform:out,opacity:.3}],E).onfinish=()=>{oc.remove();if(!B.querySelector('.wzold'))B.classList.remove('wzan')};
+  nw.animate([{transform:inn,opacity:.3},{transform:'none',opacity:1}],E)}
 function ckWzK(k){const S=cWzSteps(),i=Math.min(CK.st|0,S.length-1),z=S[i];if(!z)return;
   if(k==='x'){ACT.ckM({m:''});return}
   if(k==='ok'){if(z.need&&!(parseFloat(cWzVal(z))>0)){toast(z.need,true);return}if(i<S.length-1){CK.st=i+1;CK.pre=1;cWzPaint(0,1)}else ACT.ckAdd();return}

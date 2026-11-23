@@ -5301,3 +5301,16 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 .wzr1.gd b{font-size:15px;font-weight:900}.wzr1.gd small{color:#7a5a14}
 .wzr1.gd.on{background:linear-gradient(180deg,#e2a91f,#b27c0e);color:#fff;box-shadow:0 2px 0 #8a5d06,0 8px 16px -8px #8a5d06}
 .wzr1.gd.on small,.wzr1.gd.on i{color:#fff}
+
+/* v101.8 step device: no step pills — progress dots; the whole LCD box slides */
+.ptm.wz .ptm-body{position:relative}
+.ptm.wz .ptm-body.wzan{overflow:hidden}
+.ptm.wz .ptm-lcd.wzold{position:absolute;margin:0;pointer-events:none;z-index:2}
+.ptm.wz .ptm-lcd.wzl{overflow:hidden}
+.wzst{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;padding:0 2px}
+.wzst small{font-size:11px;font-weight:800;color:var(--mut)}
+.wzdt{display:flex;gap:5px;align-items:center}
+.wzdt i{width:7px;height:7px;border-radius:9px;background:color-mix(in srgb,var(--bk,#b27c0e) 22%,transparent);transition:width .25s}
+.wzdt i.on{width:20px;background:var(--bk,#b27c0e)}
+.wzdt i.dn{background:color-mix(in srgb,var(--bk,#b27c0e) 60%,transparent);cursor:pointer;box-shadow:0 0 0 6px transparent}
+.ptm.wz .ptm-lcd.wzl:not(.pk) .wzv{padding:8px 0 6px}
