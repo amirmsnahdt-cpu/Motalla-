@@ -34,11 +34,14 @@ const okWord=t=>{t=String(t||'');return /ارسال/.test(t)?'ارسال شد':/
    - بازخورد داخل همان دکمه: سبز + «✓ … شد» و بعد ۱٫۳ ثانیه به حالت اول برمی‌گردد (btnOk). اگر پنجره همان لحظه عوض شد، دکمه‌ای با همان کار
      در همان صفحه پیدا می‌شود؛ وگرنه یک کپی از خود دکمه سر جای قبلی‌اش سبز می‌شود و محو می‌شود (نه قرص جدا).
    - قفل دو بار زدن: تا ۹۰۰ میلی‌ثانیه بعد از زدن یک دکمه اصلی، زدن دوباره هیچ دکمه اصلی‌ای اجرا نمی‌شود (زدن دوم روی دکمه تازه پنجره بعدی هم نه). */
-const TOPSEL='#sheet .sh-h .xtop,#bar .hgo:not(.sec),.ckok,#sheet .xgo,#sheet .sh-h .shsv';let TOPLK=0;
+const TOPSEL='#sheet .sh-h .xtop,#bar .hgo:not(.sec),.ckok,#sheet .xgo,#sheet .sh-h .shsv';let TOPLK=0,TOPLP=null;
 function btnOk(el,w){if(!el||!el.isConnected)return;if(el._okH==null)el._okH=el.innerHTML;clearTimeout(el._okT);el.classList.add('cpdone');el.disabled=true;el.innerHTML=ic('check')+'<span>'+esc(w)+'</span>';
   try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}el._okT=setTimeout(()=>{if(el._okH!=null){el.innerHTML=el._okH;el._okH=null}el.classList.remove('cpdone');el.disabled=false},1300)}
 document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest(TOPSEL);if(!b||b.closest('#auth'))return;
-  if(Date.now()<TOPLK||b.disabled){e.preventDefault();e.stopImmediatePropagation();return}TOPLK=Date.now()+900;
+  /* v101.5 (صاحب اپ: «دکمه پایان و ثبت سند بار اول کار نمی‌کند»): قفل فقط برای زدن دوباره در همان نقطه (دو بار زدن)؛ قبلاً زدن «پایان و ثبت سند»
+     کمتر از ۰٫۹ ثانیه بعد از «ثبت» سند (که همین پنجره را باز کرده بود) هم خورده می‌شد چون هر دو دکمه اصلی‌اند */
+  const bx=b.getBoundingClientRect(),px=e.clientX||bx.left+bx.width/2,py=e.clientY||bx.top+bx.height/2;
+  if(b.disabled||Date.now()<TOPLK&&TOPLP&&Math.hypot(px-TOPLP[0],py-TOPLP[1])<44){e.preventDefault();e.stopImmediatePropagation();return}TOPLK=Date.now()+900;TOPLP=[px,py];
   const r=b.getBoundingClientRect(),cx={b,r,act:b.dataset.act,cl:b.cloneNode(true),t:b.textContent.trim(),ok:0,bad:0};TOPCX=cx;
   const fin=()=>{if(TOPCX===cx)TOPCX=null;if(cx.done)return;if(cx.bad){cx.done=1;if(cx.b.isConnected&&!RM()&&cx.b.animate)cx.b.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(5px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}],{duration:360,easing:'ease-out'});TOPLK=0;return}
     if(!cx.ok)return;cx.done=1;const w=okWord(cx.t);if(cx.b.isConnected){btnOk(cx.b,w);return}
