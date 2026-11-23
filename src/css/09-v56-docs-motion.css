@@ -5220,3 +5220,16 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 .ptm.wz .ptm-lcd.wzl{align-items:stretch;width:auto;align-self:stretch}
 .ptm.wz .wzp .ptm-br{width:100%}
 .ptm-pap:has(.ptm-ds) .ckph{width:auto}
+/* v101.4 پنجره «بازه تاریخ»: هر بازه یک کارت جدا (بدون قاب مشترک و خط‌های نیمه)، تعداد ردیف در برچسب، خلاصه بازه در یک کارت */
+.srw.sr2 .srn{display:flex;align-items:center;gap:10px;text-align:start;padding:10px 12px;border-radius:16px;background:color-mix(in srgb,var(--blu) 7%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 18%,var(--line))}
+.srw.sr2 .srn>span:last-child{display:flex;flex-direction:column;min-width:0}.srw.sr2 .srn b{font-size:14px;font-weight:900;color:var(--ink)}.srw.sr2 .srn small{font-size:11.5px;font-weight:750;color:var(--mut)}
+.srni{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--blu);color:#fff}.srni svg{width:18px;height:18px}
+.srw.sr2 .cufg2{display:flex;flex-direction:column;gap:8px;background:none;box-shadow:none;overflow:visible;border-radius:0}
+.srw.sr2 .cufr{border-radius:16px;background:var(--card);box-shadow:0 0 0 1px var(--line),0 3px 0 var(--line);min-height:56px;padding:8px 12px}
+.srw.sr2 .cufr+.cufr::before{display:none}
+.srw.sr2 .cufr.on{background:color-mix(in srgb,var(--blu) 8%,var(--card));box-shadow:0 0 0 2px var(--blu),0 3px 0 color-mix(in srgb,var(--blu) 40%,var(--line))}
+.srw.sr2 .cufr>em{flex:none;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--mut) 11%,transparent);color:var(--ink);font-size:11.5px;white-space:nowrap}
+.srw.sr2 .cufr.on>em{background:var(--blu);color:#fff}
+.srw.sr2 .cufr .cufc{flex:none}
+.srw.sr2 .cufr:not(.on) .cufc{display:none}
+.srw.sr2 .f6h{margin:6px 4px 0}
