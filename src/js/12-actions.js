@@ -6,7 +6,7 @@ const ACT={
     aSt=null;dpMode='';srcRet='';closeSheet()},go:d=>{if((d.n==='users'||d.n==='backups'||d.n==='stock')&&cur!=='users'&&cur!=='backups'&&cur!=='stock')meRet=cur;go(d.n)},date:openDate,user:()=>ACT.acct(),resetBulk,bulkAdd,
   toastAct:()=>{const f=toastAct;toastHide();f&&f()},
   /* v78.8: صفحه‌های قدیمی (ثبت واریزی، لیست‌ها، پیگیری، تسویه بدهی) حذف شدند؛ دکمه‌های قدیمی به جای تازه‌شان می‌روند */
-  tab:d=>{const n={custs:'custs',banks:'banks',home:'home',entry:'buy',list:'split1',split:'split1',audit:'audit',track:'split1',debt:'custs',settings:'settings'}[d&&d.n];if(!n)return;if(n==='audit'&&cur!=='audit')histTab='ev';go(n)},
+  tab:d=>{const n={custs:'custs',banks:'banks',home:'home',entry:'buy',list:'split1',split:'split1',audit:'audit',track:'split1',debt:'custs',settings:'settings',reports:'reports'}[d&&d.n];if(!n)return;if(n==='audit'&&cur!=='audit')histTab='ev';go(n)},
   cancelEdit:()=>{editId=null;const b=editBack;editBack=null;go(b||'list')},
   pickDate:d=>{closeSheet();setDate(d.iso)},
   lsel:d=>{if(d.iso==='all'){listMode='all';openGroups=new Set();render()}else{listMode='day';setDate(d.iso,true)}window.scrollTo(0,0)},
