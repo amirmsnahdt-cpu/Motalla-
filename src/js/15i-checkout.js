@@ -253,12 +253,12 @@ function ckWiz(){const m=CK.m,S=cWzSteps(),i=Math.min(CK.st|0,S.length-1),z=S[i]
   ${pap&&!pk?`<div class="ptm-pap has wzpp"><label class="ptm-ds"><small>شرح</small><input id="ckDs" value="${esc(CK.ds||'')}" placeholder="اختیاری، مثلاً دستبند کارتیر" autocomplete="off" enterkeyhint="done"></label>${ckPhIn()}</div>`:''}
   <div class="ptm-top"><span class="ptm-slot"></span><span class="ptm-led"></span></div>
   <div class="ptm-body"><div class="ptm-hd" id="posH">${cWzHead()}</div>
-    <div class="ptm-lcd wzl${pk?' pk':''}" id="posS">${cWzLcd()}</div>
+    <div class="ptm-lcd wzl${pk?' wzk':''}" id="posS">${cWzLcd()}</div>
     ${pk?'':ckKeys('lt',z.t==='dec')}</div></div>`}
 function cWzPaint(full,dir){const S=cWzSteps(),z=S[Math.min(CK.st|0,S.length-1)],L=$('posS'),dot=!!document.querySelector('#posD .ptm-k.dot');
   /* v101.8: کل کادر نمایشگر (با قابش) مثل ورق کنار می‌رود و کادر مرحله بعد از طرف دیگر می‌آید (جلو = کادر تازه از چپ، راست‌به‌چپ) */
   const oc=dir&&!RM()&&L&&L.animate?L.cloneNode(true):null,ob=oc&&[L.offsetTop,L.offsetLeft,L.offsetWidth,L.offsetHeight];
-  if(full||!L||(z.t==='pick')!==L.classList.contains('pk')||(z.t==='dec')!==dot){ckRead();CK.noan=1;ckRe();CK.noan=0}else{L.innerHTML=cWzLcd();const H=$('posH');if(H)H.innerHTML=cWzHead()}
+  if(full||!L||(z.t==='pick')!==L.classList.contains('wzk')||(z.t==='dec')!==dot){ckRead();CK.noan=1;ckRe();CK.noan=0}else{L.innerHTML=cWzLcd();const H=$('posH');if(H)H.innerHTML=cWzHead()}
   if(oc)cWzSlide(oc,ob,dir)}
 function cWzSlide(oc,ob,dir){const nw=$('posS'),B=nw&&nw.parentNode;if(!B||!nw.animate)return;
   oc.removeAttribute('id');oc.classList.add('wzold');oc.setAttribute('aria-hidden','true');oc.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));oc.querySelectorAll('[data-act]').forEach(e=>e.removeAttribute('data-act'));
@@ -277,6 +277,25 @@ function ckWzK(k){const S=cWzSteps(),i=Math.min(CK.st|0,S.length-1),z=S[i];if(!z
   try{navigator.vibrate&&navigator.vibrate(6)}catch(_){}cWzPaint()}
 ACT.ckWzGo=d=>{if(!CK||!CKWZM[CK.m])return;const o=CK.st|0;CK.st=+d.i||0;CK.pre=1;cWzPaint(0,CK.st>o?1:CK.st<o?-1:0)};
 ACT.ckWzPk=d=>{if(!CK)return;const a0=xrAy(cWzGin()?'in':'out',false,CK.cat||gkCat0());if(CK.ay===''||CK.ay==null||+CK.ay===a0)CK.ay='';CK.cat=d.k;CK.st=1;CK.pre=1;try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}cWzPaint(1,1)};
+/* v101.9 (صاحب اپ: «مثلاً صفحه که می‌خواهی عوض کنی»): صفحه نمایشگر را با انگشت ورق بزن — کشیدن به راست = مرحله بعد (مثل «تأیید»، با همان کنترل مقدار؛ در مرحله آخر چیزی ثبت نمی‌شود)، کشیدن به چپ = مرحله قبل؛ کادر همراه انگشت می‌آید */
+const WZSW={on:0};
+(function(){if(window.__wzsw)return;window.__wzsw=1;let x0=0,y0=0,L=null,dx=0,mv=0;
+  const st=(t,x,y)=>{const el=t&&t.closest&&t.closest('#posS.wzl');if(!el||!CK||!CKWZM[CK.m])return;L=el;x0=x;y0=y;dx=0;mv=0};
+  const mvF=(x,y,e)=>{if(!L)return;const ax=x-x0,ay=y-y0;if(!mv){if(Math.abs(ax)<10&&Math.abs(ay)<10)return;if(Math.abs(ay)>Math.abs(ax)){L=null;return}mv=1}if(e&&e.cancelable)e.preventDefault();dx=ax;L.style.transform=`translateX(${dx*.45}px)`;L.style.transition='none'};
+  /* گوشی: رویدادهای لمسی (کشیدن افقی مال ماست، عمودی = اسکرول فهرست)؛ موس: pointer */
+  document.addEventListener('touchstart',e=>{const t=e.touches[0];st(e.target,t.clientX,t.clientY)},{capture:true,passive:true});
+  document.addEventListener('touchmove',e=>{const t=e.touches[0];mvF(t.clientX,t.clientY,e)},{capture:true,passive:false});
+  document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')st(e.target,e.clientX,e.clientY)},true);
+  document.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')mvF(e.clientX,e.clientY,e)},true);
+  document.addEventListener('dragstart',e=>{if(e.target.closest&&e.target.closest('#posS.wzl'))e.preventDefault()},true);
+  const end=()=>{if(!L)return;const el=L;L=null;if(!mv)return;WZSW.on=Date.now();const S=cWzSteps(),i=Math.min(CK.st|0,S.length-1);
+    const back=()=>{el.style.transition='transform .22s cubic-bezier(.2,.9,.25,1)';el.style.transform='';setTimeout(()=>{el.style.transition=''},240)};
+    if(dx>55&&i<S.length-1){el.style.transform='';el.style.transition='';if(S[i].t==='pick')ACT.ckWzPk({k:CK.cat||gkCat0()});else ckWzK('ok')}
+    else if(dx<-55&&i>0){el.style.transform='';el.style.transition='';CK.st=i-1;CK.pre=1;cWzPaint(0,-1)}
+    else back()};
+  document.addEventListener('touchend',end,true);document.addEventListener('touchcancel',end,true);
+  document.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')end()},true);
+  document.addEventListener('click',e=>{if(Date.now()-WZSW.on<350&&e.target.closest&&e.target.closest('#posS')){e.stopPropagation();e.preventDefault()}},true)})();
 const ckFormOk=()=>{const m=CK.m;return !((m==='dep'||m==='cust'&&ckOut())&&!CK.sel||(m==='hav'||m==='pos')&&(CK.pl||!ckBkL().length))};
 ACT.ckAll=()=>{ckRead();CK.pl=1;CK.sq='';ckRe('ckS')};
 ACT.ckAmt=d=>{const A=$('ckA');if(!A)return;if(CK&&CK.kt){CK.kt=0;ckTnP()}A.value=(+d.v).toLocaleString('en-US');CK.amount=+d.v;if(A.oninput&&!A.readOnly)A.oninput();const h=A.closest('.ckbig,.ptm-lcd,.ckscr');if(h&&!RM()&&h.animate)h.animate([{transform:'scale(1.03)'},{transform:'none'}],{duration:240,easing:'cubic-bezier(.2,.9,.25,1)'})};
