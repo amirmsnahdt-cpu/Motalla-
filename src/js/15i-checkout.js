@@ -338,7 +338,7 @@ function ckBind(f){phPaint($('sheet'));{const BQ=$('ckBQ');if(BQ){BQ.oninput=()=
   const P=$('ckP'),rg=()=>{ckRead();const el=$('ckX');if(el)el.innerHTML=ckRgX()};if(P){selOnFocus(P);P.oninput=()=>{const v=num(P.value);P.value=v?v.toLocaleString('en-US'):'';rg()}}if(A&&CK.m==='rg'){const o=A.oninput;A.oninput=()=>{o();rg()}}
   bfxBind();const NB=$('ckNB');if(NB)NB.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.ckNBSave()}};const el=f&&$(f);if(el&&!el.readOnly)sheetFocus(el)}
 const ckLeft=()=>Math.abs(ckRest());
-ACT.ckM=d=>{ckRead();const m=d.m||'';/* v61.80: واریز مانده به حساب مشتری از لیست واریزی (15q) */if(m==='wd'){wdOpen();return}/* v61.39: تخفیف از پنجره تسویه — روی مانده همین سند */if(m==='off'){svOffOpen(true);return}
+ACT.ckM=d=>{ckRead();const m=d.m||'';/* v102.0: کارهای طلا به بخش سند می‌روند (ckDocGo) */if(CKDOC[m]){ckDocGo(m,CK&&CK.tg);return}/* v61.80: واریز مانده به حساب مشتری از لیست واریزی (15q) */if(m==='wd'){wdOpen();return}/* v61.39: تخفیف از پنجره تسویه — روی مانده همین سند */if(m==='off'){svOffOpen(true);return}
   /* v85.3 (خواسته صاحب اپ: «پرداخت هر نوع مانده‌ای — سکه، دلار و بقیه»): gd = دریافت/پرداخت طلا (فرم تسویه طلا)؛
      x:<جنس> = ردیف تحویل/دریافت همان تعداد (مانده آن جنس صفر)؛ xp:<جنس> = پولی کردن (ردیف پولی در سند با نرخ، مرحله‌ای) */
   if(m==='gd'||m==='gdl'||m==='gp'||m==='gcv'){const mm=m==='gd'||m==='gdl'?'gdl':'gcv';if(mm==='gcv'&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}const tg=CK&&CK.tg;CK={m:mm,tg,st:0,pre:1,cat:gkCat0(),wt:'',ay:'',pg:'',ds:''};ckRe();return}
@@ -411,7 +411,20 @@ let GTK=null;
 const gkRest=()=>{const g=svBalL().find(z=>z[0]==='g')||['g',0,0,0],ix=GTK.w==='p'?1:GTK.w==='f'?3:2;return Math.round(-(g[ix]||0)*1000)/1000};
 /* v101.5 (صاحب اپ: «تحویل طلا از قسمت خود طلا درست نشده»): زدن طلای نوار پایین سند و کاشی طلای حساب مشتری هم همان دستگاه مرحله‌ای تسویه (gdl) را باز می‌کند؛
    برگشت از آن = نمای کلی تسویه با «پولی کردن طلا». پنجره قدیمی gkHTML دیگر باز نمی‌شود (کدش برای gkAddCore مانده) */
-function gkOpen(w){ckOpen(svCu()?(w||'f'):'d');ACT.ckM({m:'gdl'})}
+function gkOpen(w){if(cur==='sell'&&sv){ckDocGo('gdl',svCu()?(w||'f'):'d');return}ckOpen(svCu()?(w||'f'):'d');ACT.ckM({m:'gdl'})}
+/* v102.0 (صاحب اپ، با عکس تسویه حساب: «تعویض طلا، تبدیل طلا، پرداخت طلا، دریافت طلا — هر کدام برود به بخش همان کار در سند و آن‌جا مشخصات بگیرد»):
+   کاشی‌های طلای تسویه دیگر دستگاه مرحله‌ای (ckWiz) را باز نمی‌کنند؛ پنجره تسویه بسته می‌شود و در خود سند همان کار باز می‌شود:
+   تعویض طلا → فهرست «تعویض» (متفرقه، آبشده، سکه، کالا…)؛ پرداخت/دریافت طلا → فهرست «پرداخت»/«دریافت» (جهت از مانده طلا)؛
+   تبدیل به طلا و پولی کردن طلا → ردیف «پولی» فروش/خرید با مرحله‌های خودش (جهت همان قبلی، وزن پیش‌فرض = مانده طلا) */
+const CKDOC={gx:1,rg:1,gd:1,gdl:1,gp:1,gcv:1};
+function ckDocGo(m,tg){if(!sv)return;const g=svBalL().find(z=>z[0]==='g')||['g',0,0,0],gr=Math.round(-(g[{p:1,d:2,f:3}[tg]||3]||0)*1000)/1000;
+  let f;
+  if(m==='gx')f=()=>{ACT.dkD({d:'swap'});dkShow()};
+  else if(m==='gd'||m==='gdl')f=()=>{ACT.dkD({d:gr>0?'in':'out'});dkShow();/* فهرست از بخش «طلا» شروع شود */setTimeout(()=>{const h=document.querySelector('.dkbox.open .dksh.kg'),L=h&&(h.closest('.dkl')||h.parentElement);if(h&&L&&L.scrollHeight>L.clientHeight)L.scrollTop+=h.getBoundingClientRect().top-L.getBoundingClientRect().top},60)};
+  else{if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}
+    const D=m==='rg'?(CK&&ckOut()?'sell':'buy'):(gr>0?'sell':'buy'),w=m==='rg'?'':String(Math.abs(gr)||'');
+    f=()=>{sv.qa.d=D;sv.qa.s='';sv.qa.q='';const x=xrNew(D,'gold',{pul:true,ay:750,fl:'gold',fd:D,cat:''});if(w&&+w>0)x.w=w;xrStart(x)}}
+  const open=$('sheet')&&CK;if(open)closeSheet();CK=null;setTimeout(()=>{if(cur==='sell'&&sv)f()},open?90:0)}
 function gkRe(){if(!GTK||!$('sheet').querySelector('.gkw'))return;$('sheet').innerHTML=gkHTML();gkBind()}
 function gkHTML(){const c=svCu(),r=gkRest(),L=svBalL(),g=L.find(z=>z[0]==='g')||['g',0,0,0],TL={p:'مانده طلای قبلی',d:'طلای این سند',f:'مانده طلای نهایی'}[GTK.w];
   const mini=c?`<div class="ckbl">${[['p','قبلی',1],['d','سند',2],['f','نهایی',3]].map(([w,l,ix])=>`<button type="button" class="ckbc${GTK.w===w?' on':''}" data-act="gkTg" data-w="${w}"><small>${l}</small><span class="${ftCls(g[ix])}"><b>${g[ix]?balV('g',g[ix]):'۰'}</b><i>گرم</i></span></button>`).join('')}</div>`:'';
