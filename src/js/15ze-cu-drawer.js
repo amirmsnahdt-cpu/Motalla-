@@ -11,7 +11,9 @@ const cdEl=()=>$('cdw');
 function cdInit(){if(cdEl())return;const w=document.createElement('aside');w.id='cdw';w.className='cdw';w.setAttribute('aria-label','حساب‌ها');w.setAttribute('aria-hidden','true');document.body.appendChild(w);
   const sc=document.createElement('div');sc.id='cdsc';sc.className='cdsc';const app=$('app');if(app)app.appendChild(sc);
   const z=document.createElement('div');z.id='cdez';z.className='cdez';z.setAttribute('aria-hidden','true');document.body.appendChild(z);cdGest(w,sc,z)}
-const cdW=()=>Math.min(Math.round(innerWidth*(CD.k==='me'?.88:.84)),CD.k==='me'?380:340);
+/* v101.2 (خواسته صاحب اپ: «تنظیمات با همین انیمیشن کل صفحه باز شود و با دکمه بک یا کشیدن برگردد»): کشوی «حساب کاربری» تمام‌عرض است
+   (همان حرکت، صفحه کامل کنار می‌رود)؛ کشیدن به هر دو طرف روی خودش و دکمه برگشت گوشی/مرورگر آن را می‌بندد */
+const cdW=()=>CD.k==='me'?Math.min(innerWidth,560):Math.min(Math.round(innerWidth*.84),340);
 /* v73.0 روانی مثل Claude: فقط transform و opacity سه عنصر (صفحه، کشو، پرده) و مستقیم روی همان عنصرها —
    نه متغیر روی html (که هر فریم کل صفحه را دوباره حساب می‌کرد)، نه گوشه/سایه متحرک. هنگام کشیدن هر فریم یک بار (rAF)؛
    رها کردن = ادامه با سرعت انگشت (مدت حرکت از فاصله باقی‌مانده و سرعت). */
@@ -36,7 +38,7 @@ ACT.cuGMenu=()=>{if(document.documentElement.classList.contains('cdon')&&CD.open
 ACT.cdClose=()=>cdClose();
 function cdHTML(){return CD.k==='me'?meHTML():cuDrHTML()}
 /* کشوی «حساب کاربری»: پروفایل، همگام‌سازی و همه تنظیمات (همان vSettings) */
-function meHTML(){return `<div class="cdh"><b>مطلا</b><button class="cdsb" data-act="cdClose" aria-label="بستن">${ic('x')}</button></div><div class="cdsc2 cdme2">${vSettings()}</div>`}
+function meHTML(){return `<div class="cdh cdhp"><button class="cdsb cdbk" data-act="cdClose" aria-label="برگشت">${ic('back')}</button><b>تنظیمات</b></div><div class="cdsc2 cdme2">${vSettings()}</div>`}
 function cuDrHTML(){const G=groupsList(),A=CU(),n=g=>A.filter(c=>cuGOk(g,c)).length,on=g=>(cuF.g||'')===g;
   const it=(g,l,i)=>`<button class="cdi${on(g)?' on':''}" data-act="cdG" data-g="${esc(g)}"><span class="cdic">${ic(i)}</span><span class="cdl">${l}</span><em>${fmt(n(g))}</em></button>`;
   const rec=A.slice().sort((a,b)=>String(b.lastAt||b.createdAt||'').localeCompare(String(a.lastAt||a.createdAt||''))).slice(0,12);
@@ -69,9 +71,9 @@ function cdGest(w,sc,z){let g=null;
       /* حرکت از جای فعلی شروع شود (اگر وسط انیمیشن گرفته شد) */g.x=t.clientX;g.lx=t.clientX}
     if(g.lk!=='h')return;if(e.cancelable)e.preventDefault();const now=e.timeStamp||performance.now(),dt=Math.max(1,now-g.lt),iv=(t.clientX-g.lx)/dt;g.vx=g.vx*.4+iv*.6;g.lx=t.clientX;g.lt=now;
     /* صفحه به چپ می‌رود (dx منفی) = باز شدن */
-    cdSet(g.p0-dx/CD.W,false)};
+    cdSet(g.p0-(g.mode==='drawer'&&CD.k==='me'&&g.p0>.99?Math.abs(dx):dx)/CD.W,false)};
   const end=e=>{if(!g)return;const z0=g;g=null;CD.drag=0;if(z0.lk==='h'&&z0.mode==='edge')CD.ok='';if(z0.lk!=='h'){if(z0.mode==='edge'&&!z0.lk){/* ضربه کوتاه روی لبه: به عنصر زیرش برسد */if(e&&e.cancelable)e.preventDefault();z.style.pointerEvents='none';const el=document.elementFromPoint(z0.x,z0.y);z.style.pointerEvents='';if(el){const b=el.closest(PRESS_SEL)||el;b.click()}}return}
-    const v=z0.vx;/* سرعت: منفی = به چپ = باز */const open=v<-.3?true:v>.3?false:CD.p>.5;if(open)cdOpen(v);else cdClose(0,v)};
+    const v=z0.vx;/* سرعت: منفی = به چپ = باز */if(z0.mode==='drawer'&&CD.k==='me'&&z0.p0>.99){if(Math.abs(v)>.3||CD.p<.6)cdClose(0,Math.abs(v));else cdOpen(0);return}const open=v<-.3?true:v>.3?false:CD.p>.5;if(open)cdOpen(v);else cdClose(0,v)};
   z.addEventListener('touchstart',e=>{if(!cdKind())return;st(e,'edge')},{passive:true});
   sc.addEventListener('touchstart',e=>st(e,'scrim'),{passive:true});
   w.addEventListener('touchstart',e=>st(e,'drawer'),{passive:true});

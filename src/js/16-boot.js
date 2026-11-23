@@ -15,7 +15,8 @@ window.__androidBack=()=>{try{const au=$('auth');if(au&&!au.classList.contains('
   if(typeof PCF!=='undefined'&&PCF){ACT.pcfNo();return true}/* v72.0: پیش‌نمایش عکس رسید */
   if(typeof ZV!=='undefined'&&ZV){if(ZV.crop)ACT.zvCropNo();else zvClose();return true}
   if(typeof lockUI!=='undefined'&&lockUI){const m=lockUI.m;if(m==='unlock')return false;lockKey(m==='pwun'||m==='forgot'?'back':m==='bio'||m==='pwset'?'bioNo':'cancel');return true}
-  if(typeof ckBackStep==='function'&&ckBackStep())return true;/* v91.5 تسویه: روش ← نمای کلی ← بستن */
+  if(typeof ckBackStep==='function'&&ckBackStep())return true;
+  if(typeof CD!=='undefined'&&CD.open&&$('ov').classList.contains('hide')){cdClose();return true}/* v101.2: صفحه تنظیمات (کشوی تمام‌عرض) *//* v91.5 تسویه: روش ← نمای کلی ← بستن */
   if(!$('ov').classList.contains('hide')){ACT.close();return true}
   const pv=$('pv');if(pv&&!pv.classList.contains('hide')){closePrint();return true}
   if(cur==='entry'&&editId){ACT.cancelEdit();return true}
