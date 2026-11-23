@@ -39,10 +39,14 @@ function itWarn(it){{const s=rowSane({gold:1,ay:it.ay,w:it.w,ajP:it.ajP,pp:it.pp
   if(!it.ab&&!(+it.pp>0)&&c.pr===0)return {kind:'warn',t:'سود لحاظ نشده',h:'برای '+nm+' سود صفر است؛ فقط طلا'+(c.aj?' و اجرت':'')+' حساب شده (<b>'+wT(net)+'</b>).'};
   return null}
 function xrWarn(x){if(x.a==='gold'){const s=rowSane({gold:1,ay:x.ay,w:x.w,...(xrAjOn(x)?{ajP:x.ajP,pp:x.pp}:{})});if(s)return s}const m=x.t==='sell'||x.t==='buy';if(!m)return null;const C=xrCalc(x,sv.rate),rate=+sv.rate||0;if(!(C.n>0)||!(C.amount>0))return null;
-  if(x.a==='gold'){if(!rate)return null;const q=C.q||C.n,p750=C.amount/q,d=(p750-rate)/rate*100,nm=x.cat&&x.cat!=='متفرقه'?'«'+esc(x.cat)+'»':'طلا';
-    if(x.t==='buy'&&d>0.05)return {t:'خیلی بالا می‌خرید',h:'هر گرم ۱۸ عیار در سند <b>'+fmt(rate)+'</b> است، ولی این خرید ('+nm+') هر گرم ۱۸ <b class="rd">'+fmt(Math.round(p750))+'</b> تمام می‌شود — <b>'+wPct(d)+'</b> بالاتر از نرخ روز.<small>وزن، عیار، نرخ یا مبلغ را دوباره ببینید.</small>'};
-    if(x.t==='sell'&&d<-0.05)return {t:'زیر نرخ روز می‌فروشید',h:'هر گرم ۱۸ عیار در سند <b>'+fmt(rate)+'</b> است، ولی این فروش ('+nm+') هر گرم ۱۸ <b class="rd">'+fmt(Math.round(p750))+'</b> درمی‌آید — <b>'+wPct(d)+'</b> کمتر از نرخ روز.<small>با این مبلغ ضرر می‌کنید.</small>'};
-    if(Math.abs(d)>W_ROW+3)return {kind:'warn',t:'نرخ این ردیف با نرخ سند فرق زیادی دارد',h:'هر گرم ۱۸ در سند <b>'+fmt(rate)+'</b>، این ردیف <b>'+fmt(Math.round(p750))+'</b> (<b>'+wPct(d)+'</b> '+(d<0?'کمتر':'بیشتر')+').'};
+  /* v101.1 (خواسته صاحب اپ: «سکه پارسیان را زیر قیمت خام خریدم ولی خطای خیلی بالا می‌خرید داد»): قیمت تمام‌شده = مبلغ ÷ وزن واقعی (نه وزن گردشده ۷۵۰)،
+     در برابر «قیمت خام» همان طلا = نرخ روز × عیار/۷۵۰. در خرید، عیار ۷۳۰ تا ۷۴۹ (۷۳۵ پارسیان و متفرقه، ۷۴۰ تعویض) کسر قراردادی خرید است نه عیار واقعی،
+     پس قیمت خام با ۷۵۰ سنجیده می‌شود: خرید فقط وقتی خطاست که هر گرمش از نرخ روز ۱۸ بالاتر باشد. قبلاً مبلغ بر وزن×۷۳۵ تقسیم می‌شد و هر خریدی کمی بالاتر از ۷۳۵ خطا می‌گرفت */
+  if(x.a==='gold'){if(!rate)return null;const ay=+x.ay||750,rAy=x.t==='buy'&&ay>=730&&ay<750?750:ay,pgN=C.amount/C.n,ref=rate*rAy/750,d=(pgN-ref)/ref*100,nm=x.cat&&x.cat!=='متفرقه'?'«'+esc(x.cat)+'»':'طلا',
+      aT=rAy===750?'':' (عیار '+toFa(String(rAy))+')';
+    if(x.t==='buy'&&d>0.1)return {t:'بالاتر از قیمت خام می‌خرید',h:'قیمت خام هر گرم این طلا'+aT+' با نرخ روز <b>'+fmt(Math.round(ref))+'</b> است، ولی این خرید ('+nm+') هر گرم <b class="rd">'+fmt(Math.round(pgN))+'</b> تمام می‌شود — <b>'+wPct(d)+'</b> بالاتر از قیمت خام.<small>وزن، عیار، نرخ یا مبلغ را دوباره ببینید.</small>'};
+    if(x.t==='sell'&&d<-0.1)return {t:'زیر نرخ روز می‌فروشید',h:'قیمت خام هر گرم این طلا'+aT+' با نرخ روز <b>'+fmt(Math.round(ref))+'</b> است، ولی این فروش ('+nm+') هر گرم <b class="rd">'+fmt(Math.round(pgN))+'</b> درمی‌آید — <b>'+wPct(d)+'</b> کمتر.<small>با این مبلغ ضرر می‌کنید.</small>'};
+    if(Math.abs(d)>W_ROW+3)return {kind:'warn',t:'نرخ این ردیف با نرخ سند فرق زیادی دارد',h:'قیمت خام هر گرم'+aT+' <b>'+fmt(Math.round(ref))+'</b>، این ردیف <b>'+fmt(Math.round(pgN))+'</b> (<b>'+wPct(d)+'</b> '+(d<0?'کمتر':'بیشتر')+').'};
     return null}
   /* سکه و ارز: با فی خرید/فروش همان جنس، وگرنه با آخرین نرخ ثبت‌شده */
   const u=esc((XA[x.a]||{}).u||'واحد'),nm='«'+esc((XA[x.a]||{t:x.a}).t)+'»',pg=C.pg,f=gdFee(x.a);
