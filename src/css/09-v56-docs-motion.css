@@ -5391,3 +5391,39 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 .rpsm b{overflow:visible;text-overflow:clip;font-size:16.5px}
 .rpsm,.rpsm.c1,.rpsm.c2,.rpsm:has(>div:nth-child(4)){grid-template-columns:1fr 1fr}
 .rpsm>div:last-child:nth-child(odd){grid-column:1/-1}
+/* v102.6 reports use the app's own search bar / filter / range sheet and rows */
+.rpw .stmbar.rpsb{margin:0}
+.rpw .stmsum{margin:-2px 2px 0}
+.rpls.rpcl{gap:0}
+.rpw .fcard.rpfc{margin:0}
+.rpw .fday{margin:8px 4px 2px}
+.rpcn{display:block;font-style:normal;font-size:11.5px;font-weight:850;color:var(--blu);line-height:1.3;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rpw [hidden]{display:none!important}
+/* v102.6 icons that MOVE (owner: «انیمیشن‌های مینیمال هم باید حرکتی باشند»): one small motion per kind, repeated with a long pause;
+   transform only on the <svg> box (compositor), after the one-time draw-in */
+#sheet .cko .ckti.mi .cki{transform-origin:50% 50%;animation:var(--ckm,none) 3.4s cubic-bezier(.35,.1,.25,1) infinite;animation-delay:calc(.9s + var(--ckd,0s))}
+#sheet .cko .ckti.mi:nth-child(2){--ckd:.25s}#sheet .cko .ckti.mi:nth-child(3){--ckd:.5s}#sheet .cko .ckti.mi:nth-child(4){--ckd:.75s}#sheet .cko .ckti.mi:nth-child(5){--ckd:1s}#sheet .cko .ckti.mi:nth-child(6){--ckd:1.25s}#sheet .cko .ckti.mi:nth-child(7){--ckd:1.5s}#sheet .cko .ckti.mi:nth-child(n+8){--ckd:1.75s}
+#sheet .cko .ckti.mi.q-pos{--ckm:ckmTap}
+#sheet .cko .ckti.mi.q-hav{--ckm:ckmPulse}
+#sheet .cko .ckti.mi:is(.q-dep,.q-cust){--ckm:ckmSway}
+#sheet .cko .ckti.mi.q-cash{--ckm:ckmSlide}
+#sheet .cko .ckti.mi.q-gx{--ckm:ckmSwap}
+#sheet .cko .ckti.mi.q-off{--ckm:ckmSwing}
+#sheet .cko .ckti.mi:is(.q-rg,.q-gd,.q-gp,.q-x,.q-xp){--ckm:ckmDrop}
+#sheet .cko .ckti.mi.q-wd{--ckm:ckmTick}
+#sheet .cko .ckti.mi.q-off .cki{transform-origin:85% 15%}
+@keyframes ckmTap{0%,22%,100%{transform:none}6%{transform:translateY(-2.5px)}12%{transform:translateY(1px) scale(.96)}17%{transform:translateY(-.5px)}}
+@keyframes ckmPulse{0%,24%,100%{transform:none}8%{transform:scale(1.12)}15%{transform:scale(.97)}}
+@keyframes ckmSway{0%,26%,100%{transform:none}7%{transform:translateX(-2.5px)}15%{transform:translateX(2.5px)}21%{transform:translateX(-1px)}}
+@keyframes ckmSlide{0%,26%,100%{transform:none}9%{transform:translateX(3px)}18%{transform:translateX(-2px)}}
+@keyframes ckmSwap{0%,28%,100%{transform:none}8%{transform:translateX(3px) scaleX(-1)}20%{transform:translateX(-1px) scaleX(-1)}26%{transform:none}}
+@keyframes ckmSwing{0%,26%,100%{transform:none}6%{transform:rotate(-14deg)}13%{transform:rotate(9deg)}19%{transform:rotate(-4deg)}}
+@keyframes ckmDrop{0%,26%,100%{transform:none}7%{transform:translateY(-3.5px)}14%{transform:translateY(1.5px)}20%{transform:translateY(-.5px)}}
+@keyframes ckmTick{0%,24%,100%{transform:none}8%{transform:rotate(18deg)}16%{transform:rotate(-6deg)}}
+#sheet .cko .ckti.mi:active .cki{animation:none;transform:scale(.88)}
+/* reports hub icons: a small lift when they appear and when pressed */
+.rpti i svg{animation:rpIcoUp .7s cubic-bezier(.3,1.5,.5,1) backwards;animation-delay:calc(.15s + var(--i,0)*45ms)}
+@keyframes rpIcoUp{0%{transform:translateY(6px) scale(.7);opacity:0}100%{transform:none;opacity:1}}
+.rpti:active i svg{transform:scale(.85) translateY(1px);transition:transform .12s}
+@media (prefers-reduced-motion:reduce){#sheet .cko .ckti.mi .cki,.rpti i svg{animation:none}}
+.rpw .cuLs .cuL.rpls.rpcl{display:flex;flex-direction:column;gap:8px}
