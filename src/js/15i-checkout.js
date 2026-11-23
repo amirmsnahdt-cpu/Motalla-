@@ -435,12 +435,15 @@ function gkOpen(w){if(cur==='sell'&&sv){ckDocGo('gdl',svCu()?(w||'f'):'d');retur
    تبدیل به طلا و پولی کردن طلا → ردیف «پولی» فروش/خرید با مرحله‌های خودش (جهت همان قبلی، وزن پیش‌فرض = مانده طلا) */
 const CKDOC={gx:1,rg:1,gd:1,gdl:1,gp:1,gcv:1};
 function ckDocGo(m,tg){if(!sv)return;const g=svBalL().find(z=>z[0]==='g')||['g',0,0,0],gr=Math.round(-(g[{p:1,d:2,f:3}[tg]||3]||0)*1000)/1000;
+  /* v102.4 (صاحب اپ: «قسمت‌هایی که به سند ارجاع داده می‌شود، آن‌چه هست به‌صورت پیش‌فرض اول نشان داده شود و بعد ادیت شود»):
+     ردیف سند از اول با مقدارهای پیش‌فرض باز می‌شود — نوع، وزن = مانده طلا، عیار، مبلغ = مانده تومان — و فقط ویرایش می‌شود (برگشت ردیف = فهرست همان کار) */
+  const need=m==='gx'||m==='rg'||m==='gp'||m==='gcv';if(need&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}
   let f;
-  if(m==='gx')f=()=>{ACT.dkD({d:'swap'});dkShow()};
-  else if(m==='gd'||m==='gdl')f=()=>{ACT.dkD({d:gr>0?'in':'out'});dkShow();/* فهرست از بخش «طلا» شروع شود */setTimeout(()=>{const h=document.querySelector('.dkbox.open .dksh.kg'),L=h&&(h.closest('.dkl')||h.parentElement);if(h&&L&&L.scrollHeight>L.clientHeight)L.scrollTop+=h.getBoundingClientRect().top-L.getBoundingClientRect().top},60)};
-  else{if(!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}
-    const D=m==='rg'?(CK&&ckOut()?'sell':'buy'):(gr>0?'sell':'buy'),w=m==='rg'?'':String(Math.abs(gr)||'');
-    f=()=>{sv.qa.d=D;sv.qa.s='';sv.qa.q='';const x=xrNew(D,'gold',{pul:true,ay:750,fl:'gold',fd:D,cat:''});if(w&&+w>0)x.w=w;xrStart(x)}}
+  if(m==='gx')f=()=>{sv.qa.d='swap';sv.qa.s='';sv.qa.q='';xrStart(xrNew('buy','gold',{cat:'تعویض',ay:740,fl:'gold',fd:'swap'}))};
+  else if(m==='gd'||m==='gdl'){const D=gr>0?'in':'out',c0=ls.get('m_gk_cat','آبشده'),cat=gkCats().includes(c0)?c0:'آبشده',w=Math.abs(gr);
+    f=()=>{sv.qa.d=D;sv.qa.s='';sv.qa.q='';const x=xrNew(D,'gold',{cat,ay:xrAy(D,false,cat),fl:'gold',fd:D});if(w>0)x.w=String(w);xrStart(x)}}
+  else{const D=m==='rg'?(CK&&ckOut()?'sell':'buy'):(gr>0?'sell':'buy'),w=m==='rg'?'':String(Math.abs(gr)||''),am=m==='rg'?Math.round(ckLeft()):0;
+    f=()=>{sv.qa.d=D;sv.qa.s='';sv.qa.q='';const x=xrNew(D,'gold',{pul:true,ay:750,fl:'gold',fd:D,cat:''});if(w&&+w>0)x.w=w;if(am>0)x.am=am;xrStart(x)}}
   const open=$('sheet')&&CK;if(open)closeSheet();CK=null;setTimeout(()=>{if(cur==='sell'&&sv)f()},open?90:0)}
 function gkRe(){if(!GTK||!$('sheet').querySelector('.gkw'))return;$('sheet').innerHTML=gkHTML();gkBind()}
 function gkHTML(){const c=svCu(),r=gkRest(),L=svBalL(),g=L.find(z=>z[0]==='g')||['g',0,0,0],TL={p:'مانده طلای قبلی',d:'طلای این سند',f:'مانده طلای نهایی'}[GTK.w];
