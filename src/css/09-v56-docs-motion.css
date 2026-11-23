@@ -5192,3 +5192,31 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 /* v101.2 تنظیمات = صفحه کامل */
 .cdh.cdhp{justify-content:flex-start;gap:12px;padding-inline:16px}.cdh.cdhp b{font-size:22px}
 .cdw[data-k=me]{box-shadow:none}
+/* v101.3 دستگاه مرحله‌ای طلا (تعویض، تبدیل به طلا، دریافت/تحویل طلا، پولی کردن) */
+.ptm.wz .ptm-lcd.wzl{display:flex;flex-direction:column;gap:6px;padding:8px 9px 9px;text-align:center}
+.ptm.wz .ptm-lcd.wzl.pk{flex:1;min-height:0}
+.wzc{display:flex;gap:5px}
+.wzc button{flex:1 1 0;min-width:0;border:0;border-radius:11px;padding:4px 4px 5px;font:inherit;display:flex;flex-direction:column;align-items:center;gap:0;background:color-mix(in srgb,var(--blu) 6%,var(--card));color:var(--mut);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 14%,var(--line));transition:background .18s,color .18s}
+.wzc button small{font-size:10px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.wzc button b{font-size:11.5px;font-weight:900;color:var(--ink);direction:ltr;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-variant-numeric:tabular-nums}
+.wzc button.dn{background:color-mix(in srgb,var(--ok) 9%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 28%,transparent)}
+.wzc button.on{background:linear-gradient(180deg,#d9a21b,#b27c0e);color:#fff7e0;box-shadow:0 3px 0 #8a5d06,0 6px 12px -6px #8a5d06}.wzc button.on b{color:#fff}
+.wzv{display:block!important;padding:2px 0}
+.wzv small{display:block;font-size:11.5px!important;font-weight:850;color:var(--mut)!important}
+.wzv b{display:block;font-size:clamp(30px,9vw,40px);font-weight:900;line-height:1.2;direction:ltr;color:var(--ink);font-variant-numeric:tabular-nums}
+.wzv b.df{color:color-mix(in srgb,var(--ink) 38%,transparent)}
+.wzr{font-size:12px;font-weight:750;color:var(--mut);line-height:1.6;padding-top:5px;border-top:1px dashed color-mix(in srgb,var(--blu) 22%,var(--line))}
+.wzr b{color:var(--ink);font-weight:900}.wzr b.r{color:#c0182f}.wzr b.b{color:#1d4ed8}.wzr b.z{color:var(--ok)}
+.wzp{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;text-align:start}
+.ptm.wz .ckbi.g{background:color-mix(in srgb,var(--gold) 16%,var(--card));color:color-mix(in srgb,var(--gold) 75%,var(--ink))}
+.ptm.wz .ckbi.wzi{overflow:hidden}.ptm.wz .ckbi.wzi svg.cka{width:34px;height:34px;overflow:visible}
+.ptm.wz .ptm-k.dot{font-size:30px;font-weight:900}
+.ptm.wz .ptm-pap.wzpp{width:86%;display:flex;align-items:center;gap:7px}
+.ptm-ds{flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:0 8px;height:32px;border-radius:7px;background:rgb(255 255 255/.8);box-shadow:inset 0 0 0 1px rgb(120 100 40/.3)}
+.ptm-ds small{flex:none;font-size:11px;font-weight:850;color:#5b5446}
+#sheet .ptm-ds input{flex:1;min-width:0;border:0!important;background:none!important;box-shadow:none!important;padding:0!important;min-height:0;height:30px;font:inherit;font-size:13px;font-weight:750;color:#2a2418;outline:0}
+#sheet .ptm-ds input::placeholder{color:#9c9584;font-weight:600;font-size:11.5px}
+.ptm.wz .ptm-pap .ckphb span{display:none}.ptm.wz .ptm-pap .ckphb{padding:0;width:30px;justify-content:center}
+.ptm.wz .ptm-lcd.wzl{align-items:stretch;width:auto;align-self:stretch}
+.ptm.wz .wzp .ptm-br{width:100%}
+.ptm-pap:has(.ptm-ds) .ckph{width:auto}
