@@ -5339,3 +5339,4 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]) #sheet .cko .ckti.mi{box-shadow:0 0 0 1px color-mix(in srgb,#fff 10%,transparent)}}
 #sheet .cko .ckti.mi span{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
 #sheet .cko .ckti.mi .ckts{font-size:11.5px;font-weight:700;color:var(--mut)}
+#qKs .dkst.z b{color:var(--mut);font-weight:800}

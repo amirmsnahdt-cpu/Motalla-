@@ -34,11 +34,13 @@ function gdStockAll(){if(window.__gsc)return window.__gsc;const M=new Map(),B=gd
   M.forEach(o=>{o.w=Math.round(o.w*1000)/1000;o.n=Math.round(o.n*1000)/1000});return window.__gsc=M}
 const gdSgn=(v,t)=>(v<0?'−':'')+t(Math.abs(v));
 /* متن موجودی یک کالا ('' = چیزی برای نشان دادن نیست) */
-function gdStkTx(k){const o=gdStockAll().get(k);if(!o||!(o.base||o.rc))return '';if(XA[k])return gdSgn(o.n,qFmt)+' '+esc(XA[k].u||'عدد');return gdSgn(o.w,wFmt)+' گرم'+(gdCnt(k)||o.n?' · '+gdSgn(o.n,qFmt)+' عدد':'')}
+/* v102.2 (صاحب اپ: «موجودی کالاها را برای ساخته و همه چیز در لیست حتماً می‌خواهم»): موجودی همیشه نشان داده می‌شود — بدون رسید و موجودی اولیه هم
+   (صفر، یا منفی وقتی فقط فروش خورده)؛ غیر طلا (سایر) فقط تعداد */
+function gdStkTx(k){if(!k)return '';const o=gdStockAll().get(k)||{w:0,n:0};if(XA[k])return gdSgn(o.n||0,qFmt)+' '+esc(XA[k].u||'عدد');if(gCat(k)==='سایر')return gdSgn(o.n||0,qFmt)+' عدد';return gdSgn(o.w||0,wFmt)+' گرم'+(gdCnt(k)||o.n?' · '+gdSgn(o.n||0,qFmt)+' عدد':'')}
 /* بلوک کنار هر ردیف فهرست: موجودی (پررنگ) و زیرش فی خرید · فی فروش */
-function gdEx(k){if(!k)return '';const st=gdStkTx(k),o=gdStockAll().get(k),f=gdFee(k),neg=!!st&&o&&(XA[k]?o.n<0:o.w<0);
+function gdEx(k){if(!k)return '';const st=gdStkTx(k),o=gdStockAll().get(k),f=gdFee(k),neg=!!st&&o&&(XA[k]||gCat(k)==='سایر'?o.n<0:o.w<0),z=!!st&&!(o&&(XA[k]||gCat(k)==='سایر'?o.n:o.w));
   const fe=f?[+f.b>0?'خرید '+feeTx(f.b):'',+f.s>0?'فروش '+feeTx(f.s):''].filter(Boolean).join(' · '):'';
-  return st||fe?`<span class="dkst${neg?' ng':''}">${st?`<b>${st}</b>`:''}${fe?`<small>فی ${fe}</small>`:''}</span>`:''}
+  return st||fe?`<span class="dkst${neg?' ng':''}${z?' z':''}">${st?`<b>${st}</b>`:''}${fe?`<small>فی ${fe}</small>`:''}</span>`:''}
 /* ردیف دریافت/خرید کالا: فی‌هایی که زده شد «فی فعلی» همان کالا می‌شود */
 function gdFeeKeep(x){if(!gdNamed(x)||!(x.t==='buy'||x.t==='in'))return;const b=+x.fb||0,s=+x.fs||0;if(!b&&!s)return;const r=cfgRec(1),o=(r.gfee||{})[x.cat]||{},n={b:b||+o.b||0,s:s||+o.s||0};
   if(+o.b===n.b&&+o.s===n.s)return;r.gfee={...(r.gfee||{}),[x.cat]:n};window.__gsc=null}
