@@ -5465,3 +5465,12 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 .dgb .dgp{color:#fff;background:var(--blu);box-shadow:0 8px 16px -10px color-mix(in srgb,var(--blu) 80%,transparent)}.dgb .dgp svg{width:17px;height:17px;flex:none}
 .dgb .dgs{color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
 @media (prefers-reduced-motion:reduce){.dgap{animation:none}}
+/* v103.6 (خواسته صاحب اپ: «مشکل ظاهری این تیکه» — صفحه حساب بانکی): دو کاشی «اصلاح موجودی/کارتخوان» در گوشی باریک از صفحه بیرون نزنند؛
+   نوشته‌ها در خود کاشی کوتاه شوند؛ آواتار حساب بانکی بی‌لوگو = نماد بانک؛ مانده صفر = «صفر» (صفر فارسی یک نقطه ریز بود) */
+.bkfx2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#view .bkq{min-width:0;overflow:hidden}
+.bkq .bkqt{flex:1 1 auto}.bkq .bkqt strong,.bkq .bkqt em{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+@media (max-width:380px){#view .bkq{padding:10px;gap:8px}.bkq .bkqi{flex-basis:34px;height:34px;border-radius:12px}.bkq .bkqt strong{font-size:13.5px}.bkq .bkqt em{font-size:11px}}
+.c6a.bkav0{display:grid;place-items:center;color:var(--blu);background:var(--blu2)}.c6a.bkav0 svg{width:58%;height:58%}
+@media (max-width:360px){#view .bkq{flex-direction:column;align-items:flex-start;gap:6px}.bkq .bkqi{flex:none;width:34px}.bkq .bkqt strong,.bkq .bkqt em{white-space:normal}}
+.bkc .bkcv.kz b{font-size:18px!important}.bkc.sm .bkcv.kz b{font-size:16px!important}
