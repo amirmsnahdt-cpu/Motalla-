@@ -132,7 +132,7 @@ const ckAmtV=()=>CK.amount?Number(CK.amount).toLocaleString('en-US'):'';
 const ckAIn=cls=>`<input id="ckA" class="ltr ${cls||''}" readonly inputmode="none" tabindex="-1" value="${ckAmtV()}" placeholder="0" autocomplete="off" aria-label="مبلغ">`;
 /* v91.8 (خواسته صاحب اپ: «نقدی و حواله هم مثل کارتخوان ثابت، کامپکت و درست؛ کادر مبلغ متوازن»): یک صفحه‌کلید برای همه (همان چیدمان پوز: سه ستون عدد + ستون رنگی
    انصراف/پاک/تأیید) و یک کادر مبلغ وسط‌چین (برچسب بالا، عدد وسط، «کل مانده/نصف» زیرش؛ واحد کنار عدد نیست تا عدد از وسط بیرون نرود) */
-function ckKeys(cls,dot){const k=(v,t,c)=>`<button type="button" class="ckk ptm-k${c?' '+c:''}" data-act="ckK" data-k="${v}">${t}</button>`;
+function ckKeys(cls,dot){const k=(v,t,c)=>`<button type="button" class="ckk ptm-k${c?' '+c:''}" ${v==='ok'||v==='x'?'data-act="ckK" ':'data-ck="1" '}data-k="${v}">${t}</button>`;
   return `<div class="ptm-keys${cls?' '+cls:''}">${['1','2','3'].map(d=>k(d,toFa(d))).join('')}${k('x','<i>✕</i><span>انصراف</span>','kr')}${['4','5','6'].map(d=>k(d,toFa(d))).join('')}${k('c','<i>‹</i><span>پاک</span>','ky')}${['7','8','9'].map(d=>k(d,toFa(d))).join('')}${k('ok','<i>○</i><span>تأیید</span>','kg')}${dot?k('.','.','z3 dot'):k('000','۰۰۰','z3')}${k('0','۰')}${k('bs',ic('back').replace('class="i"','class="i bsk"'),'bs')}</div>`}
 /* v91.5 (خواسته صاحب اپ: «با انیمیشن نشان بده داری آن عملیات را انجام می‌دهی»): نوار مسیر پول بالای فرم — از چه کسی/کجا به کجا، با نقطه‌های روان روی خط */
 /* v91.8: جهت درست — مبدأ سمت راست، مقصد سمت چپ، نقطه‌ها از راست به چپ (دریافت: مشتری ← بانک/صندوق؛ پرداخت: بانک/صندوق ← مشتری) */
@@ -225,6 +225,15 @@ ACT.ckK=d=>{if(CK&&CKWZM[CK.m]){if(CK.kbT&&Date.now()<CK.kbT)return;ckWzK(d.k);r
   let v=String(CK.amount||'').replace(/\D/g,'');/* v100.9: اولین رقم بعد از باز شدن یا انتخاب، جای مبلغ پیشنهادی می‌نشیند (مثل ماشین‌حساب) */if(CK.pre&&k!=='ok'&&k!=='x'){if(/^\d/.test(k))v='';CK.pre=0}if(k==='c')v='';else if(k==='bs')v=v.slice(0,-1);else if(v.length<13)v=(v+k).replace(/^0+/,'').slice(0,13);
   CK.amount=+v||0;A.value=ckAmtV();try{navigator.vibrate&&navigator.vibrate(6)}catch(_){}
   const h=A.closest('.ptm-lcd,.ckscr');if(h&&!RM()&&h.animate&&(k==='c'||k==='000'))h.animate([{transform:'scale(1.02)'},{transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.9,.25,1)'})};
+/* v103.9 (خواسته صاحب اپ: «این قسمت لگ می‌خورد و می‌پرد»): رقم‌های صفحه‌کلید کارتخوان/حواله/نقدی با همان لمس انگشت (pointerdown) عمل می‌کنند،
+   نه با click — در آیفون دو ضربه تند روی یک دکمه (مثل «۰ ۰») ژست دوبار‌زدن حساب می‌شد: ضربه دوم دیر یا گم می‌شد و صفحه می‌پرید.
+   این دکمه‌ها data-act ندارند (data-ck)، پس مسیر کلیک عمومی، ثبت تاریخچه و انیمیشن فشردن برای هر رقم اجرا نمی‌شود؛ «تأیید» و «انصراف» همان کلیک عادی‌اند
+   (تا ضربه روی صفحه بعدی نیفتد). کلیک بدون لمس قبلی (صفحه‌خوان، ماوس) هم کار می‌کند */
+let CKPD=0;
+document.addEventListener('pointerdown',e=>{if(e.button>0)return;const b=e.target&&e.target.closest&&e.target.closest('.ptm-keys [data-ck]');if(!b||!CK)return;e.preventDefault();CKPD=Date.now();b.classList.add('pr');ACT.ckK({k:b.dataset.k})},true);
+['pointerup','pointercancel','pointerleave'].forEach(n=>document.addEventListener(n,e=>{const b=e.target&&e.target.closest&&e.target.closest('.ptm-keys [data-ck]');if(b)setTimeout(()=>b.classList.remove('pr'),60)},true));
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('.ptm-keys [data-ck]');if(!b)return;e.preventDefault();e.stopPropagation();if(Date.now()-CKPD>700&&CK)ACT.ckK({k:b.dataset.k})},true);
+document.addEventListener('dblclick',e=>{if(e.target&&e.target.closest&&e.target.closest('.ptm-keys'))e.preventDefault()},true);
 function ckPosGo(){const D=$('posD'),M=$('posM');if(!D||D.classList.contains('run'))return;D.classList.add('run');if(M)M.innerHTML='<span class="ptm-dots"><i></i><i></i><i></i></span>در حال ارتباط با بانک';
   setTimeout(()=>{if(!D.isConnected)return;D.classList.add('ok');if(M)M.innerHTML=`${ic('check')} تراکنش موفق · ${fmt(+CK.amount)}`;try{navigator.vibrate&&navigator.vibrate([12,40,18])}catch(_){}},700);
   setTimeout(()=>{if(D.isConnected)ACT.ckAdd()},1550)}
