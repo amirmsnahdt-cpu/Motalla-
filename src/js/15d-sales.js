@@ -380,23 +380,17 @@ function svOffApply(T){const v=offBal(),A=Math.abs(v);if(!v){toast('مانده �
 let OFF=null;
 /* مانده هدف تخفیف: از پنجره تسویه = مانده همین سند؛ از خانه مبلغ پایین سند = مانده حساب (منفی = طلبکاریم) */
 const offBal=()=>OFF&&OFF.doc?-ckRest():svRBal();
-/* پیشنهادهای گرد کردن: به پایین و به بالا با واحد ۱ میلیون، ۱۰۰ هزار، ۱۰ هزار (هر کدام فقط اگر مانده را عوض کند) */
-const OFFU=[[1e6,'میلیون'],[1e5,'۱۰۰ هزار'],[1e4,'۱۰ هزار']];
-function offSug(A){const dn=[],up=[],seen=new Set([A]);for(const [u,n] of OFFU){const a=Math.floor(A/u)*u,b=Math.ceil(A/u)*u;if(!seen.has(a)){seen.add(a);dn.push([a,n])}if(!seen.has(b)){seen.add(b);up.push([b,n])}}
-  if(A&&!seen.has(0))dn.push([0,'صفر']);return {dn,up}}
-const offSide=(v,T,A)=>{const sg=v<0?1:-1,p=sg*(A-T);return p>0?'اضافه · تخفیف':'کسر · تخفیف'};
 function offRes(T){const v=offBal(),A=Math.abs(v);if(!(T>=0)||isNaN(T))return `<div class="ofr n"><b>مانده نهایی را بزنید</b></div>`;const d=A-T;
   if(!d)return `<div class="ofr n"><span>${ic('check')}</span><div><b>همان مانده فعلی</b><small>چیزی ثبت نمی‌شود</small></div></div>`;
-  return `<div class="ofr ${d>0?'dn':'up'}"><span>${ic('tag')}</span><div><b>${offSide(v,T,A)}</b><small>مانده ${fmt(A)} ← ${fmt(T)} · ${T?ourLab(v):'تسویه'}</small></div><em><bdi dir="ltr">${d>0?'−':'+'}${fmt(Math.abs(d))}</bdi></em></div>`}
-function offHTML(){const v=offBal(),A=Math.abs(v),T=OFF.t,S=offSug(A),cl=v<0?'d':'c',chip=([x,n],up)=>`<button type="button" class="ofk${x===T?' on':''}" data-act="offT" data-v="${x}"><b class="ltr">${fmt(x)}</b><small>${n==='صفر'?'کل مانده تخفیف':(up?'بالا · ':'پایین · ')+n}</small></button>`;
+  return `<div class="ofr ${d>0?'dn':'up'}"><span>${ic(d>0?'arD':'arU')}</span><div><b>${d>0?'گرد به پایین · تخفیف':'گرد به بالا · اضافه'}</b><small>${fmt(A)} ← ${fmt(T)}${T?' · '+ourLab(v):' · تسویه'}</small></div><em><bdi dir="ltr">${d>0?'−':'+'}${fmt(Math.abs(d))}</bdi></em></div>`}
+IC.arD='<path d="M12 5v14M6 13l6 6 6-6"/>';IC.arU='<path d="M12 19V5M6 11l6-6 6 6"/>';
+function offHTML(){const v=offBal(),A=Math.abs(v),T=OFF.t,cl=v<0?'d':'c';
   return `<div class="sh-h"><div><b>گرد کردن مانده</b><small class="shsub">${OFF.doc?'مانده این سند':'مانده حساب'} ${fmt(A)} تومان · ${ourLab(v)}</small></div><button class="x" data-act="close" aria-label="بستن">×</button></div>
-  <div class="ofg"><div class="ofc dn"><small>${ic('tag')} رند به پایین · تخفیف</small>${S.dn.map(z=>chip(z,0)).join('')||'<i>—</i>'}</div><div class="ofc up"><small>${ic('plus')} رند به بالا · اضافه</small>${S.up.map(z=>chip(z,1)).join('')||'<i>—</i>'}</div></div>
-  <label class="offf ${cl}"><small>مانده نهایی (تومان)</small><input id="offA" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" value="${T>=0?T.toLocaleString('en-US'):''}"></label>
+  <label class="offf of1 ${cl}"><small>مانده نهایی را بزنید · کمتر از مانده = تخفیف، بیشتر = اضافه</small><input id="offA" class="ltr" inputmode="numeric" autocomplete="off" enterkeyhint="done" value="${T>=0?T.toLocaleString('en-US'):''}"></label>
   <div id="offR">${offRes(T)}</div>
   <button class="xgo offgo ${cl}" data-act="offOk">${ic('check')} ثبت</button>`}
 function svOffOpen(doc){OFF={doc:!!doc};const v=offBal();if(!v){toast(doc?'مانده این سند صفر است':'مانده مبلغ صفر است');OFF=null;return}const A=Math.abs(v);OFF.t=A-off6(A);sheet(offHTML());offBind()}
-function offBind(){const I=$('offA');if(!I)return;selOnFocus(I);I.oninput=()=>{const raw=String(I.value||'').trim(),n=num(I.value);I.value=raw?n.toLocaleString('en-US'):'';OFF.t=raw?n:NaN;const R=$('offR');if(R)R.innerHTML=offRes(OFF.t);document.querySelectorAll('#sheet .ofk').forEach(b=>b.classList.toggle('on',+b.dataset.v===OFF.t))};I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.offOk()}}}
-ACT.offT=d=>{OFF.t=+d.v;const I=$('offA');if(I){I.value=OFF.t.toLocaleString('en-US');I.oninput()}};
+function offBind(){const I=$('offA');if(!I)return;selOnFocus(I);I.oninput=()=>{const raw=String(I.value||'').trim(),n=num(I.value);I.value=raw?n.toLocaleString('en-US'):'';OFF.t=raw?n:NaN;const R=$('offR');if(R)R.innerHTML=offRes(OFF.t)};I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ACT.offOk()}}}
 ACT.offOk=()=>{const I=$('offA');if(I){const raw=String(I.value||'').trim();OFF.t=raw?num(I.value):NaN}svOffApply(OFF.t)};
 /* حساب پیش‌فرض: آخرین کارتخوان یا حساب استفاده‌شده */
 /* v83.1 (خواسته صاحب اپ: «تعریف کارتخوان پیچیده می‌کند»، مثل کیمیا): کارتخوان سند = خود حساب بانک (srcId)، همان لحظه در گردش آن حساب؛
