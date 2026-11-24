@@ -39,8 +39,8 @@ const RPL=[
   ['hist','تاریخچه کارها','همه کارهای کاربران','clock','b','x',0]];
 const RPG=[['a','حساب‌ها'],['g','طلا و کالا'],['s','فروش و دفترها'],['x','سیستم']];
 const rpDef=k=>RPL.find(z=>z[0]===k);
-function vReports(){const ic2=k=>IC[k]?ic(k):ic('list');
-  return `<div class="rpw">${RPG.map(([g,gt])=>`<div class="rpgh">${gt}</div><div class="rpgr">${RPL.filter(z=>z[5]===g).map((z,i)=>`<button class="rpti t-${z[4]}" data-act="rpGo" data-k="${z[0]}" style="--i:${i}"><i>${ic2(z[3])}</i><span><b>${z[1]}</b><small>${z[2]}</small></span></button>`).join('')}</div>`).join('')}</div>`}
+function vReports(){if(PARENT.cust==='reports')PARENT.cust='custs';const ic2=k=>IC[k]?ic(k):ic('list');let dash='';try{dash=rdHTML()}catch(e){console.error(e)}
+  return `<div class="rpw rdw${RD.re?' noan':''}">${dash}<div class="rdall">همه گزارش‌ها</div>${RPG.map(([g,gt])=>`<div class="rpgh">${gt}</div><div class="rpgr">${RPL.filter(z=>z[5]===g).map((z,i)=>`<button class="rpti t-${z[4]}" data-act="rpGo" data-k="${z[0]}" style="--i:${i}"><i>${ic2(z[3])}</i><span><b>${z[1]}</b><small>${z[2]}</small></span></button>`).join('')}</div>`).join('')}</div>`}
 ACT.rpGo=d=>{const k=d.k;if(k==='stkp'){STK.f='all';STK.q='';meRet='reports';closeSheet();go('stock');return}
   if(k==='hist'){histTab='ev';go('audit');return}
   if(RPT.k!==k){RPT.s='all';RPT.o='a';RPT.q=''}RPT.k=k;const D=rpDef(k);TITLES.rpt=D?D[1]:'گزارش';go('rpt')};
