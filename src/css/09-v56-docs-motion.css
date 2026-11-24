@@ -5547,3 +5547,9 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 #sheet .ofsg2 button.on{color:#fff}
 #sheet .offf.of2.dn .ofsg2 button.on{background:var(--red)}#sheet .offf.of2.up .ofsg2 button.on{background:var(--blu)}
 
+/* v105.6 doc step bar: camera/gallery = two small icon-only squares (the labelled pills squeezed the amount field to 75px) */
+.fsearch.st3 .php2{gap:4px}
+.fsearch.st3 .php2b{width:38px;height:38px;padding:0;border-radius:11px}
+.fsearch.st3 .php2b span{display:none}
+.fsearch.st3 .php2b svg{width:18px;height:18px}
+@media (max-width:360px){.fsearch.st3 .stnx.go span{display:none}.fsearch.st3 .stnx.go{padding:0 12px}}
