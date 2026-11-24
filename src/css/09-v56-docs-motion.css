@@ -5647,14 +5647,6 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 #sheet .ptm-keys .ptm-k{transition:transform .05s,box-shadow .05s}
 #sheet .ptm-keys .ptm-k.pr{transform:translateY(3px);box-shadow:inset 0 1px 0 rgb(255 255 255/.3),0 0 0 transparent!important}
 /* v104.1 «گرد کردن مانده» (پنجره تخفیف): دو ستون پیشنهاد — رند به پایین (تخفیف) و رند به بالا (اضافه) — زیرش مانده نهایی و یک کارت نتیجه */
-#sheet .ofg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin:6px 0 12px}
-#sheet .ofc{display:flex;flex-direction:column;gap:6px;min-width:0}
-#sheet .ofc>small{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:var(--mut);padding:0 4px}#sheet .ofc>small svg{width:14px;height:14px}
-#sheet .ofc.dn>small{color:var(--red)}#sheet .ofc.up>small{color:var(--blu)}#sheet .ofc>i{font-style:normal;color:var(--mut);padding:8px}
-#sheet .ofk{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:9px 12px;border:0;border-radius:14px;font:inherit;text-align:start;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink);min-width:0}
-#sheet .ofk b{font-size:15.5px;font-weight:900;font-feature-settings:"tnum";max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#sheet .ofk small{font-size:10.5px;color:var(--mut);font-weight:700}
-#sheet .ofc.dn .ofk.on{background:color-mix(in srgb,var(--red) 9%,var(--card));box-shadow:inset 0 0 0 1.8px var(--red)}#sheet .ofc.dn .ofk.on b{color:var(--red)}
-#sheet .ofc.up .ofk.on{background:color-mix(in srgb,var(--blu) 9%,var(--card));box-shadow:inset 0 0 0 1.8px var(--blu)}#sheet .ofc.up .ofk.on b{color:var(--blu)}
 #sheet .ofr{display:flex;align-items:center;gap:10px;margin:10px 0 4px;padding:11px 13px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);animation:bf3Up .28s cubic-bezier(.2,.9,.25,1)}
 #sheet .ofr>span{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--mut) 12%,var(--card));color:var(--mut)}#sheet .ofr>span svg{width:17px;height:17px}
 #sheet .ofr>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}#sheet .ofr>div b{font-size:14px;font-weight:900}#sheet .ofr>div small{font-size:11.5px;color:var(--mut);font-feature-settings:"tnum"}
@@ -5705,3 +5697,8 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 .stimg>.php2{margin-inline-start:auto}
 .c9ht .php2{margin-top:6px}
 @media (max-width:360px){.php2b{padding:0 8px;font-size:11.5px}.php2b span{display:none}.php2.gt .php2b span{display:inline}}
+/* v105.0 rounding sheet = one box */
+#sheet .offf.of1{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:14px 12px}
+#sheet .offf.of1>small{font-size:12px;line-height:1.5}
+#sheet .offf.of1 input{width:100%;text-align:center;font-size:30px;font-weight:900;font-feature-settings:"tnum";padding:6px 4px}
+#sheet .ofr>span svg{width:20px;height:20px}
