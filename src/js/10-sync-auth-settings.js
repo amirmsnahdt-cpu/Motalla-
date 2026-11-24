@@ -25,7 +25,7 @@ const HIDE_OF={del:['delEdit','clearDay','tkDel','purgeOne','emptyTrash','credDe
 function applyPerms(){document.body.classList.toggle('staff',!!ME&&!isAdmin());let css='';
   for(const p in HIDE_OF)if(ME&&!can(p))css+=HIDE_OF[p].map(x=>x[0]==='.'?x:`[data-act="${x}"]`).join(',')+'{display:none!important}';
   let st=document.getElementById('permcss');if(!st){st=document.createElement('style');st.id='permcss';document.head.appendChild(st)}st.textContent=css}
-const rawSet=(k,v)=>{try{LS.setItem(k,JSON.stringify(v))}catch(e){storeOK=false}};
+const rawSet=(k,v)=>{let j;try{j=JSON.stringify(v)}catch(e){return}stoSet(k,j)};
 /* JSON پایدار (ترتیب کلیدها مهم نیست) برای مقایسه */
 function sj(v){if(v===undefined||v===null||typeof v!=='object')return v===undefined?'null':JSON.stringify(v);if(Array.isArray(v))return '['+v.map(x=>x===undefined?'null':sj(x)).join(',')+']';return '{'+Object.keys(v).sort().filter(k=>v[k]!==undefined&&typeof v[k]!=='function').map(k=>JSON.stringify(k)+':'+sj(v[k])).join(',')+'}'}
 const isPO=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
@@ -83,6 +83,7 @@ async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.bu
     applyRemote(res,sent);try{chgNote(res.chg)}catch(e){}
     while(res.more){res=await api('/api/sync',{since:SY.since,changes:[]});applyRemote(res,{})}
     if(res.rejected&&res.rejected.length)toastBg(res.rejected[0].why||'این تغییر مجاز نبود');
+    if(SY.rsy){SY.rsy=0;rawSet('m_rsy1',1)}/* v104.0: همگام‌سازی کامل یک‌باره انجام شد */
     SY.last=Date.now();rawSet('m_srv',1);setSync(pendN()?'busy':'ok','');flushImgs();
   }catch(e){if(e.status!==401)setSync(e.net?'off':'err',e.message)}
   finally{SY.busy=false;if(SY.again){SY.again=false;syncSoon(50)}}}
@@ -153,7 +154,7 @@ function loggedIn(r){TOKEN=r.token;try{LS.setItem('m_token',TOKEN)}catch(e){}ME=
   startFresh(false);setTimeout(()=>{try{heldOffer()}catch(e){}},1800)}
 function startFresh(upload){SY.pend={};SY.since=0;if(upload){for(const c in SYNC)for(const r of SYNC[c].get())if(r&&r.id!=null)SY.pend[c+'|'+r.id]=null}rawSet('m_pend',SY.pend);syncInit();if(upload)for(const k in SY.pend){const c=k.slice(0,k.indexOf('|'));SY.base[c].delete(k.slice(k.indexOf('|')+1))}
   render(true);toast(upload?'در حال انتقال اطلاعات به سرور…':'خوش آمدید '+ME.name);syncNow().then(()=>{if(upload&&!pendN())toast('اطلاعات این گوشی به سرور منتقل شد ✓')})}
-function clearLocal(){entries=[];sources=[];batches=[];creds=[];trash=[];audit=[];drafts={};for(const c in SYNC){const S=SYNC[c];rawSet(S.key,S.cache?S.cache():S.get())}SY.pend={};SY.since=0;SY.base={};['m_pend','m_since','m_srv','m_imgq'].forEach(k=>{try{LS.removeItem(k)}catch(e){}})}
+function clearLocal(){KV.hold={};entries=[];sources=[];batches=[];creds=[];trash=[];audit=[];drafts={};for(const c in SYNC){const S=SYNC[c];rawSet(S.key,S.cache?S.cache():S.get())}SY.pend={};SY.since=0;SY.base={};['m_pend','m_since','m_srv','m_imgq'].forEach(k=>{try{LS.removeItem(k)}catch(e){}})}
 function forceLogout(msg){/* v79.2: تغییرهای ارسال‌نشده پیش از پاک شدن نگه داشته می‌شوند (15zj) */try{heldSave()}catch(e){}TOKEN='';ME=null;try{LS.removeItem('m_token');LS.removeItem('m_me')}catch(e){}clearLocal();closeSheet();cur='home';render();showAuth(msg)}
 /* ---------- حساب کاربری ---------- */
 const ROLE={admin:'مدیر',staff:'کارمند'};

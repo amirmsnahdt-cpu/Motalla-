@@ -134,7 +134,34 @@ const liteDone=()=>{clearTimeout(LITE.t);const f=!!LITE.fill;LITE.fill=null;retu
 document.addEventListener('scroll',()=>{if(LITE.fill&&performance.now()-LITE.at>350)LITE.fill()},{capture:true,passive:true});
 /* v99.1: شماره نسخه داده هر کلید (با هر ذخیره یکی بالا می‌رود) — نمایه‌های جستجو (sxGet در 14) با آن می‌فهمند داده عوض شده یا نه */
 const DVN={};
-const ls={get(k,d){try{const v=LS.getItem(k);return v?JSON.parse(v):d}catch(e){storeOK=false;return d}},set(k,v){/* پیش‌نویس سند (با هر حرف ذخیره می‌شود) و نرخ لحظه‌ای طلا داده‌ای را که حافظه‌ها از آن ساخته شده‌اند عوض نمی‌کنند */if(k!=='m_svd'&&k!=='m_gl')memoClear();DVN[k]=(DVN[k]||0)+1;try{LS.setItem(k,JSON.stringify(v))}catch(e){storeOK=false}}};
+const ls={get(k,d){try{const v=LS.getItem(k);return v?JSON.parse(v):d}catch(e){storeOK=false;return d}},set(k,v){/* پیش‌نویس سند (با هر حرف ذخیره می‌شود) و نرخ لحظه‌ای طلا داده‌ای را که حافظه‌ها از آن ساخته شده‌اند عوض نمی‌کنند */if(k!=='m_svd'&&k!=='m_gl')memoClear();DVN[k]=(DVN[k]||0)+1;let j;try{j=JSON.stringify(v)}catch(e){return}stoSet(k,j)}};
+/* v104.0 (خواسته صاحب اپ: «آیفون به‌روز نمی‌شود؛ در اندروید تأیید خورده ولی آیفون نه، با اینکه اینترنت داریم»):
+   همه داده‌های همگام در localStorage بود. سقف آن در آیفون (Safari/WebKit) خیلی کمتر از اندروید است؛ وقتی پر می‌شد نوشتن بی‌صدا شکست می‌خورد،
+   ولی «تا کجا همگام شده» (m_since) نوشته می‌شد — پس بعد از بسته و باز شدن برنامه، داده کهنه بود و گوشی خیال می‌کرد به‌روز است و دیگر نمی‌گرفت.
+   حالا: (۱) مجموعه‌های بزرگ (BIGK) اگر در localStorage جا نشوند به IndexedDB می‌روند (KVF = فهرست کلیدهایی که آن‌جا هستند؛ بعد از نوشتن موفق،
+   کلید از localStorage پاک می‌شود)؛ (۲) تا نوشتن IndexedDB تمام نشده، m_since و m_pend نوشته نمی‌شوند (KV.hold) تا هیچ‌وقت جلوتر از داده نباشند؛
+   (۳) اگر جایی برای نوشتن نبود، m_since = 0 تا بار بعد همه داده دوباره گرفته شود. پیش‌نمایش githack به IndexedDB دست نمی‌زند (دامنه مشترک) */
+const BIGK=new Set(['m_entries','m_sources','m_batches','m_creds','m_custs','m_trash','m_audit','m_drafts']);
+let KVF=(()=>{try{const a=JSON.parse((LS&&LS.getItem('m_kvf'))||'[]');return Array.isArray(a)?a:[]}catch(e){return []}})();
+const KV={q:Promise.resolve(),n:0,hold:{},fail:0,db:null,bad:new Set()};/* bad = کلیدهایی که الان نوشته نشده‌اند؛ هشدار «ذخیره ممکن نیست» فقط تا وقتی یکی مانده */
+const stoMark=(k,ok)=>{if(ok)KV.bad.delete(k);else KV.bad.add(k);storeOK=!KV.bad.size};
+const kvOk=()=>!PVW&&typeof indexedDB!=='undefined';
+function kvDb(){return KV.db||(KV.db=new Promise((res,rej)=>{try{const r=indexedDB.open('motalla_kv',1);r.onupgradeneeded=()=>{try{r.result.createObjectStore('kv')}catch(e){}};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}}).catch(e=>{KV.db=null;throw e}))}
+function kvDrain(){const H=KV.hold;KV.hold={};if(KV.fail){KV.fail=0;delete H.m_since;try{LS.setItem('m_since','0')}catch(e){}}for(const k in H)stoSet(k,H[k])}
+function kvPut(k,s){KV.n++;KV.q=KV.q.then(()=>kvDb()).then(db=>new Promise((res,rej)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(s,k);t.oncomplete=res;t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)}))
+  .then(()=>{try{LS.removeItem(k)}catch(e){}if(!KVF.includes(k))KVF.push(k);let f;try{f=LS.getItem('m_kvf')}catch(e){}const j=JSON.stringify(KVF);if(f!==j){try{LS.setItem('m_kvf',j)}catch(e){KV.fail=1}}})/* اول نسخه کهنه localStorage پاک می‌شود تا جا برای نشانی m_kvf باشد */
+  .catch(()=>{KV.fail=1;stoMark(k,0)}).finally(()=>{KV.n--;if(!KV.n)kvDrain()})}
+function stoSet(k,s){if(BIGK.has(k)){if(KVF.includes(k)&&kvOk()){kvPut(k,s);stoMark(k,1);return true}
+    try{LS.setItem(k,s);stoMark(k,1);return true}catch(e){if(kvOk()){if(!KVF.includes(k))KVF.push(k);kvPut(k,s);stoMark(k,1);return true}stoMark(k,0);try{LS.setItem('m_since','0')}catch(_){}return false}}
+  if((k==='m_since'||k==='m_pend')&&KV.n){KV.hold[k]=s;return true}
+  try{LS.setItem(k,s);stoMark(k,1);return true}catch(e){/* جا نیست: بزرگ‌ترین مجموعه‌ای که هنوز در localStorage است به IndexedDB می‌رود و همین کلید بعد از آن نوشته می‌شود */
+    if(kvOk()&&!BIGK.has(k)){let bk='',bn=0;try{for(const x of BIGK){if(KVF.includes(x))continue;const v=LS.getItem(x);if(v&&v.length>bn){bn=v.length;bk=x}}}catch(_){}
+      if(bk){const v=LS.getItem(bk);KVF.push(bk);KV.hold[k]=s;kvPut(bk,v);return true}}
+    stoMark(k,0);return false}}
+/* شروع برنامه: کلیدهایی که در IndexedDB هستند پیش از اولین نمایش خوانده می‌شوند (16-boot). شکست = همه داده از سرور (since 0) */
+async function kvLoad(){if(!KVF.length||!kvOk())return {};const db=await kvDb(),o={};
+  for(const k of KVF){const v=await new Promise(res=>{try{const r=db.transaction('kv').objectStore('kv').get(k);r.onsuccess=()=>res(r.result==null?null:r.result);r.onerror=()=>res(null)}catch(e){res(null)}});
+    if(v!=null){try{o[k]=JSON.parse(v)}catch(e){}}}return o}
 const isoAdd=(iso,n)=>{const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const JM=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
