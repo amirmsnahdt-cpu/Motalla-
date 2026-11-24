@@ -5455,3 +5455,13 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 .txr .tx .txby{display:flex;align-items:center;gap:3px;min-width:0;margin-top:3px;font-style:normal;font-weight:600;font-size:10.5px;line-height:1.3;color:var(--mut);opacity:.72}
 .txr .tx .txby span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .txr .tx .txby svg{width:10px;height:10px;flex:none;opacity:.8}
+
+/* v103.4 کارت «مبلغ خرید این سند با مبلغ واریزی یکی نیست» (depGapHTML، صفحه واریزی و صفحه سند) */
+.dgap{margin:10px 0 12px;padding:13px 13px 12px;border-radius:20px;background:color-mix(in srgb,#b4730a 9%,var(--card));box-shadow:0 0 0 1.5px color-mix(in srgb,#b4730a 42%,transparent);display:flex;flex-direction:column;gap:11px;animation:bf3Up .35s cubic-bezier(.2,.9,.3,1.1) both}
+.dgh{display:flex;gap:10px;align-items:flex-start}.dgh>i{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none;color:#fff;background:#b4730a}.dgh>i svg{width:18px;height:18px}
+.dgh>span{display:flex;flex-direction:column;gap:3px;min-width:0}.dgh b{font-size:14px;font-weight:900;line-height:1.5}.dgh small{font-size:11.5px;font-weight:700;color:var(--mut);line-height:1.7}
+.dgb{display:flex;flex-direction:column;gap:7px}
+.dgb button{border:0;font:inherit;border-radius:14px;min-height:44px;padding:8px 12px;font-size:13px;font-weight:850;display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;line-height:1.5}
+.dgb .dgp{color:#fff;background:var(--blu);box-shadow:0 8px 16px -10px color-mix(in srgb,var(--blu) 80%,transparent)}.dgb .dgp svg{width:17px;height:17px;flex:none}
+.dgb .dgs{color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
+@media (prefers-reduced-motion:reduce){.dgap{animation:none}}

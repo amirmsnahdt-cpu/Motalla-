@@ -11,11 +11,12 @@
 if(!XA['کالا'])XA['کالا']={t:'کالا',s:'کالا',u:'مورد',k:'o'};
 const COINK={'تمام امامی':'امامی','تمام بهار':'بهار','نیم':'نیم','ربع':'ربع','گرمی':'گرمی'};
 function depXr(e){let I=(e.items||[]).filter(z=>+z.amt);/* اقلام فقط اگر جمعشان همان مبلغ واریزی است (بعد از ویرایش مبلغ، یک ردیف طلا با وزن و مبلغ تازه) */if(!I.length||Math.round(I.reduce((s,z)=>s+(+z.amt||0),0))!==Math.round(+e.amount||0))I=[{k:'طلا',q:e.weight||'',amt:+e.amount||0}];
+  /* v103.4: هر ردیف ساخته‌شده از واریزی نشان dpr دارد تا بعد از ویرایش سند هم معلوم باشد کدام ردیف «خرید همین واریزی» است */
   return I.map(z=>{const a=Math.round(+z.amt||0),q=parseFloat(toEn(String(z.q||'')))||0;
-    if(z.k==='طلا'&&q>0)return xrNew('buy','gold',{w:String(q),ay:750,amT:a,cat:z.t||'متفرقه'});
-    if(z.k==='سکه'&&COINK[z.t])return xrNew('buy',COINK[z.t],{q:String(q||1),amT:a});
-    if((z.k==='دلار'||z.k==='یورو')&&q>0)return xrNew('buy',z.k==='دلار'?'USD':'EUR',{q:String(q),amT:a});
-    return xrNew('buy','کالا',{q:'1',amT:a,nt:clean([z.k==='سایر'?'':z.k,z.t||'',z.n||''].filter(Boolean).join(' '))||'خرید'})})}
+    if(z.k==='طلا'&&q>0)return xrNew('buy','gold',{w:String(q),ay:750,amT:a,cat:z.t||'متفرقه',dpr:1});
+    if(z.k==='سکه'&&COINK[z.t])return xrNew('buy',COINK[z.t],{q:String(q||1),amT:a,dpr:1});
+    if((z.k==='دلار'||z.k==='یورو')&&q>0)return xrNew('buy',z.k==='دلار'?'USD':'EUR',{q:String(q),amT:a,dpr:1});
+    return xrNew('buy','کالا',{q:'1',amT:a,nt:clean([z.k==='سایر'?'':z.k,z.t||'',z.n||''].filter(Boolean).join(' '))||'خرید',dpr:1})})}
 
 /* ---------- حساب مشتری ---------- */
 const phD=p=>toEn(String(p||'')).replace(/\D/g,'');
@@ -33,15 +34,48 @@ function docMake(c,set){const S0=sv;let R=null;try{sv=svBlank(c.id);sv.rate=0;sv
 const depDoc=e=>{if(!e||!e.wd)return null;const c=custs.find(z=>!z.del&&String(z.id)===String(e.wd.cu)),t=c&&(c.txs||[]).find(t=>!t.del&&t.type==='inv'&&String(t.no)===String(e.wd.no));return t?{c,t}:null};
 /* سند خرید فروشنده برای یک واریزی (e باید در entries باشد) */
 /* v71.0: سند خرید همان شماره سیستمی خرید (e.sno) را می‌گیرد تا هر خرید یک شماره داشته باشد (اگر آن شماره قبلاً سند دیگری است، شماره بعدی) */
-function depDocMake(e,c){const R=docMake(c,s=>{s.dk='buy';s.date=e.entryDate||todayISO();s.xr=depXr(e);if(+e.sno)s.no0=+e.sno});R.t.auto='dep';R.t.entId=e.id;
+function depDocMake(e,c){const R=docMake(c,s=>{s.dk='buy';s.date=e.entryDate||todayISO();s.xr=depXr(e);if(+e.sno)s.no0=+e.sno});R.t.auto='dep';R.t.entId=e.id;R.t.dep=e.id;
   e.wd={cu:c.id,no:R.t.no,amt:+e.amount||0,w:String(e.weight||'')};e.cuId=c.id;saveCu();saveE();return R}
 /* بعد از ویرایش مبلغ/وزن واریزی: سند خودکارش با همان شماره دوباره ساخته می‌شود (ردیف‌های پرداخت می‌مانند).
    v91.9 (باگ ریشه‌ای): مبلغ خرید = e.wd.amt است، نه مبلغ خود واریزی اصلی. وقتی بخشی از واریزی جدا می‌شود (مانده بعد از کم شدن تسویه مشتری،
    پرداخت از چند بانک) مبلغ واریزی اصلی کم می‌شود ولی خرید همان است؛ قبلاً اولین ویرایش بعدی، سند خرید فروشنده را به اندازه همان بخش کوچک می‌کرد
    (بدهی ما به فروشنده گم می‌شد). حالا فقط «تغییری که کاربر در مبلغ داده» (d) روی مبلغ خرید می‌نشیند */
-function depDocFix(e,d){const D=depDoc(e);if(!D||D.t.auto!=='dep'||String(D.t.entId)!==String(e.id)){/* v102.5: واریزی «واریز به مشتری» از سند معمولی — سند دست نمی‌خورد ولی wd.amt همراه مبلغ واریزی می‌رود */if(e&&e.wd){const n0=Math.round(+e.wd.amt||0),dd=Math.round(+d||0);if(dd){e.wd.amt=Math.max(0,n0+dd);saveE()}}return}d=Math.round(+d||0);const base=Math.round(+e.wd.amt||+e.amount||0),want=Math.max(0,base+d);
-  if(want===base&&String(e.wd.w||'')===String(e.weight||''))return;
-  const R=docMake(D.c,s=>{s.edit={tx:D.t.id,no:D.t.no};s.dk='buy';s.date=D.t.date;s.xr=depXr({...e,amount:want});s.pays=(D.t.pays||[]).map(p=>({...p}))});R.t.auto='dep';R.t.entId=e.id;e.wd.amt=want;e.wd.w=String(e.weight||'');saveCu();saveE()}
+/* v103.4 (صاحب اپ، سند ۲۲۵۴: «مبلغش کلاً ۴۶ بوده، تسویه هم شده ولی مانده دارد»): ریشه — سند خودکار واریزی با اولین باز و ذخیره شدن
+   (ویرایش سند، تسویه از روی مانده) نشان auto را از دست می‌داد؛ از آن به بعد اصلاح مبلغ واریزی فقط wd.amt را عوض می‌کرد و ردیف خرید سند
+   همان مبلغ قدیمی می‌ماند (۹۲ در برابر واریزی ۴۶ → ۴۶ میلیون بدهی ساختگی). حالا «سند زاده‌شده از واریزی» (depLine) با هر ویرایشی شناخته
+   می‌شود (t.dep که svCommit نگه می‌دارد؛ سندهای قدیمی از زنجیره ویرایش edOf) و تغییر مبلغ واریزی فقط روی ردیف‌های خرید همان واریزی (dpr)
+   می‌نشیند؛ بقیه ردیف‌ها و پرداخت‌هایی که کاربر اضافه کرده دست نمی‌خورند. */
+function depLine(e,D){D=D||depDoc(e);if(!D||!e)return null;const id=String(e.id),t=D.t;if((t.auto==='dep'&&String(t.entId)===id)||(t.dep!=null&&String(t.dep)===id))return D;
+  const T=D.c.txs||[];let r=t,n=0;while(r&&r.edOf!=null&&n++<40){r=T.find(z=>String(z.id)===String(r.edOf));if(r&&r.auto==='dep'&&String(r.entId)===id)return D}return null}
+/* شماره ردیف‌های «خرید همین واریزی» در سند: ردیف‌های نشان‌دار؛ سند قدیمی = ردیف‌های خریدی که در نسخه خودکار اول زنجیره بوده‌اند */
+function depRowsIx(e,D){const t=D.t,X=t.xr||[],M=X.map((x,i)=>x.dpr?i:-1).filter(i=>i>=0);if(M.length)return M;
+  if(t.auto==='dep'&&String(t.entId)===String(e.id))return X.map((x,i)=>x.t==='buy'?i:-1).filter(i=>i>=0);
+  const T=D.c.txs||[];let r=t,n=0;while(r.edOf!=null&&n++<40){const q=T.find(z=>String(z.id)===String(r.edOf));if(!q)break;r=q}
+  const k1=x=>[x.t,x.a,x.cat||'',x.nt||''].join('|'),k2=x=>k1(x)+'|'+Math.round(+x.amount||+x.amT||0),O=(r.xr||[]).filter(x=>x.t==='buy');
+  for(const k of [k2,k1]){const used=new Set(),I=[];X.forEach((x,i)=>{if(x.t!=='buy')return;const j=O.findIndex((q,qi)=>!used.has(qi)&&k(q)===k(x));if(j>=0){used.add(j);I.push(i)}});if(I.length)return I}return []}
+const depBuyOf=(e,D)=>depRowsIx(e,D).reduce((a,i)=>a+Math.round(+((D.t.xr||[])[i]||{}).amount||0),0);
+/* بعد از ویرایش مبلغ/وزن واریزی: مبلغ خرید همین واریزی در سندش d تومان عوض می‌شود (پایه = ردیف‌های خرید خود سند، نه نسخه ذخیره‌شده) */
+function depDocFix(e,d){const D=depLine(e);d=Math.round(+d||0);
+  if(!D){/* v102.5: واریزی «واریز به مشتری» از سند معمولی — سند دست نمی‌خورد ولی wd.amt همراه مبلغ واریزی می‌رود */if(e&&e.wd&&d){e.wd.amt=Math.max(0,Math.round(+e.wd.amt||0)+d);saveE()}return}
+  const t=D.t,pure=t.auto==='dep'&&String(t.entId)===String(e.id)&&!(t.items||[]).length&&(t.xr||[]).every(x=>x.t==='buy'),base=depBuyOf(e,D)||Math.round(+e.wd.amt||+e.amount||0),want=Math.max(0,base+d);
+  if(pure){if(want===base&&String(e.wd.w||'')===String(e.weight||''))return;
+    const R=docMake(D.c,s=>{s.edit={tx:t.id,no:t.no};s.dk='buy';s.date=t.date;s.xr=depXr({...e,amount:want});s.pays=(t.pays||[]).map(p=>({...p}))});R.t.auto='dep';R.t.entId=e.id;R.t.dep=e.id}
+  else{if(!d)return;const I=depRowsIx(e,D);if(!I.length)return;
+    const R=docMake(D.c,s=>{Object.assign(s,invSv(D.c,t));s.edit={tx:t.id,no:t.no};let left=d;
+      for(let j=I.length-1;j>=0&&left;j--){const x=s.xr[I[j]];if(!x)continue;const cur=Math.round(+((t.xr||[])[I[j]]||{}).amount||+x.amT||0),nv=Math.max(0,cur+left);left-=nv-cur;x.amT=nv;x.dpr=1;if(left>0)break}});R.t.dep=e.id}
+  e.wd.amt=Math.max(0,Math.round(+e.wd.amt||base)+d);e.wd.w=String(e.weight||'');saveCu();saveE()}
+/* سند زاده‌شده از واریزی که بدهی ما در آن بیشتر از واریزی‌های در راهش است (مثل سند ۲۲۵۴ پیش از این نسخه): کارت «مبلغ خرید با مبلغ واریزی یکی نیست» */
+function depGap(e){try{if(!e||!e.wd||e.splitOf!=null||e.del)return null;const D=depLine(e);if(!D)return null;memoClear();
+    const P=depBuyOf(e,D),F=wdFamAmt(e);if(!(P>F))return null;const own=wdRoots().filter(z=>z.wd&&String(z.wd.cu)===String(D.c.id)&&String(z.wd.no)===String(D.t.no));
+    const pend=own.reduce((a,z)=>a+wdState(z).pend,0),owe=Math.round(txD(D.t).r||0),gap=Math.min(P-F,owe-pend);if(!(gap>=1))return null;
+    if(e.wd.gk===P+'|'+F)return null;return {D,P,F,gap}}catch(_){return null}}
+function depGapHTML(e){const G=depGap(e);if(!G)return '';const {P,F,gap}=G;
+  return `<div class="dgap"><div class="dgh"><i>${ic('info')}</i><span><b>مبلغ خرید این سند با مبلغ واریزی یکی نیست</b><small>خرید ${fmt(P)} · واریزی ${fmt(F)} · ${fmt(gap)} تومان بدهی ما به این مشتری در هیچ واریزی نیست</small></span></div>
+  <div class="dgb"><button class="dgp" data-act="depGapFix" data-id="${e.id}">${ic('check')}<span>خرید ${fmt(P-gap)} بوده؛ سند اصلاح شود</span></button><button class="dgs" data-act="depGapOk" data-id="${e.id}">درست است؛ بقیه جدا پرداخت می‌شود</button></div></div>`}
+ACT.depGapFix=d=>{const e=entries.find(z=>String(z.id)===String(d.id)),G=depGap(e);if(!G)return;if(!can('debt')&&!can('edit')){toast('دسترسی اصلاح سند برای حساب شما فعال نیست',true);return}
+  askConfirm('مبلغ خرید سند '+toFa(G.D.t.no)+' از '+fmt(G.P)+' به '+fmt(G.P-G.gap)+' تومان اصلاح شود؟ بدهی ما به این مشتری '+fmt(G.gap)+' تومان کم می‌شود.','اصلاح سند',()=>{
+    const no=G.D.t.no,c=G.D.c;depDocFix(e,-G.gap);if(e.wd)e.wd.amt=wdFamAmt(e);saveE();logA('edit','اصلاح مبلغ خرید سند از روی واریزی',cuName(c)+' | سند '+toFa(no)+' | '+fmt(G.P)+' → '+fmt(G.P-G.gap)+' تومان',{ids:[e.id],cu:c.id});memoClear();const N=depDoc(e);if(cur==='inv'&&N)invOpen(N.c.id,N.t.id);else render();toast('سند '+toFa(no)+' اصلاح شد ✓')})};
+ACT.depGapOk=d=>{const e=entries.find(z=>String(z.id)===String(d.id)),G=depGap(e);if(!G)return;e.wd.gk=G.P+'|'+G.F;saveE();render();toast('ثبت شد؛ این اختلاف دیگر نشان داده نمی‌شود')};
 /* ترمیم سندی که با همان باگ کوچک شده: واریزی اصلی «مانده» زنده دارد و مبلغ خرید ثبت‌شده درست برابر مبلغ خود واریزی اصلی شده
    (یعنی بعد از جدا شدن مانده یک بار با مبلغ کم‌شده دوباره ساخته شده) → مبلغ مانده به سند برمی‌گردد. در حالت سالم این دو هیچ‌وقت برابر نیستند */
 function depDocHeal(e){try{if(!e||!e.wd||e.splitOf!=null)return 0;const D=depDoc(e);if(!D||D.t.auto!=='dep'||String(D.t.entId)!==String(e.id))return 0;
@@ -65,7 +99,7 @@ function depDocBack(L){const S=new Set(L.map(e=>String(e.id))),now=ns();let n=0;
 
 /* ---------- جزئیات واریزی: پیوند به سند مشتری ---------- */
 function entDocLink(x){const e=entries.find(z=>z.id===famRoot(x))||x,D=depDoc(e);
-  if(D)return `<button class="py7doc" data-act="depDocGo" data-id="${e.id}"><span class="py7di">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(D.t))}</b><small>در حساب «${esc(cuName(D.c))}» · ${(b=>b.R?balLab(b.R)+' '+fmt(Math.abs(b.R))+' تومان':'حساب تسویه است')(cuBal(D.c))}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`;
+  if(D)return `<button class="py7doc" data-act="depDocGo" data-id="${e.id}"><span class="py7di">${ic('inv')}</span><span class="tx"><b>${esc(invTitle(D.t))}</b><small>در حساب «${esc(cuName(D.c)||('حساب شماره '+toFa(D.c.cno||'')))}» · ${(b=>b.R?balLab(b.R)+' '+fmt(Math.abs(b.R))+' تومان':'حساب تسویه است')(cuBal(D.c))}</small></span>${ic('back').replace('class="i"','class="i flip"')}</button>`+depGapHTML(e);
   return can('edit')&&!x.splitOf?`<button class="py7doc nw" data-act="depDocNew" data-id="${e.id}"><span class="py7di">${ic('plus')}</span><span class="tx"><small>این واریزی هنوز سند ندارد</small><b>ساخت حساب و سند در حساب مشتری</b></span></button>`:''}
 ACT.depDocGo=d=>{const e=entries.find(z=>String(z.id)===String(d.id)),D=depDoc(e);if(D)invOpen(D.c.id,D.t.id)};
 ACT.depDocNew=d=>{const e=entries.find(z=>String(z.id)===String(d.id));if(!e||depDoc(e))return;
