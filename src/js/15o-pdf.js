@@ -17,7 +17,7 @@ function pageSpec(html){/* v97.5: اندازه دلخواه «size:210mm 140mm»
 async function pdfMake(html,title,keep){
   const Q=pageSpec(html),SHM=/<section class="sht"/.test(html);if(SHM){Q.mv=0;Q.mh=0}
   const mmW=Q.mmW,mmH=Q.mmH,PX=96/25.4,
-    W=Math.round((mmW-2*Q.mh)*PX),H=Math.round((mmH-2*Q.mv)*PX),S=3,base=location.href.replace(/[^/]*$/,'');
+    W=Math.round((mmW-2*Q.mh)*PX),H=Math.round((mmH-2*Q.mv)*PX),S=SHM?4:3/* v104.4: برگه فاکتور ~۳۸۴ dpi (قبلاً ~۲۹۰) */,base=location.href.replace(/[^/]*$/,'');
   const f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.style.cssText=`position:fixed;left:-20000px;top:0;width:${W}px;height:${H}px;border:0;opacity:0;pointer-events:none`;document.body.appendChild(f);
   try{
     await new Promise(r=>{f.onload=r;f.srcdoc=html.replace(/<head>/i,'<head><base href="'+base+'">').replace(/<button class="pb"[^>]*>.*?<\/button>/,'')});
@@ -60,7 +60,11 @@ async function pdfMake(html,title,keep){
       {const c0=document.createElement('canvas');c0.width=c0.height=4;c0.getContext('2d').drawImage(im,0,0,4,4);await new Promise(r=>setTimeout(r,imgs.length?250:700))}
       const cv=document.createElement('canvas');cv.width=W*S;cv.height=hp*S;const x=cv.getContext('2d');
       for(let k=0;k<2;k++){x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(im,0,0,W,hp,0,0,cv.width,cv.height);if(!k)await new Promise(r=>setTimeout(r,60))}
-      const j=cv.toDataURL('image/jpeg',.9);imgs.push({b:Uint8Array.from(atob(j.split(',')[1]),c=>c.charCodeAt(0)),w:cv.width,h:cv.height,hp,j:keep?j:''})};
+      /* v104.4 (خواسته صاحب اپ: «کیفیت چاپ و رنگ‌ها بهتر شود»): JPEG خط‌ها و نوشته‌های رنگی ریز (قرمز، آبی، طلایی روی کرم) را مات می‌کرد
+         (رنگ نیم‌وضوح ذخیره می‌شود). برگه‌های فاکتور: برای چاپ (اندروید و چاپ مستقیم) نسخه بی‌افت PNG نگه داشته می‌شود و داخل PDF عکس
+         بی‌افت Flate (pdfFlate) گذاشته می‌شود؛ مرورگری که CompressionStream ندارد همان JPEG با کیفیت ۰٫۹۵ */
+      const j=cv.toDataURL('image/jpeg',SHM?.95:.9),pn=SHM&&keep?cv.toDataURL('image/png'):'',fz=SHM?await pdfFlate(x,cv.width,cv.height):null;
+      imgs.push({b:fz||Uint8Array.from(atob(j.split(',')[1]),c=>c.charCodeAt(0)),fl:!!fz,w:cv.width,h:cv.height,hp,j:keep?j:'',pn})};
     for(const [a,b] of pages){const P=B.cloneNode(true),E2=[...P.querySelectorAll('*')];
       /* همان ترتیب عنصرها در iframe و در نسخه (اسکریپت‌ها و دکمه‌ها قبلاً از نسخه برداشته شده‌اند؛ با ترتیب نسبی تطبیق داده می‌شود) */
       let k=0;EL.forEach((el,i)=>{if(el.matches('script,.pb,.pb0')||el.closest('.pb,.pb0'))return;const e2=E2[k++];if(!e2)return;const r=RC[i];if(!r.h||r.abs)return;
@@ -77,9 +81,12 @@ async function pdfMake(html,title,keep){
     const blob=pdfBuild(PP,PW,PH,MX,MY);
     const fl=new File([blob],String(title||'motalla').replace(/[\\/:*?"<>|]/g,'-').replace(/[۰-۹]/g,d=>d.charCodeAt(0)-1776).replace(/[٠-٩]/g,d=>d.charCodeAt(0)-1632)/* v61.87: عددهای نام فایل ارسالی انگلیسی */+'.pdf',{type:'application/pdf'});
     /* keep: عکس صفحه‌ها هم برگردانده می‌شود (چاپ اندروید همان صفحه‌ها را چاپ می‌کند تا دقیقاً همان PDF باشد) */
-    if(keep)fl._pages=PP.map(o=>({j:o.j,wmm:(mmW-2*Q.mh)*o.k,hmm:(mmW-2*Q.mh)*o.k*o.hp/W})),fl._spec=Q;return fl}
+    if(keep)fl._pages=PP.map(o=>({j:o.j,pn:o.pn,wmm:(mmW-2*Q.mh)*o.k,hmm:(mmW-2*Q.mh)*o.k*o.hp/W})),fl._spec=Q;return fl}
   finally{f.remove()}}
 /* PDF ساده: هر صفحه A5 یک عکس JPEG (DCTDecode) بالای صفحه با حاشیه */
+/* عکس صفحه بی‌افت برای PDF: پیکسل‌های RGB با zlib (CompressionStream 'deflate' = همان FlateDecode پی‌دی‌اف) */
+async function pdfFlate(x,w,h){try{if(typeof CompressionStream!=='function')return null;const D=x.getImageData(0,0,w,h).data,R=new Uint8Array(w*h*3);for(let i=0,k=0;i<D.length;i+=4){R[k++]=D[i];R[k++]=D[i+1];R[k++]=D[i+2]}
+  const st=new Blob([R]).stream().pipeThrough(new CompressionStream('deflate'));return new Uint8Array(await new Response(st).arrayBuffer())}catch(e){return null}}
 function pdfBuild(P,PW,PH,M,MY){if(MY==null)MY=M;const enc=new TextEncoder(),parts=[],off=[];let len=0;const put=x=>{const u=typeof x==='string'?enc.encode(x):x;parts.push(u);len+=u.length};
   const obj=(n,body)=>{off[n]=len;put(n+' 0 obj\n');if(Array.isArray(body))body.forEach(put);else put(body);put('\nendobj\n')};
   const n=P.length,f=v=>(Math.round(v*10000)/10000).toString();put('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
@@ -88,7 +95,7 @@ function pdfBuild(P,PW,PH,M,MY){if(MY==null)MY=M;const enc=new TextEncoder(),par
   P.forEach((p,i)=>{const pg=3+i*3,ct=pg+1,im=pg+2,x0=p.x!=null?p.x:M,y0=PH-(p.y!=null?p.y:MY)-p.ih,fi=-(p.r||0)*Math.PI/180,cs=Math.cos(fi),sn=Math.sin(fi),cx=x0+p.iw/2,cy=y0+p.ih/2,/* v99.6 چرخش جبرانی دور مرکز عکس */s=p.r?`q ${f(p.iw*cs)} ${f(p.iw*sn)} ${f(-p.ih*sn)} ${f(p.ih*cs)} ${f(cx-(p.iw/2*cs-p.ih/2*sn))} ${f(cy-(p.iw/2*sn+p.ih/2*cs))} cm /Im0 Do Q`:`q ${f(p.iw)} 0 0 ${f(p.ih)} ${f(x0)} ${f(y0)} cm /Im0 Do Q`;
     obj(pg,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f(PW)} ${f(PH)}] /Resources << /XObject << /Im0 ${im} 0 R >> >> /Contents ${ct} 0 R >>`);
     obj(ct,[`<< /Length ${s.length} >>\nstream\n`,s,'\nendstream']);
-    obj(im,[`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.b.length} >>\nstream\n`,p.b,'\nendstream'])});
+    obj(im,[`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter ${p.fl?'/FlateDecode':'/DCTDecode'} /Length ${p.b.length} >>\nstream\n`,p.b,'\nendstream'])});
   const N=3+n*3,xr=len;put(`xref\n0 ${N}\n0000000000 65535 f \n`);for(let i=1;i<N;i++)put(String(off[i]).padStart(10,'0')+' 00000 n \n');
   put(`trailer\n<< /Size ${N} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`);return new Blob(parts,{type:'application/pdf'})}
 const pdfTitle=h=>(String(h).match(/<title>([^<]*)<\/title>/)||[])[1]||'مطلا';
@@ -127,5 +134,5 @@ function pdfPrintAnd(){const fl=PDFK.file,B=window.AndroidBridge;if(!fl||!fl._pa
     pz=`@page{size:${Q.cz||PB?Q.mmW+'mm '+n2(HB)+'mm':(Q.a4?'A4':'A5')+(Q.land?' landscape':'')};margin:0}html,body{margin:0;padding:0;background:#fff}`;
   const css=C||PB?`${pz}.p{width:${Q.mmW}mm;height:${n2(HB)}mm;overflow:hidden;page-break-after:always;break-after:page}.p:last-child{page-break-after:auto;break-after:auto}.q{width:${n2(Q.mmW*kx)}mm;height:${n2(Q.mmH*ky)}mm;margin:${n2((HB-Q.mmH*ky)/2+(C?C.y:0))}mm 0 0 ${n2(Q.mmW*(1-kx)/2+(C?C.x:0))}mm;box-sizing:border-box;padding:${n2(Q.mv*ky)}mm ${n2(Q.mh*kx)}mm;overflow:hidden${C&&C.r?`;transform:rotate(${C.r}deg);transform-origin:50% 50%`:''}}img{display:block}`
     :`${pz}.p{width:${Q.mmW}mm;height:${Q.mmH}mm;box-sizing:border-box;padding:${Q.mv}mm ${Q.mh}mm;overflow:hidden;page-break-after:always;break-after:page}.p:last-child{page-break-after:auto;break-after:auto}img{display:block}`;
-  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${pdfEsc(fl.name.replace(/\.pdf$/,''))}</title><style>${css}</style></head><body>${fl._pages.map(p=>{const im=`<img src="${p.j}" style="width:${n2(p.wmm*kx)}mm;height:${n2(p.hmm*ky)}mm;margin:0 auto">`;return `<div class="p">${C||PB?`<div class="q">${im}</div>`:im}</div>`}).join('')}</body></html>`;
+  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${pdfEsc(fl.name.replace(/\.pdf$/,''))}</title><style>${css}</style></head><body>${fl._pages.map(p=>{const im=`<img src="${p.pn||p.j}" style="width:${n2(p.wmm*kx)}mm;height:${n2(p.hmm*ky)}mm;margin:0 auto">`;return `<div class="p">${C||PB?`<div class="q">${im}</div>`:im}</div>`}).join('')}</body></html>`;
   toast('در حال آماده‌سازی چاپ…');try{B.printHtml(html,fl.name.replace(/\.pdf$/,''))}catch(e){toast('چاپ در این گوشی ممکن نشد',true)}return true}

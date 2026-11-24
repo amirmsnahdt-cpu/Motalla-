@@ -5502,3 +5502,10 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 :root[data-theme="dark"] .d8eb.d8wt{color:#fbbf24}
 .txr .tx .txwt{display:inline-block;align-self:flex-start;margin-top:3px;font-style:normal;font-size:10.5px;font-weight:800;padding:1px 8px;border-radius:999px;color:#b45309;background:color-mix(in srgb,#d97706 14%,var(--card))}
 :root[data-theme="dark"] .txr .tx .txwt{color:#fbbf24}
+/* v104.4 (خواسته صاحب اپ: «وقتی واردش می‌شوم می‌پرد»): دستگاه کارتخوان/حواله/نقدی هنگام ورود دیگر از پایین بالا نمی‌آید و کاغذ رسید
+   از چاپگر بیرون نمی‌پرد — فقط یک محو شدن کوتاه، آن هم فقط بار اولِ هر روش (کلاس ent)؛ بازسازی‌های بعدی (انتخاب شخص/بانک) بی‌حرکت */
+#sheet .ptm{animation:none}#sheet .ptm.ent{animation:ptmFd .14s ease-out both}@keyframes ptmFd{from{opacity:0}}
+#sheet .ptm-pap{animation:none}#sheet .ptm-card:not(.in){animation:none}
+#sheet .ptm-lz{display:flex;flex-direction:column;gap:6px}#sheet .ptm-lz i{display:block;height:54px;border-radius:14px;background:color-mix(in srgb,var(--mut) 10%,var(--card))}
+@media (prefers-reduced-motion:reduce){#sheet .ptm.ent{animation:none}}
+#sheet .ckw.cpos>.ckfm,#sheet .ckfm:has(>.ptm){animation:none}#sheet .ptm-bl{animation:none}
