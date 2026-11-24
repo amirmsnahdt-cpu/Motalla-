@@ -13,6 +13,7 @@ const PRESS_SEL='button,[data-act],a[href],[role="button"],label,summary,.opt,.l
   const SC=(()=>{try{return CSS.supports('scale','1')}catch(_){return false}})();
   const target=e=>{const el=e.target&&e.target.closest&&e.target.closest(PRESS_SEL);if(!el||el.disabled||el.getAttribute('aria-disabled')==='true')return null;
     if(el.matches('input,textarea,select'))return null;
+    if(el.matches('.ptm-k'))return null;/* v103.9: دکمه‌های صفحه‌کلید کارتخوان/حواله فرورفتن خودشان را دارند (.pr) */
     /* برچسبی که فقط دور یک فیلد متنی است (نه دکمه) فرو نرود */
     if(el.tagName==='LABEL'&&el.querySelector('input:not([type=file]):not([type=checkbox]):not([type=radio]),textarea,select'))return null;
     /* v70.5 (خواسته صاحب اپ): سرتیتر کارت‌های بازشو (منبع‌های لیست واریز) = کل کارت با هم فرو می‌رود، نه فقط تکه‌ای از آن */
