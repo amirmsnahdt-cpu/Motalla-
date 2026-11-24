@@ -5702,3 +5702,15 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 #sheet .offf.of1>small{font-size:12px;line-height:1.5}
 #sheet .offf.of1 input{width:100%;text-align:center;font-size:30px;font-weight:900;font-feature-settings:"tnum";padding:6px 4px}
 #sheet .ofr>span svg{width:20px;height:20px}
+/* v105.1 rounding suggestions = one list under the box */
+#sheet .ofsg{margin:2px 0 12px}
+#sheet .ofsg>small{display:block;font-size:11.5px;font-weight:800;color:var(--mut);padding:0 4px 6px}
+#sheet .ofks{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,138px),1fr));gap:8px}
+#sheet .ofk{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 12px;border:0;border-radius:14px;font:inherit;text-align:start;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink);min-width:0}
+#sheet .ofk b{font-size:15.5px;font-weight:900;font-feature-settings:"tnum";max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sheet .ofk small{font-size:11px;font-weight:800;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+#sheet .ofk.dn small{color:var(--red)}#sheet .ofk.up small{color:var(--blu)}
+#sheet .ofk.dn.on{background:color-mix(in srgb,var(--red) 9%,var(--card));box-shadow:inset 0 0 0 1.8px var(--red)}#sheet .ofk.dn.on b{color:var(--red)}
+#sheet .ofk.up.on{background:color-mix(in srgb,var(--blu) 9%,var(--card));box-shadow:inset 0 0 0 1.8px var(--blu)}#sheet .ofk.up.on b{color:var(--blu)}
+
+#sheet .ofk{padding:7px 11px;gap:1px;border-radius:13px}#sheet .ofk b{font-size:14.5px}#sheet .ofks{gap:7px}
