@@ -59,10 +59,17 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('ov').classList.
 try{history.replaceState({n:'home'},'')}catch(e){}
 /* آیفون (برنامه روی صفحه اصلی): iOS ارتفاع صفحه را به اندازه نوار ساعت کم گزارش می‌کند؛ قاب را به اندازه کامل صفحه می‌کنیم */
 
-if(ME)user=ME.name;applyPerms();syncInit();
-try{if(sessionStorage.getItem('m_back_settings')){sessionStorage.removeItem('m_back_settings');if(ME&&TOKEN)cur='settings'}}catch(e){}
-render(true);
-if(!TOKEN)showAuth();else{setSync(navigator.onLine===false?'off':'busy');syncNow()}
+/* v104.0: داده‌هایی که به IndexedDB رفته‌اند (KVF، 01-core) پیش از اولین نمایش خوانده می‌شوند؛ اگر خوانده نشد، همه داده از سرور گرفته می‌شود.
+   یک بار برای همه گوشی‌ها (m_rsy1): همگام‌سازی کامل از صفر — گوشی‌هایی (آیفون) که حافظه‌شان پر شده بود و داده کهنه داشتند ولی خود را به‌روز می‌دانستند درست می‌شوند */
+const KVA={m_entries:v=>{entries=(v||[]).map(e=>({...e,entryDate:e.entryDate||dateVal,name:stripName(e.name)}))},m_sources:v=>{sources=v||[]},m_batches:v=>{batches=(v||[]).map(b=>({...b,items:(b.items||[]).map(x=>({...x,name:stripName(x.name)}))}))},
+  m_creds:v=>{creds=v||[]},m_custs:v=>{custs=v||[]},m_trash:v=>{trash=v||[]},m_audit:v=>{audit=v||[]},m_drafts:v=>{drafts=v&&typeof v==='object'?v:{}}};
+function bootGo(){/* داده اصلی نه در localStorage هست نه در IndexedDB ولی گوشی خود را همگام می‌داند → همه از سرور */try{if(SY.since>0&&['m_custs','m_entries'].some(k=>!KVF.includes(k)&&LS.getItem(k)==null))SY.since=0}catch(e){}
+  if(ME)user=ME.name;applyPerms();syncInit();
+  try{if(sessionStorage.getItem('m_back_settings')){sessionStorage.removeItem('m_back_settings');if(ME&&TOKEN)cur='settings'}}catch(e){}
+  render(true);
+  if(!TOKEN)showAuth();else{if(!PVW){let d=0;try{d=LS.getItem('m_rsy1')}catch(e){}if(!d){SY.since=0;SY.rsy=1}}setSync(navigator.onLine===false?'off':'busy');syncNow()}}
+if(KVF.length&&kvOk())kvLoad().then(o=>{let miss=0;for(const k of KVF){if(k in o&&KVA[k])KVA[k](o[k]);else miss=1}alloc=null;memoClear();if(miss)SY.since=0;bootGo()},()=>{SY.since=0;bootGo()});
+else bootGo();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||/^(127\.0\.0\.1|localhost)$/.test(location.hostname))){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 /* v67.1: صفحه بارگذاری (مهر مطلا در index.html) بعد از آماده شدن قفل/ورود/خانه محو می‌شود؛ دست‌کم ۰٫۶۵ ثانیه تا چشمک نزند */
 (()=>{const s=$('splash');if(!s)return;let w=650;try{w=Math.max(0,650-performance.now())}catch(e){}
