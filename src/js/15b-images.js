@@ -25,11 +25,17 @@ function galCtx(){if(!GAL)return null;/* v61.47: عکس ردیف کالای سن
    زدن «+» همان‌جا زیر عکس‌ها دو گزینه باز می‌کند: «گرفتن عکس» (دوربین) و «از گالری». هم پنجره رسید و هم پنل واریز بانکی (itGalHTML) از همین استفاده می‌کنند.
    بدون دوربین (کامپیوتر): «+» مستقیم گالری/فایل را باز می‌کند */
 const galGalIn=()=>`<input type="file" accept="image/*"${picMulti()?' multiple':''} data-galadd="1" hidden>`;
-function galAddHTML(c){if(!c||!c.ed)return '';
-  if(!picCam())return `<label class="galt add gadd" aria-label="افزودن عکس">${ic('plus')}${galGalIn()}</label>`;
-  return `<button type="button" class="galt add gadd" data-act="galPick" aria-label="افزودن عکس" aria-expanded="${c.keys.length?'false':'true'}"${c.keys.length?'':' hidden'}>${ic('plus')}</button>
-  <div class="galpk${c.keys.length?' hide':''}" id="galpk"><label class="galpr">${ic('cam')}<span><b>گرفتن عکس</b><small>دوربین گوشی</small></span><input type="file" accept="image/*" capture="environment" data-galadd="1" hidden></label><label class="galpr">${ic('gal')}<span><b>از گالری</b><small>${picMulti()?'یک یا چند عکس':'انتخاب عکس'}</small></span>${galGalIn()}</label></div>`}
-ACT.galPick=(d,e)=>{const t=e&&e.target&&e.target.closest('.gadd'),g=t&&t.parentNode,p=g&&g.querySelector('.galpk');if(!p)return;const on=p.classList.toggle('hide');t.setAttribute('aria-expanded',on?'false':'true');t.classList.toggle('on',!on)};
+/* v104.7 (خواسته صاحب اپ: «افزودن عکس در همه جای برنامه قشنگ و درست با دو کلید: مستقیم دوربین و مستقیم گالری، که در وقت صرفه‌جویی شود»):
+   phPair = دو دکمه «دوربین» (capture) و «گالری» (چندتایی اگر بشود)؛ کامپیوتر بی‌دوربین فقط «گالری». هر دو همان ورودی را دارند (attr)،
+   پیش‌فرض data-galadd = پنجره عکس‌ها؛ ref = همان GAL که پیش از باز شدن انتخاب فایل گذاشته می‌شود (کلیک capture پایین)، پس دیگر لازم نیست
+   اول پنجره گالری باز شود. cls: gt = کاشی مربع (داخل شبکه عکس‌ها)، sm = دو دکمه کوچک (پنل ردیف سند) */
+/* دوربین: اپ اندروید وقتی پل دوربین دارد؛ مرورگر گوشی لمسی (آیفون و…) همیشه (capture مستقیم دوربین را باز می‌کند)؛ کامپیوتر نه */
+const phCam=()=>picCam()||!/MotallaAndroid/.test(navigator.userAgent)&&!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+function phPair(ref,o){o=o||{};const at=o.attr||'data-galadd="1"',L=(cam,lab,icn)=>`<label class="php2b${cam?' cam':' gal'}"><i>${ic(icn)}</i><span>${lab}</span><input type="file" accept="image/*"${cam?' capture="environment"':(o.multi!==false&&picMulti()?' multiple':'')} ${at} hidden></label>`;
+  return `<span class="php2${o.cls?' '+o.cls:''}"${ref?` data-gref="${esc(JSON.stringify(ref))}"`:''}>${phCam()?L(1,'دوربین','cam'):''}${L(0,'گالری','gal')}</span>`}
+document.addEventListener('click',e=>{const g=e.target&&e.target.closest&&e.target.closest('[data-gref]');if(!g)return;let r=null;try{r=JSON.parse(g.dataset.gref)}catch(_){}if(!r)return;
+  if(r.k==='row'){if(!r.ck&&typeof qaRead==='function'&&sv&&sv.qa)try{qaRead()}catch(_){}GAL=r;if(!phT()){e.preventDefault();GAL=null;toast('اول ردیف را کامل کنید',true);return}}else GAL=r},true);
+function galAddHTML(c){if(!c||!c.ed)return '';return phPair(null,{cls:'gt'})}
 function galHTML(){const c=galCtx();if(!c)return `<div class="sh-h"><b>رسید</b><button class="x" data-act="close" aria-label="بستن">×</button></div><div class="spempty"><b>پیدا نشد</b></div>`;const K=c.keys;
   return `<div class="sh-h"><div><b>${GAL.k==='it'?'رسید واریز بانکی':c.meta.kind==='rc'?'عکس رسید':GAL.k==='row'||GAL.k==='view'?'عکس کالا':'رسید تسویه مشتری'}</b><small class="shsub">${esc(c.meta.name)}${c.meta.amount?' · '+fmt(c.meta.amount)+' تومان':''}${K.length?'، '+fmt(K.length)+' عکس':''}</small></div><button class="x" data-act="${GAL.ck?'ckPhBack':'close'}" aria-label="بستن">×</button></div>
   <div class="galg">${K.map((k,i)=>`<button class="galt" data-act="galView" data-i="${i}" aria-label="دیدن عکس ${toFa(i+1)}"><span class="galim" id="gal${i}"></span><i>${toFa(i+1)}</i></button>`).join('')}${galAddHTML(c)}</div>
