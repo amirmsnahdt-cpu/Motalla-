@@ -113,8 +113,13 @@ ACT.depDocNew=d=>{const e=entries.find(z=>String(z.id)===String(d.id));if(!e||de
 const stlBkC=z=>{if(!z)return null;const id=z.byInv&&z.byInv.cu!=null?z.byInv.cu:z.cuId;if(id==null||id==='')return null;const c=custs.find(q=>String(q.id)===String(id));return c&&c.grp==='بانک'&&!c.del?c:null};
 let pyFlash=null;
 /* «افزودن پرداخت» (تسویه از مشتری) برای این واریزی باز است؟ — همان شرط دکمه؛ پنجره یکپارچه هم زبانه «حساب مشتری» را با همین نشان می‌دهد */
-function pyAddOk(x){if(!x||!can('edit'))return false;const rootId=famRoot(x);if(x.id!==rootId||x.full||!(x.amount>0)||(x.sentBid&&stOf(x.id)==='ok'))return false;
-  const xr=validated().find(z=>z.id===rootId)||x;return !(xr.sentBid&&(q0=>!q0||ssLock(q0.it)||q0.b.closed)(entBI(xr)))}
+/* v103.8 (خواسته صاحب اپ، ویدیو «پرداخت از کجا؟»: «در این قسمت حساب مشتری نداریم که بخواهیم بزنیم»): وقتی بخش اصلی واریزی ارسال/تأیید شده
+   ولی بخشی از آن هنوز آزاد است (مانده یا بخش بدون ارسال)، پرداخت از حساب مشتری هم ممکن است — فقط به اندازه همان بخش‌های آزاد.
+   pyLockR = بخش اصلی دیگر جای تسویه ندارد؛ pyPcFree = بخش‌های ارسال‌نشده غیر از اصلی که مشتری می‌تواند بپردازد */
+function pyLockR(x){const rootId=famRoot(x),xr=validated().find(z=>z.id===rootId)||x;return !!((xr.sentBid&&stOf(xr.id)==='ok')||(xr.sentBid&&(q0=>!q0||ssLock(q0.it)||q0.b.closed)(entBI(xr))))}
+const pyPcFree=x=>{const rid=famRoot(x);return famOf(x).filter(r=>r.id!==rid&&!r.sentBid&&r.amount>0)};
+function pyAddOk(x){if(!x||!can('edit'))return false;const rootId=famRoot(x);if(x.id!==rootId||x.full)return false;
+  if(!(x.amount>0)||pyLockR(x))return can('split')&&pyPcFree(x).length>0;return true}
 function entPay(x){const F=famOf(x),e=entries.find(z=>z.id===x.id)||x,S=e.settles||[],ed=can('edit'),A=allocMap(),sent=F.some(r=>r.sentBid),tot=(+e.amount||0)+(x.id===famRoot(x)?F.filter(r=>r.id!==e.id).reduce((a,r)=>a+(+r.amount||0),0):0);
   const open=!x.full&&x.amount>0&&!(x.sentBid&&stOf(x.id)==='ok'),canAdd=ed&&open;if(!S.length&&!tot)return '';
   const SC=S.filter(z=>!stlBkC(z)),cOk=SC.filter(z=>z.st!=='wait').reduce((a,z)=>a+(+z.amount||0),0),cW=SC.filter(z=>z.st==='wait').reduce((a,z)=>a+(+z.amount||0),0);
@@ -176,7 +181,17 @@ function pyRe(){const v=$('view'),y=v?v.scrollTop:0;render();if(v)v.scrollTop=y}
 
 /* ---------- پنل «پرداخت از کجا؟»: مرحله ۱ جستجو (فهرست = اسکرول خود پنل، جستجو چسبیده بالا)، مرحله ۲ مبلغ و رسید ---------- */
 let PX=null;
-const pxRest=()=>{if(PX.bz)return Math.max(0,num(bz.d.amount||0)-bzStlSum());const x=entRow();if(!x)return 0;if(PX.pg!=null){const r=famOf(x).find(z=>String(z.id)===String(PX.pg));return r&&!r.sentBid?Math.max(0,+r.amount||0):0}if(PX.sel&&PX.sel.k==='bk'){const L=pkL(x);return Math.max(0,(L[0]?+L[0].amount:0)+(PX.edit!=null?pkCur()+pkFree(L):0))}return Math.max(0,+x.amount||0)};
+const pxRest=()=>{if(PX.bz)return Math.max(0,num(bz.d.amount||0)-bzStlSum());const x=entRow();if(!x)return 0;if(PX.pg!=null){const r=famOf(x).find(z=>String(z.id)===String(PX.pg));return r&&!r.sentBid?Math.max(0,+r.amount||0):0}if(PX.sel&&PX.sel.k==='bk'){const L=pkL(x);return Math.max(0,(L[0]?+L[0].amount:0)+(PX.edit!=null?pkCur()+pkFree(L):0))}return pxCuCap(x)};
+/* سقف پرداخت از حساب مشتری: بخشی که رویش زده شده (اگر آزاد است) = همان بخش؛ وگرنه مانده بخش اصلی + بخش‌های بی‌بانک آزاد؛ بخش اصلی قفل = فقط بخش‌های آزاد */
+const pxCuPc=x=>PX&&PX.pc!=null?pyPcFree(x).find(r=>String(r.id)===String(PX.pc))||null:null;
+function pxCuCap(x){const pc=pxCuPc(x);if(pc)return Math.max(0,+pc.amount||0);const e=entries.find(z=>z.id===famRoot(x)),fr=e?depFreeSum(e):0;
+  if(!(x.amount>0)||pyLockR(x))return Math.max(0,pyPcFree(x).reduce((a,r)=>a+(+r.amount||0),0));return Math.max(0,(+x.amount||0)+fr)}
+/* پرداخت مشتری از یک بخش مشخص: همان بخش به اندازه a کم و بخش اصلی همان‌قدر زیاد می‌شود؛ تسویه روی بخش اصلی نشسته و خالص آن ثابت می‌ماند
+   (ردیف ارسال‌شده بانک تکان نمی‌خورد)؛ جمع خانواده و سند فروشنده عوض نمی‌شود. بخش صفرشده از تخصیص و فهرست برداشته می‌شود */
+function pxPcMove(x,a){const pc=pxCuPc(x),lk=pyLockR(x)||!(x.amount>0);let need=a;const L=pc?[pc]:lk?pyPcFree(x).slice().sort((p,q)=>(pkSrcOf(p.id)?1:0)-(pkSrcOf(q.id)?1:0)):[];if(!L.length)return 0;
+  const root=entries.find(z=>z.id===famRoot(x));if(!root)return 0;const now=new Date().toISOString(),dead=[];let got=0;
+  for(const r of L){if(need<=0)break;const e=entries.find(z=>z.id===r.id);if(!e||e.sentBid!=null)continue;const k=Math.min(+e.amount||0,need);if(!(k>0))continue;e.amount=(+e.amount||0)-k;e.updatedAt=now;e.updatedBy=who();need-=k;got+=k;if(!(e.amount>0))dead.push(e.id)}
+  if(got){root.amount=(+root.amount||0)+got;root.updatedAt=now;dead.forEach(id=>wdPartRm(id));if(dead.length)entries=entries.filter(z=>!dead.includes(z.id));alloc=null}return got}
 /* ---------- v66.0 (خواسته صاحب اپ): «بخشی از مبلغ از بانک دیگر» بدون پنجره چند منبع ----------
    بخش‌ها همان واریزی‌های همراه (splitOf) هستند و با psApply ساخته می‌شوند؛ این فقط راه ساده‌تر ثبت است:
    بانک را بزنید، مبلغ را بزنید؛ از مانده بانک اصلی کم می‌شود و در «پرداخت این واریزی» یک ردیف با مانده می‌آید. */
@@ -412,7 +427,7 @@ ACT.pxSave=async()=>{pxRead();const a=Math.round(PX.amount||0),r=pxRest(),s=PX.s
   const x=entRow(),e=x&&entries.find(z=>z.id===x.id);if(!e)return;if(PX.busy)return;PX.busy=1;
   try{let K=[];if(PX.imgD){const k=newImgKey('stl:'+e.id+'.'+Date.now());if(await imgPut(k,PX.imgD))K=[k];else toast('حافظه پر است؛ عکس ذخیره نشد',true)}
     const c=s.k==='cu'?CU().find(z=>String(z.id)===String(s.id)):pyOf({name:s.name,phone:s.phone});if(!c){toast('حساب پیدا نشد',true);return}
-    const R=payDocMake(e,c,a,{tn:PX.tn,note:PX.note,imgs:K});e.updatedAt=ns();e.updatedBy=who();saveE();
+    if(pxPcMove(x,a))memoClear();const R=payDocMake(e,c,a,{tn:PX.tn,note:PX.note,imgs:K});e.updatedAt=ns();e.updatedBy=who();saveE();
     logA('edit','تسویه از مشتری (سند)',fullName(e)+' ← '+cuName(c)+' | '+fmt(a)+' تومان | '+invTitle(R.t));pyFlash=R.z?R.z.id:null;PX=null;closeSheet();pyRe();
     setTimeout(()=>{pyFlash=null},1400);const el=$('py7');if(el&&!RM())try{el.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}
     toast(invTitle(R.t)+' در حساب «'+cuName(c)+'» ثبت شد','','دیدن سند',()=>invOpen(c.id,R.t.id))}finally{if(PX)PX.busy=0}};
