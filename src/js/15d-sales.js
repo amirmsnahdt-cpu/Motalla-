@@ -616,7 +616,7 @@ function svCommit(){const c=svCu();let depOld=null,depOff=null;/* v98.6: بده�
   let OLD=null;if(sv.edit){/* v88.5: نسخه‌ای که باز شده اگر در این فاصله جایگزین شده باشد (ویرایش از گوشی دیگر)، همان سند زنده با همین شماره کنار می‌رود — وگرنه دو سند با یک شماره می‌ماند */const t0=(c.txs||[]).find(x=>String(x.id)===String(sv.edit.tx)&&!x.del)||(c.txs||[]).find(x=>!x.del&&x.type==='inv'&&!x.lk&&!x.pd&&!x.bl&&!x.bd&&String(x.no)===String(sv.edit.no));if(t0){OLD=t0;const at=new Date().toISOString();t0.del=true;t0.delAt=at;t0.delBy=who();t0.edBy=1;txLinked(c,t0).forEach(x=>{x.t.del=true;x.t.delAt=at;x.t.delBy=who()});depOld=depKeep(t0);depOff=invDepOff(t0,1)}}
   const T=svTot(),now=ns(),no=sv.edit?sv.edit.no:sv.no0&&!invNoUsed(sv.no0)?sv.no0:invNext(),items=sv.items.map(it=>{const c2=itCalc(it,sv.rate,sv.tax),J=ajPT(it);return{...it,ajP:J.P,ajT:J.T,gold:c2.gold,ajv:c2.aj,prv:c2.pr,taxv:c2.tax,tot:c2.tot}});
   const xr=sv.xr.map(x=>{const C=xrCalc(x,sv.rate);return{...x,pg:C.pg,n:C.n,q750:x.a==='gold'?C.q:undefined,amount:C.amount,e:C.e,q0:C.q0,ajg:C.ajg,prg:C.prg}});
-  const t={id:nid++,type:'inv',dk:sv.dk||undefined,no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>{const q={...p};delete q.xfId;return q}),at:now,by:who()};if(OLD){t.edOf=OLD.id;t.at0=OLD.at0||OLD.at;if(OLD.by0||OLD.by)t.by0=OLD.by0||OLD.by;/* v103.0: ثبت‌کننده اول سند می‌ماند */t.cn=cnOf(c,OLD)||undefined}else t.cn=cnNext(c)
+  const t={id:nid++,type:'inv',dk:sv.dk||undefined,no,date:sv.date,rate:sv.rate,mz:sv.mz||0,items,xr,tax:!!sv.tax,disc:T.disc,sub:T.sub,total:T.total,pays:sv.pays.map(p=>{const q={...p};delete q.xfId;return q}),at:now,by:who()};if(OLD){t.edOf=OLD.id;t.at0=OLD.at0||OLD.at;/* v103.4: سند زاده‌شده از واریزی پیوندش را با ویرایش از دست نمی‌دهد */if(OLD.dep!=null)t.dep=OLD.dep;else if(OLD.auto==='dep'&&OLD.entId!=null)t.dep=OLD.entId;if(OLD.by0||OLD.by)t.by0=OLD.by0||OLD.by;/* v103.0: ثبت‌کننده اول سند می‌ماند */t.cn=cnOf(c,OLD)||undefined}else t.cn=cnNext(c)
   if(T.ge)t.ge=T.ge;if(Object.keys(T.xe).length)t.xe=T.xe;
   if(sv.gconv&&T.rest>0&&sv.rate)t.gc={r:T.rest,g:Math.round(T.rest/sv.rate*1000)/1000};
   for(const p of t.pays){if(p.m!=='cust'&&!p.bk||p.m==='pos')continue;/* v83.7: طرف مقابل = سند واقعی (15zt lnkMirror) */const x=lnkMirror(c,t,p,no,now);if(x)p.xfId=x.id}
@@ -705,10 +705,10 @@ function ivDet(c,t){const D=dates(t.date),eff=d6Eff,R=[];
   (t.xr||[]).forEach((x,xi)=>{if(PG.sx.has(xi))return;const C={n:x.n!=null?x.n:(x.a==='gold'?x.w:x.q),pg:x.pg,amount:+x.amount||0,e:+x.e||0,...(x.q0!=null?{q0:+x.q0,ajg:+x.ajg||0,prg:+x.prg||0}:{})},R0=xrR(x,C.amount),k=dkOfX(x);R.push(row(d6Ico(k,'coin'),k,esc(xrLab(x))+dsH(x),xrDet(x,C,t.rate),eff(R0)+eff(C.e,x.a==='gold'?'g':x.a),xrPh(x)))});
   if(+t.disc)R.push(row('tag','','تخفیف','از جمع سند کم شد',eff(+t.disc)));
   (t.pays||[]).forEach((p,pi)=>{if(PG.sp.has(pi))return;const out=pAmt(p)<0,M=PM[p.m]||PM.cash;R.push(row(M.i,pyTagK(p),esc(pyLab(p)),pyDet(p,t.id),eff(pAmt(p)),xrPh(p),p.m==='dep'?depActs(p,'v'+t.id+'.'+pi,c):pyActs(p,c,t.id,t.no)))});
-  wdRowsHTML(c,t.no,t.id).forEach(h=>R.push(h));
+  wdRowsHTML(c,t.no,t.id).forEach(h=>R.push(h));/* v103.4: کارت «مبلغ خرید با مبلغ واریزی یکی نیست» بالای ردیف‌ها */const GP=t.del?'':entries.filter(e=>!e.del&&e.splitOf==null&&e.wd&&String(e.wd.cu)===String(c.id)&&String(e.wd.no)===String(t.no)).map(depGapHTML).join('');
   PG.L.forEach(G=>R.push(row('clock',G.dir,'مانده قبلی',pvSub(G,t.pays||[],t.xr||[]),pvEffs(G,t.pays||[],t.xr||[],x=>+x.e||0),pvPh(G,t.pays||[],t.xr||[]))));
   const E=txD(t),ef=[E.r?eff(E.r):'',E.g?eff(E.g,'g'):'',...Object.keys(E.x||{}).filter(k=>+E.x[k]).map(k=>eff(E.x[k],k))].filter(Boolean);
-  return `<div class="ivd6${ivCntId!==String(t.id)?' anim':''}">
+  return `<div class="ivd6${ivCntId!==String(t.id)?' anim':''}">${GP}
   ${R.length?`<div class="d6sh"><b>ردیف‌های سند</b><small>${toFa(R.length)} ردیف</small></div><div class="d6rows d7">${R.join('')}</div>`:''}
   </div>`}
 /* v61.53 (خواسته صاحب اپ): مانده‌های سند پایین صفحه (جای دکمه چاپ)؛ هر جنس یک قاب: نام و واحد کامل کنار هم،
