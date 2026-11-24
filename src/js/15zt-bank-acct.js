@@ -5,7 +5,7 @@
       ارسال می‌شود خودکار یک سند «لیست واریز» در همین حساب می‌خورد (t.bl = شناسه بچ، pays m:'dls')؛ برگشت/ناموفق/ویرایش منابع = سند هم‌گام می‌شود (bkDepSync). */
 function lnkMirror(c,t,p,no,now){const Y=custs.find(z=>String(z.id)===String(p.cuId));if(!Y)return null;
   const x={id:nid++,type:'inv',dk:p.amount>0?'out':'in',no,date:t.date||sv.date,rate:0,mz:0,items:[],xr:[],tax:false,disc:0,sub:0,total:0,
-    pays:[{m:'lnk',lm:p.m,amount:-(+p.amount||0),cuId:c.id,cuName:cuName(c),...(p.why?{why:p.why}:{}),...(p.tn?{tn:p.tn}:{})}],
+    pays:[{m:'lnk',lm:p.m,amount:-(+p.amount||0),cuId:c.id,cuName:cuName(c),...(p.why?{why:p.why}:{}),...(p.tn?{tn:p.tn}:{}),...(p.wt?{wt:1}:{}),...(p.okAt?{okAt:p.okAt,okBy:p.okBy}:{})}],
     note:'',lk:{cu:c.id,tx:t.id},at:now,by:who(),cn:cnNext(Y)};
   (Y.txs=Y.txs||[]).push(x);Y.lastAt=now;return x}
 const lnkLab=p=>{const out=pAmt(p)<0,bk=p.lm==='pos'?'کارتخوان':p.lm==='hav'?(out?'حواله به بانک':'حواله از بانک'):(out?'حواله به':'حواله از');return bk+' «'+(p.cuName||'')+'»'};
