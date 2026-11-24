@@ -123,7 +123,7 @@ function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.
     ${ed?`<div class="stft"><button type="button" class="stdel" data-act="stDel" aria-label="حذف ردیف">${ic('trash')}<span>حذف</span></button></div>`:''}
 </div>`}
 /* v69.2 (خواسته صاحب اپ): «+ عکس» داخل همان کادر فیلد، در انتهای آن (با شمار عکس‌ها)؛ عکس‌های زده‌شده ردیف کوچکی زیر کادر مبلغ */
-function stPhIn(){const x=phT();if(!x)return '';const n=xrPh(x).length;return `<button type="button" class="stphin${n?' has':''}" data-act="rowGal" aria-label="افزودن عکس">${ic('cam')}${n?`<i>${toFa(n)}</i>`:`<i class="pl">+</i>`}</button>`}
+function stPhIn(){const x=phT();if(!x)return '';const n=xrPh(x).length;return n?`<button type="button" class="stphin has" data-act="rowGal" aria-label="عکس‌ها">${ic('cam')}<i>${toFa(n)}</i></button>`:phPair({k:'row'},{cls:'sm'})}/* v104.7: بی‌عکس = دو دکمه مستقیم دوربین/گالری؛ با عکس = همان دکمه شمارنده (دیدن و افزودن) */
 function stPhRow(){const x=phT();if(!x)return '';const K=xrPh(x);if(!K.length)return '';return `<div class="stph2 only"><span class="stphl2">${K.map((k,i)=>`<button type="button" class="stpht" data-act="rowPhV" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</span></div>`}
 /* v61.30: همه فهرست‌های انتخابی (کارتخوان، حساب ما، مشتری…) جستجو دارند و فهرست زیرش دیده می‌شود */
 /* v61.31: هر فهرست انتخابی ردیف «افزودن» هم دارد (کارتخوان، حساب ما، مشتری): نام را در جستجو بنویسید و بزنید */

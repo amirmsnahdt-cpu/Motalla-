@@ -182,7 +182,7 @@ ACT.dkD=d=>{qaRead();const a=sv.qa,k=d.d||'';a.d=k;a.s='';a.q='';a.pk='';
   if(k==='ret'){if(!dkRateOk()){a.d='';svKeep();qaRe();return}a.d='';xrStart(xrNew('buy','gold',{cat:'مرجوعی',ay:750,fl:'gold',fd:k}));return}
   svKeep();qaRe('qK')};
 /* عکس سکه (یا هر جنس) در ردیف: در IndexedDB مثل رسیدها؛ کلید روی ردیف (img) */
-document.addEventListener('change',async ev=>{const t=ev.target;if(!t||t.id!=='xrF'||!sv||!sv.qa.x)return;const f=t.files&&t.files[0];t.value='';if(!f)return;
+document.addEventListener('change',async ev=>{const t=ev.target;if(!t||!(t.id==='xrF'||t.dataset&&t.dataset.xrf)||!sv||!sv.qa.x)return;const f=t.files&&t.files[0];t.value='';if(!f)return;
   try{const d=await shrink(f),k=newImgKey('xr');if(await imgPut(k,d)){xrRead();sv.qa.x.img=k;svKeep();qaRe();toast('عکس ضمیمه شد')}else toast('حافظه پر است؛ عکس ذخیره نشد',true)}catch(e){toast('این عکس خوانده نشد',true)}});
 async function xrImgPaint(){const x=sv&&sv.qa&&sv.qa.x,el=$('xrFi');if(!x||!x.img||!el)return;const v=await imgGet(x.img);if(v&&el.isConnected)el.style.backgroundImage=`url(${v})`;else if(el.isConnected)el.classList.add('miss')}
 
