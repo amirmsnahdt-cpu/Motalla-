@@ -122,12 +122,16 @@ tr(){const K={};let gS=0,gSa=0,gB=0,gBa=0,gI=0,gO=0,iS=0;
   return rpPerH()+rpSum([['جمع فروش',fmt(Math.round(S)),'r','تومان'],['جمع خرید',fmt(Math.round(B)),'b','تومان'],['خالص',fmt(Math.round(Math.abs(S-B))),S>=B?'r':'b',S>=B?'فروش بیشتر':'خرید بیشتر']])
    +`<div class="rpgh2">طلا · گرم ۷۵۰</div><div class="rpls">${row('فروش طلا (کالا و متفرقه)',`فروش کالا ${fmt(Math.round(iS))} · متفرقه/آبشده ${fmt(Math.round(gSa))} تومان`,`<em class="r"><b>${wFmt(gS)}</b><small>گرم</small></em>`)}${row('خرید طلا',fmt(Math.round(gBa))+' تومان',`<em class="b"><b>${wFmt(gB)}</b><small>گرم</small></em>`)}${row('دریافت طلا (بدون پول)','',`<em class="b"><b>${wFmt(gI)}</b><small>گرم</small></em>`)}${row('تحویل طلا (بدون پول)','',`<em class="r"><b>${wFmt(gO)}</b><small>گرم</small></em>`)}${row('خالص طلای وارد شده',gB+gI-gS-gO>=0?'بیشتر خریده/دریافت شده':'بیشتر فروخته/تحویل شده',`<em class="${gB+gI-gS-gO>=0?'b':'r'}"><b>${wFmt(Math.abs(gB+gI-gS-gO))}</b><small>گرم</small></em>`)}</div>`
    +(Object.keys(K).length?`<div class="rpgh2">سکه و ارز</div><div class="rpls">${Object.entries(K).map(([k,o])=>row(esc((XA[k]||{}).t||k),`فروش/تحویل ${qFmt(o.s)} · خرید/دریافت ${qFmt(o.b)}`,`<em class="${o.b-o.s>=0?'b':'r'}"><b>${qFmt(Math.abs(o.b-o.s))}</b><small>${esc((XA[k]||{}).u||'')} خالص</small></em>`)).join('')}</div>`:'')},
-prof(){const M=new Map();let AJ=0,PR=0,TX=0,N=0;
-  for(const {t} of rpDocs(0)){if(t.type!=='inv'||!(t.items||[]).length)continue;const rate=+t.rate||(+t.mz?(+t.mz)/MZK:0);
-    (t.items||[]).forEach(it=>{const k=it.ab?'آبشده':(it.k||'کالا'),C=itCalc(it,rate,t.tax),o=M.get(k)||{k,w:0,aj:0,pr:0,n:0};o.w+=+it.w||0;o.aj+=C.aj;o.pr+=C.pr;o.n++;M.set(k,o);AJ+=C.aj;PR+=C.pr;TX+=C.tax;N++})}
+prof(){const M=new Map();let AJ=0,PR=0,TX=0,N=0,DS=0;
+  /* v107.6 (صاحب اپ: «تخفیف باید در سود نهایی تأثیر بگذارد و سود واقعی را بزند»): تخفیف هر سند از سود کالاهای همان سند کم می‌شود (به نسبت سود هر کالا) */
+  for(const {t} of rpDocs(0)){if(t.type!=='inv'||!(t.items||[]).length)continue;const rate=+t.rate||(+t.mz?(+t.mz)/MZK:0),dsc=docDisc(t),L=[];
+    (t.items||[]).forEach(it=>{const k=it.ab?'آبشده':(it.k||'کالا'),C=itCalc(it,rate,t.tax);L.push([k,it,C]);AJ+=C.aj;PR+=C.pr;TX+=C.tax;N++});
+    const P=L.reduce((s,z)=>s+Math.max(0,z[2].pr),0),Q=L.reduce((s,z)=>s+z[2].aj+z[2].pr,0);DS+=dsc;
+    L.forEach(([k,it,C])=>{const o=M.get(k)||{k,w:0,aj:0,pr:0,n:0},sh=dsc?(P>0?Math.max(0,C.pr)/P:Q>0?(C.aj+C.pr)/Q:1/L.length)*dsc:0;o.w+=+it.w||0;o.aj+=C.aj;o.pr+=C.pr-sh;o.n++;M.set(k,o)})}
+  PR-=DS;
   const A=[...M.values()].sort((x,y)=>(y.aj+y.pr)-(x.aj+x.pr));
-  return rpPerH()+rpSum([['اجرت',fmt(AJ),'g','تومان'],['سود',fmt(PR),'g','تومان'],['جمع',fmt(AJ+PR),'g',rpN(N)+' قلم']])
-   +`<div class="rpnote">${ic('info')} فقط اجرت و سود کالاهایی که در سند فروخته شده؛ سود خرید و فروش طلای متفرقه و پولی در این عدد نیست${TX?' · مالیات '+fmt(TX)+' تومان جدا':''}</div>`
+  return rpPerH()+rpSum([['اجرت',fmt(AJ),'g','تومان'],['سود واقعی',fmt(PR),PR<0?'r':'g',DS?'پس از '+fmt(DS)+' تخفیف':'تومان'],['جمع',fmt(AJ+PR),'g',rpN(N)+' قلم']])
+   +`<div class="rpnote">${ic('info')} فقط اجرت و سود کالاهایی که در سند فروخته شده، پس از کم کردن تخفیف همان سند؛ سود خرید و فروش طلای متفرقه و پولی در این عدد نیست${TX?' · مالیات '+fmt(TX)+' تومان جدا':''}</div>`
    +(A.length?`<div class="rpls">${A.map(o=>rpRow({av:`<i class="rpav g">${ic('ring')}</i>`,t:esc(o.k),s:`${rpN(o.n)} قلم · ${wFmt(o.w)} گرم · اجرت ${fmt(o.aj)}`,v:`<em class="g"><b>${fmt(o.aj+o.pr)}</b><small>اجرت + سود</small></em>`})).join('')}</div>`:rpEmpty('در این بازه کالایی فروخته نشده'))},
 exp(){const L=rpDocs(1).filter(z=>z.c.grp==='هزینه').sort((a,b)=>String(b.t.date).localeCompare(String(a.t.date)));const tot=L.reduce((s,z)=>s+(txD(z.t).r||0),0);
   return rpPerH()+rpSum([['جمع هزینه‌ها',fmt(Math.abs(tot)),'r','تومان'],['سند',rpN(L.length),'']])+(L.length?`<div class="rpls">${(()=>{let last='',h='';L.forEach(({c,t})=>{if(t.date!==last){last=t.date;h+=`<div class="fday">${esc(dates(t.date).fa)}</div>`}h+=rpTxRow(c,t)});return h})()}</div>`:rpEmpty('حساب هزینه‌ای در این بازه سند ندارد'))},

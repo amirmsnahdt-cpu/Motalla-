@@ -31,7 +31,7 @@ function rdData(){const sig=Object.values(DVN).join()+'|'+custs.length+'|'+today
     if(bk)continue;
     for(const t of (c.txs||[])){if(!t||t.del||t.draft||t.type!=='inv'||!t.date||t.lk||t.bd||t.pd||t.bl)continue;
       const rate=+t.rate||(+t.mz?(+t.mz)/MZK:0);let s=0,b=0,gs=0,gb=0,pf=0,ci=0,co=0;const it=[];
-      (t.items||[]).forEach(i=>{const a=+i.tot||0,w=(+i.w||0)*(+i.ay||750)/750;s+=a;gs+=w;try{const C=itCalc(i,rate,t.tax);pf+=(+C.aj||0)+(+C.pr||0)}catch(_){}it.push([i.ab?'آبشده':(i.k||'کالا'),a,w])});
+      (t.items||[]).forEach(i=>{const a=+i.tot||0,w=(+i.w||0)*(+i.ay||750)/750;s+=a;gs+=w;try{const C=itCalc(i,rate,t.tax);pf+=(+C.aj||0)+(+C.pr||0)}catch(_){}it.push([i.ab?'آبشده':(i.k||'کالا'),a,w])});if((t.items||[]).length)pf-=docDisc(t);/* v107.6: سود واقعی پس از تخفیف */
       (t.xr||[]).forEach(x=>{const g=x.a==='gold',a=+x.amount||0,w=g?(+x.w||0)*(+x.ay||750)/750:0;
         if(x.t==='sell'){s+=a;gs+=w;it.push([g?(x.pul?'طلای پولی':(x.cat&&x.cat!=='تعویض'&&x.cat!=='مرجوعی'?x.cat:'متفرقه')):((XA[x.a]||{}).t||x.a),a,w])}else if(x.t==='buy'){b+=a;gb+=w}});
       (t.pays||[]).forEach(p=>{if(!RDCASH.has(p.m))return;const a=pAmt(p);if(a>0)ci+=a;else co-=a});
