@@ -20,7 +20,7 @@ const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   cw:'a',cay:'a',cw7:'n',clab:'n',cang:'n',crt:'a',cgv:'n',caj:'a',cpp:'a',ctx:'a',
   aj:'p',pp:'p',rt:'m',
   rh:5.5,fs:0,cap:'a',sum:1,ex:1,py:1,tn:1,fill:'b',
-  acc:1,ap:1,ad:1,ag:'y',ax:'a',an:1,lg:1,wr:'w',wds:1,
+  acc:1,ap:1,ad:1,ag:'y',ax:'a',an:1,lg:1,wr:'w',wds:1,wdt:'',
   /* v100.5 (صاحب اپ: «سود بیشتر از ۷ مثلاً ۷٫۰۱ ذخیره می‌شود؛ همان ۷ بزند») درصد سود در چاپ بدون اعشار (فقط نوشته؛ مبلغ‌ها دست نمی‌خورد) */ppi:1,
   /* v99.3 «تنظیم جای چاپ روی کاغذ»، جدا برای هر راه چاپ (a = اپ اندروید، i = آیفون، w = کامپیوتر/مرورگر): psk؟ = اندازه ٪، psx؟ = جابه‌جایی به راست (میلی‌متر، منفی = چپ)،
      psy؟ = جابه‌جایی به پایین. فقط هنگام چاپ اعمال می‌شود (prCal)، نه در خود برگه. نام‌ها عمداً بلندند: py از قبل «هر پرداخت یک ردیف / یک ردیف جمع» است */pska:100,psxa:0,psya:0,pski:100,psxi:0,psyi:0,pskw:100,psxw:0,psyw:0,
@@ -238,6 +238,8 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   else if(WS0.length){const L3=WS0.length>3?WS0.slice(0,2):WS0,RS=WS0.slice(L3.length);WL=L3.map((x,i)=>`${i?'<span class="wsp"></span>':DIA}${i?'و ':'واریز به حساب مشتری: '}${wdA(x.a)} ${wdD(x)}`);
     if(RS.length){const lz=RS[RS.length-1],Dz=lz.d?dates(lz.d):null;WL.push(`<span class="wsp"></span>و ${wdA(RS.reduce((s,x)=>s+x.a,0))} در ${toFa(RS.length)} نوبت دیگر${Dz?` تا <b>${esc(Dz.fa)}</b>`:''}`)}
     WL.push(`<span class="wsp"></span>جمع واریزی‌های در راه ${wdA(WST)}<s>·</s>پس از این واریزها، ${wdE}`)}
+  /* v106.4 (صاحب اپ): زیر واریزی‌های در راه، شماره پیگیری واریزی‌ها و رسید (تنظیمات فاکتور › حساب مشتری؛ خالی = چاپ نمی‌شود) */
+  if(WL.length&&S.wdt)WL.push(`<span class="wsp"></span>جهت پیگیری واریزی‌های انجام‌شده و دریافت رسید با شماره <b class="wa">${esc(toFa(S.wdt))}</b> تماس بگیرید`);
   const WLH=4,WDH=WL.length?+(WL.length*WLH+1.6).toFixed(1):0,WDS=WL.length?`<div class="wds">${WL.map(l=>`<div class="wl">${l}</div>`).join('')}</div>`:'',HB=ACH+LGH+WDH;
   const LGD=!LGH?'':!KD.some(K=>RJ.some(j=>K.v[j]))?'<div class="lgd"></div>':`<div class="lgd"><em class="vd">${WR[1]}</em> یعنی مشتری به مطلا بدهکار است<s>·</s><em class="vc">${WR[2]}</em> یعنی ${S.wr==='c'?'مشتری از مطلا طلبکار است':'مطلا به مشتری بدهکار است'}</div>`;
   /* ---- اندازه تکه‌های برگه: سربرگ کوتاه‌تر وقتی نه لوگو هست نه خوشنویسی؛ پانویس به اندازه چیزهایی که روشن است؛ هر چه آزاد شود به قاب ردیف‌ها می‌رسد ---- */
