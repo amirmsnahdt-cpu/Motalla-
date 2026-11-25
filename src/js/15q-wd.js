@@ -90,15 +90,15 @@ function wdRowsHTML(c,no,txId){if(no==null||!c)return [];const A=allocMap(),view
     wdParts(e,S,A).forEach(o=>{const v=`<span class="d6e wdv"><small>${o.t==='s'?'در انتظار تأیید':'رفته برای واریز'}</small><span class="fz"><b${fitS(fmt(o.a))}>${fmt(o.a)}</b></span><i>تومان</i></span>`;
       if(o.t==='s'){const sub=[o.doc?'تسویه با '+esc(o.doc)+' در حساب «'+esc(o.nm)+'»':'تسویه از مشتری · بدون سند دریافت','وضعیت: پرداخت مستقیم به فروشنده · منتظر تأیید',o.tn?'پیگیری '+esc(toFa(o.tn)):'','تاریخ واریز: '+esc(D.fa)].filter(Boolean).join(' · ');
         R.push(d6Row({ico:'swap',tag:'<em class="d6k k-wd">در انتظار تأیید</em>',b:esc(o.nm),sub,v,ex:view&&o.tx!=null?`<span class="d8eb d8lk" role="button" data-act="cuInv" data-cu="${esc(o.cu)}" data-tx="${esc(o.tx)}">${ic('inv')}<span>${esc(o.doc)}</span><small>${esc(o.nm)}</small></span>`:depL,key:'w'+e.id+o.k}));return}
-      const sub=['وضعیت: '+o.st,'تاریخ واریز: '+esc(D.fa),o.src?'منبع: '+esc(o.src):'',e.iban?'بانک: '+esc((ibanBank(e.iban)||'')+' '+String(e.iban).slice(-4)):'شبا ندارد',e.holder?'صاحب حساب: '+esc(e.holder):''].filter(Boolean).join(' · ');
-      R.push(wdSw(e,d6Row({ico:o.fr?'cal':'clock',tag:o.fr?'<em class="d6k k-wf">در لیست واریز</em>':'<em class="d6k k-wd">در انتظار تأیید</em>',b:'واریز بانکی · '+dl+(o.src?' · '+esc(o.src):''),sub,v:o.fr?v.replace('d6e wdv','d6e wdv wf').replace('رفته برای واریز','تخصیص نخورده · آزاد'):v.replace('رفته برای واریز','تخصیص‌شده'),ex:depL+wdActs(e,o),key:'w'+e.id+o.k})))})});return R}
+      const sub=['وضعیت: '+String(o.st||'').replace(/ · /g,'، '),'تاریخ واریز: '+esc(D.fa),o.src?'منبع: '+esc(o.src):'',e.iban?'بانک: '+esc((ibanBank(e.iban)||'')+' '+String(e.iban).slice(-4)):'شبا ندارد',e.holder?'صاحب حساب: '+esc(e.holder):''].filter(Boolean).join(' · ');
+      R.push(wdSw(e,d6Row({ico:o.fr?'cal':'clock',tag:o.fr?'<em class="d6k k-wf">در لیست واریز</em>':'<em class="d6k k-wd">در انتظار تأیید</em>',b:'واریز بانکی · '+dl+(o.src?' · '+esc(o.src):''),sub,v:o.fr?v.replace('d6e wdv','d6e wdv wf').replace('رفته برای واریز','تخصیص نخورده · آزاد'):v.replace('رفته برای واریز','تخصیص‌شده'),ex:`<span class="wdab"><span class="d8eb" role="button" data-act="depGo" data-e="${e.id}">${ic('open')}<span>واریزی</span></span>${wdActs(e,o)}</span>`,key:'w'+e.id+o.k})))})});return R}
 /* v106.2: ردیف واریزی سند کشیده می‌شود — «حذف» (مبلغ به روز دیگر همان سند) و «مبلغ و روز» */
 const wdSw=(e,h)=>swW(h,{r:remCan()?[['wdAmt','مبلغ و روز','cal','#3b6fd6']]:[],l:[['wdDel','حذف','trash','#d23c48']],data:{e:e.id}});
 /* v98.6 (خواسته صاحب اپ: «مانده مستقیم ادیت و تخصیص داده شود»): زیر ردیف واریزی سند دو دکمه — «مبلغ واریزی» (wdAmt) و «انتخاب بانک» (همان پنجره پرداخت، pxUni) */
 function wdActs(e,o){if(!o||o.t!=='b')return '';const p=entries.find(z=>z.id===o.ent),un=p&&p.sentBid==null,B=[];
-  if(remCan())B.push(`<span class="d8eb" role="button" data-act="wdAmt" data-e="${e.id}">${ic('edit')}<span>مبلغ و روز واریز</span></span>`);
+  if(remCan())B.push(`<span class="d8eb" role="button" data-act="wdAmt" data-e="${e.id}">${ic('edit')}<span>مبلغ و روز</span></span>`);
   if(un&&can('split'))B.push(`<span class="d8eb" role="button" data-act="entMove" data-id="${p.id}">${ic('bank')}<span>${o.src?'تغییر بانک':'انتخاب بانک'}</span></span>`);
-  return B.length?`<span class="wdab">${B.join('')}</span>`:''}
+  return B.join('')}
 /* ---- v87.7 «مسیر پرداخت» (خواسته صاحب اپ: «مدل خوانا و منطقی که بچه‌ها گیج نشوند؛ هم در حساب و سند، هم در لیست مشتری»)
    یک زبان و یک رنگ در همه جا. بدهی ما به مشتری سه مرحله دارد (واریزشده از مانده کم شده و دیگر اینجا نیست):
    ۱ نرفته به لیست (قرمز) → ۲ در لیست، تخصیص نخورده (بنفش) → ۳ تخصیص‌شده، منتظر واریز (زرد).

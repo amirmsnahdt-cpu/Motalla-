@@ -20,10 +20,10 @@ function wsShift(i,diff){/* diff = مقداری که ردیف i اضافه گر�
   while(left&&tried.size<WS.R.length){const j=wsMate(i,left);if(j<0||tried.has(j))break;tried.add(j);const r=WS.R[j],room=left>0?(+r.a||0)-r.lk:Infinity,k=left>0?Math.min(left,room):left;if(!k)continue;r.a=(+r.a||0)-k;left-=k}
   return left}
 function wsRow(r,i,n){const lab=payLab(r.d)||'',D=dates(r.d);
-  return `<div class="wsr${r.nw?' nw':''}" data-i="${i}"><button type="button" class="wsd${r.dl?' lk':''}" data-act="wsDate" data-i="${i}"${r.dl?' disabled':''}>${ic('cal')}<span><b>${esc(lab||D.fa)}</b><small>${esc(lab?D.fa:D.wd||'')}</small></span></button>
+  return `<div class="wsr${r.nw?' nw':''}" data-i="${i}"><button type="button" class="wsd${r.dl?' wlk':''}" data-act="wsDate" data-i="${i}"${r.dl?' disabled':''}>${ic('cal')}<span><b>${esc(lab||D.fa)}</b><small>${esc(lab?D.fa:D.wd||'')}</small></span></button>
   <label class="wsa"><input id="wsA${i}" class="ltr" inputmode="numeric" value="${r.a?Number(r.a).toLocaleString('en-US'):''}" placeholder="۰" data-i="${i}" autocomplete="off" enterkeyhint="done" aria-label="مبلغ این روز"><i>تومان</i></label>
   ${n>1&&!r.lk&&!r.dl?`<button type="button" class="wsx" data-act="wsDel" data-i="${i}" aria-label="حذف این روز">${ic('trash')}</button>`:`<span class="wsx0">${r.lk||r.dl?ic('padlock'):''}</span>`}
-  ${r.lk?`<small class="wsl">${fmt(r.lk)} تومان ارسال‌شده یا در انتظار تأیید است</small>`:''}</div>`}
+  ${r.lk||r.dl?`<small class="wsl">${r.lk?fmt(r.lk)+' تومان ارسال‌شده یا تسویه در انتظار است؛ کمتر از این نمی‌شود':'بخشی از این واریزی رفته یا تسویه مشتری دارد؛ روزش عوض نمی‌شود'}</small>`:''}</div>`}
 function wsRes(){const T=wsTot(),M=wsMax(),d=T-WS.T0,bad=wsLive().find(r=>(+r.a||0)<r.lk);
   if(bad)return `<div class="bf3d r"><span class="bf3di">${ic('x')}</span><span class="tx"><b>کمتر از بخش ارسال‌شده</b><small>روز ${esc(payLab(bad.d)||dates(bad.d).fa)} حداقل ${fmt(bad.lk)} تومان</small></span></div>`;
   if(T>M)return `<div class="bf3d r"><span class="bf3di">${ic('x')}</span><span class="tx"><b>بیشتر از بدهی ما</b><small>حداکثر ${fmt(M)} تومان برای این سند</small></span></div>`;
