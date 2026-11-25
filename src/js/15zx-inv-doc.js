@@ -30,17 +30,19 @@ const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   sgc:1,sgs:1,by:1,th:1,shp:1,note:'',
   /* v106.8 «چاپ روی کاغذ آماده» (صاحب اپ: «قسمت‌هایی که چاپ بشود یا نشود را با تیک درست کنم؛ کاغذ را رنگی آماده می‌کنم و بعد پرینت روی آن می‌گیرم»):
      ۱ = چاپ شود، ۰ = چاپ نشود. بخش خاموش جایش را نگه می‌دارد (فقط دیده نمی‌شود) تا عددها روی همان جای کاغذ آماده بنشینند. برای همه فاکتورها یکی است */
-  oxfr:1,oxbg:1,oxln:1,oxlg:1,oxtt:1,oxlb:1,oxch:1,oxal:1,oxft:1};
+  oxfr:1,oxbg:1,oxln:1,oxob:1,oxlg:1,oxtt:1,oxlb:1,oxch:1,oxal:1,oxft:1};
 /* بخش‌های «چاپ روی کاغذ آماده» به ترتیب تنظیمات: [کلید، عنوان، توضیح] */
 const INVOX=[['oxfr','قاب دور برگه','نوار طلایی و خط‌های دور کاغذ'],['oxbg','رنگ زمینه کاغذ و نوارها','کرم کاغذ، نوار سر ستون‌ها، ردیف جمع و مانده نهایی'],
-  ['oxln','خط‌ها و کادر جدول‌ها','خط ستون‌ها و ردیف‌ها، کادر حساب مشتری'],['oxlg','لوگو',''],['oxtt','عنوان «فاکتور فروش/خرید»',''],
+  ['oxln','خطوط سند (داخل جدول‌ها)','خط ستون‌ها و ردیف‌ها، خط طلایی زیر سر ستون، قاب ردیف جمع'],['oxob','خطوط بیرون (کادر جدول‌ها و سربرگ)','کادر دور جدول کالاها و حساب مشتری، خط‌های نوار مشتری، خط زیر شماره و تاریخ، خط امضا'],['oxlg','لوگو',''],['oxtt','عنوان «فاکتور فروش/خرید»',''],
   ['oxlb','برچسب‌ها','«شماره»، «تاریخ»، «مشتری»، «مظنه روز»، شماره برگه'],['oxch','عنوان ستون‌ها و گروه‌ها','«شرح»، «وزن»، «مبلغ»، «فروش به مشتری»، «حساب مشتری»…'],
   ['oxal','نام سطرهای جمع و حساب','«جمع فروش»، «مانده قبلی»، «این فاکتور»، «مانده نهایی حساب»'],['oxft','پانویس و جای امضا','امضاها، «با سپاس…»، مشخصات فروشگاه، راهنما']];
 /* CSS پنهان کردن: visibility/color/border شفاف، بدون عوض شدن اندازه‌ها */
 function invOxCSS(S){const T='color:transparent!important',B='border-color:transparent!important;box-shadow:none!important;outline:0!important',G='background:transparent!important;background-image:none!important',V='visibility:hidden!important',R=[];
   if(!S.oxfr)R.push(`.f1,.f2,.f3{${B};${G}}`);
   if(!S.oxbg)R.push(`.sht,.pg,.f1,.f2,.f3,.hd,.cu,.zn,.tb,.acw,.ac,.ft,.wds,.lgd{${G}}.r td,.r,.a td,.a{${G}}`);
-  if(!S.oxln)R.push(`.hd,.cu,.mr,.zn,.tb,.r,.r td,.fl,.acw,.ac,.a,.a td,.wds,.lgd,.ft,.sg0,.sg,.mid{${B}}.r.sm td{${B}}`);
+  /* v106.9: «خطوط سند» و «خطوط بیرون» دو تیک جدا (صاحب اپ: «خطوط سند باشد ولی خطوط بیرون نباشد یا برعکس») */
+  if(!S.oxln)R.push(`.r,.r td,.fl,.a,.a td,.r.sm,.r.sm td{${B}}`);
+  if(!S.oxob)R.push(`.hd,.cu,.mr,.zn,.tb,.acw,.ac,.wds,.lgd,.ft,.sg0,.sg,.mid{${B}}`);
   if(!S.oxlg)R.push(`.lg{${V}}`);
   if(!S.oxtt)R.push(`.ttl{${V}}`);
   if(!S.oxlb)R.push(`.mr small,.cu small,.pgn,.mr i.tm{${V}}`);
