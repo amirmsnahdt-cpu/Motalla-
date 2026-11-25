@@ -5,7 +5,7 @@
    در پیش‌نمایش دیده می‌شود. پیش‌نمایش همان invDoc واقعی است (در iframe کوچک‌شده؛ دو iframe که جایشان عوض می‌شود تا چشمک نزند).
    تا «ذخیره» زده نشود چیزی عوض نمی‌شود (IS.W نسخه کاری است)؛ ذخیره فقط فرق با پیش‌فرض را در cfg.inv می‌نویسد و با بقیه گوشی‌ها همگام می‌شود. فقط مدیر. */
 let IS=null;
-const IVSEC=[['paper','کاغذ و PDF'],['head','سربرگ'],['cust','مشتری و نرخ'],['cols','ستون‌ها'],['rows','ردیف‌ها'],['acc','مانده حساب'],['foot','پانویس']];
+const IVSEC=[['paper','کاغذ و PDF'],['head','سربرگ'],['cust','مشتری و نرخ'],['cols','ستون‌ها'],['rows','ردیف‌ها'],['acc','مانده حساب'],['foot','پانویس'],['pre','کاغذ آماده']];
 const IVTTL=['فاکتور فروش','فاکتور خرید','فاکتور آبشده','فاکتور طلا','پیش فاکتور','رسید دریافت','رسید پرداخت','صورت حساب'];
 const ivSig=()=>JSON.stringify([IS.W,IS.shop]),ivDirty=()=>!!IS&&ivSig()!==IS.sig0;
 function ivOpen(o){o=o||{};const W={};INVP.forEach(([k])=>{W[k]=invCfg(k)});W.stm=stmCfg();const s=(cfgRec()||{}).shop||{};
@@ -82,6 +82,9 @@ function ivSecHTML(){if(IS.p==='stm')return stmSecHTML();const S=IS.W[IS.p],k=IS
     +ivSw('ex','جزئیات کنار نام کالا','توضیح ردیف، شرطی، آزمایشگاه و انگ (اگر ستون جدا ندارند)، معادل ۷۵۰')
     +ivPick('py','دریافت و پرداخت‌ها','',[[1,'هر کدام یک ردیف'],[0,'یک ردیف جمع']])+ivSw('tn','شماره پیگیری حواله','')
     +ivPick('fill','فضای خالی زیر ردیف‌ها','',[['b','ساده'],['l','ادامه خط ستون‌ها'],['r','ردیف‌های خالی']]);
+  else if(k==='pre'){const on=INVOX.filter(([q])=>S[q]).length;h=`<div class="ivnote">اگر روی کاغذی چاپ می‌کنید که قاب و رنگ و نوشته‌های ثابتش از قبل چاپ شده، تیک بخش‌هایی را که روی کاغذ هست بردارید. آن بخش‌ها چاپ نمی‌شوند ولی جایشان خالی می‌ماند، پس عددها همان جای همیشگی می‌نشینند.</div>`
+    +`<div class="ivox"><button type="button" class="${on===INVOX.length?'on':''}" data-act="ivOx" data-v="1">${ic('check')}<span>همه چاپ شود</span></button><button type="button" class="${on===0?'on':''}" data-act="ivOx" data-v="0">${ic('edit')}<span>فقط اطلاعات فاکتور</span></button></div>`
+    +INVOX.map(([q,t,d])=>ivSw(q,t,d)).join('')}
   else if(k==='acc')h=ivSw('acc','جدول «حساب مشتری»','مانده قبلی، این فاکتور و مانده نهایی، پایین همان قاب')
     +(S.acc?ivSw('ap','سطر «مانده قبلی»','')+ivSw('ad','سطر «این فاکتور»','')+ivPick('ag','مانده طلا','',[['y','همیشه'],['a','فقط وقتی مانده دارد'],['n','هرگز']])+ivPick('ax','مانده سکه و ارز','هر سکه یا ارزی که مشتری مانده دارد یک ستون می‌گیرد',[['a','خودکار'],['n','هرگز']])
       +ivSw('an','توضیح کنار سطرها','پیش از این فاکتور · فروش − خرید − دریافت · …')+ivSw('lg','راهنمای زیر جدول','یک خط که معنی دو طرف حساب را می‌گوید')
@@ -150,6 +153,7 @@ ACT.invSet=()=>{if(!isAdmin()){toast('فقط مدیر می‌تواند تنظی
 ACT.invSetDoc=()=>{if(!isAdmin()){toast('فقط مدیر می‌تواند تنظیمات فاکتور را عوض کند',true);return}const X=invGet();if(!X)return;const p=invProf(X.t);PARENT.invset='inv';ivOpen({from:'inv',p,doc:{cu:X.c.id,tx:X.t.id,p}});go('invset')};
 ACT.ivTab=d=>{if(!IS||IS.p===d.p)return;const sw=(IS.p==='stm')!==(d.p==='stm');IS.p=d.p;if(sw){IS.sec=ivSecs()[0][0];const c=$('ivSc');if(c)c.innerHTML=ivSecBtns()}ivRe({anim:1})};
 ACT.ivSec=d=>{if(!IS||IS.sec===d.s)return;IS.sec=d.s;ivRe({anim:1,noPrev:1});const b=document.querySelector('#ivSc button.on');if(b&&b.scrollIntoView)b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'})};
+ACT.ivOx=d=>{if(!IS||IS.p==='stm')return;const S=IS.W[IS.p],v=d.v==='1'?1:0;INVOX.forEach(([q])=>{S[q]=v});ivRe()};
 ACT.ivT=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=S[d.k]?0:1;if(IS.p==='stm')IS.W.stm=stmClean(S);ivRe()};
 ACT.ivV=d=>{if(!IS)return;const S=IS.W[IS.p],n=typeof ivDf()[d.k]==='number';S[d.k]=n?+d.v:d.v;IS.W[IS.p]=ivCl(S);ivRe()};
 ACT.ivN=d=>{if(!IS)return;const S=IS.W[IS.p];S[d.k]=Math.round(((+S[d.k]||0)+(+d.d||0))*10)/10;IS.W[IS.p]=ivCl(S);ivRe()};

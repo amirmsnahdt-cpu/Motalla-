@@ -27,7 +27,27 @@ const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   /* v99.4 کشیدن جدا: psw؟ = چند درصد به عرض چاپ اضافه/کم شود، psh؟ = به ارتفاع (روی اندازه psk؟ می‌نشیند؛ ۰ = بدون کشیدگی) */pswa:0,psha:0,pswi:0,pshi:0,psww:0,pshw:0,
   /* v99.6 چرخش جبرانی (درجه، + = جهت عقربه‌های ساعت) برای چاپگری که کاغذ را همیشه کمی کج می‌کشد */psra:0,psri:0,psrw:0,
   /* v100.2 راه چهارم «d» = چاپ مستقیم اپ اندروید روی چاپگر وای‌فای (15zz-yprn) */pskd:100,psxd:0,psyd:0,pswd:0,pshd:0,psrd:0,
-  sgc:1,sgs:1,by:1,th:1,shp:1,note:''};
+  sgc:1,sgs:1,by:1,th:1,shp:1,note:'',
+  /* v106.8 «چاپ روی کاغذ آماده» (صاحب اپ: «قسمت‌هایی که چاپ بشود یا نشود را با تیک درست کنم؛ کاغذ را رنگی آماده می‌کنم و بعد پرینت روی آن می‌گیرم»):
+     ۱ = چاپ شود، ۰ = چاپ نشود. بخش خاموش جایش را نگه می‌دارد (فقط دیده نمی‌شود) تا عددها روی همان جای کاغذ آماده بنشینند. برای همه فاکتورها یکی است */
+  oxfr:1,oxbg:1,oxln:1,oxlg:1,oxtt:1,oxlb:1,oxch:1,oxal:1,oxft:1};
+/* بخش‌های «چاپ روی کاغذ آماده» به ترتیب تنظیمات: [کلید، عنوان، توضیح] */
+const INVOX=[['oxfr','قاب دور برگه','نوار طلایی و خط‌های دور کاغذ'],['oxbg','رنگ زمینه کاغذ و نوارها','کرم کاغذ، نوار سر ستون‌ها، ردیف جمع و مانده نهایی'],
+  ['oxln','خط‌ها و کادر جدول‌ها','خط ستون‌ها و ردیف‌ها، کادر حساب مشتری'],['oxlg','لوگو',''],['oxtt','عنوان «فاکتور فروش/خرید»',''],
+  ['oxlb','برچسب‌ها','«شماره»، «تاریخ»، «مشتری»، «مظنه روز»، شماره برگه'],['oxch','عنوان ستون‌ها و گروه‌ها','«شرح»، «وزن»، «مبلغ»، «فروش به مشتری»، «حساب مشتری»…'],
+  ['oxal','نام سطرهای جمع و حساب','«جمع فروش»، «مانده قبلی»، «این فاکتور»، «مانده نهایی حساب»'],['oxft','پانویس و جای امضا','امضاها، «با سپاس…»، مشخصات فروشگاه، راهنما']];
+/* CSS پنهان کردن: visibility/color/border شفاف، بدون عوض شدن اندازه‌ها */
+function invOxCSS(S){const T='color:transparent!important',B='border-color:transparent!important;box-shadow:none!important;outline:0!important',G='background:transparent!important;background-image:none!important',V='visibility:hidden!important',R=[];
+  if(!S.oxfr)R.push(`.f1,.f2,.f3{${B};${G}}`);
+  if(!S.oxbg)R.push(`.sht,.pg,.f1,.f2,.f3,.hd,.cu,.zn,.tb,.acw,.ac,.ft,.wds,.lgd{${G}}.r td,.r,.a td,.a{${G}}`);
+  if(!S.oxln)R.push(`.hd,.cu,.mr,.zn,.tb,.r,.r td,.fl,.acw,.ac,.a,.a td,.wds,.lgd,.ft,.sg0,.sg,.mid{${B}}.r.sm td{${B}}`);
+  if(!S.oxlg)R.push(`.lg{${V}}`);
+  if(!S.oxtt)R.push(`.ttl{${V}}`);
+  if(!S.oxlb)R.push(`.mr small,.cu small,.pgn,.mr i.tm{${V}}`);
+  if(!S.oxch)R.push(`.r.h td,.r.h td *,.r.cp td,.r.cp td *,.a.ah td,.a.ah td *{${T}}.r.cp svg,.a.ah svg{${V}}`);
+  if(!S.oxal)R.push(`.a .al,.a .al *,.r.sm .nm,.r.sm .nm *{${T}}.a .al svg{${V}}`);
+  if(!S.oxft)R.push(`.ft,.lgd{${V}}`);
+  return R.join('')}
 /* پیش‌فرض ویژه هر قالب: آبشده اجرت و مالیات ندارد و آزمایشگاه و انگش ستون جدا می‌گیرد */
 const INVT={ab:{clab:'a',cang:'a',caj:'n',ctx:'n'}};
 const INVE={paper:['a5','b14','a4','a42'],bg:['c','w'],ink:['c','m'],frame:['g','l','n'],lp:['c','r','n'],aj:['p','o','t','b'],pp:['p','o','t','b'],rt:['m','g'],cap:['a','y','n'],fill:['b','l','r'],ag:['y','a','n'],ax:['a','n'],wr:['w','c']},INVN={rh:[4.6,9],fs:[-1,2],pska:[85,115],psxa:[-25,25],psya:[-25,25],pski:[85,115],psxi:[-25,25],psyi:[-25,25],pskw:[85,115],psxw:[-25,25],psyw:[-25,25],pswa:[-12,12],psha:[-12,12],pswi:[-12,12],pshi:[-12,12],psww:[-12,12],pshw:[-12,12],psra:[-3,3],psri:[-3,3],psrw:[-3,3],pskd:[85,115],psxd:[-25,25],psyd:[-25,25],pswd:[-12,12],pshd:[-12,12],psrd:[-3,3]};
@@ -328,7 +348,7 @@ u,em,i,s{text-decoration:none;font-style:normal}
   /* v99.3: «تنظیم جای چاپ» دیگر داخل خود برگه نیست (پیش‌نمایش و فایل PDF دست نمی‌خورد)؛ فقط هنگام چاپ روی همان دستگاه اعمال می‌شود (prCal). */
   /* v99.8 (عکس پیش‌نمایش چاپ اندروید صاحب اپ: باز خانه‌های بعد از «شرح» و بعد از عنوان «حساب مشتری» یک ردیف پایین‌تر افتاده بودند، یعنی موتور چاپ آن گوشی
      display:table روی div/span را هم مثل جدول نمی‌چیند). ردیف‌ها حالا جدول واقعی HTML هستند (table > tr > td) که هر موتوری درست می‌چیند؛ همان کلاس‌ها و اندازه‌ها. */
-  css=css.replace(/>span/g,' td');body=invTbl(body);
+  css=css.replace(/>span/g,' td')+invOxCSS(S);body=invTbl(body);
   const KT=A4?K4:1;
   if(KT!==1){css=invScale('<style>'+css+'</style>',KT).slice(7,-8);body=invScale(body,KT)}
   return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(invTitle(t))} · ${esc(cuName(c))}</title><style>@page{size:${S.paper==='a5'?'A5 landscape':S.paper==='b14'?'210mm 140mm':A4?'A4 landscape':'A4'};margin:0mm}
