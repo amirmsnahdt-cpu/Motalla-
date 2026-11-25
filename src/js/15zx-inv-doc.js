@@ -69,6 +69,8 @@ function invShOf(inv){inv=inv||{};const o={};if(inv.all){for(const k in inv.all)
 function invCfg(k){const inv=(cfgRec()||{}).inv||{},c=inv[k]||{},own={};for(const q in c)if(invOwn(q))own[q]=c[q];return invClean({...INVD,...(INVT[k]||{}),...own,...invShOf(inv)})}
 /* قالب سند: فروش دارد → اگر همه کالاهای فروخته‌شده آبشده‌اند «آبشده» وگرنه «فروش طلا»؛ فقط خرید → «خرید» (خرید فقط آبشده هم «آبشده»)؛ بدون کالا → «رسید» */
 function invProf(t){const its=t.items||[],X=(t.xr||[]).filter(x=>!(x.pv&&x.cat==='مانده قبلی')&&(x.t==='sell'||x.t==='buy')),S=X.filter(x=>x.t==='sell'),B=X.filter(x=>x.t==='buy'),abx=x=>x.a==='gold'&&x.cat==='آبشده';
+  /* v107.4: سندی که فقط آبشده جابه‌جا کرده (خرید/فروش/دریافت/تحویل، با ردیف پولی برای تسویه اختلاف) قالب «آبشده» می‌گیرد */
+  {const XA2=(t.xr||[]).filter(x=>!(x.pv&&x.cat==='مانده قبلی')),ab=XA2.some(abx)||its.some(i=>i.ab),ot=its.some(i=>!i.ab)||XA2.some(x=>(x.t==='sell'||x.t==='buy')&&!abx(x)&&!x.pul);if(ab&&!ot)return 'ab'}
   if(its.length||S.length)return its.every(i=>i.ab)&&S.every(abx)?'ab':'sale';if(B.length)return B.every(abx)?'ab':'buy';return 'rcp'}
 /* همه میلی‌مترها و اندازه قلم‌ها (pt) در k ضرب می‌شوند: فقط داخل <style>، صفت style و اندازه SVGها — نه در نوشته‌ها */
 function invScale(h,k){const f=s=>s.replace(/(\d*\.?\d+)(mm|pt)\b/g,(m,n,u)=>(+(n*k).toFixed(3))+u);
@@ -154,7 +156,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
      (u تحویل به مشتری · v دریافت از مشتری) و از دریافت/پرداخت «وجه» جدا هستند؛ ستون آخر هر ردیف طلا همان وزن ۷۵۰ی است که به حساب طلا می‌نشیند */
   const GR={s:[],b:[],u:[],v:[],w:[],i:[],o:[],p:[],z:[]},XP=[],FST={},r3=v=>Math.round(v*1000)/1000;if((t.items||[]).length)FST.s=-1;
   its.forEach(it=>{const J=ajPT(it),ay=+it.ay||750,mz=mzOf2(it),pg=Math.round(mz/MZK*ay/750),ajE=[J.P?toFa(String(J.P))+'٪':'',J.T?fmt(J.T):''].filter(Boolean).join(' + '),ppE=+it.amT>0?'':[+it.pp?ppT(+it.pp):'',+it.pp&&+it.ppT?fmt(Math.round(+it.ppT)):''].filter(Boolean).join(' + '),w7=r3((+it.w||0)*ay/750);
-    GR.s.push({wv:+it.w||0,n:esc(it.k+dsP(it)),e:[it.sh===1?'شرطی':''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
+    GR.s.push({wv:+it.w||0,abA:it.ab?toFa(ay):'',n:esc(it.k+dsP(it)),e:[it.sh===1?'شرطی':''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
       c:{w:[wFmt(it.w)+' <u>گرم</u>'],ay:[toFa(ay)],w7:[wFmt(w7)],rt:[fmt(S.rt==='g'?pg:mz)],gv:[+it.gold?fmt(it.gold):''],
         /* v91.5 (خواسته صاحب اپ): «فقط درصد» — اگر اجرت/سود تومانی وارد شده، درصدش از روی مبلغ طلا حساب می‌شود */
         aj:!ajE&&!+it.ajv?['']:S.aj==='o'?[+it.gold&&+it.ajv?pctT(it.ajv/it.gold*100):ajE]:S.aj==='t'?[+it.ajv?fmt(it.ajv):'']:S.aj==='b'&&J.P&&+it.ajv?[ajE,fmt(it.ajv)]:[ajE],
@@ -164,7 +166,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
     const acc='در حساب '+(g?'طلا':(XA[x.a]||{}).k==='c'?'سکه':esc((XA[x.a]||{s:x.a}).s)),wA=g?(x.q750!=null?+x.q750:r3((+q||0)*ay/750)):0,aj=g&&!m&&x.q0!=null,w7=aj?+x.q0:wA,w7d=g&&Math.abs(w7-(+q||0))>.0005,jam=aj?+x.amount||0:0;
     /* v91.7: دریافت/تحویل طلا با اجرت و سود (بدون مظنه): درصدها در ستون خودشان، «با اجرت و سود n گرم ۷۵۰» کنار نام؛ اجرت تومانی در ستون مبلغ */
     const gk=x.t==='sell'?'s':x.t==='buy'?'b':x.t==='in'?'v':'u',gq=g&&!m&&!jam&&!pv;if(!pv&&FST[gk]==null)FST[gk]=xi;
-    (pv?XP:GR[gk]).push({xi,sw:dkOfX(x)==='swap',wv:g?+q||0:0,kd:g?'g':(XA[x.a]||{}).k==='c'?'c':'f',g7:g&&!m&&!pv?wA:0,gq,n:esc(nl(xrLab(x))+dsP(x)),sdw:pv?sd:0,e:pv?[]:[x.sh===1?'شرطی':'',x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',(m&&x.pul)||jam?acc:''],lab:x.lab?esc(x.lab):'',ang:x.ang?esc(toFa(x.ang)):'',w7d,eqA:!gq&&aj&&Math.abs(wA-w7)>.0005,eq:gq?(aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود ':w7d?'معادل ':'')+wFmt(wA)+' گرم ۷۵۰':aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود '+wFmt(wA)+' گرم ۷۵۰':w7d&&(x.pul||!m)?'معادل '+wFmt(w7)+' گرم ۷۵۰':'',rv,
+    (pv?XP:GR[gk]).push({xi,abA:g&&x.cat==='آبشده'?toFa(ay):'',sw:dkOfX(x)==='swap',wv:g?+q||0:0,kd:g?'g':(XA[x.a]||{}).k==='c'?'c':'f',g7:g&&!m&&!pv?wA:0,gq,n:esc(nl(xrLab(x))+dsP(x)),sdw:pv?sd:0,e:pv?[]:[x.sh===1?'شرطی':'',x.pz&&+x.cnt?qFmt(x.cnt)+' عدد':'',(m&&x.pul)||jam?acc:''],lab:x.lab?esc(x.lab):'',ang:x.ang?esc(toFa(x.ang)):'',w7d,eqA:!gq&&aj&&Math.abs(wA-w7)>.0005,eq:gq?(aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود ':w7d?'معادل ':'')+wFmt(wA)+' گرم ۷۵۰':aj&&Math.abs(wA-w7)>.0005?'با اجرت و سود '+wFmt(wA)+' گرم ۷۵۰':w7d&&(x.pul||!m)?'معادل '+wFmt(w7)+' گرم ۷۵۰':'',rv,
       c:{w:[(g?wFmt(q):qFmt(q))+' <u>'+esc(u)+'</u>'],ay:[g?toFa(ay):''],w7:[g?wFmt(gq?wA:w7):''],rt:[rv?fmt(rv):''],gv:[''],aj:[aj?[+x.ajP?toFa(String(+x.ajP))+'٪':'',jam?fmt(jam):''].filter(Boolean).join(' + '):''],pp:[aj&&+x.pp?ppT(+x.pp):''],tx:['']},am:m||jam?nm(x.amount):gq?'—':acc,av:m||jam?+x.amount||0:0,dl:!m&&!jam})});
   let inS=0,outS=0,pvS=0,offR=0;const PY={i:[],o:[]};
   pays.forEach((p,pi)=>{const a=pAmt(p);if(!a)return;if(PG.sp.has(pi)){pvS+=a;GR.p.push({n:esc(nl(pyLab(p,1))),sdw:a,e:[],am:nm(a)});return}
@@ -179,7 +181,12 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   /* v94.7 (خواسته صاحب اپ: «تعویض در سند تعویض بخورد»): گروه خرید وقتی همه ردیف‌هایش تعویض است «تعویض از مشتری» نام می‌گیرد (جمع و فرمول هم «تعویض»)؛ قاطی = «خرید و تعویض از مشتری» */
   const swA=GR.b.length>0&&GR.b.every(r=>r.sw),swS=GR.b.some(r=>r.sw),bW=swA?'تعویض':'خرید',bCap=swA?'تعویض از مشتری':swS?'خرید و تعویض از مشتری':'خرید از مشتری';
   const hasS=GR.s.length>0,hasB=GR.b.length>0,goods=hasS||hasB,inL=GR.i.length+GR.v.length,outL=GR.o.length+GR.u.length,io=inL+outL>0,docN=goods?'فاکتور':io?'رسید':'سند';
-  const TT0=hasS?['فاکتور','فروش']:hasB?['فاکتور','خرید']:inL&&!outL?['رسید','دریافت']:outL&&!inL?['رسید','پرداخت']:io&&inS>outS?['رسید','دریافت']:io&&outS>inS?['رسید','پرداخت']:['صورت','حساب'],TTL=S.ttl?S.ttl.split(' ').filter(Boolean):TT0;
+  /* v107.4 (صاحب اپ: «وقتی آبشده خرید و فروش یا دریافت و پرداخت می‌شود آبشده بخورد؛ پولی و قلک هم؛ نباید فاکتور خرید یا فروش بخورد»):
+     وقتی کالای سند فقط آبشده / پولی / قلک است (هیچ کالای ساخته یا خرید و فروش دیگری نیست) عنوان همان است: «فاکتور آبشده» (هر جا آبشده‌ای جابه‌جا شده)، وگرنه «فاکتور پولی» / «فاکتور قلک» */
+  const XK=(t.xr||[]).filter(x=>!(x.pv&&x.cat==='مانده قبلی')),xAb=x=>x.a==='gold'&&x.cat==='آبشده',xQl=x=>x.pul&&x.cat==='قلک',xPu=x=>x.pul&&x.cat!=='قلک',
+    othG=its.some(i=>!i.ab)||XK.some(x=>(x.t==='sell'||x.t==='buy')&&!xAb(x)&&!x.pul),anyAb=its.some(i=>i.ab)||XK.some(xAb),anyPu=XK.some(xPu),anyQl=XK.some(xQl),
+    TK=othG?'':anyAb?'آبشده':anyPu&&!anyQl?'پولی':anyQl&&!anyPu?'قلک':anyPu?'پولی':'';
+  const TT0=TK?['فاکتور',TK]:hasS?['فاکتور','فروش']:hasB?['فاکتور','خرید']:inL&&!outL?['رسید','دریافت']:outL&&!inL?['رسید','پرداخت']:io&&inS>outS?['رسید','دریافت']:io&&outS>inS?['رسید','پرداخت']:['صورت','حساب'],TTL=S.ttl?S.ttl.split(' ').filter(Boolean):TT0;
   const onlyOff=GR.i.length>0&&GR.i.every(r=>r.off);
   /* نام گروه طلا/سکه از روی خود ردیف‌ها؛ اگر سند هم طلا و هم پول جابه‌جا کرده، گروه پول «وجه» نام می‌گیرد تا با طلا قاطی نشود.
      گروه‌های کالا به ترتیب ثبت در سند می‌آیند (مثلاً تحویل طلا، دریافت طلا، بعد فروش پولی مانده) و گروه‌های پول بعد از آن‌ها */
@@ -218,7 +225,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const z=n=>+(n*fz).toFixed(2),cs=f=>` style="width:${CW[f]}mm"`;
   /* ارتفاع‌ها: ردیف یک‌خطی، ردیف دوخطی (درصد و مبلغ زیرش)، نوار گروه، سرستون */
   let RH=Math.max(S.rh,+(4.7*fz).toFixed(1)),RH2=+Math.max(RH*1.36,7.3*fz).toFixed(1),CAPH=+Math.max(4.6,4.6*fz).toFixed(1);const HEADH=+Math.max(5.6,5.4*fz).toFixed(1);
-  ALLR.forEach(r=>{const E=(r.e||[]).filter(Boolean);if(S.ex){if(r.lab&&!UC.includes('lab'))E.push('آزمایشگاه '+r.lab);if(r.ang&&!UC.includes('ang'))E.push('انگ '+r.ang);if(r.eq&&(r.eqA||!UC.includes('w7')))E.push(r.eq)}else if(r.gq&&!UC.includes('w7'))E.push(r.eq);
+  ALLR.forEach(r=>{const E=(r.e||[]).filter(Boolean);/* v107.4 (صاحب اپ: «عیار آبشده را قید نکرده؛ این اشتباه نباید پیش بیاید»): عیار آبشده همیشه چاپ می‌شود — اگر ستون عیار نیست، کنار نام */if(r.abA&&!UC.includes('ay'))E.unshift('عیار '+r.abA);if(S.ex){if(r.lab&&!UC.includes('lab'))E.push('آزمایشگاه '+r.lab);if(r.ang&&!UC.includes('ang'))E.push('انگ '+r.ang);if(r.eq&&(r.eqA||!UC.includes('w7')))E.push(r.eq)}else if(r.gq&&!UC.includes('w7'))E.push(r.eq);
     r.x=(r.sdw?`<em class="${cls(r.sdw)}">${side(r.sdw)}</em>`:'')+((S.ex||r.py!=null)?E.join(' · '):(r.e||[]).filter(v=>/^در حساب /.test(v)).join(' · '));r.full=UC.some(f=>r.c[f]&&r.c[f][0]);r.two=UC.some(f=>r.c[f]&&r.c[f][1])});
   const cell=(r,f)=>{const v=r.c[f]||[];return v[1]?`<span class="d"${cs(f)}><b>${v[0]}</b><i>${v[1]}</i></span>`:`<span${f==='w7'&&G7?' class="c7"':''}${cs(f)}>${v[0]||''}</span>`};
   const row=(r,i,pre)=>`<div class="r${r.two?' t2':''}"><span class="k">${toFa(i+1)}</span><span class="nm${r.two&&r.x?' d':''}"><b>${pre||''}${r.n}</b>${r.x?` <i>${r.x}</i>`:''}</span>${r.full?UC.map(f=>cell(r,f)).join(''):''}<span class="am${r.dl?' dl':''}">${r.am}</span></div>`;

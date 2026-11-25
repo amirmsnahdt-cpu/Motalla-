@@ -666,7 +666,8 @@ ACT.svSave=d=>{const c=svCu();if(!c){toast('مشتری سند را انتخاب 
 /* v61.47: زدن هر مانده (قبلی / سند / نهایی) = تسویه همان مبلغ */
 /* v61.59: زدن مانده طلا = تسویه طلا (gkOpen در 15i)؛ مبلغ و سکه = تسویه تومانی */
 /* v100.7: زدن مانده سکه یا ارز = فرم تحویل/دریافت همان جنس در پنجره تسویه (اگر در آن خانه مانده دارد) */
-ACT.svBal=d=>{if(d&&d.k==='g'){if(!svCu()){toast('مشتری سند را انتخاب کنید',true);return}if(!svFlush())return;gkOpen(d.w);return}ACT.svSave(d);if(d&&d.k&&d.k!=='r'&&CK&&$('sheet')&&document.querySelector('#sheet .ckw')&&ckXv(d.k))ACT.ckM({m:'x:'+d.k})};
+/* v107.4 (صاحب اپ: «مانده طلایی را می‌زنی باید مثل پولی پنجره تبدیل و تحویل باز شود»): مانده طلا هم پنجره تسویه را باز می‌کند (کاشی‌های تحویل/دریافت طلا، پولی کردن، تعویض) */
+ACT.svBal=d=>{ACT.svSave(d);if(d&&d.k&&d.k!=='r'&&d.k!=='g'&&CK&&$('sheet')&&document.querySelector('#sheet .ckw')&&ckXv(d.k))ACT.ckM({m:'x:'+d.k})};
 /* خروج از صفحه سند → ثبت خودکار. نتیجه: true = ثبت شد */
 let svAutoBusy=false;
 function svAuto(why){if(!sv||svAutoBusy)return false;svAutoBusy=true;try{
