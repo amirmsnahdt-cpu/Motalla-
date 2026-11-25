@@ -113,8 +113,8 @@ ACT.ckPhBack=()=>{GAL=null;sheet(ckHTML());ckBind();phPaint($('sheet'))};
    روی کاغذ رسید دستگاه دو دکمه کوچک «دوربین» و «گالری» که مستقیم ورودی فایل گوشی را باز می‌کنند (همان پیش‌نمایش و تأیید picOk و همان ذخیره galCtx)؛
    عکس‌های اضافه‌شده همان‌جا کوچک دیده می‌شوند و زدنشان بزرگ‌نمایی است. دوربین فقط وقتی هست که گوشی دارد (اپ اندروید قدیمی: فقط گالری).
    GAL پیش از باز شدن انتخاب فایل در کلیک خود برچسب (ckBind) تنظیم می‌شود؛ data-act ندارد چون کلیک عمومی preventDefault می‌کند */
-function ckPhIn(){const K=xrPh(CK),cam=picCam()||!/MotallaAndroid/.test(navigator.userAgent);/* v107.0: دوربین و گالری مستقیم (دوربین = دوربین سریع داخل برنامه) */
-  return `<div class="ckph">${K.map((k,i)=>`<button type="button" class="stpht" data-act="ckPhV" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}${cam?`<label class="ckphb cam" aria-label="گرفتن عکس رسید">${ic('cam')}<span>دوربین</span><input type="file" accept="image/*" capture="environment" data-galadd="1" hidden></label>`:''}<label class="ckphb gal" aria-label="عکس از گالری">${ic('gal')}<span>گالری</span>${galGalIn()}</label></div>`}
+function ckPhIn(){const K=xrPh(CK),cam=picCam()||!/MotallaAndroid/.test(navigator.userAgent);
+  return `<div class="ckph">${K.map((k,i)=>`<button type="button" class="stpht" data-act="ckPhV" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}${cam?`<label class="ckphb" aria-label="گرفتن عکس رسید">${ic('cam')}<span>دوربین</span><input type="file" accept="image/*" capture="environment" data-galadd="1" hidden></label>`:''}<label class="ckphb" aria-label="عکس از گالری">${ic('gal')}<span>گالری</span>${galGalIn()}</label></div>`}
 const ckTnP=()=>{const v=$('ckTv'),b=v&&v.closest('.ptm-tn'),D=$('posD');if(v){v.textContent=CK.tn||'اختیاری · بزنید';v.classList.toggle('ph',!CK.tn)}if(b)b.classList.toggle('on',!!CK.kt);if(D)D.classList.toggle('ktn',!!CK.kt)};
 ACT.ckTnF=()=>{if(!CK)return;CK.kt=CK.kt?0:1;CK.pre=0;ckTnP();try{navigator.vibrate&&navigator.vibrate(6)}catch(_){}};
 ACT.ckAmF=()=>{if(CK&&CK.kt){CK.kt=0;ckTnP()}};

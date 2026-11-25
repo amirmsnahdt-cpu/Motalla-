@@ -12,7 +12,6 @@
 /* v59.9: اول هر لایه‌ای که روی بقیه است بسته شود: نمایش تمام‌صفحه عکس (#zv، بالاتر از پنجره) — قبلاً پنجره زیرش بسته می‌شد
    و عکس همان‌جا می‌ماند، پس برگشت «کار نمی‌کرد» — بعد صفحه قفل، بعد پنجره، پیش‌نمایش و صفحه قبلی */
 window.__androidBack=()=>{try{const au=$('auth');if(au&&!au.classList.contains('hide'))return false;
-  if(typeof tgBack==='function'&&tgBack())return true;/* v107.0: پنل/دوربین عکس */
   if(typeof PCF!=='undefined'&&PCF){ACT.pcfNo();return true}/* v72.0: پیش‌نمایش عکس رسید */
   if(typeof ZV!=='undefined'&&ZV){if(ZV.crop)ACT.zvCropNo();else zvClose();return true}
   if(typeof lockUI!=='undefined'&&lockUI){const m=lockUI.m;if(m==='unlock')return false;lockKey(m==='pwun'||m==='forgot'?'back':m==='bio'||m==='pwset'?'bioNo':'cancel');return true}
