@@ -453,8 +453,8 @@ function ckDocGo(m,tg){if(!sv)return;const g=svBalL().find(z=>z[0]==='g')||['g',
   const need=m==='gx'||m==='rg'||m==='gp'||m==='gcv';if(need&&!sv.rate){toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);return}
   let f;
   if(m==='gx')f=()=>{sv.qa.d='swap';sv.qa.s='';sv.qa.q='';xrStart(xrNew('buy','gold',{cat:'تعویض',ay:740,fl:'gold',fd:'swap'}))};
-  else if(m==='gd'||m==='gdl'){const D=gr>0?'in':'out',c0=ls.get('m_gk_cat','آبشده'),cat=gkCats().includes(c0)?c0:'آبشده',w=Math.abs(gr);
-    f=()=>{sv.qa.d=D;sv.qa.s='';sv.qa.q='';const x=xrNew(D,'gold',{cat,ay:xrAy(D,false,cat),fl:'gold',fd:D});if(w>0)x.w=String(w);xrStart(x)}}
+  else if(m==='gd'||m==='gdl'){/* v106.2 (صاحب اپ: «باید برود به پرداخت و بعد انتخاب شود، مثل سند زدن»): فهرست «پرداخت/دریافت» سند از بخش طلا باز می‌شود؛ آبشده، متفرقه یا کالا را خودش انتخاب می‌کند و وزن = مانده طلا پیش‌فرض می‌شود */
+    const D=gr>0?'in':'out',w=Math.abs(gr);f=()=>{ACT.dkD({d:D});sv.qa.gw=w>0?{d:D,w}:null;dkShow();setTimeout(()=>{const h=document.querySelector('.dkbox.open .dksh.kg'),L=h&&(h.closest('.dkl')||h.parentElement);if(h&&L&&L.scrollHeight>L.clientHeight)L.scrollTop+=h.getBoundingClientRect().top-L.getBoundingClientRect().top},60)}}
   else{const D=m==='rg'?(CK&&ckOut()?'sell':'buy'):(gr>0?'sell':'buy'),w=m==='rg'?'':String(Math.abs(gr)||''),am=m==='rg'?Math.round(ckLeft()):0;
     f=()=>{sv.qa.d=D;sv.qa.s='';sv.qa.q='';const x=xrNew(D,'gold',{pul:true,ay:750,fl:'gold',fd:D,cat:''});if(w&&+w>0)x.w=w;if(am>0)x.am=am;xrStart(x)}}
   const open=$('sheet')&&CK;if(open)closeSheet();CK=null;setTimeout(()=>{if(cur==='sell'&&sv)f()},open?90:0)}

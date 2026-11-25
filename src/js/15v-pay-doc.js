@@ -83,8 +83,17 @@ function depDocHeal(e){try{if(!e||!e.wd||e.splitOf!=null)return 0;const D=depDoc
     depDocFix(e,rm);return rm}catch(_){return 0}}
 /* سند «دریافت» پرداخت‌کننده: ردیف حواله به فروشنده همین واریزی → تسویه byInv روی واریزی (ckDepApply در svCommit) */
 function payDocMake(e,c,a,o){o=o||{};const p={m:'dep',amount:Math.round(a),entId:e.id,entName:fullName(e)};if(o.tn)p.tn=o.tn;if(o.imgs&&o.imgs.length){p.imgs=o.imgs.slice();p.img=o.imgs[0]}
+  /* v106.2 (صاحب اپ: «سند تسویه در همان سند بخورد، نه یک سند دریافت جدا»): اگر پرداخت‌کننده فاکتور بازی دارد که هنوز به ما بدهکار است، این دریافت ردیف همان فاکتور می‌شود */
+  const T=payDocTarget(c,a,e);if(T){try{const old=new Set((T.pays||[]).filter(q=>q.m==='dep').map(q=>String(q.stlId)));
+      const R=docMake(c,s=>{Object.assign(s,invSv(c,T));s.edit={tx:T.id,no:T.no};s.pays=(s.pays||[]).concat([p])});const t=R.t,np=(t.pays||[]).find(q=>q.m==='dep'&&String(q.entId)===String(e.id)&&!old.has(String(q.stlId)));
+      const z=np&&(e.settles||[]).find(s=>s.id===np.stlId);if(z){z.note=o.note||'';if(o.st==='ok'){z.st='ok';z.okAt=ns();z.okBy=who()}stlSync(e)}saveCu();saveE();return {c,t,z,into:1}}catch(err){console.warn('payDocTarget',err)}}
   const R=docMake(c,s=>{s.dk='in';s.date=todayISO();s.pays=[p]});const t=R.t;t.auto='stl';t.entId=e.id;
   const z=(e.settles||[]).find(s=>s.id===(t.pays[0]||{}).stlId);if(z){z.inv='';z.note=o.note||'';if(o.st==='ok'){z.st='ok';z.okAt=ns();z.okBy=who()}stlSync(e)}saveCu();saveE();return {c,t,z}}
+/* v106.2: فاکتور باز پرداخت‌کننده که این دریافت مال آن است — سندی که مشتری هنوز در آن به ما بدهکار است (cuOpenMap)؛ اول همان مبلغ، بعد قدیمی‌ترین که جا دارد، بعد بزرگ‌ترین مانده باز */
+function payDocTarget(c,a,e){try{if(!c||c.sys||c.grp==='بانک'||!(a>0))return null;const M=cuOpenMap(c),L=[];
+    for(const t of c.txs||[]){if(!t||t.del||t.type!=='inv'||t.auto||t.lk||t.bd||t.pd||t.bl||t.dep||t.fix||t.posm)continue;if(e&&String(t.entId)===String(e.id))continue;const o=M.get(String(t.id)),r=o&&o.r;if(r&&r.v<0&&r.rem>0)L.push({t,rem:r.rem,k:String(t.date||'')+'|'+String(t.at0||t.at||'')})}
+    if(!L.length)return null;const ex=L.filter(o=>Math.abs(o.rem-a)<1).sort((x,y)=>x.k<y.k?1:-1)[0];if(ex)return ex.t;
+    const fit=L.filter(o=>o.rem>=a).sort((x,y)=>x.k<y.k?-1:1)[0];if(fit)return fit.t;return L.sort((x,y)=>y.rem-x.rem)[0].t}catch(_){return null}}
 /* واریزی تازه → حساب + سند؛ تسویه‌های همراهش → سند دریافت هر پرداخت‌کننده */
 function depLink(e,o){o=o||{};try{const S=(o.settles||[]).filter(s=>+s.amount>0);
     /* v98.6: «مشتری هم‌نام دیگر» در خرید دستی = حساب تازه، حتی اگر حسابی با همین نام هست */const c=(o.nwCu?null:cuFindBy({cuId:o.cuId,name:e.name,phone:e.phone,nid:e.nid}))||cuMakeBy({cuId:o.cuId,name:e.name,title:e.title,phone:e.phone,nid:e.nid,iban:e.iban,card:e.card,holder:e.holder},'از واریزی');depDocMake(e,c);

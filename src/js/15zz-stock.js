@@ -208,9 +208,3 @@ function stRfS(x){const L=rfSold(svCu());if(!L.length&&!x.rf)return [];
     {opt:1,opts:()=>[...L.map(p=>({v:p.key,t:p.nm,sub:['فروش',p.date?payLab(p.date):'','سند '+toFa(String(p.no)),p.av<p.w-0.0004?'از '+wFmt(p.w)+' گرم':''].filter(Boolean).join(' · '),amt:wFmt(p.av),lab:'گرم · عیار '+toFa(String(p.ay)),ico:'ring',cls:'ab'})),{v:'-',t:'بدون انتخاب',sub:'طلایی که در این فهرست نیست',ico:'plus'}],
      lab0:v=>{const p=v&&L.find(z=>z.key===v);return p?p.nm:''}})]}
 function stRfN(x){if(!x.rf)return {};const p=rfSold(svCu()).find(z=>z.key===x.rf);if(!p)return {};return {need:()=>(parseFloat(x.w)||0)>p.av+0.0004,msg:'وزن مرجوعی از وزن فروخته‌شده بیشتر است · '+wFmt(p.av)+' گرم'}}
-/* v105.8 (صاحب اپ، عکس «پرداخت › آبشده»: «در پرداخت باید بتوانم متفرقه یا آبشده انتخاب کنم؛ چیزهای دیگر هم اضافه شود»):
-   ردیف دریافت/تحویل طلا (نه پولی، نه مانده قبلی، نه آبشده شرطی) پله اول «نوع طلا» دارد: آبشده، متفرقه و کالاهای مغازه با موجودی هر کدام.
-   عیاری که دست نخورده با نوع عوض می‌شود (xrAy: تحویل متفرقه ۷۴۰)، انتخاب آبشده موجود با نوع دیگر پاک می‌شود، آخرین نوع به خاطر سپرده می‌شود (m_gk_cat) */
-function stGcS(x){if(!xrAjOn(x)||x.sh)return [];const L=gkCats();if(x.cat&&!L.includes(x.cat))L.push(x.cat);
-  return [stS('cat','نوع طلا','','pick',()=>x.cat||'',v=>{if(!v||v===x.cat)return;const a0=xrAy(x.t,x.pul,x.cat);if(!+x.ay||+x.ay===a0)x.ay=xrAy(x.t,x.pul,v);x.cat=v;if(v!=='آبشده')x.pc='';try{ls.set('m_gk_cat',v)}catch(_){}},
-    {opts:()=>L.map(k=>{const st=typeof gdStkTx==='function'?gdStkTx(k):'';return {v:k,t:k,sub:(k==='آبشده'?'شمش و آبشده':k==='متفرقه'?'طلای متفرقه · عیار '+toFa(String(xrAy(x.t,x.pul,k))):'کالای مغازه')+(st?' · موجودی '+st:''),ico:'coin'}}),lab0:v=>v||''})]}
