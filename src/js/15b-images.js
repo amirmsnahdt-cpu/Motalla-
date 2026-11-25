@@ -31,10 +31,9 @@ const galGalIn=()=>`<input type="file" accept="image/*"${picMulti()?' multiple':
    اول پنجره گالری باز شود. cls: gt = کاشی مربع (داخل شبکه عکس‌ها)، sm = دو دکمه کوچک (پنل ردیف سند) */
 /* دوربین: اپ اندروید وقتی پل دوربین دارد؛ مرورگر گوشی لمسی (آیفون و…) همیشه (capture مستقیم دوربین را باز می‌کند)؛ کامپیوتر نه */
 const phCam=()=>picCam()||!/MotallaAndroid/.test(navigator.userAgent)&&!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
-function phPair(ref,o){o=o||{};const at=o.attr||'data-galadd="1"';
-  /* v107.0: یک دکمه «سنجاق» مثل تلگرام؛ زدنش پنل عکس (دوربین داخل برنامه + گالری + عکس‌های اخیر، 15zz-zwt-attach) را باز می‌کند.
-     اگر مرورگر پنل را پشتیبانی نکند، همین ورودی پنجره انتخاب خود گوشی را باز می‌کند */
-  return `<span class="php2 one${o.cls?' '+o.cls:''}"${ref?` data-gref="${esc(JSON.stringify(ref))}"`:''}><label class="php2b att"><i>${ic('clip')}</i><span>${o.lab||'افزودن عکس'}</span><input type="file" accept="image/*"${o.multi!==false&&picMulti()?' multiple':''} ${at} hidden></label></span>`}
+function phPair(ref,o){o=o||{};const at=o.attr||'data-galadd="1"',L=(cam,lab,icn)=>`<label class="php2b${cam?' cam':' gal'}"><i>${ic(icn)}</i><span>${lab}</span><input type="file" accept="image/*"${cam?' capture="environment"':(o.multi!==false&&picMulti()?' multiple':'')} ${at} hidden></label>`;
+  /* v107.0 (صاحب اپ: «عکس و گالری مستقیم همان‌جا، همان قبلی ولی بهتر»): دو دکمه مستقیم؛ «دوربین» دوربین سریع داخل برنامه را باز می‌کند (15zz-zwt-attach، چند عکس پشت هم)، «گالری» گالری خود گوشی */
+  return `<span class="php2${o.cls?' '+o.cls:''}"${ref?` data-gref="${esc(JSON.stringify(ref))}"`:''}>${phCam()?L(1,'دوربین','cam'):''}${L(0,'گالری','gal')}</span>`}
 document.addEventListener('click',e=>{const g=e.target&&e.target.closest&&e.target.closest('[data-gref]');if(!g)return;let r=null;try{r=JSON.parse(g.dataset.gref)}catch(_){}if(!r)return;
   if(r.k==='row'){if(!r.ck&&typeof qaRead==='function'&&sv&&sv.qa)try{qaRead()}catch(_){}GAL=r;if(!phT()){e.preventDefault();GAL=null;toast('اول ردیف را کامل کنید',true);return}}else GAL=r},true);
 function galAddHTML(c){if(!c||!c.ed)return '';return phPair(null,{cls:'gt'})}
