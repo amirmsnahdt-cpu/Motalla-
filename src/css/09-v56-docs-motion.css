@@ -5553,3 +5553,26 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 .fsearch.st3 .php2b span{display:none}
 .fsearch.st3 .php2b svg{width:18px;height:18px}
 @media (max-width:360px){.fsearch.st3 .stnx.go span{display:none}.fsearch.st3 .stnx.go{padding:0 12px}}
+/* v106.2 زمان‌بندی واریزی‌های سند (wsHTML, 15zz-zwsched): هر روز یک کارت — روز (دکمه تقویم) + مبلغ + حذف؛ جمع و نتیجه زیرش */
+#sheet .wsw .wsl0{display:flex;flex-direction:column;gap:10px;margin:4px 0 10px}
+#sheet .wsr{display:grid;grid-template-columns:auto minmax(0,1fr) 40px;align-items:center;gap:8px;padding:10px;border-radius:18px;background:var(--card);box-shadow:var(--bfr);animation:bf3Up .28s ease both}
+#sheet .wsr.nw{box-shadow:0 0 0 1.5px #16a34a,0 0 0 5px rgba(22,163,74,.12)}
+#sheet .wsd{display:flex;align-items:center;gap:6px;min-width:0;padding:8px 10px;border:0;border-radius:13px;background:color-mix(in srgb,var(--blu) 10%,transparent);color:var(--blu);font:inherit;text-align:start}
+#sheet .wsd svg{width:18px;height:18px;flex:none}
+#sheet .wsd span{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+#sheet .wsd b{font-size:14px;font-weight:800;white-space:nowrap}
+#sheet .wsd small{font-size:10.5px;color:var(--mut);white-space:nowrap}
+#sheet .wsd.lk{background:color-mix(in srgb,var(--mut) 10%,transparent);color:var(--mut)}
+#sheet .wsa{display:flex;align-items:baseline;gap:4px;min-width:0}
+#sheet .wsa input{flex:1;min-width:0;width:100%;border:0;background:transparent;font:inherit;font-size:21px;font-weight:900;color:var(--ink);text-align:left;padding:4px 0;outline:0}
+#sheet .wsa i{font-style:normal;font-size:11px;color:var(--mut)}
+#sheet .wsx{width:38px;height:38px;border:0;border-radius:12px;background:color-mix(in srgb,#d23c48 12%,transparent);color:#d23c48;display:grid;place-items:center}
+#sheet .wsx svg,#sheet .wsx0 svg{width:18px;height:18px}
+#sheet .wsx0{display:grid;place-items:center;color:var(--mut)}
+#sheet .wsr .wsl{grid-column:1/-1;font-size:11px;color:var(--mut)}
+#sheet .wsadd{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border:1.5px dashed color-mix(in srgb,var(--blu) 45%,transparent);border-radius:16px;background:transparent;color:var(--blu);font:inherit;font-weight:800;margin-bottom:10px}
+#sheet .wsadd svg{width:18px;height:18px}
+#sheet .wst{display:flex;align-items:baseline;gap:8px;padding:10px 14px;border-radius:16px;background:color-mix(in srgb,var(--blu) 7%,transparent);margin-bottom:10px}
+#sheet .wst span{font-size:12.5px;color:var(--mut);white-space:nowrap}
+#sheet .wst input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:17px;font-weight:900;color:var(--blu);text-align:left;outline:0}
+#sheet .wst i{font-style:normal;font-size:11px;color:var(--mut)}

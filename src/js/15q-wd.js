@@ -91,10 +91,12 @@ function wdRowsHTML(c,no,txId){if(no==null||!c)return [];const A=allocMap(),view
       if(o.t==='s'){const sub=[o.doc?'تسویه با '+esc(o.doc)+' در حساب «'+esc(o.nm)+'»':'تسویه از مشتری · بدون سند دریافت','وضعیت: پرداخت مستقیم به فروشنده · منتظر تأیید',o.tn?'پیگیری '+esc(toFa(o.tn)):'','تاریخ واریز: '+esc(D.fa)].filter(Boolean).join(' · ');
         R.push(d6Row({ico:'swap',tag:'<em class="d6k k-wd">در انتظار تأیید</em>',b:esc(o.nm),sub,v,ex:view&&o.tx!=null?`<span class="d8eb d8lk" role="button" data-act="cuInv" data-cu="${esc(o.cu)}" data-tx="${esc(o.tx)}">${ic('inv')}<span>${esc(o.doc)}</span><small>${esc(o.nm)}</small></span>`:depL,key:'w'+e.id+o.k}));return}
       const sub=['وضعیت: '+o.st,'تاریخ واریز: '+esc(D.fa),o.src?'منبع: '+esc(o.src):'',e.iban?'بانک: '+esc((ibanBank(e.iban)||'')+' '+String(e.iban).slice(-4)):'شبا ندارد',e.holder?'صاحب حساب: '+esc(e.holder):''].filter(Boolean).join(' · ');
-      R.push(d6Row({ico:o.fr?'cal':'clock',tag:o.fr?'<em class="d6k k-wf">در لیست واریز</em>':'<em class="d6k k-wd">در انتظار تأیید</em>',b:'واریز بانکی'+(o.src?' · '+esc(o.src):''),sub,v:o.fr?v.replace('d6e wdv','d6e wdv wf').replace('رفته برای واریز','تخصیص نخورده · آزاد'):v.replace('رفته برای واریز','تخصیص‌شده'),ex:depL+wdActs(e,o),key:'w'+e.id+o.k}))})});return R}
+      R.push(wdSw(e,d6Row({ico:o.fr?'cal':'clock',tag:o.fr?'<em class="d6k k-wf">در لیست واریز</em>':'<em class="d6k k-wd">در انتظار تأیید</em>',b:'واریز بانکی · '+dl+(o.src?' · '+esc(o.src):''),sub,v:o.fr?v.replace('d6e wdv','d6e wdv wf').replace('رفته برای واریز','تخصیص نخورده · آزاد'):v.replace('رفته برای واریز','تخصیص‌شده'),ex:depL+wdActs(e,o),key:'w'+e.id+o.k})))})});return R}
+/* v106.2: ردیف واریزی سند کشیده می‌شود — «حذف» (مبلغ به روز دیگر همان سند) و «مبلغ و روز» */
+const wdSw=(e,h)=>swW(h,{r:remCan()?[['wdAmt','مبلغ و روز','cal','#3b6fd6']]:[],l:[['wdDel','حذف','trash','#d23c48']],data:{e:e.id}});
 /* v98.6 (خواسته صاحب اپ: «مانده مستقیم ادیت و تخصیص داده شود»): زیر ردیف واریزی سند دو دکمه — «مبلغ واریزی» (wdAmt) و «انتخاب بانک» (همان پنجره پرداخت، pxUni) */
 function wdActs(e,o){if(!o||o.t!=='b')return '';const p=entries.find(z=>z.id===o.ent),un=p&&p.sentBid==null,B=[];
-  if(remCan())B.push(`<span class="d8eb" role="button" data-act="wdAmt" data-e="${e.id}">${ic('edit')}<span>مبلغ واریزی</span></span>`);
+  if(remCan())B.push(`<span class="d8eb" role="button" data-act="wdAmt" data-e="${e.id}">${ic('edit')}<span>مبلغ و روز واریز</span></span>`);
   if(un&&can('split'))B.push(`<span class="d8eb" role="button" data-act="entMove" data-id="${p.id}">${ic('bank')}<span>${o.src?'تغییر بانک':'انتخاب بانک'}</span></span>`);
   return B.length?`<span class="wdab">${B.join('')}</span>`:''}
 /* ---- v87.7 «مسیر پرداخت» (خواسته صاحب اپ: «مدل خوانا و منطقی که بچه‌ها گیج نشوند؛ هم در حساب و سند، هم در لیست مشتری»)
@@ -241,7 +243,8 @@ function waHTML(){const I=waInfo();if(!I)return '';const v=WA.v===''?'':Number(W
   <div id="waL">${waRes()}</div>
   <button type="button" class="xgo" data-act="waSave">${ic('check')} ثبت</button></div>`}
 function waBind(f){const A=$('waA');if(!A)return;selOnFocus(A);A.oninput=()=>{const n=num(A.value);A.value=n?n.toLocaleString('en-US'):/\d/.test(toEn(A.value))?'0':'';WA.v=A.value===''?'':n;const L=$('waL');if(L)L.innerHTML=waRes()};A.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();A.blur()}};if(f)sheetFocus(A)}
-ACT.wdAmt=d=>{if(!remCan()){toast(REMNO,true);return}const e=entries.find(z=>String(z.id)===String(d.e));if(!e||!e.wd)return;WA={e:e.id,v:''};const I=waInfo();if(!I)return;WA.v=I.cur;sheet(waHTML());waBind(1)};
+/* v106.2: «مبلغ و روز واریز» = پنجره زمان‌بندی همه واریزی‌های همین سند (wsOpen، 15zz-zwsched) */
+ACT.wdAmt=d=>{if(!remCan()){toast(REMNO,true);return}const e=entries.find(z=>String(z.id)===String(d.e));if(!e||!e.wd)return;wsOpen(e.wd.cu,e.wd.no)};
 ACT.waQ=d=>{if(!WA)return;WA.v=+d.v;$('sheet').innerHTML=waHTML();waBind()};
 ACT.waSave=()=>{const I=waInfo();if(!I)return;const X=WA.v===''?I.cur:Math.round(+WA.v);if(X>I.max){toast('حداکثر '+fmt(I.max)+' تومان',true);return}if(X<I.lock){toast('حداقل '+fmt(I.lock)+' تومان (بخش ارسال‌شده)',true);return}
   const d=X-I.cur;if(!d){WA=null;closeSheet();return}const got=wdAdj(I.e,d);saveE();saveD();logA('split','ویرایش مبلغ واریزی سند',fullName(I.e)+' | سند '+toFa(I.e.wd.no)+' | '+fmt(I.cur)+' ← '+fmt(I.cur+(d>0?got:-got))+' تومان',{ids:[I.e.id]});

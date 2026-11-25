@@ -176,7 +176,7 @@ ACT.dkF=d=>{qaRead();const a=sv.qa,D=a.d,[ty,v]=String(d.id).split(':');a.q='';a
     if(BUY&&!dkRateOk())return;if(SW&&v==='misc'){xrStart(xrNew('buy','gold',{cat:'تعویض',ay:740,fl:'gold',fd:'swap'}));return}
     xrStart(xrNew(T,'gold',{cat:v==='ab'?'آبشده':'متفرقه',ay:v==='ab'?750:xrAy(T,false,'متفرقه'),fl:'gold',fd:D,...X}));return}};
 const dkRateOk=()=>{if(sv.rate)return true;toast('اول مظنه یا نرخ گرم را بالای سند بزنید',true);const m=$('svM');if(m)m.focus();return false};
-ACT.dkD=d=>{qaRead();const a=sv.qa,k=d.d||'';a.d=k;a.s='';a.q='';a.pk='';
+ACT.dkD=d=>{qaRead();const a=sv.qa,k=d.d||'';a.d=k;a.s='';a.q='';a.pk='';a.gw=null;
   if(dkBk()&&BKX[k]&&BKX[k][1]){pyStart(pyNew('bkx',{k,dir:BKX[k][1]>0?'out':'in',fl:1}));return}
   if(k==='add'||k==='sub'){pyStart(pyNew('adj',{dir:k==='add'?'in':'out',fl:1}));return}
   if(k==='ret'){if(!dkRateOk()){a.d='';svKeep();qaRe();return}a.d='';xrStart(xrNew('buy','gold',{cat:'مرجوعی',ay:750,fl:'gold',fd:k}));return}

@@ -228,7 +228,7 @@ function validated0(){
   for(const c in codes){const G=codes[c];if(G.length<2)continue;const w0=G[0].wd;if(w0&&G.every(r=>r.wd&&String(r.wd.cu)===String(w0.cu)&&String(r.wd.no)===String(w0.no)))continue;G.forEach(r=>{r.issues.push('شماره فاکتور تکراری');r.level=2})}
   /* v88.6 (خواسته صاحب اپ): دو واریزی از «یک سند» با همان شبا و همان مبلغ = خطا (واریز دوباره)؛ بقیه هم‌شبا/هم‌مبلغ‌ها همان هشدار قبلی */
   for(const k in keys){const G=keys[k];if(G.length<2)continue;const D={};G.forEach(r=>{if(r.wd){const d=r.wd.cu+'|'+r.wd.no;(D[d]=D[d]||[]).push(r)}});
-    G.forEach(r=>{const same=r.wd&&D[r.wd.cu+'|'+r.wd.no].length>1;if(same){r.issues.push('واریزی تکراری از یک سند (شبا و مبلغ یکسان)');r.level=2}else{r.issues.push('شبا و مبلغ تکراری');r.level=Math.max(r.level,1)}})}
+    G.forEach(r=>{const S=r.wd?D[r.wd.cu+'|'+r.wd.no]:[],same=S.filter(z=>(z.payDate||'')===(r.payDate||'')).length>1;/* v106.2: یک سند که مبلغش برای چند روز مختلف تقسیم شده (زمان‌بندی واریز) تکراری نیست */if(!same&&S.length>1&&S.length===G.length)return;if(same){r.issues.push('واریزی تکراری از یک سند (شبا و مبلغ یکسان)');r.level=2}else{r.issues.push('شبا و مبلغ تکراری');r.level=Math.max(r.level,1)}})}
   const PC={};L.forEach(r=>{if(r.splitOf!=null)PC[r.splitOf]=(PC[r.splitOf]||1)+1});
   L.forEach(r=>{r.bankShow=ibanBank(r.iban)||r.bank;r.acct=acctOf(r.iban);r.card=r.card||'';const pk=r.splitOf!=null?r.splitOf:r.id;if(PC[pk])r.pcs=PC[pk]});return L}
 const dayList=()=>validated().filter(r=>r.entryDate===dateVal);
