@@ -21,7 +21,7 @@ const INVD={paper:'b14',bg:'c',ink:'c',frame:'g',copy:0,
   aj:'p',pp:'p',rt:'m',
   rh:5.5,fs:0,cap:'a',sum:1,ex:1,py:1,tn:1,fill:'b',
   acc:1,ap:1,ad:1,ag:'y',ax:'a',an:1,lg:1,wr:'w',wds:1,wdt:'',
-  /* v100.5 (صاحب اپ: «سود بیشتر از ۷ مثلاً ۷٫۰۱ ذخیره می‌شود؛ همان ۷ بزند») درصد سود در چاپ بدون اعشار (فقط نوشته؛ مبلغ‌ها دست نمی‌خورد) */ppi:1,/* v107.6 (صاحب اپ: «تخفیف باید در سود نهایی تأثیر بگذارد و سود واقعی را بزند»): تخفیف از سود کالاهای فروخته‌شده کم می‌شود */dpf:1,
+  /* v100.5 (صاحب اپ: «سود بیشتر از ۷ مثلاً ۷٫۰۱ ذخیره می‌شود؛ همان ۷ بزند») درصد سود در چاپ بدون اعشار (فقط نوشته؛ مبلغ‌ها دست نمی‌خورد) */ppi:1,/* v107.8: کنار ردیف تخفیف «از سود کم شد · سود نهایی n٪» (ردیف کالا دست نمی‌خورد) */dpf:1,
   /* v99.3 «تنظیم جای چاپ روی کاغذ»، جدا برای هر راه چاپ (a = اپ اندروید، i = آیفون، w = کامپیوتر/مرورگر): psk؟ = اندازه ٪، psx؟ = جابه‌جایی به راست (میلی‌متر، منفی = چپ)،
      psy؟ = جابه‌جایی به پایین. فقط هنگام چاپ اعمال می‌شود (prCal)، نه در خود برگه. نام‌ها عمداً بلندند: py از قبل «هر پرداخت یک ردیف / یک ردیف جمع» است */pska:100,psxa:0,psya:0,pski:100,psxi:0,psyi:0,pskw:100,psxw:0,psyw:0,
   /* v99.4 کشیدن جدا: psw؟ = چند درصد به عرض چاپ اضافه/کم شود، psh؟ = به ارتفاع (روی اندازه psk؟ می‌نشیند؛ ۰ = بدون کشیدگی) */pswa:0,psha:0,pswi:0,pshi:0,psww:0,pshw:0,
@@ -158,7 +158,7 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
      (u تحویل به مشتری · v دریافت از مشتری) و از دریافت/پرداخت «وجه» جدا هستند؛ ستون آخر هر ردیف طلا همان وزن ۷۵۰ی است که به حساب طلا می‌نشیند */
   const GR={s:[],b:[],u:[],v:[],w:[],i:[],o:[],p:[],z:[]},XP=[],FST={},r3=v=>Math.round(v*1000)/1000;if((t.items||[]).length)FST.s=-1;
   its.forEach(it=>{const J=ajPT(it),ay=+it.ay||750,mz=mzOf2(it),pg=Math.round(mz/MZK*ay/750),ajE=[J.P?toFa(String(J.P))+'٪':'',J.T?fmt(J.T):''].filter(Boolean).join(' + '),ppE=+it.amT>0?'':[+it.pp?ppT(+it.pp):'',+it.pp&&+it.ppT?fmt(Math.round(+it.ppT)):''].filter(Boolean).join(' + '),w7=r3((+it.w||0)*ay/750);
-    GR.s.push({wv:+it.w||0,prv:+it.prv||0,pb:(+it.gold||0)+(+it.ajv||0),ppE0:ppE,abA:it.ab?toFa(ay):'',n:esc(it.k+dsP(it)),e:[it.sh===1?'شرطی':''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
+    GR.s.push({wv:+it.w||0,prv:+it.prv||0,pb:(+it.gold||0)+(+it.ajv||0),abA:it.ab?toFa(ay):'',n:esc(it.k+dsP(it)),e:[it.sh===1?'شرطی':''],lab:it.lab?esc(it.lab):'',ang:it.ang?esc(toFa(it.ang)):'',w7d:Math.abs(w7-(+it.w||0))>.0005,rv:S.rt==='g'?pg:mz,am:nm(it.tot),av:+it.tot||0,
       c:{w:[wFmt(it.w)+' <u>گرم</u>'],ay:[toFa(ay)],w7:[wFmt(w7)],rt:[fmt(S.rt==='g'?pg:mz)],gv:[+it.gold?fmt(it.gold):''],
         /* v91.5 (خواسته صاحب اپ): «فقط درصد» — اگر اجرت/سود تومانی وارد شده، درصدش از روی مبلغ طلا حساب می‌شود */
         aj:!ajE&&!+it.ajv?['']:S.aj==='o'?[+it.gold&&+it.ajv?pctT(it.ajv/it.gold*100):ajE]:S.aj==='t'?[+it.ajv?fmt(it.ajv):'']:S.aj==='b'&&J.P&&+it.ajv?[ajE,fmt(it.ajv)]:[ajE],
@@ -175,13 +175,10 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
     const k=a>0?'دریافت':'پرداخت',off=p.m==='adj'&&p.why==='تخفیف'||p.m==='off',ds=off?'تخفیف':esc(nl(pyLab(p,1)).replace(/^(دریافت|پرداخت)\s*/,''))||k;if(a>0){inS+=a;if(off)offR=1}else outS-=a;
     PY[a>0?'i':'o'].push({n:ds,py:k,off,e:[S.tn&&p.tn?'پیگیری '+esc(toFa(p.tn)):''],am:nm(a),av:Math.abs(a)})});
   const disc=+t.disc||0;if(disc){PY.i.push({n:'تخفیف',py:'دریافت',off:1,e:[],am:nm(disc),av:disc});offR=1}
-  /* v107.6 (صاحب اپ: «تخفیف باید در سود نهایی تأثیر بگذارد و سود واقعی را بزند»): تخفیف از سود کالاهای فروخته‌شده کم می‌شود — به نسبت سود هر ردیف؛
-     ستون سود «سود واقعی» را نشان می‌دهد و مبلغ ردیف همان مبلغ پس از تخفیف است؛ آن‌چه از کل سود بیشتر باشد همان ردیف «تخفیف» می‌ماند. جمع و مانده‌ها عوض نمی‌شوند */
-  if(S.dpf){const OF=PY.i.filter(r=>r.off),D=OF.reduce((q,r)=>q+r.av,0),IT=GR.s.filter(r=>r.prv>0),P=IT.reduce((q,r)=>q+r.prv,0);
-    if(D>0&&P>0){const use=Math.min(D,P);let left=use;IT.forEach((r,i)=>{const dd=i===IT.length-1?left:Math.round(use*r.prv/P);left-=dd;const p2=r.prv-dd,pc=r.pb>0?p2/r.pb*100:0;
-        r.av-=dd;r.am=nm(r.av);r.c.pp=S.pp==='t'||!r.ppE0?[fmt(Math.round(p2))]:S.pp==='b'?[ppT(pc),fmt(Math.round(p2))]:[ppT(pc)];r.e=[...(r.e||[]),'سود پس از تخفیف']});
-      let u=use;for(const r of OF){const k=Math.min(u,r.av);r.av-=k;r.am=nm(r.av);u-=k;if(!u)break}
-      PY.i=PY.i.filter(r=>!r.off||r.av>0);inS-=use;offR=PY.i.some(r=>r.off)?1:0}}
+  /* v107.8 (صاحب اپ: «ستون ردیف را خراب نکند، ولی درصد سود نهایی را بزند؛ در ردیف تخفیف بزند که چقدر از سود کم شده»):
+     ردیف کالا همان می‌ماند (مبلغ و سود ثبت‌شده)؛ کنار ردیف «تخفیف» نوشته می‌شود که از سود کم شده و سود نهایی کالاها چند درصد شده است */
+  if(S.dpf){const OF=PY.i.filter(r=>r.off),D=OF.reduce((q,r)=>q+r.av,0),IT=GR.s.filter(r=>r.prv>0),P=IT.reduce((q,r)=>q+r.prv,0),PB=IT.reduce((q,r)=>q+r.pb,0);
+    if(D>0&&P>0&&PB>0){const pc=(P-D)/PB*100;OF.forEach(r=>{r.e=[...(r.e||[]).filter(Boolean),'از سود '+ppT(P/PB*100)+' کم شد','سود نهایی '+ppT(pc)]})}}
   /* «ردیف‌های دریافت و پرداخت» خاموش: پول‌های هر گروه یک ردیف می‌شوند (نوع‌ها کنار نام) */
   for(const k of ['i','o']){const L=PY[k];if(S.py||L.length<2)GR[k].push(...L);else{const sm=L.reduce((s,r)=>s+r.av,0);GR[k].push({n:(k==='i'?'دریافت':'پرداخت')+' · '+toFa(L.length)+' فقره',py:'',e:[[...new Set(L.map(r=>r.n.replace(/ · .*$/,'')))].slice(0,5).join('، ')],am:nm(sm),av:sm,off:L.every(r=>r.off)})}}
   GR.p.push(...XP);
