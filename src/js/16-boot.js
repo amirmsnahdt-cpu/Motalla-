@@ -64,7 +64,7 @@ try{history.replaceState({n:'home'},'')}catch(e){}
 const KVA={m_entries:v=>{entries=(v||[]).map(e=>({...e,entryDate:e.entryDate||dateVal,name:stripName(e.name)}))},m_sources:v=>{sources=v||[]},m_batches:v=>{batches=(v||[]).map(b=>({...b,items:(b.items||[]).map(x=>({...x,name:stripName(x.name)}))}))},
   m_creds:v=>{creds=v||[]},m_custs:v=>{custs=v||[]},m_vv:v=>{VV=v&&typeof v==='object'&&!Array.isArray(v)?v:{}},m_trash:v=>{trash=v||[]},m_audit:v=>{audit=v||[]},m_drafts:v=>{drafts=v&&typeof v==='object'?v:{}}};
 function bootGo(){/* داده اصلی نه در localStorage هست نه در IndexedDB ولی گوشی خود را همگام می‌داند → همه از سرور */try{if(SY.since>0&&['m_custs','m_entries'].some(k=>!KVF.includes(k)&&LS.getItem(k)==null))SY.since=0}catch(e){}
-  if(ME)user=ME.name;applyPerms();syncInit();/* v108.2: از این لحظه همگام‌سازی مجاز است (داده گوشی کامل خوانده شده) */SY.boot=1;
+  if(ME)user=ME.name;applyPerms();syncInit();/* v108.2: از این لحظه همگام‌سازی مجاز است (داده گوشی کامل خوانده شده) */SY.boot=1;try{audSpamPurge()}catch(e){}
   try{if(sessionStorage.getItem('m_back_settings')){sessionStorage.removeItem('m_back_settings');if(ME&&TOKEN)cur='settings'}}catch(e){}
   render(true);
   if(!TOKEN)showAuth();else{if(!PVW){let d=0;try{d=LS.getItem('m_rsy1')}catch(e){}if(!d){SY.since=0;SY.rsy=1}}setSync(navigator.onLine===false?'off':'busy');syncNow()}}

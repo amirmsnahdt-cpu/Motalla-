@@ -127,14 +127,20 @@ function applyRemote(res,sent){const touched=new Set(),byColl={},NEWAUD=[];
   if(touched.size){alloc=null;try{if(typeof audPrime==='function')audPrime([...touched].filter(c=>c!=='audit'))}catch(e){}remoteRefresh()}
   if(NEWAUD.length&&!res.full&&SY.scanned&&typeof tlNotify==='function')try{tlNotify(NEWAUD)}catch(e){}
   if(SY.scanned&&!SY.manual){const k=(SY.newN||0)-(SY.annN||0);if(k>0&&res.changes&&res.changes.length&&!res.full){SY.annN=SY.newN;if(!SY.quiet)toast(toFa(k)+' مورد تازه دریافت شد')}else SY.annN=SY.newN}}
+/* v108.4 (صاحب اپ: «تاریخچه در آیفون الکی به‌روز می‌شود و لگ دارد» — ۴۰۰ ردیف «پرداخت خودکار از واریزی» در یک دقیقه):
+   نوشتن‌های خودکار (پرداخت سند از واریزی‌های تأییدشده wdSync، سند روز کارتخوان، لیست واریز بانک، حساب‌های پرداخت‌کننده…) روی هر رسم صفحه اجرا می‌شوند.
+   گوشی‌ای که داده‌اش ناقص بود چیز دیگری حساب می‌کرد، سندها را «اصلاح» می‌کرد، گوشی دیگر برمی‌گرداند و این رفت‌وبرگشت بی‌پایان بود.
+   حالا این نوشتن‌ها فقط وقتی انجام می‌شود که در همین اجرا داده گوشی با اثر انگشت سرور خوانده باشد (SY.ckOk=1) — یا اصلاً سروری در کار نباشد */
+const autoOk=()=>!TOKEN||(SY.boot&&SY.ckOk===1);
 /* v108.2: وارسی داده گوشی با اثر انگشت سرور؛ ناهمخوانی = یک همگام‌سازی کامل (داده‌های در صف ارسال حفظ می‌شوند) */
+function ckOkSet(v){const was=SY.ckOk;SY.ckOk=v;if(v===1&&was!==1)setTimeout(()=>{try{remoteRefresh()}catch(e){}},0)}
 function ckLocal(c){const M=VV[c]||{};let n=0,x=0;for(const r of SYNC[c].get()){if(!r||r.id==null)continue;n++;x+=+M[String(r.id)]||0}return {n,x}}
-function ckCheck(ck){if(!ck||typeof ck!=='object'||pendN()||SY.again)return;const bad=[];
+function ckCheck(ck){if(!ck||typeof ck!=='object'){/* سرور قدیمی بی اثر انگشت */ckOkSet(1);return}if(pendN()||SY.again)return;const bad=[];
   for(const c in SYNC){if(c==='audit')continue;const s=ck[c]||{n:0,x:0},l=ckLocal(c);if(l.n!==(+s.n||0)||l.x!==(+s.x||0))bad.push(c+' '+l.n+'/'+(+s.n||0))}
-  SY.ckBad=bad;if(!bad.length)return;const now=Date.now();if(now-(SY.ckAt||0)<10*60e3)return;SY.ckAt=now;
+  SY.ckBad=bad;if(!bad.length){ckOkSet(1);return}ckOkSet(0);const now=Date.now();if(now-(SY.ckAt||0)<10*60e3)return;SY.ckAt=now;
   try{console.warn('sync check: phone data differs from server → full sync',bad)}catch(e){}SY.since=0;SY.quiet=1;syncSoon(30);setTimeout(()=>{SY.quiet=0},8000)}
 /* v71.8: فرم خرید دستی (buy) هم وسط پر کردن با داده همکارها دوباره ساخته نمی‌شود */const canRender=()=>!['entry','bulk','cwiz','pwiz','buy','bdoc','invset'].includes(cur)&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&!document.querySelector('.swr.on');
-function remoteRefresh(){window.__audbg=(window.__audbg||0)+1;try{entItSyncAll()}catch(e){}finally{window.__audbg--}/* v72.0 */if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}
+function remoteRefresh(){window.__audbg=(window.__audbg||0)+1;try{if(autoOk())entItSyncAll()}catch(e){}finally{window.__audbg--}/* v72.0 */if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}
 document.addEventListener('focusout',()=>setTimeout(()=>{if(SY.needRender&&canRender())remoteRefresh()},250));
 setInterval(()=>{if(TOKEN&&document.visibilityState==='visible')syncNow()},4000);
 setInterval(()=>{if(TOKEN&&document.visibilityState!=='visible')syncNow()},60000);
@@ -312,3 +318,6 @@ let quietT=0;function quietRefresh(){if(!TOKEN||Date.now()-quietT<2500)return;qu
     /* v59.1: بعد از تازه‌سازی، ردیف‌های خانه از پایین پشت سر هم بالا بیایند (قبلاً فقط ۳۴ پیکسل سر جایشان می‌لغزیدند) */
     const vv=V(),y=vv.scrollTop,fr=cur==='home';if(fr)render._v='';render();vv.scrollTop=y;if(fr){const pn=hp();if(pn){pn.querySelectorAll(':scope>*:not(.grab)').forEach(l=>{l.style.transition='';l.style.transform=''});riseIn(pn,':scope>.bph,:scope>.fday,.blist>.swr,:scope>.hmore,:scope>.lrow,:scope>.hpast,:scope>.ball')}}flashNew();refreshMsg(r)};
   document.addEventListener('touchend',end,{passive:true});document.addEventListener('touchcancel',end,{passive:true});})();
+/* v108.4: ردیف‌های تکراری «پرداخت خودکار از واریزی» که رفت‌وبرگشت قبلی ساخته و هنوز به سرور نرفته‌اند پاک می‌شوند (هرگز به سرور نرسیده‌اند) */
+function audSpamPurge(){const K='پرداخت خودکار از واریزی',D=audit.filter(a=>a&&a.summary===K&&('audit|'+a.id) in SY.pend);if(D.length<5)return;const KP=new Map();for(const a of D){const k=String(a.note||'').split('|').slice(0,2).join('|'),o=KP.get(k);if(!o||String(a.ts||'')>String(o.ts||''))KP.set(k,a)}const S=new Set(D.filter(a=>!new Set(KP.values()).has(a)).map(a=>String(a.id)));if(!S.size)return;
+  audit=audit.filter(a=>!(a&&S.has(String(a.id))));for(const id of S)delete SY.pend['audit|'+id];rawSet('m_audit',audit);rawSet('m_pend',SY.pend);try{console.warn('removed '+S.size+' queued duplicate history rows')}catch(e){}}

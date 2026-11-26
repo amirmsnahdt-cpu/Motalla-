@@ -66,7 +66,7 @@ function wdSched(c,t){if(!c||!t)return [];const K=x=>String(x.date||'')+'|'+Stri
     wdParts(e,S,A).forEach(p=>{const x=(p.t==='b'&&p.ent!=null&&entries.find(z=>z.id===p.ent))||e,dt=PD(x)||PD(e)||'';const o=M.get(dt)||M.set(dt,{d:dt,a:0,n:0}).get(dt);o.a+=p.a;o.n++})});
   return [...M.values()].filter(o=>o.a>0).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0)}
 /* همگام‌سازی: ردیف‌های پرداخت سند با بخش‌های تأییدشده واریزی‌ها (دو طرفه؛ تکراری‌ها یکی می‌شوند) */
-let wdBusy=false;
+let wdBusy=false;const WDLOG=new Map();
 /* v102.5: داده‌هایی که پیش از این رفع خراب شده‌اند (wd.amt بزرگ‌تر یا کوچک‌تر از واریزی واقعی) — فقط برای واریزی‌های «واریز به مشتری» از سند معمولی؛
    سند خودکار «خرید دستی» دست نمی‌خورد (ترمیم آن با depDocHeal است) */
 function wdAmtHeal(R){let ch=0;for(const e of R){const D=typeof depDoc==='function'?depDoc(e):null;if(D&&D.t.auto==='dep')continue;const a=wdFamAmt(e);if(a>0&&Math.round(+e.wd.amt||0)!==a){e.wd.amt=a;ch=1}}if(ch){const f=()=>saveE();typeof audBg==='function'?audBg(f):f()}}
@@ -81,7 +81,7 @@ function wdSync(){if(wdBusy)return;const R=wdRoots();try{wdAmtHeal(R)}catch(_){}
         if(seen.has(p.wk)){tc=true;continue}const o=want.get(p.wk);if(!o&&live.has(String(p.entId))){tc=true;continue}seen.add(p.wk);
         if(o&&(Math.abs(pAmt(p))!==o.a||(p.src||'')!==(o.src||'')||(p.tn||'')!==(o.tn||'')||!!p.w!==!!o.w)){p.amount=-o.a;p.src=o.src||'';p.tn=o.tn||'';if(o.w)p.w=1;else delete p.w;tc=true}P.push(p)}
       L.forEach(o=>{if(seen.has(o.k))return;seen.add(o.k);P.push({m:'wd',dir:'out',amount:-o.a,wk:o.k,entId:o.ent,src:o.src||'',nm:o.nm||'',tn:o.tn||'',q:'',at:o.at||now,...(o.w?{w:1}:{})});tc=true});
-      if(tc){t.pays=P;c.lastAt=now;ch=true;logA('cust','پرداخت خودکار از واریزی',cuName(c)+' | '+invTitle(t)+' | '+fmt(L.reduce((s,o)=>s+o.a,0))+' تومان تأییدشده')}}}
+      if(tc){t.pays=P;c.lastAt=now;ch=true;/* v108.4: هر وضعیت یک سند فقط یک بار در تاریخچه */const sg=P.filter(p=>p.m==='wd').map(p=>p.wk+':'+pAmt(p)).sort().join(','),lk=String(t.id);if(WDLOG.get(lk)!==sg){WDLOG.set(lk,sg);if(WDLOG.size>3000)WDLOG.clear();logA('cust','پرداخت خودکار از واریزی',cuName(c)+' | '+invTitle(t)+' | '+fmt(L.reduce((s,o)=>s+o.a,0))+' تومان تأییدشده')}}}}
     if(ch){saveCu();if(sv&&sv.edit){const c=svCu(),t=c&&(c.txs||[]).find(x=>!x.del&&x.type==='inv'&&String(x.no)===String(sv.edit.no));if(t){const keep=sv.pays.filter(p=>p.m!=='wd');sv.pays=keep.concat((t.pays||[]).filter(p=>p.m==='wd').map(p=>({...p})));svKeep()}}}}
   finally{wdBusy=false}}
 /* ردیف «رفته برای واریز» (در انتظار تأیید) در فهرست ردیف‌های سند — در جمع حساب نمی‌آید */
