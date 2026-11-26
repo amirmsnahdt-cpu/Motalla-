@@ -7,11 +7,11 @@
 let WRN=null,WRNT=0;
 function warnClose(now){clearTimeout(WRNT);const P=$('wrnp'),B=$('wrnbd');if(!P&&!B)return;const rm=()=>{if(P)P.remove();if(B)B.remove()};
   if(now||RM()||!P||!P.animate){rm();return}P.id='';if(B)B.id='';P.animate([{opacity:1,transform:'translate(-50%,0) scale(1)'},{opacity:0,transform:'translate(-50%,-8px) scale(.96)'}],{duration:160,easing:'ease-in',fill:'forwards'});if(B)B.animate([{opacity:1},{opacity:0}],{duration:160,fill:'forwards'});setTimeout(rm,170)}
-function askWarn(o){o=o||{};warnClose(1);WRN={go:o.go||null,focus:o.focus||''};const k=o.kind==='warn'?'wrw':'wre';/* نام کلاس کوتاه مثل er/wr با کلاس‌های قدیمی برنامه قاطی می‌شود */
+function askWarn(o){o=o||{};warnClose(1);WRN={go:o.go||null,focus:o.focus||''};const k=o.kind==='warn'?'wrw':o.kind==='ok'?'wrk':o.kind==='info'?'wri':'wre';/* نام کلاس کوتاه مثل er/wr با کلاس‌های قدیمی برنامه قاطی می‌شود */
   const bd=document.createElement('div');bd.className='cntbd wrnbd';bd.id='wrnbd';bd.onclick=()=>ACT.warnX();document.body.appendChild(bd);
   const P=document.createElement('div');P.className='cntp wrnp '+k+(o.mini?' wmini':'');P.id='wrnp';P.setAttribute('role','alertdialog');P.setAttribute('aria-live','assertive');
   P.innerHTML=`<div class="cnth"><span class="cnthi">${ic(o.ico||'info')}</span><span class="tx"><b>${o.t||'توجه'}</b>${o.sub?`<small>${o.sub}</small>`:''}</span><button type="button" class="cntx" data-act="warnX" aria-label="بستن">${ic('x')}</button></div>
-  ${o.h?`<div class="wrnb">${o.h}</div>`:''}<div class="wrnf"><button type="button" class="wrnok" data-act="warnX">${o.ok||'متوجه شدم'}</button>${o.go?`<button type="button" class="wrngo" data-act="warnGo">${o.goT||'با همین ثبت شود'}</button>`:''}</div>`;
+  ${o.h?`<div class="wrnb">${o.h}</div>`:''}<div class="wrnf"><button type="button" class="wrnok" data-act="warnX">${o.ok||'متوجه شدم'}</button>${o.go?`<button type="button" class="wrngo${o.goMain?' pri':''}" data-act="warnGo">${o.goT||'با همین ثبت شود'}</button>`:''}</div>`;
   document.body.appendChild(P);if(document.activeElement&&document.activeElement.blur&&!o.keepKb)document.activeElement.blur();
   if(!RM()&&P.animate){P.animate([{opacity:0,transform:'translate(-50%,-12px) scale(.93)'},{opacity:1,transform:'translate(-50%,0) scale(1)'}],{duration:360,easing:'cubic-bezier(.2,1.3,.4,1)'});bd.animate([{opacity:0},{opacity:1}],{duration:220,fill:'both'});
     const I=P.querySelector('.cnthi');if(I)I.animate([{transform:'scale(.5) rotate(-12deg)'},{transform:'scale(1.12)'},{transform:'none'}],{duration:480,easing:'cubic-bezier(.2,1.2,.4,1)'})}

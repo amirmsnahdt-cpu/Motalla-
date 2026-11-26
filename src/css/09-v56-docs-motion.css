@@ -5885,3 +5885,24 @@ small.bccd{direction:ltr;text-align:right;font-family:ui-monospace,monospace;let
 #sheet .sh-h>.xgo.xtop.galsv~.xgo.xtop{margin-inline-start:0}
 #sheet .sh-h:has(>.galsv)>.xgo.xtop svg{width:17px;height:17px;flex:none;transform:none!important}
 @media (max-width:370px){#sheet .sh-h:has(>.galsv)>.xgo.xtop{padding:0;width:38px;justify-content:center}#sheet .sh-h:has(>.galsv)>.xgo.xtop span{display:none}}
+
+/* v108.8 بررسی خودکار رسید: کارت سبز (درست) و آبی (بخشی)، عکس کوچک رسید کنار مبلغ‌ها، نوار «در حال بررسی» */
+.wrnp.wrk{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--grn,#15803d) 45%,transparent),0 0 0 6px color-mix(in srgb,var(--grn,#15803d) 10%,transparent),0 28px 60px -18px rgb(16 32 70/.55)}
+.wrnp.wrk .cnthi{background:var(--grn,#15803d)}.wrnp.wrk .wrnb{background:color-mix(in srgb,var(--grn,#15803d) 7%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--grn,#15803d) 22%,transparent)}
+.wrnp.wrk .wrnok{background:var(--grn,#15803d);box-shadow:0 10px 20px -12px color-mix(in srgb,var(--grn,#15803d) 80%,transparent)}
+.wrnp.wri{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--blu) 40%,transparent),0 0 0 6px color-mix(in srgb,var(--blu) 9%,transparent),0 28px 60px -18px rgb(16 32 70/.55)}
+.wrnp.wri .cnthi{background:var(--blu)}.wrnp.wri .wrnb{background:color-mix(in srgb,var(--blu) 6%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blu) 18%,transparent)}
+.wrngo.pri{background:var(--grn,#15803d);color:#fff;font-weight:900}
+.wrnp:has(.wrngo.pri) .wrnok{background:var(--seg,var(--hair));color:var(--ink);box-shadow:none;font-weight:800}
+.rcvc{display:flex;gap:11px;align-items:flex-start}
+.rcvim{flex:none;width:64px;height:84px;border-radius:12px;background:#ddd center/cover no-repeat;box-shadow:inset 0 0 0 1px rgb(0 0 0/.08)}
+.rcvg{flex:1;min-width:0;display:grid;grid-template-columns:auto 1fr;column-gap:10px;row-gap:1px;align-items:baseline;line-height:1.6}
+.rcvg>span{font-size:12px;color:var(--mut);white-space:nowrap}.rcvg>b{font-size:14.5px;font-weight:900;text-align:end;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcvg>b.ltr{direction:ltr;font-size:12px;font-weight:800}.rcvg>b.rd{color:var(--red)}
+.rcvg>small{grid-column:1/-1;text-align:end;margin:0 0 5px!important;font-size:11.5px;color:var(--mut);overflow-wrap:anywhere}
+.rcvg .ltr{direction:ltr;unicode-bidi:isolate}
+.rcvdel{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:10px;min-height:38px;border:0;border-radius:12px;background:color-mix(in srgb,var(--red) 9%,var(--card));color:var(--red);font:inherit;font-size:13px;font-weight:800;cursor:pointer}.rcvdel svg{width:16px;height:16px}
+#rcvp{position:fixed;z-index:9980;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);transform:translateX(-50%);display:flex;align-items:center;gap:8px;max-width:min(92vw,420px);padding:9px 15px;border-radius:20px;background:var(--ink,#111);color:var(--card,#fff);font-size:13px;font-weight:800;box-shadow:0 12px 30px -10px rgb(0 0 0/.45);pointer-events:none}
+#rcvp span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcvsp{flex:none;width:15px;height:15px;border-radius:50%;border:2.2px solid currentColor;border-top-color:transparent;animation:rcvSp .8s linear infinite}
+@keyframes rcvSp{to{transform:rotate(360deg)}}
