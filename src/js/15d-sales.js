@@ -114,15 +114,16 @@ const svFix=()=>{if(sv.gconv&&!sv.gcOld)sv.gconv=false;/* v88.7: سند قدیم
   /* v61.46: مبلغ دستی قدیمی (با مالیات داخلش) یک بار به «پیش از مالیات» برگردانده می‌شود؛ جمع همان می‌ماند */
   sv.items.forEach(it=>{if(+it.amT>0&&!it.amN){const c=itCalc(it,sv.rate,sv.tax);if(c.fx){it.amT=c.gold+c.aj+c.pr;it.amN=1}}});};
 ACT.svNew=d=>{if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}closeSheet();svQO=0;svCuLim=40;/* v70.6: ورود به سند تازه = فهرست مشتری بسته */const cu=d&&d.cu?d.cu:'',old=ls.get('m_svd',null);
-  if(!(d&&d.fresh)&&old&&(old.v===1||old.v===2)&&((old.items||[]).length||(old.pays||[]).length||(old.xr||[]).length)&&(!cu||String(old.cuId||'')===String(cu)||!old.cuId)){sv=old;if(cu)sv.cuId=cu;toast('پیش‌نویس سند قبلی باز شد','', 'سند تازه',()=>{const dk=sv.dk,fc=sv.fixCu;sv=svBlank(cu);sv.dk=dk;sv.fixCu=fc;svFix();svKeep();render()})}else sv=svBlank(cu);
+  /* v107.9: سند باز همین مشتری (سندهای هم‌زمان) همان باز می‌شود */if(cu&&!(d&&d.fresh)&&typeof svtL==='function'&&!d.pre){const P=svtL().find(o=>String(o.cuId||'')===String(cu)&&!o.edit);if(P){ACT.svtOpenK({k:P.tk});return}}
+  if(!(d&&d.fresh)&&old&&(old.v===1||old.v===2)&&((old.items||[]).length||(old.pays||[]).length||(old.xr||[]).length)&&(!cu||String(old.cuId||'')===String(cu)||!old.cuId)){sv=old;if(cu)sv.cuId=cu;toast('پیش‌نویس سند قبلی باز شد','', 'سند تازه',()=>{const dk=sv.dk,fc=sv.fixCu;sv=svBlank(cu);sv.dk=dk;sv.fixCu=fc;svFix();svKeep();render()})}else{/* v107.9: پیش‌نویس مشتری دیگر دور ریخته نمی‌شود؛ سند باز می‌ماند */if(!(d&&d.fresh)&&old&&(old.v===1||old.v===2)&&typeof svtKeepOld==='function')svtKeepOld(old);sv=svBlank(cu)}
   /* v60.5: نوع سند: فروش یا خرید (فقط عنوان و پیشنهادهای جستجو را عوض می‌کند؛ ساختار سند همان است) */
   sv.dk=d&&d.dk==='buy'?'buy':'';sv.fixCu=!!cu;
   svFix();const k=d&&d.pre;if(k==='in'||k==='out')sv.qa={...qaBlank(),p:pyNew('cash',{dir:k})};else if((k==='hin'||k==='hout')&&d.src!=null)sv.qa={...qaBlank(),p:pyNew('hav',{dir:k==='hout'?'out':'in',srcId:+d.src||d.src})};else if(k==='gin'||k==='gout')sv.qa={...qaBlank(),x:xrNew(k==='gin'?'in':'out','gold')};
   PARENT.sell=cur==='cust'?'cust':cur==='bank'?'bank':'custs';svKeep();go('sell')};
 /* v61.6: سندی که ثبت نشده (خروج ناگهانی از صفحه سند) زیر «سند جدید» در صفحه همان مشتری دیده می‌شود */
 function svDraft(c){const o=ls.get('m_svd',null);if(!o||!(o.v===1||o.v===2)||String(o.cuId||'')!==String(c.id))return null;const n=(o.items||[]).length+(o.xr||[]).length+(o.pays||[]).length;return n?{o,n}:null}
-function svDraftHTML(c){const D=svDraft(c);if(!D)return '';const keep=sv;let T;try{sv=D.o;svFix();T=svTot()}catch(_){T=null}finally{sv=keep}
-  const r=T?T.rest:0;return `<div class="c6dr"><button class="c6drb" data-act="svNew" data-cu="${c.id}"><span class="c6ni">${ic('edit')}</span><span><b>${D.o.edit?'ویرایش ناتمام سند '+toFa(D.o.edit.no):'سند ثبت‌نشده'}</b><small>${toFa(D.n)} ردیف${D.o.date?'، '+esc(dates(D.o.date).fa):''}${r?'، '+ourLab(-r)+' '+fmt(Math.abs(r)):''} · برای ادامه بزنید</small></span>${ic('back').replace('class="i"','class="i flip"')}</button><button class="c6drx" data-act="svDraftDel" aria-label="دور انداختن">${ic('trash')}</button></div>`}
+function svDraftHTML(c){const D=svDraft(c),P=typeof svtCuHTML==='function'?svtCuHTML(c):'';if(!D)return P;const keep=sv;let T;try{sv=D.o;svFix();T=svTot()}catch(_){T=null}finally{sv=keep}
+  const r=T?T.rest:0;return P+`<div class="c6dr"><button class="c6drb" data-act="svNew" data-cu="${c.id}"><span class="c6ni">${ic('edit')}</span><span><b>${D.o.edit?'ویرایش ناتمام سند '+toFa(D.o.edit.no):'سند ثبت‌نشده'}</b><small>${toFa(D.n)} ردیف${D.o.date?'، '+esc(dates(D.o.date).fa):''}${r?'، '+ourLab(-r)+' '+fmt(Math.abs(r)):''} · برای ادامه بزنید</small></span>${ic('back').replace('class="i"','class="i flip"')}</button><button class="c6drx" data-act="svDraftDel" aria-label="دور انداختن">${ic('trash')}</button></div>`}
 ACT.svDraftDel=()=>{const o=ls.get('m_svd',null);askConfirm('سند ثبت‌نشده دور ریخته شود؟','دور انداختن',()=>{ls.set('m_svd',null);render();toast('سند ثبت‌نشده دور ریخته شد','','برگرداندن',()=>{ls.set('m_svd',o);render()})})};
 /* اجرت: درصدی و تومانی با هم (ردیف‌های قدیمی فقط یکی از این دو را دارند) */
 const ajPT=it=>({P:it.ajP!=null?+it.ajP||0:(it.ajU==='p'?+it.aj||0:0),T:it.ajT!=null?+it.ajT||0:(it.ajU==='t'?+it.aj||0:0)});
@@ -178,7 +179,7 @@ function svTot(){let gold=0,aj=0,pr=0,tax=0,w=0;for(const it of sv.items){const 
 const svCu=()=>sv&&sv.cuId?custs.find(c=>!c.del&&(!c.sys||c.sys==='py')&&String(c.id)===String(sv.cuId))||null:null;
 const svHasG=()=>sv.items.length||(sv.xr||[]).some(x=>x.a==='gold'&&(x.t==='sell'||x.t==='buy')&&!x.pgM);
 function vSell(){xaSync();if(!sv){sv=ls.get('m_svd',null)||svBlank('')}svFix();glSync();svUsed=goodsUsed();const D=dates(sv.date);
-  return `<div class="d6">
+  return `<div class="d6">${typeof svtHTML==='function'?svtHTML():''}
   <div class="d6hd"><button class="d6no" data-act="svCal"><small>${sv.items.length?'فاکتور':'سند'}</small><b>${toFa(sv.edit?sv.edit.no:invNext())}</b><span>${ic('cal')}${esc(payLab(sv.date)||D.fa)}</span></button><button type="button" class="d6tx${sv.tax?' on':''}" id="svTx" data-act="svTax" aria-pressed="${!!sv.tax}"><i>${ic('check')}</i><span>مالیات</span><small>۱۰٪</small></button>
     ${rateHTML()}</div>
   <div id="svCu">${svCuHTML()}</div>
@@ -785,7 +786,7 @@ function invSv(c,t){const items=(t.items||[]).map(it=>{const o={...it};['gold','
 /* v61.56 (خواسته صاحب اپ): در صفحه سند ثبت‌شده هم نگه داشتن روی مانده‌های پایین = جزئیات فاکتور (همان پنجره صفحه سند) */
 function invDetHTML(){const X=invGet();if(!X)return '';const keep=sv;try{sv=invSv(X.c,X.t);return svDetHTML({inv:1})}finally{sv=keep}}
 ACT.invEdit=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'ویرایش');return}if(X.t.lk||X.t.bl||X.t.pd){lkGoTx(X.t,'ویرایش');return}if(X.t.legacy){toast('این سند قدیمی است و ویرایش ندارد؛ در صورت نیاز حذف و دوباره ثبت کنید',true);return}if(!can('debt')){toast('دسترسی این بخش برای حساب شما فعال نیست',true);return}const {c,t}=X;
-  sv=invSv(c,t);sv.sig0=svSig();svKeep();TITLES.sell='ویرایش سند '+toFa(t.no);PARENT.sell='inv';go('sell')};
+  /* v107.9: ویرایش ناتمام همین سند که کنار گذاشته شده بود، همان باز می‌شود */const P=typeof svtTake==='function'?svtTake(o=>o.edit&&String(o.edit.tx)===String(t.id)):null;if(P){sv=P;svFix()}else{sv=invSv(c,t);sv.sig0=svSig()}svKeep();TITLES.sell='ویرایش سند '+toFa(t.no);PARENT.sell='inv';go('sell')};
 const aInv=()=>{const X=invGet();return X?ivBalP(X.c,X.t):''};
 ACT.invDel=()=>{const X=invGet();if(!X)return;if(X.t.bd){bdGoTx(X.t,'حذف');return}if(X.t.lk||X.t.bl||X.t.pd){lkGoTx(X.t,'حذف');return}{const g=docDelLock(X.c,X.t);if(g){toast(g,true);return}}askConfirm(invTitle(X.t)+' حذف شود؟ اثرش از حساب مشتری'+(txLinked(X.c,X.t).length?' و مشتری پرداخت‌کننده':'')+' برداشته می‌شود.'+(docWdL(X.c,X.t).length?' '+toFa(docWdL(X.c,X.t).length)+' واریزی این سند هم از لیست واریز حذف می‌شود.':''),'حذف',()=>{custId=X.c.id;cur='cust';ACT.txDel({id:X.t.id});go('cust',true)})};
 /* v61.33: برگه سند (چاپ / PDF) — خواسته صاحب اپ: هر ردیف فقط مشخصات (کالا، وزن، عیار، مظنه، اجرت ٪، سود ٪) و مبلغ نهایی؛

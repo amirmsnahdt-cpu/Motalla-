@@ -409,14 +409,14 @@ ACT.ckAdd=()=>{ckRead();if(CK.m==='rg'){if(CK.amount===''||CK.amount==null)CK.am
       else{const x=validated().find(z=>String(z.id)===String(s.id));if(!x)return;const av=depAvail(x)-ckUsedDep(x.id);if(a>av){toast('بیشتر از مانده واریزی «'+fullName(x)+'» است ('+fmt(av)+')',true);return}sv.pays.push({m:'dep',amount:a,entId:x.id,entName:fullName(x)})}}}
   ckPhPut(n0);CK={m:''};ckBackToDoc()};
 /* v61.32: بعد از افزودن هر دریافت/پرداخت در تسویه، پنجره بسته می‌شود و سند با ردیف تازه و مانده تازه دیده می‌شود */
-function ckBackToDoc(){if(ckFin){ckFin=0;svKeep();closeSheet();setTimeout(()=>{if(cur==='sell')back()},60);return}svKeep();closeSheet();svAdd=-1;svRe();setTimeout(()=>{const r=document.querySelector('#svRows .d6r:last-child');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'});if(r&&!RM()&&r.animate)r.animate([{background:'color-mix(in srgb,var(--blu) 14%,transparent)'},{background:'transparent'}],{duration:900,easing:'ease-out'})},120);
+function ckBackToDoc(){if(ckFin){ckFin=0;svKeep();closeSheet();setTimeout(()=>{if(cur==='sell'){if(typeof svFinish==='function')svFinish();else back()}},60);return}svKeep();closeSheet();svAdd=-1;svRe();setTimeout(()=>{const r=document.querySelector('#svRows .d6r:last-child');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:RM()?'auto':'smooth',block:'center'});if(r&&!RM()&&r.animate)r.animate([{background:'color-mix(in srgb,var(--blu) 14%,transparent)'},{background:'transparent'}],{duration:900,easing:'ease-out'})},120);
   const r=ckRest();toast(r?('ردیف به سند اضافه شد · مانده '+fmt(Math.abs(r))):(ckAcct()?'حساب تسویه شد ✓':'سند تسویه شد ✓'))}
 ACT.ckDel=d=>{const L=d.k==='xr'?sv.xr:sv.pays;if(d.k!=='xr'&&L[+d.i]&&L[+d.i].m==='wd'){ACT.svWdRow();return}L.splice(+d.i,1);svKeep();svRe();ckRe()};
 /* «پایان» = ثبت و خروج از سند (همان ثبت خودکار خروج) */
 /* v80.4 رفع باگ: اگر فرم یک روش (حواله، نقد، کارتخوان…) باز و مبلغ پر بود و «پایان و ثبت» زده می‌شد، آن ردیف بی‌صدا دور ریخته
    می‌شد. حالا اول همان ردیف (با همان بررسی‌ها) اضافه می‌شود و بعد سند ثبت؛ اگر چیزی کم باشد پیام می‌دهد و پنجره می‌ماند */
 let ckFin=0;
-ACT.ckSave=()=>{ckRead();if(CK&&CK.m==='bfix'){bfxRead();if(CK.bt!==''&&CK.bt!=null){ckFin=1;try{bfxApply()}finally{ckFin=0}return}}if(CK&&CK.m&&(+CK.amount>0||+CK.w>0)){ckFin=1;try{ACT.ckAdd()}finally{ckFin=0}return}closeSheet();setTimeout(()=>{if(cur==='sell')back()},60)};
+ACT.ckSave=()=>{ckRead();if(CK&&CK.m==='bfix'){bfxRead();if(CK.bt!==''&&CK.bt!=null){ckFin=1;try{bfxApply()}finally{ckFin=0}return}}if(CK&&CK.m&&(+CK.amount>0||+CK.w>0)){ckFin=1;try{ACT.ckAdd()}finally{ckFin=0}return}closeSheet();setTimeout(()=>{if(cur==='sell'){if(typeof svFinish==='function')svFinish();else back()}},60)};
 /* ثبت تسویه‌های «حواله به فروشنده واریزی» روی همان واریزی‌ها (بعد از ساخته شدن سند) */
 /* v61.75 (خواسته صاحب اپ): حواله دوطرفه — تسویه روی واریزی به حساب همین مشتری پیوند دارد (cuId، مثل ثبت دستی با انتخاب مشتری؛
    اثرش فقط در سند است، byInv)، عکس‌های ردیف سند همان عکس‌های تسویه‌اند، و با ویرایش سند وضعیت/عکس/پیگیری تسویه قبلی می‌ماند (old) */

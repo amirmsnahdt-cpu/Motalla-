@@ -5760,3 +5760,34 @@ button.ptm-tn{border:0;font:inherit;text-align:start;cursor:pointer}
 .ivox button.on{background:var(--blu);color:#fff;box-shadow:none}
 .ivox button svg{width:17px;height:17px;flex:none}
 .ivox button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* v107.9 سندهای هم‌زمان: نوار سندهای باز بالای صفحه سند (15zz-zzt) */
+.svtb{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;margin:0 -16px 12px;padding:2px 16px 6px;scroll-padding-inline:16px}
+.svtb::-webkit-scrollbar{display:none}
+.svtc{flex:none;position:relative;display:flex;align-items:center;min-width:0;max-width:min(62vw,240px);height:52px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line),0 1px 2px rgba(15,23,42,.05);transition:box-shadow .2s}
+.svtc.on{padding:0 12px 0 10px;gap:8px;background:var(--blu);color:#fff;box-shadow:0 6px 16px -8px var(--blu)}
+.svtg{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;min-width:0;height:100%;padding:0 8px 0 10px;cursor:pointer;border-radius:16px}
+.svtt{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.svtt b{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svtt small{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svtc.on .svtt small{color:rgba(255,255,255,.82)}
+.svta{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:900;background:hsl(var(--h,214) 62% 93%);color:hsl(var(--h,214) 55% 38%);box-shadow:inset 0 0 0 1px hsl(var(--h,214) 45% 85%)}
+.svta.q{background:var(--blu2);color:var(--blu);box-shadow:none}.svta .i{width:16px;height:16px}
+.svtc.on .svta{background:rgba(255,255,255,.22);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.svtx{all:unset;box-sizing:border-box;flex:none;width:30px;height:30px;margin-inline-end:7px;border-radius:50%;display:grid;place-items:center;color:var(--mut);background:var(--bg);cursor:pointer}
+.svtx .i{width:14px;height:14px}
+.svtn{all:unset;box-sizing:border-box;flex:none;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;width:66px;height:52px;padding:0 4px;border-radius:16px;color:var(--blu);background:var(--blu2);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--blu) 35%,transparent);cursor:pointer;font-weight:800;font-size:13.5px}
+.svtn .i{width:19px;height:19px}.svtn span{font-size:10.5px;line-height:1.15;white-space:nowrap}
+.svtc.pop{animation:svtPop .42s cubic-bezier(.3,1.5,.5,1)}
+@keyframes svtPop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.svtc.pop{animation:none}}
+/* دکمه شناور «N سند باز» در صفحه‌های دیگر */
+#svtf{all:unset;box-sizing:border-box;position:fixed;left:12px;bottom:84px;z-index:60;display:flex;align-items:center;gap:9px;max-width:min(64vw,260px);height:50px;padding:0 14px 0 8px;border-radius:25px;background:var(--blu);color:#fff;box-shadow:0 10px 24px -10px var(--blu),0 2px 6px rgba(15,23,42,.18);cursor:pointer;animation:svtIn .35s cubic-bezier(.3,1.4,.5,1)}
+#svtf.hide{display:none}
+#svtf>span:last-child{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+#svtf b{font-size:13.5px;font-weight:800;white-space:nowrap}
+#svtf small{font-size:11px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svtfi{position:relative;flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.2)}
+.svtfi .i{width:17px;height:17px}
+html.kbo #svtf,html.shopen #svtf{display:none}
+@keyframes svtIn{from{transform:translateY(14px) scale(.9);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){#svtf{animation:none}}
