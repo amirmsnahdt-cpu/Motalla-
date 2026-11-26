@@ -141,7 +141,7 @@ const ls={get(k,d){try{const v=LS.getItem(k);return v?JSON.parse(v):d}catch(e){s
    حالا: (۱) مجموعه‌های بزرگ (BIGK) اگر در localStorage جا نشوند به IndexedDB می‌روند (KVF = فهرست کلیدهایی که آن‌جا هستند؛ بعد از نوشتن موفق،
    کلید از localStorage پاک می‌شود)؛ (۲) تا نوشتن IndexedDB تمام نشده، m_since و m_pend نوشته نمی‌شوند (KV.hold) تا هیچ‌وقت جلوتر از داده نباشند؛
    (۳) اگر جایی برای نوشتن نبود، m_since = 0 تا بار بعد همه داده دوباره گرفته شود. پیش‌نمایش githack به IndexedDB دست نمی‌زند (دامنه مشترک) */
-const BIGK=new Set(['m_entries','m_sources','m_batches','m_creds','m_custs','m_trash','m_audit','m_drafts']);
+const BIGK=new Set(['m_entries','m_sources','m_batches','m_creds','m_custs','m_trash','m_audit','m_drafts','m_vv']);
 let KVF=(()=>{try{const a=JSON.parse((LS&&LS.getItem('m_kvf'))||'[]');return Array.isArray(a)?a:[]}catch(e){return []}})();
 const KV={q:Promise.resolve(),n:0,hold:{},fail:0,db:null,bad:new Set()};/* bad = کلیدهایی که الان نوشته نشده‌اند؛ هشدار «ذخیره ممکن نیست» فقط تا وقتی یکی مانده */
 const stoMark=(k,ok)=>{if(ok)KV.bad.delete(k);else KV.bad.add(k);storeOK=!KV.bad.size};

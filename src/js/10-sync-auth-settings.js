@@ -48,7 +48,15 @@ const SYNC={
     set:v=>{const o={};v.forEach(r=>{if(r&&r.id)o[r.id]=r.parts||[]});drafts=o},key:'m_drafts',cache:()=>drafts}
 };
 const SYNCKEY=new Map(Object.entries(SYNC).map(([c,S])=>[S.key,c]));
-const SY={base:{},pend:ls.get('m_pend',{}),since:+ls.get('m_since',0)||0,busy:false,again:false,t:null,state:'off',last:0,app:null,updNote:false,needRender:false,err:''};
+/* v108.2 (صاحب اپ: «در اندروید واریزی‌هایی هست که در آیفون نیست، با اینکه به‌روز شده؛ از ریشه درست شود»):
+   ریشه: از v104 داده بزرگ آیفون از IndexedDB «بعد از» بالا آمدن برنامه خوانده می‌شد، ولی زمان‌سنج همگام‌سازی (هر ۴ ثانیه، online، visibilitychange)
+   می‌توانست زودتر اجرا شود؛ تغییرهای تازه سرور روی فهرست خالی می‌نشست، «تا کجا گرفته‌ام» جلو می‌رفت و بعد داده کهنه روی آن خوانده می‌شد → آن تغییرها برای همیشه گم.
+   (۱) SY.boot: پیش از خواندن داده (bootGo) نه همگام‌سازی می‌شود نه علامت‌گذاری تغییر؛
+   (۲) VV = نسخه سروری هر رکورد (ver) روی گوشی؛ هر پاسخ سرور اثر انگشت ck (تعداد + جمع ver هر مجموعه) دارد؛ اگر با داده گوشی نخواند و چیزی در صف نیست،
+       یک همگام‌سازی کامل خودکار انجام می‌شود (هر ۱۰ دقیقه حداکثر یک بار) — هر علت دیگری هم که داده را جا بیندازد، خودش درست می‌شود؛
+   (۳) داده‌ای که از سرور می‌رسد شماره نسخه DVN را هم بالا می‌برد تا حافظه‌های میانی کهنه نمانند */
+let VV=(()=>{const v=ls.get('m_vv',null);return v&&typeof v==='object'&&!Array.isArray(v)?v:{}})();
+const SY={boot:0,base:{},pend:ls.get('m_pend',{}),since:+ls.get('m_since',0)||0,busy:false,again:false,t:null,state:'off',last:0,app:null,updNote:false,needRender:false,err:''};
 function syncInit(){SY.base={};for(const c in SYNC){const B=SY.base[c]=new Map();for(const r of SYNC[c].get()){if(!r||r.id==null)continue;const id=String(r.id),pk=c+'|'+id;
     if(pk in SY.pend){if(SY.pend[pk]!==null)B.set(id,SY.pend[pk])}else B.set(id,sj(r))}
   for(const pk in SY.pend){const [pc,id]=[pk.slice(0,pk.indexOf('|')),pk.slice(pk.indexOf('|')+1)];if(pc===c&&!B.has(id)&&SY.pend[pk]!==null&&!SYNC[c].get().some(r=>r&&String(r.id)===id))B.set(id,SY.pend[pk])}}}
@@ -57,7 +65,7 @@ function markDirty(c){const S=SYNC[c],B=SY.base[c]||(SY.base[c]=new Map()),seen=
     if(B.get(id)!==sj(r)){if(!(pk in SY.pend))SY.pend[pk]=B.has(id)?B.get(id):null}else delete SY.pend[pk]}
   if(!S.noDel)for(const [id,bj] of B){if(!seen.has(id)){const pk=c+'|'+id;if(!(pk in SY.pend))SY.pend[pk]=bj}}
   rawSet('m_pend',SY.pend)}
-{const _set=ls.set;ls.set=(k,v)=>{_set(k,v);const c=SYNCKEY.get(k);/* v79.8: تور ایمنی تاریخچه (15zl) */if(c&&typeof audNote==='function'){const a=AUDC;if(window.__audbg)AUDC=null;try{audNote(c)}catch(e){}AUDC=a}if(c&&TOKEN){markDirty(c);syncSoon()}}}
+{const _set=ls.set;ls.set=(k,v)=>{_set(k,v);const c=SYNCKEY.get(k);/* v79.8: تور ایمنی تاریخچه (15zl) */if(c&&typeof audNote==='function'){const a=AUDC;if(window.__audbg)AUDC=null;try{audNote(c)}catch(e){}AUDC=a}if(c&&TOKEN&&SY.boot){markDirty(c);syncSoon()}}}
 function syncSoon(ms){clearTimeout(SY.t);SY.t=setTimeout(syncNow,ms==null?300:ms)}
 const pendN=()=>Object.keys(SY.pend).length;
 function setSync(s,err){SY.state=s;if(err!==undefined)SY.err=err;const L=syncLabel();document.querySelectorAll('.sdot').forEach(d=>{d.className='sdot '+s;d.title=L});document.querySelectorAll('.slbl').forEach(e=>{e.textContent=L});try{offPaint()}catch(e){}}
@@ -71,7 +79,7 @@ async function api(path,body,method){let r;
   if(!r.ok)throw Object.assign(new Error((j&&j.error)||('خطای سرور ('+r.status+')')),{status:r.status});return j}
 function noteApp(v){if(!SY.app){SY.app=v;return}if(v!==SY.app&&!SY.updNote){SY.updNote=true;toast('نسخه جدید برنامه آماده است','','به‌روزرسانی',()=>location.reload())}}
 function findIdx(arr){const m=new Map();arr.forEach((r,i)=>{if(r&&r.id!=null)m.set(String(r.id),i)});return m}
-async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.busy=true;clearTimeout(SY.t);
+async function syncNow(){if(!TOKEN||!SY.boot)return;if(SY.busy){SY.again=true;return}SY.busy=true;clearTimeout(SY.t);
   try{
     if(!SY.scanned){for(const c in SYNC)markDirty(c);SY.scanned=true}
     const sent={},changes=[];
@@ -82,6 +90,7 @@ async function syncNow(){if(!TOKEN)return;if(SY.busy){SY.again=true;return}SY.bu
     let res=await api('/api/sync',{since:SY.since,changes});try{if(res&&res.me)meUpdate(res.me)}catch(e){}try{if(res&&+res.v>APP_V){if(location.hostname==='raw.githack.com')checkUpdate(false);else updFound(+res.v)}}catch(e){}
     applyRemote(res,sent);try{chgNote(res.chg)}catch(e){}
     while(res.more){res=await api('/api/sync',{since:SY.since,changes:[]});applyRemote(res,{})}
+    ckCheck(res.ck);
     if(res.rejected&&res.rejected.length)toastBg(res.rejected[0].why||'این تغییر مجاز نبود');
     if(SY.rsy){SY.rsy=0;rawSet('m_rsy1',1)}/* v104.0: همگام‌سازی کامل یک‌باره انجام شد */
     SY.last=Date.now();rawSet('m_srv',1);setSync(pendN()?'busy':'ok','');flushImgs();
@@ -93,6 +102,8 @@ function meUpdate(u){if(!ME||!u||u.id!==ME.id)return;const k=x=>JSON.stringify([
   toast(was!==u.role?'نقش حساب شما به «'+(ROLE[u.role]||u.role)+'» تغییر کرد ✓':'دسترسی‌های حساب شما به‌روز شد ✓')}
 function applyRemote(res,sent){const touched=new Set(),byColl={},NEWAUD=[];
   for(const ch of res.changes||[]){if(!SYNC[ch.coll])continue;(byColl[ch.coll]=byColl[ch.coll]||[]).push(ch)}
+  /* v108.2: نسخه سروری هر رکورد */{let vc=0;for(const c in byColl){if(c==='audit')continue;if(res.full){VV[c]={};vc=1}const M=VV[c]||(VV[c]={});for(const ch of byColl[c]){const id=String(ch.id);if(ch.deleted)delete M[id];else if(ch.ver!=null)M[id]=+ch.ver;vc=1}}
+    if(res.full)for(const c in SYNC)if(c!=='audit'&&!byColl[c]){VV[c]={};vc=1}if(vc)rawSet('m_vv',VV)}
   for(const c in SYNC){const S=SYNC[c],B=SY.base[c]||(SY.base[c]=new Map()),list=byColl[c]||[];
     if(!res.full&&!list.length)continue;
     let arr=S.get().slice(),idx=findIdx(arr);
@@ -109,13 +120,19 @@ function applyRemote(res,sent){const touched=new Set(),byColl={},NEWAUD=[];
         if(isNew&&!mine&&c==='audit')NEWAUD.push(ch.data);/* v76.5: اعلان فعالیت تازه همکاران */
         if(!mine&&FRESH_C.includes(c)){FLASH.add(id);SY.newN=(SY.newN||0)+1;if(isNew)SY.addN=(SY.addN||0)+1}}
       delete SY.pend[pk];touched.add(c)}
-    if(touched.has(c)){if(S.cmp)arr.sort(S.cmp);S.set(arr);rawSet(S.key,S.cache?S.cache():S.get())}}
+    if(touched.has(c)){if(S.cmp)arr.sort(S.cmp);S.set(arr);rawSet(S.key,S.cache?S.cache():S.get());DVN[S.key]=(DVN[S.key]||0)+1}}
   for(const pk in sent){if(!(pk in SY.pend))continue;const i=pk.indexOf('|'),c=pk.slice(0,i),id=pk.slice(i+1),r=SYNC[c].get().find(x=>x&&String(x.id)===id),cj=r?sj(r):null;
     if(cj===sent[pk]){delete SY.pend[pk];const B=SY.base[c];if(cj===null)B.delete(id);else B.set(id,cj)}}
   SY.since=res.ver;rawSet('m_since',SY.since);rawSet('m_pend',SY.pend);
   if(touched.size){alloc=null;try{if(typeof audPrime==='function')audPrime([...touched].filter(c=>c!=='audit'))}catch(e){}remoteRefresh()}
   if(NEWAUD.length&&!res.full&&SY.scanned&&typeof tlNotify==='function')try{tlNotify(NEWAUD)}catch(e){}
   if(SY.scanned&&!SY.manual){const k=(SY.newN||0)-(SY.annN||0);if(k>0&&res.changes&&res.changes.length&&!res.full){SY.annN=SY.newN;if(!SY.quiet)toast(toFa(k)+' مورد تازه دریافت شد')}else SY.annN=SY.newN}}
+/* v108.2: وارسی داده گوشی با اثر انگشت سرور؛ ناهمخوانی = یک همگام‌سازی کامل (داده‌های در صف ارسال حفظ می‌شوند) */
+function ckLocal(c){const M=VV[c]||{};let n=0,x=0;for(const r of SYNC[c].get()){if(!r||r.id==null)continue;n++;x+=+M[String(r.id)]||0}return {n,x}}
+function ckCheck(ck){if(!ck||typeof ck!=='object'||pendN()||SY.again)return;const bad=[];
+  for(const c in SYNC){if(c==='audit')continue;const s=ck[c]||{n:0,x:0},l=ckLocal(c);if(l.n!==(+s.n||0)||l.x!==(+s.x||0))bad.push(c+' '+l.n+'/'+(+s.n||0))}
+  SY.ckBad=bad;if(!bad.length)return;const now=Date.now();if(now-(SY.ckAt||0)<10*60e3)return;SY.ckAt=now;
+  try{console.warn('sync check: phone data differs from server → full sync',bad)}catch(e){}SY.since=0;SY.quiet=1;syncSoon(30);setTimeout(()=>{SY.quiet=0},8000)}
 /* v71.8: فرم خرید دستی (buy) هم وسط پر کردن با داده همکارها دوباره ساخته نمی‌شود */const canRender=()=>!['entry','bulk','cwiz','pwiz','buy','bdoc','invset'].includes(cur)&&$('ov').classList.contains('hide')&&$('pv').classList.contains('hide')&&!(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))&&!document.querySelector('.swr.on');
 function remoteRefresh(){window.__audbg=(window.__audbg||0)+1;try{entItSyncAll()}catch(e){}finally{window.__audbg--}/* v72.0 */if(!canRender()){SY.needRender=true;try{$('dock').innerHTML=dockHTML();dockInd()}catch(e){}return}SY.needRender=false;const v=$('view'),y=v.scrollTop;render();v.scrollTop=y;flashNew()}
 document.addEventListener('focusout',()=>setTimeout(()=>{if(SY.needRender&&canRender())remoteRefresh()},250));
@@ -154,7 +171,7 @@ function loggedIn(r){TOKEN=r.token;try{LS.setItem('m_token',TOKEN)}catch(e){}ME=
   startFresh(false);setTimeout(()=>{try{heldOffer()}catch(e){}},1800)}
 function startFresh(upload){SY.pend={};SY.since=0;if(upload){for(const c in SYNC)for(const r of SYNC[c].get())if(r&&r.id!=null)SY.pend[c+'|'+r.id]=null}rawSet('m_pend',SY.pend);syncInit();if(upload)for(const k in SY.pend){const c=k.slice(0,k.indexOf('|'));SY.base[c].delete(k.slice(k.indexOf('|')+1))}
   render(true);toast(upload?'در حال انتقال اطلاعات به سرور…':'خوش آمدید '+ME.name);syncNow().then(()=>{if(upload&&!pendN())toast('اطلاعات این گوشی به سرور منتقل شد ✓')})}
-function clearLocal(){KV.hold={};entries=[];sources=[];batches=[];creds=[];trash=[];audit=[];drafts={};for(const c in SYNC){const S=SYNC[c];rawSet(S.key,S.cache?S.cache():S.get())}SY.pend={};SY.since=0;SY.base={};['m_pend','m_since','m_srv','m_imgq'].forEach(k=>{try{LS.removeItem(k)}catch(e){}})}
+function clearLocal(){KV.hold={};VV={};entries=[];sources=[];batches=[];creds=[];trash=[];audit=[];drafts={};for(const c in SYNC){const S=SYNC[c];rawSet(S.key,S.cache?S.cache():S.get())}SY.pend={};SY.since=0;SY.base={};['m_pend','m_since','m_srv','m_imgq','m_vv'].forEach(k=>{try{LS.removeItem(k)}catch(e){}})}
 function forceLogout(msg){/* v79.2: تغییرهای ارسال‌نشده پیش از پاک شدن نگه داشته می‌شوند (15zj) */try{heldSave()}catch(e){}TOKEN='';ME=null;try{LS.removeItem('m_token');LS.removeItem('m_me')}catch(e){}clearLocal();closeSheet();cur='home';render();showAuth(msg)}
 /* ---------- حساب کاربری ---------- */
 const ROLE={admin:'مدیر',staff:'کارمند'};

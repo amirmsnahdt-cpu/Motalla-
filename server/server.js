@@ -123,6 +123,8 @@ const q = {
   since: db.prepare('SELECT coll,id,data,deleted,ver FROM docs WHERE ver>? ORDER BY ver LIMIT ?'),
   allLive: db.prepare("SELECT coll,id,data,deleted,ver FROM docs WHERE deleted=0 AND coll<>'audit'"),
   recentAudit: db.prepare("SELECT coll,id,data,deleted,ver FROM docs WHERE deleted=0 AND coll='audit' ORDER BY ver DESC LIMIT 500"),
+  /* v108.2: اثر انگشت داده‌ها برای وارسی گوشی (تعداد و جمع ver هر مجموعه؛ پیش‌نویس تخصیص خالی را گوشی نگه نمی‌دارد) */
+  ckSum: db.prepare("SELECT coll, COUNT(*) AS n, SUM(ver) AS x FROM docs WHERE deleted=0 AND coll<>'audit' AND NOT (coll='drafts' AND data LIKE '%\"parts\":[]%') GROUP BY coll"),
   getMeta: db.prepare('SELECT v FROM meta WHERE k=?'),
   setMeta: db.prepare('INSERT INTO meta(k,v) VALUES(?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v'),
   getImg: db.prepare('SELECT data FROM imgs WHERE k=?'),
@@ -139,6 +141,9 @@ const q = {
 };
 let VER = +(q.getMeta.get('ver') || { v: 0 }).v || 0;
 const nextVer = () => { VER += 1; q.setMeta.run('ver', String(VER)); return VER; };
+/* v108.2: اثر انگشت فقط وقتی داده عوض شده دوباره حساب می‌شود */
+let CKC = null;
+function ckSums() { if (CKC && CKC.v === VER) return CKC.s; const s = {}; for (const r of q.ckSum.all()) s[r.coll] = { n: Number(r.n) || 0, x: Number(r.x) || 0 }; CKC = { v: VER, s }; return s; }
 function tx(fn) { db.exec('BEGIN IMMEDIATE'); try { const r = fn(); db.exec('COMMIT'); return r; } catch (e) { try { db.exec('ROLLBACK'); } catch (_) { } throw e; } }
 
 /* ---------- رمز عبور ---------- */
@@ -403,6 +408,7 @@ function doSync(user, body) {
   for (const k of touched) { if (have.has(k)) continue; const [c, i] = k.split('\u0000'); const r = q.getDoc.get(c, i); if (r) out.push(rowOut(r)); }
   const ver = more ? rows[rows.length - 1].ver : VER;
   const res = { ver, full: since === 0, more, changes: out, rejected, app: APP_VER, v: APP_V, me: pubUser(user) };
+  if (!more) res.ck = ckSums();
   if (user.role === 'admin') res.chg = q.unseenChanges.get(+((q.getMeta.get('chg_seen_' + user.id) || {}).v || 0)).c;
   return res;
 }
