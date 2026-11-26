@@ -5879,9 +5879,9 @@ small.bccd{direction:ltr;text-align:right;font-family:ui-monospace,monospace;let
 #sheet .bcpq input{height:auto;padding:0;border:0;border-radius:0;box-shadow:none!important;background:none}
 .bclp .blb.n{display:flex;flex-direction:column}.bclp .blb.n .lbc{flex:1 1 auto;min-height:0;height:auto}.bclp .blb .lcd{line-height:1;flex:none}
 
-/* v108.6 رسید: اشتراک و ذخیره کنار دوربین و گالری، در خانه‌های عکس */
-.php2.gt.galsx .php2b{border:0;font:inherit;font-size:11.5px;font-weight:800;cursor:pointer}
-.php2.gt.galsx .php2b.shr{background:color-mix(in srgb,#7c3aed 10%,var(--card));color:#6d28d9;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#7c3aed 30%,transparent)}
-.php2.gt.galsx .php2b.sav{background:color-mix(in srgb,#d97706 11%,var(--card));color:#b45309;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#d97706 32%,transparent)}
-:root[data-theme=dark] .php2.gt.galsx .php2b.shr{color:#c4b5fd}:root[data-theme=dark] .php2.gt.galsx .php2b.sav{color:#fcd34d}
-.php2.gt.galsx .php2b i,.php2.gt.galsx .php2b svg{color:inherit;stroke:currentColor;transform:none!important}
+/* v108.7 رسید: «اشتراک» (دکمه اصلی آبی) و «ذخیره» (روشن) بالای پنجره، گوشه چپ کنار × — مثل بقیه پنجره‌ها */
+#sheet .sh-h>.xgo.xtop.galsv{background:color-mix(in srgb,var(--blu) 12%,var(--card))!important;color:var(--blu)!important;box-shadow:none!important}
+#sheet .sh-h:has(>.galsv){gap:6px}#sheet .sh-h:has(>.galsv)>div:first-child{min-width:0;flex:1 1 auto}
+#sheet .sh-h>.xgo.xtop.galsv~.xgo.xtop{margin-inline-start:0}
+#sheet .sh-h:has(>.galsv)>.xgo.xtop svg{width:17px;height:17px;flex:none;transform:none!important}
+@media (max-width:370px){#sheet .sh-h:has(>.galsv)>.xgo.xtop{padding:0;width:38px;justify-content:center}#sheet .sh-h:has(>.galsv)>.xgo.xtop span{display:none}}
