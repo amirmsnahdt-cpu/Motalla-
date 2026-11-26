@@ -5878,3 +5878,10 @@ small.bccd{direction:ltr;text-align:right;font-family:ui-monospace,monospace;let
 .bcst .tx b{font-size:14.5px;font-weight:800}.bcst .tx small{font-size:11.5px;color:var(--mut)}.bcst>.i{width:18px;height:18px;color:var(--mut)}
 #sheet .bcpq input{height:auto;padding:0;border:0;border-radius:0;box-shadow:none!important;background:none}
 .bclp .blb.n{display:flex;flex-direction:column}.bclp .blb.n .lbc{flex:1 1 auto;min-height:0;height:auto}.bclp .blb .lcd{line-height:1;flex:none}
+
+/* v108.5 رسید: اشتراک و ذخیره بالای پنجره کنار × */
+#sheet .sh-h .galhb{display:flex;gap:6px;margin-inline-start:auto;flex:none;align-items:center}
+#sheet .sh-h .galhb button{display:inline-flex;align-items:center;gap:5px;height:38px;padding:0 12px;border:0;border-radius:19px;background:color-mix(in srgb,var(--blu) 11%,var(--card));color:var(--blu);font:inherit;font-size:13.5px;font-weight:800;cursor:pointer}
+#sheet .sh-h .galhb button svg{width:17px;height:17px;flex:none}
+#sheet .sh-h:has(.galhb)>div:first-child{min-width:0}
+@media (max-width:370px){#sheet .sh-h .galhb button{padding:0;width:38px;justify-content:center}#sheet .sh-h .galhb button span{display:none}}
