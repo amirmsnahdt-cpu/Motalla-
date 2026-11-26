@@ -28,7 +28,7 @@ const scBoxH=b=>{const S=SCN;if(!b||!S||!S.iw||!S.ih)return '';const P=(v,t)=>Ma
 function scConfH(R){const S=SCN,rd=S&&S.wSrc==='ocr';
   return `<span class="sccf ${rd?'md':'no'}">${ic(rd?'check':'info')}${rd?'آزمایشی · حتماً با عکس مقایسه کنید':'خوانده نشد · خودتان بنویسید'}</span>`}
 function scHTML(){const S=SCN;if(!S)return '';
-  if(S.st==='pick')return scHead('ثبت با عکس','عکس بگیرید؛ عددها خودکار خوانده می‌شود')+`<div class="scw">
+  if(S.st==='pick')return scHead(S.doc?'ثبت با عکس در همین سند':'ثبت با عکس',S.doc?'ردیف خوانده‌شده در همین سند می‌نشیند':'عکس بگیرید؛ عددها خودکار خوانده می‌شود')+`<div class="scw">
   <div class="sct w"><i>${ic('ring')}</i><span><b>عکس ترازو</b><small>وزن از صفحه ترازو خوانده می‌شود و ردیف فروش یا خرید با قیمت لحظه ساخته می‌شود</small></span><div class="scbs">${scIn('w')}</div></div>
   <div class="sct r"><i>${ic('card')}</i><span><b>عکس رسید بانکی</b><small>رسید کارتخوان، حواله یا واریز: مبلغ و پیگیری خوانده می‌شود و سند دریافت یا تأیید واریز آماده می‌شود</small></span><div class="scbs">${scIn('r')}</div></div>
   <p class="scnt">${ic('padlock')}<span>عکس فقط روی همین گوشی خوانده می‌شود و جایی فرستاده نمی‌شود. پیش از هر ثبت، عدد را خودتان می‌بینید و تأیید می‌کنید. خواندن وزن ترازو هنوز آزمایشی است.</span></p></div>`;
@@ -62,15 +62,16 @@ function scFrBind(){const F=$('scFr');if(!F||F.dataset.b)return;F.dataset.b=1;le
   const up=e=>{if(!st)return;const q=P(e),a=st;st=null;const w=Math.abs(q.x-a.x),h=Math.abs(q.y-a.y);if(w<18||h<10||!SCN||!SCN.iw){if(bx)bx.remove();bx=null;return}
     const kx=SCN.iw/q.r.width,ky=SCN.ih/q.r.height;scRun('w',SCN.img,{x:Math.round(Math.min(a.x,q.x)*kx),y:Math.round(Math.min(a.y,q.y)*ky),w:Math.round(w*kx),h:Math.round(h*ky)})};
   F.addEventListener('pointerup',up);F.addEventListener('pointercancel',()=>{st=null;if(bx)bx.remove();bx=null})}
-ACT.scOpen=()=>{if(!can('add')){toast('دسترسی «ثبت واریزی جدید» برای حساب شما فعال نیست',true);return}SCN={st:'pick'};sheet(scHTML());scBind()};
-ACT.scBack=()=>{SCN={st:'pick'};scRe()};
+/* v108.0 (صاحب اپ: «خرید و فروش و دریافت و پرداخت با عکس در خود سند»): از صفحه سند باز شود = ردیف در همین سند می‌نشیند (SCN.doc) */
+ACT.scOpen=()=>{const doc=cur==='sell'&&!!sv;if(!doc&&!can('add')){toast('دسترسی «ثبت واریزی جدید» برای حساب شما فعال نیست',true);return}if(doc&&!can('debt')){toast('دسترسی سند برای حساب شما فعال نیست',true);return}SCN={st:'pick',doc};sheet(scHTML());scBind()};
+ACT.scBack=()=>{SCN={st:'pick',doc:!!(SCN&&SCN.doc)};scRe()};
 ACT.scAlt=d=>{SCN.w=String(d.v||'');SCN.wSrc='ocr';SCN.wOk=0;scRe()};
 ACT.scWOk=()=>{if(!SCN)return;SCN.wOk=SCN.wOk?0:1;const b=document.querySelector('#sheet .scok');if(b)b.classList.toggle('on',!!SCN.wOk)};
 ACT.scDec=d=>{const v=d.v==='a'?'a':+d.v;ls.set('m_sc_dec',v);if(SCN&&SCN.img&&SCN.k==='w'){scRun('w',SCN.img,SCN.hb);return}scRe()};
 ACT.scJob=d=>{SCN.job=d.v==='buy'?'buy':'sell';scDefs();scRe()};
 ACT.scKd=d=>{SCN.kd=String(d.v||'');ls.set('m_sc_kd',SCN.kd);scDefs();const y=$('scKd')?$('scKd').scrollLeft:0;scRe();if($('scKd'))$('scKd').scrollLeft=y};
 /* خواندن عکس: همیشه با نتیجه برمی‌گردد (خوانده‌شده یا خوانده‌نشده)؛ خطای موتور = «خوانده نشد» */
-async function scRun(k,img,hb){const K=scKinds(),k0=ls.get('m_sc_kd',''),same=SCN&&SCN.img===img;SCN={st:'busy',k,img,hb:hb||null,iw:same?SCN.iw:0,ih:same?SCN.ih:0,job:(SCN&&SCN.job)||'sell',kd:(SCN&&SCN.kd)||(K.includes(k0)?k0:K[0]),w:''};scDefs();const tok=SCN;scRe();
+async function scRun(k,img,hb){const K=scKinds(),k0=ls.get('m_sc_kd',''),same=SCN&&SCN.img===img;SCN={st:'busy',k,img,hb:hb||null,doc:!!(SCN&&SCN.doc),iw:same?SCN.iw:0,ih:same?SCN.ih:0,job:(SCN&&SCN.job)||'sell',kd:(SCN&&SCN.kd)||(K.includes(k0)?k0:K[0]),w:''};scDefs();const tok=SCN;scRe();
   if(!tok.iw)await new Promise(r=>{const im=new Image();im.onload=()=>{tok.iw=im.naturalWidth;tok.ih=im.naturalHeight;r()};im.onerror=()=>r();im.src=img});
   let R=null;try{if(k==='w'){{const dc=scDecGet();R=await scScale(img,{...(dc==='a'?{}:{decimals:dc}),...(hb?{hintBox:hb}:{})})}}else R=await scRcpRead(img)}catch(e){console.error(e);R=null}
   if(SCN!==tok)return;/* در این فاصله پنجره بسته یا عکس دیگری انتخاب شده */
@@ -83,11 +84,11 @@ ACT.scDoc=async()=>{const S=SCN;if(!S)return;const w=scNum(S.w);if(!(w>0)){toast
   if(w>3000){toast('وزن بیش از ۳ کیلو است؛ عدد را بررسی کنید',true);return}
   if(S.wSrc==='ocr'&&!S.wOk){toast('عدد از روی عکس خوانده شده؛ اول آن را با عکس ترازو مقایسه و تأیید کنید',true);const b=document.querySelector('#sheet .scok');if(b){b.scrollIntoView({block:'center',behavior:'smooth'});b.classList.add('nd');setTimeout(()=>b.classList.remove('nd'),900)}return}
   let key='';try{const k=newImgKey('xr');if(await imgPut(k,S.img))key=k}catch(_){}
-  const sell=S.job==='sell',kd=S.kd,ph=key?{imgs:[key],img:key}:{};SCN=null;closeSheet();ACT.svNew({fresh:1,...(sell?{}:{dk:'buy'})});
+  const sell=S.job==='sell',kd=S.kd,ph=key?{imgs:[key],img:key}:{},inDoc=S.doc&&cur==='sell'&&!!sv;SCN=null;closeSheet();if(!inDoc)ACT.svNew({fresh:1,...(sell?{}:{dk:'buy'})});
   setTimeout(()=>{if(cur!=='sell'||!sv)return;sv.qa.d=sell?'sell':'buy';sv.qa.s='';sv.qa.q='';
     if(sell){if(kd==='آبشده')ACT.dkF({id:'g:ab'});else ACT.qaK({k:kd});const a=sv.qa;a.w=String(w);if(kd!=='آبشده'&&kd!=='متفرقه'){a.ajP=S.ajP===''?'':+S.ajP||'';if(S.ajT)a.ajT=S.ajT}if(S.pp!=='')a.pp=+S.pp||0;Object.assign(a,ph);svKeep();qaRe()}
     else{if(!sv.rate){const r=+rtRef0()||0;if(r){sv.rate=r;sv.mz=mzOf(r)}}const x=xrNew('buy','gold',{cat:kd,ay:S.ay,fl:'gold',fd:'buy'});x.w=String(w);Object.assign(x,ph);xrStart(x)}
-    toast('ردیف با وزن ترازو آماده است؛ مشتری را انتخاب و بررسی کنید')},160)};
+    toast(svCu()?'ردیف با وزن ترازو آماده است؛ بررسی و «افزودن» را بزنید':'ردیف با وزن ترازو آماده است؛ مشتری را انتخاب و بررسی کنید')},inDoc?60:160)};
 /* ---------- رسید بانکی ---------- */
 /* متن رسید با همان tesseract خود برنامه (ocrWorker/ocrPrep، 15zv) خوانده می‌شود؛ جداکردن مبلغ، پیگیری، تاریخ و بانک با rcpParse (15zz-zzs2).
    خروجی یکدست: {ok,amount (تومان),tn,date (ISO),time,bank,kind,conf,text} */
@@ -135,9 +136,9 @@ ACT.scDep=async d=>{const S=SCN;if(!S)return;if(!can('track')){toast('دسترس
   toast(tn?'رسید پیوست شد و پیگیری نوشته شد؛ بررسی و «ذخیره» کنید':'رسید پیوست شد؛ بررسی و «ذخیره» کنید')};
 /* سند دریافت/پرداخت: سند تازه با ردیف آماده (مبلغ، پیگیری، عکس)؛ مشتری و حساب بانک در خود سند */
 ACT.scPay=async d=>{const S=SCN;if(!S)return;const a=Math.round(scNum(S.rc.amount));if(!(a>0)){toast('مبلغ را بزنید',true);return}
-  const m=d.m==='pos'?'pos':'hav',dir=d.dir==='out'?'out':'in',tn=m==='pos'?'':(S.rc.tn||''),key=await scRcpKey('xr');SCN=null;closeSheet();ACT.svNew({fresh:1});
+  const m=d.m==='pos'?'pos':'hav',dir=d.dir==='out'?'out':'in',tn=m==='pos'?'':(S.rc.tn||''),key=await scRcpKey('xr'),inDoc=S.doc&&cur==='sell'&&!!sv;SCN=null;closeSheet();if(!inDoc)ACT.svNew({fresh:1});
   setTimeout(()=>{if(cur!=='sell'||!sv)return;sv.qa.d=dir;sv.qa.s='';sv.qa.q='';const p=pyNew(m,{dir,fl:1,tn,...(key?{imgs:[key],img:key}:{})});p.amount=a;pyStart(p);
-    toast('ردیف با مبلغ رسید آماده است؛ مشتری و حساب بانک را انتخاب کنید')},160)};
+    toast(svCu()?'ردیف با مبلغ رسید آماده است؛ حساب بانک را انتخاب و «افزودن» را بزنید':'ردیف با مبلغ رسید آماده است؛ مشتری و حساب بانک را انتخاب کنید')},inDoc?60:160)};
 /* خواندن وزن: موتور هفت‌قطعه‌ای (sgsRead). نتیجه همیشه «برای بررسی» است — کنار عکس و قابل ویرایش */
 async function scScale(img,o){if(typeof sgsRead!=='function')return null;return sgsRead(img,o||{})}
 ACT.scRcS=d=>{const r=SCN&&SCN.rc;if(!r)return;if(d.f==='amount'){r.amount=r.amountS;r.amountS=0}else{r.tn=r.tnS;r.tnS=''}scRe()};

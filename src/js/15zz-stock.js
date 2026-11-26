@@ -102,7 +102,7 @@ function stkHeroHTML(){const A=stkAll(),G=A.filter(r=>r.g==='g'||r.g==='m'),tw=M
   <div class="stkhv${tw<0?' ng':''}"><b>${gdSgn(tw,wFmt)}</b><i>گرم</i></div>
   <div class="stkhc"><em>${toFa(has)} قلم موجود</em>${neg?`<button type="button" class="ng" data-act="stkF" data-f="neg">${toFa(neg)} قلم منفی · نیاز به اصلاح</button>`:`<em class="ok">${ic('check')} موجودی منفی نداریم</em>`}</div></div>`}
 const STKF=[['all','همه'],['g','طلای خام'],['m','ساخته'],['o','غیر طلا'],['c','سکه'],['f','ارز'],['neg','منفی‌ها']];
-function vStock(){return `<div class="stkp">${stkHeroHTML()}
+function vStock(){return `<div class="stkp">${stkHeroHTML()}${typeof bcStkTile==='function'?bcStkTile():''}
   <div class="fsearch stkq">${ic('search')}<input id="stkQ" type="search" value="${esc(STK.q||'')}" placeholder="جستجوی کالا، سکه یا ارز…" autocomplete="off" enterkeyhint="search" aria-label="جستجوی کالا"></div>
   <div class="stkf" role="tablist">${STKF.map(([k,t])=>`<button type="button" role="tab" aria-selected="${STK.f===k}" class="${STK.f===k?'on':''}" data-act="stkF" data-f="${k}">${t}</button>`).join('')}</div>
   <div id="stkL">${stkListHTML()}</div>
@@ -199,12 +199,12 @@ function abStkHTML(){const L=abBase('').filter(p=>p.av>0.0004);if(!L.length)retu
    ردیف مرجوعی کلید را در rf نگه می‌دارد؛ مانده قابل برگشت هر کالا = وزن فروش − مرجوعی‌های ثبت‌شده (و ردیف‌های همین سندِ باز). انتخاب، وزن و عیار و شرح را پر می‌کند و همه قابل ویرایش است. */
 function rfSold(c){if(!c)return [];const L=[],U=new Map(),ex=sv&&sv.edit?String(sv.edit.tx):'',a=sv&&sv.qa||{},add=(k,w)=>{if(k&&w>0)U.set(k,(U.get(k)||0)+w)};
   for(const t of c.txs||[]){if(!t||t.del||t.type!=='inv')continue;const b={no:t.no,date:t.date||'',at:String(t.at0||t.at||'')};
-    (t.items||[]).forEach((it,i)=>{if(+it.w>0)L.push({...b,key:t.no+':i'+i,nm:it.k+dsP(it),w:+it.w,ay:+it.ay||750})});
+    (t.items||[]).forEach((it,i)=>{if(+it.w>0)L.push({...b,key:t.no+':i'+i,nm:it.k+dsP(it),w:+it.w,ay:+it.ay||750,...(it.bc?{bc:it.bc}:{})})});
     (t.xr||[]).forEach((x,i)=>{if(!x||x.a!=='gold'||x.pul)return;const w=parseFloat(x.w)||0;if(x.t==='sell'&&w>0)L.push({...b,key:t.no+':x'+i,nm:(x.pz?'سکه پارسیان':x.cat||'طلا')+dsP(x),w,ay:+x.ay||750});else if(x.cat==='مرجوعی'&&x.rf&&String(t.id)!==ex)add(x.rf,w)})}
   (sv&&sv.xr||[]).forEach((x,i)=>{if(x.cat==='مرجوعی'&&x.rf&&!(a.x&&a.x.i===i))add(x.rf,parseFloat(x.w)||0)});const me=a.x?a.x.rf:'';
   return L.map(p=>({...p,av:abR3(p.w-(U.get(p.key)||0))})).filter(p=>p.av>0.0004||p.key===me).sort((x,y)=>x.at<y.at?1:x.at>y.at?-1:0)}
 function stRfS(x){const L=rfSold(svCu());if(!L.length&&!x.rf)return [];
-  return [stS('rf','کالای فروخته‌شده','','pick',()=>x.rf||'',v=>{if(v==='-'){x.rf='';return}const p=rfSold(svCu()).find(z=>z.key===v);if(!p)return;x.rf=p.key;x.ay=p.ay;x.w=String(p.av);x.am='';x.amT='';x.ds=p.nm},
+  return [stS('rf','کالای فروخته‌شده','','pick',()=>x.rf||'',v=>{if(v==='-'){x.rf='';return}const p=rfSold(svCu()).find(z=>z.key===v);if(!p)return;x.rf=p.key;x.ay=p.ay;x.w=String(p.av);x.am='';x.amT='';x.ds=p.nm;/* v108.0: برگشت قطعه بارکددار = قطعه دوباره موجود */x.bc=p.bc||''},
     {opt:1,opts:()=>[...L.map(p=>({v:p.key,t:p.nm,sub:['فروش',p.date?payLab(p.date):'','سند '+toFa(String(p.no)),p.av<p.w-0.0004?'از '+wFmt(p.w)+' گرم':''].filter(Boolean).join(' · '),amt:wFmt(p.av),lab:'گرم · عیار '+toFa(String(p.ay)),ico:'ring',cls:'ab'})),{v:'-',t:'بدون انتخاب',sub:'طلایی که در این فهرست نیست',ico:'plus'}],
      lab0:v=>{const p=v&&L.find(z=>z.key===v);return p?p.nm:''}})]}
 function stRfN(x){if(!x.rf)return {};const p=rfSold(svCu()).find(z=>z.key===x.rf);if(!p)return {};return {need:()=>(parseFloat(x.w)||0)>p.av+0.0004,msg:'وزن مرجوعی از وزن فروخته‌شده بیشتر است · '+wFmt(p.av)+' گرم'}}
