@@ -5879,9 +5879,9 @@ small.bccd{direction:ltr;text-align:right;font-family:ui-monospace,monospace;let
 #sheet .bcpq input{height:auto;padding:0;border:0;border-radius:0;box-shadow:none!important;background:none}
 .bclp .blb.n{display:flex;flex-direction:column}.bclp .blb.n .lbc{flex:1 1 auto;min-height:0;height:auto}.bclp .blb .lcd{line-height:1;flex:none}
 
-/* v108.5 رسید: اشتراک و ذخیره بالای پنجره کنار × */
-#sheet .sh-h .galhb{display:flex;gap:6px;margin-inline-start:auto;flex:none;align-items:center}
-#sheet .sh-h .galhb button{display:inline-flex;align-items:center;gap:5px;height:38px;padding:0 12px;border:0;border-radius:19px;background:color-mix(in srgb,var(--blu) 11%,var(--card));color:var(--blu);font:inherit;font-size:13.5px;font-weight:800;cursor:pointer}
-#sheet .sh-h .galhb button svg{width:17px;height:17px;flex:none}
-#sheet .sh-h:has(.galhb)>div:first-child{min-width:0}
-@media (max-width:370px){#sheet .sh-h .galhb button{padding:0;width:38px;justify-content:center}#sheet .sh-h .galhb button span{display:none}}
+/* v108.6 رسید: اشتراک و ذخیره کنار دوربین و گالری، در خانه‌های عکس */
+.php2.gt.galsx .php2b{border:0;font:inherit;font-size:11.5px;font-weight:800;cursor:pointer}
+.php2.gt.galsx .php2b.shr{background:color-mix(in srgb,#7c3aed 10%,var(--card));color:#6d28d9;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#7c3aed 30%,transparent)}
+.php2.gt.galsx .php2b.sav{background:color-mix(in srgb,#d97706 11%,var(--card));color:#b45309;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#d97706 32%,transparent)}
+:root[data-theme=dark] .php2.gt.galsx .php2b.shr{color:#c4b5fd}:root[data-theme=dark] .php2.gt.galsx .php2b.sav{color:#fcd34d}
+.php2.gt.galsx .php2b i,.php2.gt.galsx .php2b svg{color:inherit;stroke:currentColor;transform:none!important}
