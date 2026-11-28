@@ -274,9 +274,10 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
     return H.length===1?`به حساب ${q(H[0])}`:H.length===2?`به حساب‌های ${q(H[0])} و ${q(H[1])}`:`به حساب‌های ${q(H[0])}، ${q(H[1])} و ${toFa(H.length-2)} حساب دیگر`};
   const wdHf=(x,mk)=>{for(const L of [40,24,16,10]){const l=mk(wdHn(x,L));if(tw(l)*.95<=181)return l}return mk(wdHn(x,8))};
   let WL=[];if(WS0.length===1){const a1=wdHf(WS0[0],h=>`${DIA}مبلغ ${wdA(WS0[0].a)} ${h} ${wdD(WS0[0])}`),a2=`پس از این واریز، ${wdE}`;WL=tw(a1+' · '+a2)*.95<=181?[a1+'<s>·</s>'+a2]:[a1,'<span class="wsp"></span>'+a2]}
-  else if(WS0.length){const L3=WS0.length>3?WS0.slice(0,2):WS0,RS=WS0.slice(L3.length);WL=L3.map((x,i)=>wdHf(x,h=>`${i?'<span class="wsp"></span>':DIA}${i?'و ':'واریزهای در راه: '}${wdA(x.a)} ${h} ${wdD(x)}`));
+  else if(WS0.length){const L3=WS0.length>3?WS0.slice(0,2):WS0,RS=WS0.slice(L3.length);/* v109.1: یک خط برای هر حساب (مبلغ · حساب · روز)؛ وقتی همه یک روزند، روز فقط یک‌بار در خط آخر */const sd=WS0.every(x=>x.d===WS0[0].d);
+    WL=L3.map((x,i)=>wdHf(x,h=>`${i?'<span class="wsp"></span>':DIA}${i?'و ':'واریزهای در راه: '}${wdA(x.a)} ${h}${sd?'':' '+wdD(x)}`));
     if(RS.length){const lz=RS[RS.length-1],Dz=lz.d?dates(lz.d):null;WL.push(`<span class="wsp"></span>و ${wdA(RS.reduce((s,x)=>s+x.a,0))} در ${toFa(RS.length)} نوبت دیگر${Dz?` تا <b>${esc(Dz.fa)}</b>`:''}`)}
-    WL.push(`<span class="wsp"></span>جمع واریزی‌های در راه ${wdA(WST)}<s>·</s>پس از این واریزها، ${wdE}`)}
+    WL.push(`<span class="wsp"></span>جمع ${wdA(WST)}${sd&&!RS.length?' '+wdD(WS0[0]):''}<s>·</s>پس از این واریزها، ${wdE}`)}
   /* v106.4 (صاحب اپ): زیر واریزی‌های در راه، شماره پیگیری واریزی‌ها و رسید (تنظیمات فاکتور › حساب مشتری؛ خالی = چاپ نمی‌شود) */
   if(WL.length&&S.wdt)WL.push(`<span class="wsp"></span>جهت پیگیری واریزی‌های انجام‌شده و دریافت رسید با شماره <b class="wa">${esc(toFa(S.wdt))}</b> تماس بگیرید`);
   const WLH=4,WDH=WL.length?+(WL.length*WLH+1.6).toFixed(1):0,WDS=WL.length?`<div class="wds">${WL.map(l=>`<div class="wl">${l}</div>`).join('')}</div>`:'',HB=ACH+LGH+WDH;
