@@ -138,8 +138,10 @@ ACT.dkNew=d=>{qaRead();const a=sv.qa,k=clean(d.k||a.q||''),c=d.c;if(d.k)a.q=k;if
 /* v61.60 (خواسته صاحب اپ): کالاهای اضافه‌شده در همان فهرست ویرایش یا حذف می‌شوند (دکمه ⋯ کنار هر ردیف).
    سندهای ثبت‌شده نام قبلی را نگه می‌دارند؛ فقط فهرست انتخاب عوض می‌شود. */
 ACT.gdMenu=(d,e)=>{const k=d.k,b=e&&e.target.closest('[data-act]');if(!k||!b)return;const c=gCat(k),I=[['gdInfo',ic('coin'),'فی و موجودی',{k}]];
-  if(d.fx){ACT.gdInfo({k});return}/* موارد ثابت (آبشده، متفرقه، سکه، ارز): فقط فی و موجودی */
-  popMenu(b,[...(isAdmin()||can('src')?I:[]),['gdRen',ic('edit'),'ویرایش نام',{k}],['gdCat',ic('ring'),'دسته: '+(c==='ساخته'?'سایر':'ساخته'),{k}],['gdDel',ic('trash'),'حذف از فهرست',{k},1]])};
+  /* v109.5 (خواسته صاحب اپ: «اصلاح موجودی از این قسمت شدنی بشه»): همان پنجره «اصلاح موجودی» صفحه موجودی کالاها (stkFix، 15zz-stock)؛ بعد از ثبت فهرست همین سند تازه می‌شود (gdRe) */
+  const SF=typeof stkCan==='function'&&stkCan()&&typeof stkAll==='function'&&stkAll().some(r=>r.k===k)?[['stkFix',ic('check'),'اصلاح موجودی',{k}]]:[];
+  if(d.fx){if(SF.length)popMenu(b,[...SF,...I]);else ACT.gdInfo({k});return}/* موارد ثابت (آبشده، متفرقه، سکه، ارز): اصلاح موجودی + فی و موجودی */
+  popMenu(b,[...SF,...(isAdmin()||can('src')?I:[]),['gdRen',ic('edit'),'ویرایش نام',{k}],['gdCat',ic('ring'),'دسته: '+(c==='ساخته'?'سایر':'ساخته'),{k}],['gdDel',ic('trash'),'حذف از فهرست',{k},1]])};
 ACT.gdRen=d=>{const k=d.k;sheet(`<div class="sh-h"><b>ویرایش نام کالا</b></div><div class="ef"><input id="gdN" value="${esc(k)}" autocomplete="off" enterkeyhint="done"></div><div class="row"><button class="btn sec" data-act="close">انصراف</button><button class="btn" data-act="gdRenOk" data-k="${esc(k)}">ذخیره</button></div>`);
   const I=$('gdN');if(I){sheetFocus(I);I.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();ACT.gdRenOk({k})}}}};
 ACT.gdRenOk=d=>{const k=d.k,I=$('gdN'),n=clean((I&&I.value)||'');if(!n){toast('نام کالا را بنویسید',true);return}if(n===k){closeSheet();return}
