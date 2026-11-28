@@ -124,7 +124,7 @@ function stHTML(){const a=sv.qa,S=stSteps(),n=S.length;if(a.st==null||a.st>=n)a.
 </div>`}
 /* v69.2 (خواسته صاحب اپ): «+ عکس» داخل همان کادر فیلد، در انتهای آن (با شمار عکس‌ها)؛ عکس‌های زده‌شده ردیف کوچکی زیر کادر مبلغ */
 function stPhIn(){const x=phT();if(!x)return '';const n=xrPh(x).length;return n?`<button type="button" class="stphin has" data-act="rowGal" aria-label="عکس‌ها">${ic('cam')}<i>${toFa(n)}</i></button>`:phPair({k:'row'},{cls:'sm'})}/* v104.7: بی‌عکس = دو دکمه مستقیم دوربین/گالری؛ با عکس = همان دکمه شمارنده (دیدن و افزودن) */
-function stPhRow(){const x=phT();if(!x)return '';const K=xrPh(x);if(!K.length)return '';return `<div class="stph2 only"><span class="stphl2">${K.map((k,i)=>`<button type="button" class="stpht" data-act="rowPhV" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</span></div>`}
+function stPhRow(){const x=phT();if(!x)return '';const K=xrPh(x);if(!K.length)return '';return `<div class="stph2 only"><span class="stphl2">${K.map((k,i)=>`<button type="button" class="stpht${typeof prvCls==='function'?prvCls(x,k):''}" data-act="rowPhV" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</span></div>`}
 /* v61.30: همه فهرست‌های انتخابی (کارتخوان، حساب ما، مشتری…) جستجو دارند و فهرست زیرش دیده می‌شود */
 /* v61.31: هر فهرست انتخابی ردیف «افزودن» هم دارد (کارتخوان، حساب ما، مشتری): نام را در جستجو بنویسید و بزنید */
 const pkAddRow=(t,q,act)=>`<button type="button" class="bzsr dkrw nw" data-act="${act}"><span class="av">${ic('plus')}</span><span class="tx"><b>${q?'افزودن «'+esc(q)+'»':t+' تازه'}</b><small>${q?t+' تازه':'نامش را در جستجو بنویسید'}</small></span></button>`;

@@ -464,7 +464,7 @@ ACT.pySave=()=>{pyRead();const p=sv.qa.p;if(!p)return;const amt=+p.amount||0;
   if((p.m==='pos'||p.m==='hav')&&p.bk&&p.cuId){if(String(p.cuId)===String(sv.cuId)){toast('حساب دیگری انتخاب کنید',true);return}Object.assign(o,{cuId:p.cuId,cuName:p.cuName||'',bk:1});if(p.m==='hav')o.tn=p.tn||'';ls.set('m_bk_cu',p.cuId)}
   else if(p.m==='pos'){if(p.srcId!=null&&p.srcId!==''){o.srcId=p.srcId;ls.set('m_src_pos',p.srcId)}else o.chId=p.chId}
   else if(p.m==='hav'){if(p.srcId!=null){o.srcId=p.srcId;ls.set('m_src_hav',p.srcId)}else o.chId=p.chId;o.tn=p.tn||''}
-  const pk=xrPh(p);if(pk.length&&!PHNO.includes(p.m)){o.imgs=pk;o.img=pk[0]}
+  const pk=xrPh(p);if(pk.length&&!PHNO.includes(p.m)){o.imgs=pk;o.img=pk[0]}if(typeof prvKeep==='function')prvKeep(o,p);
   if(p.m==='cust')Object.assign(o,{cuId:p.cuId,cuName:p.cuName||''});if(p.m==='bkx'){o.k=p.k;if(clean(p.why||''))o.why=clean(p.why);if((BKX[p.k]||[])[2]&&!bdReasons().includes(o.why)){const c=cfgRec(1);c.adj=[...(c.adj||[]),o.why];saveCu()}}if(p.m==='adj'){o.why=clean(p.why);if(!bdReasons().includes(o.why)){const c=cfgRec(1);c.adj=[...(c.adj||[]),o.why];saveCu()}}if(p.m==='nm')o.cuName=clean(p.cuName||'');
   /* v61.75: ویرایش ردیف «حواله به فروشنده واریزی» پیوند واریزی را نگه می‌دارد (قبلاً entId پاک می‌شد → سند ثبت نمی‌شد و موقت می‌ماند) */if(p.m==='dep'){if(!p.entId){toast('واریزی این حواله پیدا نشد؛ ردیف را حذف و دوباره اضافه کنید',true);return}Object.assign(o,{entId:p.entId,entName:p.entName||depName(p),...(p.stlId?{stlId:p.stlId}:{})})}
   if(p.i!=null)sv.pays[p.i]=o;else sv.pays.push(o);qaDone()};
@@ -602,7 +602,7 @@ const phName=x=>x===(sv&&sv.qa&&sv.qa.pv)?'مانده قبلی':x===(typeof CK!=
 const phAmt=x=>{try{if(x===(sv&&sv.qa&&sv.qa.pv))return +x.r||0;return phRc(x)?(+x.amount||0):x===(sv&&sv.qa)?itCalc(qaIt(x),sv.rate,sv.tax).tot||0:xrCalc(x,sv.rate).amount||0}catch(_){return 0}};
 async function phPaint(root){for(const im of (root||document).querySelectorAll('img[data-ik]:not([src])')){const v=await imgGet(im.dataset.ik);if(v&&im.isConnected)im.src=v;else if(im.isConnected)im.closest('.ph,.stpht,.cuidp')&&im.closest('.ph,.stpht,.cuidp').classList.add('miss')}}
 function stPhHTML(x0){const x=x0||phT();if(!x)return '';const K=xrPh(x),rc=phRc(x);
-  return `<div class="stph2"><span class="stphl2"><small>${ic('cam')}${K.length?toFa(K.length)+' عکس':rc?'عکس رسید':x===(sv&&sv.qa&&sv.qa.pv)?'عکس':'عکس کالا'}</small>${K.map((k,i)=>`<button type="button" class="stpht" data-act="${x===(typeof CK!=='undefined'&&CK)?'ckPhV':'rowPhV'}" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</span>${phPair(x===(typeof CK!=='undefined'&&CK)?{k:'row',ck:1}:{k:'row'},{cls:'sm'})}</div>`}
+  return `<div class="stph2"><span class="stphl2"><small>${ic('cam')}${K.length?toFa(K.length)+' عکس':rc?'عکس رسید':x===(sv&&sv.qa&&sv.qa.pv)?'عکس':'عکس کالا'}</small>${K.map((k,i)=>`<button type="button" class="stpht${typeof prvCls==='function'?prvCls(x,k):''}" data-act="${x===(typeof CK!=='undefined'&&CK)?'ckPhV':'rowPhV'}" data-i="${i}" aria-label="دیدن عکس"><img data-ik="${esc(k)}" alt=""></button>`).join('')}</span>${phPair(x===(typeof CK!=='undefined'&&CK)?{k:'row',ck:1}:{k:'row'},{cls:'sm'})}</div>`}
 ACT.rowGal=()=>{if(!phT())return;qaRead();openGal({k:'row'})};
 ACT.rowPhV=d=>{if(!phT())return;GAL={k:'row'};zvOpen(+d.i||0)};
 /* عکس ردیف ثبت‌شده: فقط دیدن (data-ks = کلیدها با «,») */

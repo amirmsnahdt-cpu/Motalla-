@@ -213,7 +213,7 @@ function pyDet(p,txId){if(p.m==='dep')return depSub(p,txId);const a=pAmt(p),out=
   return ['تشخیص: '+(out?'پرداخت':'دریافت'),'روش: '+(p.m==='wd'?'واریز بانکی (لیست واریزی)':p.m==='cust'?'حواله دوطرفه بین حساب‌ها':p.m==='nm'?'حواله دستی':M.t),'مبلغ: '+dtT(Math.abs(a)),
     p.srcId!=null?'حساب ما: '+esc(srcName(p.srcId)):'',ch?(p.m==='pos'?'کارتخوان: ':'حساب: ')+esc(ch.name):'',p.m==='wd'&&p.src?'از بانک: '+esc(p.src):'',p.m==='wd'&&p.nm?'تسویه از: '+esc(p.nm):'',
     Y?(out?'به حساب: ':'از حساب: ')+esc(cuName(Y)):'',p.m==='nm'&&p.cuName?'طرف حواله: '+esc(p.cuName):'',p.m==='gold'?'وزن: '+wFmt(p.w)+' گرم':'',p.m==='gold'?'عیار: '+toFa(p.ay||750):'',
-    p.m==='off'?'صفر کردن مانده':'',p.tn?'پیگیری '+esc(p.tn):'',p.note?'توضیح: '+esc(p.note):''].filter(Boolean).join(' · ')}
+    p.m==='off'?'صفر کردن مانده':'',p.tn?'پیگیری '+esc(p.tn):'',p.rv&&p.rv.t?(p.rv.t==='ok'?'رسید بررسی شد · مبلغ درست':'رسید تأیید شد'):'',p.note?'توضیح: '+esc(p.note):''].filter(Boolean).join(' · ')}
 /* دکمه‌های زیر جزئیات دریافت/پرداخت: حواله دوطرفه → حساب و ردیف طرف مقابل؛ واریز بانکی → خود واریزی */
 /* v104.1: حواله مشتری به مشتری در انتظار تأیید — نوار زرد با دکمه تأیید (در سند ثبت‌شده؛ هر دو طرف) و خط «تأیید شد» بعد از آن */
 function pyActs(p,c,txId,no){const cw=p.m==='cust'||p.m==='lnk'&&p.lm==='cust',ok=cw&&!p.wt&&p.okAt;let W='';
