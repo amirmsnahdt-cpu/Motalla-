@@ -47,7 +47,9 @@ const INVCX={'پولی':[0,65],'آبشده':[0,182],'پیش':[0,182],'تعویض
 const invCalG=(words,gap)=>{const K=words.filter(w=>INVCAL[w]),g=gap==null?230:gap,x=w=>INVCX[w]||[0,0];return K.length?{K,g,tot:K.reduce((a,w)=>a+INVCAL[w][0],0)+g*(K.length-1),pl:Math.max(70,x(K[K.length-1])[0]+30),pr:Math.max(70,x(K[0])[1]+30)}:null};
 /* پهنای عنوان نستعلیق به میلی‌متر در ارتفاع h */
 const invCalW=(words,h,gap)=>{const G=invCalG(words,gap);return G?(G.tot+G.pl+G.pr)*h/2380:0};
-function invCal(words,h,gap){const G=invCalG(words,gap);if(!G)return '';const top=-1910,bot=470,sc=h/(bot-top);let x=G.tot,P='';
-  G.K.forEach(w=>{const W=INVCAL[w];x-=W[0];P+=`<path transform="translate(${x} 0)" d="${W[1]}"/>`;x-=G.g});
+/* v109.2 (صاحب اپ: «با سپاس از اعتماد شما نافرم است، صاف‌تر») — جابه‌جایی عمودی هر کلمه تا مرکز جوهرش روی یک خط بنشیند (اندازه‌گیری getBBox: مرکز = −۳۵۰) */
+const INVCY={'با':-107,'سپاس':-151,'از':66,'اعتماد':98,'شما':231};
+function invCal(words,h,gap,lv){const G=invCalG(words,gap);if(!G)return '';const top=-1910,bot=470,sc=h/(bot-top);let x=G.tot,P='';
+  G.K.forEach(w=>{const W=INVCAL[w];x-=W[0];P+=`<path transform="translate(${x} ${lv?(INVCY[w]||0):0})" d="${W[1]}"/>`;x-=G.g});
   return `<svg class="cal" style="overflow:visible" xmlns="http://www.w3.org/2000/svg" viewBox="${-G.pl} ${top} ${G.tot+G.pl+G.pr} ${bot-top}" width="${((G.tot+G.pl+G.pr)*sc).toFixed(2)}mm" height="${h}mm" role="img" aria-label="${words.join(' ')}">${P}</svg>`}
 /* v90.8: مشخصات فروشگاه (cfg.shop: نشانی، تلفن، صفحه) در صفحه «تنظیمات فاکتور» (15zy، بخش پانویس) ویرایش می‌شود */
