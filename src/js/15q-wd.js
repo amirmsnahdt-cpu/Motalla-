@@ -63,7 +63,7 @@ const wdPend=(c,no)=>wdPendL(c,no).reduce((s,o)=>s+o.S.pend,0);
    هر بخش بانکی با تاریخ واریز خودش (بخش‌های یک واریزی می‌توانند تاریخ جدا داشته باشند)؛ تسویه از مشتری در انتظار با تاریخ خود واریزی. خروجی: [{d,a,n}] از نزدیک‌ترین تاریخ */
 function wdSched(c,t){if(!c||!t)return [];const K=x=>String(x.date||'')+'|'+String(x.at0||x.at||''),k=K(t),M=new Map(),A=allocMap();
   wdPendL(c).forEach(({e,S})=>{const d=(c.txs||[]).find(q=>!q.del&&q.type==='inv'&&String(q.no)===String(e.wd.no));if(d&&String(d.id)!==String(t.id)&&String(d.no)!==String(t.no)&&K(d)>k)return;
-    wdParts(e,S,A).forEach(p=>{const x=(p.t==='b'&&p.ent!=null&&entries.find(z=>z.id===p.ent))||e,dt=PD(x)||PD(e)||'';const o=M.get(dt)||M.set(dt,{d:dt,a:0,n:0}).get(dt);o.a+=p.a;o.n++})});
+    wdParts(e,S,A).forEach(p=>{const x=(p.t==='b'&&p.ent!=null&&entries.find(z=>z.id===p.ent))||e,dt=PD(x)||PD(e)||'';const o=M.get(dt)||M.set(dt,{d:dt,a:0,n:0,h:[]}).get(dt);o.a+=p.a;o.n++;/* v109.0: صاحب حساب مقصد (اسم صاحب حساب، وگرنه اسم مشتری روی واریزی) */const hn=holdOf(x)||holdOf(e)||clean(x.name||e.name||'');if(hn&&p.a>0&&!o.h.includes(hn))o.h.push(hn)})});
   return [...M.values()].filter(o=>o.a>0).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0)}
 /* همگام‌سازی: ردیف‌های پرداخت سند با بخش‌های تأییدشده واریزی‌ها (دو طرفه؛ تکراری‌ها یکی می‌شوند) */
 let wdBusy=false;const WDLOG=new Map();

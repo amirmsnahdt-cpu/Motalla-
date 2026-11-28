@@ -269,8 +269,12 @@ function invDoc(c,t,o){o=o||{};const PF=o.prof||invProf(t),S=o.S?invClean({...IN
   const wdD=x=>{if(!x.d)return 'در نوبت واریز است';const D2=dates(x.d),ds=`<b>${esc(D2.wd+' '+D2.fa)}</b>`;return x.d>TDY?`در تاریخ ${ds} واریز خواهد شد`:x.d===TDY?`امروز ${ds} واریز می‌شود`:`در نوبت واریز است <i>(تاریخ واریز ${esc(D2.fa)})</i>`};
   const wdA=a=>`<b class="wa">${nm(a)}</b> تومان`,wdE=!WS0.length?'':Math.abs(WAF)<1?'حساب تومانی مشتری <em class="vz">تسویه</em> است':`مانده حساب ${wdA(WAF)} می‌شود <em class="${cls(WAF)}">(${side(WAF)})</em>`;
   /* یک تاریخ: اگر جا شود همه در یک خط؛ با عددهای خیلی بلند جمله نتیجه به خط دوم می‌رود (پهنا با همان برآورد tw، ضریب از اندازه‌گیری واقعی) */
-  let WL=[];if(WS0.length===1){const a1=`${DIA}مبلغ ${wdA(WS0[0].a)} به حساب مشتری ${wdD(WS0[0])}`,a2=`پس از این واریز، ${wdE}`;WL=tw(a1+' · '+a2)*.95<=181?[a1+'<s>·</s>'+a2]:[a1,'<span class="wsp"></span>'+a2]}
-  else if(WS0.length){const L3=WS0.length>3?WS0.slice(0,2):WS0,RS=WS0.slice(L3.length);WL=L3.map((x,i)=>`${i?'<span class="wsp"></span>':DIA}${i?'و ':'واریز به حساب مشتری: '}${wdA(x.a)} ${wdD(x)}`);
+  /* v109.0 (صاحب اپ): به جای «به حساب مشتری» اسم صاحب حساب(های) مقصد؛ اسم بلند کوتاه می‌شود، بیش از دو حساب = «و N حساب دیگر» */
+  const wdHn=(x,L)=>{const H=(x&&x.h)||[];if(!H.length)return 'به حساب مشتری';const q=n=>{n=String(n);return `«<b>${esc(n.length>L?n.slice(0,L-1)+'…':n)}</b>»`};
+    return H.length===1?`به حساب ${q(H[0])}`:H.length===2?`به حساب‌های ${q(H[0])} و ${q(H[1])}`:`به حساب‌های ${q(H[0])}، ${q(H[1])} و ${toFa(H.length-2)} حساب دیگر`};
+  const wdHf=(x,mk)=>{for(const L of [40,24,16,10]){const l=mk(wdHn(x,L));if(tw(l)*.95<=181)return l}return mk(wdHn(x,8))};
+  let WL=[];if(WS0.length===1){const a1=wdHf(WS0[0],h=>`${DIA}مبلغ ${wdA(WS0[0].a)} ${h} ${wdD(WS0[0])}`),a2=`پس از این واریز، ${wdE}`;WL=tw(a1+' · '+a2)*.95<=181?[a1+'<s>·</s>'+a2]:[a1,'<span class="wsp"></span>'+a2]}
+  else if(WS0.length){const L3=WS0.length>3?WS0.slice(0,2):WS0,RS=WS0.slice(L3.length);WL=L3.map((x,i)=>wdHf(x,h=>`${i?'<span class="wsp"></span>':DIA}${i?'و ':'واریزهای در راه: '}${wdA(x.a)} ${h} ${wdD(x)}`));
     if(RS.length){const lz=RS[RS.length-1],Dz=lz.d?dates(lz.d):null;WL.push(`<span class="wsp"></span>و ${wdA(RS.reduce((s,x)=>s+x.a,0))} در ${toFa(RS.length)} نوبت دیگر${Dz?` تا <b>${esc(Dz.fa)}</b>`:''}`)}
     WL.push(`<span class="wsp"></span>جمع واریزی‌های در راه ${wdA(WST)}<s>·</s>پس از این واریزها، ${wdE}`)}
   /* v106.4 (صاحب اپ): زیر واریزی‌های در راه، شماره پیگیری واریزی‌ها و رسید (تنظیمات فاکتور › حساب مشتری؛ خالی = چاپ نمی‌شود) */
