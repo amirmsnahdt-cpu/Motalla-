@@ -10,6 +10,7 @@ function calHTML(){const{y,m}=cal,n=jDays(y,m),[gy,gm,gd]=j2g(y,m,1),first=(new 
   <div class="calh"><button class="ib0" data-act="calMv" data-d="-1" aria-label="ماه قبل">${ic('back')}</button><b>${JM[m-1]} ${toFa(y)}</b><button class="ib0" data-act="calMv" data-d="1" aria-label="ماه بعد">${ic('back').replace('class="i"','class="i flip"')}</button></div>
   <div class="calw">${['ش','ی','د','س','چ','پ','ج'].map(w=>`<span>${w}</span>`).join('')}</div><div class="calg">${cells.join('')}</div>`}
 ACT.calMv=d=>{let m=cal.m+(+d.d),y=cal.y;if(m<1){m=12;y--}if(m>12){m=1;y++}cal.m=m;cal.y=y;$('sheet').innerHTML=calHTML()};
+ACT.dpQ=d=>{setDp(isoAdd(todayISO(),+d.o),dp.t);buildWheels()};
 ACT.calPick=d=>{const cb=cal.cb;cal.sel=d.iso;closeSheet();if(cb)cb(d.iso)};
 
 ACT.entCommit=()=>entCommit();
